@@ -160,7 +160,7 @@ sub render_subject_form {
         $self->logger->trace("Field '$id': profile spec = " . Dumper $field) if $self->logger->is_trace;
 
         # translate profile field spec to workflow field spec
-        my $renew = OpenXPKI::Client::UI::Handle::Profile::__transform_profile_field($field, $parent_name);
+        my $renew = $self->__transform_profile_field($field, $parent_name);
         $self->logger->trace("Field '$id': transformed to wf spec = " . Dumper $field) if $self->logger->is_trace;
 
         # web UI field spec
@@ -361,50 +361,6 @@ sub render_server_password {
 
     return $self;
 
-}
-
-=head2 __transform_profile_field
-
-Translate legacy and profile-only field attributes (e.g. C<keep>, C<default>
-for placeholder, etc.) to get a definition that matches workflow fields.
-
-B<Please note>: this will modify the given C<$field> HashRef!
-
-=cut
-sub __transform_profile_field {
-    my $field = shift;
-    my $parent_name = shift;
-
-    my $id = delete $field->{id};
-
-    # default to "required" unless explicitely set or...
-    $field->{required} //= 1 unless (
-        (defined $field->{min} && $field->{min} == 0) or
-        ($field->{type} eq 'static')
-    );
-
-    # translate field names in "keys" and adjust parent name
-    if ($field->{keys}) {
-        $field->{name} = $parent_name.'{*}'; # this "parent" field name will be excluded from requests by the web UI
-        for my $variant (@{$field->{keys}}) {
-            $variant->{value} = sprintf('%s{%s}', $parent_name, $variant->{value}), # search tag: #wf_fields_with_sub_items
-        }
-    }
-    else {
-        $field->{name} = sprintf('%s{%s}', $parent_name, $id); # search tag: #wf_fields_with_sub_items
-    }
-
-    # support legacy name "default" for "placeholder"
-    $field->{placeholder} //= $field->{default} if $field->{default};
-    delete $field->{default};
-
-    # support legacy usage of "description" for "tooltip"
-    $field->{tooltip} //= $field->{description} if $field->{description};
-
-    # renewal option
-    my $renew = delete($field->{renew}) // 'preset';
-
-    return $renew;
 }
 
 __PACKAGE__->meta->make_immutable;
