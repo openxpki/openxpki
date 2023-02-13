@@ -1290,12 +1290,12 @@ sub __render_output_field {
     my $field = shift;
     my $context = $wf_info->{workflow}->{context};
 
-    my $key = $field->{name} || '';
-    ##! 64: "Context value for field $key: " . (defined $context->{$key} ? Dumper($context->{$key}) : '')
+    my $fieldname = $field->{name} || '';
+    ##! 64: "Context value for field $fieldname: " . (defined $context->{$fieldname} ? Dumper($context->{$fieldname}) : '')
 
     my $item = {
-        name => $key,
-        value => $field->{value} // (defined $context->{$key} ? $context->{$key} : ''),
+        name => $fieldname,
+        value => $field->{value} // (defined $context->{$fieldname} ? $context->{$fieldname} : ''),
         format =>  $field->{format} || ''
     };
 
@@ -1308,7 +1308,7 @@ sub __render_output_field {
     }
 
     # Suppress key material, exceptions are vollatile and download fields
-    if ($item->{value} =~ /-----BEGIN[^-]*PRIVATE KEY-----/ && $item->{format} ne 'download' && substr($key,0,1) ne '_') {
+    if ($item->{value} =~ /-----BEGIN[^-]*PRIVATE KEY-----/ && $item->{format} ne 'download' && substr($fieldname,0,1) ne '_') {
         $item->{value} = 'I18N_OPENXPKI_UI_WORKFLOW_SENSITIVE_CONTENT_REMOVED_FROM_CONTEXT';
     }
 
@@ -1316,7 +1316,7 @@ sub __render_output_field {
     foreach my $prop (qw(label description tooltip preamble)) {
         $item->{$prop} = $field->{$prop} if $field->{$prop};
     }
-    $item->{label} ||= $key;
+    $item->{label} ||= $fieldname;
 
     my $field_type = $field->{type};
 
@@ -1329,13 +1329,13 @@ sub __render_output_field {
     if (!$item->{format}) {
 
         # create a link on cert_identifier fields
-        if ( $key =~ m{ cert_identifier \z }x ||
+        if ( $fieldname =~ m{ cert_identifier \z }x ||
             $field_type eq 'cert_identifier') {
             $item->{format} = 'cert_identifier';
         }
 
         # Code format any PEM blocks
-        if ( $key =~ m{ \A (pkcs10|pkcs7) \z }x  ||
+        if ( $fieldname =~ m{ \A (pkcs10|pkcs7) \z }x  ||
             $item->{value} =~ m{ \A -----BEGIN([A-Z ]+)-----.*-----END([A-Z ]+)---- }xms) {
             $item->{format} = 'code';
         } elsif ($field_type eq 'textarea') {
@@ -1698,7 +1698,7 @@ sub __render_output_field {
 
     if ($field->{template}) {
 
-        $self->logger()->trace('Render output using template on field '.$key.', '. $field->{template} . ', value:  ' . Dumper $item->{value}) if $self->logger->is_trace;
+        $self->logger->trace("Render output using template on field '$fieldname', template: ".$field->{template}.', value: ' . Dumper $item->{value}) if $self->logger->is_trace;
 
         # Rendering target depends on value format
         # deflist: iterate over each label/value pair and render the value template
