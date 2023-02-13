@@ -5,4 +5,4 @@ New Features
 Upgrades, Improvements and Bugfixes
 
 Removals, Deprecations, Breaking Changes
-
+  + Remove API command "get_cert_subject_styles"
