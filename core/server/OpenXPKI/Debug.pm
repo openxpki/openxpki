@@ -29,6 +29,10 @@ our %BITMASK;
 our $USE_COLOR = 0;
 our $NOCENSOR = 0;
 
+$Data::Dumper::Indent = 1;   # fixed width indentation
+$Data::Dumper::Terse = 1;    # don't output a statement (skip "$VAR1 = ")
+$Data::Dumper::Sortkeys = 1; # sort hash keys
+
 sub import {
     my($self,$module) = @_ ;
     if (not defined $module) {
