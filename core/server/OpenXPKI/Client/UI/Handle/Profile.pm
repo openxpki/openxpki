@@ -104,6 +104,8 @@ sub render_subject_form {
     my $param = shift;
 
     my %extra;
+    # Parameters given in config via:
+    #   uihandle: OpenXPKI::Client::UI::Handle::Profile::render_subject_form!mode!renewal
     if ($param) {
         my @param = split /!/, $param;
         # Legacy format, section only
@@ -115,19 +117,18 @@ sub render_subject_form {
             %extra = @param;
         }
     }
+    $self->logger->trace("Additional parameters via 'uihandle' config: " . Dumper \%extra) if (scalar keys %extra and $self->logger->is_trace);
 
     my $section = $extra{'section'};
-    my $mode = $extra{'mode'} || 'enroll';
+    my $is_renewal = ($extra{'mode'}//'' eq 'renewal');
 
+    # Workflow info
     my $wf_info = $args->{wf_info};
-
     my $context = $wf_info->{workflow}->{context};
 
-    # get profile and style from the context
+    # Profile and style from context
     my $cert_profile = $context->{'cert_profile'};
     my $cert_subject_style = $context->{'cert_subject_style'};
-
-    my $is_renewal = ($mode eq 'renewal');
 
     # Parse out the field name and type, we assume that there is only one activity with one field
     $wf_action = (keys %{$wf_info->{activity}})[0] unless($wf_action);
@@ -135,36 +136,39 @@ sub render_subject_form {
 
     $section = substr($wf_info->{activity}->{$wf_action}->{field}[0]->{type}, 5) unless($section);
 
-    $self->logger()->debug( " Render subject for $parent_name, section $section in $wf_action" );
+    $self->logger->debug("Render subject for '$parent_name', section '$section' in '$wf_action'");
 
     # Allowed types are cert_subject, cert_san, cert_info
     my $profile_fields = $self->send_command_v2('get_field_definition' => {
         profile => $cert_profile, style => $cert_subject_style, 'section' => $section,
     });
 
-    $self->logger()->trace( 'Profile fields' . Dumper $profile_fields ) if $self->logger->is_trace;
-
     # Load preexisiting values from context
     my $values = {};
     if ($context->{$parent_name}) {
-        $values = $self->serializer()->deserialize( $context->{$parent_name} );
+        $values = $self->serializer->deserialize( $context->{$parent_name} );
     }
-    $self->logger()->trace( 'Preset ' . Dumper $values ) if $self->logger->is_trace;
+    $self->logger->trace('Presets: ' . Dumper $values) if $self->logger->is_trace;
 
     my @fielddesc;
-    foreach my $field (@{$profile_fields}) {
-        push @fielddesc, { label => $field->{label}, value => $field->{description}, format => 'raw' } if ($field->{description});
-    }
-
-    # Translate profile field definition to match workflow fields
-    OpenXPKI::Client::UI::Handle::Profile::__translate_profile_fields( $profile_fields, $parent_name, $values, $is_renewal );
-
-    $self->logger()->trace( 'Mapped fields' . Dumper $profile_fields ) if $self->logger->is_trace;
-
     my @fields;
     foreach my $field (@{$profile_fields}) {
-        my ($item, @more_items) = $self->__render_input_field( $field );
+        # description
+        push @fielddesc, { label => $field->{label}, value => $field->{description}, format => 'raw' } if ($field->{description});
+
+        # translate profile field spec to workflow field spec
+        $self->logger->trace('Profile field: ' . Dumper $field) if $self->logger->is_trace;
+
+        OpenXPKI::Client::UI::Handle::Profile::__translate_profile_field($field, $parent_name, $values->{$field->{id}}, $is_renewal);
+
+        $self->logger->trace('Translated wf field: ' . Dumper $field) if $self->logger->is_trace;
+
+        # web UI field spec
+        my ($item, @more_items) = $self->__render_input_field($field, $field->{value});
         next unless $item;
+
+        $self->logger->trace('Web UI field: ' . Dumper $item) if $self->logger->is_trace;
+
         push @fields, $item, @more_items;
     }
 
@@ -358,52 +362,48 @@ for placeholder, etc.) to get a definition that matches workflow fields.
 B<Please note>: this will modify the given C<$fields> HashRef!
 
 =cut
-sub __translate_profile_fields {
-
-    my $fields = shift;
+sub __translate_profile_field {
+    my $field = shift;
     my $parent_name = shift;
-    my $values = shift;
+    my $value = shift;
     my $is_renewal = shift || 0;
 
-    foreach my $field (@{$fields}) {
+    my $id = $field->{id};
+    delete $field->{id};
 
-        my $id = $field->{id};
-        delete $field->{id};
+    # default to "required" unless explicitely set or...
+    $field->{required} //= 1 unless (
+        (defined $field->{min} && $field->{min} == 0) or
+        ($field->{type} eq 'static')
+    );
 
-        # default to "required" unless explicitely set or...
-        $field->{required} //= 1 unless (
-            (defined $field->{min} && $field->{min} == 0) or
-            ($field->{type} eq 'static')
-        );
-
-        # translate field names in "keys" and adjust parent name
-        if ($field->{keys}) {
-            $field->{name} = $parent_name.'{*}'; # this "parent" field name will be excluded from requests by the web UI
-            for my $variant (@{$field->{keys}}) {
-                $variant->{value} = sprintf('%s{%s}', $parent_name, $variant->{value}), # search tag: #wf_fields_with_sub_items
-            }
+    # translate field names in "keys" and adjust parent name
+    if ($field->{keys}) {
+        $field->{name} = $parent_name.'{*}'; # this "parent" field name will be excluded from requests by the web UI
+        for my $variant (@{$field->{keys}}) {
+            $variant->{value} = sprintf('%s{%s}', $parent_name, $variant->{value}), # search tag: #wf_fields_with_sub_items
         }
-        else {
-            $field->{name} = sprintf('%s{%s}', $parent_name, $id); # search tag: #wf_fields_with_sub_items
-        }
-        $field->{value} = $values->{$id};
+    }
+    else {
+        $field->{name} = sprintf('%s{%s}', $parent_name, $id); # search tag: #wf_fields_with_sub_items
+    }
+    $field->{value} = $value;
 
-        # support legacy name "default" for "placeholder"
-        $field->{placeholder} //= $field->{default} if $field->{default};
-        delete $field->{default};
+    # support legacy name "default" for "placeholder"
+    $field->{placeholder} //= $field->{default} if $field->{default};
+    delete $field->{default};
 
-        # support legacy usage of "description" for "tooltip"
-        $field->{tooltip} //= $field->{description} if $field->{description};
+    # support legacy usage of "description" for "tooltip"
+    $field->{tooltip} //= $field->{description} if $field->{description};
 
-        # renewal policy
-        my $renew = $is_renewal ? ($field->{renew} || 'preset') : '';
-        delete $field->{renew};
+    # renewal policy
+    my $renew = $is_renewal ? ($field->{renew} || 'preset') : '';
+    delete $field->{renew};
 
-        if ($renew eq 'clear') {
-            $field->{value} = undef;
-        } elsif ($renew eq 'keep') {
-            $field->{type} = 'static';
-        }
+    if ($renew eq 'clear') {
+        $field->{value} = undef;
+    } elsif ($renew eq 'keep') {
+        $field->{type} = 'static';
     }
 }
 
