@@ -633,7 +633,7 @@ sub render {
     # helper to print HTTP headers
     my $print_headers = sub {
         my $headers = $self->get_header_str($cgi);
-        $self->logger->trace("Response headers: $headers") if $self->logger->is_trace;
+        $self->logger->trace("Response headers:\n$headers") if $self->logger->is_trace;
         print $headers;
     };
 

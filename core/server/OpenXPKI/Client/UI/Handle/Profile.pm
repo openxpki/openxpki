@@ -156,15 +156,15 @@ sub render_subject_form {
         # description
         push @fielddesc, { label => $field->{label}, value => $field->{description}, format => 'raw' } if ($field->{description});
 
-        # translate profile field spec to workflow field spec
-        $self->logger->trace('Profile field: ' . Dumper $field) if $self->logger->is_trace;
-
         my $id = $field->{id};
+        $self->logger->trace("Field '$id': profile spec = " . Dumper $field) if $self->logger->is_trace;
+
+        # translate profile field spec to workflow field spec
         my $renew = $is_renewal ? ($field->{renew} || 'preset') : '';
         delete $field->{renew};
 
-        OpenXPKI::Client::UI::Handle::Profile::__translate_profile_field($field, $parent_name);
-        $self->logger->trace('Translated wf field: ' . Dumper $field) if $self->logger->is_trace;
+        OpenXPKI::Client::UI::Handle::Profile::__transform_profile_field($field, $parent_name);
+        $self->logger->trace("Field '$id': transformed to wf spec = " . Dumper $field) if $self->logger->is_trace;
 
         # web UI field spec
         my ($item, @more_items) = $self->__render_input_field($field, $values->{$id});
@@ -177,7 +177,7 @@ sub render_subject_form {
             $item->{type} = 'static';
         }
 
-        $self->logger->trace('Web UI field: ' . Dumper $item) if $self->logger->is_trace;
+        $self->logger->trace("Field '$id': transformed to web ui spec = " . Dumper $item) if $self->logger->is_trace;
 
         push @fields, $item, @more_items;
     }
@@ -364,7 +364,7 @@ sub render_server_password {
 
 }
 
-=head2 __translate_profile_field
+=head2 __transform_profile_field
 
 Translate legacy and profile-only field attributes (e.g. C<keep>, C<default>
 for placeholder, etc.) to get a definition that matches workflow fields.
@@ -372,7 +372,7 @@ for placeholder, etc.) to get a definition that matches workflow fields.
 B<Please note>: this will modify the given C<$fields> HashRef!
 
 =cut
-sub __translate_profile_field {
+sub __transform_profile_field {
     my $field = shift;
     my $parent_name = shift;
 
