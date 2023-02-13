@@ -73,19 +73,7 @@ export default {
             {
                 format: "email",
                 label: "email",
-                value: {
-                    address: "office@whiterabbitsecurity.com",
-                    tooltip: "WRS",
-                },
-            },
-            {
-                format: "email",
-                label: "email (labeled)",
-                value: {
-                    address: "office@whiterabbitsecurity.com",
-                    label: "WRS",
-                    tooltip: "WRS",
-                },
+                value: "office@whiterabbitsecurity.com",
             },
             {
                 format: "tooltip",

@@ -57,8 +57,8 @@
         </a>
 
     {{else if (eq "email" this.format)}}
-        <a href="mailto:{{v.address}}" title={{v.tooltip}} class="oxi-formatted-email {{@class}}">
-            <OxiBase::Label @text={{try v.label v.address}} />
+        <a href="mailto:{{v}}" class="oxi-formatted-email {{@class}}">
+            <OxiBase::Label @text={{v}} />
         </a>
 
     {{else if (eq "tooltip" this.format)}}
