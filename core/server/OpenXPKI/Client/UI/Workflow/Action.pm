@@ -90,11 +90,6 @@ sub action_index {
         $self->logger()->trace( "wf fields: " . Dumper \%wf_param ) if $self->logger->is_trace;
     }
 
-    # take over params from token, if any
-    if($wf_args->{wf_param}) {
-        %wf_param = (%wf_param, %{$wf_args->{wf_param}});
-    }
-
     $self->logger()->trace( "wf params: " . Dumper \%wf_param ) if $self->logger->is_trace;
     ##! 64: "wf params: " . Dumper \%wf_param
 
