@@ -13,6 +13,7 @@ use Template;
 use Data::Dumper;
 
 # Project modules
+use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Plugin::Profile::Util;
 
@@ -84,6 +85,8 @@ command "preset_subject_parts_from_profile" => {
     die "Either 'fields' or 'style' must be specified"
      unless $params->has_fields || $params->has_style;
 
+    ##! 16: "Preset values = " . Dumper $params->preset
+
     my %args = (
         profile => $params->profile,
         section => $params->section,
@@ -99,6 +102,7 @@ command "preset_subject_parts_from_profile" => {
     my $cert_subject_parts;
     FIELDS:
     foreach my $field (@{$fields}) {
+        ##! 16: "Field = " . Dumper $field
         # Check if there is a preset template
         my $preset = $field->{preset};
         next FIELDS unless ($preset);
@@ -130,7 +134,7 @@ command "preset_subject_parts_from_profile" => {
         } elsif ($preset =~ m{ \A \s* ([a-z]+)\.(\w+) \s* \z }xs) {
             my $sect = $1;
             my $comp = $2;
-            ##! 16: "Extra info $sect -> $comp"
+            ##! 16: "Extra info: $sect -> $comp"
             next FIELDS unless (ref $params->preset->{$sect} eq 'HASH');
             my $val = $params->preset->{$sect}->{$comp};
             if (defined $val && $val ne '') {
@@ -139,11 +143,17 @@ command "preset_subject_parts_from_profile" => {
         # Should be a TT or fixed string
         } else {
             my $val;
-            $tt->process(\$preset, $params->preset, \$val) || OpenXPKI::Exception->throw(
-                message => 'Preset profile fields TT failed',
-                params => { PROFILE => $params->profile, STYLE => $params->has_style ? $params->style : undef,
-                    FIELD => $field, PATTERN => $preset, 'ERROR' => $tt->error() }
-            );
+            $tt->process(\$preset, $params->preset, \$val)
+                or OpenXPKI::Exception->throw(
+                    message => 'Preset profile fields TT failed',
+                    params => {
+                        PROFILE => $params->profile,
+                        STYLE => $params->has_style ? $params->style : undef,
+                        FIELD => $field,
+                        PATTERN => $preset,
+                        ERROR => $tt->error(),
+                    }
+                );
 
             ##! 16: "Template result: $val"
             # cloneable fields cn return multiple values using a pipe as seperator
@@ -158,11 +168,11 @@ command "preset_subject_parts_from_profile" => {
         ##! 16: 'Result ' . Dumper \@val
         if (scalar @val) {
             if ($field->{clonable}) {
-                $cert_subject_parts->{ $field->{id} } = \@val;
+                $cert_subject_parts->{ $field->{name} } = \@val;
                 CTX('log')->application()->debug("subject preset - field $field, pattern $preset, values " . join('|', @val));
 
             } else {
-                $cert_subject_parts->{ $field->{id} } = $val[0];
+                $cert_subject_parts->{ $field->{name} } = $val[0];
 
                 CTX('log')->application()->debug("subject preset - field $field, pattern $preset, value " . $val[0]);
 

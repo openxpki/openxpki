@@ -1503,7 +1503,7 @@ sub __render_output_field {
             $item->{value}->{autodownload} = 1;
         }
 
-    # format for cert_info block
+    # legacy format for cert_info block
     } elsif ($item->{format} eq "cert_info") {
         $item->{format} = 'deflist';
 
@@ -1519,13 +1519,15 @@ sub __render_output_field {
                 $raw = {};
             }
 
-            my $fields = $self->send_command_v2( 'get_field_definition',
-                { profile => $cert_profile, style => $cert_subject_style, 'section' =>  'info' });
-            $self->logger()->trace( 'Profile fields' . Dumper $fields ) if $self->logger->is_trace;
+            my $fields = $self->send_command_v2(get_field_definition => {
+                profile => $cert_profile,
+                style => $cert_subject_style,
+                section => 'info',
+            });
+            $self->logger->trace('Profile fields = ' . Dumper $fields) if $self->logger->is_trace;
 
             foreach my $field (@$fields) {
-                # FIXME this still uses "old" syntax - adjust after API refactoring
-                my $key = $field->{id}; # Name of the context key
+                my $key = $field->{name}; # Name of the context key
                 if ($raw->{$key}) {
                     push @val, { label => $field->{label}, value => $raw->{$key}, key => $key };
                 }
@@ -2117,51 +2119,6 @@ sub __render_workflow_action_body {
             }
         }) if scalar @fielddesc;
     }
-}
-
-=head2 __transform_profile_field
-
-Translate legacy and profile-only field attributes (e.g. C<keep>, C<default>
-for placeholder, etc.) to get a definition that matches workflow fields.
-
-B<Please note>: this will modify the given C<$field> I<HashRef> in-place!
-
-=cut
-sub __transform_profile_field {
-    my $self = shift;
-    my $field = shift;
-    my $parent_name = shift;
-
-    my $id = delete $field->{id};
-
-    # default to "required" unless explicitely set or...
-    $field->{required} //= 1 unless (
-        (defined $field->{min} && $field->{min} == 0) or
-        ($field->{type} eq 'static')
-    );
-
-    # translate field names in "keys" and adjust parent name
-    if ($field->{keys}) {
-        $field->{name} = $parent_name.'{*}'; # this "parent" field name will be excluded from requests by the web UI
-        for my $variant (@{$field->{keys}}) {
-            $variant->{value} = sprintf('%s{%s}', $parent_name, $variant->{value}), # search tag: #wf_fields_with_sub_items
-        }
-    }
-    else {
-        $field->{name} = sprintf('%s{%s}', $parent_name, $id); # search tag: #wf_fields_with_sub_items
-    }
-
-    # support legacy name "default" for "placeholder"
-    $field->{placeholder} //= $field->{default} if $field->{default};
-    delete $field->{default};
-
-    # support legacy usage of "description" for "tooltip"
-    $field->{tooltip} //= $field->{description} if $field->{description};
-
-    # renewal option
-    my $renew = delete($field->{renew}) // 'preset';
-
-    return $renew;
 }
 
 sub __save_query {

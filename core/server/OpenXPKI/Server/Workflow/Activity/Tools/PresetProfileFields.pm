@@ -108,13 +108,13 @@ sub execute {
         my $fields = CTX('api2')->get_field_definition(
             profile => $cert_profile,
             style => $cert_subject_style,
-            section => 'san'
+            section => 'san',
         );
         ##! 16: 'san ui definition:' . Dumper $fields
         my $cert_san_parts;
         # Get all allowed san types
         foreach my $field (@{$fields}) {
-            my $keys = ref $field->{keys} ? $field->{keys} : [ $field->{id} ];
+            my $keys = ref $field->{keys} ? $field->{keys} : [ $field->{name} ];
             ##! 16: 'testing keys:' . join "-", @{$keys}
             foreach my $key (@{$keys}) {
                 # hash items are mixed case

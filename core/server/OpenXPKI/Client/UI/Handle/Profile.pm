@@ -139,8 +139,10 @@ sub render_subject_form {
     $self->logger->debug("Render subject for '$parent_name', section '$section' in '$wf_action'");
 
     # Allowed types are cert_subject, cert_san, cert_info
-    my $profile_fields = $self->send_command_v2('get_field_definition' => {
-        profile => $cert_profile, style => $cert_subject_style, 'section' => $section,
+    my $profile_fields = $self->send_command_v2(get_field_definition => {
+        profile => $cert_profile,
+        style => $cert_subject_style,
+        section => $section,
     });
 
     # Load preexisiting values from context
@@ -153,30 +155,41 @@ sub render_subject_form {
     my @fielddesc;
     my @fields;
     foreach my $field (@{$profile_fields}) {
+        my $name = $field->{name};
+
         # description
-        push @fielddesc, { label => $field->{label}, value => $field->{description}, format => 'raw' } if ($field->{description});
+        push @fielddesc, {
+            label => $field->{label},
+            value => $field->{description},
+            format => 'raw',
+        } if $field->{description};
 
-        my $id = $field->{id};
-        $self->logger->trace("Field '$id': profile spec = " . Dumper $field) if $self->logger->is_trace;
-
-        # translate profile field spec to workflow field spec
-        my $renew = $self->__transform_profile_field($field, $parent_name);
-        $self->logger->trace("Field '$id': transformed to wf spec = " . Dumper $field) if $self->logger->is_trace;
+        # translate field names in "keys" and adjust parent name
+        if ($field->{keys}) {
+            $field->{name} = $parent_name.'{*}'; # this "parent" field name will not be sent in requests by the web UI
+            for my $variant (@{$field->{keys}}) {
+                $variant->{value} = sprintf('%s{%s}', $parent_name, $variant->{value}), # search tag: #wf_fields_with_sub_items
+            }
+        }
+        # translate field name to include "parent"
+        else {
+            $field->{name} = sprintf('%s{%s}', $parent_name, $name); # search tag: #wf_fields_with_sub_items
+        }
 
         # web UI field spec
-        my ($item, @more_items) = $self->__render_input_field($field, $values->{$id});
+        my ($item, @more_items) = $self->__render_input_field($field, $values->{$name});
         next unless $item;
 
         # renewal policy - after __render_input_field() because value might get overridden
         if ($is_renewal) {
-            if ($renew eq 'clear') {
+            if ($field->{renew} eq 'clear') {
                 $item->{value} = undef;
-            } elsif ($renew eq 'keep') {
+            } elsif ($field->{renew} eq 'keep') {
                 $item->{type} = 'static';
             }
         }
 
-        $self->logger->trace("Field '$id': transformed to web ui spec = " . Dumper $item) if $self->logger->is_trace;
+        $self->logger->trace("Field '$name': transformed to web ui spec = " . Dumper $item) if $self->logger->is_trace;
 
         push @fields, $item, @more_items;
     }

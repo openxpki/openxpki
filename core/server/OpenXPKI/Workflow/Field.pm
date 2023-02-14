@@ -5,7 +5,7 @@ use Moose;
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::MooseParams;
-use OpenXPKI::Workflow::Factory;
+use OpenXPKI::Server::Context qw( CTX );
 
 has 'config' => (
     is => 'rw',
@@ -25,10 +25,27 @@ has 'field' => (
     required => 1,
 );
 
+has 'is_profile_field' => (
+    is => 'rw',
+    isa => 'Bool',
+    default => 0,
+);
 
+has 'log' => (
+    is => 'ro',
+    isa => 'Object',
+    lazy => 1,
+    default => sub { CTX('log')->workflow },
+);
+
+
+# B<Please note>: this will modify the given C<$field> I<HashRef> in-place!
 sub process {
     my $class = shift;
     my $self = $class->new(@_);
+
+    $self->transform_profile_field if $self->is_profile_field;
+    # profile-only attributes after transformation: "renew", "preset"
 
     # "type" default
     $self->field->{type} //= 'text';
@@ -145,6 +162,41 @@ sub perlre_to_ecma {
     $ecma_re =~ s/\\[zZ]$/\$/;                 # \z -> $
 
     $self->field->{ecma_match} = $ecma_re;
+}
+
+=head2 _transform_profile_field
+
+Translate legacy and profile-only field attributes (e.g. C<keep>, C<default>
+for placeholder, etc.) to get a definition that matches workflow fields.
+
+=cut
+sub transform_profile_field {
+    my $self = shift;
+    my $parent_name = shift;
+
+    $self->log->trace("Field '".$self->field->{id}."': profile spec = " . Dumper $self->field) if $self->log->is_trace;
+
+    # id -> name
+    my $id = delete $self->field->{id};
+    $self->field->{name} = $id;
+
+    # renewal option
+    $self->field->{renew} //= 'preset';
+
+    # default to "required" unless explicitely set or...
+    $self->field->{required} //= 1 unless (
+        (defined $self->field->{min} && $self->field->{min} == 0) or
+        ($self->field->{type} eq 'static')
+    );
+
+    # support legacy name "default" for "placeholder"
+    $self->field->{placeholder} //= $self->field->{default} if $self->field->{default};
+    delete $self->field->{default};
+
+    # support legacy usage of "description" for "tooltip"
+    $self->field->{tooltip} //= $self->field->{description} if $self->field->{description};
+
+    $self->log->trace("Field '$id': transformed to wf spec = " . Dumper $self->field) if $self->log->is_trace;
 }
 
 __PACKAGE__->meta->make_immutable;

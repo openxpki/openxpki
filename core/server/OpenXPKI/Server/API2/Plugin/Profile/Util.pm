@@ -70,6 +70,7 @@ sub get_input_elements {
 
         OpenXPKI::Workflow::Field->process(
             field => \%lcinput,
+            is_profile_field => 1,
             config => $config,
             path => $input_path,
         );

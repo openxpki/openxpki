@@ -274,12 +274,16 @@ sub execute {
 
         if ($csr_san) {
             my $san_names = CTX('api2')->list_supported_san();
-            my $fields = CTX('api2')->get_field_definition( profile => $cert_profile, style => $cert_subject_style, section => 'san' );
+            my $fields = CTX('api2')->get_field_definition(
+                profile => $cert_profile,
+                style => $cert_subject_style,
+                section => 'san',
+            );
             ##! 16: 'san ui definition:' . Dumper $fields
             my $cert_san_parts;
             # Get all allowed san types
             foreach my $field (@{$fields}) {
-                my $keys = ref $field->{keys} ? $field->{keys} : [ $field->{id} ];
+                my $keys = ref $field->{keys} ? $field->{keys} : [ $field->{name} ];
                 ##! 16: 'testing keys:' . join "-", @{$keys}
                 foreach my $key (@{$keys}) {
                     # hash items are mixed case
@@ -309,7 +313,7 @@ sub execute {
             profile => $cert_profile,
             style => $cert_subject_style,
             section => 'info',
-            preset =>  { %{$hashed_dn}, ( userinfo => $userinfo ) },
+            preset => { %{$hashed_dn}, ( userinfo => $userinfo ) },
         );
         if ($cert_info) {
             $param->{$subject_prefix.'info'} = $cert_info;
