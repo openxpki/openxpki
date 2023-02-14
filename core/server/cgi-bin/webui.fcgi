@@ -127,21 +127,23 @@ sub __handle_error {
     return;
 }
 
+# Returns the Crypt::CBC cipher to use for cookie encryption or undef if no
+# session.cookey config entry is defined.
 sub __get_cookie_cipher {
 
     my $key = $conf->{session}->{cookey} || '';
-    # a list of ENV variables, added to the cookie passphrase
-    # binds the cookie encyption to the system environment
-    # Even if the Cryrp::CBC module will run a hash on the passphrase
-    # we directly use sha256 here to preprocess the input data one by one
-    # to keep the memory footprint as small as possible
+    # Fingerprint: a list of ENV variables, added to the cookie passphrase,
+    # binds the cookie encyption to the system environment.
+    # Even though Crypt::CBC will run a hash on the passphrase we still use
+    # sha256 here to preprocess the input data one by one to keep the memory
+    # footprint as small as possible.
     if ($conf->{session}->{fingerprint}) {
         $log->trace('Use fingerprint for cookie encryption: ' . $conf->{session}->{fingerprint});
         my $sha = Digest::SHA->new('sha256');
-        $sha->add($key) if ($key);
-        map { $sha->add($ENV{$_}) if ($ENV{$_}); } split /\W+/, $conf->{session}->{fingerprint};
+        $sha->add($key) if $key;
+        map { $sha->add($ENV{$_}) if $ENV{$_} } split /\W+/, $conf->{session}->{fingerprint};
         $key = $sha->digest;
-        $log->trace(sprintf('Cookie encryption key: %*vx', '', $key)) if ($log->trace);
+        $log->trace(sprintf('Cookie encryption key: %*vx', '', $key)) if $log->trace;
     }
     return unless ($key);
     my $cipher = Crypt::CBC->new(
@@ -156,9 +158,10 @@ sub __get_cookie_cipher {
 while (my $cgi = CGI::Fast->new()) {
     $log->debug('check for cgi session, fcgi pid '. $$ );
 
+    my $cipher = __get_cookie_cipher();
     my $session_cookie = OpenXPKI::Client::UI::SessionCookie->new(
         cgi => $cgi,
-        cipher => __get_cookie_cipher(),
+        $cipher ? (cipher => $cipher) : (),
     );
 
     my $sess_id;

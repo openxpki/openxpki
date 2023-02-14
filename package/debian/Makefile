@@ -23,6 +23,7 @@ EXTERNAL=				\
 	DBIx__Handler \
 	DBIx__TransactionManager \
 	Feature__Compat__Try \
+	Syntax__Keyword__Try \
 	Git__PurePerl \
 	JSON__MaybeXS \
 	Log__Log4perl__Layout__JSON \

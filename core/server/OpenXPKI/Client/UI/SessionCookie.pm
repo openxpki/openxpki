@@ -119,6 +119,8 @@ the session ID.
 
 Throws an error if the decryption fails.
 
+Returns C<undef> if no cookie was found.
+
 =cut
 sub fetch_id {
     my $self = shift;
@@ -133,12 +135,14 @@ Encrypt the given value.
 Returns the encrypted value if a cipher was configured, or the plain input value
 otherwise.
 
+Returns an empty string if no value was given.
+
 =cut
 sub _encrypt {
     my $self = shift;
     my $value = shift;
 
-    return $value unless $value;
+    return '' unless defined $value;
     return $value unless $self->has_cipher;
 
     return encode_base64($self->cipher->encrypt($value));
@@ -156,7 +160,7 @@ sub _decrypt {
     my $self = shift;
     my $value = shift;
 
-    return $value unless $value;
+    return unless defined $value;
     return $value unless $self->has_cipher;
 
     my $plain;
