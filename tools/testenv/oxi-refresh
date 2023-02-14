@@ -158,12 +158,18 @@ TestAccounts:
         caop:
             digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
             role: CA Operator
+            realname: Christina Op
+            email: ca@example.org
         raop:
             digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
             role: RA Operator
+            realname: Richard Alfred Op
+            email: ra@example.org
         user:
             digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
             role: User
+            realname: User No. 1
+            email: user@example.org
 __HANDLER
 fi
 
