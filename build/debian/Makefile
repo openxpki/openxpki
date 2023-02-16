@@ -3,6 +3,8 @@ EXTRA_DIRS=packages repository extra
 
 -include Makefile.local
 
+.PHONY: dirs
+
 all: cpan openxpki repo test
 
 Makefile.local: ;
@@ -23,9 +25,11 @@ upload:
 	rsync -av repository/* packages.openxpki.org:/var/www/hosts/packages.openxpki.org/v3/debian/
 
 $(EXTRA_DIRS):
-	mkdir -m 755 -p $@
+	@mkdir -m 755 -p $@
 
-repo: repository extra packages
+dirs: $(EXTRA_DIRS)
+
+repo:
 	docker run --rm -ti \
 		-v $(abspath ../../):/openxpki:ro \
 		-v $(abspath repository):/repository \
