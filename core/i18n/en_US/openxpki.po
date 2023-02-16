@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2023-01-18 15:22+0100\n"
+"PO-Revision-Date: 2023-02-16 16:42+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -52,6 +52,18 @@ msgstr "Approve Revocation"
 
 msgid "I18N_OPENXPKI_UI_BULK_APPROVE_CSR_LABEL"
 msgstr "Approve Request"
+
+msgid "I18N_OPENXPKI_UI_BULK_FAILED_WORKFLOW_DESCRIPTION"
+msgstr "Resume or discard workflows in exception state."
+
+msgid "I18N_OPENXPKI_UI_BULK_FAILED_WORKFLOW_LABEL"
+msgstr "Failed Workflows"
+
+msgid "I18N_OPENXPKI_UI_BULK_PAUSED_WORKFLOW_DESCRIPTION"
+msgstr "Wakeup or discard workflows in paused state."
+
+msgid "I18N_OPENXPKI_UI_BULK_PAUSED_WORKFLOW_LABEL"
+msgstr "Paused Workflows"
 
 msgid "I18N_OPENXPKI_UI_BULK_PENDING_REQUEST_DESCRIPTION"
 msgstr "Bulk approve or reject outstanding certificate signing requests."
@@ -2100,8 +2112,8 @@ msgstr ""
 "user role or for all users. If a general and a role specific message is "
 "defined, only the one for the role is shown. If you specify a link url, a "
 "new browser window opens with the given url when the user clicks on the "
-"message box. To delete an existing MOTD, just define a new one with the not "
-"valid after date set to now."
+"message box. To delete an existing MOTD, submit this form with the message "
+"field left empty"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_MOTD_INITIALIZE_LABEL"
 msgstr "Set Information"
@@ -3411,6 +3423,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_LINK_MESSAGE_LABEL"
 msgstr "Link"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_MESSAGE_REMOVED_LABEL"
+msgstr "The message for the given role was removed from the system."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_VALIDATOR_EXPIRATION_DATE_FAILED"
 msgstr "The Not Valid After date must be in the future!"
 
@@ -4158,6 +4173,16 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_PREREG_LABEL"
 msgstr "Certificate Enrollment (Prereg)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_DESC"
+msgstr ""
+"With certificate preregistration you can request the assignment of  "
+"hostnames to a commonName for later enrollment via an automated interface "
+"using a API key."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_LABEL"
+msgstr "Preregistration Request Report"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_DESC"
 msgstr "Publish certificate information to defined repositories."

@@ -70,6 +70,22 @@ msgid "I18N_OPENXPKI_UI_BULK_APPROVE_CSR_LABEL"
 msgstr "Профиль пользователя"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_BULK_FAILED_WORKFLOW_DESCRIPTION"
+msgstr "Описания пока нет"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BULK_FAILED_WORKFLOW_LABEL"
+msgstr "Последнее обновление"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BULK_PAUSED_WORKFLOW_DESCRIPTION"
+msgstr "Описания пока нет"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BULK_PAUSED_WORKFLOW_LABEL"
+msgstr "Последнее обновление"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_BULK_PENDING_REQUEST_DESCRIPTION"
 msgstr "Описания пока нет"
 
@@ -4522,6 +4538,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_LINK_MESSAGE_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_MESSAGE_REMOVED_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_VALIDATOR_EXPIRATION_DATE_FAILED"
 msgstr "Экспорт"
 
@@ -5396,6 +5416,14 @@ msgstr "Экспорт"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_PREREG_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_DESC"
+msgstr "Экспорт"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
@@ -14089,14 +14117,6 @@ msgstr "Имя учетной записи"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_AUTH_LABEL"
-#~ msgstr "Родительский технологический процесс"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_DESC"
-#~ msgstr "Экспорт"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_LABEL"
 #~ msgstr "Родительский технологический процесс"
 
 #, fuzzy
