@@ -43,7 +43,7 @@ sub validate {
     ##! 1: 'start'
 
     if (!defined $value || $value eq '') {
-         CTX('log')->application()->info("Regex validator skipped - value is empty");
+         CTX('log')->application()->debug("Regex validator skipped - value is empty");
 
         return 1;
     }
