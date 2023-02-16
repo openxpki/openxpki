@@ -76,7 +76,12 @@ command "is_token_usable" => {
     }
     my $token_type = $types{$1};
 
-    my $token = CTX('crypto_layer')->get_token({ TYPE => $token_type, NAME => $params->alias });
+    my $token;
+    eval { $token = CTX('crypto_layer')->get_token({ TYPE => $token_type, NAME => $params->alias }); };
+    if (!$token) {
+        CTX('log')->application()->error('Unable to get token from TokenManager');
+        return;
+    }
 
     my $operation;
     if ($params->engine) {
