@@ -1,28 +1,14 @@
 package OpenXPKI::Config::Lint::Dummy;
 
 use Moose;
-with 'OpenXPKI::Config::Lint::Role';
+with 'OpenXPKI::Config::Lint::RealmRole';
 
-use Data::Dumper;
-
-sub lint {
-
+sub lint_realm {
     my $self = shift;
-    my $config = shift;
+    my $realm = shift;
 
-    foreach my $realm ($config->get_keys(['system','realms'])) {
-        $self->logger()->debug('Checking realm ' . $realm);
-        next if $config->exists(['realm', $realm]);
-
-        $self->logger()->error('Configuration for ' . $realm . 'is missing');
-        push @{$self->error}, "Realm config missing for $realm";
-
-    }
-
-    if ($self->error->[0]) {
-        return sprintf 'Configuration missing for %01d realm(s)', scalar @{$self->error};
-    }
-    return;
+    $self->log->debug('Checking realm ' . $realm);
+    $self->log_error("Configuration is missing") unless $self->config->exists(['realm', $realm]);
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -42,7 +28,7 @@ object (OpenXPKI::Config::Backend) as parameter.
 The method should return a string with a description of the errors detected.
 It MUST return false/undef in case the lint was successful. In case you want
 to provide additional output, write to the Log4perl logger which is available
-via the I<logger> attribute of the class. Additional errors can be placed in
+via the I<log> attribute of the class. Additional errors can be placed in
 the I<error> attribute.
 
 Subclasses SHOULD include C<OpenXPKI::Config::Lint::Role> (Moose::Role).

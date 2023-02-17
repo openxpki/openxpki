@@ -85,13 +85,12 @@ OpenXPKI/Client/UI/Workflow.pm
 OpenXPKI/Client/UI/Workflow/Action.pm
 OpenXPKI/Client/UI/Workflow/Init.pm
 
-
 ## Config Layers
 OpenXPKI/Config/Backend.pm
 OpenXPKI/Config/Loader.pm
 OpenXPKI/Config/Lint/Dummy.pm
+OpenXPKI/Config/Lint/RealmRole.pm
 OpenXPKI/Config/Lint/Role.pm
-
 
 # Config Connector
 OpenXPKI/Connector/DataPool.pm

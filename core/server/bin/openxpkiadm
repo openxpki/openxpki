@@ -1697,13 +1697,13 @@ if ($cmd eq 'initdb') {
             print "Unable to load lint module $module\n";
             print STDERR $EVAL_ERROR;
         } else {
-            print "Lint $module: ";
-            my $err = $class->new()->lint($c);
+            print "Lint module '$module':\n";
+            my $err = $class->new(config => $c)->lint;
             if ($err) {
-                print "\n$err\n";
+                print "$err errors found.\n";
                 $ret = 3
             } else {
-                print "ok\n";
+                print "OK.\n";
             }
         }
     }
