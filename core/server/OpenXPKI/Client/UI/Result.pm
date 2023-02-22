@@ -413,10 +413,11 @@ sub set_status_from_error_reply {
 
 =head2 param
 
-Returns a single input parameter, i.e. real CGI parameters and those appended
-to the action name using C<!>. Parameters from the action name have precedence.
+Returns a single input parameter value, i.e. real CGI parameters and those
+appended to the action name using C<!>. Parameters from the action name have
+precedence.
 
-If the input parameter has got multiple values then only the first value is
+If the input parameter is a list (multiple values) then only the first value is
 returned.
 
 B<Parameters>
@@ -442,6 +443,22 @@ sub param {
     my @val = $self->__param($key);
     return $val[0];
 }
+
+=head2 multi_param
+
+Returns a list with an input parameters' values (multi-value field, most
+likely a clonable field).
+
+B<Parameters>
+
+=over
+
+=item * I<Str> C<$key> - parameter name to retrieve: a plain parameter name or
+a stringified hash (e.g. C<key_param{curve_name}>).
+
+=back
+
+=cut
 
 sub multi_param {
 
@@ -509,6 +526,24 @@ sub __fetch_status {
     return $status;
 }
 
+=head2 param_from_fields
+
+Returns a I<HashRef> with field names and their values.
+
+The list of fields to query is taken from the given specification I<HashRef>,
+the values originate from the request (see
+L<OpenXPKI::Client::UI::Result/multi_param>).
+
+B<Positional parameters>
+
+=over
+
+=item * C<$fields> I<HashRef> - field specifications as returned by
+L<OpenXPKI::Client::UI::Workflow/__render_input_field>
+
+=back
+
+=cut
 sub param_from_fields {
 
     my ($self, $fields) = @_;
@@ -533,14 +568,15 @@ sub param_from_fields {
             $vv = $v_list[0];
         }
 
+        # cert profile field name including sub item (e.g. "cert_info{requestor_email}") - search tag: #wf_fields_with_sub_items
         if ($name =~ m{ \A (\w+)\{(\w+)\} \z }xs) {
             $param->{$1} ||= ();
             $param->{$1}->{$2} = $vv;
+        # plain field name
         } else {
             $param->{$name} = $vv;
         }
     }
-    $self->logger()->trace( "params: " . Dumper $param ) if $self->logger->is_trace;
     return $param;
 }
 
@@ -631,7 +667,7 @@ sub render {
     # helper to print HTTP headers
     my $print_headers = sub {
         my $headers = $self->get_header_str($cgi);
-        $self->logger->trace("Response headers: $headers") if $self->logger->is_trace;
+        $self->logger->trace("Response headers:\n$headers") if $self->logger->is_trace;
         print $headers;
     };
 

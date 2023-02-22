@@ -77,7 +77,7 @@ sub action_index {
 
     my $wf_args = $self->__fetch_wf_token( $wf_token );
 
-    $self->logger()->trace( "wf args: " . Dumper $wf_args) if $self->logger->is_trace;
+    $self->logger->trace("wf args from token: " . Dumper $wf_args) if $self->logger->is_trace;
 
     # check for delegation
     if ($wf_args->{wf_handler}) {
@@ -87,16 +87,8 @@ sub action_index {
     my %wf_param;
     if ($wf_args->{wf_fields}) {
         %wf_param = %{$self->param_from_fields( $wf_args->{wf_fields} )};
-        $self->logger()->trace( "wf fields: " . Dumper \%wf_param ) if $self->logger->is_trace;
+        $self->logger->trace( "wf parameters from request: " . Dumper \%wf_param ) if $self->logger->is_trace;
     }
-
-    # take over params from token, if any
-    if($wf_args->{wf_param}) {
-        %wf_param = (%wf_param, %{$wf_args->{wf_param}});
-    }
-
-    $self->logger()->trace( "wf params: " . Dumper \%wf_param ) if $self->logger->is_trace;
-    ##! 64: "wf params: " . Dumper \%wf_param
 
     if ($wf_args->{wf_id}) {
 

@@ -403,6 +403,7 @@ OpenXPKI/SOAP/Revoke.pm
 OpenXPKI/Workflow/Config.pm
 OpenXPKI/Workflow/Context.pm
 OpenXPKI/Workflow/Factory.pm
+OpenXPKI/Workflow/Field.pm
 OpenXPKI/Workflow/Handler.pm
 
 OpenXPKI/Server/Watchdog.pm

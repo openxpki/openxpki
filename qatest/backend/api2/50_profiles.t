@@ -161,7 +161,7 @@ $result = $oxitest->api2_command("get_field_definition" => {
 cmp_deeply $result, superbagof(
     map {
         superhashof({
-            id => $_,
+            name => $_,
             type => ignore(),
         })
     }
@@ -179,7 +179,7 @@ $result = $oxitest->api2_command("get_field_definition" => {
 cmp_deeply $result, superbagof(
     map {
         superhashof({
-            id => $_,
+            name => $_,
             type => ignore(),
         })
     }

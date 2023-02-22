@@ -104,6 +104,8 @@ sub render_subject_form {
     my $param = shift;
 
     my %extra;
+    # Parameters given in config via:
+    #   uihandle: OpenXPKI::Client::UI::Handle::Profile::render_subject_form!mode!renewal
     if ($param) {
         my @param = split /!/, $param;
         # Legacy format, section only
@@ -115,58 +117,87 @@ sub render_subject_form {
             %extra = @param;
         }
     }
+    $self->logger->trace("Additional parameters via 'uihandle' config: " . Dumper \%extra) if (scalar keys %extra and $self->logger->is_trace);
 
     my $section = $extra{'section'};
-    my $mode = $extra{'mode'} || 'enroll';
+    my $is_renewal = ($extra{'mode'}//'' eq 'renewal');
 
+    # Workflow info
     my $wf_info = $args->{wf_info};
-
     my $context = $wf_info->{workflow}->{context};
 
-    # get profile and style from the context
+    # Profile and style from context
     my $cert_profile = $context->{'cert_profile'};
     my $cert_subject_style = $context->{'cert_subject_style'};
 
-    my $is_renewal = ($mode eq 'renewal');
-
     # Parse out the field name and type, we assume that there is only one activity with one field
     $wf_action = (keys %{$wf_info->{activity}})[0] unless($wf_action);
-    my $field_name = $wf_info->{activity}->{$wf_action}->{field}[0]->{name};
+    my $parent_name = $wf_info->{activity}->{$wf_action}->{field}[0]->{name};
 
     $section = substr($wf_info->{activity}->{$wf_action}->{field}[0]->{type}, 5) unless($section);
 
-    $self->logger()->debug( " Render subject for $field_name, section $section in $wf_action" );
+    $self->logger->debug("Render subject for '$parent_name', section '$section' in '$wf_action'");
 
     # Allowed types are cert_subject, cert_san, cert_info
-    my $fields = $self->send_command_v2('get_field_definition' => {
-        profile => $cert_profile, style => $cert_subject_style, 'section' => $section,
+    my $profile_fields = $self->send_command_v2(get_field_definition => {
+        profile => $cert_profile,
+        style => $cert_subject_style,
+        section => $section,
     });
-
-    $self->logger()->trace( 'Profile fields' . Dumper $fields ) if $self->logger->is_trace;
 
     # Load preexisiting values from context
     my $values = {};
-    if ($context->{$field_name}) {
-        $values = $self->serializer()->deserialize( $context->{$field_name} );
+    if ($context->{$parent_name}) {
+        $values = $self->serializer->deserialize( $context->{$parent_name} );
     }
-
+    $self->logger->trace('Presets: ' . Dumper $values) if $self->logger->is_trace;
 
     my @fielddesc;
-    foreach my $field (@{$fields}) {
-        push @fielddesc, { label => $field->{label}, value => $field->{description}, format => 'raw' } if ($field->{description});
+    my @fields;
+    foreach my $field (@{$profile_fields}) {
+        my $name = $field->{name};
+
+        # description
+        push @fielddesc, {
+            label => $field->{label},
+            value => $field->{description},
+            format => 'raw',
+        } if $field->{description};
+
+        # translate field names in "keys" and adjust parent name
+        if ($field->{keys}) {
+            $field->{name} = $parent_name.'{*}'; # this "parent" field name will not be sent in requests by the web UI
+            for my $variant (@{$field->{keys}}) {
+                $variant->{value} = sprintf('%s{%s}', $parent_name, $variant->{value}), # search tag: #wf_fields_with_sub_items
+            }
+        }
+        # translate field name to include "parent"
+        else {
+            $field->{name} = sprintf('%s{%s}', $parent_name, $name); # search tag: #wf_fields_with_sub_items
+        }
+
+        # web UI field spec
+        my ($item, @more_items) = $self->__render_input_field($field, $values->{$name});
+        next unless $item;
+
+        # renewal policy - after __render_input_field() because value might get overridden
+        if ($is_renewal) {
+            if ($field->{renew} eq 'clear') {
+                $item->{value} = undef;
+            } elsif ($field->{renew} eq 'keep') {
+                $item->{type} = 'static';
+            }
+        }
+
+        $self->logger->trace("Field '$name': transformed to web ui spec = " . Dumper $item) if $self->logger->is_trace;
+
+        push @fields, $item, @more_items;
     }
 
-    $self->logger()->trace( 'Preset ' . Dumper $values ) if $self->logger->is_trace;
-
-    # Map the old notation for the new UI
-    $fields = OpenXPKI::Client::UI::Handle::Profile::__translate_form_def( $fields, $field_name, $values, $is_renewal );
-
-    $self->logger()->trace( 'Mapped fields' . Dumper $fields ) if $self->logger->is_trace;
-
     # record the workflow info in the session
-    push @{$fields}, $self->__register_wf_token($wf_info, {
+    push @fields, $self->__register_wf_token($wf_info, {
         wf_action => $wf_action,
-        wf_fields => $fields,
+        wf_fields => \@fields, # search tag: #wf_fields_with_sub_items
     });
 
     my $form = $self->main->add_form(
@@ -174,7 +205,7 @@ sub render_subject_form {
         submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
         buttons => $self->__get_form_buttons( $wf_info ),
     );
-    $form->add_field(%{ $_ }) for @{ $fields };
+    $form->add_field(%{ $_ }) for @fields;
 
     if (@fielddesc) {
         $self->main->add_section({
@@ -229,7 +260,7 @@ sub render_key_select {
                 # We create the label as I18 string from the param name
                 my $label = 'I18N_OPENXPKI_UI_KEY_'.$pn;
                 push @fields, {
-                    name => "key_gen_params{$pn}",
+                    name => "key_gen_params{$pn}", # search tag: #wf_fields_with_sub_items
                     label => $label,
                     value => $key_gen_param_values->{ $pn },
                     type => 'select',
@@ -261,7 +292,7 @@ sub render_key_select {
     # record the workflow info in the session
     push @fields, $self->__register_wf_token($wf_info, {
         wf_action => $wf_action,
-        wf_fields => \@fields,
+        wf_fields => \@fields, # search tag: #wf_fields_with_sub_items
         cert_profile => $context->{cert_profile}
     });
 
@@ -342,85 +373,6 @@ sub render_server_password {
     $form->add_field(%{ $_ }) for @fields;
 
     return $self;
-
-}
-
-
-sub __translate_form_def {
-
-    my $fields = shift;
-    my $field_name = shift;
-    my $values = shift;
-    my $is_renewal = shift || 0;
-
-    # TODO - Refactor profile definitions to make this obsolete
-    my @fields;
-    foreach my $field (@{$fields}) {
-
-        my $renew = $is_renewal ? ($field->{renew} || 'preset') : '';
-
-        my $new = {
-            name => $field_name.'{'.$field->{id}.'}',
-            label => $field->{label},
-            tooltip => defined $field->{tooltip} ? $field->{tooltip} : $field->{description},
-             # Placeholder is the new attribute, fallback to old default
-            placeholder => (defined $field->{placeholder} ? $field->{placeholder} : $field->{default}),
-            value => $values->{$field->{id}},
-        };
-        $new->{ecma_match} = $field->{ecma_match} if $field->{ecma_match};
-
-        $field->{type} //= '';
-        if ($field->{type} eq 'select') {
-            $new->{type} = 'select';
-            $new->{options} = $field->{options};
-        } elsif ($field->{type} =~ m{static|textarea|datetime}) {
-               $new->{type} = $field->{type};
-        } else {
-            $new->{type} = 'text';
-        }
-
-        # reasons to make the field optional
-        if ((defined $field->{min} && $field->{min} == 0)
-            || (defined $field->{required} && $field->{required} eq '0')
-            || ($field->{type} eq 'static')) {
-            $new->{is_optional} = 1;
-        }
-
-        if ($field->{min}) {
-            $new->{min} = $field->{min};
-            $new->{clonable} = 1;
-        }
-
-        if (defined $field->{max}) {
-            $new->{max} = $field->{max};
-            $new->{clonable} = 1;
-        }
-
-        # Check for key/value field
-        if ($field->{keys}) {
-            $new->{name} =  $field_name.'{*}';
-            my $format = $field_name.'{%s}';
-
-            my @keys = map { {
-                value => sprintf ($format, $_->{value}),
-                label => $_->{label}
-            } } @{$field->{keys}};
-            $new->{keys} = \@keys;
-        }
-
-        if ($renew eq 'clear') {
-            $new->{value} = undef;
-
-        } elsif ($renew eq 'keep') {
-            $new->{type} = 'static';
-
-        }
-
-        push @fields, $new;
-
-    }
-
-    return \@fields;
 
 }
 

@@ -46,7 +46,7 @@ sub _validate {
     FIELD:
     foreach my $field (@$fields) {
 
-        my $name = $field->{id};
+        my $name = $field->{name};
         my $min = $field->{min} || 0;
         my $max = $field->{max} || 0;
         my $match = $field->{match} || '';
@@ -65,7 +65,7 @@ sub _validate {
         delete $subject_parts->{ $name };
 
         # we need to form field name in the json reply
-        $name = sprintf "%s{%s}", $basename, $name if ($basename);
+        $name = sprintf "%s{%s}", $basename, $name if $basename; # search tag: #wf_fields_with_sub_items
 
         # if the field is a cloneable, the name ends on square brackets
         if ($clonable) {
