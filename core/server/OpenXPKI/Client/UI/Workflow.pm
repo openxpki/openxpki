@@ -1507,7 +1507,7 @@ sub __render_output_field {
     } elsif ($item->{format} eq "request_info") {
         $item->{format} = 'unilist';
 
-        my $default_types = {
+        my $default_formats = {
             email => 'email',
             requestor_email => 'email',
             owner_contact => 'email',
@@ -1534,7 +1534,7 @@ sub __render_output_field {
                 my $value = $cert_values->{$cert_fieldname} or next;
 
                 push @val, {
-                    format => $cert_field->{format} // $default_types->{$cert_fieldname} // 'text',
+                    format => $cert_field->{format} // $default_formats->{$cert_fieldname} // 'text',
                     label => $cert_field->{label},
                     value => $value,
                 };
@@ -1543,7 +1543,7 @@ sub __render_output_field {
         } else {
             foreach my $key (sort keys %{$cert_values}) {
                 push @val, {
-                    format => $default_types->{$key} // 'text',
+                    format => $default_formats->{$key} // 'text',
                     label => $key,
                     value => $cert_values->{$key},
                 };
