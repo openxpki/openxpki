@@ -1662,20 +1662,19 @@ if ($cmd eq 'initdb') {
 
     -e $conf || die "Given config path $conf does not exist!";
 
-    my $c = OpenXPKI::Config::Backend->new( LOCATION => $conf );
     print "Checking config at $conf\n";
+    my $c = OpenXPKI::Config::Backend->new( LOCATION => $conf );
+
+    # YAML was ok but there is no system node
     if ($c->get_hash('system')) {
-        printf "Config ok (%s)\n", $c->checksum();
+        printf "Config is valid YAML (%s)\n", $c->checksum();
         $ret = 0;
     } else {
-        # this means the yaml was ok but there is no system node
-        if (defined $c) {
-            print "Config was parsed but no system node was found\n";
-        }
+        print "No 'system' node was found\n";
         $ret = 2;
     }
 
-    if (defined $params{debug}) {
+    if ($ret == 0 and defined $params{debug}) {
         my $hash = $c->get_hash('');
         if ($params{debug}) {
             printf "system config at %s:\n", $params{debug};
@@ -1692,25 +1691,27 @@ if ($cmd eq 'initdb') {
         print Dump $hash;
     }
 
-    foreach my $module (@{$params{module}}) {
-        my $class = "OpenXPKI::Config::Lint::". ucfirst($module);
-        eval "use $class;1";
-        if ($EVAL_ERROR) {
-            print "Unable to load lint module $module\n";
-            print STDERR $EVAL_ERROR;
-        } else {
-            print "Lint module '$module':\n";
-            my $linter = $class->new(
-                config => $c,
-                $params{realm} ? (realm => $params{realm}) : (),
-                $module eq 'workflow' && $params{workflow} ? (workflow => $params{workflow}) : (),
-            );
-            my $err = $linter->lint;
-            if ($err) {
-                print "$err errors found.\n";
-                $ret = 3
+    if ($ret == 0) {
+        foreach my $module (@{$params{module}}) {
+            my $class = "OpenXPKI::Config::Lint::". ucfirst($module);
+            eval "use $class;1";
+            if ($EVAL_ERROR) {
+                print "Unable to load lint module $module\n";
+                print STDERR $EVAL_ERROR;
             } else {
-                print "OK.\n";
+                print "Lint module '$module':\n";
+                my $linter = $class->new(
+                    config => $c,
+                    $params{realm} ? (realm => $params{realm}) : (),
+                    $module eq 'workflow' && $params{workflow} ? (workflow => $params{workflow}) : (),
+                );
+                my $err = $linter->lint;
+                if ($err) {
+                    print "$err errors found.\n";
+                    $ret = 3
+                } else {
+                    print "OK.\n";
+                }
             }
         }
     }
