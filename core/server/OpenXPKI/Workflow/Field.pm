@@ -44,11 +44,11 @@ sub process {
     my $class = shift;
     my $self = $class->new(@_);
 
-    $self->transform_profile_field if $self->is_profile_field;
-    # profile-only attributes after transformation: "renew", "preset"
-
-    # "type" default
+    # default "type"
     $self->field->{type} //= 'text';
+
+    # attributes after transformation (only profile fields): "renew", "preset"
+    $self->transform_profile_field if $self->is_profile_field;
 
     # set "clonable" attribute
     $self->field->{clonable} = (defined $self->field->{min} || $self->field->{max}) ? 1: 0;
