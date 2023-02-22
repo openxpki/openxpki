@@ -3,6 +3,13 @@
     {{#if (eq "dummy-placeholder" this.format)}}
         {{!-- just so that all following "else if" look the same --}}
 
+    {{else if (or (not this.format) (eq "text" this.format))}}
+        <OxiBase::Label
+            @text={{v}}
+            @tooltip={{if @truncate v}}
+            @class="oxi-formatted-text {{if @truncate "oxi-truncate"}}"
+        />
+
     {{else if (eq "raw" this.format)}}
         <OxiBase::Label
             @text={{this.valueStr}}
@@ -11,18 +18,9 @@
             @class="oxi-formatted-raw {{if @truncate "oxi-truncate"}}"
         />
 
-    {{else if (eq "text" this.format)}}
-        <OxiBase::Label
-            @text={{v}}
-            @raw={{false}}
-            @tooltip={{if @truncate v}}
-            @class="oxi-formatted-text {{if @truncate "oxi-truncate"}}"
-        />
-
     {{else if (eq "subject" this.format)}}
         <OxiBase::Label
             @text={{v}}
-            @raw={{false}}
             @tooltip={{if @truncate v}}
             @class="oxi-formatted-subject {{if @truncate "oxi-truncate"}} d-inline-flex"
         />
@@ -58,14 +56,21 @@
             <OxiBase::Label @text={{v.label}} @raw={{true}} />
         </a>
 
+    {{else if (eq "email" this.format)}}
+        <a href="mailto:{{v}}" class="oxi-formatted-email {{@class}}">
+            <OxiBase::Label @text={{v}} />
+        </a>
+
     {{else if (eq "tooltip" this.format)}}
+        {{! "d-inline-flex" prevents labels from taking the whole width and
+            tooltips being placed in the "center" from being above the
+            whitespace in case of short labels. }}
         <OxiBase::Label
             @text={{v.value}}
             @tooltip={{v.tooltip}}
             @tooltip_page={{v.tooltip_page}}
             @tooltip_page_args={{v.tooltip_page_args}}
-            @raw={{false}}
-            @class="oxi-formatted-tooltip {{@class}}"
+            @class="oxi-formatted-tooltip d-inline-flex {{@class}}"
         />
 
     {{else if (eq "code" this.format)}}
@@ -95,6 +100,29 @@
             @class="oxi-formatted-download {{@class}}"
         />
 
+    {{else if (eq "arbitrary" this.format)}}
+        <OxiBase::Formatted::Arbitrary
+            @value={{v}}
+            @class="oxi-formatted-arbitrary"
+        />
+
+    {{else if (eq "unilist" this.format)}}
+        <dl class="oxi-formatted-unilist {{@class}}">
+            {{#each v as |item|}}
+                {{#if item.label}}
+                    <dt class="pt-1">{{item.label}}</dt>
+                {{/if}}
+                <dd class="m-0 {{if item.label "ps-3" "pt-1"}}">
+                    <OxiBase::Formatted
+                        @format={{item.format}}
+                        @value={{item.value}}
+                        @truncate={{@truncate}}
+                    />
+                </dd>
+            {{/each}}
+        </dl>
+
+    {{! legacy list format }}
     {{else if (eq "deflist" this.format)}}
         <dl class="oxi-formatted-deflist {{@class}}">
             {{#each v as |val|}}
@@ -107,20 +135,23 @@
             {{/each}}
         </dl>
 
+    {{! legacy list format }}
     {{else if (eq "ullist" this.format)}}
         <ul class="oxi-formatted-ullist list-unstyled {{@class}}">
             {{#each v as |val|}}
                 <li>
-                    <OxiBase::Formatted::Arbitrary @value={{val}} @raw={{false}} />
+                    <OxiBase::Formatted::Arbitrary @value={{val}} />
                 </li>
             {{/each}}
         </ul>
 
+    {{! legacy list format }}
     {{else if (eq "rawlist" this.format)}}
         <ul class="oxi-formatted-rawlist list-unstyled {{@class}}">
             {{#each v as |val|}} <li><OxiBase::Label @text={{val}} @raw={{true}} /> </li> {{/each}}
         </ul>
 
+    {{! legacy list format }}
     {{else if (eq "linklist" this.format)}}
         <ul class="oxi-formatted-linklist list-unstyled {{@class}}">
             {{#each v as |val|}}
@@ -137,6 +168,9 @@
                 </li>
             {{/each}}
         </ul>
+
+    {{else}}
+        (error: unknown field format "{{this.format}}")
 
     {{/if}}
 

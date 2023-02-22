@@ -6,7 +6,7 @@ export default {
         data: [
             {
                 format: "head",
-                value: "These is all we got:",
+                value: "Scalar types:",
             },
             {
                 format: "raw",
@@ -71,9 +71,9 @@ export default {
                 },
             },
             {
-                format: "head",
-                value: "More values...",
-                className: "spacer",
+                format: "email",
+                label: "email",
+                value: "office@whiterabbitsecurity.com",
             },
             {
                 format: "tooltip",
@@ -135,19 +135,124 @@ export default {
                 },
             },
             {
+                format: "arbitrary",
+                label: "arbitrary",
+                value: {
+                    'one-two-three': [
+                        "first.loooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-example.org",
+                        "second.example.org"
+                    ],
+                },
+            },
+            {
+                format: "head",
+                value: "List types...",
+                className: "spacer",
+            },
+            {
+                format: "unilist",
+                label: "unilist",
+                value: [
+                    {
+                        value: "text without label",
+                    },
+                    {
+                        format: "tooltip",
+                        label: "tooltip (short)",
+                        value: {
+                            value: "Hover me",
+                            tooltip: "This is a short tooltip.",
+                        },
+                    },
+                    {
+                        format: "link",
+                        value: {
+                            label: "Technical Log",
+                            page: "workflow!log!wf_id!13567",
+                            tooltip: "I feel like hovering",
+                        },
+                    },
+                    {
+                        format: "link",
+                        value: {
+                            label: "Workflow History",
+                            page: "workflow!history!wf_id!13567",
+                            tooltip: "I feel like hovering",
+                        },
+                    },
+                    {
+                        format: "code",
+                        label: "code",
+                        value: "console.log('Hello world');\nArray.isArray([yep:'I_am'])",
+                    },
+                    {
+                        format: "timestamp",
+                        label: "timestamp",
+                        value: 1617495633,
+                    },
+                    {
+                        format: "styled",
+                        label: "styled",
+                        value: "attention:hear my words",
+                    },
+                    {
+                        format: "certstatus",
+                        label: "certstatus",
+                        value: {
+                            value: "issued",
+                            label: "<i>Issued</i>",
+                            tooltip: "It's issued",
+                        },
+                    },
+                    {
+                        format: "unilist",
+                        label: "list-level-2",
+                        value: [
+                            {
+                                value: "text without label",
+                            },
+                            {
+                                format: "arbitrary",
+                                value: {
+                                    'one-two-three': [
+                                        "first.loooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-example.org",
+                                        "second.example.org"
+                                    ],
+                                },
+                            },
+                            {
+                                format: "unilist",
+                                label: "list-level-3",
+                                value: [
+                                    {
+                                        format: "timestamp",
+                                        value: 1617495633,
+                                    },
+                                    {
+                                        format: "styled",
+                                        value: "attention:hear my words",
+                                    },
+                                ],
+                            },
+                            {
+                                format: "tooltip",
+                                label: "tooltip (short)",
+                                value: {
+                                    value: "Hover me",
+                                    tooltip: "This is a short tooltip.",
+                                },
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
                 format: "deflist",
                 label: "deflist",
                 value: [
                     { label: "first", value: "PKI <a href=\"should be escaped\">" },
                     { label: "second", value: "<a href=\"https://www.openxpki.org\">OpenXPKI</a>", format: "raw" },
                     { label: "subject", value: [ "CN=sista.example.org", "DC=Test Deployment", "DC=PKI Examples", "DC=OpenXPKI", "DC=org" ] },
-                ],
-                className: "crosses",
-            },
-            {
-                format: "deflist",
-                label: "deflist (arbitrary)",
-                value: [
                     {
                         label: "hosts-by-group",
                         value: {
@@ -162,6 +267,7 @@ export default {
                         value: "1234"
                     },
                 ],
+                className: "crosses",
             },
             {
                 format: "ullist",

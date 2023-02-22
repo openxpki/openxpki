@@ -1,9 +1,11 @@
 {{#if this.isString}}
+    <div class={{@class}}>
     {{#if @raw}}
         {{html @value}}
     {{else}}
         {{@value}}
     {{/if}}
+    </div>
 {{else}}
     <BsButton
         @onClick={{this.toggleDetails}}
@@ -19,7 +21,7 @@
     </BsButton>
     {{#if this.detailsOpen}}
         <div class="card card-body bg-light">
-            <pre class="text-prewrap">{{this.asJSON}}</pre>
+            <pre class="text-prewrap {{@class}}">{{this.asJSON}}</pre>
         </div>
     {{/if}}
 {{/if}}
