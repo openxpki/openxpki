@@ -1646,6 +1646,8 @@ if ($cmd eq 'initdb') {
 
     push @options_spec, qw(
       module|m=s
+      realm=s
+      workflow=s
     );
     __init();
 
@@ -1698,7 +1700,12 @@ if ($cmd eq 'initdb') {
             print STDERR $EVAL_ERROR;
         } else {
             print "Lint module '$module':\n";
-            my $err = $class->new(config => $c)->lint;
+            my $linter = $class->new(
+                config => $c,
+                $params{realm} ? (realm => $params{realm}) : (),
+                $module eq 'workflow' && $params{workflow} ? (workflow => $params{workflow}) : (),
+            );
+            my $err = $linter->lint;
             if ($err) {
                 print "$err errors found.\n";
                 $ret = 3
@@ -2201,11 +2208,10 @@ location I</etc/openxpki/config.d> is used.
 
 Command options:
 
-  -- module  Specify extra modules to apply on the config object for
-             additional checks.
-
-  --debug               Dump the full config tree as YAML structure
-  --debug path.to.node  Dump the tree below this node as YAML structure
+  --module MODULE       Specify extra modules for additional checks
+  --realm REALM         Only test the given realm (for realm-specific modules)
+  --debug               Dump the full config tree as YAML
+  --debug path.to.node  Dump the tree below this node as YAML
 
 =head2 buildconfig
 
