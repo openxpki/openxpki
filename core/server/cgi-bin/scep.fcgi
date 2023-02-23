@@ -50,9 +50,9 @@ while (my $cgi = CGI::Fast->new()) {
     Log::Log4perl::MDC->put('server', $server);
 
     # the allowed IP range from the config file
-    my $requesting_host = new NetAddr::IP $ENV{'REMOTE_ADDR'}; # the host;
+    my $requesting_host = NetAddr::IP->new($ENV{'REMOTE_ADDR'}); # the host;
     if ($iprange && $iprange ne '0.0.0.0/0') {
-        my $allowed_range = new NetAddr::IP $iprange;
+        my $allowed_range = NetAddr::IP->new($iprange);
         # Check if requesting host is allowed to talk to us
         if (!$requesting_host->within($allowed_range)) {
             # TODO: better response?

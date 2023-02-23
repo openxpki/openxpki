@@ -39,7 +39,7 @@ my $dirname = dirname($0);
 our @cfgpath = ( $dirname );
 our %cfg = ();
 
-my $testcfg = new TestCfg;
+my $testcfg = TestCfg->new;
 $testcfg->read_config_path( 'paused_wf.cfg', \%cfg, @cfgpath );
 
 #------------------------- INIT ----------------------------------

@@ -187,7 +187,7 @@ while (my $cgi = CGI::Fast->new()) {
     }
 
     my $driver_args = $conf->{session_driver} ? $conf->{session_driver} : { Directory => '/tmp' };
-    my $session_front = new CGI::Session($conf->{session}->{driver}, $sess_id, $driver_args );
+    my $session_front = CGI::Session->new($conf->{session}->{driver}, $sess_id, $driver_args );
     Log::Log4perl::MDC->put('sid', substr($session_front->id,0,4));
 
     if (defined $conf->{session}->{timeout}) {

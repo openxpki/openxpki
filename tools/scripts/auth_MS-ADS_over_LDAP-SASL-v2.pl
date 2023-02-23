@@ -195,7 +195,7 @@ sub getIsMember
 		my $urlvalues = $entry->get_value("memberurl", asref => 1);
 		foreach my $urlval (@{$urlvalues})
 		{
-			my $uri 	= new URI ($urlval);
+			my $uri 	= URI->new($urlval);
 			my $filter 	= $uri->filter();
 			my @attrs	= $uri->attributes();
 			eval {	
