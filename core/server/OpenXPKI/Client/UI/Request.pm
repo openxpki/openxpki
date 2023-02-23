@@ -69,7 +69,7 @@ sub BUILD {
 
     # store keys from CGI params
     my @keys = $self->cgi->param;
-    $cache{$_} = undef for @keys;
+    $cache{$_} = undef for @keys; # we do not yet query/cache the value but make the key known
     do { $self->logger->trace(sprintf('CGI param: %s=%s', $_, join(',', $self->cgi->multi_param($_)))) for $self->cgi->param } if $self->logger->is_trace;
 
     # store keys and values from JSON POST data
@@ -170,10 +170,10 @@ sub _param {
         my $prefix_jwt = $self->_prefix_jwt;
 
         my @queries = (
-            # Try CGI parameters (and strip whitespaces)
+            # Try CGI parameters (and strip leading/trailing whitespaces)
             sub {
                 return unless $cgi;
-                return map { my $v = $_; $v =~ s/^\s+|\s+$//g; $v } ($cgi->multi_param($key))
+                return map { my $v = $_; $v =~ s/ ^\s+ | \s+$ //gx; $v } ($cgi->multi_param($key))
             },
             # Try Base64 encoded parameter from JSON input
             sub {
