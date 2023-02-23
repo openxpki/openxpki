@@ -52,7 +52,7 @@
                 </h4>
             </Modal.header>
             <Modal.body>
-                {{html @button.confirm.description}}
+                {{defuse @button.confirm.description}}
             </Modal.body>
             <Modal.footer>
                 <BsButton {{on "click" this.executeAction}} @type="primary">

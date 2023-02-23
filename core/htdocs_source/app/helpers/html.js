@@ -2,7 +2,7 @@ import Helper from "@ember/component/helper"
 import { htmlSafe } from '@ember/template'
 
 /**
- * Interpret the given string as HTML code and remove unsafe parts.
+ * Interpret the given string as HTML code - DOES NOT remove unsafe parts (script).
  *
  * Example:
  * ```html

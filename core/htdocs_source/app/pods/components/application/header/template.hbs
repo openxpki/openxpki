@@ -2,10 +2,10 @@
     <div class="container-fluid pe-lg-4">
         <div class="row py-2 align-items-center {{this.content.tenantCssClass}}">
             {{#if this.config.header.html}}
-                {{html this.config.header.html}}
+                {{defuse this.config.header.html}}
             {{else if this.config.oldHeader}}
                 <div class="col">
-                    {{html this.config.oldHeader}}
+                    {{defuse this.config.oldHeader}}
                 </div>
             {{else}}
                 <div class="col">

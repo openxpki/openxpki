@@ -12,7 +12,7 @@
                 @delay={{array this.config.tooltipDelay 50}}
                 @placement="top-start"
             >
-                {{html @raw_tooltip}}
+                {{defuse @raw_tooltip}}
             </Tippy>
         {{else if @tooltip_page}}
             <Tippy
@@ -28,7 +28,7 @@
             </Tippy>
         {{/if}}
     {{#if @raw}}
-        {{html txt}}
+        {{defuse txt}}
     {{else}}
         {{txt}}
     {{/if}}

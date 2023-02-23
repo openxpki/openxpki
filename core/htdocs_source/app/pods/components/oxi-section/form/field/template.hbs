@@ -55,7 +55,7 @@
                 error=@field._error
             ) as |FieldInstance|
         }}
-            {{html (concat '<!-- field: ' @field.name ' -->')}}
+            {{defuse (concat '<!-- field: ' @field.name ' -->')}}
             <FieldInstance>
             </FieldInstance>
         {{/let}}

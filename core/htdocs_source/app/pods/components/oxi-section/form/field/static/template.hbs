@@ -1,9 +1,9 @@
 <!-- components/oxi-section/form/field/static -->
 <div class="oxi-no-input" {{on-init @setFocusInfo false}}>
     {{#if @content.verbose}}
-        {{html @content.verbose}}
+        {{defuse @content.verbose}}
     {{else if @content.value}}
-        {{html @content.value}}
+        {{defuse @content.value}}
     {{else}}
         {{t 'component.oxifield_static.unset'}}
     {{/if}}
