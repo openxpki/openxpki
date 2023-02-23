@@ -1,8 +1,11 @@
 package OpenXPKI::Client::UI::Cache;
-
 use Moose;
 
 extends 'OpenXPKI::Client::UI::Result';
+
+# Core modules
+use Data::Dumper;
+
 
 =head2 init_fetch
 
@@ -21,7 +24,7 @@ sub init_fetch {
         return;
     }
 
-    $self->log->trace('Cached response retrieved: ' . Dumper $data) if $self->log->is_trace;
+    $self->log->trace('Cached response retrieved: ' . Dumper($data)) if $self->log->is_trace;
 
     # support multi-valued responses (persisted as array ref)
     if (ref $data eq 'ARRAY') {
