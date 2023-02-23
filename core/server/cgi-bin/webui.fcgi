@@ -199,21 +199,21 @@ while (my $cgi = CGI::Fast->new()) {
     my $response = OpenXPKI::Client::UI::Response->new(session_cookie => $session_cookie);
     $response->add_header(@header_tpl);
 
-    $log->debug('session id (front) is '. $session_front->id);
+    $log->debug('session id (front): '. $session_front->id);
 
     # Set the path to the directory component of the script, this
     # automagically creates seperate cookies for path based realms
     my $realm_mode = $conf->{global}->{realm_mode} || '';
     my $realm_detect;
-    $log->debug('realm_mode is ' . $realm_mode);
-    if ($realm_mode eq "path") {
+    $log->debug("realm_mode: '$realm_mode'");
 
+    if ($realm_mode eq "path") {
         my $script_path = $ENV{'REQUEST_URI'};
         # Strip off cgi-bin, last word of the path and discard query string
         $script_path =~ s|\/(f?cgi-bin\/)?([^\/]+)((\?.*)?)$||;
         $response->session_cookie->path($script_path);
 
-        $log->debug('script path is ' . $script_path);
+        $log->debug("script path: '$script_path'");
 
         # if the session has no realm set, try to get a realm from the map
         if (!$session_front->param('pki_realm')) {
@@ -233,6 +233,7 @@ while (my $cgi = CGI::Fast->new()) {
                 $log->warn('Unable to read realm from url path');
             }
         }
+
     } elsif ($realm_mode eq "hostname") {
         my $host = $ENV{HTTP_HOST};
         $log->trace('realm map is: ' . Dumper $conf->{realm});
@@ -243,6 +244,7 @@ while (my $cgi = CGI::Fast->new()) {
             last;
         }
         $log->warn('Unable to find realm from hostname: ' . $host) unless($realm_detect);
+
     } elsif ($realm_mode eq "fixed") {
         # Fixed realm mode, mode must be defined in the config
         $realm_detect = $conf->{global}->{realm};
@@ -268,7 +270,6 @@ while (my $cgi = CGI::Fast->new()) {
 
     my $result;
     eval {
-
         my %pkey;
         if ($conf->{auth}->{'sign.key'}) {
             my $pk = decode_base64($conf->{auth}->{'sign.key'});

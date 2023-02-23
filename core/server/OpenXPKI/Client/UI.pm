@@ -130,7 +130,6 @@ sub _init_backend {
 
     Log::Log4perl::MDC->put('ssid', substr($client_id,0,4));
 
-    $self->logger()->trace( Dumper $session->dataref ) if $self->logger->is_trace;
     return $client;
 }
 

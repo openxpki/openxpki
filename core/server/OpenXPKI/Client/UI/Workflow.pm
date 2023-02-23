@@ -905,6 +905,7 @@ sub __render_input_field {
 
     my $name = $field->{name};
     my $type = $field->{type};
+    $self->logger->trace("Rendering field '$name'" . ($value ? " with value '$value'" : "")) if $self->logger->is_trace;
 
     return if ($name =~ m{ \A workflow_id }x);
     return if ($name =~ m{ \A wf_ }x);
