@@ -1,4 +1,5 @@
-import Helper from "@ember/component/helper";
+import Helper from "@ember/component/helper"
+import { htmlSafe } from '@ember/template'
 
 /**
  * Interpret the given string as HTML code and remove
@@ -15,26 +16,27 @@ import Helper from "@ember/component/helper";
  */
 export default class Defuse extends Helper {
     compute([html]) {
-        if (html === null || html === undefined) return "";
-        if (typeof html === 'number') return html;
-        if (typeof html !== 'string') return `[${typeof html}]`;
+        if (html === null || html === undefined) return ""
+        let type = typeof html
+        if (type === 'number' || type == 'boolean') return html
+        if (type !== 'string') return `[${type}]`
 
         // for strings...
-        let parser = new DOMParser();
-        let body = parser.parseFromString(html, "text/html").body;
+        let parser = new DOMParser()
+        let body = parser.parseFromString(html, "text/html").body
 
         for (let script of body.querySelectorAll("script")) {
-            script.remove();
+            script.remove()
         }
         for (let element of body.querySelectorAll("*")) {
-            let attrs = element.attributes; // a NamedNodeMap, not an Array
+            let attrs = element.attributes // a NamedNodeMap, not an Array
             for (let i = attrs.length - 1; i >= 0; i--) {
-                if (attrs[i].name.match(/^on/) || attrs[i].value.match(/javascript/)) {
-                    element.removeAttribute(attrs[i].name);
+                if (attrs[i].name.match(/^on/i) || attrs[i].value.match(/javascript/)) {
+                    element.removeAttribute(attrs[i].name)
                 }
             }
         }
 
-        return body.innerHTML;
+        return htmlSafe(body.innerHTML)
     }
 }
