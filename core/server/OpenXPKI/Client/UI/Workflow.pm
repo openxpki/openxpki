@@ -2049,7 +2049,7 @@ sub __render_workflow_action_body {
         if ($do_prefill && defined $val) {
             # XSS prevention - very rude, but if you need to pass something
             # more sophisticated use the wf_token technique
-            $val =~ s/[^A-Za-z0-9_=,-\. ]//;
+            $val =~ s/[^A-Za-z0-9_=,-\. ]//g;
         } elsif (defined $context->{$name}) {
             $val = $context->{$name};
         } else {
