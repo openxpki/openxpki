@@ -86,7 +86,7 @@ sub action_index {
 
     my %wf_param;
     if ($wf_args->{wf_fields}) {
-        %wf_param = %{$self->param_from_fields( $wf_args->{wf_fields} )};
+        %wf_param = %{$self->__request_values_for_fields( $wf_args->{wf_fields} )};
         $self->logger->trace( "wf parameters from request: " . Dumper \%wf_param ) if $self->logger->is_trace;
     }
 
@@ -674,6 +674,59 @@ sub __check_for_validation_error {
         return $field_errors;
     }
     return;
+}
+
+=head2 __request_values_for_fields
+
+Returns a I<HashRef> with field names and their values.
+
+The list of fields to query is taken from the given specification I<HashRef>,
+values originate from the request (see L<OpenXPKI::Client::UI::Result/multi_param>).
+
+B<Positional parameters>
+
+=over
+
+=item * C<$fields> I<HashRef> - field specifications as returned by
+L<OpenXPKI::Client::UI::Workflow/__render_input_field>
+
+=back
+
+=cut
+sub __request_values_for_fields {
+    my $self = shift;
+    my $fields = shift;
+
+    my $param = {};
+    foreach my $item (@{$fields}) {
+        my $name = $item->{name};
+        if ($name =~ m{ \[\] \z }xms) {
+            $self->log->warn("Got field name with square brackets $name");
+            $name = substr($name,0,-2);
+        }
+        next if $name =~ m{ \A wf_ }xms;
+
+        my @v_list = $self->multi_param($name);
+        my $vv;
+        if ($item->{clonable}) {
+            $vv = \@v_list;
+        } else {
+            if ((my $amount = scalar @v_list) > 1) {
+                $self->log->warn(sprintf "Received %s values for non-clonable field '%s'", scalar @v_list, $name);
+            }
+            $vv = $v_list[0];
+        }
+
+        # cert profile field name including sub item (e.g. "cert_info{requestor_email}") - search tag: #wf_fields_with_sub_items
+        if ($name =~ m{ \A (\w+)\{(\w+)\} \z }xs) {
+            $param->{$1} ||= ();
+            $param->{$1}->{$2} = $vv;
+        # plain field name
+        } else {
+            $param->{$name} = $vv;
+        }
+    }
+    return $param;
 }
 
 __PACKAGE__->meta->make_immutable;
