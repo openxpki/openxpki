@@ -356,12 +356,12 @@ sub send_command_v2 {
     );
     $self->_last_reply( $reply );
 
-    $self->logger->trace("Raw backend reply to '$command': ". Dumper $reply) if $self->logger->is_trace;
+    $self->log->trace("Raw backend reply to '$command': ". Dumper $reply) if $self->log->is_trace;
 
     if ( $reply->{SERVICE_MSG} ne 'COMMAND' ) {
         if (!$flags->{nostatus}) {
-            $self->logger->error("command $command failed ($reply->{SERVICE_MSG})");
-            $self->logger->trace("command reply ". Dumper $reply) if $self->logger->is_trace;
+            $self->log->error("command $command failed ($reply->{SERVICE_MSG})");
+            $self->log->trace("command reply ". Dumper $reply) if $self->log->is_trace;
             $self->set_status_from_error_reply( $reply );
         }
         return undef;
@@ -385,7 +385,7 @@ sub set_status_from_error_reply {
             $message = $reply->{'ERROR'}->{LABEL};
         }
 
-        $self->logger()->error($message);
+        $self->log->error($message);
 
         if ($message !~ /I18N_OPENXPKI_UI_/) {
             if ($message =~ /I18N_OPENXPKI_([^\s;]+)/) {
@@ -398,7 +398,7 @@ sub set_status_from_error_reply {
         }
 
     } else {
-        $self->logger()->trace(Dumper $reply) if $self->logger()->is_trace;
+        $self->log->trace(Dumper $reply) if $self->log->is_trace;
     }
     $self->status->error($message);
 
@@ -482,7 +482,7 @@ sub __param {
         return @val if defined $val[0];
     }
 
-    $self->logger->trace("Requested parameter '$key' was not found") if $self->logger->is_trace;
+    $self->log->trace("Requested parameter '$key' was not found") if $self->log->is_trace;
     return;
 }
 
@@ -515,7 +515,7 @@ sub __fetch_status {
     my $status = $self->_session->param($session_key);
     return unless ($status && ref $status eq 'HASH');
 
-    $self->logger->debug("Set persisted status: " . $status->{message});
+    $self->log->debug("Set persisted status: " . $status->{message});
     return $status;
 }
 
@@ -599,14 +599,14 @@ sub render {
     my $cgi = $self->cgi;
 
     if (not ref $cgi) {
-        $self->logger->error("Cannot render result - CGI object not available");
+        $self->log->error("Cannot render result - CGI object not available");
         return $self;
     }
 
     # helper to print HTTP headers
     my $print_headers = sub {
         my $headers = $self->get_header_str($cgi);
-        $self->logger->trace("Response headers:\n$headers") if $self->logger->is_trace;
+        $self->log->trace("Response headers:\n$headers") if $self->log->is_trace;
         print $headers;
     };
 
@@ -615,12 +615,12 @@ sub render {
         $print_headers->();
         # A) raw bytes in memory
         if ($self->has_raw_bytes) {
-            $self->logger->debug("Sending raw bytes (in memory)");
+            $self->log->debug("Sending raw bytes (in memory)");
             print $self->raw_bytes;
         }
         # B) raw bytes retrieved by callback function
         elsif ($self->has_raw_bytes_callback) {
-            $self->logger->debug("Sending raw bytes (via callback)");
+            $self->log->debug("Sending raw bytes (via callback)");
             # run callback, passing a printing function as argument
             $self->raw_bytes_callback->(sub { print @_ });
         }
@@ -628,7 +628,7 @@ sub render {
     # Standard JSON response
     } elsif ($cgi->http('HTTP_X-OPENXPKI-Client')) {
         $print_headers->();
-        $self->logger->debug("Sending JSON response");
+        $self->log->debug("Sending JSON response");
         print $self->_render_body_to_str;
 
     # Redirects
@@ -650,7 +650,7 @@ sub render {
         }
 
         # HTTP redirect
-        $self->logger->debug("Sending HTTP redirect to: $url");
+        $self->log->debug("Sending HTTP redirect to: $url");
         print $cgi->redirect($url);
     }
 
@@ -690,8 +690,8 @@ sub __register_wf_token {
         $token->{wf_last_update} = $wf_info->{workflow}->{last_update};
     }
     my $id = $self->__generate_uid();
-    $self->logger()->debug('wf token id ' . $id);
-    $self->logger()->trace('token info ' . Dumper  $token) if $self->logger()->is_trace;
+    $self->log->debug('wf token id ' . $id);
+    $self->log->trace('token info ' . Dumper  $token) if $self->log->is_trace;
     $self->_session->param($id, $token);
     return { name => 'wf_token', type => 'hidden', value => $id };
 }
@@ -711,7 +711,7 @@ sub __fetch_wf_token {
 
     return {} unless $id;
 
-    $self->logger()->debug( "load wf_token " . $id );
+    $self->log->debug( "load wf_token " . $id );
 
     my $token = $self->_session->param($id);
     $self->_session->clear($id) if($purge);
@@ -729,7 +729,7 @@ sub __purge_wf_token {
     my $self = shift;
     my $id = shift;
 
-    $self->logger()->debug( "purge wf_token " . $id );
+    $self->log->debug( "purge wf_token " . $id );
     $self->_session->clear($id);
 
     return $self;
@@ -774,10 +774,10 @@ sub __fetch_response {
     my $self = shift;
     my $id = shift;
 
-    $self->logger()->debug('fetch response ' . $id);
+    $self->log->debug('fetch response ' . $id);
     my $response = $self->_session->param('response_'.$id);
     if (!$response) {
-        $self->logger()->error( "persisted response with id $id does not exist" );
+        $self->log->error( "persisted response with id $id does not exist" );
         return;
     }
     return $response;
@@ -832,7 +832,7 @@ sub __render_pager {
         $args->{pagersize} = 20;
     }
 
-    $self->logger()->trace('pager query' . Dumper $args) if $self->logger()->is_trace;
+    $self->log->trace('pager query' . Dumper $args) if $self->log->is_trace;
 
     return {
         startat => $startat,
@@ -888,7 +888,7 @@ sub __build_attribute_subquery {
                 $val = uc($val);
             }
 
-            $self->logger()->debug( "Query: $key $operator $val" );
+            $self->log->debug( "Query: $key $operator $val" );
             push @preprocessed, $val;
         }
 
@@ -909,7 +909,7 @@ sub __build_attribute_subquery {
         }
     }
 
-    $self->logger()->trace('Attribute subquery ' . Dumper $attr) if $self->logger()->is_trace;
+    $self->log->trace('Attribute subquery ' . Dumper $attr) if $self->log->is_trace;
 
     return $attr;
 
@@ -990,7 +990,7 @@ sub decrypted_param {
         or return;
 
     if ($item->{__jwt_key} ne $self->_session->param('jwt_encryption_key')) {
-        $self->logger->debug("Parameter '".$param_name."'' was not JWT encrypted");
+        $self->log->debug("Parameter '".$param_name."'' was not JWT encrypted");
         return;
     }
     delete $item->{__jwt_key};
@@ -1136,7 +1136,7 @@ sub fetch_autocomplete_params {
     my %params = %{ $data->{persistent_params} };
     $params{$_} = $self->param($_) for @{ $data->{user_param_whitelist} };
 
-    $self->logger->trace("Autocomplete params: " . Dumper \%params) if $self->logger->is_trace;
+    $self->log->trace("Autocomplete params: " . Dumper \%params) if $self->log->is_trace;
 
     return \%params;
 

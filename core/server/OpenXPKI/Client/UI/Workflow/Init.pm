@@ -71,7 +71,7 @@ sub init_start {
 
     if (!$wf_type) {
         # todo - handle errors
-        $self->logger()->error("No workflow given to init_start");
+        $self->log->error("No workflow given to init_start");
         return $self;
     }
 
@@ -84,13 +84,13 @@ sub init_start {
 
     if (!$wf_info) {
         # todo - handle errors
-        $self->logger()->error("Create workflow failed");
+        $self->log->error("Create workflow failed");
         return $self;
     }
 
-    $self->logger()->trace("wf info on create: " . Dumper $wf_info ) if $self->logger->is_trace;
+    $self->log->trace("wf info on create: " . Dumper $wf_info ) if $self->log->is_trace;
 
-    $self->logger()->info(sprintf "Create new workflow %s, got id %01d",  $wf_info->{workflow}->{type}, $wf_info->{workflow}->{id} );
+    $self->log->info(sprintf "Create new workflow %s, got id %01d",  $wf_info->{workflow}->{type}, $wf_info->{workflow}->{id} );
 
     # this duplicates code from action_index
     if ($wf_info->{workflow}->{id} > 0 && !(grep { $_ =~ m{\A_} } keys %{$wf_info->{workflow}->{context}})) {
@@ -279,7 +279,7 @@ sub init_info {
 
     if (!$wf_info) {
         $self->page->description('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION');
-        $self->logger()->warn('Unable to load workflow info for id ' . $id);
+        $self->log->warn('Unable to load workflow info for id ' . $id);
         return $self;
     }
 
@@ -375,10 +375,10 @@ sub init_search {
 
     my $workflows = $self->send_command_v2( 'get_workflow_instance_types' );
     return $self unless defined $workflows;
-    $self->logger->trace('Workflows: ' . Dumper $workflows) if $self->logger->is_trace;
+    $self->log->trace('Workflows: ' . Dumper $workflows) if $self->log->is_trace;
 
     my $preset = $args->{preset} // $self->__wf_search_presets;
-    $self->logger->trace('Presets: ' . Dumper $preset) if $self->logger->is_trace;
+    $self->log->trace('Presets: ' . Dumper $preset) if $self->log->is_trace;
 
     #
     # Search by ID
@@ -566,11 +566,11 @@ sub init_result {
         }
     }
 
-    $self->logger()->trace( "persisted query: " . Dumper $result) if $self->logger->is_trace;
+    $self->log->trace( "persisted query: " . Dumper $result) if $self->log->is_trace;
 
     my $search_result = $self->send_command_v2( 'search_workflow_instances', $query );
 
-    $self->logger()->trace( "search result: " . Dumper $search_result) if $self->logger->is_trace;
+    $self->log->trace( "search result: " . Dumper $search_result) if $self->log->is_trace;
 
     # Add page header from result - optional
     if ($result->{page} && ref $result->{page} eq 'HASH') {
@@ -596,7 +596,7 @@ sub init_result {
 
     my @lines = $self->__render_result_list( $search_result, $body );
 
-    $self->logger()->trace( "dumper result: " . Dumper \@lines) if $self->logger->is_trace;
+    $self->log->trace( "dumper result: " . Dumper \@lines) if $self->log->is_trace;
 
     my $header = $result->{header};
     $header = $self->__default_grid_head() if(!$header);
@@ -684,11 +684,11 @@ sub init_export {
         }
     }
 
-    $self->logger()->trace( "persisted query: " . Dumper $result) if $self->logger->is_trace;
+    $self->log->trace( "persisted query: " . Dumper $result) if $self->log->is_trace;
 
     my $search_result = $self->send_command_v2( 'search_workflow_instances', $query );
 
-    $self->logger()->trace( "search result: " . Dumper $search_result) if $self->logger->is_trace;
+    $self->log->trace( "search result: " . Dumper $search_result) if $self->log->is_trace;
 
     my $header = $result->{header};
     $header = $self->__default_grid_head() if(!$header);
@@ -773,12 +773,12 @@ sub init_pager {
         $query->{reverse} = $self->param('reverse');
     }
 
-    $self->logger()->trace( "persisted query: " . Dumper $result) if $self->logger->is_trace;
-    $self->logger()->trace( "executed query: " . Dumper $query) if $self->logger->is_trace;
+    $self->log->trace( "persisted query: " . Dumper $result) if $self->log->is_trace;
+    $self->log->trace( "executed query: " . Dumper $query) if $self->log->is_trace;
 
     my $search_result = $self->send_command_v2( 'search_workflow_instances', $query );
 
-    $self->logger()->trace( "search result: " . Dumper $search_result) if $self->logger->is_trace;
+    $self->log->trace( "search result: " . Dumper $search_result) if $self->log->is_trace;
 
 
     my $body = $result->{column};
@@ -786,7 +786,7 @@ sub init_pager {
 
     my @result = $self->__render_result_list( $search_result, $body );
 
-    $self->logger()->trace( "dumper result: " . Dumper @result) if $self->logger->is_trace;
+    $self->log->trace( "dumper result: " . Dumper @result) if $self->log->is_trace;
 
     $self->confined_response({ data => \@result });
 
@@ -822,7 +822,7 @@ sub init_history {
         format => "primary",
     }]) if ($view eq 'result');
 
-    $self->logger()->trace( "dumper result: " . Dumper $workflow_history) if $self->logger->is_trace;
+    $self->log->trace( "dumper result: " . Dumper $workflow_history) if $self->log->is_trace;
 
     my $i = 1;
     my @result;
@@ -837,7 +837,7 @@ sub init_history {
         ]
     }
 
-    $self->logger()->trace( "dumper result: " . Dumper $workflow_history) if $self->logger->is_trace;
+    $self->log->trace( "dumper result: " . Dumper $workflow_history) if $self->log->is_trace;
 
     $self->main->add_section({
         type => 'grid',
@@ -931,7 +931,7 @@ sub init_task {
         return $self->redirect->to('home');
     }
 
-    $self->logger()->trace( "got tasklist: " . Dumper $tasklist) if $self->logger->is_trace;
+    $self->log->trace( "got tasklist: " . Dumper $tasklist) if $self->log->is_trace;
 
     foreach my $item (@$tasklist) {
         $self->__render_task_list($item);
@@ -971,7 +971,7 @@ sub init_log {
 
     $result = [] unless($result);
 
-    $self->logger()->trace( "dumper result: " . Dumper $result) if $self->logger->is_trace;
+    $self->log->trace( "dumper result: " . Dumper $result) if $self->log->is_trace;
 
     $self->main->add_section({
         type => 'grid',
@@ -1045,7 +1045,7 @@ sub __render_task_list {
         $query->{return_attributes} = $rattrib;
     }
 
-    $self->logger()->trace( "columns : " . Dumper $column) if $self->logger->is_trace;
+    $self->log->trace( "columns : " . Dumper $column) if $self->log->is_trace;
 
     my $search_result = $self->send_command_v2( 'search_workflow_instances', { limit => $limit, %$query } );
 
@@ -1063,7 +1063,7 @@ sub __render_task_list {
 
         @data = $self->__render_result_list( $search_result, $column );
 
-        $self->logger()->trace( "dumper result: " . Dumper @data) if $self->logger->is_trace;
+        $self->log->trace( "dumper result: " . Dumper @data) if $self->log->is_trace;
 
         if ($limit == scalar @$search_result) {
             my %count_query = %{$query};

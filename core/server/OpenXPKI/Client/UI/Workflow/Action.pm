@@ -77,7 +77,7 @@ sub action_index {
 
     my $wf_args = $self->__fetch_wf_token( $wf_token );
 
-    $self->logger->trace("wf args from token: " . Dumper $wf_args) if $self->logger->is_trace;
+    $self->log->trace("wf args from token: " . Dumper $wf_args) if $self->log->is_trace;
 
     # check for delegation
     if ($wf_args->{wf_handler}) {
@@ -87,7 +87,7 @@ sub action_index {
     my %wf_param;
     if ($wf_args->{wf_fields}) {
         %wf_param = %{$self->__request_values_for_fields( $wf_args->{wf_fields} )};
-        $self->logger->trace( "wf parameters from request: " . Dumper \%wf_param ) if $self->logger->is_trace;
+        $self->log->trace( "wf parameters from request: " . Dumper \%wf_param ) if $self->log->is_trace;
     }
 
     if ($wf_args->{wf_id}) {
@@ -97,7 +97,7 @@ sub action_index {
             return $self;
         }
         Log::Log4perl::MDC->put('wfid', $wf_args->{wf_id});
-        $self->logger()->info(sprintf "Run %s on workflow #%01d", $wf_args->{wf_action}, $wf_args->{wf_id} );
+        $self->log->info(sprintf "Run %s on workflow #%01d", $wf_args->{wf_action}, $wf_args->{wf_id} );
 
         # send input data to workflow
         $wf_info = $self->send_command_v2( 'execute_workflow_activity', {
@@ -113,12 +113,12 @@ sub action_index {
                 return $self;
             }
 
-            $self->logger()->error("workflow acton failed!");
+            $self->log->error("workflow acton failed!");
             my $extra = { wf_id => $wf_args->{wf_id}, wf_action => $wf_args->{wf_action} };
             return $self->internal_redirect('workflow!load' => $extra);
         }
 
-        $self->logger()->trace("wf info after execute: " . Dumper $wf_info ) if $self->logger->is_trace;
+        $self->log->trace("wf info after execute: " . Dumper $wf_info ) if $self->log->is_trace;
         # purge the workflow token
         $self->__purge_wf_token( $wf_token );
 
@@ -135,15 +135,15 @@ sub action_index {
                 return $self;
             }
 
-            $self->logger()->error("Create workflow failed");
+            $self->log->error("Create workflow failed");
             # pass required arguments via extra and reload init page
 
             my $extra = { wf_type => $wf_args->{wf_type} };
             return $self->internal_redirect('workflow!index' => $extra);
         }
-        $self->logger()->trace("wf info on create: " . Dumper $wf_info ) if $self->logger->is_trace;
+        $self->log->trace("wf info on create: " . Dumper $wf_info ) if $self->log->is_trace;
 
-        $self->logger()->info(sprintf "Create new workflow %s, got id %01d",  $wf_args->{wf_type}, $wf_info->{workflow}->{id} );
+        $self->log->info(sprintf "Create new workflow %s, got id %01d",  $wf_args->{wf_type}, $wf_info->{workflow}->{id} );
 
         # purge the workflow token
         $self->__purge_wf_token( $wf_token );
@@ -169,7 +169,7 @@ sub action_index {
     my $wf_action;
     if ($wf_info->{state}->{autoselect}) {
         $wf_action = $wf_info->{state}->{autoselect};
-        $self->logger()->debug("Autoselect set: $wf_action");
+        $self->log->debug("Autoselect set: $wf_action");
     } else {
         $wf_action = $self->__get_next_auto_action($wf_info);
     }
@@ -235,28 +235,28 @@ sub action_handle {
 
 
     if ('fail' eq $handle) {
-        $self->logger()->info(sprintf "Workflow %01d set to failure by operator", $wf_args->{wf_id} );
+        $self->log->info(sprintf "Workflow %01d set to failure by operator", $wf_args->{wf_id} );
 
         $wf_info = $self->send_command_v2( 'fail_workflow', {
             id => $wf_args->{wf_id},
         });
     } elsif ('wakeup' eq $handle) {
-        $self->logger()->info(sprintf "Workflow %01d trigger wakeup", $wf_args->{wf_id} );
+        $self->log->info(sprintf "Workflow %01d trigger wakeup", $wf_args->{wf_id} );
         $wf_info = $self->send_command_v2( 'wakeup_workflow', {
             id => $wf_args->{wf_id}, async => 1, wait => 1
         });
     } elsif ('resume' eq $handle) {
-        $self->logger()->info(sprintf "Workflow %01d trigger resume", $wf_args->{wf_id} );
+        $self->log->info(sprintf "Workflow %01d trigger resume", $wf_args->{wf_id} );
         $wf_info = $self->send_command_v2( 'resume_workflow', {
             id => $wf_args->{wf_id}, async => 1, wait => 1
         });
     } elsif ('reset' eq $handle) {
-        $self->logger()->info(sprintf "Workflow %01d trigger reset", $wf_args->{wf_id} );
+        $self->log->info(sprintf "Workflow %01d trigger reset", $wf_args->{wf_id} );
         $wf_info = $self->send_command_v2( 'reset_workflow', {
             id => $wf_args->{wf_id}
         });
     } elsif ('archive' eq $handle) {
-        $self->logger()->info(sprintf "Workflow %01d trigger archive", $wf_args->{wf_id} );
+        $self->log->info(sprintf "Workflow %01d trigger archive", $wf_args->{wf_id} );
         $wf_info = $self->send_command_v2( 'archive_workflow', {
             id => $wf_args->{wf_id}
         });
@@ -302,7 +302,7 @@ sub action_select {
     my $args = shift;
 
     my $wf_action =  $self->param('wf_action');
-    $self->logger()->debug('activity select ' . $wf_action);
+    $self->log->debug('activity select ' . $wf_action);
 
     # can be either token or id
     my $wf_id = $self->param('wf_id');
@@ -311,7 +311,7 @@ sub action_select {
         my $wf_args = $self->__fetch_wf_token( $wf_token );
         $wf_id = $wf_args->{wf_id};
         if (!$wf_id) {
-            $self->logger()->error('No workflow id given');
+            $self->log->error('No workflow id given');
             $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION');
             return $self;
         }
@@ -322,7 +322,7 @@ sub action_select {
         id => $wf_id,
         with_ui_info => 1,
     });
-    $self->logger()->trace('wf_info ' . Dumper  $wf_info) if $self->logger->is_trace;
+    $self->log->trace('wf_info ' . Dumper  $wf_info) if $self->log->is_trace;
 
     if (!$wf_info) {
         $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION');
@@ -332,11 +332,11 @@ sub action_select {
     # If the activity has no fields and no ui class we proceed immediately
     # FIXME - really a good idea - intentional stop items without fields?
     my $wf_action_info = $wf_info->{activity}->{$wf_action};
-    $self->logger()->trace('wf_action_info ' . Dumper  $wf_action_info) if $self->logger->is_trace;
+    $self->log->trace('wf_action_info ' . Dumper  $wf_action_info) if $self->log->is_trace;
     if ((!$wf_action_info->{field} || (scalar @{$wf_action_info->{field}}) == 0) &&
         !$wf_action_info->{uihandle}) {
 
-        $self->logger()->debug('activity has no input - execute');
+        $self->log->debug('activity has no input - execute');
 
         # send input data to workflow
         $wf_info = $self->send_command_v2( 'execute_workflow_activity', {
@@ -431,7 +431,7 @@ sub action_search {
 
     $query->{return_attributes} = $rattrib if ($rattrib);
 
-    $self->logger()->trace("query : " . Dumper $query) if $self->logger->is_trace;
+    $self->log->trace("query : " . Dumper $query) if $self->log->is_trace;
 
     my $result_count = $self->send_command_v2( 'search_workflow_instances_count', $query );
 
@@ -505,7 +505,7 @@ sub action_bulk {
         return $self;
     }
 
-    $self->logger()->trace('Doing bulk with arguments: '. Dumper $wf_args) if $self->logger->is_trace;
+    $self->log->trace('Doing bulk with arguments: '. Dumper $wf_args) if $self->log->is_trace;
 
     # wf_token is also used as name of the form field
     my @serials = $self->multi_param($wf_token);
@@ -531,9 +531,9 @@ sub action_bulk {
         return $self;
     }
 
-    $self->logger()->debug("Run command $command on workflows " . join(", ", @serials));
+    $self->log->debug("Run command $command on workflows " . join(", ", @serials));
 
-    $self->logger()->trace('Execute parameters ' . Dumper \%params) if ($self->logger()->is_trace);
+    $self->log->trace('Execute parameters ' . Dumper \%params) if ($self->log->is_trace);
 
     foreach my $id (@serials) {
 
@@ -549,7 +549,7 @@ sub action_bulk {
             $errors->{$id} = $self->status->is_set ? $self->status->message : 'I18N_OPENXPKI_UI_APPLICATION_ERROR';
         } else {
             push @success, $wf_info;
-            $self->logger()->trace('Result on '.$id.': '. Dumper $wf_info) if $self->logger->is_trace;
+            $self->log->trace('Result on '.$id.': '. Dumper $wf_info) if $self->log->is_trace;
         }
     }
 
@@ -575,7 +575,7 @@ sub action_bulk {
             $_->[ $pos_state ] = $errors->{$serial};
         } @result_failed;
 
-        $self->logger()->trace('Mangled failed result: '. Dumper \@result_failed) if $self->logger->is_trace;
+        $self->log->trace('Mangled failed result: '. Dumper \@result_failed) if $self->log->is_trace;
 
         my @fault_head = @{$self->__default_grid_head};
         $fault_head[$pos_state] = { sTitle => 'Error' };
@@ -663,14 +663,14 @@ sub __check_for_validation_error {
         my $validator_msg = $reply->{'ERROR'}->{LABEL};
         my $field_errors = $reply->{'ERROR'}->{ERRORS};
         if (ref $field_errors eq 'ARRAY') {
-            $self->logger()->info('Input validation error on fields '.
+            $self->log->info('Input validation error on fields '.
                 join(",", map { ref $_ ? $_->{name} : $_ } @{$field_errors}));
         } else {
-            $self->logger()->info('Input validation error');
+            $self->log->info('Input validation error');
         }
         $self->status->error($validator_msg);
         $self->status->field_errors($field_errors);
-        $self->logger()->trace('validation details' . Dumper $field_errors ) if $self->logger->is_trace;
+        $self->log->trace('validation details' . Dumper $field_errors ) if $self->log->is_trace;
         return $field_errors;
     }
     return;

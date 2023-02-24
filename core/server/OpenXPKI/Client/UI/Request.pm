@@ -39,7 +39,7 @@ has method => (
     default => 'GET',
 );
 
-has logger => (
+has log => (
     is => 'ro',
     isa => 'Log::Log4perl::Logger',
     lazy => 1,
@@ -70,11 +70,11 @@ sub BUILD {
     # store keys from CGI params
     my @keys = $self->cgi->param;
     $cache{$_} = undef for @keys; # we do not yet query/cache the value but make the key known
-    do { $self->logger->trace(sprintf('CGI param: %s=%s', $_, join(',', $self->cgi->multi_param($_)))) for $self->cgi->param } if $self->logger->is_trace;
+    do { $self->log->trace(sprintf('CGI param: %s=%s', $_, join(',', $self->cgi->multi_param($_)))) for $self->cgi->param } if $self->log->is_trace;
 
     # store keys and values from JSON POST data
     if (($self->cgi->content_type // '') eq 'application/json') {
-        $self->logger->debug('Incoming POST data in JSON format (application/json)');
+        $self->log->debug('Incoming POST data in JSON format (application/json)');
 
         my $data = decode_json( scalar $self->cgi->param('POSTDATA') );
 
@@ -93,7 +93,7 @@ sub BUILD {
         # wrap Scalars and HashRefs in an ArrayRef as param() expects it (but leave ArrayRefs as is)
         $cache{$_} = (ref $data->{$_} eq 'ARRAY' ? $data->{$_} : [ $data->{$_} ]) for keys %$data;
 
-        $self->logger->debug('JSON param: ' . SDumper $data) if $self->logger->is_debug;
+        $self->log->debug('JSON param: ' . SDumper $data) if $self->log->is_debug;
         $self->method('POST');
     }
 
@@ -197,10 +197,10 @@ sub _param {
                 last;
             }
         }
-        $self->logger->trace($msg . 'not in cache. Query result: (' . join(', ', $self->_get_cache($key)) . ')') if $self->logger->is_trace;
+        $self->log->trace($msg . 'not in cache. Query result: (' . join(', ', $self->_get_cache($key)) . ')') if $self->log->is_trace;
     }
     else {
-        $self->logger->trace($msg . 'return from cache');
+        $self->log->trace($msg . 'return from cache');
     }
 
     return $self->_get_cache($key); # list
@@ -225,13 +225,13 @@ sub _decrypt_jwt {
 
     my $jwt_key = $self->session->param('jwt_encryption_key');
     unless ($jwt_key) {
-        $self->logger->debug("JWT encrypted parameter received but client session contains no decryption key");
+        $self->log->debug("JWT encrypted parameter received but client session contains no decryption key");
         return;
     }
 
     my $decrypted = decode_jwt(token => $token, key => $jwt_key);
     unless (ref $decrypted eq 'HASH') {
-        $self->logger->error("Decrypted JWT data is not a HashRef but a " . ref $decrypted);
+        $self->log->error("Decrypted JWT data is not a HashRef but a " . ref $decrypted);
         return;
     }
 

@@ -40,7 +40,7 @@ sub init_issuer {
     my $args = shift;
 
     my $issuers = $self->send_command_v2( 'get_ca_list' );
-    $self->logger()->trace("result: " . Dumper $issuers) if $self->logger->is_trace;
+    $self->log->trace("result: " . Dumper $issuers) if $self->log->is_trace;
 
     $self->page->label('I18N_OPENXPKI_UI_ISSUERS_LIST');
 

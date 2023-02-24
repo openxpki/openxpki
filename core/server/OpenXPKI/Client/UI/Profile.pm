@@ -1,21 +1,22 @@
-# OpenXPKI::Client::UI::Workflow::Metadata
-# (C) Copyright 2014 by The OpenXPKI Project
-
 package OpenXPKI::Client::UI::Profile;
-
 use Moose;
-use Data::Dumper;
-use English;
-use OpenXPKI::Serialization::Simple;
 
 extends 'OpenXPKI::Client::UI::Result';
+
+# Core Modules
+use English;
+use Data::Dumper;
+
+# Project modules
+use OpenXPKI::Serialization::Simple;
+
 
 sub action_get_styles_for_profile {
 
     my $self = shift;
     my $args = shift;
 
-    $self->logger()->trace( 'get_styles_for_profile with args: ' . Dumper $args ) if $self->logger->is_trace;
+    $self->log->trace( 'get_styles_for_profile with args: ' . Dumper $args ) if $self->log->is_trace;
 
     my @styles;
     if (my $cert_profile = $self->param('cert_profile')) {
@@ -60,7 +61,7 @@ sub action_get_key_param {
     # Get the possible parameters for this algo
     my $key_gen_param_supported = $key_alg ? $self->send_command_v2( 'get_key_params', { profile => $token->{cert_profile}, alg => $key_alg }) : {};
 
-    $self->logger()->trace( '$key_gen_param_supported: ' . Dumper $key_gen_param_supported ) if $self->logger->is_trace;
+    $self->log->trace( '$key_gen_param_supported: ' . Dumper $key_gen_param_supported ) if $self->log->is_trace;
 
     # The field names used in the ui are in the request
     my $key_gen_params = $self->param('key_gen_params');
@@ -74,7 +75,7 @@ sub action_get_key_param {
 
             my $preset = $key_gen_params->{$pn};
 
-            $self->logger()->trace('Preset = '.($preset?"'$preset'":'(none)'). ', Options = ' . Dumper $supported_params) if $self->logger->is_trace;
+            $self->log->trace('Preset = '.($preset?"'$preset'":'(none)'). ', Options = ' . Dumper $supported_params) if $self->log->is_trace;
 
             if (!(grep $preset, @{$supported_params})) {
                 $preset = $param[0]->{value};

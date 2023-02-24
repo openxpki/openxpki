@@ -1,5 +1,6 @@
 package OpenXPKI::Client::UI::Secret;
 use Moose;
+
 extends 'OpenXPKI::Client::UI::Result';
 
 use Data::Dumper;
@@ -118,8 +119,8 @@ sub action_unlock {
     my $secret = $self->param('id');
     my $msg = $self->send_command_v2( "set_secret_part", { secret => $secret, value => $phrase });
 
-    $self->logger()->info('Secret was sent');
-    $self->logger()->trace('Return ' . Dumper $msg) if $self->logger->is_trace;
+    $self->log->info('Secret was sent');
+    $self->log->trace('Return ' . Dumper $msg) if $self->log->is_trace;
 
     if ($msg) {
         $self->status->success('I18N_OPENXPKI_UI_SECRET_STATUS_ACCEPTED');

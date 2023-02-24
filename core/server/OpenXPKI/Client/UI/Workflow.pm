@@ -204,7 +204,7 @@ sub __render_from_workflow {
     my $self = shift;
     my $args = shift;
 
-    $self->logger()->trace( "render args: " . Dumper $args) if $self->logger->is_trace;
+    $self->log->trace( "render args: " . Dumper $args) if $self->log->is_trace;
 
     my $wf_info = $args->{wf_info} || undef;
     my $view = $args->{view} || '';
@@ -217,7 +217,7 @@ sub __render_from_workflow {
         $args->{wf_info} = $wf_info;
     }
 
-    $self->logger()->trace( "wf_info: " . Dumper $wf_info) if $self->logger->is_trace;
+    $self->log->trace( "wf_info: " . Dumper $wf_info) if $self->log->is_trace;
     if (!$wf_info) {
         $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION');
         return $self;
@@ -247,7 +247,7 @@ sub __render_from_workflow {
     if ($wf_info->{handles} && ref $wf_info->{handles} eq 'ARRAY') {
         @handles = @{$wf_info->{handles}};
 
-        $self->logger()->debug('Adding global actions ' . join('/', @handles));
+        $self->log->debug('Adding global actions ' . join('/', @handles));
 
         if (grep /\A wakeup \Z/x, @handles) {
             my $token = $self->__register_wf_token( $wf_info, { wf_handle => 'wakeup' } );
@@ -429,7 +429,7 @@ sub __render_from_workflow {
                     # 4 hours = 15 min delay, 4 min = 1 min delay
                     $timeout = POSIX::floor(sqrt( $elapsed )) * 60;
                 }
-                $self->logger()->debug('Auto Refresh when running' . $elapsed .' / ' . $timeout );
+                $self->log->debug('Auto Refresh when running' . $elapsed .' / ' . $timeout );
             }
 
             $self->set_refresh(uri => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id}, timeout => $timeout);
@@ -531,7 +531,7 @@ sub __render_from_workflow {
 
         my $fields = $self->__render_fields( $wf_info, $view );
 
-        $self->logger()->trace('Field data ' . Dumper $fields) if $self->logger->is_trace;
+        $self->log->trace('Field data ' . Dumper $fields) if $self->log->is_trace;
 
         # Add action buttons
         my $buttons = $self->__get_action_buttons( $wf_info ) ;
@@ -591,7 +591,7 @@ sub __render_from_workflow {
                 }
 
                 if ($field->{format} eq 'grid') {
-                    $self->logger()->trace('Adding grid ' . Dumper $field) if $self->logger->is_trace;
+                    $self->log->trace('Adding grid ' . Dumper $field) if $self->log->is_trace;
                     $self->main->add_section({
                         type => 'grid',
                         className => 'workflow',
@@ -610,7 +610,7 @@ sub __render_from_workflow {
                     });
                 } elsif ($field->{format} eq 'chart') {
 
-                    $self->logger()->trace('Adding chart ' . Dumper $field) if $self->logger->is_trace;
+                    $self->log->trace('Adding chart ' . Dumper $field) if $self->log->is_trace;
                     $self->main->add_section({
                         type => 'chart',
                         content => {
@@ -791,7 +791,7 @@ sub __get_action_buttons {
 
     }
 
-    $self->logger()->trace('Buttons are ' . Dumper \@buttons) if $self->logger->is_trace;
+    $self->log->trace('Buttons are ' . Dumper \@buttons) if $self->log->is_trace;
 
     return \@buttons;
 }
@@ -873,7 +873,7 @@ sub __get_next_auto_action {
     return unless ($wf_info->{activity}->{$wf_action}->{field} ||
         $wf_info->{activity}->{$wf_action}->{uihandle});
 
-    $self->logger()->debug('Implicit autoselect of action ' . $wf_action ) if($wf_action);
+    $self->log->debug('Implicit autoselect of action ' . $wf_action ) if($wf_action);
 
     return $wf_action;
 
@@ -905,7 +905,7 @@ sub __render_input_field {
 
     my $name = $field->{name};
     my $type = $field->{type};
-    $self->logger->trace("Rendering field '$name'" . ($value ? " with value '$value'" : "")) if $self->logger->is_trace;
+    $self->log->trace("Rendering field '$name'" . ($value ? " with value '$value'" : "")) if $self->log->is_trace;
 
     return if ($name =~ m{ \A workflow_id }x);
     return if ($name =~ m{ \A wf_ }x);
@@ -1020,7 +1020,7 @@ sub __delegate_call {
     my $wf_action = shift || '';
 
     my ($class, $method, $n, $param) = $call =~ /([\w\:\_]+)::([\w\_]+)(!([!\w]+))?/;
-    $self->logger()->debug("delegate render to $class, $method" );
+    $self->log->debug("delegate render to $class, $method" );
     eval "use $class; 1;";
     if ($param) {
         $class->$method( $self, $args, $wf_action, $param );
@@ -1045,7 +1045,7 @@ sub __render_result_list {
     my $search_result = shift;
     my $colums = shift;
 
-    $self->logger()->trace("search result " . Dumper $search_result) if $self->logger->is_trace;
+    $self->log->trace("search result " . Dumper $search_result) if $self->log->is_trace;
 
     my @result;
 
@@ -1087,7 +1087,7 @@ sub __render_result_list {
                     id => $wf_item->{'workflow_id'},
                     with_attributes => 1,
                 });
-                $self->logger()->trace( "fetch wf info : " . Dumper $wf_info) if $self->logger->is_trace;
+                $self->log->trace( "fetch wf info : " . Dumper $wf_info) if $self->log->is_trace;
                 $context = $wf_info->{workflow}->{context};
                 $attrib = $wf_info->{workflow}->{attribute};
             }
@@ -1237,14 +1237,14 @@ sub __render_fields {
         @fields_to_render = @$output;
         # strip array indicator [] from field name
         for (@fields_to_render) { $_->{name} =~ s/\[\]$// if ($_->{name}) }
-        $self->logger()->trace('Render output rules: ' . Dumper  \@fields_to_render) if $self->logger->is_trace;
+        $self->log->trace('Render output rules: ' . Dumper  \@fields_to_render) if $self->log->is_trace;
 
     } else {
         foreach my $field (sort keys %{$context}) {
             next if ($field =~ m{ \A (wf_|_|workflow_id|sources) }x);
             push @fields_to_render, { name => $field };
         }
-        $self->logger()->trace('No output rules, render plain context: ' . Dumper  \@fields_to_render) if $self->logger->is_trace;
+        $self->log->trace('No output rules, render plain context: ' . Dumper  \@fields_to_render) if $self->log->is_trace;
     }
 
     my $queued; # receives header items that depend on non-empty sections
@@ -1372,7 +1372,7 @@ sub __render_output_field {
             };
         }
 
-        $self->logger()->trace( 'item ' . Dumper $item) if $self->logger->is_trace;
+        $self->log->trace( 'item ' . Dumper $item) if $self->log->is_trace;
 
     # open another workflow - performs ACL check
     } elsif ($item->{format} eq "workflow_id") {
@@ -1393,7 +1393,7 @@ sub __render_output_field {
             $item->{format} = '';
         }
 
-        $self->logger->trace( 'item ' . Dumper $item) if $self->logger->is_trace;
+        $self->log->trace( 'item ' . Dumper $item) if $self->log->is_trace;
 
     # add a redirect command to the page
     } elsif ($item->{format} eq "redirect") {
@@ -1515,7 +1515,7 @@ sub __render_output_field {
         };
 
         my $cert_values = ($item->{value} and ref $item->{value} eq 'HASH') ? $item->{value} : {};
-        $self->logger->trace("Field '$fieldname': values = " . Dumper $cert_values) if $self->logger->is_trace;
+        $self->log->trace("Field '$fieldname': values = " . Dumper $cert_values) if $self->log->is_trace;
 
         my @val;
         my $cert_profile = $context->{cert_profile};
@@ -1551,7 +1551,7 @@ sub __render_output_field {
             }
         }
 
-        $self->logger->trace("Field '$fieldname': unilist values = " . Dumper \@val) if $self->logger->is_trace;
+        $self->log->trace("Field '$fieldname': unilist values = " . Dumper \@val) if $self->log->is_trace;
         $item->{value} = \@val;
 
     # legacy format for cert_info block
@@ -1575,7 +1575,7 @@ sub __render_output_field {
                 style => $cert_subject_style,
                 section => 'info',
             });
-            $self->logger->trace('Profile fields = ' . Dumper $fields) if $self->logger->is_trace;
+            $self->log->trace('Profile fields = ' . Dumper $fields) if $self->log->is_trace;
 
             foreach my $field (@$fields) {
                 my $key = $field->{name}; # Name of the context key
@@ -1751,7 +1751,7 @@ sub __render_output_field {
 
     if ($field->{template}) {
 
-        $self->logger->trace("Render output using template on field '$fieldname', template: ".$field->{template}.', value: ' . Dumper $item->{value}) if $self->logger->is_trace;
+        $self->log->trace("Render output using template on field '$fieldname', template: ".$field->{template}.', value: ' . Dumper $item->{value}) if $self->log->is_trace;
 
         # Rendering target depends on value format
         # deflist: iterate over each label/value pair and render the value template
@@ -1775,10 +1775,10 @@ sub __render_output_field {
                 template => $field->{template},
                 params => { value => $item->{value} },
             });
-            $self->logger()->debug('Rendered template: ' . $out);
+            $self->log->debug('Rendered template: ' . $out);
             if ($out) {
                 my @val = split /\s*\|\s*/, $out;
-                $self->logger()->trace('Split ' . Dumper \@val) if $self->logger->is_trace;
+                $self->log->trace('Split ' . Dumper \@val) if $self->log->is_trace;
                 $item->{value} = \@val;
             } else {
                 $item->{value} = undef; # prevent pushing emtpy lists
@@ -1799,12 +1799,12 @@ sub __render_output_field {
 
     } elsif ($field->{yaml_template}) {
         ##! 64: 'Rendering value: ' . $item->{value}
-        $self->logger->debug('Template value: ' . SDumper $item );
+        $self->log->debug('Template value: ' . SDumper $item );
         my $structure = $self->send_command_v2('render_yaml_template', {
             template => $field->{yaml_template},
             params => { value => $item->{value} },
         });
-        $self->logger->debug('Rendered YAML template: ' . SDumper $structure);
+        $self->log->debug('Rendered YAML template: ' . SDumper $structure);
         ##! 64: 'Rendered YAML template: ' . $out
         if (defined $structure) {
             $item->{value} = $structure;
@@ -1953,7 +1953,7 @@ sub __render_creator_tooltip {
             ->add($field->{yaml_template} // $field->{template} // '')
             ->add($creator//'')->hexdigest;
 
-        $self->logger()->trace('creator tooltip cache id ' .  $cacheid);
+        $self->log->trace('creator tooltip cache id ' .  $cacheid);
         my $value = $template_cache->get($cacheid);
         return $value if($value);
 
@@ -1961,7 +1961,7 @@ sub __render_creator_tooltip {
 
     # the field comes with a YAML template = render the field definiton from it
     if ($field->{yaml_template}) {
-        $self->logger()->debug('render creator tooltip from yaml template');
+        $self->log->debug('render creator tooltip from yaml template');
         my $val = $self->send_command_v2( render_yaml_template => {
             template => $field->{yaml_template},
             params => { creator => $creator },
@@ -1970,7 +1970,7 @@ sub __render_creator_tooltip {
 
     # use template (or default template) to set username
     } else {
-        $self->logger()->debug('render creator name from template');
+        $self->log->debug('render creator name from template');
         my $username = $self->send_command_v2( render_template => {
             template => $field->{template} || '[% USE Metadata; Metadata.creator(creator) %]',
             params => { creator => $creator },
@@ -1988,7 +1988,7 @@ sub __render_creator_tooltip {
     # still no result
     $value->{tooltip} //= 'I18N_OPENXPKI_UI_WORKFLOW_CREATOR_UNABLE_TO_RESOLVE';
 
-    $self->logger()->trace(Dumper { cacheid => $cacheid, value => $value} );
+    $self->log->trace(Dumper { cacheid => $cacheid, value => $value} );
 
     $template_cache->set($cacheid => $value) if($cacheid);
     return $value;
@@ -2093,7 +2093,7 @@ sub __render_workflow_action_body {
 
     my $wf_action_info = $wf_info->{activity}->{$wf_action};
 
-    $self->logger()->trace('activity info ' . Dumper $wf_action_info ) if $self->logger->is_trace;
+    $self->log->trace('activity info ' . Dumper $wf_action_info ) if $self->log->is_trace;
 
     # we allow prefill of the form if the workflow is started
     my $do_prefill = $wf_info->{workflow}->{state} eq 'INITIAL';

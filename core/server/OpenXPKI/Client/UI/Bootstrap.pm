@@ -19,7 +19,7 @@ sub init_structure {
 
     # create CSRF token
     if (!$session->param('rtoken')) {
-        $self->logger->debug('Generate rtoken');
+        $self->log->debug('Generate rtoken');
         $session->param('rtoken', Digest::SHA::sha1_hex( $$. $session->id() . rand(2**32) ) );
     }
     $self->rtoken($session->param('rtoken'));
@@ -31,7 +31,7 @@ sub init_structure {
     $baseurl =~ s|/$||;
     $session->param('baseurl',  $baseurl.'/#/');
     $session->flush;
-    $self->logger->debug("Baseurl from referrer: " . $baseurl);
+    $self->log->debug("Baseurl from referrer: " . $baseurl);
 
     if ($session->param('is_logged_in') and $user) {
         $self->set_user(%{ $user });
@@ -39,7 +39,7 @@ sub init_structure {
         # Preselect tenant, for now we just pick the first from the list
         if ($user->{tenants}) {
             $self->tenant($user->{tenants}->[0]->{value});
-            $self->logger->trace('Preset tenant from items ' . Dumper $user->{tenants}) if $self->logger->is_trace;
+            $self->log->trace('Preset tenant from items ' . Dumper $user->{tenants}) if $self->log->is_trace;
         }
 
         # Last Login

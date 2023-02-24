@@ -1,6 +1,8 @@
 package OpenXPKI::Client::UI::Certificate;
 use Moose;
 
+extends 'OpenXPKI::Client::UI::Result';
+
 # Core modules
 use Data::Dumper;
 use Math::BigInt;
@@ -13,9 +15,6 @@ use DateTime;
 use OpenXPKI::DN;
 use OpenXPKI::i18n qw( i18nGettext );
 use OpenXPKI::Serialization::Simple;
-
-
-extends 'OpenXPKI::Client::UI::Result';
 
 
 has __default_grid_head => (
@@ -241,11 +240,11 @@ sub init_result {
         }
     }
 
-    $self->logger()->debug( "persisted query: " . Dumper $result) if $self->logger->is_debug;
+    $self->log->debug( "persisted query: " . Dumper $result) if $self->log->is_debug;
 
     my $search_result = $self->send_command_v2( 'search_cert', $query );
 
-    $self->logger()->debug( "search result: " . Dumper $search_result) if $self->logger->is_debug;
+    $self->log->debug( "search result: " . Dumper $search_result) if $self->log->is_debug;
 
     my $criteria = '<br>' . (join ", ", @{$result->{criteria}});
 
@@ -268,7 +267,7 @@ sub init_result {
 
     my @result = $self->__render_result_list( $search_result, $body );
 
-    $self->logger()->trace( "dumper result: " . Dumper @result) if $self->logger->is_trace;
+    $self->log->trace( "dumper result: " . Dumper @result) if $self->log->is_trace;
 
     $self->main->add_section({
         type => 'grid',
@@ -351,11 +350,11 @@ sub init_export {
         }
     }
 
-    $self->logger()->trace( "persisted query: " . Dumper $result) if $self->logger->is_trace;
+    $self->log->trace( "persisted query: " . Dumper $result) if $self->log->is_trace;
 
     my $search_result = $self->send_command_v2( 'search_cert', $query );
 
-    $self->logger()->trace( "search result: " . Dumper $search_result) if $self->logger->is_trace;
+    $self->log->trace( "search result: " . Dumper $search_result) if $self->log->is_trace;
 
     my $header = $result->{header};
     $header = $self->__default_grid_head() if(!$header);
@@ -462,19 +461,19 @@ sub init_pager {
         $query->{reverse} = $self->param('reverse');
     }
 
-    $self->logger()->trace( "persisted query: " . Dumper $result) if $self->logger->is_trace;
-    $self->logger()->trace( "executed query: " . Dumper $query) if $self->logger->is_trace;
+    $self->log->trace( "persisted query: " . Dumper $result) if $self->log->is_trace;
+    $self->log->trace( "executed query: " . Dumper $query) if $self->log->is_trace;
 
     my $search_result = $self->send_command_v2( 'search_cert', $query );
 
-    $self->logger()->trace( "search result: " . Dumper $search_result) if $self->logger->is_trace;
+    $self->log->trace( "search result: " . Dumper $search_result) if $self->log->is_trace;
 
     my $body = $result->{column};
     $body = $self->__default_grid_row() if(!$body);
 
     my @result = $self->__render_result_list( $search_result, $body );
 
-    $self->logger()->trace( "dumper result: " . Dumper @result) if $self->logger->is_trace;
+    $self->log->trace( "dumper result: " . Dumper @result) if $self->log->is_trace;
 
     $self->confined_response({ data => \@result });
 
@@ -507,7 +506,7 @@ sub init_mine {
         $self->__tenant(),
     };
 
-    $self->logger()->trace( "search query: " . Dumper $query) if $self->logger->is_trace;
+    $self->log->trace( "search query: " . Dumper $query) if $self->log->is_trace;
 
     my $search_result = $self->send_command_v2( 'search_cert', { %$query, limit => $limit, start => $startat } );
 
@@ -532,7 +531,7 @@ sub init_mine {
 
     }
 
-    $self->logger()->trace( "search result: " . Dumper $search_result) if $self->logger->is_trace;
+    $self->log->trace( "search result: " . Dumper $search_result) if $self->log->is_trace;
 
     $self->set_page(
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_MINE_LABEL',
@@ -541,7 +540,7 @@ sub init_mine {
 
     my @result = $self->__render_result_list( $search_result, $self->__default_grid_row() );
 
-    $self->logger()->trace( "dumper result: " . Dumper @result) if $self->logger->is_trace;
+    $self->log->trace( "dumper result: " . Dumper @result) if $self->log->is_trace;
 
     $self->main->add_section({
         type => 'grid',
@@ -611,10 +610,10 @@ sub init_detail {
         return;
     }
 
-    $self->logger()->trace("result: " . Dumper $cert) if $self->logger->is_trace;
+    $self->log->trace("result: " . Dumper $cert) if $self->log->is_trace;
 
     my $cert_attribute = $cert->{cert_attributes};
-    $self->logger()->trace("result: " . Dumper $cert_attribute) if $self->logger->is_trace;
+    $self->log->trace("result: " . Dumper $cert_attribute) if $self->log->is_trace;
 
     my %dn = OpenXPKI::DN->new( $cert->{subject} )->get_hashed_content();
 
@@ -627,7 +626,7 @@ sub init_detail {
     # check if this is a entity certificate from the current realm
     my $is_local_entity = 0;
     if ($cert->{req_key} && $cert->{pki_realm} eq $self->_session->param('pki_realm')) {
-        $self->logger()->debug("cert is local entity");
+        $self->log->debug("cert is local entity");
         $is_local_entity = 1;
     }
 
@@ -774,7 +773,7 @@ sub init_detail {
         my @actions;
         my $reply = $self->send_command_v2 ( "get_cert_actions", { identifier => $cert_identifier });
 
-        $self->logger()->trace("available actions for cert " . Dumper $reply) if $self->logger->is_trace;
+        $self->log->trace("available actions for cert " . Dumper $reply) if $self->log->is_trace;
 
         if (defined $reply->{workflow} && ref $reply->{workflow} eq 'ARRAY') {
             foreach my $item (@{$reply->{workflow}}) {
@@ -786,7 +785,7 @@ sub init_detail {
                         cert_identifier => $cert_identifier,
                         wf_type => $item->{workflow},
                     };
-                    $self->logger()->trace("compile token" . Dumper $action) if $self->logger->is_trace;
+                    $self->log->trace("compile token" . Dumper $action) if $self->log->is_trace;
                     my $token = $self->_encrypt_jwt($action);
                     $page = 'encrypted!'.$token;
                 } else {
@@ -853,7 +852,7 @@ sub init_text {
 
     my $pem = $self->send_command_v2 ( "get_cert", {'identifier' => $cert_identifier, 'format' => $format });
 
-    $self->logger()->trace("Cert data: " . Dumper $pem) if $self->logger->is_trace;
+    $self->log->trace("Cert data: " . Dumper $pem) if $self->log->is_trace;
 
     $self->set_page(
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL',
@@ -946,7 +945,7 @@ sub init_related {
         format => 'DBINFO',
         attribute => 'system_workflow%'
     });
-    $self->logger()->trace("result: " . Dumper $cert) if $self->logger->is_trace;
+    $self->log->trace("result: " . Dumper $cert) if $self->log->is_trace;
 
     my %dn = OpenXPKI::DN->new( $cert->{subject} )->get_hashed_content();
 
@@ -958,13 +957,13 @@ sub init_related {
     # run a workflow search using the given ids from the cert attributes
     my @wfid = values %{$cert->{cert_attributes}};
 
-    $self->logger()->trace("related workflows " . Dumper \@wfid) if $self->logger->is_trace;
+    $self->log->trace("related workflows " . Dumper \@wfid) if $self->log->is_trace;
 
     my @result;
     if (scalar @wfid) {
         my $cert_workflows = $self->send_command_v2( 'search_workflow_instances', {
             id => \@wfid, check_acl => 1, $self->__tenant() });
-        $self->logger()->trace("workflow results" . Dumper $cert_workflows) if ($self->logger()->is_trace());;
+        $self->log->trace("workflow results" . Dumper $cert_workflows) if ($self->log->is_trace());;
 
         my $workflow_labels = $self->send_command_v2( 'get_workflow_instance_types');
 
@@ -1030,7 +1029,7 @@ sub init_download {
         return;
     }
 
-    $self->logger()->trace("cert info " . Dumper $cert_info ) if $self->logger->is_trace;
+    $self->log->trace("cert info " . Dumper $cert_info ) if $self->log->is_trace;
     my %dn = OpenXPKI::DN->new( $cert_info->{subject} )->get_hashed_content();
     my $filename = $dn{CN}[0] || $dn{emailAddress}[0] || $cert_info->{identifier};
 
@@ -1048,7 +1047,7 @@ sub init_download {
     } elsif ($format eq 'bundle') {
 
         my $chain = $self->send_command_v2 ( "get_chain", { start_with => $cert_identifier, format => 'PEM', 'keeproot' => 1 });
-        $self->logger()->trace("chain info " . Dumper $chain ) if $self->logger->is_trace;
+        $self->log->trace("chain info " . Dumper $chain ) if $self->log->is_trace;
 
         for (my $i=0;$i<@{$chain->{certificates}};$i++) {
             $output .= $chain->{subject}->[$i]. "\n". $chain->{certificates}->[$i]."\n\n";
@@ -1135,7 +1134,7 @@ sub action_autocomplete {
     my $term = $self->param('cert_identifier') || '';
     my $params = $self->fetch_autocomplete_params; # from OpenXPKI::Client::UI::Result
 
-    $self->logger()->trace( "autocomplete query: $term") if $self->logger->is_trace;
+    $self->log->trace( "autocomplete query: $term") if $self->log->is_trace;
 
 
     my @result;
@@ -1143,7 +1142,7 @@ sub action_autocomplete {
     # we assume it is a cert identifier - this might fail in few cases
     # Note - we replace + and / by - and _ in our base64 strings!
     if ($term =~ /[a-zA-Z0-9-_]{25,27}/) {
-        $self->logger()->debug( "search for identifier: $term ");
+        $self->log->debug( "search for identifier: $term ");
         my $search_result = $self->send_command_v2( 'get_cert', {
             identifier => $term,
             format => 'DBINFO',
@@ -1186,7 +1185,7 @@ sub action_autocomplete {
         }
     }
 
-    $self->logger()->trace( "search result: " . Dumper \@result) if $self->logger->is_trace;
+    $self->log->trace( "search result: " . Dumper \@result) if $self->log->is_trace;
 
     $self->confined_response(\@result);
 
@@ -1276,14 +1275,14 @@ sub action_search {
     my $self = shift;
     my $args = shift;
 
-    $self->logger()->trace("input params: " . Dumper $self->cgi()->param()) if $self->logger->is_trace;
+    $self->log->trace("input params: " . Dumper $self->cgi()->param()) if $self->log->is_trace;
 
     my $query = { entity_only => 1, $self->__tenant() };
     my $input = {}; # store the input data the reopen the form later
     my $verbose = {};
     foreach my $key (qw(subject issuer_dn)) {
         my $val = $self->param($key);
-        $self->logger()->trace("$key: " . ($val//''));
+        $self->log->trace("$key: " . ($val//''));
         if (defined $val && $val ne '') {
             $query->{$key} = '%'.$val.'%';
             $input->{$key} = $val;
@@ -1321,7 +1320,7 @@ sub action_search {
         my $val = $self->param($key);
         next unless ($val);
         if ($val =~ /[^0-9]/) {
-            $self->logger()->warn('skipping non-numeric value for validity option ' .$key);
+            $self->log->warn('skipping non-numeric value for validity option ' .$key);
             next;
         }
         push @{$input->{validity_options}}, { key => $key, value => $val };
@@ -1368,7 +1367,7 @@ sub action_search {
         $query->{cert_attributes} = $attr;
     }
 
-    $self->logger()->debug("query : " . Dumper $query) if $self->logger->is_debug;
+    $self->log->debug("query : " . Dumper $query) if $self->log->is_debug;
 
 
     my $result_count = $self->send_command_v2( 'search_cert_count', $query  );

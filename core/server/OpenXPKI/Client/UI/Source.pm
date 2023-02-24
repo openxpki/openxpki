@@ -1,5 +1,6 @@
 package OpenXPKI::Client::UI::Source;
 use Moose;
+
 extends 'OpenXPKI::Client::UI::Result';
 
 =head1 NAME
@@ -47,7 +48,7 @@ sub init_html {
     my @content = <FH>;
     close (FH);
 
-    $self->logger()->debug('Got content ' . join("",@content));
+    $self->log->debug('Got content ' . join("",@content));
 
     $self->main->add_section({
         type => 'text',
@@ -80,7 +81,7 @@ sub init_json {
     my @content = <FH>;
     close (FH);
 
-    $self->logger()->debug('Got content ' . join("",@content));
+    $self->log->debug('Got content ' . join("",@content));
 
     my $json = decode_json(join("",@content));
 
@@ -95,11 +96,11 @@ sub _init_path {
 
     my $config = $self->_client()->_config();
 
-    $self->logger()->trace('Got config ' . Dumper $config) if $self->logger->is_trace;
+    $self->log->trace('Got config ' . Dumper $config) if $self->log->is_trace;
 
     if ($config->{staticdir}) {
         if (! -d $config->{staticdir}) {
-            $self->logger()->error('Configured path for static content does not exist: ' . $config->{staticdir});
+            $self->log->error('Configured path for static content does not exist: ' . $config->{staticdir});
             die "Configuration broken - Path does not exist";
         } else {
             return $config->{staticdir};
@@ -120,7 +121,7 @@ sub _build_path {
     $file =~ s/[^a-zA-Z0-9_-]//g;
 
     if (!$file) {
-        $self->logger()->error('No file source given');
+        $self->log->error('No file source given');
         $self->_notfound();
         return $self;
     }
@@ -134,16 +135,16 @@ sub _build_path {
     } elsif (-d $path.'_global') {
         $path .= '_global'
     } else {
-        $self->logger()->error('No realm and also no global directory found');
+        $self->log->error('No realm and also no global directory found');
         $self->_notfound();
         return $self;
     }
 
     $path .= "/$file.$ext";
-    $self->logger()->debug('Try to source file from ' . $path);
+    $self->log->debug('Try to source file from ' . $path);
 
     if (! -f $path) {
-        $self->logger()->error('File to source not found: ' . $path);
+        $self->log->error('File to source not found: ' . $path);
         $self->_notfound();
         return $self;
     }

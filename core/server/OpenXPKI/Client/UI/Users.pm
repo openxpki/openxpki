@@ -1,5 +1,6 @@
 package OpenXPKI::Client::UI::Users;
 use Moose;
+
 extends 'OpenXPKI::Client::UI::Result';
 
 use Data::Dumper;
@@ -86,11 +87,11 @@ sub init_result {
         }
     }
 
-    $self->logger()->debug( "persisted query: " . Dumper $result) if $self->logger->is_debug;
+    $self->log->debug( "persisted query: " . Dumper $result) if $self->log->is_debug;
 
     my $query_result = $self->send_command_v2( 'search_users', $query );
 
-    $self->logger()->debug( "search result: " . Dumper $query_result) if $self->logger->is_debug;
+    $self->log->debug( "search result: " . Dumper $query_result) if $self->log->is_debug;
 
     my $criteria = '<br>' . (join ", ", @{$result->{criteria}});
 
@@ -105,7 +106,7 @@ sub init_result {
 
     my $pager = $self->__render_pager( $result, { limit => $limit, startat => $startat } );
     my @result = $self->__render_result_list( $query_result);
-    $self->logger()->trace( "dumper result: " . Dumper @result) if $self->logger->is_trace;
+    $self->log->trace( "dumper result: " . Dumper @result) if $self->log->is_trace;
     $self->__render_result_table($result,\@result,$limit,$startat);
     return $self;
 
@@ -156,16 +157,16 @@ sub init_pager {
         $query->{reverse} = $self->param('reverse');
     }
 
-    $self->logger()->trace( "persisted query: " . Dumper $result) if $self->logger->is_trace;
-    $self->logger()->trace( "executed query: " . Dumper $query) if $self->logger->is_trace;
+    $self->log->trace( "persisted query: " . Dumper $result) if $self->log->is_trace;
+    $self->log->trace( "executed query: " . Dumper $query) if $self->log->is_trace;
 
     my $query_result = $self->send_command_v2( 'search_users', $query );
 
-    $self->logger()->trace( "search result: " . Dumper $query_result) if $self->logger->is_trace;
+    $self->log->trace( "search result: " . Dumper $query_result) if $self->log->is_trace;
 
     my @result = $self->__render_result_list( $query_result );
 
-    $self->logger()->trace( "dumper result: " . Dumper @result) if $self->logger->is_trace;
+    $self->log->trace( "dumper result: " . Dumper @result) if $self->log->is_trace;
 
     $self->confined_response({ data => \@result });
 
@@ -183,7 +184,7 @@ Handle search requests and display the result as grid
 sub action_search {
     my $self = shift;
     my $args = shift;
-    $self->logger()->trace("input params: " . Dumper $self->cgi()->param()) if $self->logger->is_trace;
+    $self->log->trace("input params: " . Dumper $self->cgi()->param()) if $self->log->is_trace;
 
     # assemble query
     my $query = {};
@@ -193,7 +194,7 @@ sub action_search {
     # handle fields that are compared with placeholders: username, realname, mail
     foreach my $key (qw(username realname mail)) {
         my $val = $self->param($key);
-        $self->logger()->trace("$key: $val") if $self->logger->is_trace;
+        $self->log->trace("$key: $val") if $self->log->is_trace;
         if (defined $val && $val ne '') {
             $query->{$key} = '%'.$val.'%';
             $input->{$key} = $val;
@@ -203,7 +204,7 @@ sub action_search {
     # handle fields that are compared exactly: role
     foreach my $key (qw(role)) {
         my $val = $self->param($key);
-        $self->logger()->trace("$key: $val") if $self->logger->is_trace;
+        $self->log->trace("$key: $val") if $self->log->is_trace;
         if (defined $val && $val ne '') {
             $query->{$key} = $val;
             $input->{$key} = $val;
