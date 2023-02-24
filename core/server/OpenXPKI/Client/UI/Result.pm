@@ -270,12 +270,6 @@ has type => (
     default => 'json',
 );
 
-has _prefix_jwt => (
-    is => 'ro',
-    isa => 'Str',
-    default => '_encrypted_jwt_',
-);
-
 # Redirection (from an action_* method) to an init_* method that may live
 # in another class.
 # The ArrayRef holds the page call (e.g. "home!welcome") plus additional
@@ -476,7 +470,6 @@ sub __param {
 
     confess "param() / multi_param() expect a single key (string) as argument\n" if (not $key or ref $key); # die
 
-    my $prefix_jwt = $self->_prefix_jwt;
     my @queries = (
         # Try extra parameters appended to action
         sub { return $self->extra->{$key} },
