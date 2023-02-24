@@ -164,16 +164,13 @@ sub _param {
 
     # cache miss - query parameter
     unless (defined $self->cache->{$key}) {
-        my $cgi = $self->cgi;
-
         my $prefix_b64 = $self->_prefix_base64;
         my $prefix_jwt = $self->_prefix_jwt;
 
         my @queries = (
             # Try CGI parameters (and strip leading/trailing whitespaces)
             sub {
-                return unless $cgi;
-                return map { my $v = $_; $v =~ s/ ^\s+ | \s+$ //gx; $v } ($cgi->multi_param($key))
+                return map { my $v = $_; $v =~ s/ ^\s+ | \s+$ //gx; $v } ($self->cgi->multi_param($key))
             },
             # Try Base64 encoded parameter from JSON input
             sub {
@@ -181,8 +178,7 @@ sub _param {
             },
             # Try Base64 encoded CGI parameters
             sub {
-                return unless $cgi;
-                return map { decode_base64($_) } $cgi->multi_param($prefix_b64.$key)
+                return map { decode_base64($_) } $self->cgi->multi_param($prefix_b64.$key)
             },
             # Try JWT encrypted JSON data (may be deep structure when decrypted)
             sub {
@@ -190,8 +186,7 @@ sub _param {
             },
             # Try JWT encrypted CGI parameters (may be deep structure when decrypted)
             sub {
-                return unless $cgi;
-                return map { $self->_decrypt_jwt($_) } $cgi->multi_param($prefix_jwt.$key)
+                return map { $self->_decrypt_jwt($_) } $self->cgi->multi_param($prefix_jwt.$key)
             },
         );
 
