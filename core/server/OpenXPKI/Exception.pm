@@ -61,7 +61,7 @@ sub full_message {
     }
 
     ## put together and translate message
-    my $msg = OpenXPKI::i18n::i18nGettext ($self->{message}, %{$self->{params}});
+    my $msg = OpenXPKI::i18n::i18nGettext($self->{message} );
 
     # append all parameters if message was not translated
     if ($msg eq $self->{message} and scalar keys %{$self->{params}}) {

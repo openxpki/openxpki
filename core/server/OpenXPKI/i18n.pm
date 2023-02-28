@@ -22,7 +22,7 @@ use vars qw (@ISA @EXPORT_OK);
 use base qw( Exporter );
 #require Exporter;
 #@ISA = qw (Exporter);
-@EXPORT_OK = qw (i18nGettext i18nTokenizer i18nNoop set_locale_prefix set_language get_language);
+@EXPORT_OK = qw (i18nGettext i18nTokenizer set_locale_prefix set_language get_language);
 
 sub set_locale_prefix
 {
@@ -37,6 +37,7 @@ sub set_locale_prefix
 
 
 sub i18nGettext {
+
     my $text = shift;
 
     # do not handle empty strings or strings that do not start with I18N...
@@ -44,54 +45,17 @@ sub i18nGettext {
     # characters as they break when handled by gettext
     return $text unless (defined $text && length($text) && $text =~ m{\AI18N_});
 
-    my $arg_ref;
-    my $ref_of_first_argument = ref($_[0]);
+    warn "Parameter expansion with i18nGettext is no longer supported" if (@_);
 
-    # coerce arguments into a hashref
-    if ($ref_of_first_argument eq "") {
-    # first argument is a scalar
-    my %arguments = @_;
-    $arg_ref = \%arguments;
-    }
-    elsif ($ref_of_first_argument eq "HASH") {
-    $arg_ref = $_[0];
-    }
-    elsif ($ref_of_first_argument eq "REF") {
-    $arg_ref = ${$_[0]};
-    }
+    my $i18n_string = gettext($text);
 
-    ## we need this for utf8
-    #it's too slow, I try to use "use utf8;"
-    #my $i18n_string = pack "U0C*", unpack "C*", gettext ($text);
-    my $i18n_string = gettext ($text);
+    # gettext does not support empty translations, we use a single whitespace which we dont want to show up.
+    return '' if ($i18n_string eq ' ');
 
-    utf8::upgrade($i18n_string);
-
-    if ($i18n_string ne $text)
-    {
-
-        # gettext does not support empty translations, we use a single whitespace which we dont want to show up.
-        if ($i18n_string eq ' ') { return ''; }
-
-    ## there is a translation for this, so replace the parameters
-    ## in the resulting string
-
-    for my $parameter (keys %{$arg_ref}) {
-            my $key = $parameter;
-            if ($parameter !~ m{\A __\w+__ \z}xm)
-            {
-                warn "The i18 token $text is used together with the parameter ".
-                     "$parameter without __ as prefix and suffix. ".
-                     "The prefix and suffix will be fixed automatically. ";
-                $parameter =~ s{\A _* (\w+) _* \z}{__$1__}xms;
-            }
-            $i18n_string =~ s/$parameter/$arg_ref->{$key}/g;
-        }
-    } elsif (not $text) {
-        $i18n_string = '';
-    }
-
-    return $i18n_string;
+    # as we use this (hopefully) only to create internal strings
+    # in preparation for a LATER output we decode this back to the
+    # perl internal format
+    return Encode::decode('UTF-8', $i18n_string);
 }
 
 sub i18nTokenizer {
@@ -99,10 +63,10 @@ sub i18nTokenizer {
     my $string = shift;
     my %tokens = map { $_ => '' } ($string =~ /(I18N_OPENXPKI_UI_[A-Z0-9a-z\_-]+)/g);
     foreach my $token (keys %tokens) {
-        my $replace = i18nGettext( $token );
+        my $replace = gettext($token);
+        $replace = '' if ($replace eq ' ');
         $string =~ s/$token\b/$replace/g;
     }
-
     return $string;
 
 }
@@ -110,10 +74,7 @@ sub i18nTokenizer {
 sub set_language
 {
     ## global scope intended
-    $language = shift;
-    if (! defined $language) {
-    $language = "";
-    }
+    $language = shift || "C";
 
     ## erase environment to block libc's automatic environment detection
     ## and enforcement
@@ -121,9 +82,7 @@ sub set_language
     #delete $ENV{LC_TIME};
     delete $ENV{LANGUAGE};    ## known from Debian
     nl_putenv("LANGUAGE=$language");
-
-    if ($language eq "C" or $language eq "")
-    {
+    if ($language eq "C") {
         setlocale(LC_MESSAGES, "C");
         setlocale(LC_TIME,     "C");
         nl_putenv("LC_MESSAGES=C");
@@ -173,12 +132,6 @@ Exported function are function which can be imported by every other
 object. All i18n functions are static functions and work in global
 context.
 
-=head2 debug
-
-You should call the function in the following way:
-
-i18nGettext ("I18N_OPENXPKI_MY_CLASS_MY_FUNCTION_MY_MESSAGE");>
-
 =head1 Description
 
 This module manages all i18n stuff for the L<OpenXPKi> system.
@@ -198,39 +151,24 @@ to set the path to the directory with the mo databases.
 
 =head2 i18nGettext
 
-The first parameter is the i18n code string that should be looked up
-in the translation table. Usually this identifier should look like
-C<I18N_OPENXPKI_MODULE_FUNCTION_SPECIFIC_STUFF>. If the first parameter is
-undefined or has the length zero then the function returns the first
-parameter itself.
-Optionally there may follow a hash or a hash reference that maps parameter
-keywords to values that should be replaced in the original string.
-A parameter should have the format C<__NAME__>, but in fact every
-keyword is possible.
+Returns the translation for a string based on the current gettext settings.
+It will handle the internal convention of the "empty string" being a single
+whitespace to disable certain translations and return a real empty string
+instead.
 
-The function obtains the translation for the code string (if available)
-and then replaces each parameter keyword in the code string
-with the corresponding replacement value.
+The resulting string can contain UTF8 characters and is encoded with the
+perl internal representation so it should be safe to work with it inside
+perl. If you want to output the string directly you might need to call
+Encode::encode('UTF-8') or similar on the result.
 
-The function always returns an UTF8 string.
+If the string does not start with the prefix I<I18N_OPENXPKI_UI>, the method
+just returns the input as is.
 
-Examples:
+=head2 i18nTokenizer
 
-    my $text;
-    $text = i18nGettext("I18N_OPENXPKI_FOO_BAR");
-    $text = i18nGettext("I18N_OPENXPKI_FOO_BAR",
-                        "__COUNT__" => 1,
-                        "__ORDER__" => "descending",
-                        );
-
-    %translation = ( "__COUNT__" => 1,
-                     "__ORDER__" => "descending" );
-    $text = i18nGettext("I18N_OPENXPKI_FOO_BAR", %translation);
-
-    $translation_ref = { "__COUNT__" => 1,
-                         "__ORDER__" => "descending" };
-    $text = i18nGettext("I18N_OPENXPKI_FOO_BAR", $translation_ref);
-
+Expects a string that contains translatable items I<I18N_OPENXPKI_UI> and
+replaces any occurence with its translation. The result is returned with
+"external utf-8" encoding so it should be directly echoed.
 
 =head2 set_language
 
