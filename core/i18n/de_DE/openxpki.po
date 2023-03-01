@@ -184,8 +184,7 @@ msgstr ""
 "Typen zu finden, kann dieser als Präfix angegeben werden, z.B. IP:%"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_DESC"
-msgstr ""
-"Suche von Zertifikaten, die von dieser CA ausgestellt wurden."
+msgstr "Suche von Zertifikaten, die von dieser CA ausgestellt wurden."
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_FIELD_HINT_LIST"
 msgstr "Erläuterungen zu den Suchfiltern:"
@@ -369,6 +368,9 @@ msgstr "zurück zur Listenansicht"
 msgid "I18N_OPENXPKI_UI_CRL_CURRENT_LISTS"
 msgstr "Aktuelle Sperrlisten"
 
+msgid "I18N_OPENXPKI_UI_CRL_EXPIRED"
+msgstr "CRL abgelaufen - Aktualisierung notwendig!"
+
 msgid "I18N_OPENXPKI_UI_CRL_ISSUER"
 msgstr "CRL Aussteller"
 
@@ -387,8 +389,14 @@ msgstr "zeige ältere Sperrlisten"
 msgid "I18N_OPENXPKI_UI_CRL_LIST_VIEW_DETAIL"
 msgstr "Sperrlisten"
 
+msgid "I18N_OPENXPKI_UI_CRL_NEARLY_EXPIRED"
+msgstr "CRL fast abgelaufen - Aktualisierung empfohlen"
+
 msgid "I18N_OPENXPKI_UI_CRL_NEXT_UPDATE"
 msgstr "Nächste Aktualisierung"
+
+msgid "I18N_OPENXPKI_UI_CRL_NONE"
+msgstr "Keine Sperrlisten gefunden!"
 
 msgid "I18N_OPENXPKI_UI_CRL_NONE_FOR_CA"
 msgstr "Bisher keine Sperrlisten für diesen Aussteller."
@@ -427,6 +435,10 @@ msgstr "Challenge Password"
 
 msgid "I18N_OPENXPKI_UI_CSR_KEY_GENERATION_FAILED"
 msgstr "Schlüsselerzeugung fehlgeschlagen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST"
+msgstr "ja"
 
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION"
 msgstr ""
@@ -1460,8 +1472,8 @@ msgstr "Suche verfeinern"
 
 msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_EMAIL_HINT"
 msgstr ""
-"Suche nach der E-Mailadresse des Antragstellers. Exakter Treffer, Platzhalter "
-"sind erlaubt."
+"Suche nach der E-Mailadresse des Antragstellers. Exakter Treffer, "
+"Platzhalter sind erlaubt."
 
 msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_EMAIL_LABEL"
 msgstr "E-Mail (Antragsteller)"
@@ -1528,8 +1540,61 @@ msgstr "Passwort entspricht nicht der hinterlegten Prüfsumme"
 msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL"
 msgstr "Entsperren"
 
+msgid "I18N_OPENXPKI_UI_SELECT_ALL"
+msgstr "alle"
+
 msgid "I18N_OPENXPKI_UI_STACK_HINT_LIST"
 msgstr "Anmeldeverfahren"
+
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_NOT_AVAILABLE"
+msgstr "nicht verfügbar"
+
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_NO_TOKEN_FOUND"
+msgstr "kein Token gefunden"
+
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_EXPIRED"
+msgstr "Verschlüsselungstoken ist abgelaufen"
+
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_LABEL"
+msgstr "Aktiver Verschlüsselungstoken"
+
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_NEARLY_EXPIRED"
+msgstr "Verschlüsselungstoken nahe Ablaufdatum"
+
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_NOT_SET"
+msgstr "Verschlüsselungstoken nicht gesetzt!"
+
+msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES"
+msgstr "Laufende Prozesse (global)"
+
+msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_INFO"
+msgstr "Info"
+
+msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_SECONDS"
+msgstr "Sekunden"
+
+msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_STARTED"
+msgstr "Start"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_LABEL"
+msgstr "Passwortgruppen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_UNAVAILABLE"
+msgstr "Anzahl an nicht verfügbaren Passwortgruppen:"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_CRITICAL"
+msgstr "Der Systemstatus ist kritisch!"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_HEAD"
+msgstr "OpenXPKI Systemstatus"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_OK"
+msgstr "Der Systemstatus ist gut"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_WARNING"
+msgstr "Der Systemstatus benötigt Ihre Aufmerksamkeit!"
 
 msgid "I18N_OPENXPKI_UI_SUPPORT_TRAILER"
 msgstr ""
@@ -1566,8 +1631,11 @@ msgstr "Keine Daten verfügbar"
 msgid "I18N_OPENXPKI_UI_TOKEN_ALIAS"
 msgstr "Token Alias"
 
+msgid "I18N_OPENXPKI_UI_TOKEN_OF_TYPE"
+msgstr "Token vom Typ:"
+
 msgid "I18N_OPENXPKI_UI_TOKEN_STATUS"
-msgstr "Token Status"
+msgstr "Token-Status"
 
 msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_EXPIRED"
 msgstr "abgelaufen"
@@ -2560,9 +2628,9 @@ msgstr "Ausstellende CA"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_DESC"
 msgstr ""
 "Sie können direkt den alphanumerischen Zertifikatsidentifier eingeben oder "
-"einen Suchbegriff eintippen, um die Liste der Zertifikate zu durchsuchen. Die "
-"Ergebnisse werden unterhalb des Feldes als Liste angezeigt, wählen Sie das "
-"gewünschte per Mausklick aus. Die Suche beginnt nach der Eingabe von "
+"einen Suchbegriff eintippen, um die Liste der Zertifikate zu durchsuchen. "
+"Die Ergebnisse werden unterhalb des Feldes als Liste angezeigt, wählen Sie "
+"das gewünschte per Mausklick aus. Die Suche beginnt nach der Eingabe von "
 "mindestens drei Zeichen."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_LABEL"
@@ -3213,8 +3281,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_TIME_TOOLTIP"
 msgstr "Die Sperrung wird nach dem angegebenen Zeitpunkt ausgeführt"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RUN_IN_BACKGROUND_DESC"
-msgstr ""
-"Wählen Sie diese Option, um den Workflow im Hintergrund auszuführen."
+msgstr "Wählen Sie diese Option, um den Workflow im Hintergrund auszuführen."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RUN_IN_BACKGROUND_LABEL"
 msgstr "im Hintergrund ausführen"
@@ -3396,8 +3463,7 @@ msgstr "zurück zur Profilauswahl"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_PKCS10_UPLOAD"
 msgstr ""
-"Laden Sie einen bereits vorhandenen Zertifikatsantrag im PKCS#10-Format "
-"hoch."
+"Laden Sie einen bereits vorhandenen Zertifikatsantrag im PKCS#10-Format hoch."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_SELECT_TO_PROCEED"
 msgstr "Bitte wählen Sie die nächste Aktion aus"
@@ -4191,8 +4257,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REJECTED_LABEL"
 msgstr "Antrag abgelehnt"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REPORT_DETAIL_SUCCESS_DESC"
-msgstr ""
-"Ihre Auswertung liegt nun zum Download vor."
+msgstr "Ihre Auswertung liegt nun zum Download vor."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REPORT_DETAIL_SUCCESS_LABEL"
 msgstr "Auswertung erfolgreich erstellt"
@@ -4412,6 +4477,7 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_PREREG_LABEL"
 msgstr "Zertifikatsantrag (Vorregistrierung)"
+
 # fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_DESC"
 msgstr ""

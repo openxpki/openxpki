@@ -382,6 +382,10 @@ msgstr "返回总览"
 msgid "I18N_OPENXPKI_UI_CRL_CURRENT_LISTS"
 msgstr "当前吊销列表"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CRL_EXPIRED"
+msgstr "已过期"
+
 msgid "I18N_OPENXPKI_UI_CRL_ISSUER"
 msgstr "CRL颁发者"
 
@@ -400,8 +404,16 @@ msgstr "显示较旧的吊销列表"
 msgid "I18N_OPENXPKI_UI_CRL_LIST_VIEW_DETAIL"
 msgstr "证书吊销列表"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CRL_NEARLY_EXPIRED"
+msgstr "已过期"
+
 msgid "I18N_OPENXPKI_UI_CRL_NEXT_UPDATE"
 msgstr "下次更新/过期"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CRL_NONE"
+msgstr "该机构尚未发布CRL。"
 
 msgid "I18N_OPENXPKI_UI_CRL_NONE_FOR_CA"
 msgstr "该机构尚未发布CRL。"
@@ -443,6 +455,11 @@ msgstr "挑战密码"
 
 msgid "I18N_OPENXPKI_UI_CSR_KEY_GENERATION_FAILED"
 msgstr "密钥生成失败"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST"
+msgstr "是"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION"
@@ -1612,8 +1629,77 @@ msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL"
 msgstr "解锁"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_SELECT_ALL"
+msgstr "密钥算法"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_STACK_HINT_LIST"
 msgstr "返回总览"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_NOT_AVAILABLE"
+msgstr "无可用数据"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_NO_TOKEN_FOUND"
+msgstr "找不到请求的动作"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_EXPIRED"
+msgstr "已过期"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_LABEL"
+msgstr "无可用数据"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_NEARLY_EXPIRED"
+msgstr "已过期"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_NOT_SET"
+msgstr "CRL signing token is not online"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES"
+msgstr "该工作流当前由服务器处理，请稍后返回以检查其状态。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_INFO"
+msgstr "处理信息"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_SECONDS"
+msgstr "该工作流当前由服务器处理，请稍后返回以检查其状态。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_STARTED"
+msgstr "已签署"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_LABEL"
+msgstr "管理秘密"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_UNAVAILABLE"
+msgstr "用户名"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_CRITICAL"
+msgstr "系统状态"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_HEAD"
+msgstr "已签署"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_OK"
+msgstr "已签署"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_WARNING"
+msgstr "等待中"
 
 msgid "I18N_OPENXPKI_UI_SUPPORT_TRAILER"
 msgstr ""
@@ -1648,6 +1734,10 @@ msgstr "无可用数据"
 
 msgid "I18N_OPENXPKI_UI_TOKEN_ALIAS"
 msgstr "令牌别名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TOKEN_OF_TYPE"
+msgstr "令牌状态"
 
 msgid "I18N_OPENXPKI_UI_TOKEN_STATUS"
 msgstr "令牌状态"
@@ -4516,11 +4606,6 @@ msgstr "是"
 #~ "配符来执行子字符串匹配。 要查找特定的SAN类型，请将期望的类型设置为带有冒号"
 #~ "的前缀，例如 'IP:10.*' 以查找10.x子网中IP地址的所有SAN项目。"
 
-# Remove?
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_CUST"
-#~ msgstr "是"
-
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_CI_STATUS_OK_LABEL"
 #~ msgstr "Creator"
@@ -4565,9 +4650,6 @@ msgstr "是"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_LABEL"
 #~ msgstr "Export Password"
-
-#~ msgid "I18N_OPENXPKI_UI_PAUSED_CRL_TOKEN_NOT_USABLE"
-#~ msgstr "CRL signing token is not online"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_NODEID"
 #~ msgstr "Node ID"

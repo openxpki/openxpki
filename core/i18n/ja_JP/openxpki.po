@@ -396,6 +396,10 @@ msgstr "概要に戻る"
 msgid "I18N_OPENXPKI_UI_CRL_CURRENT_LISTS"
 msgstr "現在の失効リスト"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CRL_EXPIRED"
+msgstr "期限切れ"
+
 msgid "I18N_OPENXPKI_UI_CRL_ISSUER"
 msgstr "CRL発行者"
 
@@ -414,8 +418,16 @@ msgstr "古い失効リストを表示する"
 msgid "I18N_OPENXPKI_UI_CRL_LIST_VIEW_DETAIL"
 msgstr "証明書失効リスト"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CRL_NEARLY_EXPIRED"
+msgstr "期限切れ"
+
 msgid "I18N_OPENXPKI_UI_CRL_NEXT_UPDATE"
 msgstr "次の更新/有効期限"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CRL_NONE"
+msgstr "この権限によって発行されたCRLはありません"
 
 msgid "I18N_OPENXPKI_UI_CRL_NONE_FOR_CA"
 msgstr "この権限によって発行されたCRLはありません"
@@ -458,6 +470,10 @@ msgstr "チャレンジパスワード"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CSR_KEY_GENERATION_FAILED"
 msgstr "キー識別子"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST"
+msgstr "はい"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION"
@@ -1654,8 +1670,77 @@ msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL"
 msgstr "ロック解除"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_SELECT_ALL"
+msgstr "キーアルゴリズム"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_STACK_HINT_LIST"
 msgstr "概要に戻る"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_NOT_AVAILABLE"
+msgstr "データなし"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_NO_TOKEN_FOUND"
+msgstr "リクエストされたアクションが見つかりません"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_EXPIRED"
+msgstr "期限切れ"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_LABEL"
+msgstr "データなし"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_NEARLY_EXPIRED"
+msgstr "有効期限切れ"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_NOT_SET"
+msgstr "CRL署名トークンがオンラインではありません"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES"
+msgstr "許可者の承認待ちです。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_INFO"
+msgstr "プロセス情報"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_SECONDS"
+msgstr "許可者の承認待ちです。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_STARTED"
+msgstr "発行済み"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_LABEL"
+msgstr "秘密鍵の管理"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_UNAVAILABLE"
+msgstr "ユーザ名"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_CRITICAL"
+msgstr "システムステータス"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_HEAD"
+msgstr "発行済み"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_OK"
+msgstr "発行済み"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_WARNING"
+msgstr "待機中です"
 
 msgid "I18N_OPENXPKI_UI_SUPPORT_TRAILER"
 msgstr ""
@@ -1691,6 +1776,10 @@ msgstr "データなし"
 
 msgid "I18N_OPENXPKI_UI_TOKEN_ALIAS"
 msgstr "トークン別名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TOKEN_OF_TYPE"
+msgstr "トークンステータス"
 
 msgid "I18N_OPENXPKI_UI_TOKEN_STATUS"
 msgstr "トークンステータス"
@@ -4710,10 +4799,6 @@ msgstr "はい"
 #~ msgid "I18N_OPENXPKI_UI_CRL_LAST_ITEMCNT"
 #~ msgstr "古い失効リストを表示する"
 
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_CUST"
-#~ msgstr "はい"
-
 #~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_CI_STATUS_OK_LABEL"
 #~ msgstr "作成者"
 
@@ -4766,9 +4851,6 @@ msgstr "はい"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_LABEL"
 #~ msgstr "パスワード"
-
-#~ msgid "I18N_OPENXPKI_UI_PAUSED_CRL_TOKEN_NOT_USABLE"
-#~ msgstr "CRL署名トークンがオンラインではありません"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_NODEID"
 #~ msgstr "ノードID"

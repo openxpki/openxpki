@@ -370,6 +370,9 @@ msgstr "back to overview"
 msgid "I18N_OPENXPKI_UI_CRL_CURRENT_LISTS"
 msgstr "Current revocation lists"
 
+msgid "I18N_OPENXPKI_UI_CRL_EXPIRED"
+msgstr "CRL expired - update required!"
+
 msgid "I18N_OPENXPKI_UI_CRL_ISSUER"
 msgstr "CRL Issuer"
 
@@ -388,8 +391,14 @@ msgstr "show older revocation lists"
 msgid "I18N_OPENXPKI_UI_CRL_LIST_VIEW_DETAIL"
 msgstr "Certificate Revocation List"
 
+msgid "I18N_OPENXPKI_UI_CRL_NEARLY_EXPIRED"
+msgstr "CRL is near expiration - update recommended!"
+
 msgid "I18N_OPENXPKI_UI_CRL_NEXT_UPDATE"
 msgstr "Next Update / Expires"
+
+msgid "I18N_OPENXPKI_UI_CRL_NONE"
+msgstr "No CRL found!"
 
 msgid "I18N_OPENXPKI_UI_CRL_NONE_FOR_CA"
 msgstr "No CRLs have been issued by this authority, yet."
@@ -426,6 +435,11 @@ msgstr "Challenge password"
 
 msgid "I18N_OPENXPKI_UI_CSR_KEY_GENERATION_FAILED"
 msgstr "Key generation failed"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST"
+msgstr "Yes"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION"
@@ -1519,8 +1533,61 @@ msgstr "Key Check Value does not match secret"
 msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL"
 msgstr "Unlock"
 
+msgid "I18N_OPENXPKI_UI_SELECT_ALL"
+msgstr "all"
+
 msgid "I18N_OPENXPKI_UI_STACK_HINT_LIST"
 msgstr "Login Methods"
+
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_NOT_AVAILABLE"
+msgstr "not available"
+
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_NO_TOKEN_FOUND"
+msgstr "no token found"
+
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_EXPIRED"
+msgstr "Encryption token is expired"
+
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_LABEL"
+msgstr "Active Encryption Token"
+
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_NEARLY_EXPIRED"
+msgstr "Encryption token is near expiration"
+
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_NOT_SET"
+msgstr "No encryption token set!"
+
+msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES"
+msgstr "Running processes (global)"
+
+msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_INFO"
+msgstr "info"
+
+msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_SECONDS"
+msgstr "seconds"
+
+msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_STARTED"
+msgstr "started"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_LABEL"
+msgstr "Secret groups"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_UNAVAILABLE"
+msgstr "Number of unavailable secret groups:"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_CRITICAL"
+msgstr "Your system status is critical!"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_HEAD"
+msgstr "OpenXPKI system status"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_OK"
+msgstr "System status is good"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_WARNING"
+msgstr "Your system status requires your attention!"
 
 msgid "I18N_OPENXPKI_UI_SUPPORT_TRAILER"
 msgstr ""
@@ -1556,6 +1623,9 @@ msgstr "No data available"
 
 msgid "I18N_OPENXPKI_UI_TOKEN_ALIAS"
 msgstr "Token Alias"
+
+msgid "I18N_OPENXPKI_UI_TOKEN_OF_TYPE"
+msgstr "Tokens of type:"
 
 msgid "I18N_OPENXPKI_UI_TOKEN_STATUS"
 msgstr "Token Status"

@@ -467,6 +467,10 @@ msgid "I18N_OPENXPKI_UI_CRL_CURRENT_LISTS"
 msgstr "Действителен"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CRL_EXPIRED"
+msgstr "Доступ к УЦ"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CRL_ISSUER"
 msgstr "Технологические процессы выдачи новых списков отзыва"
 
@@ -491,8 +495,16 @@ msgid "I18N_OPENXPKI_UI_CRL_LIST_VIEW_DETAIL"
 msgstr "Действителен"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CRL_NEARLY_EXPIRED"
+msgstr "Доступ к УЦ"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CRL_NEXT_UPDATE"
 msgstr "Действителен"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CRL_NONE"
+msgstr "Имя"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CRL_NONE_FOR_CA"
@@ -541,6 +553,10 @@ msgstr "Изменить дополнительную информацию"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CSR_KEY_GENERATION_FAILED"
 msgstr "Изменить причину отзыва сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST"
+msgstr "Имя учетной записи"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION"
@@ -2084,8 +2100,78 @@ msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL"
 msgstr "Загрузка сертификата в форматах PEM или CRT"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_SELECT_ALL"
+msgstr "Имя учетной записи"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_STACK_HINT_LIST"
 msgstr "Действителен"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_NOT_AVAILABLE"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_NO_TOKEN_FOUND"
+msgstr "Тестировщик"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_EXPIRED"
+msgstr "С истекшим сроком действия"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_NEARLY_EXPIRED"
+msgstr "С истекшим сроком действия"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_NOT_SET"
+msgstr ""
+"Выбранный способ построения имени требует наличия, как минимум, одного "
+"названия подразделения и двух компонентов доменного имени."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES"
+msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_INFO"
+msgstr "Профиль пользователя"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_SECONDS"
+msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_STARTED"
+msgstr "В состоянии ожидания запуска"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_UNAVAILABLE"
+msgstr "Профиль пользователя"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_CRITICAL"
+msgstr "Статус"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_HEAD"
+msgstr "Статус"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_OK"
+msgstr "Статус"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_WARNING"
+msgstr "В состоянии ожидания запуска"
 
 msgid "I18N_OPENXPKI_UI_SUPPORT_TRAILER"
 msgstr ""
@@ -2134,6 +2220,10 @@ msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_TOKEN_ALIAS"
+msgstr "Статус сертификата УЦ"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TOKEN_OF_TYPE"
 msgstr "Статус сертификата УЦ"
 
 #, fuzzy
@@ -5739,10 +5829,6 @@ msgstr "Имя учетной записи"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CERT_"
-#~ msgstr "Доступ к УЦ"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CERT_EXPIRED"
 #~ msgstr "Доступ к УЦ"
 
 #, fuzzy
@@ -9933,10 +10019,6 @@ msgstr "Имя учетной записи"
 #~ msgstr "Действителен"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_CUST"
-#~ msgstr "Имя учетной записи"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_CI_STATUS_OK_LABEL"
 #~ msgstr "Дочерние технологические процессы"
 
@@ -10004,12 +10086,6 @@ msgstr "Имя учетной записи"
 #~ "хорошо знаете компоненты этой структуры и соглашения об использовании "
 #~ "имен в Вашей части инфраструктуры открытых ключей. Данный профиль "
 #~ "позволяет использовать также произвольный набор альтернативных имен."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_PAUSED_CRL_TOKEN_NOT_USABLE"
-#~ msgstr ""
-#~ "Выбранный способ построения имени требует наличия, как минимум, одного "
-#~ "названия подразделения и двух компонентов доменного имени."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_NODEID"
@@ -15231,9 +15307,6 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_STATE_VICE_INITIAL"
 #~ msgstr "Идет запуск... "
-
-#~ msgid "I18N_OPENXPKI_WF_STATE_WAITING_FOR_START"
-#~ msgstr "В состоянии ожидания запуска"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_TYPE_CA_ISSUANCE"

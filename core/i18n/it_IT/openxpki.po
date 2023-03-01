@@ -456,6 +456,10 @@ msgid "I18N_OPENXPKI_UI_CRL_CURRENT_LISTS"
 msgstr "mostra le liste di revoca precedenti"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CRL_EXPIRED"
+msgstr "Scaduto"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CRL_ISSUER"
 msgstr "Emissione Lista Revoche (CRL)"
 
@@ -479,8 +483,16 @@ msgid "I18N_OPENXPKI_UI_CRL_LIST_VIEW_DETAIL"
 msgstr "mostra le liste di revoca precedenti"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CRL_NEARLY_EXPIRED"
+msgstr "Scaduto"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CRL_NEXT_UPDATE"
 msgstr "mostra le liste di revoca precedenti"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CRL_NONE"
+msgstr "Non è stata ancora emessa alcuna CRL da questa autorità."
 
 msgid "I18N_OPENXPKI_UI_CRL_NONE_FOR_CA"
 msgstr "Non è stata ancora emessa alcuna CRL da questa autorità."
@@ -528,6 +540,11 @@ msgstr "Password della Chiave"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CSR_KEY_GENERATION_FAILED"
 msgstr "Cifratura"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST"
+msgstr "Chiave"
 
 # This is just a prefix
 #, fuzzy
@@ -1882,8 +1899,77 @@ msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL"
 msgstr "Scarica"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_SELECT_ALL"
+msgstr "Algoritmo della Chiave"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_STACK_HINT_LIST"
 msgstr "mostra le liste di revoca precedenti"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_NOT_AVAILABLE"
+msgstr "Nessun dato disponibile"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_NO_TOKEN_FOUND"
+msgstr "Azione richiesta non trovata"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_EXPIRED"
+msgstr "Scaduto"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_LABEL"
+msgstr "Nessun dato disponibile"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_NEARLY_EXPIRED"
+msgstr "Scaduto"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_NOT_SET"
+msgstr "Il token di firma della CRL non è online"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES"
+msgstr "Questa Richiesta di Revoca è in attesa di approvazione."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_INFO"
+msgstr "Informazioni Processi"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_SECONDS"
+msgstr "Questa Richiesta di Revoca è in attesa di approvazione."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_STARTED"
+msgstr "Emesso"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_LABEL"
+msgstr "Relazioni"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_UNAVAILABLE"
+msgstr "Nome utente"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_CRITICAL"
+msgstr "Stato del Sistema"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_HEAD"
+msgstr "Emesso"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_OK"
+msgstr "Emesso"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_WARNING"
+msgstr "In attesa"
 
 msgid "I18N_OPENXPKI_UI_SUPPORT_TRAILER"
 msgstr ""
@@ -1921,6 +2007,10 @@ msgstr "Nessun dato disponibile"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_TOKEN_ALIAS"
+msgstr "Stato del Token"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TOKEN_OF_TYPE"
 msgstr "Stato del Token"
 
 msgid "I18N_OPENXPKI_UI_TOKEN_STATUS"
@@ -5253,11 +5343,6 @@ msgstr "Chiave"
 #~ msgid "I18N_OPENXPKI_UI_CRL_LAST_ITEMCNT"
 #~ msgstr "mostra le liste di revoca precedenti"
 
-# Remove?
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_CUST"
-#~ msgstr "Chiave"
-
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_CI_STATUS_OK_LABEL"
 #~ msgstr "Creator"
@@ -5311,9 +5396,6 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_LABEL"
 #~ msgstr "Password"
-
-#~ msgid "I18N_OPENXPKI_UI_PAUSED_CRL_TOKEN_NOT_USABLE"
-#~ msgstr "Il token di firma della CRL non è online"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_NODEID"

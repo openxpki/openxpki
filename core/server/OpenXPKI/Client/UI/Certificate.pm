@@ -132,13 +132,13 @@ sub init_search {
         type => 'text', is_optional => 1, value => $preset->{san},
     )->add_field(
         name => 'status', label => 'I18N_OPENXPKI_UI_CERTIFICATE_STATUS',
-        type => 'select', is_optional => 1, prompt => 'all', options => \@states, , value => $preset->{status},
+        type => 'select', is_optional => 1, prompt => 'I18N_OPENXPKI_UI_SELECT_ALL', options => \@states, , value => $preset->{status},
     )->add_field(
         name => 'profile', label => 'I18N_OPENXPKI_UI_CERTIFICATE_PROFILE',
-        type => 'select', is_optional => 1, prompt => 'all', options => \@profile_list, value => $preset->{profile},
+        type => 'select', is_optional => 1, prompt => 'I18N_OPENXPKI_UI_SELECT_ALL', options => \@profile_list, value => $preset->{profile},
     )->add_field(
         name => 'issuer_identifier', label => 'I18N_OPENXPKI_UI_CERTIFICATE_ISSUER',
-        type => 'select', is_optional => 1, prompt => 'all', options => \@issuer_list, value => $preset->{issuer_identifier},
+        type => 'select', is_optional => 1, prompt => 'I18N_OPENXPKI_UI_SELECT_ALL', options => \@issuer_list, value => $preset->{issuer_identifier},
     )->add_field(
         name => 'validity', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY', placeholder => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_VALIDITY_PLACEHOLDER',
         type => 'datetime', is_optional => 1, clonable => 1,

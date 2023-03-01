@@ -20,7 +20,7 @@ sub render_process_status {
 
     $self->logger()->trace("result: " . Dumper $process ) if $self->logger->is_trace;
 
-    $self->page->label('Running processes (global)');
+    $self->page->label('I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES');
 
     my @result;
     my $now = time;
@@ -40,10 +40,10 @@ sub render_process_status {
         className => 'proc',
         content => {
             columns => [
-                { sTitle => "PID" },
-                { sTitle => "started", format => 'timestamp'},
-                { sTitle => "seconds" },
-                { sTitle => "info"},
+                { sTitle => 'PID' },
+                { sTitle => 'I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_STARTED', format => 'timestamp'},
+                { sTitle => 'I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_SECONDS' },
+                { sTitle => 'I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_INFO'},
             ],
             data => \@result,
             empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
@@ -69,14 +69,14 @@ sub render_system_status {
     my $warning = 0;
     my $critical = 0;
 
-    $self->page->label('OpenXPKI system status');
+    $self->page->label('I18N_OPENXPKI_UI_STATUS_SYSTEM_HEAD');
 
     if ($status->{secret_offline}) {
         push @fields, {
-            label => 'Secret groups',
+            label => 'I18N_OPENXPKI_UI_SECRET_GROUPS_STATUS_LABEL',
             format=>'link',
             value => {
-                label => sprintf ('%01d secret groups are NOT available',  $status->{secret_offline}),
+                label => 'I18N_OPENXPKI_UI_SECRET_GROUPS_STATUS_UNAVAILABLE ' . $status->{secret_offline},
                 page => 'secret!index',
                 target => '_top'
             }
@@ -90,14 +90,14 @@ sub render_system_status {
         $self->logger()->debug('Skipping crl status - not defined');
     } elsif (!$status->{crl_expiry}) {
         push @fields, {
-            label  => 'No CRL found!',
+            label  => 'I18N_OPENXPKI_UI_CRL_NONE',
             value  => '---',
             className => 'oxi-status-warning'
         };
         $warning = 1;
     } elsif ($status->{crl_expiry} < $now) {
         push @fields, {
-            label  => 'CRL expired - update required!',
+            label  => 'I18N_OPENXPKI_UI_CRL_EXPIRED',
             format => 'timestamp',
             value  => $status->{crl_expiry},
             className => 'oxi-status-danger'
@@ -114,7 +114,7 @@ sub render_system_status {
 
         if ($status->{crl_expiry} < $crl_expiry) {
             push @fields, {
-                label  => 'CRL is near expiration - update recommended!',
+                label  => 'I18N_OPENXPKI_UI_CRL_NEARLY_EXPIRED',
                 format => 'timestamp',
                 value  => $status->{crl_expiry},
                 className => 'oxi-status-warning'
@@ -135,7 +135,7 @@ sub render_system_status {
     } elsif (!$status->{dv_expiry}) {
         $warning = 1;
         push @fields, {
-            label  => 'No encryption token set!',
+            label  => 'I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_NOT_SET',
             value => '---',
             className => 'oxi-status-warning',
         };
@@ -144,21 +144,21 @@ sub render_system_status {
         my $dp_status = $self->send_command_v2("get_datavault_status", { check_online => 1 });
         if (!$dp_status->{alias}) {
             push @fields, {
-                label  => 'Active Encryption Token',
-                value  => 'No token found',
+                label  => 'I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_LABEL',
+                value  => 'I18N_OPENXPKI_UI_STATUS_DATAVAULT_NO_TOKEN_FOUND',
                 className => 'oxi-status-danger',
             };
             $critical = 1;
         } elsif ($dp_status->{online}) {
             push @fields, {
-                label  => 'Active Encryption Token',
+                label  => 'I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_LABEL',
                 value  => $dp_status->{alias},
                 className => '',
             };
         } else {
             push @fields, {
-                label  => 'Active Encryption Token',
-                value  => sprintf('not available (%s)', $dp_status->{alias}),
+                label  => 'I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_LABEL',
+                value  => sprintf('I18N_OPENXPKI_UI_STATUS_DATAVAULT_NOT_AVAILABLE (%s)', $dp_status->{alias}),
                 className => 'oxi-status-danger',
             };
             $critical = 1;
@@ -169,7 +169,7 @@ sub render_system_status {
         } elsif ($status->{dv_expiry} < $now) {
             $critical = 1;
             push @fields, {
-                label  => 'Encryption token is expired',
+                label  => 'I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_EXPIRED',
                 format => 'timestamp',
                 value  => $status->{dv_expiry},
                 className => 'oxi-status-danger',
@@ -186,7 +186,7 @@ sub render_system_status {
             if ($status->{dv_expiry} < $dv_expiry) {
                 $warning = 1;
                 push @fields, {
-                    label  => 'Encryption token expires',
+                    label  => 'I18N_OPENXPKI_UI_STATUS_DATAVAULT_TOKEN_NEARLY_EXPIRED',
                     format => 'timestamp',
                     value  => $status->{dv_expiry},
                     className => 'oxi-status-warning',
@@ -261,7 +261,7 @@ sub render_system_status {
             type => 'grid',
             className => 'token',
             content => {
-                label => 'Tokens of type ' . $type,
+                label => 'I18N_OPENXPKI_UI_TOKEN_OF_TYPE ' . $type,
                 columns => [
                     { sTitle => "I18N_OPENXPKI_UI_TOKEN_ALIAS" },
                     { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER" },
@@ -287,11 +287,11 @@ sub render_system_status {
 
 
     if ($critical) {
-        $self->status->error('Your system status is critical!');
+        $self->status->error('I18N_OPENXPKI_UI_STATUS_SYSTEM_CRITICAL');
     } elsif($warning) {
-        $self->status->warn('Your system status requires your attention!');
+        $self->status->warn('I18N_OPENXPKI_UI_STATUS_SYSTEM_WARNING');
     } else {
-        $self->status->success('System status is good');
+        $self->status->success('I18N_OPENXPKI_UI_STATUS_SYSTEM_OK');
     }
 
     return $self;
@@ -343,14 +343,14 @@ sub render_token_status {
             type => 'grid',
             className => 'token',
             content => {
-                label => 'Tokens of type ' . $type,
+                label => 'I18N_OPENXPKI_UI_TOKEN_OF_TYPE ' . $type,
                 columns => [
-                    { sTitle => "I18N_OPENXPKI_UI_TOKEN_ALIAS" },
-                    { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER" },
-                    { sTitle => "I18N_OPENXPKI_UI_TOKEN_STATUS" },
-                    { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE", format => 'timestamp'},
-                    { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER", format => 'timestamp'},
-                    { sTitle => "_className"},
+                    { sTitle => 'I18N_OPENXPKI_UI_TOKEN_ALIAS' },
+                    { sTitle => 'I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER' },
+                    { sTitle => 'I18N_OPENXPKI_UI_TOKEN_STATUS' },
+                    { sTitle => 'I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE', format => 'timestamp'},
+                    { sTitle => 'I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER', format => 'timestamp'},
+                    { sTitle => '_className'},
                 ],
                 data => \@result,
                 empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
