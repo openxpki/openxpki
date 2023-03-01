@@ -89,6 +89,7 @@ command "set_cert_metadata" => {
     my $mode = $params->mode;
     my $dbi = CTX('dbi');
 
+    my $log = CTX('log')->application();
     ##! 16: $cert_identifier
     ##! 16: $params->attribute
 
@@ -107,7 +108,7 @@ command "set_cert_metadata" => {
         # and https://rt.cpan.org/Public/Bug/Display.html?id=97541
         if ($value =~ m{ \A (-|\.|e|\+) \z }x) {
             $value = 'n/a';
-            CTX('log')->application()->debug(sprintf ('Replace metadata dash/dot by verbose "n/a" on %s / %s',
+            $log->debug(sprintf ('Replace metadata dash/dot by verbose "n/a" on %s / %s',
                     $cert_identifier, $key));
         }
         $dbi->insert(
@@ -151,17 +152,20 @@ command "set_cert_metadata" => {
         if (!$item) {
             ##! 32: '  -> no item found, plain insert'
             if (!ref $value) {
-                $insert_item->( $key, $value);
+                $insert_item->( $key, $value );
+                $log->info("Append (set) certificate metadata $key with $value");
                 next KEY;
             }
             foreach my $val (@{$value}) {
                 $insert_item->( $key, $val );
+                $log->info("Append (set) certificate metadata $key with $val");
             }
             next KEY;
         }
 
         if ($mode eq 'skip') {
             ##! 32: '  -> item found in "skip" mode'
+            $log->info("Key $key already exists, skip certificate metadata");
             next KEY;
         }
 
@@ -189,9 +193,11 @@ command "set_cert_metadata" => {
             # mark to keep
             if (exists $existing{$val}) {
                 $existing{$val} = 1;
+                $log->info("Value already exists, skip certificate metadata with $key with $val");
             # insert
             } else {
                 push @add, $val;
+                $log->info("Append (merge) certificate metadata $key with $val");
             }
         }
 
