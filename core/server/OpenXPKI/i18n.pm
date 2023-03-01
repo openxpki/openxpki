@@ -4,7 +4,6 @@
 
 use strict;
 use warnings;
-use utf8;
 
 package OpenXPKI::i18n;
 
