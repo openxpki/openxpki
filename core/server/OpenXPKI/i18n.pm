@@ -1,30 +1,25 @@
-## OpenXPKI::i18n.pm
-## Written 2005 by Michael Bell for the OpenXPKI project
-## (C) Copyright 2005-2006 The OpenXPKI Project
-
+package OpenXPKI::i18n;
 use strict;
 use warnings;
 
-package OpenXPKI::i18n;
-
+# Core modules
 use English;
-
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use Locale::gettext_pp qw (:locale_h :libintl_h nl_putenv);
 use POSIX qw (setlocale);
+
+# Project modules
+use OpenXPKI::Exception;
+use OpenXPKI::Debug;
+
 
 our $language = "";
 our $locale_prefix = "";
 
 use vars qw (@ISA @EXPORT_OK);
 use base qw( Exporter );
-#require Exporter;
-#@ISA = qw (Exporter);
 @EXPORT_OK = qw (i18nGettext i18nTokenizer set_locale_prefix set_language get_language);
 
-sub set_locale_prefix
-{
+sub set_locale_prefix {
     $locale_prefix = shift;
     if (not -e $locale_prefix)
     {
@@ -36,7 +31,6 @@ sub set_locale_prefix
 
 
 sub i18nGettext {
-
     my $text = shift;
 
     # do not handle empty strings or strings that do not start with I18N...
@@ -44,22 +38,22 @@ sub i18nGettext {
     # characters as they break when handled by gettext
     return $text unless (defined $text && length($text) && $text =~ m{\AI18N_});
 
-    warn "Parameter expansion with i18nGettext is no longer supported" if (@_);
+    warn "Parameter expansion with i18nGettext() is no longer supported" if (@_);
 
     my $i18n_string = gettext($text);
 
     # gettext does not support empty translations, we use a single whitespace which we dont want to show up.
     return '' if ($i18n_string eq ' ');
 
-    # as we use this (hopefully) only to create internal strings
+    # as we (hopefully) use i18nGettext() only to create internal strings
     # in preparation for a LATER output we decode this back to the
-    # perl internal format
+    # internal Perl format
     return Encode::decode('UTF-8', $i18n_string);
 }
 
 sub i18nTokenizer {
-
     my $string = shift;
+
     my %tokens = map { $_ => '' } ($string =~ /(I18N_OPENXPKI_UI_[A-Z0-9a-z\_-]+)/g);
     foreach my $token (keys %tokens) {
         my $replace = gettext($token);
@@ -67,11 +61,9 @@ sub i18nTokenizer {
         $string =~ s/$token\b/$replace/g;
     }
     return $string;
-
 }
 
-sub set_language
-{
+sub set_language {
     ## global scope intended
     $language = shift || "C";
 
@@ -81,39 +73,29 @@ sub set_language
     #delete $ENV{LC_TIME};
     delete $ENV{LANGUAGE};    ## known from Debian
     nl_putenv("LANGUAGE=$language");
-    if ($language eq "C") {
-        setlocale(LC_MESSAGES, "C");
-        setlocale(LC_TIME,     "C");
-        nl_putenv("LC_MESSAGES=C");
-        nl_putenv("LC_TIME=C");
-    } else {
-        my $loc = "${language}.UTF-8";
-        if (setlocale(LC_MESSAGES, $loc) ne $loc) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_I18N_SETLOCALE_LC_MESSAGES_FAILED',
-                params  => {
-                    LOCALE => $loc,
-                },
-            );
-        };
-        if (setlocale(LC_TIME,     $loc) ne $loc) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_I18N_SETLOCALE_LC_TIME_FAILED',
-                params  => {
-                    LOCALE => $loc,
-                },
-            );
-        }
-        nl_putenv("LC_MESSAGES=$loc");
-        nl_putenv("LC_TIME=$loc");
+
+    my $loc = $language eq "C" ? $language : "${language}.UTF-8";
+    if (setlocale(LC_MESSAGES, $loc) ne $loc) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_I18N_SETLOCALE_LC_MESSAGES_FAILED',
+            params  => { LOCALE => $loc },
+        );
+    };
+    if (setlocale(LC_TIME, $loc) ne $loc) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_I18N_SETLOCALE_LC_TIME_FAILED',
+            params  => { LOCALE => $loc },
+        );
     }
+    nl_putenv("LC_MESSAGES=$loc");
+    nl_putenv("LC_TIME=$loc");
+
     textdomain("openxpki");
     bindtextdomain("openxpki", $locale_prefix);
     bind_textdomain_codeset("openxpki", "UTF-8");
 }
 
-sub get_language
-{
+sub get_language {
     return $language;
 }
 
