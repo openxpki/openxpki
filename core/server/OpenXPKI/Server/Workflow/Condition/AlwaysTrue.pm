@@ -20,14 +20,6 @@ __END__
 
 OpenXPKI::Server::Workflow::Condition::AlwaysTrue
 
-=head1 SYNOPSIS
-
-<action name="do_something">
-  <condition name="something"
-             class="OpenXPKI::Server::Workflow::Condition::AlwaysTrue">
-  </condition>
-</action>
-
 =head1 DESCRIPTION
 
 This condition always returns true. This is mainly useful as a dummy

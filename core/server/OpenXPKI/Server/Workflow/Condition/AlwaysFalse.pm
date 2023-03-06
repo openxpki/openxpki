@@ -20,14 +20,6 @@ __END__
 
 OpenXPKI::Server::Workflow::Condition::AlwaysFalse
 
-=head1 SYNOPSIS
-
-<action name="do_something">
-  <condition name="something"
-             class="OpenXPKI::Server::Workflow::Condition::AlwaysFalse">
-  </condition>
-</action>
-
 =head1 DESCRIPTION
 
 This condition always returns false. This is mainly useful as a dummy

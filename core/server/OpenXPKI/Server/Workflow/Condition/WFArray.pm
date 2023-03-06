@@ -144,35 +144,35 @@ The following conditions are supported:
 
 =over 8
 
-=item is_empty
+=item C<is_empty>
 
 Condition is true if the array is either non-existent or is empty (I<value> is not used).
 
-=item is_not_empty
+=item C<is_not_empty>
 
 Condition is true if the array is not empty (I<value> is not used).
 
-=item count_is
+=item C<count_is>
 
 Condition is true if the number of elements matches the value set in C<value>.
 
-=item count_ne
+=item C<count_ne>
 
 Condition is true if the number of elements does not match the value set in C<value>.
 
-=item count_lt
+=item C<count_lt>
 
 Condition is true if the number of elements is less than the value set in C<value>.
 
-=item count_lte
+=item C<count_lte>
 
 Condition is true if the number of elements is less than or equal the value set in C<value>.
 
-=item count_gt
+=item C<count_gt>
 
 Condition is true if the number of elements is greater than the value set in C<value>.
 
-=item count_gte
+=item C<count_gte>
 
 Condition is true if the number of elements is greater than or equal the value set in C<value>.
 

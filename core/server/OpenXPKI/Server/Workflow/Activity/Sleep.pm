@@ -23,7 +23,11 @@ sub execute {
 
 __END__
 
-=head1 OpenXPKI::Server::Workflow::Activity::Sleep
+=head1 Name
+
+OpenXPKI::Server::Workflow::Activity::Sleep
+
+=head1 Description
 
 Do a real, synchronus (and blocking) sleep. Use this only for some
 seconds of sleep. If you need to interupt for longer please use the

@@ -35,8 +35,11 @@ sub execute {
 
 __END__;
 
+=head1 Name
 
-=head1 OpenXPKI::Server::Workflow::Activity::Tools::CalculateArgon2Key
+OpenXPKI::Server::Workflow::Activity::Tools::CalculateArgon2Key
+
+=head1 Description
 
 Derive key from given password using the Argon2 algorithm.
 

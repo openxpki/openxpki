@@ -42,8 +42,11 @@ sub execute {
 
 __END__;
 
+=head1 Name
 
-=head1 OpenXPKI::Server::Workflow::Activity::Tools::CalculateRequestHMAC
+OpenXPKI::Server::Workflow::Activity::Tools::CalculateRequestHMAC
+
+=head1 Description
 
 Calculate the SHA256 HMAC for a PEM encoded CSR
 

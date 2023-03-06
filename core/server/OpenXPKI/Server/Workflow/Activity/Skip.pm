@@ -13,6 +13,10 @@ sub execute {
 
 __END__
 
-=head1 OpenXPKI::Server::Workflow::Activity::Skip
+=head1 Name
+
+OpenXPKI::Server::Workflow::Activity::Skip
+
+=head1 Description
 
 Does nothing, reserved for later use!

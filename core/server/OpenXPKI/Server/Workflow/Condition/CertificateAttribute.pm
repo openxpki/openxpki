@@ -21,7 +21,7 @@ __END__
 
 OpenXPKI::Server::Workflow::Condition::CertificateAttribute
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 This class is deprecated and should no longer be used.
 Use OpenXPKI::Server::Workflow::Condition::CertificateB<Has>Attribute.

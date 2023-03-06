@@ -43,7 +43,11 @@ sub execute {
 
 __END__
 
-=head1 OpenXPKI::Server::Workflow::Activity::EST::GenerateCSRAttribute;
+=head1 Name
+
+OpenXPKI::Server::Workflow::Activity::EST::GenerateCSRAttribute;
+
+=head1 Description
 
 Generate attribute list for the EST csrattrs command
 

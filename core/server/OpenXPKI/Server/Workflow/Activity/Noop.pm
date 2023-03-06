@@ -13,6 +13,10 @@ sub execute {
 
 __END__
 
-=head1 OpenXPKI::Server::Workflow::Activity::Noop
+=head1 Name
+
+OpenXPKI::Server::Workflow::Activity::Noop
+
+=head1 Description
 
 The OpenXPKI equivalent to Workflow::Action::Null.

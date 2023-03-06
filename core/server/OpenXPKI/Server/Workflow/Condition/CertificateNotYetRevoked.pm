@@ -60,14 +60,6 @@ __END__
 
 OpenXPKI::Server::Workflow::Condition::CertificateNotYetRevoked
 
-=head1 SYNOPSIS
-
-<action name="do_something">
-  <condition name="certificate_not_yet_revoked"
-             class="OpenXPKI::Server::Workflow::Condition::CertificateNotYetRevoked">
-  </condition>
-</action>
-
 =head1 DESCRIPTION
 
 The condition checks if the certificate from a CRR has not yet been

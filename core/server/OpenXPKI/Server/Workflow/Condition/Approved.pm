@@ -108,14 +108,11 @@ OpenXPKI::Server::Workflow::Condition::Approved
 
 =head1 SYNOPSIS
 
-<action name="CreateCSR">
-  <condition name="Condition::Approved"
-             class="OpenXPKI::Server::Workflow::Condition::Approved">
-    <param name="role" value="RA Operator"/>
-    <param name="role" value="RA Operator"/>
-    <param name="role" value="Privacy Officer"/>
-  </condition>
-</action>
+    condition:
+        is_approved:
+            class: OpenXPKI::Server::Workflow::Condition::Approved
+            param:
+                role: RA Operator, Privacy Officer
 
 =head1 DESCRIPTION
 

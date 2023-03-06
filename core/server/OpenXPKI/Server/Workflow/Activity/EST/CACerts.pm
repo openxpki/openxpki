@@ -39,7 +39,11 @@ sub execute {
 __END__;
 
 
-=head1 OpenXPKI::Server::Workflow::Activity::EST::CACerts;
+=head1 Name
+
+OpenXPKI::Server::Workflow::Activity::EST::CACerts
+
+=head1 Description
 
 Generate PKCS7 block holding the current issuer with all chain certificates
 

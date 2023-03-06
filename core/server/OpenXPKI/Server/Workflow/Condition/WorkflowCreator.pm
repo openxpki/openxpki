@@ -41,9 +41,8 @@ OpenXPKI::Server::Workflow::Condition::WorkflowCreator
 
 =head1 SYNOPSIS
 
-   is_workflow_creator"
+   is_workflow_creator:
         class: OpenXPKI::Server::Workflow::Condition::WorkflowCreator
-
 
 =head1 DESCRIPTION
 
