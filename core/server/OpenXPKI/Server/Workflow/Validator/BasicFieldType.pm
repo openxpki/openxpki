@@ -87,7 +87,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Validator::BasicFieldType;
+OpenXPKI::Server::Workflow::Validator::BasicFieldType
 
 =head1 DESCRIPTION
 

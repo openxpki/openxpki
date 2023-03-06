@@ -28,7 +28,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::NICE::RenewCertificate;
+OpenXPKI::Server::Workflow::Activity::NICE::RenewCertificate
 
 =head1 Description
 

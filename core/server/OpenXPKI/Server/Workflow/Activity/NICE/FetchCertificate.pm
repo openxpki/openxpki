@@ -46,7 +46,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::NICE::FetchCertificate;
+OpenXPKI::Server::Workflow::Activity::NICE::FetchCertificate
 
 =head1 Description
 

@@ -145,7 +145,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::RevokeCertificate;
+OpenXPKI::Server::Workflow::Activity::Tools::RevokeCertificate
 
 =head1 Description
 

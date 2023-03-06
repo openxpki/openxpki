@@ -62,7 +62,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::RelateWorkflow;
+OpenXPKI::Server::Workflow::Activity::Tools::RelateWorkflow
 
 =head1 Description
 

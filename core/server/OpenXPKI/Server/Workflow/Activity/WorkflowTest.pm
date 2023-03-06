@@ -90,7 +90,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::WorkflowTest;
+OpenXPKI::Server::Workflow::Activity::WorkflowTest
 
 =head1 Description
 

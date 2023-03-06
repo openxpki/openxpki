@@ -43,7 +43,7 @@ sub execute {
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::User::LoadUserData;
+OpenXPKI::Server::Workflow::Activity::User::LoadUserData
 
 =head1 Description
 

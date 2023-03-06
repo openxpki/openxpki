@@ -95,7 +95,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::NICE::RevokeCertificate;
+OpenXPKI::Server::Workflow::Activity::NICE::RevokeCertificate
 
 =head1 Description
 

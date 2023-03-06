@@ -159,7 +159,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::NICE::IssueCertificate;
+OpenXPKI::Server::Workflow::Activity::NICE::IssueCertificate
 
 =head1 Description
 

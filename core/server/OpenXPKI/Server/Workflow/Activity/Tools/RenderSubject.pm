@@ -143,7 +143,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::RenderSubject;
+OpenXPKI::Server::Workflow::Activity::Tools::RenderSubject
 
 =head1 Description
 

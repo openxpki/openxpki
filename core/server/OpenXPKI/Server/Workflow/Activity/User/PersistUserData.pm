@@ -33,7 +33,7 @@ sub execute {
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::User::PersistUserData;
+OpenXPKI::Server::Workflow::Activity::User::PersistUserData
 
 =head1 Description
 

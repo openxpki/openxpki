@@ -42,7 +42,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::NICE::CheckForRevocation;
+OpenXPKI::Server::Workflow::Activity::NICE::CheckForRevocation
 
 =head1 Description
 

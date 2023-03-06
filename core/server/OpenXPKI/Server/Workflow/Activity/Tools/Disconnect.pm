@@ -56,7 +56,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::Disconnect;
+OpenXPKI::Server::Workflow::Activity::Tools::Disconnect
 
 =head1 Description
 
