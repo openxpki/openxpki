@@ -546,7 +546,6 @@ OpenXPKI/Server/Workflow/Condition/Evaluate.pm
 OpenXPKI/Server/Workflow/Condition/HasRole.pm
 OpenXPKI/Server/Workflow/Condition/IsCertificateOwner.pm
 OpenXPKI/Server/Workflow/Condition/IsWrappedRequest.pm
-OpenXPKI/Server/Workflow/Condition/Key.pm
 OpenXPKI/Server/Workflow/Condition/KeyGenerationMode.pm
 OpenXPKI/Server/Workflow/Condition/KeyParams.pm
 OpenXPKI/Server/Workflow/Condition/SubjectsMatch.pm
