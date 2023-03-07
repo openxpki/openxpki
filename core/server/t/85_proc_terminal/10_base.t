@@ -85,7 +85,7 @@ my $config = {
     'test' => {
         server_pidfile => "$tempdir/terminal.pid",
         socket_file => "$tempdir/terminal.sock",
-        system_command => ['/bin/bash', '-c', "$Bin/bash-proc.sh" ],
+        command => ['/bin/bash', '-c', "$Bin/bash-proc.sh" ],
         internal => 1,
     },
 };
@@ -106,7 +106,7 @@ for my $internal (1, 0) {
             name => 'test-external',
             server_pidfile => $config->{test}->{server_pidfile},
             socket_file => $config->{test}->{socket_file},
-            system_command => $config->{test}->{system_command},
+            command => $config->{test}->{command},
         );
 
         $term = OpenXPKI::Server::ProcTerminal::Client->new(
