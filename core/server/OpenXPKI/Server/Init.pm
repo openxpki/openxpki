@@ -51,6 +51,7 @@ my @INIT_TASKS = qw(
   notification
   server
   bedroom
+  terminal
 );
 #
 
@@ -338,6 +339,30 @@ sub __do_init_bedroom {
     ##! 1: "init bedroom"
     OpenXPKI::Server::Context::setcontext({
         'bedroom' => OpenXPKI::Server::Bedroom->new()
+    });
+}
+
+sub __do_init_terminal {
+    try {
+        # this is EE code:
+        require OpenXPKI::Server::ProcTerminal;
+    }
+    catch ($err) {
+        return if $err =~ m{locate OpenXPKI/Server/ProcTerminal\.pm in \@INC}; # silently fail if file does not exist
+        die $err;
+    }
+
+    my $config = CTX('config')->get_hash('system.terminal') // {};
+
+    my $manager = OpenXPKI::Server::ProcTerminal->new(
+        OpenXPKI::Server::Context::hascontext('log')
+            ? (log => CTX('log')->system)
+            : (),
+        config => $config,
+    );
+
+    OpenXPKI::Server::Context::setcontext({
+        'terminal' => $manager
     });
 }
 

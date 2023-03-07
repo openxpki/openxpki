@@ -320,10 +320,11 @@ WriteMakefile(
         'Devel::NYTProf'                => 0,           # CPAN
         'English'                       => '1',         # for broken Perl installations like on Ubuntu Drapper
         'Exception::Class'              => '1.22',
-        'Feature::Compat::Try'          => '0.05',
+        'Feature::Compat::Try'          => '0.05',      # 0.5 is included in Debian Bookworm
         'File::Which'                   => '1.27',      # docker-test.pl
         'HTML::Entities'                => 0,
         'Import::Into'                  => '1.002005',  # OpenXPKI::Debug
+        'IO::Pty::Easy'                 => '0.10',      # OpenXPKI::Server::ProcTerminal::Process (EE code)
         'IO::Prompt'                    => '0.099004',  # for deployment tools
         'JSON'                          => 0,
         'JSON::PP'                      => '4.02',      # rpc.fcgi; 4.02000-1 is included in Debian Buster

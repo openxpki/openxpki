@@ -956,6 +956,10 @@ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATE_KEY_FAILED"
 msgstr "Catena di certificazione"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_EXTERNAL_PROCESS_TERMINATED"
+msgstr "Informazioni Processi"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_FIELD_DOMAINLIST"
 msgstr "Indirizzo IP"
 
@@ -1304,6 +1308,30 @@ msgstr "Questa pagina mostra una lista di tutti i workflow iniziati da te."
 
 msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE"
 msgstr "Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_FINISH_LABEL"
+msgstr "cerca adesso"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_PASSPHRASE_LABEL"
+msgstr "Relazioni"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_RESET_LABEL"
+msgstr "cerca adesso"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_SUBMIT_LABEL"
+msgstr "cerca adesso"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_PAGE_DESC"
+msgstr "Completo"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_PAGE_LABEL"
+msgstr "Relazioni"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_NICE_BACKEND_ERROR"
@@ -5360,6 +5388,14 @@ msgstr "Chiave"
 
 #~ msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST94"
 #~ msgstr "GOST 94"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_REFRESH_LABEL"
+#~ msgstr "cerca adesso"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_START_LABEL"
+#~ msgstr "cerca adesso"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_NOT_IN_RENWAL_WINDOW_WARNING"
