@@ -57,8 +57,8 @@ export default class OxiContentService extends Service {
      * @param {hash} request - Request data
      * @return {Promise} Promise receiving the JSON document on success or `{}` on error
      */
-    updateRequestQuiet(request) {
-        return this.updateRequest(request, true);
+    async updateRequestQuiet(request) {
+        return this.updateRequest(request, true)
     }
 
     /**
@@ -68,18 +68,19 @@ export default class OxiContentService extends Service {
      * @param {bool} isQuiet - set to `true` to hide optical hints (loading banner)
      * @return {Promise} Promise receiving the JSON document on success or `{}` on error
      */
-    updateRequest(request, isQuiet = false) {
-        if (! isQuiet) this._setLoadingBanner(this.intl.t('site.banner.loading'));
+    async updateRequest(request, isQuiet = false) {
+        if (! isQuiet) this._setLoadingBanner(this.intl.t('site.banner.loading'))
 
         if (this.refresh) {
             cancel(this.refresh);
             this.refresh = null;
         }
 
-        let realTarget = this._resolveTarget(request.target); // has to be done before "this.popup = null"
+        let realTarget = this._resolveTarget(request.target) // has to be done before "this.popup = null"
 
-        return this._request(request, isQuiet)
-        .then(doc => {
+        try {
+            let doc = await this._request(request, isQuiet)
+
             // Errors occured and handlers above returned null
             if (!doc) {
                 this._setLoadingBanner(null);
@@ -87,53 +88,48 @@ export default class OxiContentService extends Service {
             }
 
             // chain backend calls via Promise
-            let maybeBootstrap = this.isBootstrapNeeded(doc.session_id)
-                ? this.bootstrap()
-                : Promise.resolve()
+            if (this.isBootstrapNeeded(doc.session_id)) await this.bootstrap()
 
-            return maybeBootstrap.then(() => {
-                // Successful request
-                this.status = doc.status;
-                this.popup = null;
+            // Successful request
+            this.status = doc.status
+            this.popup = null
 
-                // Auto refresh
-                if (doc.refresh) {
-                    debug("updateRequest(): response - \"refresh\" " + doc.refresh.href + ", " + doc.refresh.timeout);
-                    this._autoRefreshOnce(doc.refresh.href, doc.refresh.timeout);
+            // Auto refresh
+            if (doc.refresh) {
+                debug("updateRequest(): response - \"refresh\" " + doc.refresh.href + ", " + doc.refresh.timeout)
+                this._autoRefreshOnce(doc.refresh.href, doc.refresh.timeout)
+            }
+
+            // Redirect
+            if (doc.goto) {
+                debug("updateRequest(): response - \"goto\" " + doc.goto)
+                this._redirect(doc.goto, doc.type, doc.loading_banner)
+                return doc
+            }
+
+            // Set page contents
+            if (doc.page || doc.main || doc.right) {
+                debug("updateRequest(): response - \"page\" and \"main\"")
+                this._setPageContent(realTarget, doc.page, doc.main, doc.right, doc.status)
+            }
+            // or (e.g. on error) set error code for current tab
+            else {
+                if (doc.status && this.tabs.length > 0) {
+                    let currentTab = this.tabs.findBy("active") // findBy() is an EmberArray method
+                    emSet(currentTab, 'status', doc.status)
                 }
+            }
 
-                // Redirect
-                if (doc.goto) {
-                    debug("updateRequest(): response - \"goto\" " + doc.goto);
-                    this._redirect(doc.goto, doc.type, doc.loading_banner);
-                    return doc;
-                }
-
-                // Set page contents
-                if (doc.page || doc.main || doc.right) {
-                    debug("updateRequest(): response - \"page\" and \"main\"");
-                    this._setPageContent(realTarget, doc.page, doc.main, doc.right, doc.status);
-                }
-                // or (e.g. on error) set error code for current tab
-                else {
-                    if (doc.status && this.tabs.length > 0) {
-                        let currentTab = this.tabs.findBy("active") // findBy() is an EmberArray method
-                        emSet(currentTab, 'status', doc.status)
-                    }
-                }
-
-                this._setLoadingBanner(null);
-
-                return doc; // calling code might handle other data
-            })
-        })
+            this._setLoadingBanner(null)
+            return doc // the calling code might handle other data
+        }
         // Client side error
-        .catch(error => {
-            this._setLoadingBanner(null);
-            console.error('There was an error while processing the data', error);
-            this.error = this.intl.t('error_popup.message.client', { reason: error });
-            return null;
-        });
+        catch (error) {
+            this._setLoadingBanner(null)
+            console.error('There was an error while processing the data', error)
+            this.error = this.intl.t('error_popup.message.client', { reason: error })
+            return null
+        }
     }
 
     isBootstrapNeeded(session_id) {
@@ -155,36 +151,38 @@ export default class OxiContentService extends Service {
     }
 
     // "Bootstrapping" - menu, user info, locale, ...
-    bootstrap() {
-        return this._request({
+    async bootstrap() {
+        let doc = await this._request({
             page: "bootstrap!structure",
             baseurl: window.location.pathname,
         }, true)
-        .then(doc => {
-            debug("bootstrap(): response");
 
-            if (doc.rtoken) this.rtoken = doc.rtoken; // CSRF token
-            if (doc.language) this.oxiLocale.locale = doc.language;
-            this.user = doc.user; // this also unsets the user on logout!
+        debug("bootstrap(): response")
 
-            // do not overwrite current tenant on repeated bootstrapping
-            if (this.tenant === null && doc.tenant) this.setTenant(doc.tenant);
+        if (doc.rtoken) this.rtoken = doc.rtoken // CSRF token
+        if (doc.language) this.oxiLocale.locale = doc.language
+        this.user = doc.user // this also unsets the user on logout!
 
-            // menu
-            if (doc.structure) { this.navEntries = doc.structure; this._refreshNavEntries() }
+        // do not overwrite current tenant on repeated bootstrapping
+        if (this.tenant === null && doc.tenant) this.setTenant(doc.tenant)
 
-            // keepalive ping
-            if (doc.ping) {
-                debug("bootstrap(): setting ping = " + doc.ping);
-                if (this.ping) cancel(this.ping);
-                this._ping(doc.ping);
-            }
+        // menu
+        if (doc.structure) {
+            this.navEntries = doc.structure
+            this._refreshNavEntries()
+        }
 
-            // custom HTTP error code handling
-            if (doc.on_exception) this.serverExceptions = doc.on_exception;
+        // keepalive ping
+        if (doc.ping) {
+            debug("bootstrap(): setting ping = " + doc.ping)
+            if (this.ping) cancel(this.ping)
+            this._ping(doc.ping)
+        }
 
-            return doc;
-        });
+        // custom HTTP error code handling
+        if (doc.on_exception) this.serverExceptions = doc.on_exception
+
+        return doc
     }
 
     async _request(request, isQuiet = false) {
