@@ -1,11 +1,11 @@
-import Service from '@ember/service';
-import { service } from '@ember/service';
-import { tracked } from '@glimmer/tracking';
-import { later, cancel } from '@ember/runloop';
-import { isArray } from '@ember/array';
-import { set as emSet } from '@ember/object';
-import { debug } from '@ember/debug';
-import fetch from 'fetch';
+import Service from '@ember/service'
+import { service } from '@ember/service'
+import { tracked } from '@glimmer/tracking'
+import { later, cancel } from '@ember/runloop'
+import { isArray } from '@ember/array'
+import { set as emSet } from '@ember/object'
+import { debug } from '@ember/debug'
+import fetch from 'fetch'
 
 /**
  * Stores the current page contents and state and provides methods to send
@@ -14,30 +14,30 @@ import fetch from 'fetch';
  * @module service/oxi-content
  */
 export default class OxiContentService extends Service {
-    @service router;
-    @service('intl') intl;
-    @service('oxi-config') oxiConfig;
-    @service('oxi-locale') oxiLocale;
-    @service('oxi-backend') backend;
+    @service router
+    @service('intl') intl
+    @service('oxi-config') oxiConfig
+    @service('oxi-locale') oxiLocale
+    @service('oxi-backend') backend
 
-    @tracked user = null;
-    @tracked page = null;
-    @tracked ping = null;
-    @tracked refresh = null;
-    @tracked structure = null;
-    @tracked rtoken = null;
-    @tracked tenant = null;
-    @tracked status = null;
-    @tracked popup = null;
-    @tracked tabs = [];
-    @tracked navEntries = [];
-    @tracked error = null;
-    @tracked loadingBanner = null;
-    last_session_id = null; // to track server-side logouts with session id changes
-    serverExceptions = []; // custom HTTP response code error handling
+    @tracked user = null
+    @tracked page = null
+    @tracked ping = null
+    @tracked refresh = null
+    @tracked structure = null
+    @tracked rtoken = null
+    @tracked tenant = null
+    @tracked status = null
+    @tracked popup = null
+    @tracked tabs = []
+    @tracked navEntries = []
+    @tracked error = null
+    @tracked loadingBanner = null
+    last_session_id = null // to track server-side logouts with session id changes
+    serverExceptions = [] // custom HTTP response code error handling
 
     get tenantCssClass() {
-        if (!this.tenant) return '';
+        if (!this.tenant) return ''
         return 'tenant-'
           + this.tenant
           .toLowerCase()
@@ -47,7 +47,7 @@ export default class OxiContentService extends Service {
     }
 
     constructor() {
-        super(...arguments);
+        super(...arguments)
     }
 
     /**
@@ -72,8 +72,8 @@ export default class OxiContentService extends Service {
         if (! isQuiet) this._setLoadingBanner(this.intl.t('site.banner.loading'))
 
         if (this.refresh) {
-            cancel(this.refresh);
-            this.refresh = null;
+            cancel(this.refresh)
+            this.refresh = null
         }
 
         let realTarget = this._resolveTarget(request.target) // has to be done before "this.popup = null"
@@ -83,8 +83,8 @@ export default class OxiContentService extends Service {
 
             // Errors occured and handlers above returned null
             if (!doc) {
-                this._setLoadingBanner(null);
-                return {};
+                this._setLoadingBanner(null)
+                return {}
             }
 
             // chain backend calls via Promise
@@ -134,7 +134,7 @@ export default class OxiContentService extends Service {
 
     isBootstrapNeeded(session_id) {
         let last_id = this.last_session_id
-        if (session_id) this.last_session_id = session_id;
+        if (session_id) this.last_session_id = session_id
 
         // did server-side session change (e.g. user was logged out due to timeout)?
         if (last_id) {
@@ -228,16 +228,16 @@ export default class OxiContentService extends Service {
     }
 
     setPage(page) {
-        this.page = page;
-        this._refreshNavEntries();
+        this.page = page
+        this._refreshNavEntries()
     }
 
     setTenant(tenant) {
-        this.tenant = tenant;
+        this.tenant = tenant
     }
 
     _resolveTarget(requestTarget) {
-        let target = requestTarget || 'self';
+        let target = requestTarget || 'self'
         // Pseudo-target "self" is transformed so new content will be shown in the
         // currently active place: a modal popup, an active tab or on top (i.e. single hidden tab)
         if (target === 'self') {
@@ -246,7 +246,7 @@ export default class OxiContentService extends Service {
             else { target = 'top' }
         }
         if (target === 'modal') target = 'popup'; // FIXME remove support for legacy target 'modal'
-        return target;
+        return target
     }
 
     // Sets the loading state, i.e. dims the page and shows a banner with the
@@ -258,9 +258,9 @@ export default class OxiContentService extends Service {
         if (message) {
             // remove focus from button to prevent user from doing another
             // submit by hitting enter
-            document.activeElement.blur();
+            document.activeElement.blur()
         }
-        this.loadingBanner = message;
+        this.loadingBanner = message
     }
 
     _ping(href, timeout) {
@@ -273,55 +273,55 @@ export default class OxiContentService extends Service {
             })
             .catch(error => {
                 /* eslint-disable-next-line no-console */
-                console.error(`Error loading ${href} (network error: ${error.name})`);
-            });
-            return this._ping(href, timeout);
-        }, timeout);
+                console.error(`Error loading ${href} (network error: ${error.name})`)
+            })
+            return this._ping(href, timeout)
+        }, timeout)
     }
 
     _autoRefreshOnce(href, timeout) {
         this.refresh = later(this, function() {
-            this.updateRequest({ page: href });
-        }, timeout);
+            this.updateRequest({ page: href })
+        }, timeout)
     }
 
     _redirect(url, type = 'internal', banner = this.intl.t('site.banner.redirecting')) {
         if (type == 'external' || /^(http|\/)/.test(url)) {
             this._setLoadingBanner(banner); // never hide banner as browser will open a new page
-            window.location.href = url;
+            window.location.href = url
         }
         else {
-            this.router.transitionTo("openxpki", url);
+            this.router.transitionTo("openxpki", url)
         }
     }
 
     // Apply custom exception handler for given status code if one was set up
     // (bootstrap parameter 'on_exception').
     _handleServerException(status_code) {
-        debug(`Exception - handling server HTTP status code: ${status_code}`);
+        debug(`Exception - handling server HTTP status code: ${status_code}`)
         // Check custom exception handlers
         for (let handler of this.serverExceptions) {
-            let codes = isArray(handler.status_code) ? handler.status_code : [ handler.status_code ];
+            let codes = isArray(handler.status_code) ? handler.status_code : [ handler.status_code ]
             if (codes.find(c => c == status_code)) {
                 // Show message
                 if (handler.message) {
-                    this._setLoadingBanner(null);
-                    console.error(handler.message);
-                    this.error = handler.message;
+                    this._setLoadingBanner(null)
+                    console.error(handler.message)
+                    this.error = handler.message
                 }
                 // Redirect
                 else if (handler.redirect) {
                     // we intentionally do NOT remove the loading banner here
-                    debug(`Exception - redirecting to ${handler.redirect}`);
-                    this._redirect(handler.redirect);
+                    debug(`Exception - redirecting to ${handler.redirect}`)
+                    this._redirect(handler.redirect)
                 }
-                return;
+                return
             }
         }
         // Unhandled exception
-        this._setLoadingBanner(null);
-        console.error(`Server did not return expected data: ${status_code}`);
-        this.error = this.intl.t('error_popup.message.server', { code: status_code });
+        this._setLoadingBanner(null)
+        console.error(`Server did not return expected data: ${status_code}`)
+        this.error = this.intl.t('error_popup.message.server', { code: status_code })
     }
 
     _setPageContent(target, page, main, right, status) {
@@ -331,53 +331,53 @@ export default class OxiContentService extends Service {
             main,
             right,
             status,
-        };
+        }
 
         // Mark the first form on screen: only the first one is allowed to focus
         // its first input field.
-        let isFirst = true;
+        let isFirst = true
         for (const section of [...(newTab.main||[]), ...(newTab.right||[])]) {
             if (section.type === "form") {
-                section.content.isFirstForm = isFirst;
-                if (isFirst) isFirst = false;
+                section.content.isFirstForm = isFirst
+                if (isFirst) isFirst = false
             }
         }
 
         // Popup
         if (target === "popup") {
-            this.popup = newTab;
+            this.popup = newTab
         }
         // New tab
         else if (target === "tab") {
-            let tabs = this.tabs;
-            tabs.setEach("active", false);
-            tabs.pushObject(newTab);
+            let tabs = this.tabs
+            tabs.setEach("active", false)
+            tabs.pushObject(newTab)
         }
         // Current tab
         else if (target === "active") {
-            let tabs = this.tabs;
-            let index = tabs.indexOf(tabs.findBy("active")); // findBy() is an EmberArray method
-            tabs.replace(index, 1, [newTab]); // top
+            let tabs = this.tabs
+            let index = tabs.indexOf(tabs.findBy("active")) // findBy() is an EmberArray method
+            tabs.replace(index, 1, [newTab]) // top
         }
         // Set as only tab
         else {
-            this.tabs = [newTab];
+            this.tabs = [newTab]
         }
     }
 
     _refreshNavEntries() {
-        let page = this.page;
+        let page = this.page
         for (const entry of this.navEntries) {
-            emSet(entry, "active", (entry.key === page));
+            emSet(entry, "active", (entry.key === page))
             if (entry.entries) {
-                entry.entries.setEach("active", false);
-                let subEntry = entry.entries.findBy("key", page);
+                entry.entries.setEach("active", false)
+                let subEntry = entry.entries.findBy("key", page)
                 if (subEntry) {
-                    emSet(subEntry, "active", true);
-                    emSet(entry, "active", true);
+                    emSet(subEntry, "active", true)
+                    emSet(entry, "active", true)
                 }
             }
         }
-        this.navEntries = this.navEntries; // eslint-disable-line no-self-assign -- trigger Ember update
+        this.navEntries = this.navEntries // eslint-disable-line no-self-assign -- trigger Ember update
     }
 }
