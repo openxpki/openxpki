@@ -52,7 +52,7 @@ header:
         return buttons
     }
 
-    _toUrlParams(entries) {
+    #toUrlParams(entries) {
         let result = [];
         let URLPARAM_FIND = /[!'()~]|%20/g;
         let URLPARAM_REPLACE = { '!': '%21', "'": '%27', '(': '%28', ')': '%29', '~': '%7E', '%20': '+' };
@@ -71,7 +71,7 @@ header:
             time : new Date().getTime(),
         };
 
-        let url = this.localRequestUrl + '?' + this._toUrlParams(data);
+        let url = this.localRequestUrl + '?' + this.#toUrlParams(data);
 
         let fetchParams = {
             method : 'GET',

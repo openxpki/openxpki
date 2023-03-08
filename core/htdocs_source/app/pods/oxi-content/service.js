@@ -69,26 +69,26 @@ export default class OxiContentService extends Service {
      * @return {Promise} Promise receiving the JSON document on success or `{}` on error
      */
     async updateRequest(request, isQuiet = false) {
-        if (! isQuiet) this._setLoadingBanner(this.intl.t('site.banner.loading'))
+        if (! isQuiet) this.#setLoadingBanner(this.intl.t('site.banner.loading'))
 
         if (this.refresh) {
             cancel(this.refresh)
             this.refresh = null
         }
 
-        let realTarget = this._resolveTarget(request.target) // has to be done before "this.popup = null"
+        let realTarget = this.#resolveTarget(request.target) // has to be done before "this.popup = null"
 
         try {
-            let doc = await this._request(request, isQuiet)
+            let doc = await this.#request(request, isQuiet)
 
             // Errors occured and handlers above returned null
             if (!doc) {
-                this._setLoadingBanner(null)
+                this.#setLoadingBanner(null)
                 return {}
             }
 
             // chain backend calls via Promise
-            if (this.isBootstrapNeeded(doc.session_id)) await this.bootstrap()
+            if (this.#isBootstrapNeeded(doc.session_id)) await this.#bootstrap()
 
             // Successful request
             this.status = doc.status
@@ -97,20 +97,20 @@ export default class OxiContentService extends Service {
             // Auto refresh
             if (doc.refresh) {
                 debug("updateRequest(): response - \"refresh\" " + doc.refresh.href + ", " + doc.refresh.timeout)
-                this._autoRefreshOnce(doc.refresh.href, doc.refresh.timeout)
+                this.#autoRefreshOnce(doc.refresh.href, doc.refresh.timeout)
             }
 
             // Redirect
             if (doc.goto) {
                 debug("updateRequest(): response - \"goto\" " + doc.goto)
-                this._redirect(doc.goto, doc.type, doc.loading_banner)
+                this.#redirect(doc.goto, doc.type, doc.loading_banner)
                 return doc
             }
 
             // Set page contents
             if (doc.page || doc.main || doc.right) {
                 debug("updateRequest(): response - \"page\" and \"main\"")
-                this._setPageContent(realTarget, doc.page, doc.main, doc.right, doc.status)
+                this.#setPageContent(realTarget, doc.page, doc.main, doc.right, doc.status)
             }
             // or (e.g. on error) set error code for current tab
             else {
@@ -120,19 +120,19 @@ export default class OxiContentService extends Service {
                 }
             }
 
-            this._setLoadingBanner(null)
+            this.#setLoadingBanner(null)
             return doc // the calling code might handle other data
         }
         // Client side error
         catch (error) {
-            this._setLoadingBanner(null)
+            this.#setLoadingBanner(null)
             console.error('There was an error while processing the data', error)
             this.error = this.intl.t('error_popup.message.client', { reason: error })
             return null
         }
     }
 
-    isBootstrapNeeded(session_id) {
+    #isBootstrapNeeded(session_id) {
         let last_id = this.last_session_id
         if (session_id) this.last_session_id = session_id
 
@@ -151,13 +151,13 @@ export default class OxiContentService extends Service {
     }
 
     // "Bootstrapping" - menu, user info, locale, ...
-    async bootstrap() {
-        let doc = await this._request({
+    async #bootstrap() {
+        let doc = await this.#request({
             page: "bootstrap!structure",
             baseurl: window.location.pathname,
         }, true)
 
-        debug("bootstrap(): response")
+        debug("#bootstrap(): response")
 
         if (doc.rtoken) this.rtoken = doc.rtoken // CSRF token
         if (doc.language) this.oxiLocale.locale = doc.language
@@ -169,14 +169,14 @@ export default class OxiContentService extends Service {
         // menu
         if (doc.structure) {
             this.navEntries = doc.structure
-            this._refreshNavEntries()
+            this.#refreshNavEntries()
         }
 
         // keepalive ping
         if (doc.ping) {
-            debug("bootstrap(): setting ping = " + doc.ping)
+            debug("#bootstrap(): setting ping = " + doc.ping)
             if (this.ping) cancel(this.ping)
-            this._ping(doc.ping)
+            this.#ping(doc.ping)
         }
 
         // custom HTTP error code handling
@@ -185,8 +185,8 @@ export default class OxiContentService extends Service {
         return doc
     }
 
-    async _request(request, isQuiet = false) {
-        debug("_request(" + ['page','action'].map(p=>request[p]?`${p} = ${request[p]}`:null).filter(e=>e!==null).join(", ") + ")")
+    async #request(request, isQuiet = false) {
+        debug("#request(" + ['page','action'].map(p=>request[p]?`${p} = ${request[p]}`:null).filter(e=>e!==null).join(", ") + ")")
 
         let data = {
             ...request,
@@ -222,21 +222,21 @@ export default class OxiContentService extends Service {
         }
         // Handle non-2xx HTTP status codes
         else {
-            this._handleServerException(response.status)
+            this.#handleServerException(response.status)
             return null
         }
     }
 
     setPage(page) {
         this.page = page
-        this._refreshNavEntries()
+        this.#refreshNavEntries()
     }
 
     setTenant(tenant) {
         this.tenant = tenant
     }
 
-    _resolveTarget(requestTarget) {
+    #resolveTarget(requestTarget) {
         let target = requestTarget || 'self'
         // Pseudo-target "self" is transformed so new content will be shown in the
         // currently active place: a modal popup, an active tab or on top (i.e. single hidden tab)
@@ -252,7 +252,7 @@ export default class OxiContentService extends Service {
     // Sets the loading state, i.e. dims the page and shows a banner with the
     // given message.
     // If 'message' is set to null, the banner will be hidden.
-    _setLoadingBanner(message) {
+    #setLoadingBanner(message) {
         // note that we cannot use the Ember "loading" event as this would only
         // trigger on route changes, but not if we do updateRequest()
         if (message) {
@@ -263,7 +263,7 @@ export default class OxiContentService extends Service {
         this.loadingBanner = message
     }
 
-    _ping(href, timeout) {
+    #ping(href, timeout) {
         this.ping = later(this, () => {
             fetch(href, {
                 headers: {
@@ -275,19 +275,19 @@ export default class OxiContentService extends Service {
                 /* eslint-disable-next-line no-console */
                 console.error(`Error loading ${href} (network error: ${error.name})`)
             })
-            return this._ping(href, timeout)
+            return this.#ping(href, timeout)
         }, timeout)
     }
 
-    _autoRefreshOnce(href, timeout) {
+    #autoRefreshOnce(href, timeout) {
         this.refresh = later(this, function() {
             this.updateRequest({ page: href })
         }, timeout)
     }
 
-    _redirect(url, type = 'internal', banner = this.intl.t('site.banner.redirecting')) {
+    #redirect(url, type = 'internal', banner = this.intl.t('site.banner.redirecting')) {
         if (type == 'external' || /^(http|\/)/.test(url)) {
-            this._setLoadingBanner(banner); // never hide banner as browser will open a new page
+            this.#setLoadingBanner(banner); // never hide banner as browser will open a new page
             window.location.href = url
         }
         else {
@@ -297,7 +297,7 @@ export default class OxiContentService extends Service {
 
     // Apply custom exception handler for given status code if one was set up
     // (bootstrap parameter 'on_exception').
-    _handleServerException(status_code) {
+    #handleServerException(status_code) {
         debug(`Exception - handling server HTTP status code: ${status_code}`)
         // Check custom exception handlers
         for (let handler of this.serverExceptions) {
@@ -305,7 +305,7 @@ export default class OxiContentService extends Service {
             if (codes.find(c => c == status_code)) {
                 // Show message
                 if (handler.message) {
-                    this._setLoadingBanner(null)
+                    this.#setLoadingBanner(null)
                     console.error(handler.message)
                     this.error = handler.message
                 }
@@ -313,18 +313,18 @@ export default class OxiContentService extends Service {
                 else if (handler.redirect) {
                     // we intentionally do NOT remove the loading banner here
                     debug(`Exception - redirecting to ${handler.redirect}`)
-                    this._redirect(handler.redirect)
+                    this.#redirect(handler.redirect)
                 }
                 return
             }
         }
         // Unhandled exception
-        this._setLoadingBanner(null)
+        this.#setLoadingBanner(null)
         console.error(`Server did not return expected data: ${status_code}`)
         this.error = this.intl.t('error_popup.message.server', { code: status_code })
     }
 
-    _setPageContent(target, page, main, right, status) {
+    #setPageContent(target, page, main, right, status) {
         let newTab = {
             active: true,
             page,
@@ -365,7 +365,7 @@ export default class OxiContentService extends Service {
         }
     }
 
-    _refreshNavEntries() {
+    #refreshNavEntries() {
         let page = this.page
         for (const entry of this.navEntries) {
             emSet(entry, "active", (entry.key === page))

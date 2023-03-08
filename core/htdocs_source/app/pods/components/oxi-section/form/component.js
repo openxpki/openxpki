@@ -59,11 +59,11 @@ export default class OxiSectionFormComponent extends Component {
 
     constructor() {
         super(...arguments);
-        this.fields = this._prepareFields(this.args.def.fields);
-        this._updateCloneFields();
+        this.fields = this.#prepareFields(this.args.def.fields);
+        this.#updateCloneFields();
     }
 
-    _prepareFields(fields) {
+    #prepareFields(fields) {
         let result = [];
         for (const fieldHash of fields) {
             // convert hash into field
@@ -122,7 +122,7 @@ export default class OxiSectionFormComponent extends Component {
         return result;
     }
 
-    _updateCloneFields() {
+    #updateCloneFields() {
         for (const name of this.clonableRefNames) {
             let clones = this.fields.filter(f => f._refName === name);
             for (const clone of clones) {
@@ -157,7 +157,7 @@ export default class OxiSectionFormComponent extends Component {
         fieldCopy.value = "";
         fieldCopy._focusClone = true;
         this.fields.insertAt(index + 1, fieldCopy);
-        this._updateCloneFields();
+        this.#updateCloneFields();
     }
 
     @action
@@ -165,18 +165,18 @@ export default class OxiSectionFormComponent extends Component {
         if (field._canDelete === false) return;
         let index = this.fields.indexOf(field);
         this.fields.removeAt(index);
-        this._updateCloneFields();
+        this.#updateCloneFields();
     }
 
     // Turns all (non-empty) fields into request parameters (returns an Object)
-    _encodeAllFields({ includeEmpty = false }) {
-        return this._encodeFields({
+    #encodeAllFields({ includeEmpty = false }) {
+        return this.#encodeFields({
             includeEmpty,
             fieldNames: this.uniqueFieldNames,
         });
     }
 
-    _encodeFields({ fieldNames, includeEmpty = false, renameMap = new Map() }) {
+    #encodeFields({ fieldNames, includeEmpty = false, renameMap = new Map() }) {
         let result = new Map();
 
         for (const name of fieldNames) {
@@ -250,14 +250,14 @@ export default class OxiSectionFormComponent extends Component {
         let request = {
             action: field.actionOnChange,
             _sourceField: field.name,
-            ...this._encodeAllFields({ includeEmpty: true }),
+            ...this.#encodeAllFields({ includeEmpty: true }),
         };
 
         let fields = this.fields;
 
         return this.content.updateRequest(request, true)
         .then((doc) => {
-            for (const newField of this._prepareFields(doc.fields)) {
+            for (const newField of this.#prepareFields(doc.fields)) {
                 for (const oldField of fields) {
                     if (oldField.name === newField.name) {
                         let idx = fields.indexOf(oldField);
@@ -301,7 +301,7 @@ export default class OxiSectionFormComponent extends Component {
     encodeFields(fieldNames, renameMap) {
         debug(`oxi-section/form (${this.args.def.action}): encodeFields ()`);
 
-        return this._encodeFields({ fieldNames, renameMap, includeEmpty: true });
+        return this.#encodeFields({ fieldNames, renameMap, includeEmpty: true });
     }
 
     get originalFieldCount() {
@@ -389,7 +389,7 @@ export default class OxiSectionFormComponent extends Component {
 
         let request = {
             action: this.args.def.action,
-            ...this._encodeAllFields({ includeEmpty: false }),
+            ...this.#encodeAllFields({ includeEmpty: false }),
         };
 
         this.loading = true;

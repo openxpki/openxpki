@@ -18,8 +18,8 @@ export default class OxiConfigService extends Service {
         super(...arguments)
 
         // load custom YAML config
-        let url = this._rel2absUrl('localconfig.yaml')
-        this.ready = this._loadRemote(url)
+        let url = this.#rel2absUrl('localconfig.yaml')
+        this.ready = this.#loadRemote(url)
             .then( yamlStr => {
                 console.debug(`Custom config (YAML):\n${yamlStr}`)
                 if (! yamlStr) return
@@ -33,12 +33,12 @@ export default class OxiConfigService extends Service {
                     console.error(`Error parsing localconfig.yaml:\n${err}`)
                 }
             } )
-            .catch( () => {} ) // ignore errors as they were logged in _loadRemote()
+            .catch( () => {} ) // ignore errors as they were logged in #loadRemote()
     }
 
     // Tries to load the given url.
     // Returns a Promise.
-    _loadRemote(url) {
+    #loadRemote(url) {
         return fetch(url)
         .then(response => {
             if (response.ok) {
@@ -65,7 +65,7 @@ export default class OxiConfigService extends Service {
     }
 
     // Takes the given absolute or relative path and returns a URL
-    _rel2absUrl(path) {
+    #rel2absUrl(path) {
         let baseUrl = window.location.protocol + '//' + window.location.host
 
         // add current path if given path is relative
@@ -76,12 +76,12 @@ export default class OxiConfigService extends Service {
     get backendUrl() {
         // default to relative path to support URL-based realms
         let path = this.localConfig.backendPath || 'cgi-bin/webui.fcgi'
-        return this._rel2absUrl(path)
+        return this.#rel2absUrl(path)
     }
 
     get customCssUrl() {
         if (! this.localConfig.customCssPath) return null
-        let absUrl = this._rel2absUrl(this.localConfig.customCssPath)
+        let absUrl = this.#rel2absUrl(this.localConfig.customCssPath)
         /* eslint-disable-next-line no-console */
         console.log(`Custom CSS file configured: ${absUrl}`)
         return absUrl

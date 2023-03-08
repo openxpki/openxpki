@@ -38,7 +38,7 @@ export default class OxiBackendService extends Service {
         }
 
         if (method == 'GET') {
-            if (data) url += '?' + this._toUrlParams(data);
+            if (data) url += '?' + this.#toUrlParams(data);
         }
 
         return fetch(url, params)
@@ -55,7 +55,7 @@ export default class OxiBackendService extends Service {
      *
      * TODO: Replace with...
      *
-     *     _toUrlParams(data) {
+     *     #toUrlParams(data) {
      *         let params = new URLSearchParams();
      *         Object.keys(data).forEach(k => params.set(k, data[k] ?? ''));
      *         return params.toString();
@@ -64,7 +64,7 @@ export default class OxiBackendService extends Service {
      * ...once https://github.com/babel/ember-cli-babel/issues/395 is fixed and we can
      * set up @babel/preset-env to use core-js version 3.x
      */
-    _toUrlParams(entries) {
+    #toUrlParams(entries) {
         let result = [];
         let URLPARAM_FIND = /[!'()~]|%20/g;
         let URLPARAM_REPLACE = { '!': '%21', "'": '%27', '(': '%28', ')': '%29', '~': '%7E', '%20': '+' };
