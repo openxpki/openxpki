@@ -187,46 +187,46 @@ export default class OxiContentService extends Service {
         });
     }
 
-    _request(request, isQuiet = false) {
-        debug("_request(" + ['page','action'].map(p=>request[p]?`${p} = ${request[p]}`:null).filter(e=>e!==null).join(", ") + ")");
+    async _request(request, isQuiet = false) {
+        debug("_request(" + ['page','action'].map(p=>request[p]?`${p} = ${request[p]}`:null).filter(e=>e!==null).join(", ") + ")")
 
         let data = {
             ...request,
             '_': new Date().getTime(),
         }
-        let url = this.oxiConfig.backendUrl;
+        let url = this.oxiConfig.backendUrl
 
         // POST
-        let method;
+        let method
         if (request.action) {
-            method = 'POST';
-            data = { ...data, _rtoken: this.rtoken };
+            method = 'POST'
+            data = { ...data, _rtoken: this.rtoken }
         }
         // GET
         else {
-            method = 'GET';
+            method = 'GET'
         }
         if (this.tenant) {
-            data = { ...data, _tenant: this.tenant };
+            data = { ...data, _tenant: this.tenant }
         }
 
-        return this.backend.request({ url, method, data })
-        // Network error, thrown by fetch() itself
-        .catch(error => {
-            this.error = this.intl.t('error_popup.message.network', { reason: error.message });
-            return null;
-        })
-        .then(response => {
-            // If OK: unpack JSON data
-            if (response?.ok) {
-                return response.json();
-            }
-            // Handle non-2xx HTTP status codes
-            else {
-                this._handleServerException(response.status);
-                return null;
-            }
-        })
+        let response
+        try { response = await this.backend.request({ url, method, data }) }
+        catch (err) {
+            // Network error, thrown by fetch() itself
+            this.error = this.intl.t('error_popup.message.network', { reason: err.message })
+            return null
+        }
+
+        // If OK: unpack JSON data
+        if (response?.ok) {
+            return response.json()
+        }
+        // Handle non-2xx HTTP status codes
+        else {
+            this._handleServerException(response.status)
+            return null
+        }
     }
 
     setPage(page) {
