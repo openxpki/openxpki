@@ -2140,7 +2140,7 @@ msgstr ""
 "sich, dass das Profil den gewünschten Einsatzzweck abdeckt."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SELECT_PROFILE_LABEL"
-msgstr "Profil wählen"
+msgstr "Zertifikatsprofil"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SET_ISSUER_LABEL"
 msgstr "Issuer setzen"
@@ -2257,7 +2257,7 @@ msgstr ""
 "können das Erstellen neuer Sperrlisten nachfolgend erzwingen."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_ISSUE_CRL_LABEL"
-msgstr "Trigger CRL Issue"
+msgstr "Sperrliste (CRL) erzeugen"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_TRUSTGROUP_IMPORT_DESC"
@@ -2688,7 +2688,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_DESC"
 msgstr "Name des Zertifikatsprofils."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_LABEL"
-msgstr "Zertifikatsprofil"
+msgstr "Profil"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_PLACEHOLDER"
 msgstr "Bitte wählen Sie das gewünschte Zertifikatsprofil"
