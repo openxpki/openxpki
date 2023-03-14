@@ -19,15 +19,17 @@ export default [
                 {
                     type: "text",
                     name: "text",
-                    label: "Text",
+                    label: "Text (small)",
                     value: "",
+                    width: "small",
                 },
                 {
                     type: "text",
                     name: "text_maybe",
-                    label: "Text",
+                    label: "Text (large)",
                     value: "",
                     is_optional: 1,
+                    width: "large",
                 },
                 {
                     type: "text",

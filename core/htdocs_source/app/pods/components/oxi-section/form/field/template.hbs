@@ -43,7 +43,7 @@
     {{/if}}
 
     {{!-- template-lint-disable no-invalid-interactive --}}
-    <div class="col" {{on "keydown" this.onKeydown}}>
+    <div class={{if this.isLarge "col" (if this.isSmall "col-md-3" "col-md-6")}} {{on "keydown" this.onKeydown}}>
         {{#let
             (component
                 this.type

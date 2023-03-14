@@ -20,6 +20,13 @@ export default class OxiFieldMainComponent extends Component {
         return `oxi-section/form/field/${this.args.field.type}`;
     }
 
+    get isSmall() {
+        return new String(this.args.field.width || '').toLowerCase() == 'small'
+    }
+
+    get isLarge() {
+        return new String(this.args.field.width || '').toLowerCase() == 'large'
+    }
     /*
      * Options for <Tippy>, i.e. Popper.js
      * See

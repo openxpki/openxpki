@@ -392,6 +392,7 @@ sub init_search {
         label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL',
         type => 'text',
         value => $preset->{wf_id} || '',
+        width => 'small',
     );
 
     #

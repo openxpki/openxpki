@@ -23,6 +23,7 @@ export default class Field extends Base {
     is_optional
     tooltip
     placeholder
+    width
     actionOnChange
     @tracked _error // client- or server-side error state
     autofill
