@@ -272,6 +272,7 @@ a:hover{text-decoration:underline}
 .glyphicon-menu-right:before{content:"\e258"}
 .glyphicon-menu-down:before{content:"\e259"}
 .glyphicon-menu-up:before{content:"\e260"}
+.text-break-hyphens{word-wrap:break-word!important;word-break:break-word!important;hyphens:auto}
 body,html{height:100%}
 .oxi-header{margin-bottom:0}
 .oxi-header-bar{color:#757373}
