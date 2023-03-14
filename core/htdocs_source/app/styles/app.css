@@ -2,6 +2,17 @@
 @import url("glyphicons.css");
 
 /******************************************************************************
+ * Common helpers
+ */
+
+/* break text incl. hyphens, extended version of Bootstrap's .text-break */
+.text-break-hyphens {
+  word-wrap: break-word !important;
+  word-break: break-word !important;
+  hyphens: auto;
+}
+
+/******************************************************************************
  * Header, page structure, basic elements
  */
 
