@@ -132,7 +132,7 @@ sub init_search {
         type => 'text', is_optional => 1, value => $preset->{san},
     )->add_field(
         name => 'status', label => 'I18N_OPENXPKI_UI_CERTIFICATE_STATUS',
-        type => 'select', is_optional => 1, prompt => 'I18N_OPENXPKI_UI_SELECT_ALL', options => \@states, , value => $preset->{status},
+        type => 'select', is_optional => 1, prompt => 'I18N_OPENXPKI_UI_SELECT_ALL', options => \@states, value => $preset->{status},
     )->add_field(
         name => 'profile', label => 'I18N_OPENXPKI_UI_CERTIFICATE_PROFILE',
         type => 'select', is_optional => 1, prompt => 'I18N_OPENXPKI_UI_SELECT_ALL', options => \@profile_list, value => $preset->{profile},
