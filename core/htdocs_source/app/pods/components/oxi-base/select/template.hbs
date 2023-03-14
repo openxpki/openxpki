@@ -2,7 +2,7 @@
 The top HTML element this template has to be <select> as otherwise the calling
 components' use of {{on-init @setFocusInfo ...}} would not work.
 --}}
-<select ...attributes class="form-control form-select" {{on "change" this.listChanged}} {{on-init this.startup}}>
+<select ...attributes class="form-control form-select text-truncate" {{on "change" this.listChanged}} {{on-init this.startup}}>
     {{#each @list as |item|}}
         <option value="{{item.value}}" selected={{if (eq item.value @selected) "selected"}}>
             {{item.label}}
