@@ -8,7 +8,7 @@ has 'label' => (
 
 has 'shortlabel' => (
     is => 'rw',
-    isa => 'Str',
+    isa => 'Str|Undef',
 );
 
 has 'description' => (
