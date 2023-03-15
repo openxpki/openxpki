@@ -6,6 +6,7 @@ use warnings;
 use English;
 use Locale::gettext_pp qw (:locale_h :libintl_h nl_putenv);
 use POSIX qw (setlocale);
+use Memoize;
 
 # Project modules
 use OpenXPKI::Exception;
@@ -32,14 +33,16 @@ sub set_locale_prefix {
 
 sub i18nGettext {
     my $text = shift;
+    warn "Parameter expansion with i18nGettext() is no longer supported" if @_;
 
-    # do not handle empty strings or strings that do not start with I18N...
-    # this also fixes a problem with already translated texts having utf8
-    # characters as they break when handled by gettext
-    return $text unless (defined $text && length($text) && $text =~ m{\AI18N_});
+    # skip empty strings
+    return unless $text;
 
-    warn "Parameter expansion with i18nGettext() is no longer supported" if (@_);
+    # skip strings not starting with "I18N" - also fixes a problem with already
+    # translated texts that include UTF-8 characters which break gettext().
+    return $text unless $text =~ m{\AI18N_};
 
+    # translate
     my $i18n_string = gettext($text);
 
     # gettext does not support empty translations, we use a single whitespace which we dont want to show up.
@@ -50,6 +53,8 @@ sub i18nGettext {
     # internal Perl format
     return Encode::decode('UTF-8', $i18n_string);
 }
+
+memoize('i18nGettext');
 
 sub i18nTokenizer {
     my $string = shift;
