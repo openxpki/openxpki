@@ -6,6 +6,7 @@ use warnings;
 use English;
 use Locale::gettext_pp qw (:locale_h :libintl_h nl_putenv);
 use POSIX qw (setlocale);
+use Scalar::Util qw(blessed reftype refaddr);
 use Memoize;
 
 # Project modules
@@ -15,10 +16,11 @@ use OpenXPKI::Debug;
 
 our $language = "";
 our $locale_prefix = "";
+our %_seen_refaddrs;
 
 use vars qw (@ISA @EXPORT_OK);
 use base qw( Exporter );
-@EXPORT_OK = qw (i18nGettext i18nTokenizer set_locale_prefix set_language get_language);
+@EXPORT_OK = qw (i18nGettext i18nTokenizer i18n_walk set_locale_prefix set_language get_language);
 
 sub set_locale_prefix {
     $locale_prefix = shift;
@@ -66,6 +68,45 @@ sub i18nTokenizer {
         $string =~ s/$token\b/$replace/g;
     }
     return $string;
+}
+
+sub i18n_walk {
+    my $data = shift;
+    die 'Parameter must be either HashRef or ArrayRef' unless (ref $data eq 'HASH' or ref $data eq 'ARRAY');
+
+    local %_seen_refaddrs;
+    return _walk($data);
+}
+
+# inspired by Data::Walk::More
+sub _walk {
+    my ($val) = @_; # $val may be Scalar, ArrayRef, HashRef etc.
+    my $ref = ref $val;
+
+    # Scalars: i18n translation
+    if ($ref eq '') {
+        return i18nGettext($val) // undef;
+        # Note: we explicitely must "return undef" (not "return") or the
+        # map{} function for HashRefs below will complain about
+        # "Odd number of elements in anonymous hash"
+    }
+
+    # References: skip if already seen
+    my $refaddr = refaddr($val);
+    return $val if $_seen_refaddrs{$refaddr}++;
+
+    if (blessed $val) {
+        $ref = reftype($val);
+    }
+
+    # References: recurse if ArrayRef or HashRef
+    return $val unless $ref eq 'ARRAY' || $ref eq 'HASH';
+
+    if ($ref eq 'ARRAY') {
+        return [ map { _walk($_) } @$val ];
+    } else { # HASH
+        return { map { $_ => _walk($val->{$_}) } keys %$val };
+    }
 }
 
 sub set_language {
@@ -155,6 +196,11 @@ just returns the input as is.
 Expects a string that contains translatable items I<I18N_OPENXPKI_UI> and
 replaces any occurence with its translation. The result is returned with
 "external utf-8" encoding so it should be directly echoed.
+
+=head2 i18n_walk
+
+Recurses into the given data structure (I<ArrayRef> or I<HashRef>) and
+translates all occurrances if I18N strings in array items and hash values.
 
 =head2 set_language
 
