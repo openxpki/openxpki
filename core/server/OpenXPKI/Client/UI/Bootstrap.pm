@@ -8,7 +8,7 @@ use Data::Dumper;
 use Digest::SHA;
 
 # Project modules
-use OpenXPKI::i18n qw( i18nTokenizer get_language );
+use OpenXPKI::i18n qw( get_language );
 
 
 sub init_structure {
