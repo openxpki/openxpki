@@ -60,7 +60,7 @@ my %dispatch = (
     showenv => sub {
         my $cgi = shift;
         print $cgi->header( -type => 'application/json', charset => 'utf8', -status => 200 );
-        print encode_json( \%ENV );
+        print JSON->new->pretty->encode( \%ENV );
     }
 );
 
