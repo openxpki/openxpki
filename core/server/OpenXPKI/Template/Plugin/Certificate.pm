@@ -74,11 +74,12 @@ sub get_hash {
 =head2 body(cert_identifier, property)
 
 Return a selected property from the certificate body. All fields returned by
-the get_cert API method are allowed, the property name is always uppercased.
+the get_cert API method are allowed, the property name is always lowercased.
 Note that some properties might return a hash or an array ref!
 If the key (or the certificate) is not found, undef is returned.
 
 =cut
+
 sub body {
 
     my $self = shift;
@@ -144,6 +145,7 @@ Returns the certificate serial number in decimal notation.
 This is a shortcut for body(cert_id, 'serial_hex');
 
 =cut
+
 sub serial_hex {
     my $self = shift;
     my $cert_id = shift;
@@ -172,6 +174,7 @@ sub subject {
 Returns the certificate status.
 
 =cut
+
 sub status {
     my $self = shift;
     my $cert_id = shift;
@@ -185,6 +188,7 @@ sub status {
 Returns the identifier of the issuer certifcate.
 
 =cut
+
 sub issuer {
     my $self = shift;
     my $cert_id = shift;
@@ -198,6 +202,7 @@ sub issuer {
 Returns the subject key identifier of the certifcate.
 
 =cut
+
 sub key_id {
     my $self = shift;
     my $cert_id = shift;
@@ -252,6 +257,7 @@ Return the notbefore date in given format. Format can be any string accepted
 by OpenXPKI::DateTime, default is UTC format (iso8601).
 
 =cut
+
 sub notbefore {
 
     my $self = shift;
