@@ -24,14 +24,10 @@ use base qw( Exporter );
 
 sub set_locale_prefix {
     $locale_prefix = shift;
-    if (not -e $locale_prefix)
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SET_LOCALE_PREFIX_DIR_DOES_NOT_EXIST",
-            params  => {"DIR" => $locale_prefix});
+    if (not -e $locale_prefix) {
+        OpenXPKI::Exception->throw(message => "Specified locale directory '$locale_prefix' does not exist");
     }
 }
-
 
 sub i18nGettext {
     my $text = shift;
