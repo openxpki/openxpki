@@ -36,6 +36,18 @@ sub i18nGettext {
     # skip empty strings
     return unless $text;
 
+    # translate
+    my $i18n_string = _i18n_gettext($text);
+
+    # as we (hopefully) use i18nGettext() only to create internal strings
+    # in preparation for a LATER output we decode this back to the
+    # internal Perl format
+    return Encode::decode('UTF-8', $i18n_string);
+}
+
+sub _i18n_gettext {
+    my $text = shift;
+
     # skip strings not starting with "I18N" - also fixes a problem with already
     # translated texts that include UTF-8 characters which break gettext().
     return $text unless $text =~ m{\AI18N_};
@@ -46,24 +58,15 @@ sub i18nGettext {
     # gettext does not support empty translations, we use a single whitespace which we dont want to show up.
     return '' if ($i18n_string eq ' ');
 
-    # as we (hopefully) use i18nGettext() only to create internal strings
-    # in preparation for a LATER output we decode this back to the
-    # internal Perl format
-    return Encode::decode('UTF-8', $i18n_string);
+    return $i18n_string;
 }
 
-memoize('i18nGettext');
+memoize('_i18n_gettext');
 
 sub i18nTokenizer {
-    my $string = shift;
-
-    my %tokens = map { $_ => '' } ($string =~ /(I18N_OPENXPKI_UI_[A-Z0-9a-z\_-]+)/g);
-    foreach my $token (keys %tokens) {
-        my $replace = gettext($token);
-        $replace = '' if ($replace eq ' ');
-        $string =~ s/$token\b/$replace/g;
-    }
-    return $string;
+    my $text = shift;
+    $text =~ s/(I18N_OPENXPKI_UI_[A-Z0-9a-z\_-]+)/_i18n_gettext($1)/ge;
+    return $text;
 }
 
 sub i18n_walk {
