@@ -21,7 +21,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Client::Config;
 use OpenXPKI::Client::Service::RPC;
 use OpenXPKI::Serialization::Simple;
-use OpenXPKI::i18n qw( i18nGettext i18nTokenizer );
+use OpenXPKI::i18n qw( i18nGettext i18n_walk );
 
 
 our $config;
@@ -154,11 +154,7 @@ sub send_output {
         $json->canonical( $canonical_keys ? 1 : 0 );
 
         # run i18n tokenzier on output if a language is set
-        if ($config->language()) {
-            print i18nTokenizer($json->encode( $result ));
-        } else {
-            print $json->encode( $result );
-        }
+        print $json->encode( $config->language ? i18n_walk($result) : $result );
     }
 }
 

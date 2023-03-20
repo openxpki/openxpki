@@ -20,7 +20,7 @@ use Crypt::JWT qw( encode_jwt );
 use Crypt::PRNG;
 
 # Project modules
-use OpenXPKI::i18n qw( i18nTokenizer );
+use OpenXPKI::i18n qw( i18n_walk );
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Client::UI::Response;
 
@@ -569,7 +569,7 @@ sub _render_body_to_str {
     # B) response to a confined request, i.e. no page update (auto-complete etc.)
     #
     if ($self->has_confined_response) {
-        return i18nTokenizer(encode_json($self->confined_response));
+        return encode_json(i18n_walk($self->confined_response)));
     }
 
     #
@@ -585,7 +585,7 @@ sub _render_body_to_str {
     # add session ID
     $result->{session_id} = $self->_session->id;
 
-    return i18nTokenizer(encode_json($result));
+    return encode_json(i18n_walk($result));
 }
 
 =head2 render
