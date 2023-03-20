@@ -4,6 +4,7 @@ New Features
 
 Upgrades, Improvements and Bugfixes
   + Certificate profile fields (profile.template.*.yaml) now support the same attributes as workflow fields
+  + Visual improvements of UI form fields (label hyphenation, continuation dots, sizing)
 
 Removals, Deprecations, Breaking Changes
   + Remove API command "get_cert_subject_styles"
