@@ -85,10 +85,13 @@ sub _walk {
 
     # Scalars: i18n translation
     if ($ref eq '') {
-        return i18nGettext($val) // undef;
+        my $translated = i18nTokenizer($val);
         # Note: we explicitely must "return undef" (not "return") or the
         # map{} function for HashRefs below will complain about
         # "Odd number of elements in anonymous hash"
+        return undef unless defined $translated;
+        # decode UTF-8 back to internal Perl format
+        return Encode::decode('UTF-8', $translated);
     }
 
     # References: skip if already seen
