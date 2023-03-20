@@ -99,9 +99,17 @@ You can pass strings to append to the fqdn for failure, success or timeout
 as second/third/fourth argument. Timeout falls back to the string given for
 failed if it was not given (can be turned off by setting an empty value).
 
-  Example: CheckDNS.valid(fqdn,'(FAILED!)','(ok)')
-  Valid: <span class="dns-valid">www.openxpki.org (ok)</span>
-  Invalid: <span class="dns-failed">www.openxpki.org (FAILED!)</span>
+Example:
+
+    CheckDNS.valid(fqdn,'(FAILED!)','(ok)')
+
+Valid:
+
+    <span class="dns-valid">www.openxpki.org (ok)</span>
+
+Invalid:
+
+    <span class="dns-failed">www.openxpki.org (FAILED!)</span>
 
 =cut
 
@@ -153,10 +161,21 @@ argument to do a recursive lookup up to the first A-Record. If the lookup
 failed, "???" is printed instead of the result. The combined string is
 wrapped into a span element with css class I<dns-valid> or I<dns-failed>.
 
-  Example: CheckDNS.resolve(fqdn)
-  Valid: <span class="dns-valid">www.openxpki.org (1.2.3.4)</span>
-  Valid: <span class="dns-valid">www2.openxpki.org (www.openxpki.org)</span>
-  Invalid: <span class="dns-failed">www.openxpki.org (???)</span>
+Example:
+
+    CheckDNS.resolve(fqdn)
+
+Valid:
+
+    <span class="dns-valid">www.openxpki.org (1.2.3.4)</span>
+
+Valid:
+
+    <span class="dns-valid">www2.openxpki.org (www.openxpki.org)</span>
+
+Invalid:
+
+    <span class="dns-failed">www.openxpki.org (???)</span>
 
 =cut
 
