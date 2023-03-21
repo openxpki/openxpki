@@ -1,6 +1,9 @@
 package OpenXPKI::Workflow::Field;
 use Moose;
 
+# Core modules
+use Data::Dumper;
+
 # Project modules
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
