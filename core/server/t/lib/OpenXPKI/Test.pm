@@ -912,8 +912,21 @@ sub init_server {
     OpenXPKI::Server::Context::setcontext({ log => OpenXPKI::Server::Log->new(CONFIG => undef) })
         unless OpenXPKI::Server::Context::hascontext("log"); # may already be set if multiple instances of OpenXPKI::Test are created
 
-    # init basic CTX objects
-    my @tasks = qw( config_versioned dbi_log api2 authentication );
+    # init basic CTX objects: all those we do not explicitely skip
+    # (this way we do not need to adjust the test code if new INIT tasks are added)
+    my %skip_tasks = map { $_ => 1 } qw(
+        i18n
+        log
+        redirect_stderr
+        prepare_daemon
+        dbi
+        crypto_layer
+        workflow_factory
+        volatile_vault
+        notification
+        server
+    );
+    my @tasks = grep { !$skip_tasks{$_} } OpenXPKI::Server::Init::get_init_tasks();
 
     # init notification object if needed
     my $cfg_notification = "realm.".$self->default_realm.".notification";
