@@ -307,6 +307,7 @@ make_path "/var/openxpki/session", "/var/log/openxpki";
 # customize config
 use File::Slurp qw( edit_file );
 edit_file { s/ ^ ( (user|group): \s+ ) \w+ /$1root/gmsx } "/etc/openxpki/config.d/system/server.yaml";
+edit_file { s/ ( \.(owner|group) \s* = \s* ) \w+ /$1root/gmsx } "/etc/openxpki/log.conf";
 execute show => "/tools-copy/testenv/mysql-oxi-config.sh";
 
 #
