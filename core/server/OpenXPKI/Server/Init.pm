@@ -157,6 +157,10 @@ sub get_remaining_init_tasks {
     return @remaining_tasks;
 }
 
+sub get_init_tasks {
+    return @INIT_TASKS;
+}
+
 ###########################################################################
 # init functions to be called during init task processing
 
