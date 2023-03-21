@@ -27,6 +27,8 @@ sub __build_subject_oid_map {
         "2.5.4.10"                      => ['O','organizationName'],
         "2.5.4.11"                      => ['OU','organizationalUnitName'],
         "1.2.840.113549.1.9.1"          => ["emailAddress","E"],
+        "1.2.840.113549.1.9.2"          => 'unstructuredName',
+        "1.2.840.113549.1.9.8"          => 'unstructuredAddress',
         "0.9.2342.19200300.100.1.1"     => ['UID','userID'],
         "0.9.2342.19200300.100.1.25"    => ['DC','domainComponent'],
         '2.5.4.12'                      => [ 'title', 'Title' ],
