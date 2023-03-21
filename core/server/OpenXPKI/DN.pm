@@ -34,6 +34,8 @@ my %mapping_of = (
     PSEUDONYM            => "pseudonym",
     ROLE                 => "role",
     DESCRIPTION          => "description",
+    UNSTRUCTUREDNAME     => "unstructuredName",
+    UNSTRUCTUREDADDRESS  => "unstructuredAddress",
     );
 
 sub new
