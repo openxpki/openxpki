@@ -120,30 +120,6 @@ cmp_deeply $result, superhashof({
 }), "list profile styles incl. hidden ones (without UI definition)";
 
 #
-# get_cert_subject_styles
-#
-$result = $oxitest->api2_command("get_cert_subject_styles" => {
-    profile => 'tls_server'
-});
-cmp_deeply $result, superhashof({
-    map {
-        $_ => superhashof({
-            label => ignore(),
-            dn => ignore(),
-            description => ignore(),
-            subject_alternative_names => array_each(ignore()),
-            additional_information => { input => ignore() },
-            template => { input => ignore() },
-        })
-    }
-    qw(
-        00_basic_style
-        05_advanced_style
-        enroll
-    )
-}), "list profile style details" or diag explain $result;
-
-#
 # list_supported_san
 #
 $result = $oxitest->api2_command("list_supported_san");

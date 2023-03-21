@@ -335,6 +335,7 @@ lives_and {
                     name => 'dummy_arg',
                     type => 'text',
                     required => 0,
+                    clonable => 0,
                 },
             ],
         },
@@ -425,7 +426,7 @@ subtest "get_workflow_log()" => sub {
     isnt scalar @$result, 0, "log has at least one entry";
 
     # remove noisy message that occurs since Workflow 1.53
-    my @clean_log = grep { $_->[2] ne 'Using standard field class' } @$result;
+    my @clean_log = grep { $_->[2] !~ /^Using (standard|custom) field class/ } @$result;
 
     # check first message
     my $i = -1;

@@ -1025,7 +1025,7 @@ sub set_user {
             PARAMS => { LOGIN => $user, PASSWD => $self->password },
         },
     });
-;
+
     die "Could not set user to '$user' " unless(ref $reply eq 'OpenXPKI::Server::Authentication::Handle');
 
     my $userid = $reply->userid;
