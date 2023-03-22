@@ -24,11 +24,6 @@ export default class Button extends Base {
     @tracked image
     @tracked loading = false            // pure client-side status
     onClick                             // pure client-side status
-    // <a href> mode
-    @tracked href                       // mandatory - triggers the <a href...> format
-    @tracked target
-    // <button> mode
-    @tracked page
     disabled
     /* confirm = {
      *     label: "Really sure?",       / mandatory if "confirm" exists
@@ -38,6 +33,11 @@ export default class Button extends Base {
      * }
      */
     confirm
+    // <a href> mode
+    @tracked href                       // mandatory - triggers the <a href...> format
+    @tracked target
+    // <button> mode
+    @tracked page
 
     /*
      * oxi-base/button-container
