@@ -1,8 +1,8 @@
-import Component from '@glimmer/component';
-import { tracked } from '@glimmer/tracking';
-import { action, set } from "@ember/object";
-import { debug } from '@ember/debug';
-//import ow from 'ow';
+import Component from '@glimmer/component'
+import { tracked } from '@glimmer/tracking'
+import { action, set } from "@ember/object"
+import { debug } from '@ember/debug'
+//import ow from 'ow'
 
 /**
  * Shows a button with an optional confirm dialog.
@@ -64,24 +64,30 @@ let format2css = {
     exceptional:    "oxi-btn-exceptional",
     terminate:      "oxi-btn-terminate",
     tile:           "oxi-btn-tile",
-};
+}
 
 export default class OxiButtonComponent extends Component {
-    @tracked showConfirmDialog = false;
+    @tracked showConfirmDialog = false
+    skipClickHandler = false
+    clickTarget = null
+
+    get isLink() {
+        return this.args.button.href ? true : false
+    }
 
     get additionalCssClass() {
         if (this.args.button.loading) { return "oxi-btn-loading" }
         if (!this.args.button.format) { return "btn-light border-secondary" }
-        let cssClass = format2css[this.args.button.format];
+        let cssClass = format2css[this.args.button.format]
         if (cssClass === undefined) {
             /* eslint-disable-next-line no-console */
-            console.error(`oxi-button: button "${this.args.button.label}" has unknown format: "${this.args.button.format}"`);
+            console.error(`oxi-button: button "${this.args.button.label}" has unknown format: "${this.args.button.format}"`)
         }
-        return cssClass ?? "";
+        return cssClass ?? ""
     }
 
     constructor() {
-        super(...arguments);
+        super(...arguments)
 
         // type validation
         // TODO Reactivate type checking once we drop IE11 support
@@ -106,30 +112,51 @@ export default class OxiButtonComponent extends Component {
                 'tooltip': ow.optional.string,
                 'target': ow.optional.string,
             }),
-        ));
+        ))
         */
     }
 
     @action
-    click() {
-        debug("oxi-button: click");
-        if (this.args.button.confirm) {
-            set(this.args.button, "loading", true);
-            this.showConfirmDialog = true;
-        } else {
-            this.executeAction();
+    click(event) {
+        debug("oxi-button: click")
+
+        if (this.skipClickHandler) {
+            this.skipClickHandler = false
+            return
         }
+
+        // only links: save <a> element to create new click event in executeAction() later on
+        this.clickTarget = event?.target // undefined for <button>
+
+        if (this.args.button.confirm) {
+            set(this.args.button, "loading", true)
+            this.showConfirmDialog = true
+        } else {
+            this.executeAction()
+        }
+
+        // cancel click event - only effective if we are called via <a onclick="...">
+        return false
     }
 
     @action
     executeAction() {
-        this.resetConfirmState();
-        this.args.button.onClick?.(this.args.button); // invoke callback
+        this.resetConfirmState()
+        // link mode
+        if (this.isLink) {
+            // this will result in a (second) call to click()
+            this.skipClickHandler = true
+            this.clickTarget.dispatchEvent(new MouseEvent("click", { view: window, bubbles: true, cancelable: false }))
+        }
+        // button mode
+        else {
+            this.args.button.onClick?.(this.args.button) // invoke callback
+        }
     }
 
     @action
     resetConfirmState() {
-        set(this.args.button, "loading", false);
-        this.showConfirmDialog = false;
+        set(this.args.button, "loading", false)
+        this.showConfirmDialog = false
     }
 }

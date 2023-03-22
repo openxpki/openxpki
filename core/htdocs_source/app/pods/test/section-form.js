@@ -135,11 +135,22 @@ export default [
             ],
             buttons: [
                 Button.fromHash({
-                    label: "Link to external",
+                    label: "External link",
                     format: "failure",
                     tooltip: "Just fyi",
                     href: "https://www.openxpki.org",
                     target: "_blank",
+                }),
+                Button.fromHash({
+                    label: "External link (with confirmation)",
+                    format: "exceptional",
+                    tooltip: "Just fyi",
+                    href: "https://www.openxpki.org",
+                    target: "_blank",
+                    confirm: {
+                        label: "Really sure?",
+                        description: "This opens an external page.",
+                    },
                 }),
                 Button.fromHash(_testButton),
                 Button.fromHash({
