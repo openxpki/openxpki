@@ -8,6 +8,7 @@ import section_form from './section-form';
 import section_grid from './section-grid';
 import section_keyvalue from './section-keyvalue';
 import section_tiles from './section-tiles';
+import section_cards from './section-cards';
 import Button from 'openxpki/data/button';
 import fetch from 'fetch';
 
@@ -23,6 +24,7 @@ export default class TestController extends Controller {
         section_grid,
         section_keyvalue,
         section_tiles,
+        section_cards,
     ]
 
     localconfig = `

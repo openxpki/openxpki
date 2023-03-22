@@ -1,0 +1,29 @@
+<!-- components/oxi-section/cards -->
+{{#if @def.cards.length}}
+        <div class="col-md-10">
+    {{#each @def.cards as |card|}}
+
+        <OxiBase::Button::Raw @button={{card}} class="card w-100 mb-3 text-start">
+            <div class="row gx-2 py-2">
+                <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
+                    <img src={{card.image}}/>
+                </div>
+                <div class="col-md-10">
+                    <div class="card-body">
+                        {{#if card.label}}
+                            <h5 class="card-title">
+                                {{defuse card.label}}
+                            </h5>
+                        {{/if}}
+                        {{#if card.description}}
+                            <p class="card-text">
+                                {{defuse card.description}}
+                            </p>
+                        {{/if}}
+                    </div>
+                </div>
+            </div>
+        </OxiBase::Button::Raw>
+    {{/each}}
+</div>
+{{/if}}
