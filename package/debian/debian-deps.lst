@@ -42,6 +42,7 @@ libintl-perl
 libio-digest-perl
 libio-prompt-perl
 libjson-perl
+libjson-pp-perl
 liblog-log4perl-perl
 libmail-rfc822-address-perl
 libmoose-perl
