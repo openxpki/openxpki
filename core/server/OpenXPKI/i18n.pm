@@ -37,12 +37,12 @@ sub i18nGettext {
     return unless $text;
 
     # translate
-    my $i18n_string = _i18n_gettext($text);
+    my $translated = _i18n_gettext($text);
 
     # as we (hopefully) use i18nGettext() only to create internal strings
     # in preparation for a LATER output we decode this back to the
     # internal Perl format
-    return Encode::decode('UTF-8', $i18n_string);
+    return Encode::decode('UTF-8', $translated);
 }
 
 sub _i18n_gettext {
@@ -53,12 +53,12 @@ sub _i18n_gettext {
     return $text unless $text =~ m{\AI18N_};
 
     # translate
-    my $i18n_string = gettext($text);
+    my $translated = gettext($text);
 
     # gettext does not support empty translations, we use a single whitespace which we dont want to show up.
-    return '' if ($i18n_string eq ' ');
+    return '' if ($translated eq ' ');
 
-    return $i18n_string;
+    return $translated;
 }
 
 memoize('_i18n_gettext');
