@@ -277,13 +277,13 @@ sub __init_basepath {
     my $self = shift;
 
     # generate name of the environemnt values from the service name
-    my $env_dir = 'OPENXPKI_'.uc($self->service()).'_CLIENT_CONF_DIR';
+    my $env_dir = 'OPENXPKI_'.uc($self->service).'_CLIENT_CONF_DIR';
     $env_dir =~ s{-}{_}g;
 
     # check for service specific basedir in env
     if ( $ENV{$env_dir} ) {
         -d $ENV{$env_dir}
-        || die sprintf "Explicit config directory not found (%s, from env %s)", $ENV{$env_dir}, $env_dir;
+            || die sprintf "Explicit config directory not found (%s from env %s)", $ENV{$env_dir}, $env_dir;
 
         return File::Spec->canonpath( $ENV{$env_dir} );
     }
@@ -292,16 +292,15 @@ sub __init_basepath {
     # check for a customized global base dir
     if ($ENV{OPENXPKI_CLIENT_CONF_DIR}) {
         $path = $ENV{OPENXPKI_CLIENT_CONF_DIR};
-        if (!-d $path) {
-            die "Explicit client config path does not exists! ($path)";
-        }
+        -d $path
+            || die "Explicit client config directory not found ($path from env OPENXPKI_CLIENT_CONF_DIR)";
         $path = File::Spec->canonpath( $path );
     } else {
         $path = '/etc/openxpki';
     }
 
     # default basedir is global path + servicename
-    return File::Spec->catdir( ( $path, $self->service() ) );
+    return File::Spec->catdir($path, $self->service);
 
 }
 

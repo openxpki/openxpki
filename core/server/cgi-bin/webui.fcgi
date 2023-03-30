@@ -55,12 +55,9 @@ if (my $err = $EVAL_ERROR) {
     die $err;
 }
 
-if (!$conf->{global}->{socket}) {
-    $conf->{global}->{socket} = '/var/openxpki/openxpki.socket';
-}
-if (!$conf->{global}->{scripturl}) {
-    $conf->{global}->{scripturl} = '/cgi-bin/webui.fcgi';
-}
+# set defaults
+$conf->{global}->{socket} ||= '/var/openxpki/openxpki.socket';
+$conf->{global}->{scripturl} ||= '/cgi-bin/webui.fcgi';
 
 my @header_tpl;
 foreach my $key (keys %{$conf->{header}}) {
@@ -88,7 +85,7 @@ if ($conf->{session}->{ip_match}) {
    $CGI::Session::IP_MATCH = 1;
 }
 
-if ($conf->{session}->{driver} && $conf->{session}->{driver} eq 'openxpki') {
+if (($conf->{session}->{driver}//'') eq 'openxpki') {
     warn "Builtin session driver is deprecated and will be removed with next release!";
     $log->warn("Builtin session driver is deprecated and will be removed with next release!");
 }
@@ -204,7 +201,7 @@ while (my $cgi = CGI::Fast->new()) {
     # Set the path to the directory component of the script, this
     # automagically creates seperate cookies for path based realms
     my $realm_mode = $conf->{global}->{realm_mode} || '';
-    my $realm_detect;
+    my $detected_realm;
     $log->debug("realm_mode: '$realm_mode'");
 
     if ($realm_mode eq "path") {
@@ -228,7 +225,7 @@ while (my $cgi = CGI::Fast->new()) {
                     $backend_client->detach();
                     next;
                 }
-                $realm_detect = $conf->{realm}->{$script_realm};
+                $detected_realm = $conf->{realm}->{$script_realm};
             } else {
                 $log->warn('Unable to read realm from url path');
             }
@@ -240,19 +237,19 @@ while (my $cgi = CGI::Fast->new()) {
         foreach my $rule (keys %{$conf->{realm}}) {
             next unless ($host =~ qr/\A$rule\z/);
             $log->trace("realm detection match: $host / $rule ");
-            $realm_detect = $conf->{realm}->{$rule};
+            $detected_realm = $conf->{realm}->{$rule};
             last;
         }
-        $log->warn('Unable to find realm from hostname: ' . $host) unless($realm_detect);
+        $log->warn('Unable to find realm from hostname: ' . $host) unless($detected_realm);
 
     } elsif ($realm_mode eq "fixed") {
         # Fixed realm mode, mode must be defined in the config
-        $realm_detect = $conf->{global}->{realm};
+        $detected_realm = $conf->{global}->{realm};
     }
 
-    if ($realm_detect) {
-        $log->debug('detected realm is ' . $realm_detect);
-        my ($realm, $stack) = split (/;/,$realm_detect);
+    if ($detected_realm) {
+        $log->debug('detected realm is ' . $detected_realm);
+        my ($realm, $stack) = split (/;/,$detected_realm);
         $session_front->param('pki_realm', $realm);
         if ($stack) {
             $session_front->param('auth_stack', $stack);
