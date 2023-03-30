@@ -19,7 +19,6 @@ use Feature::Compat::Try;
 # Project modules
 use OpenXPKI::Template;
 use OpenXPKI::Client;
-use OpenXPKI::i18n qw( i18nGettext );
 use OpenXPKI::Client::UI::Bootstrap;
 use OpenXPKI::Client::UI::Login;
 
@@ -107,7 +106,7 @@ sub _init_backend {
                 # The session has gone - start a new one - might happen if the gui
                 # was idle too long or the server was flushed
                 $client->init_session({ SESSION_ID => undef });
-                $self->resp->status->warn(i18nGettext('I18N_OPENXPKI_UI_BACKEND_SESSION_GONE'));
+                $self->resp->status->warn('I18N_OPENXPKI_UI_BACKEND_SESSION_GONE');
             } else {
                 $self->logger()->error('Error creating backend session: ' . $eval_err->{message});
                 $self->logger()->trace($eval_err);
@@ -390,7 +389,7 @@ sub __get_action {
         } else {
 
             $self->logger()->debug("Request with invalid rtoken ($rtoken_request != $rtoken_session)!");
-            $self->resp->status->error(i18nGettext('I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID'));
+            $self->resp->status->error('I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID');
         }
     }
     return '';
@@ -448,7 +447,7 @@ sub handle_page {
                 $self->logger->trace("Internal redirect to: $page") if $self->logger->is_trace;
             }
         } else {
-            $self->resp->status->error(i18nGettext('I18N_OPENXPKI_UI_ACTION_NOT_FOUND'));
+            $self->resp->status->error('I18N_OPENXPKI_UI_ACTION_NOT_FOUND');
         }
     }
 
@@ -473,7 +472,7 @@ sub handle_page {
                 resp => $self->resp,
             );
             $obj->init_error();
-            $obj->status->error(i18nGettext('I18N_OPENXPKI_UI_PAGE_NOT_FOUND'));
+            $obj->status->error('I18N_OPENXPKI_UI_PAGE_NOT_FOUND');
 
         } else {
             $method  = "init_$method";
@@ -604,7 +603,7 @@ sub handle_login {
             $self->logger()->debug("Selected realm $pki_realm, new status " . $status);
         } else {
             my $realms = $reply->{'PARAMS'}->{'PKI_REALMS'};
-            my @realm_list = map { $_ = {'value' => $realms->{$_}->{NAME}, 'label' => i18nGettext($realms->{$_}->{DESCRIPTION})} } keys %{$realms};
+            my @realm_list = map { $_ = {'value' => $realms->{$_}->{NAME}, 'label' => $realms->{$_}->{DESCRIPTION}} } keys %{$realms};
             $self->logger()->trace("Offering realms: " . Dumper \@realm_list ) if $self->logger->is_trace;
             return $result->init_realm_select( \@realm_list  )->render();
         }
@@ -625,7 +624,7 @@ sub handle_login {
             my @stack_list = map {
                 ($stacks->{$_}->{name} !~ /^_/) ? ($_ = {
                     'value' => $stacks->{$_}->{name},
-                    'label' => i18nGettext($stacks->{$_}->{label}),
+                    'label' => $stacks->{$_}->{label},
                     'description' => $stacks->{$_}->{description}
                 }) : ()
             } keys %{$stacks};
@@ -816,7 +815,7 @@ sub handle_login {
         # Failure here is likely a wrong password
 
         if ($reply->{'ERROR'} && $reply->{'ERROR'}->{CLASS} eq 'OpenXPKI::Exception::Authentication') {
-            $result->status->error(i18nGettext( $reply->{'ERROR'}->{LABEL} ));
+            $result->status->error($reply->{'ERROR'}->{LABEL});
         } else {
             $result->set_status_from_error_reply($reply);
         }
