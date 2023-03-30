@@ -791,7 +791,7 @@ msgid "I18N_OPENXPKI_UI_HOME_LOGOUT_HEAD"
 msgstr "成功登出"
 
 msgid "I18N_OPENXPKI_UI_HOME_LOGOUT_PAGE"
-msgstr "您已经登出。 <a href=\\\"#/openxpki/login\\\">返回登录页</a>。"
+msgstr "您已经登出。 <a href=\"#/openxpki/login\">返回登录页</a>。"
 
 # Remove?
 msgid "I18N_OPENXPKI_UI_HOME_WELCOME_HEAD"
@@ -929,7 +929,7 @@ msgstr "必填信息尚未填写完毕！"
 msgid "I18N_OPENXPKI_UI_LOGIN_NO_DATA_PAGE"
 msgstr ""
 "您的Web浏览器无法提供所需的信息，无法使用所选的登录方法登录。<br>请选择其他类"
-"型的身份验证。<a href=\\\"#/openxpki/redirect!login\\\">返回登录页</a>。"
+"型的身份验证。<a href=\"#/openxpki/redirect!login\">返回登录页</a>。"
 
 msgid "I18N_OPENXPKI_UI_LOGIN_PASSWORD"
 msgstr "密码"
@@ -1731,10 +1731,10 @@ msgstr "等待中"
 
 msgid "I18N_OPENXPKI_UI_SUPPORT_TRAILER"
 msgstr ""
-"感谢您使用OpenXPKI-有关支持和公告，请订阅我们的 <a href=\\\"https://lists."
-"sourceforge.net/lists/listinfo/openxpki-users\\\">邮件列表</a>。<br> 如果 如"
-"果您需要设置或商业支持方面的帮助，请联系 <a href=\\\"mailto:"
-"openxpki@whiterabbitsecurity.com\\\">openxpki@whiterabbitsecurity.com.</a>"
+"感谢您使用OpenXPKI-有关支持和公告，请订阅我们的 <a href=\"https://lists."
+"sourceforge.net/lists/listinfo/openxpki-users\">邮件列表</a>。<br> 如果 如"
+"果您需要设置或商业支持方面的帮助，请联系 <a href=\"mailto:"
+"openxpki@whiterabbitsecurity.com\">openxpki@whiterabbitsecurity.com.</a>"
 
 msgid "I18N_OPENXPKI_UI_SYSTEM_VERSION_STATUS_LABEL"
 msgstr "系统版本"
