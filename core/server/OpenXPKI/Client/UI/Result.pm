@@ -569,7 +569,7 @@ sub _render_body_to_str {
     # B) response to a confined request, i.e. no page update (auto-complete etc.)
     #
     if ($self->has_confined_response) {
-        return encode_json(i18n_walk($self->confined_response)));
+        return encode_json(i18n_walk($self->confined_response));
     }
 
     #
