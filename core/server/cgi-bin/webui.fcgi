@@ -66,11 +66,10 @@ foreach my $key (keys %{$conf->{header}}) {
     push @header_tpl, ("-$key", $val);
 }
 
-
+# legacy config compatibility
 if ($conf->{global}->{session_path} || defined $conf->{global}->{ip_match} || $conf->{global}->{session_timeout}) {
-
     if ($conf->{session}) {
-        $log->error('Session parameters in [global]  and [session] found! Ignoring [global]');
+        $log->error('Session parameters found both in [global] and [session] - ignoring [global]');
     } else {
         $log->warn('Session parameters in [global] are deprecated, please use [session]');
         $conf->{session} = {
@@ -153,7 +152,7 @@ sub __get_cookie_cipher {
 }
 
 while (my $cgi = CGI::Fast->new()) {
-    $log->debug('check for cgi session, fcgi pid '. $$ );
+    $log->debug('Check for cgi session, fcgi pid '. $$ );
 
     my $cipher = __get_cookie_cipher();
     my $session_cookie = OpenXPKI::Client::UI::SessionCookie->new(
@@ -196,7 +195,7 @@ while (my $cgi = CGI::Fast->new()) {
     my $response = OpenXPKI::Client::UI::Response->new(session_cookie => $session_cookie);
     $response->add_header(@header_tpl);
 
-    $log->debug('session id (front): '. $session_front->id);
+    $log->debug('Session id (front): '. $session_front->id);
 
     # Set the path to the directory component of the script, this
     # automagically creates seperate cookies for path based realms
@@ -210,7 +209,7 @@ while (my $cgi = CGI::Fast->new()) {
         $script_path =~ s|\/(f?cgi-bin\/)?([^\/]+)((\?.*)?)$||;
         $response->session_cookie->path($script_path);
 
-        $log->debug("script path: '$script_path'");
+        $log->debug("Script path: '$script_path'");
 
         # if the session has no realm set, try to get a realm from the map
         if (!$session_front->param('pki_realm')) {
@@ -233,7 +232,7 @@ while (my $cgi = CGI::Fast->new()) {
 
     } elsif ($realm_mode eq "hostname") {
         my $host = $ENV{HTTP_HOST};
-        $log->trace('realm map is: ' . Dumper $conf->{realm});
+        $log->trace('Realm map is: ' . Dumper $conf->{realm});
         foreach my $rule (keys %{$conf->{realm}}) {
             next unless ($host =~ qr/\A$rule\z/);
             $log->trace("realm detection match: $host / $rule ");
@@ -248,7 +247,7 @@ while (my $cgi = CGI::Fast->new()) {
     }
 
     if ($detected_realm) {
-        $log->debug('detected realm is ' . $detected_realm);
+        $log->debug('Detected realm is ' . $detected_realm);
         my ($realm, $stack) = split (/;/,$detected_realm);
         $session_front->param('pki_realm', $realm);
         if ($stack) {
@@ -301,7 +300,7 @@ while (my $cgi = CGI::Fast->new()) {
 
 }
 
-$log->info('end fcgi loop ' . $$);
+$log->info('End fcgi loop ' . $$);
 
 1;
 
