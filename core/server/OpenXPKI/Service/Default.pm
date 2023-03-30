@@ -713,8 +713,6 @@ sub __pki_realm_choice_available : PRIVATE {
     else { # more than one PKI realm available
         return 1;
     }
-
-    return 0;
 }
 
 sub __list_authentication_stacks : PRIVATE {
