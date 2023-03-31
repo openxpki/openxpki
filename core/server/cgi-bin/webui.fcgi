@@ -15,6 +15,7 @@ use Data::Dumper;
 use MIME::Base64 qw( encode_base64 decode_base64 );
 use Digest::SHA;
 use Scalar::Util qw( blessed );
+use Encode;
 
 # CPAN modules
 use CGI 4.08;
@@ -104,7 +105,7 @@ sub __handle_error {
     my $error = shift;
     # only echo UI error messages to prevent data leakage
     if (!$error || $error !~ /I18N_OPENXPKI_UI/) {
-        $log->info($error || 'undef passed to handle_error');
+        $log->info($error || '__handle_error() was called with undef');
         $error = i18nGettext('I18N_OPENXPKI_UI_APPLICATION_ERROR');
     } else {
         $error = i18nTokenizer($error);
@@ -113,11 +114,12 @@ sub __handle_error {
 
     if ( $cgi->http('HTTP_X-OPENXPKI-Client') ) {
         print $cgi->header( -type => 'application/json' );
-        print encode_json( { status => { 'level' => 'error', 'message' => $error } });
+        print encode_json({ status => { 'level' => 'error', 'message' => $error } });
     } else {
+        my $error_utf8 = Encode::encode('UTF-8', $error);
         print $cgi->header( -type => 'text/html' );
-        print $cgi->start_html( -title => $error );
-        print "<h1>An error occured</h1><p>$error</p>";
+        print $cgi->start_html( -title => $error, -encoding => 'utf-8' );
+        print "<h1>An error occured</h1><p>$error_utf8</p>";
         print $cgi->end_html;
     }
     return;

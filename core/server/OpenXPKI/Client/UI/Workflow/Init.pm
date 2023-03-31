@@ -5,6 +5,7 @@ extends 'OpenXPKI::Client::UI::Workflow';
 
 # Core modules
 use Data::Dumper;
+use Encode;
 
 # Project modules
 use OpenXPKI::DateTime;
@@ -730,7 +731,7 @@ sub init_export {
         -attachment => "workflow export " . DateTime->now()->iso8601() .  ".txt"
     );
 
-    print i18nTokenizer($buffer);
+    print Encode::encode('UTF-8', i18nTokenizer($buffer));
     exit;
 
 }

@@ -39,7 +39,7 @@ lives_and {
 } 'translate single string - i18nGettext()';
 
 lives_and {
-    is Encode::decode('UTF-8', OpenXPKI::i18n::i18nTokenizer("$orig blah $orig .")), "$de blah $de .";
+    is OpenXPKI::i18n::i18nTokenizer("$orig blah $orig ."), "$de blah $de .";
 } 'translate string with multiple i18n tokens - i18nTokenizer()';
 
 # translation of deep/nested structures

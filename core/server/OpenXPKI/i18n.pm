@@ -4,6 +4,7 @@ use warnings;
 
 # Core modules
 use English;
+use Encode;
 use Locale::gettext_pp qw (:locale_h :libintl_h nl_putenv);
 use POSIX qw (setlocale);
 use Scalar::Util qw(blessed reftype refaddr);
@@ -33,16 +34,8 @@ sub i18nGettext {
     my $text = shift;
     warn "Parameter expansion with i18nGettext() is no longer supported" if @_;
 
-    # skip empty strings
-    return unless $text;
-
     # translate
-    my $translated = _i18n_gettext($text);
-
-    # as we (hopefully) use i18nGettext() only to create internal strings
-    # in preparation for a LATER output we decode this back to the
-    # internal Perl format
-    return Encode::decode('UTF-8', $translated);
+    return _i18n_gettext($text);
 }
 
 sub _i18n_gettext {
@@ -53,12 +46,13 @@ sub _i18n_gettext {
     return $text unless $text =~ m{\AI18N_};
 
     # translate
-    my $translated = gettext($text);
+    my $translated = gettext($text); # returns UTF-8 encoded string
 
     # gettext does not support empty translations, we use a single whitespace which we dont want to show up.
     return '' if ($translated eq ' ');
 
-    return $translated;
+    # decode UTF-8 back to internal Perl format
+    return Encode::decode('UTF-8', $translated);
 }
 
 memoize('_i18n_gettext');
@@ -88,9 +82,7 @@ sub _walk {
         # Note: we explicitely must "return undef" (not "return") or the
         # map{} function for HashRefs below will complain about
         # "Odd number of elements in anonymous hash"
-        return undef unless defined $translated;
-        # decode UTF-8 back to internal Perl format
-        return Encode::decode('UTF-8', $translated);
+        return defined $translated ? $translated : undef;
     }
 
     # References: skip if already seen
@@ -196,8 +188,7 @@ just returns the input as is.
 =head2 i18nTokenizer
 
 Expects a string that contains translatable items I<I18N_OPENXPKI_UI> and
-replaces any occurence with its translation. The result is returned with
-"external utf-8" encoding so it should be directly echoed.
+replaces any occurence with its translation.
 
 =head2 i18n_walk
 
