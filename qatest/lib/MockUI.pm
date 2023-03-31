@@ -79,7 +79,7 @@ sub __request {
         OpenXPKI::Client::UI::Request->new(
             cgi => $self->cgi,
             session => $self->session,
-            logger => $self->logger,
+            logger => $self->log,
         )
     );
     $result->render;

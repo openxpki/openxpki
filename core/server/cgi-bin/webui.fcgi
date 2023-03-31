@@ -288,7 +288,7 @@ while (my $cgi = CGI::Fast->new()) {
         my $client = OpenXPKI::Client::UI->new({
             backend => $backend_client,
             session => $session_front,
-            logger => $log,
+            log => $log,
             config => $conf->{global},
             resp => $response,
             %pkey,

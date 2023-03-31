@@ -526,7 +526,7 @@ Return the class logger (log4perl ref).
 =cut
 sub log {
     my $self = shift;
-    return $self->_client->logger;
+    return $self->_client->log;
 }
 
 =head2 logger
@@ -536,7 +536,7 @@ Deprecated alias for L</log>.
 =cut
 sub logger {
     my $self = shift;
-    return $self->_client->logger;
+    return $self->_client->log;
 }
 
 =head2 _render_body_to_str
