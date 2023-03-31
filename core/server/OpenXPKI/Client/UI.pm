@@ -15,6 +15,7 @@ use URI::Escape;
 use Log::Log4perl::MDC;
 use Crypt::JWT qw( encode_jwt decode_jwt );
 use Feature::Compat::Try;
+use Moose::Util::TypeConstraints qw( enum );
 
 # Project modules
 use OpenXPKI::Template;
@@ -31,9 +32,20 @@ has 'session' => (
 
 # Response structure (JSON or some raw bytes) and HTTP headers
 has 'resp' => (
+    required => 1,
     is => 'rw',
     isa => 'OpenXPKI::Client::UI::Response',
+);
+
+has 'realm_mode' => (
     required => 1,
+    is => 'rw',
+    isa => enum([qw(
+        select
+        path
+        hostname
+        fixed
+    )]),
 );
 
 has 'socket_path' => (
@@ -617,20 +629,45 @@ sub handle_login {
     }
 
     if ( $status eq 'GET_PKI_REALM' ) {
+        $self->log->debug("Status: '$status'");
+        # realm set
         if ($pki_realm) {
             $reply = $self->backend()->send_receive_service_msg( 'GET_PKI_REALM', { PKI_REALM => $pki_realm, } );
             $status = $reply->{SERVICE_MSG};
-            $self->log->debug("Selected realm $pki_realm, new status " . $status);
+            $self->log->debug("Selected realm: '$pki_realm', new status: '$status'");
+        # no realm set
         } else {
-            my $realms = $reply->{'PARAMS'}->{'PKI_REALMS'};
-            my @realm_list = map { $_ = {'value' => $realms->{$_}->{NAME}, 'label' => $realms->{$_}->{DESCRIPTION}} } keys %{$realms};
-            $self->log->trace("Offering realms: " . Dumper \@realm_list ) if $self->log->is_trace;
-            $uilogin->init_realm_select( \@realm_list );
+            my $realms = $reply->{PARAMS}->{PKI_REALMS};
+            # "path" mode: realm selection that links to defined sub paths
+            if ('path' eq $self->realm_mode) {
+                my @cards =
+                    sort { lc($a->{label}) cmp lc($b->{label}) }
+                    map { {
+                        label => $realms->{$_}->{LABEL},
+                        description => $realms->{$_}->{DESCRIPTION},
+                        image => $realms->{$_}->{IMAGE},
+                        href => $realms->{$_}->{BASEURL},
+                    } }
+                    keys %{$realms};
+                $uilogin->init_realm_cards(\@cards);
+            # other modes: realm selection drop-down that sets "pki_realm" parameter
+            } else {
+                my $options = [
+                    map { {
+                        'value' => $realms->{$_}->{NAME},
+                        'label' => $realms->{$_}->{DESCRIPTION},
+                    } }
+                    keys %{$realms}
+                ];
+                $self->log->trace("Offering realms: " . Dumper $options) if $self->log->is_trace;
+                $uilogin->init_realm_select($options);
+            }
             return $uilogin;
         }
     }
 
     if ( $status eq 'GET_AUTHENTICATION_STACK' ) {
+        $self->log->debug("Status: '$status'");
         # Never auth with an internal stack!
         if ( $auth_stack && $auth_stack !~ /^_/) {
             $self->log->debug("Authentication stack: $auth_stack");
@@ -673,6 +710,7 @@ sub handle_login {
     # we have more than one login handler and leave it to the login
     # class to render it right.
     if ( $status =~ /GET_(.*)_LOGIN/ ) {
+        $self->log->debug("Status: '$status'");
         my $login_type = $1;
 
         ## FIXME - need a good way to configure login handlers

@@ -224,9 +224,9 @@ while (my $cgi = CGI::Fast->new()) {
 
     # Set the path to the directory component of the script, this
     # automagically creates seperate cookies for path based realms
-    my $realm_mode = $conf->{global}->{realm_mode} || '';
+    my $realm_mode = $conf->{global}->{realm_mode} || 'select';
     my $detected_realm;
-    $log->debug("realm_mode: '$realm_mode'");
+    $log->debug("Realm mode = $realm_mode");
 
     if ($realm_mode eq "path") {
         my $script_path = $ENV{'REQUEST_URI'};
@@ -234,7 +234,7 @@ while (my $cgi = CGI::Fast->new()) {
         $script_path =~ s|\/(f?cgi-bin\/)?([^\/]+)((\?.*)?)$||;
         $response->session_cookie->path($script_path);
 
-        $log->debug("Script path: '$script_path'");
+        $log->debug("Script path = '$script_path'");
 
         # if the session has no realm set, try to get a realm from the map
         if (!$session_front->param('pki_realm')) {
@@ -248,10 +248,11 @@ while (my $cgi = CGI::Fast->new()) {
                     $session_front->flush();
                     $backend_client->detach();
                     next;
+                } else {
+                    $detected_realm = $conf->{realm}->{$script_realm};
                 }
-                $detected_realm = $conf->{realm}->{$script_realm};
             } else {
-                $log->warn('Unable to read realm from url path');
+                $log->warn('Unable to read realm from URL path');
             }
         }
 
@@ -307,6 +308,7 @@ while (my $cgi = CGI::Fast->new()) {
             $conf->{global}->{loginpage} ? (login_page => $conf->{global}->{loginpage}) : (),
             $conf->{global}->{loginurl} ? (login_url => $conf->{global}->{loginurl}) : (),
             resp => $response,
+            realm_mode => $realm_mode,
             %pkey,
         });
 

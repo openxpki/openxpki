@@ -5,6 +5,7 @@ extends 'OpenXPKI::Client::UI::Result';
 
 use Data::Dumper;
 
+use OpenXPKI::MooseParams;
 
 my $meta = __PACKAGE__->meta;
 
@@ -14,6 +15,25 @@ sub BUILD {
 
 }
 
+=head2 init_realm_select
+
+Renders a realm selection drop-down.
+
+B<Parameters:>
+
+=over
+
+=item * I<ArrayRef> C<$realms> - list of I<HashRefs> defining the realms:
+
+    [
+        { label => ..., value => ... },
+        { label => ..., value => ... },
+        ...
+    ]
+
+=back
+
+=cut
 sub init_realm_select {
 
     my $self = shift;
@@ -30,6 +50,43 @@ sub init_realm_select {
     )->add_field(
         name => 'pki_realm', label => 'I18N_OPENXPKI_UI_PKI_REALM_LABEL', type => 'select', options => \@realms,
     );
+    return $self;
+}
+
+=head2 init_realm_cards
+
+For path based realm selection: show links to all realms incl. image and description.
+
+B<Parameters:>
+
+=over
+
+=item * I<ArrayRef> C<$realms> - list of I<HashRefs> defining the realms:
+
+    [
+        { label => ..., description => ..., image => ..., href => ... },
+        ...
+    ]
+
+=back
+
+=cut
+sub init_realm_cards {
+    my ($self, $realms) = positional_args(\@_, # OpenXPKI::MooseParams
+        { isa => 'ArrayRef[HashRef]' },
+    );
+
+    $self->set_page(
+        label => 'I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN',
+        description => 'I18N_OPENXPKI_UI_LOGIN_REALM_SELECTION_DESC'
+    );
+    $self->main->add_section({
+        type => 'cards',
+        content => {
+            cards => $realms,
+        }
+    });
+
     return $self;
 }
 

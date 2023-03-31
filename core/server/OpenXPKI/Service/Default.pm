@@ -333,6 +333,8 @@ sub __handle_PING : PRIVATE {
             $realms{$realm}->{NAME} = $realm;
             $realms{$realm}->{LABEL} = $label;
             $realms{$realm}->{DESCRIPTION} = CTX('config')->get("system.realms.$realm.description") || $label;
+            $realms{$realm}->{BASEURL} = CTX('config')->get("system.realms.$realm.baseurl") || '';
+            $realms{$realm}->{IMAGE} = CTX('config')->get("system.realms.$realm.image") || '';
         }
         return {
            SERVICE_MSG => 'GET_PKI_REALM',
@@ -383,6 +385,8 @@ sub __handle_SESSION_ID_ACCEPTED : PRIVATE {
     # message for the user and set the state to
     # 'WAITING_FOR_PKI_REALM'
     # we only do this if we are in a 'SESSION_ID_SENT.*' state
+
+    # TODO: checking $state_of{$ident} is not necessary as this is already checked via __is_valid_message()
     if ($pki_realm_choice
         && $state_of{$ident} =~ m{\A SESSION_ID_SENT.* \z}xms) {
         ##! 2: "build hash with ID, name and description"
@@ -693,6 +697,7 @@ sub __pki_realm_choice_available : PRIVATE {
     my $realm = OpenXPKI::Server::Context::hascontext('session')
         ? CTX('session')->data->pki_realm
         : undef;
+    # TODO: this method should only return 0 or 1 and the realm return value is not used in our code
     return $realm if defined $realm;
 
     ##! 2: "check if there is more than one realm"
