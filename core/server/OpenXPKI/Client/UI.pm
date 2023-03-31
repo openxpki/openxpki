@@ -501,7 +501,7 @@ sub handle_login {
 
     my $status = $reply->{SERVICE_MSG};
 
-    my $result = OpenXPKI::Client::UI::Login->new(
+    my $uilogin = OpenXPKI::Client::UI::Login->new(
         client => $self,
         req => $req,
         resp => $self->resp,
@@ -514,14 +514,14 @@ sub handle_login {
 
     # this is the incoming logout action
     if ($page eq 'logout') {
-        $result->redirect->to('login!logout');
-        return $result->render;
+        $uilogin->redirect->to('login!logout');
+        return $uilogin->render;
     }
 
     # this is the redirect to the "you have been logged out page"
     if ($page eq 'login!logout') {
-        $result->init_logout;
-        return $result->render;
+        $uilogin->init_logout;
+        return $uilogin->render;
     }
 
     # action is only valid within a post request
@@ -570,15 +570,15 @@ sub handle_login {
         } elsif (my $loginurl = $self->_config()->{loginurl}) {
 
             $self->logger()->debug("Redirect to external login page " . $loginurl );
-            $result->redirect->external($loginurl);
-            return $result->render();
+            $uilogin->redirect->external($loginurl);
+            return $uilogin->render();
             # Do a real exit to skip the error handling of the script body
             exit;
 
         } elsif ( $cgi->http('HTTP_X-OPENXPKI-Client') ) {
 
             # Session is gone but we are still in the ember application
-            $result->redirect->to('login');
+            $uilogin->redirect->to('login');
 
         } else {
 
@@ -592,7 +592,7 @@ sub handle_login {
             }
             $url .= '/#/openxpki/login';
             $self->logger()->debug('Redirect to login page: ' . $url);
-            $result->redirect->to($url);
+            $uilogin->redirect->to($url);
         }
     }
 
@@ -605,7 +605,7 @@ sub handle_login {
             my $realms = $reply->{'PARAMS'}->{'PKI_REALMS'};
             my @realm_list = map { $_ = {'value' => $realms->{$_}->{NAME}, 'label' => $realms->{$_}->{DESCRIPTION}} } keys %{$realms};
             $self->logger()->trace("Offering realms: " . Dumper \@realm_list ) if $self->logger->is_trace;
-            return $result->init_realm_select( \@realm_list  )->render();
+            return $uilogin->init_realm_select( \@realm_list  )->render();
         }
     }
 
@@ -640,7 +640,7 @@ sub handle_login {
                 $status = $reply->{SERVICE_MSG};
             } else {
                 $self->logger()->trace("Offering stacks: " . Dumper \@stack_list ) if $self->logger->is_trace;
-                return $result->init_auth_stack( \@stack_list )->render();
+                return $uilogin->init_auth_stack( \@stack_list )->render();
             }
         }
     }
@@ -692,14 +692,14 @@ sub handle_login {
                     { baseurl => $session->param('baseurl') } );
 
                 $self->logger()->debug("No auth data in environment - redirect found $loginurl");
-                $result->redirect->external($loginurl);
-                return $result->render();
+                $uilogin->redirect->external($loginurl);
+                return $uilogin->render();
 
             # bad luck - something seems to be really wrong
             } else {
                 $self->logger()->error('No ENV data to perform SSO Login');
                 $self->logout_session( $cgi );
-                return $result->init_login_missing_data()->render();
+                return $uilogin->init_login_missing_data()->render();
             }
 
         } elsif ( $login_type eq 'X509' ) {
@@ -726,7 +726,7 @@ sub handle_login {
             } else {
                 $self->logger()->error('Certificate missing for X509 Login');
                 $self->logout_session( $cgi );
-                return $result->init_login_missing_data()->render();
+                return $uilogin->init_login_missing_data()->render();
             }
 
         } elsif( $login_type  eq 'PASSWD' ) {
@@ -755,7 +755,7 @@ sub handle_login {
 
             } else {
                 $self->logger()->debug('No credentials, render form');
-                return $result->init_login_passwd($auth)->render();
+                return $uilogin->init_login_passwd($auth)->render();
             }
 
         } else {
@@ -800,11 +800,11 @@ sub handle_login {
             $self->resp->session_cookie->id($session->id);
 
             if ($auth_info->{login}) {
-                $result->redirect->to($auth_info->{login});
+                $uilogin->redirect->to($auth_info->{login});
             } else {
-                $result->init_index();
+                $uilogin->init_index();
             }
-            return $result->render();
+            return $uilogin->render();
         }
     }
 
@@ -815,11 +815,11 @@ sub handle_login {
         # Failure here is likely a wrong password
 
         if ($reply->{'ERROR'} && $reply->{'ERROR'}->{CLASS} eq 'OpenXPKI::Exception::Authentication') {
-            $result->status->error($reply->{'ERROR'}->{LABEL});
+            $uilogin->status->error($reply->{'ERROR'}->{LABEL});
         } else {
-            $result->set_status_from_error_reply($reply);
+            $uilogin->set_status_from_error_reply($reply);
         }
-        return $result->render();
+        return $uilogin->render();
     }
 
     $self->logger()->debug("unhandled error during auth");
