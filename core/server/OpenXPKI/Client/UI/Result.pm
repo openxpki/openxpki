@@ -600,7 +600,7 @@ sub render {
 
     if (not ref $cgi) {
         $self->log->error("Cannot render result - CGI object not available");
-        return $self;
+        return;
     }
 
     # helper to print HTTP headers
@@ -653,8 +653,6 @@ sub render {
         $self->log->debug("Sending HTTP redirect to: $url");
         print $cgi->redirect($url);
     }
-
-    return $self;
 }
 
 =head2 _escape ( string )

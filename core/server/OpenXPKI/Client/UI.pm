@@ -172,7 +172,7 @@ sub handle_request {
         );
         $self->logger()->debug("Send redirect to $goto");
         $result->redirect->to($goto);
-        return $result->render();
+        return $result;
     }
 
     # Handle logout / session restart
@@ -198,7 +198,7 @@ sub handle_request {
                 resp => $self->resp,
             );
             $result->redirect->to($redirectTo);
-            return $result->render();
+            return $result;
         }
 
     }
@@ -222,7 +222,7 @@ sub handle_request {
         );
         $self->logger()->debug("Got error from server");
         $result->set_status_from_error_reply($reply);
-        return $result->render;
+        return $result;
     }
 
 
@@ -234,7 +234,7 @@ sub handle_request {
             resp => $self->resp,
         );
         $result->init_structure;
-        return $result->render;
+        return $result;
     }
 
     # Only handle requests if we have an open channel
@@ -428,22 +428,22 @@ sub handle_page {
 
     $self->logger()->trace('Handle page: ' . Dumper { map { $_ => $args->{$_} } grep { $_ ne 'req' } keys %$args } ) if $self->logger->is_trace;
 
-    my $obj;
+    my $result;
     my $redirected_from;
     if ($action) {
         $self->logger()->info('handle action ' . $action);
 
         my $method;
-        ($obj, $method) = $self->__load_class($action, $req, 1);
+        ($result, $method) = $self->__load_class($action, $req, 1);
 
-        if ($obj) {
+        if ($result) {
             $method  = "action_$method";
             $self->logger->debug("Calling method: $method()");
-            $obj->$method();
+            $result->$method();
             # Follow an internal redirect to an init_* method
-            if (my $target = $obj->internal_redirect_target) {
+            if (my $target = $result->internal_redirect_target) {
                 ($page, @page_method_args) = @$target;
-                $redirected_from = $obj;
+                $redirected_from = $result;
                 $self->logger->trace("Internal redirect to: $page") if $self->logger->is_trace;
             }
         } else {
@@ -452,7 +452,7 @@ sub handle_page {
     }
 
     # Render a page only if there is no action or object instantiation failed
-    if (not $obj or $redirected_from) {
+    if (not $result or $redirected_from) {
 
         # Handling of special page requests - to be replaced by hash if it grows
         if ($page eq 'welcome') {
@@ -461,30 +461,30 @@ sub handle_page {
 
         my $method;
         if ($page) {
-            ($obj, $method) = $self->__load_class($page, $req);
+            ($result, $method) = $self->__load_class($page, $req);
         }
 
-        if (!$obj) {
+        if (!$result) {
             $self->logger()->error("Failed loading page class");
-            $obj = OpenXPKI::Client::UI::Bootstrap->new(
+            $result = OpenXPKI::Client::UI::Bootstrap->new(
                 client => $self,
                 req => $req,
                 resp => $self->resp,
             );
-            $obj->init_error();
-            $obj->status->error('I18N_OPENXPKI_UI_PAGE_NOT_FOUND');
+            $result->init_error();
+            $result->status->error('I18N_OPENXPKI_UI_PAGE_NOT_FOUND');
 
         } else {
             $method  = "init_$method";
             $self->logger->debug("Calling method: $method()");
-            $obj->status($redirected_from->status) if $redirected_from;
-            $obj->$method(@page_method_args);
+            $result->status($redirected_from->status) if $redirected_from;
+            $result->$method(@page_method_args);
         }
     }
 
     Log::Log4perl::MDC->put('wfid', undef);
 
-    return $obj->render();
+    return $result;
 
 }
 
@@ -515,13 +515,13 @@ sub handle_login {
     # this is the incoming logout action
     if ($page eq 'logout') {
         $uilogin->redirect->to('login!logout');
-        return $uilogin->render;
+        return $uilogin;
     }
 
     # this is the redirect to the "you have been logged out page"
     if ($page eq 'login!logout') {
         $uilogin->init_logout;
-        return $uilogin->render;
+        return $uilogin;
     }
 
     # action is only valid within a post request
@@ -571,7 +571,7 @@ sub handle_login {
 
             $self->logger()->debug("Redirect to external login page " . $loginurl );
             $uilogin->redirect->external($loginurl);
-            return $uilogin->render();
+            return $uilogin;
             # Do a real exit to skip the error handling of the script body
             exit;
 
@@ -605,7 +605,8 @@ sub handle_login {
             my $realms = $reply->{'PARAMS'}->{'PKI_REALMS'};
             my @realm_list = map { $_ = {'value' => $realms->{$_}->{NAME}, 'label' => $realms->{$_}->{DESCRIPTION}} } keys %{$realms};
             $self->logger()->trace("Offering realms: " . Dumper \@realm_list ) if $self->logger->is_trace;
-            return $uilogin->init_realm_select( \@realm_list  )->render();
+            $uilogin->init_realm_select( \@realm_list );
+            return $uilogin;
         }
     }
 
@@ -640,7 +641,8 @@ sub handle_login {
                 $status = $reply->{SERVICE_MSG};
             } else {
                 $self->logger()->trace("Offering stacks: " . Dumper \@stack_list ) if $self->logger->is_trace;
-                return $uilogin->init_auth_stack( \@stack_list )->render();
+                $uilogin->init_auth_stack(\@stack_list);
+                return $uilogin;
             }
         }
     }
@@ -688,18 +690,19 @@ sub handle_login {
             } elsif (my $loginurl = $auth->{login}) {
 
                 # the login url might contain a backlink to the running instance
-                $loginurl = OpenXPKI::Template->new()->render( $loginurl,
+                $loginurl = OpenXPKI::Template->new->render( $loginurl,
                     { baseurl => $session->param('baseurl') } );
 
                 $self->logger()->debug("No auth data in environment - redirect found $loginurl");
                 $uilogin->redirect->external($loginurl);
-                return $uilogin->render();
+                return $uilogin;
 
             # bad luck - something seems to be really wrong
             } else {
                 $self->logger()->error('No ENV data to perform SSO Login');
                 $self->logout_session( $cgi );
-                return $uilogin->init_login_missing_data()->render();
+                $uilogin->init_login_missing_data();
+                return $uilogin;
             }
 
         } elsif ( $login_type eq 'X509' ) {
@@ -726,7 +729,8 @@ sub handle_login {
             } else {
                 $self->logger()->error('Certificate missing for X509 Login');
                 $self->logout_session( $cgi );
-                return $uilogin->init_login_missing_data()->render();
+                $uilogin->init_login_missing_data;
+                return $uilogin;
             }
 
         } elsif( $login_type  eq 'PASSWD' ) {
@@ -755,7 +759,8 @@ sub handle_login {
 
             } else {
                 $self->logger()->debug('No credentials, render form');
-                return $uilogin->init_login_passwd($auth)->render();
+                $uilogin->init_login_passwd($auth);
+                return $uilogin;
             }
 
         } else {
@@ -804,7 +809,7 @@ sub handle_login {
             } else {
                 $uilogin->init_index();
             }
-            return $uilogin->render();
+            return $uilogin;
         }
     }
 
@@ -819,7 +824,7 @@ sub handle_login {
         } else {
             $uilogin->set_status_from_error_reply($reply);
         }
-        return $uilogin->render();
+        return $uilogin;
     }
 
     $self->logger()->debug("unhandled error during auth");

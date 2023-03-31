@@ -75,13 +75,14 @@ sub __request {
     local *STDOUT;
     open(STDOUT, '>', \$out);
 
-    $self->handle_request(
+    my $result = $self->handle_request(
         OpenXPKI::Client::UI::Request->new(
             cgi => $self->cgi,
             session => $self->session,
             logger => $self->logger,
         )
     );
+    $result->render;
     my $json = $self->json->decode($out);
 
     if (ref $json->{main} and my $fields = $json->{main}->[0]->{content}->{fields}) {

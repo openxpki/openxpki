@@ -297,6 +297,7 @@ while (my $cgi = CGI::Fast->new()) {
         my $req = OpenXPKI::Client::UI::Request->new( cgi => $cgi, logger => $log, session => $session_front );
         $log->trace(ref($req).' - '.Dumper({ map { $_ => $req->{$_} } qw( method cache cgi ) }) ) if ($log->is_trace());
         $result = $client->handle_request( $req );
+        $result->render; # CGI output
         $log->debug('Finished request handling');
         $log->trace(ref($result).' - '.Dumper({ map { $_ => $result->{$_} } qw( type _page redirect extra _result ) }) ) if $log->is_trace();
     };
