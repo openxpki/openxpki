@@ -289,7 +289,9 @@ while (my $cgi = CGI::Fast->new()) {
             backend => $backend_client,
             session => $session_front,
             log => $log,
-            config => $conf->{global},
+            socket_path => $conf->{global}->{'socket'},
+            $conf->{global}->{loginpage} ? (login_page => $conf->{global}->{loginpage}) : (),
+            $conf->{global}->{loginurl} ? (login_url => $conf->{global}->{loginurl}) : (),
             resp => $response,
             %pkey,
         });

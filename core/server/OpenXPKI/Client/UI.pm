@@ -36,6 +36,22 @@ has 'resp' => (
     required => 1,
 );
 
+has 'socket_path' => (
+    required => 1,
+    is => 'ro',
+    isa => 'Str',
+);
+
+has 'login_page' => (
+    is => 'ro',
+    isa => 'Str',
+);
+
+has 'login_url' => (
+    is => 'ro',
+    isa => 'Str',
+);
+
 # the OXI::Client object
 has 'backend' => (
     is => 'rw',
@@ -51,13 +67,6 @@ has 'log' => (
     isa => 'Log::Log4perl::Logger',
     lazy => 1,
     default => sub{ return Log::Log4perl->get_logger( ); },
-);
-
-has '_config' => (
-    required => 1,
-    is => 'ro',
-    isa => 'HashRef',
-    init_arg => 'config',
 );
 
 # holds key object to sign socket communication
@@ -81,7 +90,7 @@ sub _init_backend {
 
     if (!$client) {
         $client = OpenXPKI::Client->new({
-            SOCKETFILE => $self->_config()->{'socket'},
+            SOCKETFILE => $self->socket_path,
         });
         $self->log->debug('Create backend client instance');
     } else {
@@ -562,12 +571,12 @@ sub handle_login {
         }
 
         # Link to an internal method using the class!method
-        if (my $loginpage = $self->_config()->{loginpage}) {
+        if (my $loginpage = $self->login_page) {
 
             # internal call to handle_page
             return $self->handle_page({ page => $loginpage, req => $req });
 
-        } elsif (my $loginurl = $self->_config()->{loginurl}) {
+        } elsif (my $loginurl = $self->login_url) {
 
             $self->log->debug("Redirect to external login page " . $loginurl );
             $uilogin->redirect->external($loginurl);
