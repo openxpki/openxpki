@@ -261,7 +261,7 @@ while (my $cgi = CGI::Fast->new()) {
 
     if ($detected_realm) {
         $log->debug('Detected realm is ' . $detected_realm);
-        my ($realm, $stack) = split (/;/,$detected_realm);
+        my ($realm, $stack) = split (/\s*;\s*/,$detected_realm);
         $session_front->param('pki_realm', $realm);
         if ($stack) {
             $session_front->param('auth_stack', $stack);
