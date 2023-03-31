@@ -219,11 +219,18 @@ sub __load_tenant {
 
 sub list_authentication_stacks {
     my $self = shift;
-
     ##! 1: "start"
 
     ##! 2: "get PKI realm"
     my $realm = CTX('session')->data->pki_realm;
+    return $self->list_authentication_stacks_of($realm);
+}
+
+sub list_authentication_stacks_of {
+    my $self = shift;
+    my $realm = shift;
+    ##! 1: "start"
+
     my %ret = map {
         my %vv = %{$self->{PKI_REALM}->{$realm}->{STACK}->{$_}};
         delete $vv{handler};

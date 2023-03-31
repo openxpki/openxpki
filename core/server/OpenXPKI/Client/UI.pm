@@ -75,6 +75,20 @@ has 'static_dir' => (
     isa => 'Str',
 );
 
+# Only if realm_mode=path: a map of realms to URL paths
+# {
+#     realma => [
+#         { url_path => 'realm-a', stack => 'LocalPassword' },
+#         { url_path => 'realm-a-cert', stack => 'Certificate' },
+#     ],
+#     realmb => ...
+# }
+has 'realm_path_map' => (
+    is => 'ro',
+    isa => 'HashRef',
+    default => sub { {} },
+);
+
 # the OXI::Client object
 has 'backend' => (
     is => 'rw',
@@ -638,18 +652,38 @@ sub handle_login {
         # no realm set
         } else {
             my $realms = $reply->{PARAMS}->{PKI_REALMS};
+
             # "path" mode: realm selection that links to defined sub paths
             if ('path' eq $self->realm_mode) {
-                my @cards =
-                    sort { lc($a->{label}) cmp lc($b->{label}) }
-                    map { {
-                        label => $realms->{$_}->{LABEL},
-                        description => $realms->{$_}->{DESCRIPTION},
-                        image => $realms->{$_}->{IMAGE},
-                        href => $realms->{$_}->{BASEURL},
-                    } }
-                    keys %{$realms};
+                my @cards;
+
+                # use webui config but only take realms known to the server:
+                my @realm_list =
+                    sort { lc($realms->{$a}->{LABEL}) cmp lc($realms->{$b}->{LABEL}) }
+                    grep { $realms->{$_} }
+                    keys $self->realm_path_map->%*;
+
+                # create a link for each <realm URL path> = <realm> + <auth stack>
+                for my $realm (@realm_list) {
+                    my $auth_stacks = $realms->{$realm}->{AUTH_STACKS};
+
+                    my @defs = $self->realm_path_map->{$realm}->@*;
+                    for my $def (@defs) {
+                        my $stack = $def->{stack};
+                        my $stack_label = $stack
+                            ? sprintf(' (%s)', $auth_stacks->{$stack} ? $auth_stacks->{$stack}->{label} : $stack)
+                            : '';
+                        push @cards, {
+                            label => $realms->{$realm}->{LABEL} . $stack_label,
+                            description => $realms->{$realm}->{DESCRIPTION},
+                            image => $realms->{$realm}->{IMAGE},
+                            href => $def->{url},
+                        };
+                    }
+                }
+
                 $uilogin->init_realm_cards(\@cards);
+
             # other modes: realm selection drop-down that sets "pki_realm" parameter
             } else {
                 my $options = [
