@@ -118,9 +118,20 @@ sub __handle_error {
     } else {
         my $error_utf8 = Encode::encode('UTF-8', $error);
         print $cgi->header( -type => 'text/html' );
-        print $cgi->start_html( -title => $error, -encoding => 'utf-8' );
-        print "<h1>An error occured</h1><p>$error_utf8</p>";
-        print $cgi->end_html;
+        print <<"EOF";
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>$error_utf8</title>
+    </head>
+    <body>
+        <h1>An error occured</h1>
+        <p>$error_utf8</p>
+    </body>
+</html>
+EOF
     }
     return;
 }
