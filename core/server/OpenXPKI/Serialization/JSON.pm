@@ -57,8 +57,9 @@ sub serialize
     if (!$json) {
         ##! 16: 'Unable to encode to json'
         ##! 64: $args
-        Log::Log4perl->get_logger('openxpki.system')->fatal('Unable to serialize ' . ref $args);
-        Log::Log4perl->get_logger('openxpki.system')->debug( Dumper $args );
+        my $log = Log::Log4perl->get_logger('openxpki.system');
+        $log->fatal('Unable to serialize ' . ref $args);
+        $log->trace( Dumper $args ) if $log->is_trace;
         OpenXPKI::Exception->throw( message => 'Unable to serialize' );
     }
     return $json;

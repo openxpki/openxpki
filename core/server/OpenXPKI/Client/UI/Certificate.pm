@@ -240,11 +240,11 @@ sub init_result {
         }
     }
 
-    $self->log->debug( "persisted query: " . Dumper $result) if $self->log->is_debug;
+    $self->log->trace( "persisted query: " . Dumper $result) if $self->log->is_trace;
 
     my $search_result = $self->send_command_v2( 'search_cert', $query );
 
-    $self->log->debug( "search result: " . Dumper $search_result) if $self->log->is_debug;
+    $self->log->trace( "search result: " . Dumper $search_result) if $self->log->is_trace;
 
     my $criteria = '<br>' . (join ", ", @{$result->{criteria}});
 
@@ -1367,7 +1367,7 @@ sub action_search {
         $query->{cert_attributes} = $attr;
     }
 
-    $self->log->debug("query : " . Dumper $query) if $self->log->is_debug;
+    $self->log->trace("query : " . Dumper $query) if $self->log->is_trace;
 
 
     my $result_count = $self->send_command_v2( 'search_cert_count', $query  );

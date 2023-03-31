@@ -208,7 +208,7 @@ sub handle_enrollment_request {
         ),
         %{$conf->{$operation} || {}},
     };
-    $log->debug(Dumper $pickup_config);
+    $log->trace(Dumper $pickup_config) if $log->is_trace;
 
     my $workflow;
     eval {

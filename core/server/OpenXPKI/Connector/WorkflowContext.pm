@@ -102,7 +102,7 @@ sub _get_node {
         $val = $ser->deserialize( $val );
     }
 
-    $self->log()->debug('value is '. Dumper $val ) if $self->log->is_debug;
+    $self->log->trace('Value is '. Dumper $val ) if $self->log->is_trace;
 
     return $val;
 }

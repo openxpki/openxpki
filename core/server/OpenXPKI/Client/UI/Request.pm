@@ -93,7 +93,7 @@ sub BUILD {
         # wrap Scalars and HashRefs in an ArrayRef as param() expects it (but leave ArrayRefs as is)
         $cache{$_} = (ref $data->{$_} eq 'ARRAY' ? $data->{$_} : [ $data->{$_} ]) for keys %$data;
 
-        $self->log->debug('JSON param: ' . SDumper $data) if $self->log->is_debug;
+        $self->log->trace('JSON param: ' . SDumper $data) if $self->log->is_trace;
         $self->method('POST');
     }
 

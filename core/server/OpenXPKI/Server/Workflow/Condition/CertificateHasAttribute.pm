@@ -14,6 +14,7 @@ sub _evaluate {
     ##! 1: 'start'
     my ( $self, $workflow ) = @_;
 
+    my $log = CTX('log')->application();
     my $context  = $workflow->context();
     ##! 64: 'context: ' . Dumper($context)
 
@@ -41,14 +42,14 @@ sub _evaluate {
 
     if (!defined $res) {
         ##! 16: 'not defined'
-        CTX('log')->application()->debug("CertificateAttribute condition failed - no values found");
+        $log->debug("CertificateAttribute condition failed - no values found");
         condition_error('CertificateAttribute condition failed');
     }
 
     ##! 64: $res
-    CTX('log')->application()->debug("CertificateHasAttribute $attribute got result " . Dumper $res);
+    $log->trace("CertificateHasAttribute $attribute got result " . Dumper $res) if $log->is_trace;
     if ($condition eq 'defined') {
-        CTX('log')->application()->debug('CertificateHasAttribute is defined');
+        $log->debug('CertificateHasAttribute is defined');
         return 1;
     }
 
@@ -62,13 +63,13 @@ sub _evaluate {
         condition_error('CertificateAttribute condition is_value does not match')
             if ($values[0] ne $value);
 
-        CTX('log')->application()->debug('CertificateHasAttribute is_value passed');
+        $log->debug('CertificateHasAttribute is_value passed');
         return 1;
     }
 
     if ($condition eq 'has_value') {
         if (grep { $_ eq $value } @values) {
-            CTX('log')->application()->debug('CertificateHasAttribute contains value ' . $value);
+            $log->debug('CertificateHasAttribute contains value ' . $value);
             return 1;
         }
         condition_error('CertificateAttribute condition has_value failed');

@@ -1799,12 +1799,12 @@ sub __render_output_field {
 
     } elsif ($field->{yaml_template}) {
         ##! 64: 'Rendering value: ' . $item->{value}
-        $self->log->debug('Template value: ' . SDumper $item );
+        $self->log->trace('Template value: ' . SDumper $item ) if $self->log->is_trace;
         my $structure = $self->send_command_v2('render_yaml_template', {
             template => $field->{yaml_template},
             params => { value => $item->{value} },
         });
-        $self->log->debug('Rendered YAML template: ' . SDumper $structure);
+        $self->log->trace('Rendered YAML template: ' . SDumper $structure) if $self->log->is_trace;
         ##! 64: 'Rendered YAML template: ' . $out
         if (defined $structure) {
             $item->{value} = $structure;

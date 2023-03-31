@@ -944,7 +944,7 @@ sub __send_error
         }
     }
 
-    CTX('log')->system->debug('Sending error ' . Dumper $error);
+    CTX('log')->system->trace('Sending error ' . Dumper $error) if CTX('log')->system->is_trace;
 
     return $self->talk({
         SERVICE_MSG => "ERROR",

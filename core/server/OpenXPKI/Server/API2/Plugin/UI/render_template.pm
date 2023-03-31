@@ -84,6 +84,7 @@ command "render_yaml_template" => {
 
     ##! 64: $params->template
     ##! 128: $params->params
+    my $log = CTX('log')->system;
     my $oxtt = OpenXPKI::Template->new({ trim_whitespaces => 0 });
 
     my $yaml;
@@ -100,7 +101,7 @@ command "render_yaml_template" => {
     my $result = $oxtt->render($yaml, $params->params);
 
     ##! 64: 'Rendered YAML template: ' . $result
-    CTX('log')->system()->debug('Rendered YAML template: ' . $result);
+    $log->debug('Rendered YAML template: ' . $result);
 
     return unless($result);
 
@@ -117,7 +118,7 @@ command "render_yaml_template" => {
     };
 
     $value = $value->{OXI_PLACEHOLDER} if ($has_head);
-    CTX('log')->system()->debug('Parsed Perl structure: ' . Dumper($value));
+    $log->trace('Parsed Perl structure: ' . Dumper($value)) if $log->is_trace;
     ##! 64: 'Parsed Perl structure: ' . Dumper($value)
     return $value;
 };

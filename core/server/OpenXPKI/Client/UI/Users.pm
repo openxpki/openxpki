@@ -87,11 +87,11 @@ sub init_result {
         }
     }
 
-    $self->log->debug( "persisted query: " . Dumper $result) if $self->log->is_debug;
+    $self->log->trace( "persisted query: " . Dumper $result) if $self->log->is_trace;
 
     my $query_result = $self->send_command_v2( 'search_users', $query );
 
-    $self->log->debug( "search result: " . Dumper $query_result) if $self->log->is_debug;
+    $self->log->trace( "search result: " . Dumper $query_result) if $self->log->is_trace;
 
     my $criteria = '<br>' . (join ", ", @{$result->{criteria}});
 
