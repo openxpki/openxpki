@@ -59,6 +59,9 @@ memoize('_i18n_gettext');
 
 sub i18nTokenizer {
     my $text = shift;
+
+    return unless defined $text;
+
     $text =~ s/(I18N_OPENXPKI_UI_[A-Z0-9a-z\_-]+)/_i18n_gettext($1)/ge;
     return $text;
 }
