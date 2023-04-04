@@ -247,7 +247,7 @@ while (my $cgi = CGI::Fast->new()) {
 
         # Prepare realm selection
         if ('select-realm' eq $script_realm) {
-            $log->debug('Special path to trigger realm selection page');
+            $log->debug('Special path detected - showing realm selection page');
 
             # Enforce new session to get rid of selected realm etc.
             $session_front->flush();
@@ -256,21 +256,24 @@ while (my $cgi = CGI::Fast->new()) {
             # Create a map of realms to URL paths:
             # {
             #     realma => [
-            #         { url_path => 'realm-a', stack => 'LocalPassword' },
-            #         { url_path => 'realm-a-cert', stack => 'Certificate' },
+            #         { url => 'realm-a', stack => 'LocalPassword' },
+            #         { url => 'realm-a-cert', stack => 'Certificate' },
             #     ],
             #     realmb => ...
             # }
-            for my $url_path (keys $conf->{realm}->%*) {
-                my ($realm, $stack) = split (/\s*;\s*/, $conf->{realm}->{$url_path});
+            my $realm_root_url = $script_path;
+            $realm_root_url =~ s{^ ( ( / [^/]+ )*? ) / [^/]* /? $}{$1}msx; # strip off last path component
+
+            for my $url_alias (keys $conf->{realm}->%*) {
+                my ($realm, $stack) = split (/\s*;\s*/, $conf->{realm}->{$url_alias});
                 $realm_path_map->{$realm} //= [];
-                my $url = $script_path;
-                $url =~ s| ^ .* / [^/]+ /? $ |/$url_path/|msx;
                 push $realm_path_map->{$realm}->@*, {
-                    url_path => $url,
+                    url => sprintf("%s/%s", $realm_root_url, $url_alias),
                     stack => $stack,
                 }
             };
+
+            $log->trace('URL path and auth stacks by realm: ' . Dumper($realm_path_map)) if $log->is_trace;
         }
 
         # If the session has no realm set, try to get a realm from the map
