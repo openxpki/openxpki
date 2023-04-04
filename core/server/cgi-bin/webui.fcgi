@@ -231,7 +231,8 @@ while (my $cgi = CGI::Fast->new()) {
 
     if ($realm_mode eq "path") {
         my $script_path = $ENV{'REQUEST_URI'};
-        # Strip off cgi-bin, last word of the path and discard query string
+
+        # Strip off /cgi-bin/xxx?aa=bb ("cgi-bin", last path component, query string)
         $script_path =~ s|\/(f?cgi-bin\/)?([^\/]+)((\?.*)?)$||;
         $response->session_cookie->path($script_path);
 
@@ -246,7 +247,7 @@ while (my $cgi = CGI::Fast->new()) {
         }
 
         # Prepare realm selection
-        if ('select-realm' eq $script_realm) {
+        if ('index' eq $script_realm) {
             $log->debug('Special path detected - showing realm selection page');
 
             # Enforce new session to get rid of selected realm etc.
