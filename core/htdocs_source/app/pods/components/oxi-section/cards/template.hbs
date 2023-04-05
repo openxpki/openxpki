@@ -3,19 +3,20 @@
 
     <div class="col-md-10">
     {{#each @def.cards as |card|}}
-
-        <OxiBase::Button::Raw @button={{card}} class="card w-100 mb-3 text-start bg-light">
+        <OxiBase::Button::Raw @button={{card}} class="card w-100 mx-0 my-4 p-0 text-start bg-light">
+            {{#if card.label}}
+                <div class="card-header w-100 text-body-secondary text-center bg-secondary text-light">
+                    <h5 class="card-title">
+                        {{defuse card.label}}
+                    </h5>
+                </div>
+            {{/if}}
             <div class="row gx-2 py-2">
                 <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
                     <img src={{card.image}}/>
                 </div>
                 <div class="col-md-10">
                     <div class="card-body">
-                        {{#if card.label}}
-                            <h5 class="card-title">
-                                {{defuse card.label}}
-                            </h5>
-                        {{/if}}
                         {{#if card.description}}
                             <p class="card-text">
                                 {{defuse card.description}}
@@ -24,6 +25,11 @@
                     </div>
                 </div>
             </div>
+            {{#if card.footer}}
+                <div class="card-footer w-100 text-body-secondary text-center">
+                    {{defuse card.footer}}
+                </div>
+            {{/if}}
         </OxiBase::Button::Raw>
     {{/each}}
     </div>
@@ -33,20 +39,27 @@
     <div class="row row-cols-1 row-cols-md-3 g-4">
     {{#each @def.cards as |card|}}
         <div class="col">
-            <OxiBase::Button::Raw @button={{card}} class="card h-100 mb-3 text-start align-items-center bg-light">
-                <img src={{card.image}} class="m-3" />
-                <div class="card-body">
-                    {{#if card.label}}
+            <OxiBase::Button::Raw @button={{card}} class="card h-100 m-0 p-0 text-start align-items-center bg-light">
+                {{#if card.label}}
+                    <div class="card-header w-100 text-body-secondary text-center bg-secondary text-light">
                         <h5 class="card-title">
                             {{defuse card.label}}
                         </h5>
-                    {{/if}}
-                    {{#if card.description}}
+                    </div>
+                {{/if}}
+                <img src={{card.image}} class="m-3" />
+                {{#if card.description}}
+                    <div class="card-body">
                         <p class="card-text">
                             {{defuse card.description}}
                         </p>
-                    {{/if}}
-                </div>
+                    </div>
+                {{/if}}
+                {{#if card.footer}}
+                    <div class="card-footer w-100 text-body-secondary text-center">
+                        {{defuse card.footer}}
+                    </div>
+                {{/if}}
             </OxiBase::Button::Raw>
         </div>
     {{/each}}
