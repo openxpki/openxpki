@@ -14,6 +14,11 @@ export default class OxiLocaleService extends Service {
     }
 
     set locale(locale) {
+        if (!locale) {
+            /* eslint-disable-next-line no-console */
+            console.warn("oxi-locale - attempt to set locale to empty/undefined value");
+            return;
+        }
         this._locale = locale.replace('_', '-').toLowerCase();
         debug("oxi-locale - setting locale to " + this._locale);
         this.intl.setLocale([this._locale, 'en-us']); // use "en-us" as fallback in case of missing translations
