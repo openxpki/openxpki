@@ -919,7 +919,14 @@ sub __render_input_field {
     };
     $item->{placeholder} = $field->{placeholder} if $field->{placeholder};
     $item->{tooltip} = $field->{tooltip} if $field->{tooltip};
-    $item->{min} = $field->{min} if defined $field->{min};
+
+    # PLEASE NOTE:
+    # "min" is currently not processed in the web UI, it only serves as a flag:
+    # - for legacy profile fields, "min: 0" means "not required"
+    # - for workflow fields, "min: 0" or "min: 1" means "clonable"
+    # (see OpenXPKI::Workflow::Field)
+    #$item->{min} = $field->{min} if defined $field->{min};
+
     $item->{max} = $field->{max} if defined $field->{max};
     $item->{clonable} = 1 if $field->{clonable};
     $item->{is_optional} = 1 unless $field->{required};
