@@ -1,9 +1,10 @@
 <!-- components/oxi-section/cards -->
-{{#if @def.cards.length}}
-        <div class="col-md-10">
+{{#if @def.vertical}}
+
+    <div class="col-md-10">
     {{#each @def.cards as |card|}}
 
-        <OxiBase::Button::Raw @button={{card}} class="card w-100 mb-3 text-start">
+        <OxiBase::Button::Raw @button={{card}} class="card w-100 mb-3 text-start bg-light">
             <div class="row gx-2 py-2">
                 <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
                     <img src={{card.image}}/>
@@ -25,5 +26,30 @@
             </div>
         </OxiBase::Button::Raw>
     {{/each}}
-</div>
+    </div>
+
+{{else}}
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+    {{#each @def.cards as |card|}}
+        <div class="col">
+            <OxiBase::Button::Raw @button={{card}} class="card h-100 mb-3 text-start align-items-center bg-light">
+                <img src={{card.image}} class="m-3" />
+                <div class="card-body">
+                    {{#if card.label}}
+                        <h5 class="card-title">
+                            {{defuse card.label}}
+                        </h5>
+                    {{/if}}
+                    {{#if card.description}}
+                        <p class="card-text">
+                            {{defuse card.description}}
+                        </p>
+                    {{/if}}
+                </div>
+            </OxiBase::Button::Raw>
+        </div>
+    {{/each}}
+    </div>
+
 {{/if}}
