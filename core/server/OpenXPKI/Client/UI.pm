@@ -670,12 +670,13 @@ sub handle_login {
                     my @defs = $self->realm_path_map->{$realm}->@*;
                     for my $def (@defs) {
                         my $stack = $def->{stack};
-                        my $stack_label = $stack
-                            ? sprintf(' (%s)', $auth_stacks->{$stack} ? $auth_stacks->{$stack}->{label} : $stack)
+                        my $footer = $stack
+                            ? ($auth_stacks->{$stack} ? $auth_stacks->{$stack}->{label} : $stack)
                             : '';
                         push @cards, {
-                            label => $realms->{$realm}->{LABEL} . $stack_label,
+                            label => $realms->{$realm}->{LABEL},
                             description => $realms->{$realm}->{DESCRIPTION},
+                            footer => $footer,
                             image => $realms->{$realm}->{IMAGE},
                             href => $def->{url},
                         };
