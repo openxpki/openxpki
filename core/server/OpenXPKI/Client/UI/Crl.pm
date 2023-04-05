@@ -222,7 +222,7 @@ sub __print_detail {
     }
 
     my $crl_key = $crl_hash->{crl_key};
-    my $base =  $self->_client()->_config()->{'scripturl'} . "?page=crl!download!crl_key!$crl_key!format!";
+    my $base =  $self->_client->script_url . "?page=crl!download!crl_key!$crl_key!format!";
     my $pattern = '<li><a href="'.$base.'%s" target="_blank">%s</a></li>';
 
     push @fields, { label => 'Download', value => '<ul class="list-unstyled">'.

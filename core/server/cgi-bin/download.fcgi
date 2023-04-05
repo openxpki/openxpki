@@ -33,12 +33,8 @@ read_config $configfile => my %config;
 OpenXPKI::Log4perl->init_or_fallback( $config{global}{log_config} );
 my $log = Log::Log4perl->get_logger();
 
-if (!$config{global}{socket}) {
-    $config{global}{socket} = '/var/openxpki/openxpki.socket';
-}
-if (!$config{global}{scripturl}) {
-    $config{global}{scripturl} = '/cgi-bin/webui.fcgi';
-}
+# set defaults
+$config{global}{socket} ||= '/var/openxpki/openxpki.socket';
 
 $log->info('Start fcgi loop ' . $$. ', config: ' . $configfile);
 

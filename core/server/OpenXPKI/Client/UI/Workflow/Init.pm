@@ -624,7 +624,7 @@ sub init_result {
             format => 'failure'};
 
         push @buttons, { label => 'I18N_OPENXPKI_UI_SEARCH_EXPORT_RESULT',
-            href => $self->_client()->_config()->{'scripturl'} . '?page=workflow!export!id!'.$queryid,
+            href => $self->_client->script_url . '?page=workflow!export!id!'.$queryid,
             target => '_blank',
             format => 'optional'
             };

@@ -42,12 +42,23 @@ has 'socket_path' => (
     isa => 'Str',
 );
 
+has 'script_url' => (
+    required => 1,
+    is => 'ro',
+    isa => 'Str',
+);
+
 has 'login_page' => (
     is => 'ro',
     isa => 'Str',
 );
 
 has 'login_url' => (
+    is => 'ro',
+    isa => 'Str',
+);
+
+has 'static_dir' => (
     is => 'ro',
     isa => 'Str',
 );

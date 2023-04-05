@@ -93,17 +93,14 @@ sub init_json {
 sub _init_path {
 
     my $self = shift;
+    my $dir = $self->_client->static_dir;
 
-    my $config = $self->_client()->_config();
-
-    $self->log->trace('Got config ' . Dumper $config) if $self->log->is_trace;
-
-    if ($config->{staticdir}) {
-        if (! -d $config->{staticdir}) {
-            $self->log->error('Configured path for static content does not exist: ' . $config->{staticdir});
+    if ($dir) {
+        if (! -d $dir) {
+            $self->log->error('Configured path for static content does not exist: ' . $dir);
             die "Configuration broken - Path does not exist";
         } else {
-            return $config->{staticdir};
+            return $dir;
         }
     } else {
         return '/var/www/';

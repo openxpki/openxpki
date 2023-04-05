@@ -1477,7 +1477,7 @@ sub __render_output_field {
                 label => 'I18N_OPENXPKI_UI_CLICK_TO_DOWNLOAD',
                 type => 'link',
                 filename => $vv->{filename},
-                data => $self->_client()->_config()->{'scripturl'} . "?page=".$target,
+                data => $self->_client->script_url . "?page=$target",
             };
         } else {
             my $type;
