@@ -117,7 +117,11 @@ module.exports = function(defaults) {
           // https://webpack.js.org/configuration/output/#template-strings
           filename: 'autoimport-[name].js',
         },
-        optimization: { realContentHash: true }, // default now?!
+        optimization: {
+          realContentHash: true, // default now?!
+          moduleIds: 'size'      // prevent changing module IDs in the autoimport-xxx.js bundles
+                                 // https://github.com/ef4/ember-auto-import/issues/478#issuecomment-1000515314
+        },
       },
       // CSS assets
       miniCssExtractPluginOptions: {
