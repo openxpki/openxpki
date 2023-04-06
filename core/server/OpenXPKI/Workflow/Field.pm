@@ -179,6 +179,9 @@ sub transform_profile_field {
 
     $self->log->trace("Field '".$self->field->{id}."': profile spec = " . Dumper $self->field) if $self->log->is_trace;
 
+    # type "freetext" -> "text"
+    $self->field->{type} = 'text' if $self->field->{type} // '' == 'freetext';
+
     # id -> name
     my $id = delete $self->field->{id};
     $self->field->{name} = $id;
