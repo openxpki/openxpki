@@ -5,7 +5,7 @@
             <p class="text-{{this.align}}">
                 {{#each this.tiles as |tile|}}
                     {{#if (eq tile.type "button")}}
-                        <OxiBase::Button @button={{tile.content}} @onClick={{@buttonClick}} />
+                        <OxiBase::Button @button={{tile.content}} />
                     {{/if}}
                     {{#if (eq tile.type "newline")}}
                         <br/>
