@@ -33,7 +33,7 @@ import { debug } from '@ember/debug'
  *         confirm_label: ""
  *         cancel_label: ""
  *     },
- *     onClick: this.buttonClick,           // callback: Button object will be passed to the handler as single parameter
+ *     onClick: this.clickHandler,         // callback: Button object will be passed to the handler as single parameter
  * }
  * ```
  * @module component/oxi-base/button/raw

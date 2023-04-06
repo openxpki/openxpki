@@ -14,12 +14,13 @@ export default class OxiSectionComponent extends Component {
     }
 
     get sectionData() {
+        // add click handler to buttons
         let buttons = []
         for (const buttonHash of this.args.content?.content?.buttons ?? []) {
             // convert hash into field
             buttons.push(Button.fromHash({
                 ...buttonHash,
-                onClick: this.buttonClick, // add click handler
+                onClick: this.buttonClick,
             }))
         }
 
@@ -27,15 +28,15 @@ export default class OxiSectionComponent extends Component {
             ...this.args.content.content,
             buttons, // replaces this.args.content.content.buttons (array of hashes) with our array of Button objects
             // map some inconsistently placed properties into the section data
-            action:     this.args.content.action,       // used by oxisection/form
-            reset:      this.args.content.reset,        // used by oxisection/form
-            className:  this.args.content.className,    // used by oxisection/grid
+            action:     this.args.content.action,       // used by oxi-section/form
+            reset:      this.args.content.reset,        // used by oxi-section/form
+            className:  this.args.content.className,    // used by oxi-section/grid
         }
     }
 
     @action
     buttonClick(button) {
-        debug("oxisection: buttonClick");
+        debug("oxi-section: buttonClick");
         set(button, "loading", true);
         if (button.action) {
             this.content.updateRequest({ action: button.action })

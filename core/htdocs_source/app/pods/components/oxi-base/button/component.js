@@ -4,7 +4,7 @@ import Component from '@glimmer/component'
  * Shows a button with an optional confirm dialog.
  *
  * ```html
- * <OxiBase::Button::Raw @button={{buttonObj}} class="btn btn-secondary"/>
+ * <OxiBase::Button @button={{buttonObj}} class="btn btn-secondary"/>
  * ```
  *
  * The component has two modes and shows either a `<a href/>` or a `<button/>` tag.
