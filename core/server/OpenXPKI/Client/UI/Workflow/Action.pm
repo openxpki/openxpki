@@ -520,7 +520,7 @@ sub action_bulk {
     } elsif ($wf_args->{wf_action} =~ m{\w+_\w+}) {
         $command = 'execute_workflow_activity';
         $params{activity} = $wf_args->{wf_action};
-        $params{params} = %{$wf_args->{params}} if ($wf_args->{params});
+        $params{params} = $wf_args->{params} if $wf_args->{params};
     }
     # run in background
     $params{async} = 1 if ($wf_args->{async});
