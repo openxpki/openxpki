@@ -165,12 +165,17 @@ sub __get_cookie_cipher {
 }
 
 while (my $cgi = CGI::Fast->new()) {
-    $log->debug('Check for cgi session, fcgi pid '. $$ );
+    $log->debug("Check for CGI session, FCGI pid = $$");
+
+    my $insecure_cookie = $cgi->http('X-OpenXPKI-Ember-HTTP-Proxy') ? 1 : 0;
+    $log->debug("Header 'X-OpenXPKI-Ember-HTTP-Proxy' found - creating insecure cookie for HTTP proxy")
+      if $insecure_cookie;
 
     my $cipher = __get_cookie_cipher();
     my $session_cookie = OpenXPKI::Client::UI::SessionCookie->new(
         cgi => $cgi,
         $cipher ? (cipher => $cipher) : (),
+        insecure => $insecure_cookie, # flag to skip "secure" option in cookie
     );
 
     my $sess_id;
@@ -179,6 +184,12 @@ while (my $cgi = CGI::Fast->new()) {
 
     Log::Log4perl::MDC->remove();
     Log::Log4perl::MDC->put('sid', $sess_id ? substr($sess_id,0,4) : undef);
+
+    if ($sess_id) {
+        $log->debug("Previous frontend session ID read from cookie: $sess_id");
+    } else {
+        $log->debug("No previous frontend session ID found in cookie (or no cookie)");
+    }
 
     eval {
         if (!$backend_client || !$backend_client->is_connected()) {
@@ -195,20 +206,21 @@ while (my $cgi = CGI::Fast->new()) {
        next;
     }
 
+    # create CGI session
     my $driver_args = $conf->{session_driver} ? $conf->{session_driver} : { Directory => '/tmp' };
     my $session_front = CGI::Session->new($conf->{session}->{driver}, $sess_id, $driver_args );
-    Log::Log4perl::MDC->put('sid', substr($session_front->id,0,4));
-
-    if (defined $conf->{session}->{timeout}) {
-        $session_front->expire( $conf->{session}->{timeout} );
-    }
+    $session_front->expire($conf->{session}->{timeout}) if defined $conf->{session}->{timeout};
 
     $session_cookie->id($session_front->id);
+    Log::Log4perl::MDC->put('sid', substr($session_front->id,0,4));
+
+    $log->debug(
+        'Frontend session: ID = ' . $session_front->id .
+        ($session_front->expire ? ', expiration = ' . $session_front->expire : '')
+    );
 
     my $response = OpenXPKI::Client::UI::Response->new(session_cookie => $session_cookie);
     $response->add_header(@header_tpl);
-
-    $log->debug('Session id (front): '. $session_front->id);
 
     # Set the path to the directory component of the script, this
     # automagically creates seperate cookies for path based realms

@@ -88,6 +88,19 @@ has 'id' => (
     isa => 'Str',
 );
 
+=head2 insecure
+
+Used in development environment to skip the "secure" option when creating the
+cookie, so it will work with a HTTP (non-TLS) proxy that forwards requests to
+the HTTPS backend.
+
+=cut
+has 'insecure' => (
+    is => 'rw',
+    isa => 'Bool',
+    default => 0,
+);
+
 =head2 build
 
 Build the HTTP cookie string containing the encrypted session ID previously set
@@ -105,7 +118,7 @@ sub build {
         -value => $self->_encrypt($self->id),
         $self->has_path ? (-path => $self->path) : (),
         -SameSite => 'Strict',
-        -Secure => ($ENV{'HTTPS'} ? 1 : 0),
+        -Secure => (($ENV{'HTTPS'} and not $self->insecure) ? 1 : 0),
         -HttpOnly => 1,
     };
 

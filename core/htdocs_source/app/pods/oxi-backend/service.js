@@ -1,6 +1,7 @@
 import Service from '@ember/service';
 import { service } from '@ember/service';
 import fetch from 'fetch';
+import ENV from 'openxpki/config/environment';
 //import { assert, optional, enums } from 'superstruct';
 
 /**
@@ -15,12 +16,18 @@ export default class OxiBackendService extends Service {
         // type validation
         //assert(method, enums(['GET', 'POST']));
 
+        /* In development mode we assume we run the Ember HTTP Proxy (i.e. no TLS):
+           this header is a flag that tells the Perl UI to skip "secure" option in cookie
+           so it will work with the insecure proxy. */
+        let devHeader = ENV.environment == "development" ? { 'X-OpenXPKI-Ember-HTTP-Proxy' : '1' } : {};
+
         let params = {
             method,
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-OPENXPKI-Client': '1',
                 ...headers,
+                ...devHeader,
             },
         };
 
