@@ -107,12 +107,12 @@ header:
             Button.fromHash({
                 format: "expected",
                 label: "de-DE",
-                onClick: btn => this.setLang("de-DE"),
+                onClick: async btn => this.setLang("de-DE"),
             }),
             Button.fromHash({
                 format: "expected",
                 label: "en-US",
-                onClick: btn => this.setLang("en-US"),
+                onClick: async btn => this.setLang("en-US"),
             }),
         ]
 

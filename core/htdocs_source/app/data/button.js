@@ -1,5 +1,5 @@
 import { tracked } from '@glimmer/tracking'
-import Base from './base';
+import Base from './base'
 
 /*
  * Button data

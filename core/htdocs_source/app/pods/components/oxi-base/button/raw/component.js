@@ -2,6 +2,7 @@ import Component from '@glimmer/component'
 import { tracked } from '@glimmer/tracking'
 import { action, set } from "@ember/object"
 import { debug } from '@ember/debug'
+import { service } from '@ember/service'
 //import ow from 'ow'
 
 /**
@@ -13,7 +14,7 @@ import { debug } from '@ember/debug'
  *
  * The component has two modes and shows either a `<a href/>` or a `<button/>` tag.
  *
- * @param { Button } button - the button definition
+ * @param { Button } buttonObj - a Button object where the following properties are relevant:
  * Mode 1 `<a href>`:
  * ```javascript
  * {
@@ -33,7 +34,7 @@ import { debug } from '@ember/debug'
  *         confirm_label: ""
  *         cancel_label: ""
  *     },
- *     onClick: this.clickHandler,         // callback: Button object will be passed to the handler as single parameter
+ *     onClick: this.clickHandler,         // callback: Must return a Promise! Button object will be passed as parameter
  * }
  * ```
  * @module component/oxi-base/button/raw
@@ -56,7 +57,11 @@ let format2css = {
 }
 
 export default class OxiButtonRawComponent extends Component {
+    @service router;
+    @service('oxi-content') content;
+
     @tracked showConfirmDialog = false
+
     skipClickHandler = false
     clickTarget = null
 
@@ -139,7 +144,27 @@ export default class OxiButtonRawComponent extends Component {
         }
         // button mode
         else {
-            this.args.button.onClick?.(this.args.button) // invoke callback
+            let button = this.args.button
+
+            button.loading = true
+            if (button.onClick) {
+                debug(`oxi-button: executeAction - custom onClick() handler`)
+                button.onClick(button)
+                .finally(() => button.loading = false)
+            }
+            else if (button.action) {
+                debug(`oxi-button: executeAction - call to backend action '${button.action}'`)
+                this.content.updateRequest({ action: button.action })
+                .finally(() => button.loading = false)
+            }
+            else if (button.page) {
+                debug(`oxi-button: executeAction - transition to page '${button.page}`)
+                this.router.transitionTo("openxpki", button.page)
+                .then(() => button.loading = false)
+            }
+            else {
+                throw new Error("oxi-button: executeAction - nothing to do. No 'action', 'page' or 'onClick' specified")
+            }
         }
     }
 

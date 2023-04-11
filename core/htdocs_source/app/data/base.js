@@ -10,6 +10,10 @@ export default class Base {
      * hash values of the same name.
      */
     static fromHash(sourceHash) {
+        // don't convert if it's already an object of the target type
+        if (sourceHash instanceof this) { return sourceHash }
+
+        // new target instance
         let instance = new this() // "this" in static methods refers to class
 
         let props = [

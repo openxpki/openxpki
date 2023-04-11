@@ -1,15 +1,16 @@
 import Component from '@glimmer/component'
+import Button from 'openxpki/data/button'
 
 /**
  * Shows a button with an optional confirm dialog.
  *
  * ```html
- * <OxiBase::Button @button={{buttonObj}} class="btn btn-secondary"/>
+ * <OxiBase::Button @button={{hash}} class="btn btn-secondary"/>
  * ```
  *
  * The component has two modes and shows either a `<a href/>` or a `<button/>` tag.
 *
- * @param { Button } button - the button definition
+ * @param { hash } button - the button definition
  * Mode 1 `<a href>`:
  * ```javascript
  * {
@@ -35,10 +36,15 @@ import Component from '@glimmer/component'
  *         confirm_label: ""
  *         cancel_label: ""
  *     },
- *     onClick: this.buttonClick,           // callback: Button object will be passed to the handler as single parameter
+ *     onClick: this.clickHandler,         // callback: Must return a Promise! Button object will be passed as parameter
  * }
  * ```
  * @module component/oxi-base/button
  */
 
-export default class OxiButtonComponent extends Component {}
+export default class OxiButtonComponent extends Component {
+
+    get button() {
+        return Button.fromHash(this.args.button)
+    }
+}

@@ -2,6 +2,7 @@ import Component from '@glimmer/component';
 import { service } from '@ember/service';
 import { action, set } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
+import { debug } from '@ember/debug';
 import { A } from '@ember/array'
 
 /*
@@ -284,20 +285,21 @@ export default class OxiSectionGridComponent extends Component {
     }
 
     @action
-    selectClick(button) {
-        let columns = this.rawColumns.getEach("sTitle");
-        let index = columns.indexOf(button.select);
+    async selectClick(button) {
+        debug("oxi-section/grid - selectClick")
+        let columns = this.rawColumns.getEach("sTitle")
+        let index = columns.indexOf(button.select)
         if (index === -1) {
-            throw new Error(`There is no column matching "${button.select}"`);
+            throw new Error(`There is no column matching "${button.select}"`)
         }
         let request = {
             action: button.action
-        };
-        request[button.selection] = this.sortedData.filterBy("checked").getEach("originalData").getEach("" + index);
-        set(button, "loading", true);
+        }
+        request[button.selection] = this.sortedData.filterBy("checked").getEach("originalData").getEach("" + index)
+        set(button, "loading", true)
 
-        this.content.updateRequest(request)
-        .then(() => set(button, "loading", false));
+        await this.content.updateRequest(request)
+        set(button, "loading", false)
     }
 
 

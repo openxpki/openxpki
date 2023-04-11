@@ -45,11 +45,11 @@ export default class OxiSectionFormComponent extends Component {
             let reset = new Button()
             reset.label = this.args.def.reset_label || this.intl.t('component.oxisection_form.reset')
             reset.format = "reset"
-            reset.onClick = this.reset
+            reset.page = this.args.def.reset
             buttons.push(reset)
         }
 
-        buttons.push(...this.args.def.buttons)
+        if (this.args.def.buttons) { buttons.push(...this.args.def.buttons) }
         return buttons
     }
 
@@ -367,13 +367,7 @@ export default class OxiSectionFormComponent extends Component {
     }
 
     @action
-    reset() {
-        debug(`oxi-section/form (${this.args.def.action}): reset`)
-        this.router.transitionTo("openxpki", this.args.def.reset)
-    }
-
-    @action
-    submit() {
+    async submit() {
         debug(`oxi-section/form (${this.args.def.action}): submit`);
 
         // check validity and gather form data
@@ -392,26 +386,30 @@ export default class OxiSectionFormComponent extends Component {
             ...this.#encodeAllFields({ includeEmpty: false }),
         };
 
-        this.loading = true;
-        return this.content.updateRequest(request)
-        .then((res) => {
+        let res
+        try {
+            this.loading = true;
+            res = await this.content.updateRequest(request)
+        }
+        finally {
             this.loading = false;
-            if (res?.status?.field_errors !== undefined) {
-                for (const faultyField of res.status.field_errors) {
-                    debug(`oxi-section/form (${this.args.def.action}): server reports faulty field: ${faultyField.name}`);
-                    let clones = this.fields.filter(f => f.name === faultyField.name);
-                    // if no index given: mark all clones as faulty
-                    if (typeof faultyField.index === "undefined") {
-                        for (const clone of clones) {
-                            this.setFieldError(clone, faultyField.error);
-                        }
-                    // otherwise just pick the specified clone
-                    } else {
-                        this.setFieldError(clones[faultyField.index], faultyField.error);
+        }
+
+        // show field specific error messages if any
+        if (res?.status?.field_errors !== undefined) {
+            for (const faultyField of res.status.field_errors) {
+                debug(`oxi-section/form (${this.args.def.action}): server reports faulty field: ${faultyField.name}`);
+                let clones = this.fields.filter(f => f.name === faultyField.name);
+                // if no index given: mark all clones as faulty
+                if (typeof faultyField.index === "undefined") {
+                    for (const clone of clones) {
+                        this.setFieldError(clone, faultyField.error);
                     }
+                // otherwise just pick the specified clone
+                } else {
+                    this.setFieldError(clones[faultyField.index], faultyField.error);
                 }
             }
-        })
-        .finally(() => this.loading = false);
+        }
     }
 }
