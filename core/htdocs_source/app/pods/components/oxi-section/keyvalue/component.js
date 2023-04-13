@@ -11,7 +11,8 @@ import { set as emSet } from '@ember/object'
  *     ... // TODO
  * }
  * ```
- * @module component/oxi-section/keyvalue
+ * @class OxiSection::KeyValue
+ * @extends Component
  */
 export default class OxiSectionKeyvalueComponent extends Component {
     @service('oxi-content') content

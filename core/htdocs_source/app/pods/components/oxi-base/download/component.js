@@ -12,7 +12,7 @@ import copy from 'copy-text-to-clipboard';
  * <OxiBase::Download @type="base64" @data={{this.fileData}} @mimeType="text/plain" @fileName="book.txt" @autoDownload={{true}} @hide={{true}}/>
  * <OxiBase::Download @type="link" @data="img/logo.png" @fileName="openxpki.png" />
  * ```
- * @module component/oxi-base/download
+ * @class OxiBase::Download
  */
 export default class OxiDownloadComponent extends Component {
     type = this.args.type || "";

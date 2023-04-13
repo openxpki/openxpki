@@ -26,7 +26,7 @@ import Button from 'openxpki/data/button'
  *      ],
  * }
  * ```
- * @class OxiSectionCardsComponent
+ * @class OxiSection::Cards
  * @extends Component
  */
 export default class OxiSectionCardsComponent extends Component {

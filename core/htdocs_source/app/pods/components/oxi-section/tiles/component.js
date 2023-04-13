@@ -23,7 +23,8 @@ import Component from '@glimmer/component';
  *      ],
  * }
  * ```
- * @module component/oxi-section/tiles
+ * @class OxiSection::Tiles
+ * @extends Component
  */
 export default class OxiSectionTilesComponent extends Component {
     get tiles() {

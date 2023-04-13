@@ -19,7 +19,8 @@ import { debug } from '@ember/debug';
  * @param { bool } disabled - set to true to disable the button
  * @param { function } encodeFields - function that encodes the given form fields (see {@link component/oxi-section/form})
  * @param { function } valueSetter - function that processes the server response (will be given the response data)
- * @module component/oxi-section/form/autofill
+ * @class OxiSection::Form::AutoFill
+ * @extends Component
  */
 
 export default class Autofill extends Component {

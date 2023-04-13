@@ -74,7 +74,8 @@ class Pager {
  *     ... // TODO
  * }
  * ```
- * @module component/oxi-section/grid
+ * @class OxiSection::Grid
+ * @extends Component
  */
 export default class OxiSectionGridComponent extends Component {
     @service('oxi-content') content

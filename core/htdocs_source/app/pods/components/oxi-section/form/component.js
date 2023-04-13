@@ -16,7 +16,8 @@ import Button from 'openxpki/data/button';
  *     ... // TODO
  * }
  * ```
- * @module component/oxi-section/form
+ * @class OxiSection::Form
+ * @extends Component
  */
 export default class OxiSectionFormComponent extends Component {
     @service('intl') intl;
@@ -219,6 +220,7 @@ export default class OxiSectionFormComponent extends Component {
     /**
      * @param field { hash } - field definition (gets passed in via this components' template, i.e. is a reference to this components' "model")
      * @param value { string } - the field's new value
+     * @memberOf OxiSection::Form
      */
     @action
     setFieldValue(field, value) {
@@ -272,6 +274,7 @@ export default class OxiSectionFormComponent extends Component {
 
     /**
      * @param field { hash } - field definition (gets passed in via this components' template, i.e. is a reference to this components' "model")
+     * @memberOf OxiSection::Form
      */
     @action
     setFieldName(field, name) {
@@ -281,6 +284,7 @@ export default class OxiSectionFormComponent extends Component {
 
     /**
      * @param field { hash } - field definition (gets passed in via this components' template, i.e. is a reference to this components' "model")
+     * @memberOf OxiSection::Form
      */
     @action
     setFieldError(field, message) {
@@ -296,6 +300,7 @@ export default class OxiSectionFormComponent extends Component {
     /**
      * @param fieldNames { array } - the list of field names to encode
      * @param renameMap { Map } - optional mappings: source field name => target field name
+     * @memberOf OxiSection::Form
      */
     @action
     encodeFields(fieldNames, renameMap) {
@@ -309,14 +314,15 @@ export default class OxiSectionFormComponent extends Component {
     }
 
     /**
-     * Sub components of oxi-section/form/field should call this by using the
-     * modifier
-     *   {{on-init @setFocusInfo true}} or
-     *   {{on-init @setFocusInfo false}}
+     * Sub components of {@link OxiSection::Form::Field} should call this by using
+     * the `{{on-init}}` modifier:
+     * ```html
+     * {{on-init @setFocusInfo true}}
+     * {{on-init @setFocusInfo false}}
+     * ```
      * depending on if it is an editable input field that may sensibly receive
      * the focus.
-     * If it is editable, {{on-init @setFocusInfo true}} has to be attached to the DOM element
-     * that shall receive the input focus.
+     * @memberOf OxiSection::Form
      */
     @action
     setFocusInfoFor(field, element, mayFocus) { // 'field' is injected in our template via (fn ...)

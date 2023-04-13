@@ -9,26 +9,31 @@ import { action } from '@ember/object';
  * <OxiBase::Formatted @format="timestamp" @value="1617102928" @class="big" @truncate={{true}} />
  * ```
  *
- * @param { string } format - how the value shall be formatted
+ * @param { string } format - how the value shall be formatted.
+ *
  * Possible formats:
- * - `certstatus`
- * - `link`
- * - `extlink`
- * - `timestamp`
  * - `text`
+ * - `raw`
+ * - `subject`
  * - `nl2br`
+ * - `timestamp`
+ * - `styled`
+ * - `certstatus`
+ * - `link` (uses {@link OxiBase::Formatted::Link})
+ * - `extlink`
+ * - `email`
+ * - `tooltip`
  * - `code`
  * - `asciidata`
  * - `download`
- * - `raw`
- * - `deflist`
- * - `ullist`
- * - `rawlist`
- * - `linklist`
- * - `styled`
- * - `tooltip`
+ * - `arbitrary` (uses {@link OxiBase::Formatted::Arbitrary})
+ * - `unilist`
+ * - `deflist` (deprecated)
+ * - `ullist` (deprecated)
+ * - `rawlist` (deprecated)
+ * - `linklist` (deprecated)
  * @param value - value to be formatted - the data type depends on the format
- * @module component/oxi-base/formatted
+ * @class OxiBase::Formatted
  */
 export default class OxiFormattedComponent extends Component {
     get format() {
