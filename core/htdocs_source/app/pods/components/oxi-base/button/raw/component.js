@@ -3,6 +3,7 @@ import { tracked } from '@glimmer/tracking'
 import { action, set } from "@ember/object"
 import { debug } from '@ember/debug'
 import { service } from '@ember/service'
+import Clickable from 'openxpki/data/clickable'
 //import ow from 'ow'
 
 /**
@@ -12,32 +13,49 @@ import { service } from '@ember/service'
  * <OxiBase::Button::Raw @button={{buttonObj}} class="btn btn-secondary"/>
  * ```
  *
- * The component has two modes and shows either a `<a href/>` or a `<button/>` tag.
+ * The component has two modes and shows either `<a href/>` or `<button/>`.
  *
- * @param { Button } buttonObj - a Button object where the following properties are relevant:
- * Mode 1 `<a href>`:
+ * @param { Clickable } buttonObj - a {@link Clickable} object where the following properties are relevant:
+ * Common properties for all modes:
  * ```javascript
  * {
  *     format: "primary",
- *     href: "https://www.openxpki.org",   // mandatory - triggers the <a href...> format
+ *     disabled: false,
+ *     confirm: { ... },
+ * }
+ * ```
+ * Mode 1 `<a href>`:
+ * ```javascript
+ * {
+ *     ...
+ *     href: "https://www.openxpki.org", // mandatory
  *     target: "_blank",
  * }
  * ```
- * Mode 2 `<button>`:
+ * Mode 2 `<button>` with `onClick` handler:
  * ```javascript
  * {
- *     format: "expected",
- *     disabled: false,
- *     confirm: {
- *         label: "Really sure?",          // mandatory if "confirm" exists
- *         description: "Think!",          // mandatory if "confirm" exists
- *         confirm_label: ""
- *         cancel_label: ""
- *     },
- *     onClick: this.clickHandler,         // callback: Must return a Promise! Button object will be passed as parameter
+ *     ...
+ *     // callback: Must return a Promise! Button object will be passed as parameter
+ *     onClick: this.clickHandler,
  * }
  * ```
- * @module component/oxi-base/button/raw
+ * Mode 3 `<button>` with `page`:
+ * ```javascript
+ * {
+ *     ...
+ *     page: 'workflow!index!wf_type!request_checker', // mandatory
+ * }
+ * ```
+ * Mode 4 `<button>` with `action`:
+ * ```javascript
+ * {
+ *     ...
+ *     action: 'workflow!select!wf_action!global_cancel!wf_id!34', // mandatory
+ * }
+ * ```
+ * @class OxiBase::Button::Raw
+ * @extends Component
  */
 
 // mapping of format codes to CSS classes applied to the button
@@ -75,7 +93,7 @@ export default class OxiButtonRawComponent extends Component {
         let cssClass = format2css[this.args.button.format]
         if (cssClass === undefined) {
             /* eslint-disable-next-line no-console */
-            console.error(`oxi-button: button "${this.args.button.label}" has unknown format: "${this.args.button.format}"`)
+            console.error(`oxi-base/button/raw: button "${this.args.button.label}" has unknown format: "${this.args.button.format}"`)
         }
         return cssClass ?? ""
     }
@@ -83,6 +101,11 @@ export default class OxiButtonRawComponent extends Component {
     constructor() {
         super(...arguments)
 
+        let getType = obj => typeof obj == 'object' ? obj.constructor.name : typeof obj;
+
+        if (! (this.args.button instanceof Clickable)) {
+            throw new Error(`oxi-base/button/raw: Parameter "button" has wrong type. Expected: instance of "Clickable" (openxpki/data/clickable). Got: "${getType(this.args.button)}"`)
+        }
         // type validation
         // TODO Reactivate type checking once we drop IE11 support
         /*
@@ -112,7 +135,7 @@ export default class OxiButtonRawComponent extends Component {
 
     @action
     click(event) {
-        debug("oxi-button: click")
+        debug("oxi-base/button/raw: click")
 
         if (this.skipClickHandler) {
             this.skipClickHandler = false
@@ -148,22 +171,22 @@ export default class OxiButtonRawComponent extends Component {
 
             button.loading = true
             if (button.onClick) {
-                debug(`oxi-button: executeAction - custom onClick() handler`)
+                debug(`oxi-base/button/raw: executeAction - custom onClick() handler`)
                 button.onClick(button)
                 .finally(() => button.loading = false)
             }
             else if (button.action) {
-                debug(`oxi-button: executeAction - call to backend action '${button.action}'`)
+                debug(`oxi-base/button/raw: executeAction - call to backend action '${button.action}'`)
                 this.content.updateRequest({ action: button.action })
                 .finally(() => button.loading = false)
             }
             else if (button.page) {
-                debug(`oxi-button: executeAction - transition to page '${button.page}`)
+                debug(`oxi-base/button/raw: executeAction - transition to page '${button.page}`)
                 this.router.transitionTo("openxpki", button.page)
                 .then(() => button.loading = false)
             }
             else {
-                throw new Error("oxi-button: executeAction - nothing to do. No 'action', 'page' or 'onClick' specified")
+                throw new Error("oxi-base/button/raw: executeAction - nothing to do. No 'action', 'page' or 'onClick' specified")
             }
         }
     }

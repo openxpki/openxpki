@@ -1,4 +1,4 @@
-import Button from 'openxpki/data/button'
+import ContainerButton from 'openxpki/data/container-button'
 
 const _testButton = {
     label: "Button",
@@ -134,14 +134,14 @@ export default [
                 },
             ],
             buttons: [
-                Button.fromHash({
+                ContainerButton.fromHash({
                     label: "External link",
                     format: "failure",
                     tooltip: "Just fyi",
                     href: "https://www.openxpki.org",
                     target: "_blank",
                 }),
-                Button.fromHash({
+                ContainerButton.fromHash({
                     label: "External link (with confirmation)",
                     format: "exceptional",
                     tooltip: "Just fyi",
@@ -152,8 +152,8 @@ export default [
                         description: "This opens an external page.",
                     },
                 }),
-                Button.fromHash(_testButton),
-                Button.fromHash({
+                ContainerButton.fromHash(_testButton),
+                ContainerButton.fromHash({
                     ..._testButton,
                     label: "With confirmation",
                     confirm: {
@@ -162,7 +162,7 @@ export default [
                     },
                     break_before: 1,
                 }),
-                Button.fromHash({
+                ContainerButton.fromHash({
                     ..._testButton,
                     label: "Disabled",
                     disabled: true,

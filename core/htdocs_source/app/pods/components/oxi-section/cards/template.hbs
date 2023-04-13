@@ -1,10 +1,10 @@
 <!-- components/oxi-section/cards -->
-{{#if @def.cards}}
+{{#if this.cards}}
     {{#if @def.vertical}}
 
         <div class="col-md-10">
-        {{#each @def.cards as |card|}}
-            <OxiBase::Button::Raw @button={{card}} class="card w-100 mx-0 my-4 p-0 text-start bg-light">
+        {{#each this.cards as |card|}}
+            <OxiBase::Button::Raw @button={{card._button}} class="card w-100 mx-0 my-4 p-0 text-start bg-light">
                 {{#if card.label}}
                     <div class="card-header w-100 text-body-secondary text-center bg-secondary text-light">
                         <h5 class="card-title">
@@ -38,9 +38,9 @@
     {{else}}
 
         <div class="row row-cols-1 row-cols-md-3 g-4">
-        {{#each @def.cards as |card|}}
+        {{#each this.cards as |card|}}
             <div class="col">
-                <OxiBase::Button::Raw @button={{card}} class="card h-100 m-0 p-0 text-start align-items-center bg-light">
+                <OxiBase::Button::Raw @button={{card._button}} class="card h-100 m-0 p-0 text-start align-items-center bg-light">
                     {{#if card.label}}
                         <div class="card-header w-100 text-body-secondary text-center bg-secondary text-light">
                             <h5 class="card-title">

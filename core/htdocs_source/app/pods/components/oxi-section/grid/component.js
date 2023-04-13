@@ -4,6 +4,8 @@ import { action, set } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { debug } from '@ember/debug';
 import { A } from '@ember/array'
+import ContainerButton from 'openxpki/data/container-button'
+import GridButton from 'openxpki/data/grid-button'
 
 /*
  * Pager data, representing the current page, sort order etc.
@@ -75,16 +77,29 @@ class Pager {
  * @module component/oxi-section/grid
  */
 export default class OxiSectionGridComponent extends Component {
-    @service('oxi-content') content;
+    @service('oxi-content') content
 
-    @tracked rawData = A([]);
-    @tracked pager = new Pager();
+    @tracked rawData = A([])
+    @tracked pager = new Pager()
+    buttons
 
     constructor() {
-        super(...arguments);
+        super(...arguments)
 
-        this.rawData = this.args.def.data || [];
-        this.pager.fillFromHash(this.args.def.pager || {});
+        this.rawData = this.args.def.data || []
+        this.pager.fillFromHash(this.args.def.pager || {})
+
+        /* PLEASE NOTE that we cannot use a getter here, i.e. "get buttons()"
+         * as for some reason this would recalculate every time we e.g. change
+         * the "disabled" property in the derived GridButton class. And after
+         * recalculating the changed property would be reset.
+         */
+        this.buttons = (this.args.def.buttons || []).map(def =>
+            def.select
+                ? GridButton.fromHash({...def, onClick: this.selectClick})
+                : ContainerButton.fromHash(def)
+        )
+        this.updateButtonState()
     }
 
     get rawColumns() { return (this.args.def.columns || []) }
@@ -273,17 +288,6 @@ export default class OxiSectionGridComponent extends Component {
         return this.buttons.isAny("select");
     }
 
-    get buttons() {
-        let buttons = this.args.def.buttons || [];
-        return buttons.map(b => {
-            if (b.select) {
-                set(b, "disabled", this.noneChecked);
-                b.onClick = this.selectClick;
-            }
-            return b;
-        })
-    }
-
     @action
     async selectClick(button) {
         debug("oxi-section/grid - selectClick")
@@ -333,6 +337,7 @@ export default class OxiSectionGridComponent extends Component {
     select(row) {
         set(this.rawData[row.originalIndex], "checked", !this.rawData[row.originalIndex].checked)
         this.rawData = this.rawData // eslint-disable-line no-self-assign -- trigger Ember update
+        this.updateButtonState()
     }
 
     // (de-)select all rows
@@ -340,6 +345,11 @@ export default class OxiSectionGridComponent extends Component {
     selectAll() {
         this.rawData.setEach("checked", !this.allChecked)
         this.rawData = this.rawData // eslint-disable-line no-self-assign -- trigger Ember update
+        this.updateButtonState()
+    }
+
+    updateButtonState() {
+        this.buttons.filter(b => b.select).forEach(b => b.disabled = this.noneChecked)
     }
 
     @action

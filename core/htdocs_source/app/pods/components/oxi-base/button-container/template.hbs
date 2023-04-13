@@ -1,8 +1,8 @@
-{{#if (or @buttons (has-block))}}
+{{#if (or this.buttons (has-block))}}
     <div class="oxi-button-container mt-3">
         {{#if this.hasDescription}}
 
-            {{#each @buttons as |btn index|}}
+            {{#each this.buttons as |btn index|}}
                 {{#if (and (has-block) (eq index 0))}}
                     {{yield}}
                 {{/if}}

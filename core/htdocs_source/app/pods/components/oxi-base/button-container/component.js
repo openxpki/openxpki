@@ -1,4 +1,5 @@
-import Component from '@glimmer/component';
+import Component from '@glimmer/component'
+import ContainerButton from 'openxpki/data/container-button'
 
 /**
  * Shows buttons as a group.
@@ -7,31 +8,37 @@ import Component from '@glimmer/component';
  * <OxiBase::ButtonContainer @buttons={{data}}/>
  * ```
  *
- * @param { array } buttons - List of button definitions to be passed to {@link module:oxi-base/button}
- * If a button definition hash contains the attributes `break_before` or
+ * @param { array } buttons - List of button definitions (hash or
+ * {@link ContainerButton} to be passed to {@link OxiBase::Button}.
+ * If a button definition contains the attributes `break_before` or
  * `break_after` then a line break will be inserted before or after that
  * button.
- * @module component/oxi-base/button-container
+ * @class OxiBase::ButtonContainer
+ * @extends Component
  */
 export default class OxiButtonContainerComponent extends Component {
-    get buttonGroups() {
-        let buttons = this.args.buttons || [];
-        let groups = [];
-        let currentGroup = [];
+    get buttons() {
+        let btns = this.args.buttons || []
+        return btns.map(def => ContainerButton.fromHash(def))
+    }
 
-        for (const btn of buttons) {
+    get buttonGroups() {
+        let groups = []
+        let currentGroup = []
+
+        for (const btn of this.buttons) {
             if (btn.break_before) { groups.push(currentGroup); currentGroup = [] }
-            currentGroup.push(btn);
+            currentGroup.push(btn)
             if (btn.break_after)  { groups.push(currentGroup); currentGroup = [] }
         }
 
-        groups.push(currentGroup);
+        groups.push(currentGroup)
 
-        return groups;
+        return groups
     }
 
     get hasDescription() {
-        let ref;
-        return (ref = this.args.buttons) != null ? ref.isAny("description") : void 0;
+        if (!this.buttons) { return false }
+        return this.buttons.isAny('description')
     }
 }

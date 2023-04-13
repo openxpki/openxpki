@@ -9,8 +9,8 @@ import Base from './base';
  * implementations oxi-section/form/field/* via @content.
  */
 export default class Field extends Base {
-    static get _type() { return 'app/data/field' }
-    static get _idField() { return 'name' }
+    static _type = 'app/data/field'
+    static _idField = 'name'
 
     /*
      * Common

@@ -8,17 +8,17 @@ import Component from '@glimmer/component';
  * {
  *      label: 'Actions',
  *      description: 'Please choose an action',
- *      maxcol => 4, // maximum tiles per row (optional, default: maximum according to browser window)
- *      align => 'left', // or 'center' or 'right' (optional, default: 'left')
- *      tiles => [
+ *      maxcol: 4, // maximum tiles per row (optional, default: maximum according to browser window)
+ *      align: 'left', // or 'center' or 'right' (optional, default: 'left')
+ *      tiles: [
  *          {
- *              type: 'button', content => { ... },
+ *              type: 'button', content: { ... },
  *          },
  *          {
  *              type: 'newline',
  *          },
  *          {
- *              type: 'button', content => { ... },
+ *              type: 'button', content: { ... },
  *          },
  *      ],
  * }
