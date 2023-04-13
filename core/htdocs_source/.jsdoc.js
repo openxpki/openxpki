@@ -6,13 +6,12 @@ module.exports = {
         excludePattern: "((^|\\/|\\\\)_)|(node_modules)|^dist|^dist-dev",
     },
     opts: {
-        source: "app",
         recurse: true,
-        destination: "./docs-api/",
+        destination: "/docs-api", // directory in Docker container
     },
     plugins: ['plugins/markdown'],
     markdown: {
-        hardwrap: true,
+        hardwrap: false,
         idInHeadings: true,
     }
 };
