@@ -619,7 +619,7 @@ sub init_detail {
 
     $self->set_page(
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL',
-        shortlabel => $dn{CN}[0]
+        shortlabel => $dn{CN}[0] || $dn{emailAddress}[0] || $cert_identifier,
     );
 
 
@@ -951,7 +951,7 @@ sub init_related {
 
     $self->set_page(
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_RELATIONS_LABEL',
-        shortlabel => $dn{CN}[0]
+        shortlabel => $dn{CN}[0] || $dn{emailAddress}[0] || $cert_identifier,
     );
 
     # run a workflow search using the given ids from the cert attributes
