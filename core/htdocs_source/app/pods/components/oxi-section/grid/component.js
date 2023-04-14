@@ -6,64 +6,7 @@ import { debug } from '@ember/debug';
 import { A } from '@ember/array'
 import ContainerButton from 'openxpki/data/container-button'
 import GridButton from 'openxpki/data/grid-button'
-
-/*
- * Pager data, representing the current page, sort order etc.
- */
-class Pager {
-    @tracked num
-    @tracked active
-    @tracked count = 0
-    @tracked startat = 0
-    @tracked limit = Number.MAX_VALUE
-    @tracked order
-    @tracked reverse = false
-    @tracked pagesizes
-    @tracked pagersize
-    @tracked pagerurl
-    @tracked disabled = false
-
-    fillFromHash(sourceHash) {
-        for (const attr of Object.keys(sourceHash)) {
-            // @tracked properties are prototype properties, the others instance properties
-            if (! (Object.prototype.hasOwnProperty.call(Object.getPrototypeOf(this), attr) || Object.prototype.hasOwnProperty.call(this, attr))) {
-                /* eslint-disable-next-line no-console */
-                console.error(
-                    `oxi-section/grid: unknown property "${attr}" in field "${sourceHash.name}". ` +
-                    `If it's a new property, please add it to class 'Pager' defined in app/pod/components/oxi-section/grid/component.js`
-                )
-            }
-            else {
-                this[attr] = sourceHash[attr]
-            }
-        }
-    }
-
-    clone() {
-        let twin = new Pager()
-        // @tracked properties
-        Object.keys(Object.getPrototypeOf(this)).forEach(k => twin[k] = this[k])
-        // public class properties
-        Object.keys(this).forEach(k => twin[k] = this[k])
-        return twin
-    }
-
-    /**
-     * Returns all non-private properties (i.e. no leading underscore) as a plain hash/object
-     */
-    toPlainHash() {
-        let hash = {}
-        // @tracked non-private properties
-        Object.keys(Object.getPrototypeOf(this))
-            .filter(k => k.charAt(0) != '_')
-            .forEach(k => hash[k] = this[k])
-        // non-private class properties
-        Object.keys(this)
-            .filter(k => k.charAt(0) != '_')
-            .forEach(k => hash[k] = this[k])
-        return hash
-    }
-}
+import Pager from 'openxpki/data/pager'
 
 /**
  * Draws a grid.
@@ -81,14 +24,14 @@ export default class OxiSectionGridComponent extends Component {
     @service('oxi-content') content
 
     @tracked rawData = A([])
-    @tracked pager = new Pager()
+    @tracked pager
     buttons
 
     constructor() {
         super(...arguments)
 
         this.rawData = this.args.def.data || []
-        this.pager.fillFromHash(this.args.def.pager || {})
+        this.pager = Pager.fromHash(this.args.def.pager || {})
 
         /* PLEASE NOTE that we cannot use a getter here, i.e. "get buttons()"
          * as for some reason this would recalculate every time we e.g. change
@@ -367,7 +310,7 @@ export default class OxiSectionGridComponent extends Component {
         })
         .then((res) => {
             this.rawData = res.data || [];
-            this.pager.fillFromHash(page);
+            this.pager.setFromHash(page);
         });
     }
 
@@ -379,7 +322,7 @@ export default class OxiSectionGridComponent extends Component {
         }
         // client-side sorting
         else {
-            this.pager.fillFromHash(page);
+            this.pager.setFromHash(page);
         }
     }
 }

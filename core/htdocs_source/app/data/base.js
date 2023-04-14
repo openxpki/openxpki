@@ -30,26 +30,34 @@ export default class Base {
 
         // new target instance
         let instance = new this() // "this" in static methods refers to class
+        instance.setFromHash(sourceHash)
+        return instance
+    }
 
+    /**
+     * Set the instance properties to the given hash values of the same name.
+     * May also be given another instance of Base or a derived class.
+     * @memberOf Base
+     */
+    setFromHash(sourceHash) {
         // list our and their properties
-        let ourProps = instance.getPropertyNames()
+        let ourProps = this.getPropertyNames()
         let theirProps = sourceHash instanceof Base ? sourceHash.getPropertyNames() : Object.keys(sourceHash)
-
         let unknownProps = []
+
         for (const prop of theirProps) {
             if (ourProps.has(prop) === false) {
                 unknownProps.push(prop)
+                continue
             }
-            else {
-                instance[prop] = sourceHash[prop]
-            }
+            this[prop] = sourceHash[prop]
         }
+
         if (unknownProps.length > 0) {
             /* eslint-disable-next-line no-console */
-            debug(`Attempt to set unknown properties in ${this.name} instance "${sourceHash[this._idField] ?? '<unknown>'}": ${unknownProps.join(', ')}`)
-            debug(`If you need to process these backend properties, please add them to ${this._type}.js or one of its ancestors.`)
+            debug(`Attempt to set unknown properties in ${this.constructor.name} instance "${sourceHash[this.constructor._idField] ?? '<unknown>'}": ${unknownProps.join(', ')}`)
+            debug(`If you need to process these backend properties, please add them to ${this.constructor._type}.js or one of its ancestors.`)
         }
-        return instance
     }
 
     /**
