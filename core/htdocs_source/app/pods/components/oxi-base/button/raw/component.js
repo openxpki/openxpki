@@ -89,7 +89,7 @@ export default class OxiButtonRawComponent extends Component {
 
     get additionalCssClass() {
         if (this.args.button.loading) { return "oxi-btn-loading" }
-        if (!this.args.button.format) { return "btn-light border-secondary" }
+        if (!this.args.button.format) { return "oxi-btn-optional border-secondary" }
         let cssClass = format2css[this.args.button.format]
         if (cssClass === undefined) {
             /* eslint-disable-next-line no-console */

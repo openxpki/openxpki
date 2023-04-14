@@ -1,8 +1,15 @@
+{{!--
+  We set the CSS class btn-light additionally to our own oxi-btn-xxx
+  classes. This is to ensure the buttons are properly rendered by Bootstrap in
+  "disabled" and "hover" states (without the need to specify these state
+  dependent colors for every one of our buttons).
+--}}
+
 {{!-- <a href> mode --}}
 {{#if @button.href}}
     <a
         ...attributes
-        class="btn {{this.additionalCssClass}}"
+        class="btn btn-light {{this.additionalCssClass}}"
         href="{{@button.href}}"
         target="{{@button.target}}"
         onclick={{this.click}}
@@ -18,7 +25,7 @@
     <BsButton
         ...attributes
         @type=""
-        class={{this.additionalCssClass}}
+        class="btn-light {{this.additionalCssClass}}"
         @onClick={{this.click}}
         disabled={{or @button.disabled @button.loading}}
     >
