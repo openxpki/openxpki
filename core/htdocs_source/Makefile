@@ -89,6 +89,16 @@ update-ember: docker-build
 	  update-ember
 
 #
+# Update Javascript dependencies
+#
+update-deps: docker-build
+	$(MANAGER) run $(MANAGER_OPTS_RUN) -ti --rm \
+	  -v $(abspath ./):/source:ro \
+	  -v $(abspath ./):/output \
+	  $(IMAGE) \
+	  update-deps
+
+#
 # Generate JavaScript documentation
 #
 docs: docker-build ## compile Ember code using a Docker image
