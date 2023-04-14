@@ -122,7 +122,7 @@ export default class OpenXpkiController extends Controller {
         let tabs = this.model.tabs;
         tabs.removeObject(entry);
         if (!tabs.find(i => i.active == true)) {
-            tabs.set("lastObject.active", true);
+            emSet(tabs.at(-1), "active", true);
         }
         return false;
     }
