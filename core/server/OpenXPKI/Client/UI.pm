@@ -653,10 +653,9 @@ sub handle_login {
         } else {
             my $realms = $reply->{PARAMS}->{PKI_REALMS};
 
+            my @cards;
             # "path" mode: realm selection that links to defined sub paths
             if ('path' eq $self->realm_mode) {
-                my @cards;
-
                 # use webui config but only take realms known to the server:
                 my @realm_list =
                     sort { lc($realms->{$a}->{LABEL}) cmp lc($realms->{$b}->{LABEL}) }
@@ -683,20 +682,23 @@ sub handle_login {
                     }
                 }
 
-                $uilogin->init_realm_cards(\@cards);
-
             # other modes: realm selection drop-down that sets "pki_realm" parameter
             } else {
-                my $options = [
+                @cards =
                     map { {
-                        'value' => $realms->{$_}->{NAME},
-                        'label' => $realms->{$_}->{DESCRIPTION},
+                        label => $realms->{$_}->{LABEL},
+                        description => $realms->{$_}->{DESCRIPTION},
+                        image => $realms->{$_}->{IMAGE},
+                        action => 'login!realm',
+                        action_params => {
+                            pki_realm => $realms->{$_}->{NAME},
+                        },
                     } }
-                    keys %{$realms}
-                ];
-                $self->log->trace("Offering realms: " . Dumper $options) if $self->log->is_trace;
-                $uilogin->init_realm_select($options);
+                    sort { lc($realms->{$a}->{LABEL}) cmp lc($realms->{$b}->{LABEL}) }
+                    keys %{$realms};
             }
+
+            $uilogin->init_realm_cards(\@cards);
             return $uilogin;
         }
     }
