@@ -177,13 +177,15 @@ export default class OxiButtonRawComponent extends Component {
             }
             else if (button.action) {
                 debug(`oxi-base/button/raw: executeAction - call to backend action '${button.action}'`)
-                this.content.updateRequest({ action: button.action })
+                let request = { action: button.action }
+                if (button.action_params) request = { ...button.action_params, ...request };
+                this.content.updateRequest(request)
                 .finally(() => button.loading = false)
             }
             else if (button.page) {
                 debug(`oxi-base/button/raw: executeAction - transition to page '${button.page}`)
                 this.router.transitionTo("openxpki", button.page)
-                .then(() => button.loading = false)
+                .finally(() => button.loading = false)
             }
             else {
                 throw new Error("oxi-base/button/raw: executeAction - nothing to do. No 'action', 'page' or 'onClick' specified")
