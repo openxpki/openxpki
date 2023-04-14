@@ -198,15 +198,14 @@ export default class OxiContentService extends Service {
         let method
         if (request.action) {
             method = 'POST'
-            data = { ...data, _rtoken: this.rtoken }
+            data._rtoken = this.rtoken
         }
         // GET
         else {
             method = 'GET'
         }
-        if (this.tenant) {
-            data = { ...data, _tenant: this.tenant }
-        }
+
+        if (this.tenant) data._tenant = this.tenant
 
         let response
         try { response = await this.backend.request({ url, method, data }) }
