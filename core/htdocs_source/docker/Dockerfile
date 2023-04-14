@@ -20,7 +20,7 @@ RUN test -n "$NPM_CUSTOM_REGISTRY" \
   || echo "\nNo custom npm registry set (or it did not respond)\n"
 
 # install pnpm
-RUN npm install -g pnpm \
+RUN npm install -g pnpm@8.2.0 \
   && pnpm config set auto-install-peers true
 
 # Copy depency lists separately to allow for Docker caching
