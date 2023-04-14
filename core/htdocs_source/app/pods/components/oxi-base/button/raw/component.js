@@ -58,20 +58,27 @@ import Clickable from 'openxpki/data/clickable'
  * @extends Component
  */
 
-// mapping of format codes to CSS classes applied to the button
+/*
+  Mapping of format codes to CSS classes applied to the button.
+
+  We set the CSS class btn-light additionally to our own oxi-btn-xxx
+  classes. This is to ensure the buttons are properly rendered by Bootstrap in
+  "disabled" and "hover" states (without the need to specify these state
+  dependent colors for every one of our buttons).
+*/
 let format2css = {
     primary:        "btn-primary",
-    submit:         "oxi-btn-submit",
-    loading:        "oxi-btn-loading",
-    cancel:         "oxi-btn-cancel",
-    reset:          "oxi-btn-reset",
-    expected:       "oxi-btn-expected",
-    failure:        "oxi-btn-failure",
-    optional:       "oxi-btn-optional",
-    alternative:    "oxi-btn-alternative",
-    exceptional:    "oxi-btn-exceptional",
-    terminate:      "oxi-btn-terminate",
-    tile:           "oxi-btn-tile",
+    submit:         "btn-light oxi-btn-submit",
+    loading:        "btn-light oxi-btn-loading",
+    cancel:         "btn-light oxi-btn-cancel",
+    reset:          "btn-light oxi-btn-reset",
+    expected:       "btn-light oxi-btn-expected",
+    failure:        "btn-light oxi-btn-failure",
+    optional:       "btn-light oxi-btn-optional",
+    alternative:    "btn-light oxi-btn-alternative",
+    exceptional:    "btn-light oxi-btn-exceptional",
+    terminate:      "btn-light oxi-btn-terminate",
+    tile:           "btn-light oxi-btn-tile",
 }
 
 export default class OxiButtonRawComponent extends Component {
@@ -87,15 +94,17 @@ export default class OxiButtonRawComponent extends Component {
         return this.args.button.href ? true : false
     }
 
-    get additionalCssClass() {
+    get cssClass() {
         if (this.args.button.loading) { return "oxi-btn-loading" }
-        if (!this.args.button.format) { return "oxi-btn-optional border-secondary" }
-        let cssClass = format2css[this.args.button.format]
+
+        let format = this.args.button.format || 'optional'
+        let cssClass = format2css[format]
         if (cssClass === undefined) {
             /* eslint-disable-next-line no-console */
             console.error(`oxi-base/button/raw: button "${this.args.button.label}" has unknown format: "${this.args.button.format}"`)
+            cssClass = format2css['optional']
         }
-        return cssClass ?? ""
+        return cssClass
     }
 
     constructor() {
