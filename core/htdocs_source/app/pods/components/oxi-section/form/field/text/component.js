@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import { tracked  } from '@glimmer/tracking';
-import { action, set } from '@ember/object';
+import { action, set as emSet } from '@ember/object';
 import { scheduleOnce } from '@ember/runloop';
 import { service } from '@ember/service';
 
@@ -188,10 +188,10 @@ export default class OxiFieldTextComponent extends Component {
         let results = this.searchResults;
         if (!results.length) { return }
         let a = results.find(i => i.active == true)
-        set(a, "active", false);
+        emSet(a, "active", false);
         let index = (results.indexOf(a) + diff + results.length) % results.length;
         a = results[index];
-        return set(a, "active", true);
+        return emSet(a, "active", true);
     }
 
     @action

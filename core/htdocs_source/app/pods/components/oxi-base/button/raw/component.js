@@ -1,6 +1,6 @@
 import Component from '@glimmer/component'
 import { tracked } from '@glimmer/tracking'
-import { action, set } from "@ember/object"
+import { action, set as emSet } from "@ember/object"
 import { debug } from '@ember/debug'
 import { service } from '@ember/service'
 import Clickable from 'openxpki/data/clickable'
@@ -146,7 +146,7 @@ export default class OxiButtonRawComponent extends Component {
         this.clickTarget = event?.target // undefined for <button>
 
         if (this.args.button.confirm) {
-            set(this.args.button, "loading", true)
+            emSet(this.args.button, "loading", true)
             this.showConfirmDialog = true
         } else {
             this.executeAction()
@@ -195,7 +195,7 @@ export default class OxiButtonRawComponent extends Component {
 
     @action
     resetConfirmState() {
-        set(this.args.button, "loading", false)
+        emSet(this.args.button, "loading", false)
         this.showConfirmDialog = false
     }
 }

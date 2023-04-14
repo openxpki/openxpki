@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import { service } from '@ember/service';
-import { action, set } from '@ember/object';
+import { action, set as emSet } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { debug } from '@ember/debug';
 import { A } from '@ember/array'
@@ -242,10 +242,10 @@ export default class OxiSectionGridComponent extends Component {
             action: button.action
         }
         request[button.selection] = this.sortedData.filter(i => i.checked).map(i => i.originalData[index])
-        set(button, "loading", true)
+        emSet(button, "loading", true)
 
         await this.content.updateRequest(request)
-        set(button, "loading", false)
+        emSet(button, "loading", false)
     }
 
 
@@ -277,7 +277,7 @@ export default class OxiSectionGridComponent extends Component {
     // (de-)select single row
     @action
     select(row) {
-        set(this.rawData[row.originalIndex], "checked", !this.rawData[row.originalIndex].checked)
+        emSet(this.rawData[row.originalIndex], "checked", !this.rawData[row.originalIndex].checked)
         this.rawData = this.rawData // eslint-disable-line no-self-assign -- trigger Ember update
         this.updateButtonState()
     }
@@ -285,7 +285,7 @@ export default class OxiSectionGridComponent extends Component {
     // (de-)select all rows
     @action
     selectAll() {
-        this.rawData.forEach(i => set(i, "checked", !this.allChecked)) // FIXME turn rawData into object that extends Base and use @tracked properties instead of set()
+        this.rawData.forEach(i => emSet(i, "checked", !this.allChecked)) // FIXME turn rawData into object that extends Base and use @tracked properties instead of emSet()
         this.rawData = this.rawData // eslint-disable-line no-self-assign -- trigger Ember update
         this.updateButtonState()
     }
