@@ -160,7 +160,7 @@ export default class OxiSectionGridComponent extends Component {
 
     get data() {
         let columns = this.formattedColumns
-        let titles = this.rawColumns.getEach("sTitle")
+        let titles = this.rawColumns.map(i => i.sTitle)
         let classIndex = titles.indexOf("_status")
         if (classIndex === -1) {
             classIndex = titles.indexOf("_className")
@@ -199,7 +199,7 @@ export default class OxiSectionGridComponent extends Component {
         if (this.hasPager) return this.data;
 
         // client-side sorting
-        let data = this.data.toArray()
+        let data = this.data
 
         let col_index = this.formattedColumns.findIndex(col => col.isSorted)
         if (col_index >= 0) {
@@ -221,21 +221,21 @@ export default class OxiSectionGridComponent extends Component {
     }
 
     get allChecked() {
-        return this.sortedData.isEvery("checked", true);
+        return this.sortedData.every(i => i.checked == true)
     }
 
     get noneChecked() {
-        return this.sortedData.isEvery("checked", false);
+        return this.sortedData.every(i => i.checked == false)
     }
 
     get isBulkable() {
-        return this.buttons.isAny("select");
+        return this.buttons.some(i => i.select);
     }
 
     @action
     async selectClick(button) {
         debug("oxi-section/grid - selectClick")
-        let columns = this.rawColumns.getEach("sTitle")
+        let columns = this.rawColumns.map(i => i.sTitle)
         let index = columns.indexOf(button.select)
         if (index === -1) {
             throw new Error(`There is no column matching "${button.select}"`)
@@ -243,7 +243,7 @@ export default class OxiSectionGridComponent extends Component {
         let request = {
             action: button.action
         }
-        request[button.selection] = this.sortedData.filterBy("checked").getEach("originalData").getEach("" + index)
+        request[button.selection] = this.sortedData.filter(i => i.checked).map(i => i.originalData[index])
         set(button, "loading", true)
 
         await this.content.updateRequest(request)
@@ -287,7 +287,7 @@ export default class OxiSectionGridComponent extends Component {
     // (de-)select all rows
     @action
     selectAll() {
-        this.rawData.setEach("checked", !this.allChecked)
+        this.rawData.forEach(i => set(i, "checked", !this.allChecked)) // FIXME turn rawData into object that extends Base and use @tracked properties instead of set()
         this.rawData = this.rawData // eslint-disable-line no-self-assign -- trigger Ember update
         this.updateButtonState()
     }

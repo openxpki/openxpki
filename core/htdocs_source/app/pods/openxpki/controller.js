@@ -1,6 +1,6 @@
 import Controller from '@ember/controller';
 import { tracked } from '@glimmer/tracking';
-import { action, set } from '@ember/object';
+import { action, set as emSet } from '@ember/object';
 import { service } from '@ember/service';
 import lite from 'caniuse-lite';
 import { detect } from 'detect-browser'
@@ -112,8 +112,8 @@ export default class OpenXpkiController extends Controller {
     @action
     activateTab(entry) {
         let tabs = this.model.tabs;
-        tabs.setEach("active", false);
-        set(entry, "active", true);
+        tabs.forEach(i => emSet(i, "active", false))
+        emSet(entry, "active", true);
         return false;
     }
 
@@ -121,7 +121,7 @@ export default class OpenXpkiController extends Controller {
     closeTab(entry) {
         let tabs = this.model.tabs;
         tabs.removeObject(entry);
-        if (!tabs.findBy("active", true)) {
+        if (!tabs.find(i => i.active == true)) {
             tabs.set("lastObject.active", true);
         }
         return false;

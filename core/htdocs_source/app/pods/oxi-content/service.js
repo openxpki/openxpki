@@ -115,7 +115,7 @@ export default class OxiContentService extends Service {
             // or (e.g. on error) set error code for current tab
             else {
                 if (doc.status && this.tabs.length > 0) {
-                    let currentTab = this.tabs.findBy("active") // findBy() is an EmberArray method
+                    let currentTab = this.tabs.find(i => i.active == true)
                     emSet(currentTab, 'status', doc.status)
                 }
             }
@@ -349,13 +349,13 @@ export default class OxiContentService extends Service {
         // New tab
         else if (target === "tab") {
             let tabs = this.tabs
-            tabs.setEach("active", false)
+            tabs.forEach(i => emSet(i, "active", false))
             tabs.pushObject(newTab)
         }
         // Current tab
         else if (target === "active") {
             let tabs = this.tabs
-            let index = tabs.indexOf(tabs.findBy("active")) // findBy() is an EmberArray method
+            let index = tabs.indexOf(tabs.find(i => i.active == true)) // findBy() is an EmberArray method
             tabs.replace(index, 1, [newTab]) // top
         }
         // Set as only tab
@@ -369,8 +369,8 @@ export default class OxiContentService extends Service {
         for (const entry of this.navEntries) {
             emSet(entry, "active", (entry.key === page))
             if (entry.entries) {
-                entry.entries.setEach("active", false)
-                let subEntry = entry.entries.findBy("key", page)
+                entry.entries.forEach(i => emSet(i, "active", false))
+                let subEntry = entry.entries.find(i => i.key == page)
                 if (subEntry) {
                     emSet(subEntry, "active", true)
                     emSet(entry, "active", true)

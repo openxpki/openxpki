@@ -161,7 +161,7 @@ export default class OxiFieldTextComponent extends Component {
         // Enter - select active value
         if (evt.keyCode === 13) {
             let results = this.searchResults;
-            let a = results.findBy("active", true);
+            let a = results.find(i => i.active == true)
             if (a) {
                 this.selectResult(a);
             }
@@ -187,7 +187,7 @@ export default class OxiFieldTextComponent extends Component {
     selectNeighbor(diff) {
         let results = this.searchResults;
         if (!results.length) { return }
-        let a = results.findBy("active", true);
+        let a = results.find(i => i.active == true)
         set(a, "active", false);
         let index = (results.indexOf(a) + diff + results.length) % results.length;
         a = results[index];
