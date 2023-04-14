@@ -176,7 +176,7 @@ sub action_result {
     };
 
     $self->__save_query($queryid => {
-        'type' => 'bulk',
+        'type' => 'workflow',
         'count' => $result_count,
         'query' => $query,
         'input' => {},
