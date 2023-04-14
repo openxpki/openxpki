@@ -33,16 +33,7 @@ export default class OxiSectionCardsComponent extends Component {
     get cards() {
         let cards = this.args.def.cards || []
         // inject _button property
-        cards.forEach(c => c._button = Button.fromHash({
-            format: c.format,
-            href: c.href,
-            target: c.target,
-            page: c.page,
-            action: c.action,
-            disabled: c.disabled,
-            confirm: c.confirm,
-            onClick: c.onClick,
-        }))
+        cards.forEach(c => c._button = Button.fromHash(c))
         return cards
     }
 }

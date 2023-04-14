@@ -1,3 +1,5 @@
+import { debug } from '@ember/debug'
+
 /**
  * Base class for data transfer objects ("DTOs": objects with minimal behaviour).
  *
@@ -33,15 +35,19 @@ export default class Base {
         let ourProps = instance.getPropertyNames()
         let theirProps = sourceHash instanceof Base ? sourceHash.getPropertyNames() : Object.keys(sourceHash)
 
+        let unknownProps = []
         for (const prop of theirProps) {
             if (ourProps.has(prop) === false) {
-                /* eslint-disable-next-line no-console */
-                console.error(`Attempt to set unknown property "${prop}" in ${this.name} instance "${sourceHash[this._idField] ?? '<unknown>'}". `)
-                console.error(`If it's a new property, please add it to ${this._type}.js`)
+                unknownProps.push(prop)
             }
             else {
                 instance[prop] = sourceHash[prop]
             }
+        }
+        if (unknownProps.length > 0) {
+            /* eslint-disable-next-line no-console */
+            debug(`Attempt to set unknown properties in ${this.name} instance "${sourceHash[this._idField] ?? '<unknown>'}": ${unknownProps.join(', ')}`)
+            debug(`If you need to process these backend properties, please add them to ${this._type}.js or one of its ancestors.`)
         }
         return instance
     }
