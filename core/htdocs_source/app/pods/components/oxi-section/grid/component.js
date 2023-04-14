@@ -213,9 +213,7 @@ export default class OxiSectionGridComponent extends Component {
                 }
                 return (a > b) ? 1 : -1;
             });
-            if (this.pager.reverse) {
-                data.reverseObjects();
-            }
+            if (this.pager.reverse) data.reverse()
         }
         return data;
     }
