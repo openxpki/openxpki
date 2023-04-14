@@ -89,6 +89,28 @@ update-ember: docker-build
 	  update-ember
 
 #
+# Update Javascript dependencies
+#
+update-deps: docker-build
+	$(MANAGER) run $(MANAGER_OPTS_RUN) -ti --rm \
+	  -v $(abspath ./):/source:ro \
+	  -v $(abspath ./):/output \
+	  $(IMAGE) \
+	  update-deps
+
+#
+# Generate JavaScript documentation
+#
+docs: docker-build ## compile Ember code using a Docker image
+	rm -rf ./docs-api
+	mkdir ./docs-api
+	$(MANAGER) run $(MANAGER_OPTS_RUN) -ti --rm \
+	  -v $(abspath ./):/source:ro \
+	  -v $(abspath ./docs-api):/docs-api \
+	  $(IMAGE) \
+	  docs
+
+#
 # Build Docker image
 #
 # Docker image is built using the internal Docker cache, the last image

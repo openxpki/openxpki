@@ -326,20 +326,7 @@ sub __handle_PING : PRIVATE {
         };
     }
     elsif ($state_of{$ident} eq 'WAITING_FOR_PKI_REALM') {
-        my @realm_names = CTX('config')->get_keys("system.realms");
-        my %realms =();
-        foreach my $realm (sort @realm_names) {
-            my $label = CTX('config')->get("system.realms.$realm.label");
-            $realms{$realm}->{NAME} = $realm;
-            $realms{$realm}->{LABEL} = $label;
-            $realms{$realm}->{DESCRIPTION} = CTX('config')->get("system.realms.$realm.description") || $label;
-        }
-        return {
-           SERVICE_MSG => 'GET_PKI_REALM',
-           PARAMS => {
-              'PKI_REALMS' => \%realms,
-           },
-        };
+        return $self->__list_pki_realms;
     }
     elsif ($state_of{$ident} eq 'WAITING_FOR_AUTHENTICATION_STACK') {
         return $self->__list_authentication_stacks();
@@ -383,24 +370,13 @@ sub __handle_SESSION_ID_ACCEPTED : PRIVATE {
     # message for the user and set the state to
     # 'WAITING_FOR_PKI_REALM'
     # we only do this if we are in a 'SESSION_ID_SENT.*' state
-    if ($pki_realm_choice
-        && $state_of{$ident} =~ m{\A SESSION_ID_SENT.* \z}xms) {
-        ##! 2: "build hash with ID, name and description"
-        my @realm_names = CTX('config')->get_keys("system.realms");
-        my %realms =();
-        foreach my $realm (sort @realm_names) {
-            $realms{$realm}->{NAME} = $realm;
-            $realms{$realm}->{DESCRIPTION} = CTX('config')->get("system.realms.$realm.label");
-        }
+
+    # TODO: checking $state_of{$ident} is not necessary as this is already checked via __is_valid_message()
+    if ($pki_realm_choice and $state_of{$ident} =~ m{\A SESSION_ID_SENT.* \z}xms) {
         $self->__change_state({
             STATE => 'WAITING_FOR_PKI_REALM',
         });
-        return {
-            SERVICE_MSG => 'GET_PKI_REALM',
-            PARAMS => {
-                'PKI_REALMS' => \%realms,
-            },
-        };
+        return $self->__list_pki_realms;
     }
 
     # if we do not have an authentication stack in the session,
@@ -693,6 +669,7 @@ sub __pki_realm_choice_available : PRIVATE {
     my $realm = OpenXPKI::Server::Context::hascontext('session')
         ? CTX('session')->data->pki_realm
         : undef;
+    # TODO: this method should only return 0 or 1 and the realm return value is not used in our code
     return $realm if defined $realm;
 
     ##! 2: "check if there is more than one realm"
@@ -718,11 +695,36 @@ sub __pki_realm_choice_available : PRIVATE {
 sub __list_authentication_stacks : PRIVATE {
     my $self = shift;
 
-    my $authentication = CTX('authentication');
     return {
         SERVICE_MSG => 'GET_AUTHENTICATION_STACK',
         PARAMS => {
-            'AUTHENTICATION_STACKS' => $authentication->list_authentication_stacks(),
+            'AUTHENTICATION_STACKS' => CTX('authentication')->list_authentication_stacks(),
+        },
+    };
+}
+
+sub __list_pki_realms : PRIVATE {
+    my $self = shift;
+
+    my @realm_names = CTX('config')->get_keys("system.realms");
+    my %realms;
+    foreach my $realm (sort @realm_names) {
+        my $label = CTX('config')->get("system.realms.$realm.label");
+
+        $realms{$realm} = {
+            NAME => $realm,
+            LABEL => $label,
+            DESCRIPTION => CTX('config')->get("system.realms.$realm.description") || $label,
+            IMAGE =>CTX('config')->get("system.realms.$realm.image") || '',
+            # auth stack info is needed to display stack label on realm selection page
+            AUTH_STACKS => CTX('authentication')->list_authentication_stacks_of($realm),
+        };
+    }
+
+    return {
+        SERVICE_MSG => 'GET_PKI_REALM',
+        PARAMS => {
+            'PKI_REALMS' => \%realms,
         },
     };
 }

@@ -3,7 +3,8 @@ import Component from '@glimmer/component';
 /**
  * Draws a chart.
  *
- * @module component/oxi-section/chart
+ * @class OxiSection::Chart
+ * @extends Component
  */
 export default class OxiSectionKeyvalueComponent extends Component {
     get options() {

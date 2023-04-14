@@ -1,67 +1,10 @@
-{{#if @button.href}}
-    <a
-        ...attributes
-        class="btn {{this.additionalCssClass}}"
-        href="{{@button.href}}"
-        target="{{@button.target}}"
-    >
-        {{#if @button.tooltip}}
-            <Tippy>{{@button.tooltip}}</Tippy>
-        {{/if}}
-        {{#if @button.image}}
-            <img src={{@button.image}} alt="" role="presentation"/>
-            <br/>
-        {{/if}}
-        {{@button.label}}
-    </a>
-{{else}}
-
-    <BsButton
-        ...attributes
-        @type=""
-        class={{this.additionalCssClass}}
-        @onClick={{this.click}}
-        disabled={{or @button.disabled @button.loading}}
-    >
-        {{#if @button.tooltip}}
-            <Tippy>{{@button.tooltip}}</Tippy>
-        {{/if}}
-        {{#if @button.image}}
-            <img src={{@button.image}} alt="" role="presentation"/>
-            <br/>
-        {{/if}}
-        {{#if @button.loading}}
-            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-        {{/if}}
-        {{@button.label}}
-    </BsButton>
-
-    {{#if @button.confirm}}
-        <BsModal
-            @open={{this.showConfirmDialog}}
-            @closeButton={{true}}
-            @fade={{true}}
-            @backdrop={{true}}
-            @backdropClose={{false}}
-            @onHidden={{this.resetConfirmState}}
-            as |Modal|
-        >
-            <Modal.header>
-                <h4 class="modal-title">
-                    {{@button.confirm.label}}
-                </h4>
-            </Modal.header>
-            <Modal.body>
-                {{defuse @button.confirm.description}}
-            </Modal.body>
-            <Modal.footer>
-                <BsButton {{on "click" this.executeAction}} @type="primary">
-                    {{if @button.confirm.confirm_label @button.confirm.confirm_label (t 'button.confirm_dialog.ok')}}
-                </BsButton>
-                <BsButton {{on "click" Modal.close}}>
-                    {{if @button.confirm.cancel_label @button.confirm.cancel_label (t 'button.confirm_dialog.cancel')}}
-                </BsButton>
-            </Modal.footer>
-        </BsModal>
+<OxiBase::Button::Raw @button={{this.button}} ...attributes>
+    {{#if this.button.tooltip}}
+        <Tippy>{{this.button.tooltip}}</Tippy>
     {{/if}}
-{{/if}}
+    {{#if this.button.image}}
+        <img src={{this.button.image}} alt="" role="presentation"/>
+        <br/>
+    {{/if}}
+    {{this.button.label}}
+</OxiBase::Button::Raw>

@@ -1,3 +1,5 @@
+/* Ember supports plain CSS out of the box. More info: https://cli.emberjs.com/release/advanced-use/stylesheets/ */
+
 @import url("bootstrap-v5-tweaks.css");
 @import url("glyphicons.css");
 

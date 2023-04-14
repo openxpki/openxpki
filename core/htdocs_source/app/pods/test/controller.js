@@ -8,6 +8,8 @@ import section_form from './section-form';
 import section_grid from './section-grid';
 import section_keyvalue from './section-keyvalue';
 import section_tiles from './section-tiles';
+import section_cards from './section-cards';
+import section_cards_vertical from './section-cards-vertical';
 import Button from 'openxpki/data/button';
 import fetch from 'fetch';
 
@@ -23,6 +25,8 @@ export default class TestController extends Controller {
         section_grid,
         section_keyvalue,
         section_tiles,
+        section_cards,
+        section_cards_vertical,
     ]
 
     localconfig = `
@@ -103,12 +107,12 @@ header:
             Button.fromHash({
                 format: "expected",
                 label: "de-DE",
-                onClick: btn => this.setLang("de-DE"),
+                onClick: async btn => this.setLang("de-DE"),
             }),
             Button.fromHash({
                 format: "expected",
                 label: "en-US",
-                onClick: btn => this.setLang("en-US"),
+                onClick: async btn => this.setLang("en-US"),
             }),
         ]
 

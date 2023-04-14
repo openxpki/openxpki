@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import { tracked  } from '@glimmer/tracking';
-import { action, set } from '@ember/object';
+import { action, set as emSet } from '@ember/object';
 import { scheduleOnce } from '@ember/runloop';
 import { service } from '@ember/service';
 
@@ -161,7 +161,7 @@ export default class OxiFieldTextComponent extends Component {
         // Enter - select active value
         if (evt.keyCode === 13) {
             let results = this.searchResults;
-            let a = results.findBy("active", true);
+            let a = results.find(i => i.active == true)
             if (a) {
                 this.selectResult(a);
             }
@@ -187,11 +187,11 @@ export default class OxiFieldTextComponent extends Component {
     selectNeighbor(diff) {
         let results = this.searchResults;
         if (!results.length) { return }
-        let a = results.findBy("active", true);
-        set(a, "active", false);
+        let a = results.find(i => i.active == true)
+        emSet(a, "active", false);
         let index = (results.indexOf(a) + diff + results.length) % results.length;
         a = results[index];
-        return set(a, "active", true);
+        return emSet(a, "active", true);
     }
 
     @action

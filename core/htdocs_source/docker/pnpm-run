@@ -29,24 +29,27 @@ else
 fi
 
 # ...instead use /node_modules/ from the container
-rsync "${OPTS[@]}" \
-  /node_modules/ /build/node_modules
+mv /node_modules /build/node_modules
 
-if [[ "$1" == "serve" || "$1" == "build" ]]; then
+
+if [ "update-ember" == "$1" ]; then
+  echo -e "\n[Update ember-cli and ember-cli-update]"
+  pnpm remove ember-cli ember-cli-update
+  pnpm add --save-dev ember-cli ember-cli-update
+  cp package.json pnpm-lock.yaml /output
+  echo -e "\nDone.\npackage.json and pnpm-lock.yaml were updated on your host."
+
+elif [ "update-deps" == "$1" ]; then
+  echo -e "\n[Update Javascript dependencies]"
+  npm install -g npm-check-updates
+  ncu -u
+  cp package.json pnpm-lock.yaml /output
+  echo -e "\nDone.\npackage.json and pnpm-lock.yaml were updated on your host."
+
+else
   cd /build
   echo -e "\n[pnpm run $1]"
   # The output path for compiled assets can be changed via
   # OPENXPKI_BUILD_OUTPUT_PATH (which is read in package.json).
   OPENXPKI_BUILD_OUTPUT_PATH=/compiled pnpm run "$1"
-  exit
-fi
-
-if [ "$1" == "update-ember" ]; then
-  echo -e "\n[Update ember-cli and ember-cli-update]"
-  pnpm remove ember-cli ember-cli-update
-  pnpm install --save-dev ember-cli ember-cli-update
-  cp package.json pnpm-lock.yaml /output
-
-  echo -e "\nDone.\npackage.json and pnpm-lock.yaml were updated on your host."
-  exit
 fi

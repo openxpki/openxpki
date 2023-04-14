@@ -5,9 +5,11 @@ import { service } from '@ember/service';
 
 /**
  * Shows a label (a text) and escapes special characters.
- *
+ * ```javascript
+ * hint = "A <b>bold</b> statement"
+ * ```
  * ```html
- * <OxiBase::Label @text="A <b>bold</b> statement" @tooltip="Oh!" @raw={{true}} />
+ * <OxiBase::Label @text={{this.hint}} @tooltip="Oh!" @raw={{true}} />
  * ```
  *
  * @param { string|array } text - the text to display. If an array is given, the contents are separated via <span> tags
@@ -15,7 +17,7 @@ import { service } from '@ember/service';
  * @param { bool } raw - set to `true` to allow HTML entities incl. `<script>` tags etc.
  * @param { bool } nowrap - do not wrap long text
  * @param { bool } truncate - truncate long text
- * @module component/oxi-base/label
+ * @class OxiBase::Label
  */
 export default class OxiLabelComponent extends Component {
     @service('oxi-content') content;

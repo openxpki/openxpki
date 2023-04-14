@@ -1,66 +1,12 @@
 import Component from '@glimmer/component';
 import { service } from '@ember/service';
-import { action, set } from '@ember/object';
+import { action, set as emSet } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
+import { debug } from '@ember/debug';
 import { A } from '@ember/array'
-
-/*
- * Pager data, representing the current page, sort order etc.
- */
-class Pager {
-    @tracked num
-    @tracked active
-    @tracked count = 0
-    @tracked startat = 0
-    @tracked limit = Number.MAX_VALUE
-    @tracked order
-    @tracked reverse = false
-    @tracked pagesizes
-    @tracked pagersize
-    @tracked pagerurl
-    @tracked disabled = false
-
-    fillFromHash(sourceHash) {
-        for (const attr of Object.keys(sourceHash)) {
-            // @tracked properties are prototype properties, the others instance properties
-            if (! (Object.prototype.hasOwnProperty.call(Object.getPrototypeOf(this), attr) || Object.prototype.hasOwnProperty.call(this, attr))) {
-                /* eslint-disable-next-line no-console */
-                console.error(
-                    `oxi-section/grid: unknown property "${attr}" in field "${sourceHash.name}". ` +
-                    `If it's a new property, please add it to class 'Pager' defined in app/pod/components/oxi-section/grid/component.js`
-                )
-            }
-            else {
-                this[attr] = sourceHash[attr]
-            }
-        }
-    }
-
-    clone() {
-        let twin = new Pager()
-        // @tracked properties
-        Object.keys(Object.getPrototypeOf(this)).forEach(k => twin[k] = this[k])
-        // public class properties
-        Object.keys(this).forEach(k => twin[k] = this[k])
-        return twin
-    }
-
-    /**
-     * Returns all non-private properties (i.e. no leading underscore) as a plain hash/object
-     */
-    toPlainHash() {
-        let hash = {}
-        // @tracked non-private properties
-        Object.keys(Object.getPrototypeOf(this))
-            .filter(k => k.charAt(0) != '_')
-            .forEach(k => hash[k] = this[k])
-        // non-private class properties
-        Object.keys(this)
-            .filter(k => k.charAt(0) != '_')
-            .forEach(k => hash[k] = this[k])
-        return hash
-    }
-}
+import ContainerButton from 'openxpki/data/container-button'
+import GridButton from 'openxpki/data/grid-button'
+import Pager from 'openxpki/data/pager'
 
 /**
  * Draws a grid.
@@ -71,19 +17,33 @@ class Pager {
  *     ... // TODO
  * }
  * ```
- * @module component/oxi-section/grid
+ * @class OxiSection::Grid
+ * @extends Component
  */
 export default class OxiSectionGridComponent extends Component {
-    @service('oxi-content') content;
+    @service('oxi-content') content
 
-    @tracked rawData = A([]);
-    @tracked pager = new Pager();
+    @tracked rawData = A([])
+    @tracked pager
+    buttons
 
     constructor() {
-        super(...arguments);
+        super(...arguments)
 
-        this.rawData = this.args.def.data || [];
-        this.pager.fillFromHash(this.args.def.pager || {});
+        this.rawData = this.args.def.data || []
+        this.pager = Pager.fromHash(this.args.def.pager || {})
+
+        /* PLEASE NOTE that we cannot use a getter here, i.e. "get buttons()"
+         * as for some reason this would recalculate every time we e.g. change
+         * the "disabled" property in the derived GridButton class. And after
+         * recalculating the changed property would be reset.
+         */
+        this.buttons = (this.args.def.buttons || []).map(def =>
+            def.select
+                ? GridButton.fromHash({...def, onClick: this.selectClick})
+                : ContainerButton.fromHash(def)
+        )
+        this.updateButtonState()
     }
 
     get rawColumns() { return (this.args.def.columns || []) }
@@ -200,7 +160,7 @@ export default class OxiSectionGridComponent extends Component {
 
     get data() {
         let columns = this.formattedColumns
-        let titles = this.rawColumns.getEach("sTitle")
+        let titles = this.rawColumns.map(i => i.sTitle)
         let classIndex = titles.indexOf("_status")
         if (classIndex === -1) {
             classIndex = titles.indexOf("_className")
@@ -239,7 +199,7 @@ export default class OxiSectionGridComponent extends Component {
         if (this.hasPager) return this.data;
 
         // client-side sorting
-        let data = this.data.toArray()
+        let data = this.data
 
         let col_index = this.formattedColumns.findIndex(col => col.isSorted)
         if (col_index >= 0) {
@@ -253,51 +213,39 @@ export default class OxiSectionGridComponent extends Component {
                 }
                 return (a > b) ? 1 : -1;
             });
-            if (this.pager.reverse) {
-                data.reverseObjects();
-            }
+            if (this.pager.reverse) data.reverse()
         }
         return data;
     }
 
     get allChecked() {
-        return this.sortedData.isEvery("checked", true);
+        return this.sortedData.every(i => i.checked == true)
     }
 
     get noneChecked() {
-        return this.sortedData.isEvery("checked", false);
+        return this.sortedData.every(i => i.checked == false)
     }
 
     get isBulkable() {
-        return this.buttons.isAny("select");
-    }
-
-    get buttons() {
-        let buttons = this.args.def.buttons || [];
-        return buttons.map(b => {
-            if (b.select) {
-                set(b, "disabled", this.noneChecked);
-                b.onClick = this.selectClick;
-            }
-            return b;
-        })
+        return this.buttons.some(i => i.select);
     }
 
     @action
-    selectClick(button) {
-        let columns = this.rawColumns.getEach("sTitle");
-        let index = columns.indexOf(button.select);
+    async selectClick(button) {
+        debug("oxi-section/grid - selectClick")
+        let columns = this.rawColumns.map(i => i.sTitle)
+        let index = columns.indexOf(button.select)
         if (index === -1) {
-            throw new Error(`There is no column matching "${button.select}"`);
+            throw new Error(`There is no column matching "${button.select}"`)
         }
         let request = {
             action: button.action
-        };
-        request[button.selection] = this.sortedData.filterBy("checked").getEach("originalData").getEach("" + index);
-        set(button, "loading", true);
+        }
+        request[button.selection] = this.sortedData.filter(i => i.checked).map(i => i.originalData[index])
+        emSet(button, "loading", true)
 
-        this.content.updateRequest(request)
-        .then(() => set(button, "loading", false));
+        await this.content.updateRequest(request)
+        emSet(button, "loading", false)
     }
 
 
@@ -329,15 +277,21 @@ export default class OxiSectionGridComponent extends Component {
     // (de-)select single row
     @action
     select(row) {
-        set(this.rawData[row.originalIndex], "checked", !this.rawData[row.originalIndex].checked)
+        emSet(this.rawData[row.originalIndex], "checked", !this.rawData[row.originalIndex].checked)
         this.rawData = this.rawData // eslint-disable-line no-self-assign -- trigger Ember update
+        this.updateButtonState()
     }
 
     // (de-)select all rows
     @action
     selectAll() {
-        this.rawData.setEach("checked", !this.allChecked)
+        this.rawData.forEach(i => emSet(i, "checked", !this.allChecked)) // FIXME turn rawData into object that extends Base and use @tracked properties instead of emSet()
         this.rawData = this.rawData // eslint-disable-line no-self-assign -- trigger Ember update
+        this.updateButtonState()
+    }
+
+    updateButtonState() {
+        this.buttons.filter(b => b.select).forEach(b => b.disabled = this.noneChecked)
     }
 
     @action
@@ -354,7 +308,7 @@ export default class OxiSectionGridComponent extends Component {
         })
         .then((res) => {
             this.rawData = res.data || [];
-            this.pager.fillFromHash(page);
+            this.pager.setFromHash(page);
         });
     }
 
@@ -366,7 +320,7 @@ export default class OxiSectionGridComponent extends Component {
         }
         // client-side sorting
         else {
-            this.pager.fillFromHash(page);
+            this.pager.setFromHash(page);
         }
     }
 }

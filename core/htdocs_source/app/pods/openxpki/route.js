@@ -48,7 +48,7 @@ export default class OpenXpkiRoute extends Route {
 
         // load as top content if 'modelId' is part of navigation or in 'topTarget' list
         let flatList = this.content.navEntries.reduce((p, n) => p.concat(n, n.entries || []), []);
-        if (flatList.findBy("key", modelId) || this.topTarget.indexOf(modelId) >= 0) {
+        if (flatList.find(i => i.key == modelId) || this.topTarget.indexOf(modelId) >= 0) {
             request.target = "top";
         }
         return this.config.ready // localconfig.js might change rootURL, so first thing is to query it

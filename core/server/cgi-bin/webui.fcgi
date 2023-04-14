@@ -224,34 +224,69 @@ while (my $cgi = CGI::Fast->new()) {
 
     # Set the path to the directory component of the script, this
     # automagically creates seperate cookies for path based realms
-    my $realm_mode = $conf->{global}->{realm_mode} || '';
+    my $realm_mode = $conf->{global}->{realm_mode} || 'select';
     my $detected_realm;
-    $log->debug("realm_mode: '$realm_mode'");
+    my $realm_path_map; # only for realm_mode = path
+    $log->debug("Realm mode = $realm_mode");
 
     if ($realm_mode eq "path") {
         my $script_path = $ENV{'REQUEST_URI'};
-        # Strip off cgi-bin, last word of the path and discard query string
+
+        # Strip off /cgi-bin/xxx?aa=bb ("cgi-bin", last path component, query string)
         $script_path =~ s|\/(f?cgi-bin\/)?([^\/]+)((\?.*)?)$||;
         $response->session_cookie->path($script_path);
 
-        $log->debug("Script path: '$script_path'");
+        $log->debug("Script path = '$script_path'");
 
-        # if the session has no realm set, try to get a realm from the map
-        if (!$session_front->param('pki_realm')) {
-            # We use the last part of the script name for the realm
-            my $script_realm;
-            if ($script_path =~ qq|\/([^\/]+)\$|) {
-                $script_realm = $1;
-                if (!$conf->{realm}->{$script_realm}) {
-                    $log->debug('No realm for ident: ' . $script_realm );
-                    __handle_error($cgi, 'I18N_OPENXPKI_UI_NO_SUCH_REALM_OR_SERVICE');
-                    $session_front->flush();
-                    $backend_client->detach();
-                    next;
+        # We use the last part of the script name for the realm
+        my $script_realm;
+        if ($script_path =~ qq|\/([^\/]+)\$|) {
+            $script_realm = $1;
+        } else {
+            $log->warn('Unable to read realm from URL path');
+        }
+
+        # Prepare realm selection
+        if ('index' eq $script_realm) {
+            $log->debug('Special path detected - showing realm selection page');
+
+            # Enforce new session to get rid of selected realm etc.
+            $session_front->flush();
+            $backend_client->detach();
+
+            # Create a map of realms to URL paths:
+            # {
+            #     realma => [
+            #         { url => 'realm-a', stack => 'LocalPassword' },
+            #         { url => 'realm-a-cert', stack => 'Certificate' },
+            #     ],
+            #     realmb => ...
+            # }
+            my $realm_root_url = $script_path;
+            $realm_root_url =~ s{^ ( ( / [^/]+ )*? ) / [^/]* /? $}{$1}msx; # strip off last path component
+
+            for my $url_alias (keys $conf->{realm}->%*) {
+                my ($realm, $stack) = split (/\s*;\s*/, $conf->{realm}->{$url_alias});
+                $realm_path_map->{$realm} //= [];
+                push $realm_path_map->{$realm}->@*, {
+                    url => sprintf("%s/%s", $realm_root_url, $url_alias),
+                    stack => $stack,
                 }
-                $detected_realm = $conf->{realm}->{$script_realm};
+            };
+
+            $log->trace('URL path and auth stacks by realm: ' . Dumper($realm_path_map)) if $log->is_trace;
+        }
+
+        # If the session has no realm set, try to get a realm from the map
+        elsif (!$session_front->param('pki_realm')) {
+            if (!$conf->{realm}->{$script_realm}) {
+                $log->debug('No realm for ident: ' . $script_realm );
+                __handle_error($cgi, 'I18N_OPENXPKI_UI_NO_SUCH_REALM_OR_SERVICE');
+                $session_front->flush();
+                $backend_client->detach();
+                next;
             } else {
-                $log->warn('Unable to read realm from url path');
+                $detected_realm = $conf->{realm}->{$script_realm};
             }
         }
 
@@ -272,12 +307,12 @@ while (my $cgi = CGI::Fast->new()) {
     }
 
     if ($detected_realm) {
-        $log->debug('Detected realm is ' . $detected_realm);
-        my ($realm, $stack) = split (/\s*;\s*/,$detected_realm);
+        $log->debug("Detected realm is '$detected_realm'");
+        my ($realm, $stack) = split /\s*;\s*/, $detected_realm;
         $session_front->param('pki_realm', $realm);
         if ($stack) {
+            $log->debug("Auto-select auth stack '$stack' based on realm detection");
             $session_front->param('auth_stack', $stack);
-            $log->debug('Auto-Select stack based on realm detection');
         }
     }
 
@@ -307,6 +342,8 @@ while (my $cgi = CGI::Fast->new()) {
             $conf->{global}->{loginpage} ? (login_page => $conf->{global}->{loginpage}) : (),
             $conf->{global}->{loginurl} ? (login_url => $conf->{global}->{loginurl}) : (),
             resp => $response,
+            realm_mode => $realm_mode,
+            $realm_path_map ? (realm_path_map => $realm_path_map) : (),
             %pkey,
         });
 

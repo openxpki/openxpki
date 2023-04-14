@@ -15,13 +15,14 @@ jobs:
   lint:
     name: "Lint"
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - uses: actions/checkout@v3
       - name: Install Node
         uses: actions/setup-node@v3
         with:
-          node-version: 12.x
+          node-version: 14.x
           cache: npm
       - name: Install Dependencies
         run: npm ci
@@ -31,13 +32,14 @@ jobs:
   test:
     name: "Test"
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - uses: actions/checkout@v3
       - name: Install Node
         uses: actions/setup-node@v3
         with:
-          node-version: 12.x
+          node-version: 14.x
           cache: npm
       - name: Install Dependencies
         run: npm ci

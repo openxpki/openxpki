@@ -14,7 +14,7 @@ import ChartLineBar from './chart-line-bar';
  *
  * @param { array } data - list of data rows: `[ [x1, a1, b1, c1, ...], [x2, b2, c2, ...], ... ]`
  * @param { hash } options - display options for the chart
- * @module component/oxi-base/chart
+ * @class OxiBase::Chart
  */
 
 export default class OxiChartComponent extends Component {
