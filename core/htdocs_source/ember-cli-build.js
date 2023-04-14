@@ -2,7 +2,6 @@
 
 const EmberApp = require('ember-cli/lib/broccoli/ember-app');
 const Funnel = require('broccoli-funnel');
-
 module.exports = function(defaults) {
   // special behaviour in production mode
   let on_production = {};
@@ -29,7 +28,8 @@ module.exports = function(defaults) {
   }
 
   // app configuration
-  let app = new EmberApp(defaults, {
+  const app = new EmberApp(defaults, {
+    // Add options here
     ...on_production,
 
     // store app config in compiled JS file instead of <meta> tag

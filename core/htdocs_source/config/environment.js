@@ -1,20 +1,17 @@
 'use strict';
 
 module.exports = function (environment) {
-  let ENV = {
+  const ENV = {
     modulePrefix: 'openxpki',
     podModulePrefix: 'openxpki/pods',   // namespaced directory where resolver will look for resource files
     environment,
     rootURL: '/openxpki/',  // https://guides.emberjs.com/release/configuring-ember/embedding-applications/#toc_specifying-a-root-url
     locationType: 'hash',   // https://guides.emberjs.com/release/configuring-ember/specifying-url-type/
     EmberENV: {
+      EXTEND_PROTOTYPES: false,
       FEATURES: {
         // Here you can enable experimental features on an ember canary build
         // e.g. EMBER_NATIVE_DECORATOR_SUPPORT: true
-      },
-      EXTEND_PROTOTYPES: {
-        // Prevent Ember Data from overriding Date.parse.
-        Date: false,
       },
     },
 

@@ -15,6 +15,8 @@
   },
   "scripts": {
     "build": "ember build --environment=production --output-path=$OPENXPKI_BUILD_OUTPUT_PATH",
+    "lint:css": "stylelint \"**/*.css\"",
+    "lint:css:fix": "concurrently \"npm:lint:css -- --fix\"",
     "lint:hbs": "ember-template-lint .",
     "lint:hbs:fix": "ember-template-lint . --fix",
     "lint:js": "eslint . --cache",
@@ -25,14 +27,17 @@
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.21.3",
+    "@babel/plugin-proposal-decorators": "^7.21.0",
     "@babel/plugin-syntax-decorators": "^7.21.0",
     "@ember/optional-features": "^2.0.0",
+    "@ember/string": "^3.0.1",
     "@ember/test-helpers": "^2.9.3",
     "@glimmer/component": "^1.1.2",
     "@glimmer/tracking": "^1.1.2",
     "bootstrap": "^5.2.3",
     "broccoli-funnel": "^3.0.8",
     "caniuse-lite": "^1.0.30001478",
+    "concurrently": "^8.0.1",
     "copy-text-to-clipboard": "^3.1.0",
     "detect-browser": "^5.3.0",
     "ember-auto-import": "^2.6.3",
@@ -46,7 +51,6 @@
     "ember-cli-sri": "^2.1.1",
     "ember-cli-terser": "^4.0.2",
     "ember-cli-update": "^1.0.1",
-    "ember-export-application-global": "^2.0.1",
     "ember-fetch": "^8.1.2",
     "ember-flatpickr": "^4.0.0",
     "ember-intl": "git://github.com/ember-intl/ember-intl.git#f364dba",
@@ -60,7 +64,7 @@
     "ember-tippy": "^2.0.0",
     "eslint": "^8.38.0",
     "eslint-plugin-ember": "^11.5.1",
-    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-n": "^15.7.0",
     "eslint-plugin-qunit": "^7.3.4",
     "js-yaml": "^4.1.0",
     "jsdoc": "^4.0.2",
@@ -70,13 +74,18 @@
     "prettier": "^2.8.7",
     "qunit": "^2.19.4",
     "qunit-dom": "^2.0.0",
+    "stylelint": "^15.4.0",
+    "stylelint-config-prettier": "^9.0.5",
+    "stylelint-config-standard": "^32.0.0",
+    "stylelint-prettier": "^3.0.0",
     "superstruct": "^1.0.3",
     "tippy.js": "^6.3.7",
+    "tracked-built-ins": "^3.1.1",
     "uplot": "^1.6.24",
     "webpack": "^5.79.0"
   },
   "engines": {
-    "node": "12.* || 14.* || >= 16"
+    "node": "14.* || 16.* || >= 18"
   },
   "ember": {
     "edition": "octane"
