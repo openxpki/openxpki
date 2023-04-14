@@ -1,7 +1,7 @@
 <div class="row justify-content-end">
     {{#if @pages.length}}
         <div class="col col-lg-auto oxi-pager">
-            <ul class="pagination">
+            <ul class="pagination pagination-sm">
                 <li class="page-item {{if @pages.prev.disabled "disabled"}}">
                     <button class="page-link" aria-label={{t 'pagination.previous'}} type="button" {{on "click" (fn @setPage @pages.prev)}}>
                         {{!-- template-lint-disable no-bare-strings --}}
@@ -24,7 +24,7 @@
     {{/if}}
 
     <div class="col col-lg-auto oxi-pager">
-        <ul class="pagination">
+        <ul class="pagination pagination-sm">
             <li class="page-item disabled pagination-label">
                 <span class="page-link">{{t 'pagination.items_per_page'}}</span>
             </li>
@@ -37,7 +37,7 @@
     </div>
 
     <div class="col col-lg-auto oxi-pager">
-        <ul class="pagination">
+        <ul class="pagination pagination-sm">
             <li class="page-item disabled pagination-label">
                 <span class="page-link">{{t 'pagination.x_items' count=@pager.count}}</span>
             </li>
