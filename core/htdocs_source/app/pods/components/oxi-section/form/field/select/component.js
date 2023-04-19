@@ -18,19 +18,19 @@ export default class OxiFieldSelectComponent extends Component {
     }
 
     get options() {
-        let options, prompt, ref;
+        let options, placeholder, ref;
         /*
-          Prepend a "prompt" (option with empty value) if:
-          - "prompt" is specified or
+          Prepend a "placeholder" (option with empty value) if:
+          - "placeholder" is specified or
           - "is_optional" == 1
         */
-        prompt = this.args.content.prompt;
-        if (!prompt && this.args.content.is_optional) {
-            prompt = "";
+        placeholder = this.args.content.placeholder;
+        if (!placeholder && this.args.content.is_optional) {
+            placeholder = "";
         }
         options = (this.args.content.options || []);
-        if (typeof prompt === "string") {
-            return [ { label: prompt, value: "" } ].concat(options);
+        if (typeof placeholder === "string") {
+            return [ { label: placeholder, value: "" } ].concat(options);
         } else {
             return options;
         }

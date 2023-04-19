@@ -95,17 +95,28 @@ export default [
                 },
                 {
                     type: "select",
-                    name: "select_it",
+                    name: "select_no_preset",
                     label: "Select, no preset",
                     options: [
                         { value: 1, label: "Major" },
                         { value: 2, label: "Tom" },
                     ],
+                    placeholder: "Please select an option",
                 },
                 {
                     type: "select",
-                    name: "select_it_maybe",
-                    label: "Select, no preset",
+                    name: "select_preset",
+                    label: "Select, preset",
+                    options: [
+                        { value: 1, label: "Major" },
+                        { value: 2, label: "Tom" },
+                    ],
+                    value: 1,
+                },
+                {
+                    type: "select",
+                    name: "select_maybe",
+                    label: "Select, is_optional = 1",
                     options: [
                         { value: 1, label: "Major" },
                         { value: 2, label: "Tom" },

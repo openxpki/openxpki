@@ -51,7 +51,7 @@ export default class Field extends Base {
      * oxisection/form/field/select
      */
     options
-    prompt
+    placeholder
     editable
     /*
      * oxisection/form/field/static

@@ -54,7 +54,6 @@ sub render_profile_select {
                 %{$item},
                 options => \@profiles,
                 actionOnChange => 'profile!get_styles_for_profile',
-                prompt => $item->{placeholder}, # TODO - rename in UI
             };
         } elsif ($name eq 'cert_subject_style') {
             $item = {
@@ -228,7 +227,7 @@ sub render_key_select {
     my $args = shift;
     my $wf_action = shift;
 
-    $self->logger()->trace( 'render_profile_select with args: ' . Dumper $args ) if $self->logger->is_trace;
+    $self->logger()->trace( 'render_key_select with args: ' . Dumper $args ) if $self->logger->is_trace;
 
     my $wf_info = $args->{wf_info};
     my $context = $wf_info->{workflow}->{context};
@@ -273,7 +272,6 @@ sub render_key_select {
         my ($item, @more_items) = $self->__render_input_field( $field );
         next FIELDS unless ($item);
 
-        $item->{prompt} = $item->{placeholder}; # TODO - rename in UI
         if ($name eq 'key_alg') {
             $item = {
                 %{$item},
