@@ -41,7 +41,7 @@ header:
         format: "expected",
         label: 'Local request - ' + this.localRequestUrl,
         tooltip: "morbo -l http://*:7780 ./test-server.pl",
-        onClick: btn => this.localRequest(),
+        onClick: async btn => this.localRequest(),
     })
 
     get formNavButtons() {
@@ -50,7 +50,7 @@ header:
             buttons.push(Button.fromHash({
                 format: "optional",
                 label: form.content.title,
-                onClick: btn => this.setCurrentForm(i),
+                onClick: async btn => this.setCurrentForm(i),
             }))
         })
         return buttons
@@ -66,8 +66,7 @@ header:
         return result.join('&');
     }
 
-    @action
-    localRequest() {
+    async localRequest() {
         console.log('Sending request to localhost...');
 
         let data = {
@@ -84,7 +83,7 @@ header:
             },
         }
 
-        fetch(url, fetchParams)
+        return fetch(url, fetchParams)
         .then(response => {
             console.log('Response from local server:', response)
             if (response.ok) {
@@ -257,8 +256,7 @@ header:
         this.oxiLocale.locale = lang;
     }
 
-    @action
-    setCurrentForm(index) {
+    async setCurrentForm(index) {
         this.selectedFormIndex = index;
     }
 }
