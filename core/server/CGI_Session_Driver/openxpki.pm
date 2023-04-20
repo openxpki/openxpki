@@ -200,7 +200,7 @@ names and adds some security options.
     driver = driver:openxpki
 
     [session_driver]
-    DataSource = dbi:mysql:dbname=openxpki
+    DataSource = dbi:mysql:dbname=openxpki;host=db.example.com
     NameSpace = oxischema
     User = openxpki_session
     Password = openxpki

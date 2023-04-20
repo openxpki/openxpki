@@ -80,7 +80,7 @@ Validates the context value referenced by argument using a connector. The path t
 the connector must be given as parameter 'path' to the validator definition.
 
   global_validate_regex:
-      class: OpenXPKI::Server::Workflow::Validator::Regex
+      class: OpenXPKI::Server::Workflow::Validator::Connector
       param:
           path: metadata.systemid
           error: SystemId is invalid
