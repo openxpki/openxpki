@@ -4456,33 +4456,5 @@ msgstr "CRL data not properly formated"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_WAKEUP_AT_LABEL"
 msgstr "Wake Up"
 
-# Remove?
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "Yes"
-
-#~ msgid "I18N_OPENXPKI_UI_DICE_UPDATE_DOMAINLIST"
-#~ msgstr "Update Domainlist"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_LABEL"
-#~ msgstr "Secret groups"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_OVERRIDE_POLICY_LABEL"
-#~ msgstr "Override Policy"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_SUCCESS_DESC"
-#~ msgstr "This workflow has finished with success and can not be restarted"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
-#~ msgstr "This workflow failed finally and can not be restarted"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_DESC"
-#~ msgstr "The new password was persisted in the database"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_LABEL"
-#~ msgstr "New Password Set"

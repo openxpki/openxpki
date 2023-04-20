@@ -4695,37 +4695,3 @@ msgstr "aufwecken"
 
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "ja"
-
-#~ msgid "I18N_OPENXPKI_UI_DICE_UPDATE_DOMAINLIST"
-#~ msgstr "Aktualisiere Domainliste"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_LABEL"
-#~ msgstr "Passwortgruppen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_OVERRIDE_POLICY_LABEL"
-#~ msgstr "Policy ignorieren"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_SUCCESS_DESC"
-#~ msgstr ""
-#~ "Das von Ihnen beantragte Zertifikat wurden mit den nachfolgend "
-#~ "aufgeführten Informationen ausgestellt. Der Workflow ist hiermit "
-#~ "abgeschlossen."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
-#~ msgstr ""
-#~ "Dieser Workflow ist fehlgeschlagen und kann nicht erneut gestartet werden."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_DESC"
-#~ msgstr ""
-#~ "Das Zertifikat wurde gesperrt. Bitte beachten Sie, dass die "
-#~ "Bekanntmachung der Sperrung erst nach Ausstellung und Verteilung einer "
-#~ "neuen Sperrliste wirksam wird."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_LABEL"
-#~ msgstr "Zertifikat gesperrt"
