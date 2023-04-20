@@ -15,44 +15,6 @@ sub BUILD {
 
 }
 
-=head2 init_realm_select
-
-Renders a realm selection drop-down.
-
-B<Parameters:>
-
-=over
-
-=item * I<ArrayRef> C<$realms> - list of I<HashRefs> defining the realms:
-
-    [
-        { label => ..., value => ... },
-        { label => ..., value => ... },
-        ...
-    ]
-
-=back
-
-=cut
-sub init_realm_select {
-
-    my $self = shift;
-    my $realms = shift;
-
-    my @realms = sort { lc($a->{label}) cmp lc($b->{label}) } @{$realms};
-
-    $self->set_page(
-        label => 'I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN',
-        description => 'I18N_OPENXPKI_UI_LOGIN_REALM_SELECTION_DESC'
-    );
-    $self->main->add_form(
-        action => 'login!realm',
-    )->add_field(
-        name => 'pki_realm', label => 'I18N_OPENXPKI_UI_PKI_REALM_LABEL', type => 'select', options => \@realms,
-    );
-    return $self;
-}
-
 =head2 init_realm_cards
 
 For path based realm selection: show links to all realms incl. image and description.
