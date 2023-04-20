@@ -1693,17 +1693,18 @@ if ($cmd eq 'initdb') {
 
     if ($ret == 0) {
         foreach my $module (@{$params{module}}) {
-            my $class = "OpenXPKI::Config::Lint::". ucfirst($module);
+            my $uc_module = ucfirst($module);
+            my $class = "OpenXPKI::Config::Lint::$uc_module";
             eval "use $class;1";
             if ($EVAL_ERROR) {
-                print "Unable to load lint module $module\n";
+                print "Unable to load lint module $uc_module\n";
                 print STDERR $EVAL_ERROR;
             } else {
-                print "Lint module '$module':\n";
+                print "Lint module '$uc_module':\n";
                 my $linter = $class->new(
                     config => $c,
                     $params{realm} ? (realm => $params{realm}) : (),
-                    $module eq 'workflow' && $params{workflow} ? (workflow => $params{workflow}) : (),
+                    $uc_module eq 'Workflow' && $params{workflow} ? (workflow => $params{workflow}) : (),
                 );
                 my $err = $linter->lint;
                 if ($err) {
