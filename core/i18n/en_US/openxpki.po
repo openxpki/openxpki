@@ -895,8 +895,8 @@ msgid "I18N_OPENXPKI_UI_LOGIN_NO_DATA_PAGE"
 msgstr ""
 "Your web browser failed to present the required information to log in using "
 "the chosen login method.<br>Please select a different type of "
-"authentication. <a href=\"#/openxpki/redirect!login\">Go back to login "
-"page</a>."
+"authentication. <a href=\"#/openxpki/redirect!login\">Go back to login page</"
+"a>."
 
 msgid "I18N_OPENXPKI_UI_LOGIN_PASSWORD"
 msgstr "Password"
@@ -913,6 +913,12 @@ msgstr "Login service unavailable"
 msgid "I18N_OPENXPKI_UI_LOGIN_STACK_SELECTION_DESC"
 msgstr ""
 "Select the authentication method to use for login from the drop-down list."
+
+msgid "I18N_OPENXPKI_UI_LOGIN_STACK_SELECTION_LABEL"
+msgstr "Authentication method"
+
+msgid "I18N_OPENXPKI_UI_LOGIN_STACK_SELECTION_PLACEHOLDER"
+msgstr "Please choose:"
 
 msgid "I18N_OPENXPKI_UI_LOGIN_SUBMIT"
 msgstr "Login"
@@ -1513,6 +1519,12 @@ msgstr "Ready"
 msgid "I18N_OPENXPKI_UI_SECRET_COMPLETE_INFO"
 msgstr "Secret is complete"
 
+msgid "I18N_OPENXPKI_UI_SECRET_GROUPS_STATUS_LABEL"
+msgstr "Secret groups"
+
+msgid "I18N_OPENXPKI_UI_SECRET_GROUPS_STATUS_UNAVAILABLE"
+msgstr "Number of unavailable secret groups:"
+
 msgid "I18N_OPENXPKI_UI_SECRET_INCOMPLETE"
 msgstr "Incomplete"
 
@@ -1589,14 +1601,6 @@ msgstr "seconds"
 
 msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_STARTED"
 msgstr "started"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_LABEL"
-msgstr "Secret groups"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_UNAVAILABLE"
-msgstr "Number of unavailable secret groups:"
 
 msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_CRITICAL"
 msgstr "Your system status is critical!"
@@ -2198,13 +2202,12 @@ msgstr "Issue CRL"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_MOTD_INITIALIZE_DESCRIPTION"
 msgstr ""
-"You can set a \"Message of the Day\" that is shown as a status bar on "
-"the top of main page each time a user logs in. You can create a MOTD per "
-"user role or for all users. If a general and a role specific message is "
-"defined, only the one for the role is shown. If you specify a link url, a "
-"new browser window opens with the given url when the user clicks on the "
-"message box. To delete an existing MOTD, submit this form with the message "
-"field left empty"
+"You can set a \"Message of the Day\" that is shown as a status bar on the "
+"top of main page each time a user logs in. You can create a MOTD per user "
+"role or for all users. If a general and a role specific message is defined, "
+"only the one for the role is shown. If you specify a link url, a new browser "
+"window opens with the given url when the user clicks on the message box. To "
+"delete an existing MOTD, submit this form with the message field left empty"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_MOTD_INITIALIZE_LABEL"
 msgstr "Set Information"
@@ -2892,6 +2895,16 @@ msgstr "Owner (Group)"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_LABEL"
 msgstr "Requester/Owner"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SUPPORT_CONTACT_DESC"
+msgstr ""
+"Email address of the certificate owner. This is used for e.g. sending the "
+"expiry notifications."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SUPPORT_CONTACT_LABEL"
+msgstr "Owner (Email)"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SYSTEM_ID_DESC"
 msgstr "System Identifier"
@@ -4449,6 +4462,10 @@ msgstr "Yes"
 
 #~ msgid "I18N_OPENXPKI_UI_DICE_UPDATE_DOMAINLIST"
 #~ msgstr "Update Domainlist"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_LABEL"
+#~ msgstr "Secret groups"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_OVERRIDE_POLICY_LABEL"

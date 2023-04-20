@@ -68,7 +68,11 @@ sub init_auth_stack {
         action => 'login!stack',
         submit_label => 'I18N_OPENXPKI_UI_LOGIN_SUBMIT',
     )->add_field(
-        'name' => 'auth_stack', 'label' => 'Handler', 'type' => 'select', 'options' => \@stacks,
+        name => 'auth_stack',
+        label => 'I18N_OPENXPKI_UI_LOGIN_STACK_SELECTION_LABEL',
+        type => 'select',
+        options => \@stacks,
+        placeholder => 'I18N_OPENXPKI_UI_LOGIN_STACK_SELECTION_PLACEHOLDER',
     );
 
     my @stackdesc = map {

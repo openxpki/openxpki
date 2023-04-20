@@ -1151,6 +1151,18 @@ msgstr ""
 "favore il team di supporto!"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_STACK_SELECTION_LABEL"
+msgstr ""
+"Questo Workflow è stato interrotto da un evento imprevisto, contatta per "
+"favore il team di supporto!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_STACK_SELECTION_PLACEHOLDER"
+msgstr ""
+"Questo Workflow è stato interrotto da un evento imprevisto, contatta per "
+"favore il team di supporto!"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_LOGIN_SUBMIT"
 msgstr "Impossibile effettuare il Login con le credenziali fornite!"
 
@@ -1875,6 +1887,14 @@ msgstr "Completo"
 msgid "I18N_OPENXPKI_UI_SECRET_COMPLETE_INFO"
 msgstr "Completo"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_GROUPS_STATUS_LABEL"
+msgstr "Relazioni"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_GROUPS_STATUS_UNAVAILABLE"
+msgstr "Nome utente"
+
 msgid "I18N_OPENXPKI_UI_SECRET_INCOMPLETE"
 msgstr "Incompleto"
 
@@ -1973,14 +1993,6 @@ msgstr "Questa Richiesta di Revoca è in attesa di approvazione."
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_STARTED"
 msgstr "Emesso"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_LABEL"
-msgstr "Relazioni"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_UNAVAILABLE"
-msgstr "Nome utente"
 
 # Remove?
 #, fuzzy
@@ -3524,6 +3536,14 @@ msgstr "Richiedente/Proprietario"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_LABEL"
 msgstr "Richiedente/Proprietario"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SUPPORT_CONTACT_DESC"
+msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SUPPORT_CONTACT_LABEL"
+msgstr "Commento"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SYSTEM_ID_DESC"
 msgstr "Identificatore di Sistema"
@@ -5523,6 +5543,10 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_SECRET_GROUP_DOES_NOT_EXIST"
 #~ msgstr "Numero di serie del certificato"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_LABEL"
+#~ msgstr "Relazioni"
 
 # Remove?
 #, fuzzy

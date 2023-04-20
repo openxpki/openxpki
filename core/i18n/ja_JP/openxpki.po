@@ -982,6 +982,14 @@ msgstr "ユーザ名"
 msgid "I18N_OPENXPKI_UI_LOGIN_STACK_SELECTION_DESC"
 msgstr "予期しない中断"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_STACK_SELECTION_LABEL"
+msgstr "予期しない中断"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_STACK_SELECTION_PLACEHOLDER"
+msgstr "予期しない中断"
+
 msgid "I18N_OPENXPKI_UI_LOGIN_SUBMIT"
 msgstr "送信"
 
@@ -1658,6 +1666,14 @@ msgstr "準備完了"
 msgid "I18N_OPENXPKI_UI_SECRET_COMPLETE_INFO"
 msgstr "秘密鍵完了"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_GROUPS_STATUS_LABEL"
+msgstr "パスフレーズ"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_GROUPS_STATUS_UNAVAILABLE"
+msgstr "ユーザ名"
+
 msgid "I18N_OPENXPKI_UI_SECRET_INCOMPLETE"
 msgstr "未完了"
 
@@ -1747,14 +1763,6 @@ msgstr "許可者の承認待ちです。"
 msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_STARTED"
 msgstr "発行済み"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_LABEL"
-msgstr "秘密鍵の管理"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_UNAVAILABLE"
-msgstr "ユーザ名"
-
 # Remove?
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_CRITICAL"
@@ -1775,9 +1783,9 @@ msgstr "待機中です"
 msgid "I18N_OPENXPKI_UI_SUPPORT_TRAILER"
 msgstr ""
 "OpenXPKIをご利用いただきありがとうございます。<br>サポートと発表については、"
-"<a href=\"https://lists.sourceforge.net/lists/listinfo/openxpki-users\">"
-"メーリングリスト</a>を購読してください。 <br>セットアップまたは商用サポートに"
-"ついてサポートが必要な場合は下記まで連絡ください。<br><a href=\"mailto: "
+"<a href=\"https://lists.sourceforge.net/lists/listinfo/openxpki-users\">メー"
+"リングリスト</a>を購読してください。 <br>セットアップまたは商用サポートについ"
+"てサポートが必要な場合は下記まで連絡ください。<br><a href=\"mailto: "
 "openxpki@whiterabbitsecurity.com \">openxpki@whiterabbitsecurity.com</a>"
 
 msgid "I18N_OPENXPKI_UI_SYSTEM_VERSION_STATUS_LABEL"
@@ -3180,6 +3188,14 @@ msgstr "ARSグループ"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_LABEL"
 msgstr "依頼者/所有者"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SUPPORT_CONTACT_DESC"
+msgstr "サーバエンドポイント"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SUPPORT_CONTACT_LABEL"
+msgstr "サーバエンドポイント"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SYSTEM_ID_DESC"
 msgstr "システム識別子"
@@ -4971,6 +4987,10 @@ msgstr "はい"
 #~ "すると、部分一致の検索を行います。特定の別名タイプを指定する場合、コロンを"
 #~ "付けたプレフィックスを指定します。例えば 'IP:10.*' は、サブネット 10.x の"
 #~ "IPアドレスである別名アイテムを検索します。"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_LABEL"
+#~ msgstr "秘密鍵の管理"
 
 #~ msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_HISTORY"
 #~ msgstr "ワークフロー履歴にアクセスするために必要な権利がありません。"

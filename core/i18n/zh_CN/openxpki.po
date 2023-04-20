@@ -950,6 +950,16 @@ msgid "I18N_OPENXPKI_UI_LOGIN_STACK_SELECTION_DESC"
 msgstr ""
 "此工作流程被意外事件中断，如果没有手动交互，它将无法继续。 请联系支持团队！"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_STACK_SELECTION_LABEL"
+msgstr ""
+"此工作流程被意外事件中断，如果没有手动交互，它将无法继续。 请联系支持团队！"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_STACK_SELECTION_PLACEHOLDER"
+msgstr ""
+"此工作流程被意外事件中断，如果没有手动交互，它将无法继续。 请联系支持团队！"
+
 msgid "I18N_OPENXPKI_UI_LOGIN_SUBMIT"
 msgstr "发送"
 
@@ -1617,6 +1627,14 @@ msgstr "准备"
 msgid "I18N_OPENXPKI_UI_SECRET_COMPLETE_INFO"
 msgstr "秘密完成"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_GROUPS_STATUS_LABEL"
+msgstr "密码短语"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_GROUPS_STATUS_UNAVAILABLE"
+msgstr "用户名"
+
 msgid "I18N_OPENXPKI_UI_SECRET_INCOMPLETE"
 msgstr "不完整"
 
@@ -1704,14 +1722,6 @@ msgstr "该工作流当前由服务器处理，请稍后返回以检查其状态
 msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_STARTED"
 msgstr "已签署"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_LABEL"
-msgstr "管理秘密"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_UNAVAILABLE"
-msgstr "用户名"
-
 # Remove?
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_CRITICAL"
@@ -1732,8 +1742,8 @@ msgstr "等待中"
 msgid "I18N_OPENXPKI_UI_SUPPORT_TRAILER"
 msgstr ""
 "感谢您使用OpenXPKI-有关支持和公告，请订阅我们的 <a href=\"https://lists."
-"sourceforge.net/lists/listinfo/openxpki-users\">邮件列表</a>。<br> 如果 如"
-"果您需要设置或商业支持方面的帮助，请联系 <a href=\"mailto:"
+"sourceforge.net/lists/listinfo/openxpki-users\">邮件列表</a>。<br> 如果 如果"
+"您需要设置或商业支持方面的帮助，请联系 <a href=\"mailto:"
 "openxpki@whiterabbitsecurity.com\">openxpki@whiterabbitsecurity.com.</a>"
 
 msgid "I18N_OPENXPKI_UI_SYSTEM_VERSION_STATUS_LABEL"
@@ -3071,6 +3081,14 @@ msgstr "Requestor/Owner"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_LABEL"
 msgstr "请求者/所有者"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SUPPORT_CONTACT_DESC"
+msgstr " The server endpoint used for the request."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SUPPORT_CONTACT_LABEL"
+msgstr "Endpoint / Server"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SYSTEM_ID_DESC"
 msgstr "系统标识符"
@@ -4747,6 +4765,10 @@ msgstr "是"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_SECRET_GROUP_DOES_NOT_EXIST"
 #~ msgstr "证书不存在"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_LABEL"
+#~ msgstr "管理秘密"
 
 #~ msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_HISTORY"
 #~ msgstr ""

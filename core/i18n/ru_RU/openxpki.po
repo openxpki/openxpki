@@ -1197,6 +1197,14 @@ msgid "I18N_OPENXPKI_UI_LOGIN_STACK_SELECTION_DESC"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_STACK_SELECTION_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_STACK_SELECTION_PLACEHOLDER"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_LOGIN_SUBMIT"
 msgstr "Процесс закончился с ошибкой"
 
@@ -2076,6 +2084,14 @@ msgid "I18N_OPENXPKI_UI_SECRET_COMPLETE_INFO"
 msgstr "Завершено"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_GROUPS_STATUS_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_GROUPS_STATUS_UNAVAILABLE"
+msgstr "Профиль пользователя"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_SECRET_INCOMPLETE"
 msgstr "Не завершено"
 
@@ -2176,14 +2192,6 @@ msgstr "Технологические процессы"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_STARTED"
 msgstr "В состоянии ожидания запуска"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_LABEL"
-msgstr "Родительский технологический процесс"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_UNAVAILABLE"
-msgstr "Профиль пользователя"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_CRITICAL"
@@ -3839,6 +3847,14 @@ msgstr "Адрес электронной почты"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_LABEL"
 msgstr "Адрес электронной почты"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SUPPORT_CONTACT_DESC"
+msgstr "Это поле можно использовать для комментариев."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SUPPORT_CONTACT_LABEL"
+msgstr "Родительский технологический процесс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SYSTEM_ID_DESC"
@@ -10302,6 +10318,10 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_SECRET_GROUP_DOES_NOT_EXIST"
 #~ msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_LABEL"
+#~ msgstr "Родительский технологический процесс"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_SUBJECT_MATCH_DONT_MATCH"

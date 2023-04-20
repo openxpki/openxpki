@@ -751,8 +751,8 @@ msgstr "Erfolgreich abgemeldet"
 
 msgid "I18N_OPENXPKI_UI_HOME_LOGOUT_PAGE"
 msgstr ""
-"Sie wurden abgemeldet. <a href=\"#/openxpki/login\">Zurück zur "
-"Anmeldeseite</a>."
+"Sie wurden abgemeldet. <a href=\"#/openxpki/login\">Zurück zur Anmeldeseite</"
+"a>."
 
 msgid "I18N_OPENXPKI_UI_HOME_WELCOME_HEAD"
 msgstr "Willkommen bei ihrem OpenXPKI Trustcenter"
@@ -908,6 +908,12 @@ msgstr "Anmeldeserver nicht verfügbar"
 
 msgid "I18N_OPENXPKI_UI_LOGIN_STACK_SELECTION_DESC"
 msgstr "Bitte wählen Sie das gewünschte Verfahren für die Anmeldung"
+
+msgid "I18N_OPENXPKI_UI_LOGIN_STACK_SELECTION_LABEL"
+msgstr "Anmeldeverfahren"
+
+msgid "I18N_OPENXPKI_UI_LOGIN_STACK_SELECTION_PLACEHOLDER"
+msgstr "Bitte wählen:"
 
 msgid "I18N_OPENXPKI_UI_LOGIN_SUBMIT"
 msgstr "Absenden"
@@ -1520,6 +1526,12 @@ msgstr "entsperrt"
 msgid "I18N_OPENXPKI_UI_SECRET_COMPLETE_INFO"
 msgstr "Passwort vollständig"
 
+msgid "I18N_OPENXPKI_UI_SECRET_GROUPS_STATUS_LABEL"
+msgstr "Passwortgruppen"
+
+msgid "I18N_OPENXPKI_UI_SECRET_GROUPS_STATUS_UNAVAILABLE"
+msgstr "Anzahl nicht verfügbarer Passwortgruppen:"
+
 msgid "I18N_OPENXPKI_UI_SECRET_INCOMPLETE"
 msgstr "unvollständig"
 
@@ -1596,14 +1608,6 @@ msgstr "Sekunden"
 
 msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_STARTED"
 msgstr "Start"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_LABEL"
-msgstr "Passwortgruppen"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_UNAVAILABLE"
-msgstr "Anzahl an nicht verfügbaren Passwortgruppen:"
 
 msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_CRITICAL"
 msgstr "Der Systemstatus ist kritisch!"
@@ -2279,8 +2283,8 @@ msgstr "Sperrliste ausstellen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_MOTD_INITIALIZE_DESCRIPTION"
 msgstr ""
-"Hier können Sie eine \"Nachricht des Tages\" konfigurieren. Diese wird "
-"im Kopf der Hauptseite angezeigt, sobald sich ein Benutzer anmeldet. Diese "
+"Hier können Sie eine \"Nachricht des Tages\" konfigurieren. Diese wird im "
+"Kopf der Hauptseite angezeigt, sobald sich ein Benutzer anmeldet. Diese "
 "Nachricht kann für bestimmte Rollen oder für alle Benutzer angezeigt werden. "
 "Ist eine allgemeine und eine rollenspezifische Nachricht konfiguriert, wird "
 "ausschließlich die rollenspezifische Nachricht angezeigt. Wenn Sie eine URL "
@@ -3032,6 +3036,16 @@ msgstr "Eigentümer (Gruppe)"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_LABEL"
 msgstr "Antragsteller/Verantwortlicher"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SUPPORT_CONTACT_DESC"
+msgstr ""
+"E-Mail-Adresse des Eigentümers - wird verwendet, um u.a. die "
+"Ablaufbenachrichtigung zu versenden."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SUPPORT_CONTACT_LABEL"
+msgstr "Eigentümer (E-Mail)"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SYSTEM_ID_DESC"
 msgstr "System Identifier"
@@ -4684,6 +4698,10 @@ msgstr "ja"
 
 #~ msgid "I18N_OPENXPKI_UI_DICE_UPDATE_DOMAINLIST"
 #~ msgstr "Aktualisiere Domainliste"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_STATUS_SECRET_GROUPS_LABEL"
+#~ msgstr "Passwortgruppen"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_OVERRIDE_POLICY_LABEL"
