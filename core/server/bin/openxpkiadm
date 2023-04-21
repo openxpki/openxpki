@@ -31,7 +31,9 @@ use OpenXPKI::i18n;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Config::Backend;
 use OpenXPKI::Client::Simple;
-use Log::Log4perl qw (:easy);
+use Log::Log4perl;
+use Log::Log4perl::Appender;
+use Log::Log4perl::Layout::PatternLayout;
 
 use OpenXPKI::VERSION;
 
@@ -1333,10 +1335,24 @@ sub __init {
 
     GetOptions( \%params, @options_spec ) or pod2usage( -verbose => 0 );
 
-    Log::Log4perl->easy_init( {
-        level    => defined $params{debug} ? $DEBUG : ( $params{verbose} ? $INFO : $WARN ),
-        layout   => '[%p] %m%n'
-    });
+    # Log4perl
+    my $app = Log::Log4perl::Appender->new(
+        "Log::Log4perl::Appender::ScreenColoredLevels",
+        utf8 => 1,
+        color => {
+            TRACE => 'white',
+            DEBUG => '',
+            INFO  => 'green',
+            WARN  => 'yellow',
+            ERROR => 'red',
+            FATAL => 'bright_red',
+        },
+    );
+    my $layout = Log::Log4perl::Layout::PatternLayout->new('[%p] %m%n');
+    $app->layout($layout);
+    my $log = Log::Log4perl->get_logger('');
+    $log->level(defined $params{debug} ? 'DEBUG' : ( $params{verbose} ? 'INFO' : 'WARN' ));
+    $log->add_appender($app);
 
     if ($params{config}) {
         # we set the ENV here to outrule an external ENV setting and to have
