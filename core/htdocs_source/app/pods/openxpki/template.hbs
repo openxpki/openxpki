@@ -19,7 +19,7 @@
                 {{!-- sub menu --}}
                 {{#if navEntry.entries.length}}
                     <nav.dropdown class="mx-2" as |dd|>
-                        <dd.toggle>
+                        <dd.toggle class="{{if navEntry.active "active"}}">
                             {{navEntry.label}}
                             <span class="caret"></span>
                         </dd.toggle>
@@ -30,7 +30,7 @@
                                         {{! We need the href in addition to the click handler to support
                                             opening the page in a new window }}
                                         <a
-                                            class="dropdown-item"
+                                            class="dropdown-item {{if entry.active "active"}}"
                                             href="{{url-for "openxpki" entry.key}}"
                                             {{on "click" (fn this.navigateTo entry.key navbar.collapse)}}
                                         >
@@ -51,7 +51,7 @@
                 {{else}}
                     <nav.item class="mx-2">
                         <a
-                            class="nav-link"
+                            class="nav-link {{if navEntry.active "active"}}"
                             href="{{url-for "openxpki" navEntry.key}}"
                             {{on "click" (fn this.navigateTo navEntry.key navbar.collapse)}}
                         >
