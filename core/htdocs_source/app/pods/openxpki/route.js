@@ -33,7 +33,7 @@ export default class OpenXpkiRoute extends Route {
     serverExceptions = [];
 
     // Reserved Ember function
-    beforeModel(transition) {
+    async beforeModel(transition) {
         let modelId = transition.to.params.model_id;
         debug("openxpki/route - beforeModel: model_id = " + modelId);
 
@@ -51,8 +51,9 @@ export default class OpenXpkiRoute extends Route {
         if (flatList.find(i => i.key == modelId) || this.topTarget.indexOf(modelId) >= 0) {
             request.target = "top";
         }
-        return this.config.ready // localconfig.js might change rootURL, so first thing is to query it
-            .then( () => this.content.updateRequest(request) );
+
+        await this.config.ready; // localconfig.js might change rootURL, so first thing is to query it
+        return this.content.updateRequest(request);
     }
 
     // Reserved Ember function
