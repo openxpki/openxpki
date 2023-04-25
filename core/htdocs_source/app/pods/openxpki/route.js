@@ -33,32 +33,29 @@ export default class OpenXpkiRoute extends Route {
     serverExceptions = [];
 
     // Reserved Ember function
-    async beforeModel(transition) {
-        let modelId = transition.to.params.model_id;
-        debug("openxpki/route - beforeModel: model_id = " + modelId);
+    async model(params, transition) {
+        await this.config.ready; // localconfig.js might change rootURL, so first thing is to query it
+
+        let page = params.page;
+        debug("openxpki/route - model: page = " + page);
 
         /*
          * load requested page part
          */
         let request = {
-            page: modelId
+            page
         };
         if (transition.to.queryParams.limit) { request.limit = transition.to.queryParams.limit }
         if (transition.to.queryParams.startat) { request.startat = transition.to.queryParams.startat }
 
-        // load as top content if 'modelId' is part of navigation or in 'topTarget' list
+        // load as top content if 'page' is part of navigation or in 'topTarget' list
         let flatList = this.content.navEntries.reduce((p, n) => p.concat(n, n.entries || []), []);
-        if (flatList.find(i => i.key == modelId) || this.topTarget.indexOf(modelId) >= 0) {
+        if (flatList.find(i => i.key == page) || this.topTarget.indexOf(page) >= 0) {
             request.target = "top";
         }
 
-        await this.config.ready; // localconfig.js might change rootURL, so first thing is to query it
-        return this.content.updateRequest(request);
-    }
-
-    // Reserved Ember function
-    model(params/*, transition*/) {
-        this.content.setPage(params.model_id);
+        await this.content.updateRequest(request);
+        this.content.setPage(page);
         return this.content;
     }
 }
