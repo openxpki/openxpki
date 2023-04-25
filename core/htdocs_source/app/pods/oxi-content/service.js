@@ -103,8 +103,7 @@ export default class OxiContentService extends Service {
             // Redirect
             if (doc.goto) {
                 debug("updateRequest(): response - \"goto\" " + doc.goto)
-                this.#redirect(doc.goto, doc.type, doc.loading_banner)
-                return doc
+                return this.#redirect(doc.goto, doc.type, doc.loading_banner)
             }
 
             // Set page contents
@@ -290,7 +289,7 @@ export default class OxiContentService extends Service {
             window.location.href = url
         }
         else {
-            this.router.transitionTo("openxpki", url)
+            return this.router.transitionTo("openxpki", url)
         }
     }
 
