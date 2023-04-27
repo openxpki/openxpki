@@ -73,7 +73,7 @@
     </navbar.content>
 </BsNavbar>
 
-<div class="container-fluid {{this.model.tabs.firstObject.page.className}}">
+<div class="container-fluid {{this.model.page.page.className}}">
     {{!
       *************************************
       Old browser warning
@@ -89,10 +89,10 @@
 
     {{!
       *************************************
-      Show (error) message if no tab exists yet
+      Show (error) message if no page exists yet
       *************************************
     }}
-    {{#unless this.model.tabs}}
+    {{#unless this.model.page.main}}
         <div class="row">
             <div class="col oxi-message">
                 {{#let (echo this.getStatusClass this.model.status.level) as |cssClass|}}
@@ -118,37 +118,12 @@
         <div class="col">
             {{!
               *************************************
-              Tab bar
-              *************************************
-            }}
-            {{#if this.showTabs}}
-                <ul class="nav nav-tabs mb-3">
-                    {{#each this.model.tabs as |entry|}}
-                        <li class="nav-item">
-                            <div class="nav-link {{if entry.active "active bg-primary bg-opacity-10"}}">
-                                <div class="btn-group" role="group">
-                                    <button class="btn" type="button" {{on "click" (fn this.activateTab entry)}}>
-                                        {{if entry.page.shortlabel entry.page.shortlabel entry.page.label}}
-                                    </button>
-                                    {{#if entry.active}}
-                                        <button class="btn" type="button" {{on "click" (fn this.closeTab entry)}}>
-                                            <i class="glyphicon glyphicon-remove"></i>
-                                        </button>
-                                    {{/if}}
-                                </div>
-                            </div>
-                        </li>
-                    {{/each}}
-                </ul>
-            {{/if}}
-            {{!
-              *************************************
               Tab content
               *************************************
             }}
-            <div class="tab-content pb-3">
-                {{#each this.model.tabs as |entry|}}
-                    <div class="tab-pane {{if entry.active "active"}}">
+            <div>
+                {{#let this.model.page as |entry|}}
+                    <div>
                         {{!
                           *************************************
                           Tab-specific messages
@@ -254,7 +229,7 @@
                             </div>
                         {{/let}}
                     </div>
-                {{/each}}
+                {{/let}}
             </div>
         </div>
     </div>

@@ -6,6 +6,7 @@ import { isArray } from '@ember/array'
 import { set as emSet } from '@ember/object'
 import { debug } from '@ember/debug'
 import fetch from 'fetch'
+import Page from 'openxpki/data/page'
 
 /**
  * Stores the current page contents and state and provides methods to send
@@ -21,16 +22,17 @@ export default class OxiContentService extends Service {
     @service('oxi-backend') backend
 
     @tracked user = null
-    @tracked page = null
+    @tracked navEntries = []
     @tracked ping = null
     @tracked refresh = null
     @tracked structure = null
     #rtoken = null
     @tracked tenant = null
     @tracked status = null
+
+    @tracked page = null
     @tracked popup = null
-    @tracked tabs = []
-    @tracked navEntries = []
+
     @tracked error = null
     @tracked loadingBanner = null
     last_session_id = null // to track server-side logouts with session id changes
@@ -45,6 +47,13 @@ export default class OxiContentService extends Service {
         ]
     */
     serverExceptions = [] // custom HTTP response code error handling
+
+
+    TARGET = Object.freeze({
+        TOP: Symbol("TOP"),
+        POPUP: Symbol("POPUP"),
+        BLANK: Symbol("BLANK"),
+    })
 
     get tenantCssClass() {
         if (!this.tenant) return ''
@@ -86,7 +95,15 @@ export default class OxiContentService extends Service {
             this.refresh = null
         }
 
-        let realTarget = this.#resolveTarget(request.target) // has to be done before "this.popup = null"
+        // resolve target
+        let realTarget = request.target || 'self'
+        if (realTarget === 'self') {
+            // pseudo-target "self" leads to content being shown in the currently active place
+            realTarget = this.popup ? this.TARGET.POPUP : this.TARGET.TOP
+        }
+        if (realTarget === 'top') realTarget = this.TARGET.TOP;
+        if (realTarget === 'popup') realTarget = this.TARGET.POPUP;
+        if (realTarget === 'modal') realTarget = this.TARGET.POPUP; // FIXME remove support for legacy target 'modal'
 
         try {
             let doc = await this.#request(request, isQuiet)
@@ -102,32 +119,32 @@ export default class OxiContentService extends Service {
 
             // Successful request
             this.status = doc.status
-            this.popup = null
 
-            // Auto refresh
-            if (doc.refresh) {
-                debug("updateRequest(): response - \"refresh\" " + doc.refresh.href + ", " + doc.refresh.timeout)
-                this.#autoRefreshOnce(doc.refresh.href, doc.refresh.timeout)
+            // Popup
+            if (realTarget === this.TARGET.POPUP) {
+                if (doc.refresh || doc.goto) console.warn("'refresh'/'goto' not supported for popup contents")
             }
+            // Page
+            else {
+                this.popup = null
 
-            // Redirect
-            if (doc.goto) {
-                debug("updateRequest(): response - \"goto\" " + doc.goto)
-                return this.#redirect(doc.goto, doc.type, doc.loading_banner)
+                // Auto refresh
+                if (doc.refresh) {
+                    debug("updateRequest(): response - \"refresh\" " + doc.refresh.href + ", " + doc.refresh.timeout)
+                    this.#autoRefreshOnce(doc.refresh.href, doc.refresh.timeout)
+                }
+
+                // Redirect
+                if (doc.goto) {
+                    debug("updateRequest(): response - \"goto\" " + doc.goto)
+                    return this.#redirect(doc.goto, doc.type, doc.loading_banner)
+                }
             }
 
             // Set page contents
-            if (doc.page || doc.main || doc.right) {
-                debug("updateRequest(): response - \"page\" and \"main\"")
-                this.#setPageContent(realTarget, doc.page, doc.main, doc.right, doc.status)
-            }
-            // or (e.g. on error) set error code for current tab
-            else {
-                if (doc.status && this.tabs.length > 0) {
-                    let currentTab = this.tabs.find(i => i.active == true)
-                    emSet(currentTab, 'status', doc.status)
-                }
-            }
+            this.#setPageContent(realTarget, request.page, doc.page, doc.main, doc.right, doc.status)
+
+            if (realTarget === this.TARGET.TOP) this.#refreshNavEntries();
 
             this.#setLoadingBanner(null)
             return doc // the calling code might handle other data
@@ -234,26 +251,8 @@ export default class OxiContentService extends Service {
         }
     }
 
-    setPage(page) {
-        this.page = page
-        this.#refreshNavEntries()
-    }
-
     setTenant(tenant) {
         this.tenant = tenant
-    }
-
-    #resolveTarget(requestTarget) {
-        let target = requestTarget || 'self'
-        // Pseudo-target "self" is transformed so new content will be shown in the
-        // currently active place: a modal popup, an active tab or on top (i.e. single hidden tab)
-        if (target === 'self') {
-            if (this.popup) { target = 'popup' }
-            else if (this.tabs.length > 1) { target = 'active' }
-            else { target = 'top' }
-        }
-        if (target === 'modal') target = 'popup'; // FIXME remove support for legacy target 'modal'
-        return target
     }
 
     // Sets the loading state, i.e. dims the page and shows a banner with the
@@ -340,54 +339,40 @@ export default class OxiContentService extends Service {
         this.error = this.intl.t('error_popup.message.server', { code: status_code })
     }
 
-    #setPageContent(target, page, main, right, status) {
-        let newTab = {
-            active: true,
-            page,
-            main,
-            right,
-            status,
-        }
-
+    #setPageContent(target, url, page, main, right, status) {
         // Mark the first form on screen: only the first one is allowed to focus
         // its first input field.
-        let isFirst = true
-        for (const section of [...(newTab.main||[]), ...(newTab.right||[])]) {
+        for (const section of [...(main||[]), ...(right||[])]) {
             if (section.type === "form") {
-                section.content.isFirstForm = isFirst
-                if (isFirst) isFirst = false
+                section.content.isFirstForm = true
+                break
             }
         }
 
-        // Popup
-        if (target === "popup") {
-            this.popup = newTab
+        let obj
+        if (target === this.TARGET.POPUP) {
+            if (!this.popup) this.popup = new Page()
+            obj = this.popup
         }
-        // New tab
-        else if (target === "tab") {
-            let tabs = this.tabs
-            tabs.forEach(i => emSet(i, "active", false))
-            tabs.pushObject(newTab)
-        }
-        // Current tab
-        else if (target === "active") {
-            let tabs = this.tabs
-            let index = tabs.indexOf(tabs.find(i => i.active == true)) // findBy() is an EmberArray method
-            tabs.replace(index, 1, [newTab]) // top
-        }
-        // Set as only tab
         else {
-            this.tabs = [newTab]
+            if (!this.page) this.page = new Page()
+            obj = this.page
         }
+        obj.setFromHash({
+            ...(page && { page }),
+            ...(main && { main }),
+            ...(right && { right }),
+            ...(status && { status }),
+            ...(url && { url }),
+        })
     }
 
     #refreshNavEntries() {
-        let page = this.page
         for (const entry of this.navEntries) {
-            emSet(entry, "active", (entry.key === page))
+            emSet(entry, "active", (entry.key === this?.page?.url))
             if (entry.entries) {
                 entry.entries.forEach(i => emSet(i, "active", false))
-                let subEntry = entry.entries.find(i => i.key == page)
+                let subEntry = entry.entries.find(i => i.key == this?.page?.url)
                 if (subEntry) {
                     emSet(subEntry, "active", true)
                     emSet(entry, "active", true)
