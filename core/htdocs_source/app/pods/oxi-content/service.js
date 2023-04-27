@@ -25,7 +25,7 @@ export default class OxiContentService extends Service {
     @tracked ping = null
     @tracked refresh = null
     @tracked structure = null
-    @tracked rtoken = null
+    #rtoken = null
     @tracked tenant = null
     @tracked status = null
     @tracked popup = null
@@ -158,7 +158,7 @@ export default class OxiContentService extends Service {
 
         debug("#bootstrap(): response")
 
-        if (doc.rtoken) this.rtoken = doc.rtoken // CSRF token
+        if (doc.rtoken) this.#rtoken = doc.rtoken // CSRF token
         if (doc.language) this.oxiLocale.locale = doc.language
         this.user = doc.user // this also unsets the user on logout!
 
@@ -197,7 +197,7 @@ export default class OxiContentService extends Service {
         let method
         if (request.action) {
             method = 'POST'
-            data._rtoken = this.rtoken
+            data._rtoken = this.#rtoken
         }
         // GET
         else {
