@@ -7,6 +7,10 @@ export default class Router extends EmberRouter {
 }
 
 Router.map(function() {
+    /* Routes:
+     *      /                       app/pods/index/route.js
+     *      /openxpki/:page         app/pods/openxpki/route.js
+     */
     this.route("openxpki", { path: "/openxpki/:page" })
     if (config.environment === 'development') this.route("test")
 })

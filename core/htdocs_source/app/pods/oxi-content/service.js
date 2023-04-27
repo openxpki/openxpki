@@ -174,7 +174,6 @@ export default class OxiContentService extends Service {
         // keepalive ping
         if (doc.ping) {
             debug("#bootstrap(): setting ping = " + doc.ping)
-            if (this.ping) cancel(this.ping)
             this.#ping(doc.ping)
         }
 
@@ -262,6 +261,7 @@ export default class OxiContentService extends Service {
     }
 
     #ping(href, timeout) {
+        if (this.ping) cancel(this.ping)
         this.ping = later(this, () => {
             fetch(href, {
                 headers: {
