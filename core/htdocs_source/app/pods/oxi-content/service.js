@@ -1,7 +1,7 @@
 import Service from '@ember/service'
 import { service } from '@ember/service'
 import { tracked } from '@glimmer/tracking'
-import { later, cancel } from '@ember/runloop'
+import { later, next, cancel } from '@ember/runloop'
 import { isArray } from '@ember/array'
 import { set as emSet } from '@ember/object'
 import { debug } from '@ember/debug'
@@ -289,7 +289,15 @@ export default class OxiContentService extends Service {
             window.location.href = url
         }
         else {
-            return this.router.transitionTo("openxpki", url)
+            /* Workaround for "TransitionAborted..." error. The error seemingly
+             * occurs in Embers rerendering triggered by changes to @tracked
+             * properties that we do before #redirect() is called. Ember's
+             * update handlers seem to be executed asynchronously and somehow
+             * cause the TransitionAborted error.
+             * Tested for Ember 4.12.0
+             */
+            next(this, function() { this.router.transitionTo("openxpki", url) })
+            //this.router.transitionTo("openxpki", url)
         }
     }
 
