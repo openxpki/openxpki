@@ -20,18 +20,6 @@ export default class OpenXpkiRoute extends Route {
     };
     topTarget = ["login", "login!logout", "welcome"];
 
-    /*
-    Custom handlers for exceptions returned by the server (HTTP status codes):
-        [
-            {
-                status_code: [ 403, ... ], // array or string
-                redirect: "https://...",
-            },
-            { ... }
-        ]
-    */
-    serverExceptions = [];
-
     // Reserved Ember function
     async model(params, transition) {
         await this.config.ready; // localconfig.js might change rootURL, so first thing is to query it
