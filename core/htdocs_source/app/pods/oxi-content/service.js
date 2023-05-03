@@ -23,8 +23,8 @@ export default class OxiContentService extends Service {
 
     @tracked user = null
     @tracked navEntries = []
-    @tracked ping = null
-    @tracked refresh = null
+    @tracked pingTimer = null
+    @tracked refreshTimer = null
     @tracked structure = null
     #rtoken = null
     @tracked tenant = null
@@ -90,9 +90,9 @@ export default class OxiContentService extends Service {
     async updateRequest(request, isQuiet = false) {
         if (! isQuiet) this.#setLoadingBanner(this.intl.t('site.banner.loading'))
 
-        if (this.refresh) {
-            cancel(this.refresh)
-            this.refresh = null
+        if (this.refreshTimer) {
+            cancel(this.refreshTimer)
+            this.refreshTimer = null
         }
 
         // resolve target
@@ -296,8 +296,8 @@ export default class OxiContentService extends Service {
     }
 
     #ping(href, timeout) {
-        if (this.ping) cancel(this.ping)
-        this.ping = later(this, () => {
+        if (this.pingTimer) cancel(this.pingTimer)
+        this.pingTimer = later(this, () => {
             fetch(href, {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
@@ -313,7 +313,7 @@ export default class OxiContentService extends Service {
     }
 
     #autoRefreshOnce(href, timeout) {
-        this.refresh = later(this, function() {
+        this.refreshTimer = later(this, function() {
             this.updateRequest({ page: href })
         }, timeout)
     }
