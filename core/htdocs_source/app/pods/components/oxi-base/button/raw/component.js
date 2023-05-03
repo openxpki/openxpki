@@ -180,7 +180,7 @@ export default class OxiButtonRawComponent extends Component {
             }
             else if (button.page) {
                 debug(`oxi-base/button/raw: executeAction - transition to page '${button.page}`)
-                this.router.transitionTo("openxpki", button.page)
+                this.content.openPage(button.page, button.target)
                 .finally(() => button.loading = false)
             }
             else {

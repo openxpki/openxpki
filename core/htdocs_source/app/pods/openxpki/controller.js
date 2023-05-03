@@ -99,7 +99,7 @@ export default class OpenXpkiController extends Controller {
     navigateTo(page, navbarCollapseFunc, event) {
         if (event) { event.stopPropagation(); event.preventDefault() }
         if (navbarCollapseFunc) navbarCollapseFunc()
-        this.router.transitionTo('openxpki', page, { queryParams: { force: (new Date()).valueOf() } })
+        this.content.openPage(page, this.content.TARGET.TOP, true)
     }
 
     @action

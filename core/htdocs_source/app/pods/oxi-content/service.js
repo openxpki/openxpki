@@ -130,7 +130,7 @@ export default class OxiContentService extends Service {
                 // Redirect
                 if (doc.goto) {
                     debug("updateRequest(): response - \"goto\" " + doc.goto)
-                    return this.#redirect(doc.goto, doc.type, doc.loading_banner)
+                    return this.#redirect(doc.goto, realTarget, doc.type, doc.loading_banner)
                 }
             }
 
@@ -148,6 +148,16 @@ export default class OxiContentService extends Service {
             console.error('There was an error while processing the data', error)
             this.error = this.intl.t('error_popup.message.client', { reason: error })
             return null
+        }
+    }
+
+    openPage(page, target, force) {
+        debug(`openPage(page = ${page}, force = ${force})`)
+        if (force) {
+            return this.router.transitionTo('openxpki', page, { queryParams: { force: (new Date()).valueOf() } })
+        }
+        else {
+            return this.router.transitionTo('openxpki', page)
         }
     }
 
@@ -318,7 +328,7 @@ export default class OxiContentService extends Service {
         }, timeout)
     }
 
-    #redirect(url, type = 'internal', banner = this.intl.t('site.banner.redirecting')) {
+    #redirect(url, target = this.TARGET.TOP, type = 'internal', banner = this.intl.t('site.banner.redirecting')) {
         if (type == 'external' || /^(http|\/)/.test(url)) {
             this.#setLoadingBanner(banner); // never hide banner as browser will open a new page
             window.location.href = url
@@ -331,8 +341,8 @@ export default class OxiContentService extends Service {
              * cause the TransitionAborted error.
              * Tested for Ember 4.12.0
              */
-            next(this, function() { this.router.transitionTo("openxpki", url) })
-            //this.router.transitionTo("openxpki", url)
+            next(this, function() { this.openPage(url, target) })
+            //this.openPage(url)
         }
     }
 
