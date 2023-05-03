@@ -96,14 +96,7 @@ export default class OxiContentService extends Service {
         }
 
         // resolve target
-        let realTarget = request.target || 'self'
-        if (realTarget === 'self') {
-            // pseudo-target "self" leads to content being shown in the currently active place
-            realTarget = this.popup ? this.TARGET.POPUP : this.TARGET.TOP
-        }
-        if (realTarget === 'top') realTarget = this.TARGET.TOP;
-        if (realTarget === 'popup') realTarget = this.TARGET.POPUP;
-        if (realTarget === 'modal') realTarget = this.TARGET.POPUP; // FIXME remove support for legacy target 'modal'
+        let realTarget = this.#resolveTarget(request.target)
 
         try {
             let doc = await this.#request(request, isQuiet)
@@ -156,6 +149,39 @@ export default class OxiContentService extends Service {
             this.error = this.intl.t('error_popup.message.client', { reason: error })
             return null
         }
+    }
+
+    openLink(href, target) {
+        debug(`openLink(${href}, ${target})`)
+
+        // close popup
+        this.popup = null
+
+        // resolve link target
+        let realTarget = this.#resolveTarget(target, true)
+        if (realTarget == this.TARGET.POPUP) {
+            /* eslint-disable-next-line no-console */
+            console.warn('Attempt to open a href link in a popup. It will be opened with target = "_self" instead.')
+            realTarget = this.TARGET.TOP
+        }
+
+        // open link
+        window.open(href, realTarget == this.TARGET.TOP ? '_self' : realTarget)
+    }
+
+    #resolveTarget(target, isLink) {
+        let realTarget = target || 'self'
+
+        if (realTarget === 'self') {
+            // Pseudo-target "self" leads to content being shown in the currently active place.
+            // Except for links: they are always opened as "top", i.e. they replace the current URL
+            realTarget = (this.popup && !isLink) ? this.TARGET.POPUP : this.TARGET.TOP
+        }
+        if (realTarget === 'top') realTarget = this.TARGET.TOP;
+        if (realTarget === 'popup') realTarget = this.TARGET.POPUP;
+        if (realTarget === 'modal') realTarget = this.TARGET.POPUP; // FIXME remove support for legacy target 'modal'
+
+        return realTarget
     }
 
     #isBootstrapNeeded(session_id) {

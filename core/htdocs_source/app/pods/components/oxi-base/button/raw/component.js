@@ -87,9 +87,6 @@ export default class OxiButtonRawComponent extends Component {
 
     @tracked showConfirmDialog = false
 
-    skipClickHandler = false
-    clickTarget = null
-
     get isLink() {
         return this.args.button.href ? true : false
     }
@@ -146,14 +143,6 @@ export default class OxiButtonRawComponent extends Component {
     click(event) {
         debug("oxi-base/button/raw: click")
 
-        if (this.skipClickHandler) {
-            this.skipClickHandler = false
-            return
-        }
-
-        // only links: save <a> element to create new click event in executeAction() later on
-        this.clickTarget = event?.target // undefined for <button>
-
         if (this.args.button.confirm) {
             emSet(this.args.button, "loading", true)
             this.showConfirmDialog = true
@@ -162,7 +151,7 @@ export default class OxiButtonRawComponent extends Component {
         }
 
         // cancel click event - only effective if we are called via <a onclick="...">
-        return false
+        event?.preventDefault()
     }
 
     @action
@@ -170,9 +159,7 @@ export default class OxiButtonRawComponent extends Component {
         this.resetConfirmState()
         // link mode
         if (this.isLink) {
-            // this will result in a (second) call to click()
-            this.skipClickHandler = true
-            this.clickTarget.dispatchEvent(new MouseEvent("click", { view: window, bubbles: true, cancelable: false }))
+            this.content.openLink(this.args.button.href, this.args.button.target)
         }
         // button mode
         else {
