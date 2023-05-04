@@ -600,7 +600,7 @@ sub __render_from_workflow {
                                 path => $field->{action},
                                 label => '',
                                 icon => 'view',
-                                target => ($field->{target} ? $field->{target} : 'tab'),
+                                target => ($field->{target} ? $field->{target} : 'top'),
                             }] : undef),
                             columns =>  $field->{header},
                             data => $field->{value},
@@ -1638,7 +1638,7 @@ sub __render_output_field {
             $item->{header} = [ @head = map { { 'sTitle' => '' } } @{$item->{value}->[0]} ];
         }
         $item->{action} = $field->{action};
-        $item->{target} = $field->{target} ?  $field->{target} : 'tab';
+        $item->{target} = $field->{target} ? $field->{target} : 'top';
 
     } elsif ($item->{format} eq "chart") {
 
