@@ -88,6 +88,7 @@ export default class OxiContentService extends Service {
      * @return {Promise} Promise receiving the JSON document on success or `{}` on error
      */
     async updateRequest(request, isQuiet = false) {
+        debug("updateRequest()")
         if (! isQuiet) this.#setLoadingBanner(this.intl.t('site.banner.loading'))
 
         if (this.refreshTimer) {
@@ -162,7 +163,7 @@ export default class OxiContentService extends Service {
     }
 
     openLink(href, target) {
-        debug(`openLink(${href}, ${target})`)
+        debug(`openLink(href = ${href}, target = ${target})`)
 
         // close popup
         this.popup = null
@@ -214,12 +215,12 @@ export default class OxiContentService extends Service {
 
     // "Bootstrapping" - menu, user info, locale, ...
     async #bootstrap() {
+        debug("#bootstrap()")
         let doc = await this.#request({
             page: "bootstrap!structure",
             baseurl: window.location.pathname,
         }, true)
 
-        debug("#bootstrap(): response")
 
         if (doc.rtoken) this.#rtoken = doc.rtoken // CSRF token
         if (doc.language) this.oxiLocale.locale = doc.language

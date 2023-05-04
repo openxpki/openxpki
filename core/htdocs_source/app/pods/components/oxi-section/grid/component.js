@@ -232,7 +232,7 @@ export default class OxiSectionGridComponent extends Component {
 
     @action
     async selectClick(button) {
-        debug("oxi-section/grid - selectClick")
+        debug('oxi-section/grid - selectClick')
         let columns = this.rawColumns.map(i => i.sTitle)
         let index = columns.indexOf(button.select)
         if (index === -1) {
@@ -251,6 +251,7 @@ export default class OxiSectionGridComponent extends Component {
 
     @action
     executeAction(row, act) {
+        debug('oxi-section/grid - executeAction()')
         if (!act) return;
         let columns = this.rawColumns;
         let data = this.rawData[row.originalIndex];
@@ -296,7 +297,8 @@ export default class OxiSectionGridComponent extends Component {
 
     @action
     updatePage(page) {
-            if (page.disabled || page.active) {
+        debug('oxi-section/grid - updatePage()')
+        if (page.disabled || page.active) {
             return;
         }
         return this.content.updateRequest({
