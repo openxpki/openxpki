@@ -257,7 +257,7 @@ export default class OxiSectionFormComponent extends Component {
 
         let fields = this.fields;
 
-        return this.content.updateRequest(request, true)
+        return this.content.updateRequestQuiet(request)
         .then((doc) => {
             for (const newField of this.#prepareFields(doc.fields)) {
                 for (const oldField of fields) {
