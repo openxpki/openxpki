@@ -1,0 +1,33 @@
+{{yield this.click this.clickable.loading}}
+
+{{!-- confirmation dialog --}}
+{{#if this.clickable.confirm}}
+    {{#let this.clickable.confirm as |c|}}
+        <BsModal
+            @open={{this.showConfirmDialog}}
+            @closeButton={{true}}
+            @fade={{true}}
+            @backdrop={{true}}
+            @backdropClose={{false}}
+            @onHidden={{this.resetConfirmState}}
+            as |Modal|
+        >
+            <Modal.header>
+                <h4 class="modal-title">
+                    {{c.label}}
+                </h4>
+            </Modal.header>
+            <Modal.body>
+                {{defuse c.description}}
+            </Modal.body>
+            <Modal.footer>
+                <BsButton {{on "click" this.executeAction}} @type="primary">
+                    {{if c.confirm_label c.confirm_label (t 'button.confirm_dialog.ok')}}
+                </BsButton>
+                <BsButton {{on "click" Modal.close}}>
+                    {{if c.cancel_label c.cancel_label (t 'button.confirm_dialog.cancel')}}
+                </BsButton>
+            </Modal.footer>
+        </BsModal>
+    {{/let}}
+{{/if}}

@@ -1,62 +1,34 @@
-{{!-- <a href> mode --}}
-{{#if this.clickable.href}}
-    <a
-        ...attributes
-        class="btn {{this.cssClass}}"
-        href="{{this.clickable.href}}"
-        target="{{this.clickable.target}}"
-        onclick={{this.click}}
-    >
-        {{yield}}
-        {{#if this.clickable.loading}}
-            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-        {{/if}}
-    </a>
+<OxiBase::Clickable @clickable={{this.clickable}} as |clickHandler isLoading|>
 
-{{!-- <button> mode (if "action", "page" or "onClick" was specified) --}}
-{{else}}
-    <BsButton
-        ...attributes
-        @type=""
-        class={{this.cssClass}}
-        @onClick={{this.click}}
-        disabled={{or this.clickable.disabled this.clickable.loading}}
-    >
-        {{yield}}
-        {{#if this.clickable.loading}}
-            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-        {{/if}}
-    </BsButton>
-{{/if}}
-
-{{!-- confirmation dialog --}}
-{{#if this.clickable.confirm}}
-    {{#let this.clickable.confirm as |c|}}
-        <BsModal
-            @open={{this.showConfirmDialog}}
-            @closeButton={{true}}
-            @fade={{true}}
-            @backdrop={{true}}
-            @backdropClose={{false}}
-            @onHidden={{this.resetConfirmState}}
-            as |Modal|
+    {{!-- <a href> mode --}}
+    {{#if this.clickable.href}}
+        <a
+            ...attributes
+            class="btn {{this.cssClass}}"
+            href={{this.clickable.href}}
+            target={{this.clickable.target}}
+            onclick={{clickHandler}}
         >
-            <Modal.header>
-                <h4 class="modal-title">
-                    {{c.label}}
-                </h4>
-            </Modal.header>
-            <Modal.body>
-                {{defuse c.description}}
-            </Modal.body>
-            <Modal.footer>
-                <BsButton {{on "click" this.executeAction}} @type="primary">
-                    {{if c.confirm_label c.confirm_label (t 'button.confirm_dialog.ok')}}
-                </BsButton>
-                <BsButton {{on "click" Modal.close}}>
-                    {{if c.cancel_label c.cancel_label (t 'button.confirm_dialog.cancel')}}
-                </BsButton>
-            </Modal.footer>
-        </BsModal>
-    {{/let}}
-{{/if}}
+            {{yield}}
+            {{#if isLoading}}
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            {{/if}}
+        </a>
+
+    {{!-- <button> mode (if "action", "page" or "onClick" was specified) --}}
+    {{else}}
+        <BsButton
+            ...attributes
+            @type=""
+            class={{this.cssClass}}
+            disabled={{or this.clickable.disabled isLoading}}
+            @onClick={{clickHandler}}
+        >
+            {{yield}}
+            {{#if isLoading}}
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            {{/if}}
+        </BsButton>
+    {{/if}}
+
+</OxiBase::Clickable>

@@ -89,10 +89,6 @@ export default class OxiClickableComponent extends Component {
 
     @tracked showConfirmDialog = false
 
-    get isLink() {
-        return this.args.button.href ? true : false
-    }
-
     get cssClass() {
         if (this.args.button.loading) { return "oxi-btn-loading" }
 
@@ -108,61 +104,5 @@ export default class OxiClickableComponent extends Component {
 
     get clickable() {
         return Clickable.fromHash(this.args.button)
-    }
-
-    @action
-    click(event) {
-        debug("oxi-base/button: click")
-
-        if (this.args.button.confirm) {
-            emSet(this.args.button, "loading", true)
-            this.showConfirmDialog = true
-        } else {
-            this.executeAction()
-        }
-
-        // cancel click event - only effective if we are called via <a onclick="...">
-        event?.preventDefault()
-    }
-
-    @action
-    executeAction() {
-        this.resetConfirmState()
-        // link mode
-        if (this.isLink) {
-            this.content.openLink(this.args.button.href, this.args.button.target)
-        }
-        // button mode
-        else {
-            let button = this.args.button
-
-            button.loading = true
-            if (button.onClick) {
-                debug(`oxi-base/button: executeAction - custom onClick() handler`)
-                button.onClick(button)
-                .finally(() => button.loading = false)
-            }
-            else if (button.action) {
-                debug(`oxi-base/button: executeAction - call to backend action '${button.action}'`)
-                let request = { action: button.action }
-                if (button.action_params) request = { ...button.action_params, ...request };
-                this.content.updateRequest(request)
-                .finally(() => button.loading = false)
-            }
-            else if (button.page) {
-                debug(`oxi-base/button: executeAction - transition to page '${button.page}`)
-                this.content.openPage(button.page, button.target)
-                .finally(() => button.loading = false)
-            }
-            else {
-                throw new Error("oxi-base/button: executeAction - nothing to do. No 'action', 'page' or 'onClick' specified")
-            }
-        }
-    }
-
-    @action
-    resetConfirmState() {
-        emSet(this.args.button, "loading", false)
-        this.showConfirmDialog = false
     }
 }
