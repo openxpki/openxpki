@@ -104,39 +104,18 @@ export default class OxiButtonRawComponent extends Component {
         return cssClass
     }
 
+    get clickable() {
+        return Clickable.fromHash(this.args.button)
+    }
+
     constructor() {
         super(...arguments)
 
-        let getType = obj => typeof obj == 'object' ? obj.constructor.name : typeof obj;
+        // let getType = obj => typeof obj == 'object' ? obj.constructor.name : typeof obj;
 
-        if (! (this.args.button instanceof Clickable)) {
-            throw new Error(`oxi-base/button/raw: Parameter "button" has wrong type. Expected: instance of "Clickable" (openxpki/data/clickable). Got: "${getType(this.args.button)}"`)
-        }
-        // type validation
-        // TODO Reactivate type checking once we drop IE11 support
-        /*
-        ow(this.args.button, 'button', ow.any(
-            ow.object.partialShape({
-                'label': ow.string.not.empty,
-                'format': ow.optional.string,
-                'tooltip': ow.optional.string,
-                'disabled': ow.optional.boolean,
-                'confirm': ow.optional.object.exactShape({
-                    'label': ow.string.not.empty,
-                    'description': ow.string.not.empty,
-                    'confirm_label': ow.optional.string,
-                    'cancel_label': ow.optional.string,
-                }),
-            }),
-            ow.object.partialShape({
-                'label': ow.string.not.empty,
-                'href': ow.string.not.empty,
-                'format': ow.optional.string,
-                'tooltip': ow.optional.string,
-                'target': ow.optional.string,
-            }),
-        ))
-        */
+        // if (! (this.args.button instanceof Clickable)) {
+        //     throw new Error(`oxi-base/button/raw: Parameter "button" has wrong type. Expected: instance of "Clickable" (openxpki/data/clickable). Got: "${getType(this.args.button)}"`)
+        // }
     }
 
     @action

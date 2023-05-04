@@ -10,7 +10,7 @@ import section_keyvalue from './section-keyvalue';
 import section_tiles from './section-tiles';
 import section_cards from './section-cards';
 import section_cards_vertical from './section-cards-vertical';
-import Button from 'openxpki/data/button';
+import ContainerButton from 'openxpki/data/container-button';
 import fetch from 'fetch';
 
 export default class TestController extends Controller {
@@ -18,6 +18,8 @@ export default class TestController extends Controller {
 
     @tracked
     selectedFormIndex = 0
+
+    buttons = []
 
     charts = section_chart
     forms = section_form
@@ -37,17 +39,11 @@ header:
 
     localRequestPath = 'test-server'
     localRequestUrl = 'http://localhost:7780/' + this.localRequestPath
-    localRequestButton = Button.fromHash({
-        format: "expected",
-        label: 'Local request - ' + this.localRequestUrl,
-        tooltip: "morbo -l http://*:7780 ./test-server.pl",
-        onClick: async btn => this.localRequest(),
-    })
 
     get formNavButtons() {
         let buttons = []
         this.forms.forEach((form, i) => {
-            buttons.push(Button.fromHash({
+            buttons.push(ContainerButton.fromHash({
                 format: "optional",
                 label: form.content.title,
                 onClick: async btn => this.setCurrentForm(i),
@@ -102,16 +98,22 @@ header:
     constructor() {
         super(...arguments);
         this.oxiLocale.locale = 'de-DE';
-        this.langButtons = [
-            Button.fromHash({
+        this.buttons = [
+            ContainerButton.fromHash({
                 format: "expected",
                 label: "de-DE",
                 onClick: async btn => this.setLang("de-DE"),
             }),
-            Button.fromHash({
+            ContainerButton.fromHash({
                 format: "expected",
                 label: "en-US",
                 onClick: async btn => this.setLang("en-US"),
+            }),
+            ContainerButton.fromHash({
+                format: "expected",
+                label: 'Local request - ' + this.localRequestUrl,
+                tooltip: "morbo -l http://*:7780 ./test-server.pl",
+                onClick: async btn => this.localRequest(),
             }),
         ]
 

@@ -1,14 +1,14 @@
 {{!-- <a href> mode --}}
-{{#if @button.href}}
+{{#if this.clickable.href}}
     <a
         ...attributes
         class="btn {{this.cssClass}}"
-        href="{{@button.href}}"
-        target="{{@button.target}}"
+        href="{{this.clickable.href}}"
+        target="{{this.clickable.target}}"
         onclick={{this.click}}
     >
         {{yield}}
-        {{#if @button.loading}}
+        {{#if this.clickable.loading}}
             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
         {{/if}}
     </a>
@@ -20,41 +20,43 @@
         @type=""
         class={{this.cssClass}}
         @onClick={{this.click}}
-        disabled={{or @button.disabled @button.loading}}
+        disabled={{or this.clickable.disabled this.clickable.loading}}
     >
         {{yield}}
-        {{#if @button.loading}}
+        {{#if this.clickable.loading}}
             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
         {{/if}}
     </BsButton>
 {{/if}}
 
 {{!-- confirmation dialog --}}
-{{#if @button.confirm}}
-    <BsModal
-        @open={{this.showConfirmDialog}}
-        @closeButton={{true}}
-        @fade={{true}}
-        @backdrop={{true}}
-        @backdropClose={{false}}
-        @onHidden={{this.resetConfirmState}}
-        as |Modal|
-    >
-        <Modal.header>
-            <h4 class="modal-title">
-                {{@button.confirm.label}}
-            </h4>
-        </Modal.header>
-        <Modal.body>
-            {{defuse @button.confirm.description}}
-        </Modal.body>
-        <Modal.footer>
-            <BsButton {{on "click" this.executeAction}} @type="primary">
-                {{if @button.confirm.confirm_label @button.confirm.confirm_label (t 'button.confirm_dialog.ok')}}
-            </BsButton>
-            <BsButton {{on "click" Modal.close}}>
-                {{if @button.confirm.cancel_label @button.confirm.cancel_label (t 'button.confirm_dialog.cancel')}}
-            </BsButton>
-        </Modal.footer>
-    </BsModal>
+{{#if this.clickable.confirm}}
+    {{#let this.clickable.confirm as |c|}}
+        <BsModal
+            @open={{this.showConfirmDialog}}
+            @closeButton={{true}}
+            @fade={{true}}
+            @backdrop={{true}}
+            @backdropClose={{false}}
+            @onHidden={{this.resetConfirmState}}
+            as |Modal|
+        >
+            <Modal.header>
+                <h4 class="modal-title">
+                    {{c.label}}
+                </h4>
+            </Modal.header>
+            <Modal.body>
+                {{defuse c.description}}
+            </Modal.body>
+            <Modal.footer>
+                <BsButton {{on "click" this.executeAction}} @type="primary">
+                    {{if c.confirm_label c.confirm_label (t 'button.confirm_dialog.ok')}}
+                </BsButton>
+                <BsButton {{on "click" Modal.close}}>
+                    {{if c.cancel_label c.cancel_label (t 'button.confirm_dialog.cancel')}}
+                </BsButton>
+            </Modal.footer>
+        </BsModal>
+    {{/let}}
 {{/if}}

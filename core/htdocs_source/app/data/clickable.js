@@ -38,10 +38,10 @@ export default class Clickable extends Base {
      * }
      */
     confirm
+    target
 
     // <a href> mode
     href                       // mandatory - triggers the <a href...> format
-    target
 
     // <button> mode
     action
