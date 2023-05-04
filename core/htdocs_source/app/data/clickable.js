@@ -16,11 +16,11 @@ import Base from './base'
  *     confirm_label: ""
  *     cancel_label: ""
  * },
- * @property {string} href Link: triggers the `<a href...>` mode in {@link OxiBase::Button::Raw}
+ * @property {string} href Link: triggers the `<a href...>` mode in {@link OxiBase::Button}
  * @property {string} target Link target (only used in `<a href...>` mode)
- * @property {string} action OpenXPKI action to call: triggers the `<button...>` mode in {@link OxiBase::Button::Raw}
+ * @property {string} action OpenXPKI action to call: triggers the `<button...>` mode in {@link OxiBase::Button}
  * @property {hash} action_params Additional parameters to send with the POST request
- * @property {string} page OpenXPKI page to load: triggers the `<button...>` mode in {@link OxiBase::Button::Raw}
+ * @property {string} page OpenXPKI page to load: triggers the `<button...>` mode in {@link OxiBase::Button}
  * @property {bool} loading Internal status: `true` if button was clicked and new page is loading
  * @property {callback} onClick Internal status: click handler
  */

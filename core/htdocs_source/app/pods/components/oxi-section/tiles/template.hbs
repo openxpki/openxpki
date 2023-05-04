@@ -5,7 +5,7 @@
             <p class="text-{{this.align}}">
                 {{#each this.tiles as |tile|}}
                     {{#if (eq tile.type "button")}}
-                        <OxiBase::Button::Raw @button={{tile.content}}>
+                        <OxiBase::Button @button={{tile.content}}>
                             {{#if tile.content.tooltip}}
                                 <Tippy>{{tile.content.tooltip}}</Tippy>
                             {{/if}}
@@ -14,7 +14,7 @@
                                 <br/>
                             {{/if}}
                             {{tile.content.label}}
-                        </OxiBase::Button::Raw>
+                        </OxiBase::Button>
                     {{/if}}
                     {{#if (eq tile.type "newline")}}
                         <br/>

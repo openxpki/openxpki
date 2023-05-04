@@ -13,12 +13,12 @@
                         </div>
                     {{else}}
                         <div class="col-6 col-md-4">
-                            <OxiBase::Button::Raw @button={{btn}} class="d-block w-100">
+                            <OxiBase::Button @button={{btn}} class="d-block w-100">
                                 {{#if btn.tooltip}}
                                     <Tippy>{{btn.tooltip}}</Tippy>
                                 {{/if}}
                                 {{btn.label}}
-                            </OxiBase::Button::Raw>
+                            </OxiBase::Button>
                         </div>
                         <div class="col-6 col-md-8">
                             {{btn.description}}
@@ -38,12 +38,12 @@
                         {{#if btn.section}}
                             <!-- Section are not supported yet -->
                         {{else}}
-                            <OxiBase::Button::Raw @button={{btn}}>
+                            <OxiBase::Button @button={{btn}}>
                                 {{#if btn.tooltip}}
                                     <Tippy>{{btn.tooltip}}</Tippy>
                                 {{/if}}
                                 {{btn.label}}
-                            </OxiBase::Button::Raw>
+                            </OxiBase::Button>
                         {{/if}}
                     {{/each}}
                 </div>

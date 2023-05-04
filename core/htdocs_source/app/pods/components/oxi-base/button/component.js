@@ -7,10 +7,12 @@ import Clickable from 'openxpki/data/clickable'
 //import ow from 'ow'
 
 /**
- * Low level button implementation supporting custom inner layout.
+ * Button implementation supporting custom inner layout.
  *
  * ```html
- * <OxiBase::Button::Raw @button={{buttonObj}} class="btn btn-secondary"/>
+ * <OxiBase::Button @button={{buttonObj}} class="btn btn-secondary">
+ *     {{buttonObj.label}}
+ * </OxiBase::Button>
  * ```
  *
  * The component has two modes and shows either `<a href/>` or `<button/>`.
@@ -54,7 +56,7 @@ import Clickable from 'openxpki/data/clickable'
  *     action: 'workflow!select!wf_action!global_cancel!wf_id!34', // mandatory
  * }
  * ```
- * @class OxiBase::Button::Raw
+ * @class OxiBase::Button
  * @extends Component
  */
 
@@ -81,7 +83,7 @@ let format2css = {
     tile:           "btn-light oxi-btn-tile",
 }
 
-export default class OxiButtonRawComponent extends Component {
+export default class OxiClickableComponent extends Component {
     @service router;
     @service('oxi-content') content;
 
@@ -98,7 +100,7 @@ export default class OxiButtonRawComponent extends Component {
         let cssClass = format2css[format]
         if (cssClass === undefined) {
             /* eslint-disable-next-line no-console */
-            console.error(`oxi-base/button/raw: button "${this.args.button.label}" has unknown format: "${this.args.button.format}"`)
+            console.error(`oxi-base/button: button "${this.args.button.label}" has unknown format: "${this.args.button.format}"`)
             cssClass = format2css['optional']
         }
         return cssClass
@@ -108,19 +110,9 @@ export default class OxiButtonRawComponent extends Component {
         return Clickable.fromHash(this.args.button)
     }
 
-    constructor() {
-        super(...arguments)
-
-        // let getType = obj => typeof obj == 'object' ? obj.constructor.name : typeof obj;
-
-        // if (! (this.args.button instanceof Clickable)) {
-        //     throw new Error(`oxi-base/button/raw: Parameter "button" has wrong type. Expected: instance of "Clickable" (openxpki/data/clickable). Got: "${getType(this.args.button)}"`)
-        // }
-    }
-
     @action
     click(event) {
-        debug("oxi-base/button/raw: click")
+        debug("oxi-base/button: click")
 
         if (this.args.button.confirm) {
             emSet(this.args.button, "loading", true)
@@ -146,24 +138,24 @@ export default class OxiButtonRawComponent extends Component {
 
             button.loading = true
             if (button.onClick) {
-                debug(`oxi-base/button/raw: executeAction - custom onClick() handler`)
+                debug(`oxi-base/button: executeAction - custom onClick() handler`)
                 button.onClick(button)
                 .finally(() => button.loading = false)
             }
             else if (button.action) {
-                debug(`oxi-base/button/raw: executeAction - call to backend action '${button.action}'`)
+                debug(`oxi-base/button: executeAction - call to backend action '${button.action}'`)
                 let request = { action: button.action }
                 if (button.action_params) request = { ...button.action_params, ...request };
                 this.content.updateRequest(request)
                 .finally(() => button.loading = false)
             }
             else if (button.page) {
-                debug(`oxi-base/button/raw: executeAction - transition to page '${button.page}`)
+                debug(`oxi-base/button: executeAction - transition to page '${button.page}`)
                 this.content.openPage(button.page, button.target)
                 .finally(() => button.loading = false)
             }
             else {
-                throw new Error("oxi-base/button/raw: executeAction - nothing to do. No 'action', 'page' or 'onClick' specified")
+                throw new Error("oxi-base/button: executeAction - nothing to do. No 'action', 'page' or 'onClick' specified")
             }
         }
     }
