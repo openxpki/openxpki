@@ -249,7 +249,8 @@ sub handle_enrollment_request {
     };
 
     if (!$workflow || ( $workflow->{'proc_state'} ne 'finished' && !$workflow->{id} ) || $workflow->{'proc_state'} eq 'exception') {
-        if (my $err = $client->last_reply()->{ERROR}) {
+        my $reply = $client->last_reply() || {};
+        if (my $err = $reply->{ERROR}) {
             if ($err->{CLASS} eq 'OpenXPKI::Exception::InputValidator') {
                 $log->info( 'Input validation failed' );
                 return OpenXPKI::Client::Service::Response->new( 40004 );
