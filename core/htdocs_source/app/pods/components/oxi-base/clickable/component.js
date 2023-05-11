@@ -51,32 +51,37 @@ export default class OxiClickableComponent extends Component {
         this.resetConfirmState()
         let c = this.clickable
 
-        // external link
-        if (this.isLink) {
-            this.content.openLink(c.href, c.target)
-        }
-        // OpenXPKI call (page or action)
-        else {
+        // custom client-side click handler (overrides server-sent config)
+        if (c.onClick) {
+            debug(`oxi-base/clickable: executeAction - custom onClick() handler`)
             c.loading = true
-            if (c.onClick) {
-                debug(`oxi-base/c: executeAction - custom onClick() handler`)
-                c.onClick(c)
-                .finally(() => c.loading = false)
+            c.onClick(c)
+            .finally(() => c.loading = false)
+        }
+        else {
+            // external link
+            if (this.isLink) {
+                debug(`oxi-base/clickable: executeAction - external link`)
+                this.content.openLink(c.href, c.target)
             }
+            // OpenXPKI call: action (POST)
             else if (c.action) {
-                debug(`oxi-base/c: executeAction - call to backend action '${c.action}'`)
+                debug(`oxi-base/clickable: executeAction - call to backend action '${c.action}'`)
+                c.loading = true
                 let request = { action: c.action }
                 if (c.action_params) request = { ...c.action_params, ...request }
                 this.content.updateRequest(request)
                 .finally(() => c.loading = false)
             }
+            // OpenXPKI call: page (GET)
             else if (c.page) {
-                debug(`oxi-base/c: executeAction - transition to page '${c.page}`)
+                debug(`oxi-base/clickable: executeAction - transition to page '${c.page}`)
+                c.loading = true
                 this.content.openPage(c.page, c.target)
                 .finally(() => c.loading = false)
             }
             else {
-                throw new Error("oxi-base/clickable: executeAction - nothing to do. No 'action', 'page' or 'onClick' specified")
+                throw new Error("oxi-base/clickable: executeAction - nothing to do. No 'href', action', 'page' or 'onClick' specified")
             }
         }
     }
