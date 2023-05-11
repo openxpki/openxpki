@@ -260,10 +260,10 @@ export default class OxiSectionGridComponent extends Component {
         let path = act.path;
         let i, j, len;
         for (i = j = 0, len = columns.length; j < len; i = ++j) {
-            let col = columns[i];
+            let col = columns[i]
+            let variableName = col.sTitle
             // replace e.g. "wf_id!{serial}" with "wf_id!342"
-            path = path.replace(`{${col.sTitle}}`, data[i]);
-            path = path.replace(`{col${i}}`, data[i]);
+            path = path.replace(`{${variableName}}`, data[i]);
         }
 
         if (act.target === "_blank") {
