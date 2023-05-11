@@ -153,17 +153,23 @@ export default class OxiContentService extends Service {
     }
 
     openPage(page, target, force) {
-        debug(`openPage(page = ${page}, force = ${force})`)
-        if (force) {
-            return this.router.transitionTo('openxpki', page, { queryParams: { force: (new Date()).valueOf() } })
+        debug(`openPage(page = ${page}, target = ${typeof target == 'symbol' ? Symbol.keyFor(target) : target}, force = ${force})`)
+
+        if (this.#resolveTarget(target) == this.TARGET.POPUP) {
+            return this.updateRequest({ page, target })
         }
         else {
-            return this.router.transitionTo('openxpki', page)
+            if (force) {
+                return this.router.transitionTo('openxpki', page, { queryParams: { force: (new Date()).valueOf() } })
+            }
+            else {
+                return this.router.transitionTo('openxpki', page)
+            }
         }
     }
 
     openLink(href, target) {
-        debug(`openLink(href = ${href}, target = ${target})`)
+        debug(`openLink(href = ${href}, target = ${typeof target == 'symbol' ? Symbol.keyFor(target) : target})`)
 
         // close popup
         this.popup = null

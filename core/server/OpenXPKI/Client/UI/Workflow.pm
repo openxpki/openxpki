@@ -597,7 +597,7 @@ sub __render_from_workflow {
                         className => 'workflow',
                         content => {
                             actions => ($field->{action} ? [{
-                                path => $field->{action},
+                                page => $field->{action},
                                 label => '',
                                 icon => 'view',
                                 target => ($field->{target} ? $field->{target} : 'top'),

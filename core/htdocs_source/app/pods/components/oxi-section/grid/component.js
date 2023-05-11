@@ -6,6 +6,7 @@ import { debug } from '@ember/debug';
 import { A } from '@ember/array'
 import ContainerButton from 'openxpki/data/container-button'
 import GridButton from 'openxpki/data/grid-button'
+import GridAction from 'openxpki/data/grid-action'
 import Pager from 'openxpki/data/pager'
 
 /**
@@ -25,7 +26,7 @@ export default class OxiSectionGridComponent extends Component {
 
     rawColumns
     @tracked rawData // this needs to be @tracked because the user may (de-)select items
-    rawActions
+    actions // generic actions that contain variables instead of real URLs, e.g. page = "wf_id!{serial}"
     @tracked pager
     buttons
 
@@ -34,7 +35,11 @@ export default class OxiSectionGridComponent extends Component {
 
         this.rawColumns = this.args.def.columns || []
         this.rawData = this.args.def.data || []
-        this.rawActions = this.args.def.actions || []
+        this.actions = (this.args.def.actions || []).map(a => GridAction.fromHash(a))
+
+        this.colByName = new Map()
+        for (let i = 0; i < this.rawColumns.length; i++) this.colByName.set(this.rawColumns[i].sTitle, i)
+
         this.pager = Pager.fromHash(this.args.def.pager || {})
 
         /* PLEASE NOTE that we cannot use a getter here, i.e. "get buttons()"
@@ -50,9 +55,9 @@ export default class OxiSectionGridComponent extends Component {
         this.updateButtonState()
     }
 
-    get hasAction() { return this.rawActions.length > 0 }
-    get multipleActions() { return this.rawActions.length > 1 }
-    get firstAction() { return this.rawActions[0] }
+    get hasAction() { return this.actions.length > 0 }
+    get multipleActions() { return this.actions.length > 1 }
+    get firstAction() { return this.actions[0] }
 
     get hasPager() { return !!this.pager.pagerurl }
 
@@ -187,10 +192,29 @@ export default class OxiSectionGridComponent extends Component {
                     }
                 }),
                 checked: row.checked ? true : false,
-                originalIndex: y
+                originalIndex: y,
+                actions: this.actions.map(a => this.resolveVariables(a, row)),
             })
         }
         return results
+    }
+
+    resolveVariables(gridAction, row) {
+        let rowAction = gridAction.clone()
+
+        const replace = (str) => {
+            let result = str
+            for (const name of this.colByName.keys()) {
+                // replace e.g. "wf_id!{serial}" with "wf_id!342"
+                result = result.replace(`{${name}}`, row[this.colByName.get(name)])
+            }
+            return result
+        }
+        if (rowAction.href) rowAction.href = replace(rowAction.href)
+        if (rowAction.page) rowAction.page = replace(rowAction.page)
+        if (rowAction.action) rowAction.action = replace(rowAction.action)
+
+        return rowAction
     }
 
     // split sorting from row data generation in "get data()" for better performance when re-sorting
@@ -246,30 +270,6 @@ export default class OxiSectionGridComponent extends Component {
 
         await this.content.updateRequest(request)
         emSet(button, "loading", false)
-    }
-
-
-    @action
-    executeAction(row, act) {
-        debug('oxi-section/grid - executeAction()')
-        if (!act) return;
-        let data = this.rawData[row.originalIndex];
-        let path = act.path;
-        for (let i = 0; i < this.rawColumns.length; i++) {
-            let variableName = this.rawColumns[i].sTitle
-            // replace e.g. "wf_id!{serial}" with "wf_id!342"
-            path = path.replace(`{${variableName}}`, data[i]);
-        }
-
-        if (act.target === "_blank") {
-            window.location.href = path;
-        }
-        else {
-            return this.content.updateRequest({
-                page: path,
-                target: act.target
-            });
-        }
     }
 
     // (de-)select single row

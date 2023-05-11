@@ -635,7 +635,7 @@ sub init_result {
         className => 'workflow',
         content => {
             actions => [{
-                path => 'workflow!info!wf_id!{serial}',
+                page => 'workflow!info!wf_id!{serial}',
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
                 icon => 'view',
                 target => 'popup',
@@ -888,7 +888,7 @@ sub init_mine {
             reverse => 1,
         },
         actions => [{
-            path => 'workflow!info!wf_id!{serial}',
+            page => 'workflow!info!wf_id!{serial}',
             label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
             icon => 'view',
             target => 'popup',
@@ -1038,7 +1038,7 @@ sub __render_task_list {
         );
     }
 
-    my $actions = $item->{actions} // [{ path => 'redirect!workflow!load!wf_id!{serial}', icon => 'view' }];
+    my $actions = $item->{actions} // [{ page => 'redirect!workflow!load!wf_id!{serial}', icon => 'view' }];
 
     # create the header from the columns spec
     my ($header, $column, $rattrib) = $self->__render_list_spec( \@cols );

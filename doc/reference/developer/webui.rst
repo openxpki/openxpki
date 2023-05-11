@@ -111,9 +111,11 @@ Grids are rendered using the `jquery datatable plugin (http://datatables.net) <h
 
     GRID_ACTION_DEF:
     {
-        path => STRING_PATH, # will be submitted to server as page. terms enclosed in {brackets} will be evaluated as column-keys and replaced with the value of the given row for that column
+        page => STRING_PATH, # calls an OpenXPKI page. Terms enclosed in {brackets} will be evaluated as column-keys and replaced with the value of the given row for that column
+        action => STRING_PATH, # calls an OpenXPKI action. Replacements work as in "page".
+        href => STRING_PATH, # opens a webpage. Replacements work as in "page".
         label => STRING, # visible menu entry
-        target => STRING_TARGET # optional, where to open the new page, one of main|right|popup|tab
+        target => STRING_TARGET # optional, where to open the new page, one of self|top|popup
         icon => STRING , # optional, file name of image icon, must be placed in htdocs/img/contextmenu
     }
 
@@ -121,7 +123,7 @@ Grids are rendered using the `jquery datatable plugin (http://datatables.net) <h
 Columns, whose sTitle begin with an underscore will not be displayed but used as internal information (e.g. as path in GRID_ACTION_DEF). A column with the special title ``_status`` is used as css class for the row. Also a pulldown menu to filter by status will be displayed.
 The rows hold the data in form of a positional array.
 
-Action *target* ``popup`` creates a modal popup, ``tab`` inits or extends a tabbed window view in the current section.
+Action *target* ``popup`` creates a modal popup.
 
 *Example*::
 
@@ -140,13 +142,13 @@ Action *target* ``popup`` creates a modal popup, ``tab`` inits or extends a tabb
         ],
         actions => [
             {
-                path => 'cert!detail!{_id}',
+                page => 'cert!detail!{_id}',
                 label => 'Details',
                 icon => 'view',
                 target => 'popup'
             },
             {
-                path => 'cert!mail2issuer!{email}',
+                page => 'cert!mail2issuer!{email}',
                 label => 'Send an email to issuer'
             },
         ]

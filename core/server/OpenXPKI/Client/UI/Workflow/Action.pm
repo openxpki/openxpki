@@ -587,7 +587,7 @@ sub action_bulk {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_FAILED_ITEMS_LABEL',
                 description => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_FAILED_ITEMS_DESC',
                 actions => [{
-                    path => 'workflow!info!wf_id!{serial}',
+                    page => 'workflow!info!wf_id!{serial}',
                     label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
                     icon => 'view',
                     target => 'popup',
@@ -614,7 +614,7 @@ sub action_bulk {
                     'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_ASYNC_ITEMS_DESC' :
                     'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_SUCCESS_ITEMS_DESC',
                 actions => [{
-                    path => 'workflow!info!wf_id!{serial}',
+                    page => 'workflow!info!wf_id!{serial}',
                     label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
                     icon => 'view',
                     target => 'popup',

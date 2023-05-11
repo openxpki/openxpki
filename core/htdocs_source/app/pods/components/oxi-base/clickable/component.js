@@ -9,7 +9,18 @@ import Clickable from 'openxpki/data/clickable'
  * Low level clickable implementation supporting any visual representation.
  *
  * ```html
- * // FIXME
+ * <OxiBase::Clickable @clickable={{this.clickable}} as |clickHandler isLoading|>
+ *     <BsButton
+ *         ...attributes
+ *         @onClick={{clickHandler}}
+ *         disabled={{isLoading}}
+ *     >
+ *         {{yield}}
+ *         {{#if isLoading}}
+ *             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+ *         {{/if}}
+ *     </BsButton>
+ * </OxiBase::Clickable>
  * ```
  *
  * @class OxiBase::Clickable

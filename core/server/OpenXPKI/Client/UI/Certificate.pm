@@ -274,7 +274,12 @@ sub init_result {
         className => 'certificate',
         content => {
             actions => [{
-                path => 'certificate!detail!identifier!{identifier}',
+                page => 'certificate!detail!identifier!{identifier}',
+                label => 'I18N_OPENXPKI_UI_DOWNLOAD_LABEL',
+                icon => 'download',
+                target => 'popup'
+            },{
+                page => 'certificate!detail!identifier!{identifier}',
                 label => 'I18N_OPENXPKI_UI_DOWNLOAD_LABEL',
                 icon => 'download',
                 target => 'popup'
@@ -547,7 +552,7 @@ sub init_mine {
         className => 'certificate',
         content => {
             actions => [{
-                path => 'certificate!detail!identifier!{identifier}',
+                page => 'certificate!detail!identifier!{identifier}',
                 label => 'I18N_OPENXPKI_UI_DOWNLOAD_LABEL',
                 icon => 'download',
                 target => 'popup'
@@ -984,7 +989,7 @@ sub init_related {
         content => {
             label => 'I18N_OPENXPKI_UI_CERTIFICATE_RELATED_WORKFLOW_LABEL',
             actions => [{
-                path => 'workflow!info!wf_id!{serial}',
+                page => 'workflow!info!wf_id!{serial}',
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
                 icon => 'view',
                 target => 'popup',

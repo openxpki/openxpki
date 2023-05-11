@@ -37,7 +37,7 @@ sub init_index {
         className => 'secret',
         content => {
             actions => [{
-                path => 'secret!manage!id!{_id}',
+                page => 'secret!manage!id!{_id}',
                 target => 'popup',
             }],
             columns => [
