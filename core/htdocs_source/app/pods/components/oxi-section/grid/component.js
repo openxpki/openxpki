@@ -69,8 +69,7 @@ export default class OxiSectionGridComponent extends Component {
         let pages = Math.ceil(pager.count / pager.limit);
         let current = Math.floor(pager.startat / pager.limit);
         let o = [];
-        let i, j, ref;
-        for (i = j = 0, ref = pages - 1; (0 <= ref ? j <= ref : j >= ref); i = 0 <= ref ? ++j : --j) {
+        for (let i = 0; i < pages; i++) {
             o.push({
                 num: i + 1,
                 active: i === current,
@@ -168,8 +167,7 @@ export default class OxiSectionGridComponent extends Component {
             classIndex = titles.indexOf("_className")
         }
         let results = []
-        let y, j, len
-        for (y = j = 0, len = this.rawData.length; j < len; y = ++j) {
+        for (let y = 0; y < this.rawData.length; y++) {
             let row = this.rawData[y];
 
             let cssClass = ''
@@ -255,13 +253,10 @@ export default class OxiSectionGridComponent extends Component {
     executeAction(row, act) {
         debug('oxi-section/grid - executeAction()')
         if (!act) return;
-        let columns = this.rawColumns;
         let data = this.rawData[row.originalIndex];
         let path = act.path;
-        let i, j, len;
-        for (i = j = 0, len = columns.length; j < len; i = ++j) {
-            let col = columns[i]
-            let variableName = col.sTitle
+        for (let i = 0; i < this.rawColumns.length; i++) {
+            let variableName = this.rawColumns[i].sTitle
             // replace e.g. "wf_id!{serial}" with "wf_id!342"
             path = path.replace(`{${variableName}}`, data[i]);
         }
