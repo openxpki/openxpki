@@ -63,7 +63,7 @@
                         <td>
                             <BsDropdown as |dd|>
                                 <dd.toggle><span class="glyphicon glyphicon-cog"></span></dd.toggle>
-                                <dd.menu @renderInPlace={{false}} as |ddm|>
+                                <dd.menu @renderInPlace={{true}} as |ddm|>
                                     {{#each @def.actions as |action|}}
                                         <ddm.item>
                                             <button
