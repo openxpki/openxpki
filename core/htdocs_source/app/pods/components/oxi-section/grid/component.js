@@ -23,14 +23,18 @@ import Pager from 'openxpki/data/pager'
 export default class OxiSectionGridComponent extends Component {
     @service('oxi-content') content
 
-    @tracked rawData = A([])
+    rawColumns
+    @tracked rawData // this needs to be @tracked because the user may (de-)select items
+    rawActions
     @tracked pager
     buttons
 
     constructor() {
         super(...arguments)
 
+        this.rawColumns = this.args.def.columns || []
         this.rawData = this.args.def.data || []
+        this.rawActions = this.args.def.actions || []
         this.pager = Pager.fromHash(this.args.def.pager || {})
 
         /* PLEASE NOTE that we cannot use a getter here, i.e. "get buttons()"
@@ -46,13 +50,11 @@ export default class OxiSectionGridComponent extends Component {
         this.updateButtonState()
     }
 
-    get rawColumns() { return (this.args.def.columns || []) }
-    get rawActions() { return (this.args.def.actions || []) }
-
     get hasAction() { return this.rawActions.length > 0 }
-    get hasPager() { return !!this.pager.pagerurl }
     get multipleActions() { return this.rawActions.length > 1 }
     get firstAction() { return this.rawActions[0] }
+
+    get hasPager() { return !!this.pager.pagerurl }
 
     get visibleColumns() {
         return this.rawColumns
