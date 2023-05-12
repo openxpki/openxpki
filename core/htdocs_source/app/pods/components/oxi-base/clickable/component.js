@@ -53,8 +53,12 @@ export default class OxiClickableComponent extends Component {
             this.executeAction()
         }
 
-        // cancel click event - only effective if we are called via <a onclick="...">
-        event?.preventDefault()
+        // cancel click event - only effective if we are called via
+        // <a {{on "click" clickHandler}}> from another component
+        if (event) {
+            event.stopPropagation()
+            event.preventDefault()
+        }
     }
 
     @action
