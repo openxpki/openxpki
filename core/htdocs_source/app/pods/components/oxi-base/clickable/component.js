@@ -34,7 +34,7 @@ export default class OxiClickableComponent extends Component {
     @tracked showConfirmDialog = false
 
     get isLink() {
-        return this.args.clickable.href ? true : false
+        return this.clickable.href ? true : false
     }
 
     constructor() {
@@ -92,7 +92,8 @@ export default class OxiClickableComponent extends Component {
                 .finally(() => c.loading = false)
             }
             else {
-                throw new Error("oxi-base/clickable: executeAction - nothing to do. No 'href', action', 'page' or 'onClick' specified")
+                /* eslint-disable-next-line no-console */
+                console.warn("oxi-base/clickable: executeAction - nothing to do. No 'href', action', 'page' or 'onClick' specified")
             }
         }
     }
