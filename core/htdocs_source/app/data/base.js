@@ -40,6 +40,8 @@ export default class Base {
      * @memberOf Base
      */
     setFromHash(sourceHash) {
+        if (typeof sourceHash === 'undefined' || sourceHash === null) return
+
         // list our and their properties
         let ourProps = this.getPropertyNames()
         let theirProps = sourceHash instanceof Base ? sourceHash.getPropertyNames() : Object.keys(sourceHash)
