@@ -7,7 +7,7 @@
             class="btn {{this.cssClass}}"
             href={{this.clickable.href}}
             target={{this.clickable.target}}
-            onclick={{clickHandler}}
+            {{on "click" clickHandler}}
         >
             {{yield}}
             {{#if isLoading}}
