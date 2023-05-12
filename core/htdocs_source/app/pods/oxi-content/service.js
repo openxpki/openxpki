@@ -74,22 +74,23 @@ export default class OxiContentService extends Service {
      * dimming the page.
      *
      * @param {hash} request - Request data
+     * @param {hash} options - Set `{ verbose: true }` to show loading banner
      * @return {Promise} Promise receiving the JSON document on success or `{}` on error
      */
-    async updateRequestQuiet(request) {
-        return this.updateRequest(request, true)
+    async requestUpdate(request, { verbose = false } = {}) {
+        return this.requestPage(request, { verbose, partial: true })
     }
 
     /**
      * Send AJAX request.
      *
      * @param {hash} request - Request data
-     * @param {bool} isQuiet - set to `true` to hide optical hints (loading banner)
+     * @param {hash} options - Set `{ verbose: true }` to show loading banner. Set `{ partial: true }` to prevent resetting the whole page
      * @return {Promise} Promise receiving the JSON document on success or `{}` on error
      */
-    async updateRequest(request, isQuiet = false) {
-        debug("updateRequest()")
-        if (! isQuiet) this.#setLoadingBanner(this.intl.t('site.banner.loading'))
+    async requestPage(request, { partial = false, verbose = true } = {}) {
+        debug(`requestPage(partial = ${partial ? true : false}, verbose = ${verbose ? true : false})`)
+        if (verbose) this.#setLoadingBanner(this.intl.t('site.banner.loading'))
 
         if (this.refreshTimer) {
             cancel(this.refreshTimer)
@@ -100,7 +101,7 @@ export default class OxiContentService extends Service {
         let realTarget = this.#resolveTarget(request.target)
 
         try {
-            let doc = await this.#request(request, isQuiet)
+            let doc = await this.#request(request)
 
             // Errors occured and handlers above returned null
             if (!doc) {
@@ -124,21 +125,22 @@ export default class OxiContentService extends Service {
 
                 // Auto refresh
                 if (doc.refresh) {
-                    debug("updateRequest(): response - \"refresh\" " + doc.refresh.href + ", " + doc.refresh.timeout)
+                    debug("requestPage(): response - \"refresh\" " + doc.refresh.href + ", " + doc.refresh.timeout)
                     this.#autoRefreshOnce(doc.refresh.href, doc.refresh.timeout)
                 }
 
                 // Redirect
                 if (doc.goto) {
-                    debug("updateRequest(): response - \"goto\" " + doc.goto)
+                    debug("requestPage(): response - \"goto\" " + doc.goto)
                     return this.#redirect(doc.goto, realTarget, doc.type, doc.loading_banner)
                 }
             }
 
             // Set page contents
+            if (partial == false && realTarget !== this.TARGET.POPUP) this.page = new Page()
             this.#setPageContent(realTarget, request.page, doc.page, doc.main, doc.right, doc.status)
 
-            if (realTarget === this.TARGET.TOP) this.#refreshNavEntries();
+            if (realTarget === this.TARGET.TOP) this.#refreshNavEntries()
 
             this.#setLoadingBanner(null)
             return doc // the calling code might handle other data
@@ -156,7 +158,7 @@ export default class OxiContentService extends Service {
         debug(`openPage(page = ${page}, target = ${typeof target == 'symbol' ? Symbol.keyFor(target) : target}, force = ${force})`)
 
         if (this.#resolveTarget(target) == this.TARGET.POPUP) {
-            return this.updateRequest({ page, target })
+            return this.requestPage({ page, target })
         }
         else {
             if (force) {
@@ -194,9 +196,9 @@ export default class OxiContentService extends Service {
             // Except for links: they are always opened as "top", i.e. they replace the current URL
             realTarget = (this.popup && !isLink) ? this.TARGET.POPUP : this.TARGET.TOP
         }
-        if (realTarget === 'top') realTarget = this.TARGET.TOP;
-        if (realTarget === 'popup') realTarget = this.TARGET.POPUP;
-        if (realTarget === 'modal') realTarget = this.TARGET.POPUP; // FIXME remove support for legacy target 'modal'
+        if (realTarget === 'top') realTarget = this.TARGET.TOP
+        if (realTarget === 'popup') realTarget = this.TARGET.POPUP
+        if (realTarget === 'modal') realTarget = this.TARGET.POPUP // FIXME remove support for legacy target 'modal'
 
         return realTarget
     }
@@ -253,7 +255,7 @@ export default class OxiContentService extends Service {
         return doc
     }
 
-    async #request(request, isQuiet = false) {
+    async #request(request) {
         debug("#request(" + ['page','action'].map(p=>request[p]?`${p} = ${request[p]}`:null).filter(e=>e!==null).join(", ") + ")")
 
         let data = {
@@ -303,10 +305,9 @@ export default class OxiContentService extends Service {
     // If 'message' is set to null, the banner will be hidden.
     #setLoadingBanner(message) {
         // note that we cannot use the Ember "loading" event as this would only
-        // trigger on route changes, but not if we do updateRequest()
+        // trigger on route changes, but not if we do e.g. background updates via requestUpate()
         if (message) {
-            // remove focus from button to prevent user from doing another
-            // submit by hitting enter
+            // remove focus from button to prevent user from doing another request e.g. by hitting enter
             document.activeElement.blur()
         }
         this.loadingBanner = message
@@ -329,15 +330,15 @@ export default class OxiContentService extends Service {
         }, timeout)
     }
 
-    #autoRefreshOnce(href, timeout) {
+    #autoRefreshOnce(page, timeout) {
         this.refreshTimer = later(this, function() {
-            this.updateRequest({ page: href })
+            this.requestPage({ page })
         }, timeout)
     }
 
     #redirect(url, target = this.TARGET.TOP, type = 'internal', banner = this.intl.t('site.banner.redirecting')) {
         if (type == 'external' || /^(http|\/)/.test(url)) {
-            this.#setLoadingBanner(banner); // never hide banner as browser will open a new page
+            this.#setLoadingBanner(banner) // never hide banner as browser will open a new page
             window.location.href = url
         }
         else {

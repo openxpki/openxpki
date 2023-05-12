@@ -268,7 +268,7 @@ export default class OxiSectionGridComponent extends Component {
         request[button.selection] = this.sortedData.filter(i => i.checked).map(i => i.originalData[index])
         emSet(button, "loading", true)
 
-        await this.content.updateRequest(request)
+        await this.content.requestPage(request)
         emSet(button, "loading", false)
     }
 
@@ -298,13 +298,13 @@ export default class OxiSectionGridComponent extends Component {
         if (page.disabled || page.active) {
             return;
         }
-        return this.content.updateRequest({
+        return this.content.requestUpdate({
             page:    this.pager.pagerurl,
             limit:   page.limit,
             startat: page.startat,
             order:   page.order,
             reverse: page.reverse ? 1 : 0,
-        })
+        }, { verbose: true })
         .then((res) => {
             this.rawData = res.data || [];
             this.pager.setFromHash(page);

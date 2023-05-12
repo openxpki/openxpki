@@ -43,7 +43,7 @@ export default class OpenXpkiRoute extends Route {
         //     request.target = "top";
         // }
 
-        await this.content.updateRequest(request);
+        await this.content.requestPage(request);
         return this.content;
     }
 }

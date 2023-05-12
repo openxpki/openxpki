@@ -85,7 +85,7 @@ export default class OxiClickableComponent extends Component {
                 c.loading = true
                 let request = { action: c.action }
                 if (c.action_params) request = { ...c.action_params, ...request }
-                this.content.updateRequest(request)
+                this.content.requestPage(request)
                 .finally(() => c.loading = false)
             }
             // OpenXPKI call: page (GET)

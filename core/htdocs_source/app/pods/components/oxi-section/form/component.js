@@ -257,7 +257,7 @@ export default class OxiSectionFormComponent extends Component {
 
         let fields = this.fields;
 
-        return this.content.updateRequestQuiet(request)
+        return this.content.requestUpdate(request)
         .then((doc) => {
             for (const newField of this.#prepareFields(doc.fields)) {
                 for (const oldField of fields) {
@@ -395,7 +395,7 @@ export default class OxiSectionFormComponent extends Component {
         let res
         try {
             this.loading = true;
-            res = await this.content.updateRequest(request)
+            res = await this.content.requestPage(request)
         }
         finally {
             this.loading = false;

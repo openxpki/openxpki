@@ -54,7 +54,7 @@ export default class OxiSectionKeyvalueComponent extends Component {
         // refresh function
         let refreshRequest = () => {
             emSet(item, '_refreshing', true)
-            this.content.updateRequestQuiet({
+            this.content.requestUpdate({
                 action: uri,
             })
             .then((doc) => {
