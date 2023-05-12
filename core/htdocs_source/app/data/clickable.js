@@ -40,15 +40,13 @@ export default class Clickable extends Base {
     confirm
     target
 
-    // <a href> mode
-    href                       // mandatory - triggers the <a href...> format
-
-    // <button> mode
+    // only one of "href", "action" or "page" should be set
+    href
     action
     action_params
     page
 
     // pure client-side status:
     @tracked loading = false
-    @tracked onClick
+    @tracked onClick // this overrides "href", "action" or "page"
 }
