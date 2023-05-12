@@ -60,7 +60,7 @@ has __default_wfdetails => (
             field => 'id',
             link => {
                 page => 'workflow!load!wf_id![% id %]',
-                target => '_blank',
+                target => 'top',
             },
         },
         {
@@ -1393,7 +1393,7 @@ sub __render_output_field {
             $item->{value}  = {
                 label => $workflow_id,
                 page => 'workflow!load!wf_id!'.$workflow_id,
-                target => '_blank',
+                target => 'top',
                 value => $workflow_id,
             };
         } else {

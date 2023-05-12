@@ -435,7 +435,7 @@ Create an internal framework link to a page or action, expects a hash like::
     {
         label => STRING, #
         page => STRING, #
-        target => [_blank|main|popup|tab|active], # (optional, defaults to "popup")
+        target => [self|top|popup], # (optional, defaults to "top")
         tooltip => STRING, # (optional)
     }
 

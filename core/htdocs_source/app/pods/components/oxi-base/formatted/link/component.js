@@ -1,6 +1,7 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { service } from '@ember/service';
+import Link from 'openxpki/data/link'
 
 /**
  * Show a link to an OpenXPKI page.
@@ -9,7 +10,7 @@ import { service } from '@ember/service';
  * <OxiBase::Formatted::Link @spec={{spec}} @class="oxi-formatted-link" />
  * ```
  *
- * @param { hash } spec - link information
+ * @param { hash | Link } spec - link definition
  * ```javascript
  * {
  *     label: 'Click me',
@@ -21,21 +22,12 @@ import { service } from '@ember/service';
  * @class OxiBase::Formatted::Link
  */
 export default class OxiFormattedLinkComponent extends Component {
-    @service('oxi-content') content;
+    @service('oxi-content') content
 
-    @action
-    internalLinkClick(event) {
-        let target = this.args.spec.target || "popup";
-
-        // ignore links with _blank target
-        if (target === "_blank") return true;
-
-        // perform AJAX request instead of opening URL
-        event.stopPropagation();
-        event.preventDefault();
-        this.content.updateRequest({
-            page: this.args.spec.page,
-            target: target,
-        });
+    get link() {
+        return Link.fromHash({
+            ...this.args.spec,
+            target: this.args.spec.target || 'popup',
+        })
     }
 }

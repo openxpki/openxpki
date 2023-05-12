@@ -31,16 +31,17 @@ export default class OpenXpkiRoute extends Route {
          * load requested page part
          */
         let request = {
-            page
+            page,
+            target: 'top',
         };
         if (transition.to.queryParams.limit) { request.limit = transition.to.queryParams.limit }
         if (transition.to.queryParams.startat) { request.startat = transition.to.queryParams.startat }
 
-        // load as top content if 'page' is part of navigation or in 'topTarget' list
-        let flatList = this.content.navEntries.reduce((p, n) => p.concat(n, n.entries || []), []);
-        if (flatList.find(i => i.key == page) || this.topTarget.indexOf(page) >= 0) {
-            request.target = "top";
-        }
+        // // load as top content if 'page' is part of navigation or in 'topTarget' list
+        // let flatList = this.content.navEntries.reduce((p, n) => p.concat(n, n.entries || []), []);
+        // if (flatList.find(i => i.key == page) || this.topTarget.indexOf(page) >= 0) {
+        //     request.target = "top";
+        // }
 
         await this.content.updateRequest(request);
         return this.content;

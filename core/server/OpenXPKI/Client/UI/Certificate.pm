@@ -640,18 +640,31 @@ sub init_detail {
     # Add search links to subject / SAN and profile only for local entity certificates
     if ($is_local_entity) {
 
-        push @fields, { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT', format => 'link',  value => {
-            page => 'certificate!search!subject!'.uri_escape_utf8($cert->{subject}),
-            label => $self-> __prepare_dn_for_display($cert->{subject}),
-            target => '_top',
-            tooltip => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SIMILAR_SUBJECT'
-        }};
+        push @fields, {
+            label => 'I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT',
+            format => 'link',
+            value => {
+                page => 'certificate!search!subject!'.uri_escape_utf8($cert->{subject}),
+                label => $self-> __prepare_dn_for_display($cert->{subject}),
+                target => 'top',
+                tooltip => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SIMILAR_SUBJECT',
+            },
+        };
 
         if ($cert_attribute && $cert_attribute->{subject_alt_name}) {
             my @sanlist = map {
-                { page => 'certificate!search!san!'.uri_escape_utf8($_), label => $_, target => '_top', tooltip => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SIMILAR_SAN' }
+                {
+                    page => 'certificate!search!san!'.uri_escape_utf8($_),
+                    label => $_,
+                    target => 'top',
+                    tooltip => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SIMILAR_SAN',
+                }
             } @{$cert_attribute->{subject_alt_name}};
-            push @fields, { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SAN', value => \@sanlist, 'format' => 'linklist' };
+            push @fields, {
+                label => 'I18N_OPENXPKI_UI_CERTIFICATE_SAN',
+                value => \@sanlist,
+                format => 'linklist',
+            };
         }
 
         my $cert_profile = $self->send_command_v2( 'get_profile_for_cert', { identifier => $cert_identifier }, 1) || 'I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_UNKNOWN';
@@ -796,7 +809,7 @@ sub init_detail {
                 } else {
                     $page = $baseurl.$item->{workflow};
                 }
-                push @actions, { page => $page, label => $item->{label}, target => '_blank' };
+                push @actions, { page => $page, label => $item->{label}, target => 'top' };
             }
         }
 

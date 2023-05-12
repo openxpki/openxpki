@@ -78,7 +78,7 @@ sub render_system_status {
             value => {
                 label => 'I18N_OPENXPKI_UI_SECRET_GROUPS_STATUS_UNAVAILABLE ' . $status->{secret_offline},
                 page => 'secret!index',
-                target => '_top'
+                target => 'top'
             }
         };
         $critical = 1;

@@ -1,8 +1,17 @@
-<a href="{{url-for "openxpki" @spec.page}}"
-   target={{@spec.target}}
-   title={{@spec.tooltip}}
-   {{on "click" this.internalLinkClick}}
-   class="{{@class}}"
->
-    <OxiBase::Label @text={{@spec.label}} @raw={{true}} />
-</a>
+<OxiBase::Clickable @clickable={{this.link}} as |clickHandler isLoading|>
+      {{!--
+        The href="..." part is used to create a real link that the user can copy
+        or use to open the page in another tab/window.
+        If the link is just clicked on the "on" handler will fire, disregarding
+        the "href" attribute.
+      --}}
+      <a
+         href="{{url-for "openxpki" this.link.page}}"
+         title={{this.link.tooltip}}
+         class="{{@class}}"
+         {{on "click" clickHandler}}
+      >
+         <OxiBase::Label @text={{this.link.label}} @raw={{true}} />
+         {{yield}}
+     </a>
+</OxiBase::Clickable>
