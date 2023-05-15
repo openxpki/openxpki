@@ -102,7 +102,7 @@ export default class OpenXpkiController extends Controller {
     logout(event) {
         if (event) { event.stopPropagation(); event.preventDefault() }
         this.content.setTenant(null);
-        this.navigateTo('logout');
+        this.content.openPage('logout', this.content.TARGET.TOP, true)
     }
 
     @action
