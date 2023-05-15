@@ -30,12 +30,18 @@ export default class OpenXpkiRoute extends Route {
         /*
          * load requested page part
          */
+
+        // URL-configurable pager variables for <OxiSection::Grid>
+        let limit = transition.to.queryParams.limit
+        let startat = transition.to.queryParams.startat
+
+        // assemble request
         let request = {
             page,
             target: 'top',
+            ...(limit ? { limit } : {}),
+            ...(startat ? { startat } : {}),
         };
-        if (transition.to.queryParams.limit) { request.limit = transition.to.queryParams.limit }
-        if (transition.to.queryParams.startat) { request.startat = transition.to.queryParams.startat }
 
         // // load as top content if 'page' is part of navigation or in 'topTarget' list
         // let flatList = this.content.navEntries.reduce((p, n) => p.concat(n, n.entries || []), []);
