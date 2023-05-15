@@ -176,31 +176,27 @@ export default class OxiContentService extends Service {
         // close popup
         this.popup = null
 
-        // resolve link target
-        let realTarget = this.#resolveTarget(target, true)
-        if (realTarget == this.TARGET.POPUP) {
-            /* eslint-disable-next-line no-console */
-            console.warn('Attempt to open a href link in a popup. It will be opened with target = "_self" instead.')
-            realTarget = this.TARGET.TOP
-        }
-
         // open link
-        window.open(href, realTarget == this.TARGET.TOP ? '_self' : realTarget)
+        let realTarget = this.#resolveTarget(target, true)
+        window.open(href, realTarget == this.TARGET.TOP ? '_self' : '_blank')
     }
 
-    #resolveTarget(target, isLink) {
-        let realTarget = target || 'self'
+    #resolveTarget(rawTarget = 'self', isLink) {
+        let target = (typeof rawTarget == 'symbol') ? rawTarget : null
 
-        if (realTarget === 'self') {
-            // Pseudo-target "self" leads to content being shown in the currently active place.
-            // Except for links: they are always opened as "top", i.e. they replace the current URL
-            realTarget = (this.popup && !isLink) ? this.TARGET.POPUP : this.TARGET.TOP
-        }
-        if (realTarget === 'top') realTarget = this.TARGET.TOP
-        if (realTarget === 'popup') realTarget = this.TARGET.POPUP
-        if (realTarget === 'modal') realTarget = this.TARGET.POPUP // FIXME remove support for legacy target 'modal'
+        // Pseudo-target "self" leads to content being shown in the currently active place.
+        if (rawTarget === 'self') target = this.popup ? this.TARGET.POPUP : this.TARGET.TOP
+        if (rawTarget === 'top') target = this.TARGET.TOP
+        if (rawTarget === 'popup') target = this.TARGET.POPUP
+        if (rawTarget === 'modal') target = this.TARGET.POPUP // FIXME remove support for legacy target 'modal'
 
-        return realTarget
+        /* eslint-disable-next-line no-console */
+        if (target === null) console.warn(`Invalid page/action/link target found: "${rawTarget}"`)
+
+        // Links are always opened as "top", i.e. they replace the current URL
+        if (isLink && target == this.TARGET.POPUP) target = this.TARGET.TOP
+
+        return target
     }
 
     #isBootstrapNeeded(session_id) {
