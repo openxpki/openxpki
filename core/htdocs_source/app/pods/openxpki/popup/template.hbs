@@ -1,0 +1,27 @@
+{{#let this.model.popup as |popup|}}
+    <BsModal
+        @open={{if popup true false}}
+        @closeButton={{true}}
+        @fade={{true}}
+        @backdrop={{true}}
+        @backdropClose={{false}}
+        @size={{if popup.page.isLarge "xl" "lg"}}
+        @scrollable={{true}}
+        @onHidden={{this.closePopup}}
+        as |Modal|
+    >
+        <Modal.header class="bg-secondary text-white">
+            <h4 class="modal-title">
+                {{if popup.page.shortlabel popup.page.shortlabel popup.page.label}}
+            </h4>
+        </Modal.header>
+        <Modal.body>
+            {{#each popup.main as |mainEntry|}}
+                <OxiSection @content={{mainEntry}}/>
+            {{/each}}
+        </Modal.body>
+        <Modal.footer>
+            <BsButton {{on "click" Modal.close}}>{{t 'site.close_popup'}}</BsButton>
+        </Modal.footer>
+    </BsModal>
+{{/let}}

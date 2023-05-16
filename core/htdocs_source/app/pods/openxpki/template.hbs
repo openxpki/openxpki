@@ -73,7 +73,7 @@
     </navbar.content>
 </BsNavbar>
 
-<div class="container-fluid {{this.model.page.page.className}}">
+<div class="container-fluid {{this.model.top.page.className}}">
     {{!
       *************************************
       Old browser warning
@@ -92,7 +92,7 @@
       Show (error) message if no page exists yet
       *************************************
     }}
-    {{#unless this.model.page.main}}
+    {{#unless this.model.top.main}}
         <div class="row">
             <div class="col oxi-message">
                 {{#let (echo this.getStatusClass this.model.status.level) as |cssClass|}}
@@ -122,7 +122,7 @@
               *************************************
             }}
             <div>
-                {{#let this.model.page as |entry|}}
+                {{#let this.model.top as |top|}}
                     <div>
                         {{!
                           *************************************
@@ -131,35 +131,35 @@
                         }}
                         <div class="row">
                             <div class="col oxi-pagehead">
-                                {{#if entry.page.breadcrumb.length}}
+                                {{#if top.page.breadcrumb.length}}
                                     <ol class="breadcrumb">
-                                        {{#each entry.page.breadcrumb as |bc|}}
+                                        {{#each top.page.breadcrumb as |bc|}}
                                             {{#if bc.label}}<li class="breadcrumb-item {{bc.className}}">{{bc.label}}</li>{{/if}}
                                         {{/each}}
                                     </ol>
                                 {{/if}}
-                                {{#if entry.page.label}}
-                                    <h3>{{entry.page.label}}</h3>
+                                {{#if top.page.label}}
+                                    <h3>{{top.page.label}}</h3>
                                 {{/if}}
                             </div>
                             </div>
 
-                        {{#if entry.page.description}}
+                        {{#if top.page.description}}
                             <div class="row">
                                 <div class="col mb-3">
-                                    {{defuse entry.page.description}}
+                                    {{defuse top.page.description}}
                                 </div>
                             </div>
                         {{/if}}
 
-                        {{#let (and entry.right this.showInfoBlock) as |showInfo|}}
+                        {{#let (and top.right this.showInfoBlock) as |showInfo|}}
                             <div class="row">
                                 {{!
                                   Main page content
                                 }}
                                 <div class="col-11 {{if showInfo "col-lg-7"}} oxi-main order-0">
-                                    {{#each entry.main as |mainEntry|}}
-                                        <!-- entry.main item -->
+                                    {{#each top.main as |mainEntry|}}
+                                        <!-- top.main item -->
                                         {{! extra row/col level to restrict form width if info block
                                              is hidden (as overly long input fields look ugly) }}
                                         <div class="row">
@@ -175,10 +175,10 @@
                                 {{!
                                   Infobox - right hand info column
                                 }}
-                                {{#if entry.right}}
+                                {{#if top.right}}
                                     {{#if showInfo}}
                                         <div class="col-12 col-lg-4 order-2 order-lg-1 pe-lg-0 oxi-infobox">
-                                            {{#each entry.right as |rightEntry|}}
+                                            {{#each top.right as |rightEntry|}}
                                                 <div class="card bg-light border-secondary">
                                                     <div class="card-body p-1">
                                                         <OxiSection
@@ -210,33 +210,8 @@
     </div>
 </div>
 
-{{#let this.model.popup as |popup|}}
-    <BsModal
-        @open={{if popup true false}}
-        @closeButton={{true}}
-        @fade={{true}}
-        @backdrop={{true}}
-        @backdropClose={{false}}
-        @size={{if popup.page.isLarge "xl" "lg"}}
-        @scrollable={{true}}
-        @onHidden={{this.clearPopupData}}
-        as |Modal|
-    >
-        <Modal.header class="bg-secondary text-white">
-            <h4 class="modal-title">
-                {{if popup.page.shortlabel popup.page.shortlabel popup.page.label}}
-            </h4>
-        </Modal.header>
-        <Modal.body>
-            {{#each popup.main as |mainEntry|}}
-                <OxiSection @content={{mainEntry}}/>
-            {{/each}}
-        </Modal.body>
-        <Modal.footer>
-            <BsButton {{on "click" Modal.close}}>{{t 'site.close_popup'}}</BsButton>
-        </Modal.footer>
-    </BsModal>
-{{/let}}
+{{!-- Contents of popup sub-route (if any) --}}
+{{outlet}}
 
 <BsModal
     @open={{if this.model.error true false}}

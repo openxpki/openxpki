@@ -30,7 +30,7 @@ export default class OxiContentService extends Service {
     @tracked tenant = null
     @tracked status = null
 
-    @tracked page = null
+    @tracked top = null
     @tracked popup = null
 
     @tracked error = null
@@ -89,7 +89,7 @@ export default class OxiContentService extends Service {
      * @return {Promise} Promise receiving the JSON document on success or `{}` on error
      */
     async requestPage(request, { partial = false, verbose = true } = {}) {
-        debug(`requestPage(partial = ${partial ? true : false}, verbose = ${verbose ? true : false})`)
+        debug(`requestPage({ ..., target = ${typeof request.target == 'symbol' ? request.target.toString() : request.target} }, partial = ${partial ? true : false}, verbose = ${verbose ? true : false})`)
         if (verbose) this.#setLoadingBanner(this.intl.t('site.banner.loading'))
 
         if (this.refreshTimer) {
@@ -99,6 +99,7 @@ export default class OxiContentService extends Service {
 
         // resolve target
         let realTarget = this.#resolveTarget(request.target)
+        delete request.target // may already be a Symbol (our fake enum) which we cannot send to the backend
 
         try {
             let doc = await this.#request(request)
@@ -112,7 +113,7 @@ export default class OxiContentService extends Service {
             // chain backend calls via Promise
             if (this.#isBootstrapNeeded(doc.session_id)) await this.#bootstrap()
 
-            // Successful request
+            // last request sets the global status, whether it's a "top" or "popup" target
             this.status = doc.status
 
             // Popup
@@ -137,8 +138,7 @@ export default class OxiContentService extends Service {
             }
 
             // Set page contents
-            if (partial == false && realTarget !== this.TARGET.POPUP) this.page = new Page()
-            this.#setPageContent(realTarget, request.page, doc.page, doc.main, doc.right, doc.status)
+            this.#setPageContent(realTarget, request.page, doc.page, doc.main, doc.right, partial)
 
             if (realTarget === this.TARGET.TOP) this.#refreshNavEntries()
 
@@ -154,24 +154,29 @@ export default class OxiContentService extends Service {
         }
     }
 
-    openPage(page, target, force) {
-        debug(`openPage(page = ${page}, target = ${typeof target == 'symbol' ? Symbol.keyFor(target) : target}, force = ${force})`)
+    openPage(name, target, force) {
+        debug(`openPage(name = ${name}, target = ${typeof target == 'symbol' ? target.toString() : target}, force = ${force})`)
 
         if (this.#resolveTarget(target) == this.TARGET.POPUP) {
-            return this.requestPage({ page, target })
+            debug(`Transitioning to ${this.router.urlFor('openxpki.popup', name)}`)
+            return this.router.transitionTo('openxpki.popup', name)
         }
         else {
+            // close popup
+            this.popup = null
+
+            // this also removes the popup related data from the URL
             if (force) {
-                return this.router.transitionTo('openxpki', page, { queryParams: { force: (new Date()).valueOf() } })
+                return this.router.transitionTo('openxpki', name, { queryParams: { force: (new Date()).valueOf() } })
             }
             else {
-                return this.router.transitionTo('openxpki', page)
+                return this.router.transitionTo('openxpki', name)
             }
         }
     }
 
     openLink(href, target) {
-        debug(`openLink(href = ${href}, target = ${typeof target == 'symbol' ? Symbol.keyFor(target) : target})`)
+        debug(`openLink(href = ${href}, target = ${typeof target == 'symbol' ? target.toString() : target})`)
 
         // close popup
         this.popup = null
@@ -179,6 +184,13 @@ export default class OxiContentService extends Service {
         // open link
         let realTarget = this.#resolveTarget(target, true)
         window.open(href, realTarget == this.TARGET.TOP ? '_self' : '_blank')
+    }
+
+    closePopup() {
+        // close popup
+        this.popup = null
+        // transition to current route (keeps the current model/page) but without the "popup" part
+        return this.router.transitionTo('openxpki')
     }
 
     #resolveTarget(rawTarget = 'self', isLink) {
@@ -379,7 +391,7 @@ export default class OxiContentService extends Service {
         this.error = this.intl.t('error_popup.message.server', { code: status_code })
     }
 
-    #setPageContent(target, url, page, main, right, status) {
+    #setPageContent(target, requestedPageName, page, main, right, partial) {
         // Mark the first form on screen: only the first one is allowed to focus
         // its first input field.
         for (const section of [...(main||[]), ...(right||[])]) {
@@ -395,24 +407,25 @@ export default class OxiContentService extends Service {
             obj = this.popup
         }
         else {
-            if (!this.page) this.page = new Page()
-            obj = this.page
+            // If it was a call to an action, requestedPageName == undefined.
+            // In this case we do not wipe the page data.
+            if (!this.top || (partial == false && requestedPageName)) this.top = new Page()
+            obj = this.top
         }
         obj.setFromHash({
+            ...(requestedPageName && { name: requestedPageName }),
             ...(page && { page }),
             ...(main && { main }),
             ...(right && { right }),
-            ...(status && { status }),
-            ...(url && { url }),
         })
     }
 
     #refreshNavEntries() {
         for (const entry of this.navEntries) {
-            emSet(entry, "active", (entry.key === this?.page?.url))
+            emSet(entry, "active", (entry.key === this?.top?.name))
             if (entry.entries) {
                 entry.entries.forEach(i => emSet(i, "active", false))
-                let subEntry = entry.entries.find(i => i.key == this?.page?.url)
+                let subEntry = entry.entries.find(i => i.key == this?.top?.name)
                 if (subEntry) {
                     emSet(subEntry, "active", true)
                     emSet(entry, "active", true)

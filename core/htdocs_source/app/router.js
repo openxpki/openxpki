@@ -11,6 +11,8 @@ Router.map(function() {
      *      /                       app/pods/index/route.js
      *      /openxpki/:page         app/pods/openxpki/route.js
      */
-    this.route("openxpki", { path: "/openxpki/:page" })
+    this.route("openxpki", { path: "/openxpki/:page" }, function() {
+         this.route("popup", { path: "/popup/:popup_page" })
+    })
     if (config.environment === 'development') this.route("test")
 })

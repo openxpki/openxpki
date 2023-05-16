@@ -109,11 +109,6 @@ export default class OpenXpkiController extends Controller {
     }
 
     @action
-    clearPopupData() {
-        return this.model.popup = null
-    }
-
-    @action
     toggleInfoBlock() {
         this.showInfoBlock = !this.showInfoBlock;
     }

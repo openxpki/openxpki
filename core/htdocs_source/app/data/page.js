@@ -6,9 +6,9 @@ import Base from './base'
  */
 export default class Page extends Base {
     static _type = 'app/data/page'
-    static _idField = 'url'
+    static _idField = 'name'
 
-    @tracked url
+    @tracked name
     @tracked page
     @tracked main
     @tracked right
