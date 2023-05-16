@@ -126,31 +126,6 @@
                     <div>
                         {{!
                           *************************************
-                          Tab-specific messages
-                          *************************************
-                        }}
-                        <div class="row">
-                            <div class="col oxi-message">
-                                {{#let (echo this.getStatusClass entry.status.level) as |cssClass|}}
-                                    {{#if entry.status.message}}
-                                        {{#if entry.status.href}}
-                                            <a href="{{entry.status.href}}" target="_blank" rel="noopener noreferrer">
-                                                <div class="alert {{cssClass}}">
-                                                    <OxiBase::Formatted @format="nl2br" @value={{entry.status.message}}/>
-                                                </div>
-                                            </a>
-                                        {{else}}
-                                            <div class="alert {{cssClass}}">
-                                                <OxiBase::Formatted @format="nl2br" @value={{entry.status.message}}/>
-                                            </div>
-                                        {{/if}}
-                                    {{/if}}
-                                {{/let}}
-                            </div>
-                        </div>
-
-                        {{!
-                          *************************************
                           Breadcrumb and page title
                           *************************************
                         }}
