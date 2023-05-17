@@ -112,8 +112,8 @@ sub init_list {
         className => 'crl',
         content => {
             actions => [{
+                page => 'crl!detail!crl_key!{crl_key}',
                 label => 'I18N_OPENXPKI_UI_CRL_VIEW_IN_BROWSER',
-                path => 'crl!detail!crl_key!{crl_key}',
                 target => 'popup',
             }],
             columns => [

@@ -6,6 +6,7 @@ import { debug } from '@ember/debug';
 import { A } from '@ember/array'
 import ContainerButton from 'openxpki/data/container-button'
 import GridButton from 'openxpki/data/grid-button'
+import GridAction from 'openxpki/data/grid-action'
 import Pager from 'openxpki/data/pager'
 
 /**
@@ -23,14 +24,22 @@ import Pager from 'openxpki/data/pager'
 export default class OxiSectionGridComponent extends Component {
     @service('oxi-content') content
 
-    @tracked rawData = A([])
+    rawColumns
+    @tracked rawData // this needs to be @tracked because the user may (de-)select items
+    actions // generic actions that contain variables instead of real URLs, e.g. page = "wf_id!{serial}"
     @tracked pager
     buttons
 
     constructor() {
         super(...arguments)
 
+        this.rawColumns = this.args.def.columns || []
         this.rawData = this.args.def.data || []
+        this.actions = (this.args.def.actions || []).map(a => GridAction.fromHash(a))
+
+        this.colByName = new Map()
+        for (let i = 0; i < this.rawColumns.length; i++) this.colByName.set(this.rawColumns[i].sTitle, i)
+
         this.pager = Pager.fromHash(this.args.def.pager || {})
 
         /* PLEASE NOTE that we cannot use a getter here, i.e. "get buttons()"
@@ -46,13 +55,11 @@ export default class OxiSectionGridComponent extends Component {
         this.updateButtonState()
     }
 
-    get rawColumns() { return (this.args.def.columns || []) }
-    get rawActions() { return (this.args.def.actions || []) }
+    get hasAction() { return this.actions.length > 0 }
+    get multipleActions() { return this.actions.length > 1 }
+    get firstAction() { return this.actions[0] }
 
-    get hasAction() { return this.rawActions.length > 0 }
     get hasPager() { return !!this.pager.pagerurl }
-    get multipleActions() { return this.rawActions.length > 1 }
-    get firstAction() { return this.rawActions[0] }
 
     get visibleColumns() {
         return this.rawColumns
@@ -67,8 +74,7 @@ export default class OxiSectionGridComponent extends Component {
         let pages = Math.ceil(pager.count / pager.limit);
         let current = Math.floor(pager.startat / pager.limit);
         let o = [];
-        let i, j, ref;
-        for (i = j = 0, ref = pages - 1; (0 <= ref ? j <= ref : j >= ref); i = 0 <= ref ? ++j : --j) {
+        for (let i = 0; i < pages; i++) {
             o.push({
                 num: i + 1,
                 active: i === current,
@@ -166,8 +172,7 @@ export default class OxiSectionGridComponent extends Component {
             classIndex = titles.indexOf("_className")
         }
         let results = []
-        let y, j, len
-        for (y = j = 0, len = this.rawData.length; j < len; y = ++j) {
+        for (let y = 0; y < this.rawData.length; y++) {
             let row = this.rawData[y];
 
             let cssClass = ''
@@ -187,10 +192,29 @@ export default class OxiSectionGridComponent extends Component {
                     }
                 }),
                 checked: row.checked ? true : false,
-                originalIndex: y
+                originalIndex: y,
+                actions: this.actions.map(a => this.resolveVariables(a, row)),
             })
         }
         return results
+    }
+
+    resolveVariables(gridAction, row) {
+        let rowAction = gridAction.clone()
+
+        const replace = (str) => {
+            let result = str
+            for (const name of this.colByName.keys()) {
+                // replace e.g. "wf_id!{serial}" with "wf_id!342"
+                result = result.replace(`{${name}}`, row[this.colByName.get(name)])
+            }
+            return result
+        }
+        if (rowAction.href) rowAction.href = replace(rowAction.href)
+        if (rowAction.page) rowAction.page = replace(rowAction.page)
+        if (rowAction.action) rowAction.action = replace(rowAction.action)
+
+        return rowAction
     }
 
     // split sorting from row data generation in "get data()" for better performance when re-sorting
@@ -232,7 +256,7 @@ export default class OxiSectionGridComponent extends Component {
 
     @action
     async selectClick(button) {
-        debug("oxi-section/grid - selectClick")
+        debug('oxi-section/grid - selectClick')
         let columns = this.rawColumns.map(i => i.sTitle)
         let index = columns.indexOf(button.select)
         if (index === -1) {
@@ -244,34 +268,8 @@ export default class OxiSectionGridComponent extends Component {
         request[button.selection] = this.sortedData.filter(i => i.checked).map(i => i.originalData[index])
         emSet(button, "loading", true)
 
-        await this.content.updateRequest(request)
+        await this.content.requestPage(request)
         emSet(button, "loading", false)
-    }
-
-
-    @action
-    executeAction(row, act) {
-        if (!act) return;
-        let columns = this.rawColumns;
-        let data = this.rawData[row.originalIndex];
-        let path = act.path;
-        let i, j, len;
-        for (i = j = 0, len = columns.length; j < len; i = ++j) {
-            let col = columns[i];
-            // replace e.g. "wf_id!{serial}" with "wf_id!342"
-            path = path.replace(`{${col.sTitle}}`, data[i]);
-            path = path.replace(`{col${i}}`, data[i]);
-        }
-
-        if (act.target === "_blank") {
-            window.location.href = path;
-        }
-        else {
-            return this.content.updateRequest({
-                page: path,
-                target: act.target
-            });
-        }
     }
 
     // (de-)select single row
@@ -296,16 +294,17 @@ export default class OxiSectionGridComponent extends Component {
 
     @action
     updatePage(page) {
-            if (page.disabled || page.active) {
+        debug('oxi-section/grid - updatePage()')
+        if (page.disabled || page.active) {
             return;
         }
-        return this.content.updateRequest({
+        return this.content.requestUpdate({
             page:    this.pager.pagerurl,
             limit:   page.limit,
             startat: page.startat,
             order:   page.order,
             reverse: page.reverse ? 1 : 0,
-        })
+        }, { verbose: true })
         .then((res) => {
             this.rawData = res.data || [];
             this.pager.setFromHash(page);

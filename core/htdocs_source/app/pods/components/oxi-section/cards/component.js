@@ -1,5 +1,5 @@
 import Component from '@glimmer/component'
-import Button from 'openxpki/data/button'
+import Clickable from 'openxpki/data/clickable'
 
 /**
  * Draws cards.
@@ -32,8 +32,8 @@ import Button from 'openxpki/data/button'
 export default class OxiSectionCardsComponent extends Component {
     get cards() {
         let cards = this.args.def.cards || []
-        // inject _button property
-        cards.forEach(c => c._button = Button.fromHash(c))
+        // inject _clickable property
+        cards.forEach(c => c._clickable = Clickable.fromHash(c))
         return cards
     }
 }

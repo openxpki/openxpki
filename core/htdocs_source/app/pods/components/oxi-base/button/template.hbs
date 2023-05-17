@@ -1,10 +1,34 @@
-<OxiBase::Button::Raw @button={{this.button}} ...attributes>
-    {{#if this.button.tooltip}}
-        <Tippy>{{this.button.tooltip}}</Tippy>
+<OxiBase::Clickable @clickable={{this.clickable}} as |clickHandler isLoading|>
+
+    {{!-- <a href> mode --}}
+    {{#if this.clickable.href}}
+        <a
+            ...attributes
+            class="btn {{this.cssClass}}"
+            href={{this.clickable.href}}
+            target={{this.clickable.target}}
+            {{on "click" clickHandler}}
+        >
+            {{yield}}
+            {{#if isLoading}}
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            {{/if}}
+        </a>
+
+    {{!-- <button> mode (if "action", "page" or "onClick" was specified) --}}
+    {{else}}
+        <BsButton
+            ...attributes
+            @type=""
+            class={{this.cssClass}}
+            disabled={{or this.clickable.disabled isLoading}}
+            @onClick={{clickHandler}}
+        >
+            {{yield}}
+            {{#if isLoading}}
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            {{/if}}
+        </BsButton>
     {{/if}}
-    {{#if this.button.image}}
-        <img src={{this.button.image}} alt="" role="presentation"/>
-        <br/>
-    {{/if}}
-    {{this.button.label}}
-</OxiBase::Button::Raw>
+
+</OxiBase::Clickable>

@@ -1,11 +1,12 @@
 import Service from '@ember/service'
 import { service } from '@ember/service'
 import { tracked } from '@glimmer/tracking'
-import { later, cancel } from '@ember/runloop'
+import { later, next, cancel } from '@ember/runloop'
 import { isArray } from '@ember/array'
 import { set as emSet } from '@ember/object'
 import { debug } from '@ember/debug'
 import fetch from 'fetch'
+import Page from 'openxpki/data/page'
 
 /**
  * Stores the current page contents and state and provides methods to send
@@ -21,20 +22,38 @@ export default class OxiContentService extends Service {
     @service('oxi-backend') backend
 
     @tracked user = null
-    @tracked page = null
-    @tracked ping = null
-    @tracked refresh = null
+    @tracked navEntries = []
+    @tracked pingTimer = null
+    @tracked refreshTimer = null
     @tracked structure = null
-    @tracked rtoken = null
+    #rtoken = null
     @tracked tenant = null
     @tracked status = null
+
+    @tracked top = null
     @tracked popup = null
-    @tracked tabs = []
-    @tracked navEntries = []
+
     @tracked error = null
     @tracked loadingBanner = null
     last_session_id = null // to track server-side logouts with session id changes
+    /*
+    Custom handlers for exceptions returned by the server (HTTP status codes):
+        [
+            {
+                status_code: [ 403, ... ], // array or string
+                redirect: "https://...",
+            },
+            { ... }
+        ]
+    */
     serverExceptions = [] // custom HTTP response code error handling
+
+
+    TARGET = Object.freeze({
+        TOP: Symbol("TOP"),
+        POPUP: Symbol("POPUP"),
+        BLANK: Symbol("BLANK"),
+    })
 
     get tenantCssClass() {
         if (!this.tenant) return ''
@@ -55,31 +74,35 @@ export default class OxiContentService extends Service {
      * dimming the page.
      *
      * @param {hash} request - Request data
+     * @param {hash} options - Set `{ verbose: true }` to show loading banner
      * @return {Promise} Promise receiving the JSON document on success or `{}` on error
      */
-    async updateRequestQuiet(request) {
-        return this.updateRequest(request, true)
+    async requestUpdate(request, { verbose = false } = {}) {
+        return this.requestPage(request, { verbose, partial: true })
     }
 
     /**
      * Send AJAX request.
      *
      * @param {hash} request - Request data
-     * @param {bool} isQuiet - set to `true` to hide optical hints (loading banner)
+     * @param {hash} options - Set `{ verbose: true }` to show loading banner. Set `{ partial: true }` to prevent resetting the whole page
      * @return {Promise} Promise receiving the JSON document on success or `{}` on error
      */
-    async updateRequest(request, isQuiet = false) {
-        if (! isQuiet) this.#setLoadingBanner(this.intl.t('site.banner.loading'))
+    async requestPage(request, { partial = false, verbose = true } = {}) {
+        debug(`requestPage({ ..., target = ${typeof request.target == 'symbol' ? request.target.toString() : request.target} }, partial = ${partial ? true : false}, verbose = ${verbose ? true : false})`)
+        if (verbose) this.#setLoadingBanner(this.intl.t('site.banner.loading'))
 
-        if (this.refresh) {
-            cancel(this.refresh)
-            this.refresh = null
+        if (this.refreshTimer) {
+            cancel(this.refreshTimer)
+            this.refreshTimer = null
         }
 
-        let realTarget = this.#resolveTarget(request.target) // has to be done before "this.popup = null"
+        // resolve target
+        let realTarget = this.#resolveTarget(request.target)
+        delete request.target // may already be a Symbol (our fake enum) which we cannot send to the backend
 
         try {
-            let doc = await this.#request(request, isQuiet)
+            let doc = await this.#request(request)
 
             // Errors occured and handlers above returned null
             if (!doc) {
@@ -90,35 +113,34 @@ export default class OxiContentService extends Service {
             // chain backend calls via Promise
             if (this.#isBootstrapNeeded(doc.session_id)) await this.#bootstrap()
 
-            // Successful request
+            // last request sets the global status, whether it's a "top" or "popup" target
             this.status = doc.status
-            this.popup = null
 
-            // Auto refresh
-            if (doc.refresh) {
-                debug("updateRequest(): response - \"refresh\" " + doc.refresh.href + ", " + doc.refresh.timeout)
-                this.#autoRefreshOnce(doc.refresh.href, doc.refresh.timeout)
+            // Popup
+            if (realTarget === this.TARGET.POPUP) {
+                if (doc.refresh || doc.goto) console.warn("'refresh'/'goto' not supported for popup contents")
             }
+            // Page
+            else {
+                this.popup = null
 
-            // Redirect
-            if (doc.goto) {
-                debug("updateRequest(): response - \"goto\" " + doc.goto)
-                this.#redirect(doc.goto, doc.type, doc.loading_banner)
-                return doc
+                // Auto refresh
+                if (doc.refresh) {
+                    debug("requestPage(): response - \"refresh\" " + doc.refresh.href + ", " + doc.refresh.timeout)
+                    this.#autoRefreshOnce(doc.refresh.href, doc.refresh.timeout)
+                }
+
+                // Redirect
+                if (doc.goto) {
+                    debug("requestPage(): response - \"goto\" " + doc.goto)
+                    return this.#redirect(doc.goto, realTarget, doc.type, doc.loading_banner)
+                }
             }
 
             // Set page contents
-            if (doc.page || doc.main || doc.right) {
-                debug("updateRequest(): response - \"page\" and \"main\"")
-                this.#setPageContent(realTarget, doc.page, doc.main, doc.right, doc.status)
-            }
-            // or (e.g. on error) set error code for current tab
-            else {
-                if (doc.status && this.tabs.length > 0) {
-                    let currentTab = this.tabs.find(i => i.active == true)
-                    emSet(currentTab, 'status', doc.status)
-                }
-            }
+            this.#setPageContent(realTarget, request.page, doc.page, doc.main, doc.right, partial)
+
+            if (realTarget === this.TARGET.TOP) this.#refreshNavEntries()
 
             this.#setLoadingBanner(null)
             return doc // the calling code might handle other data
@@ -130,6 +152,66 @@ export default class OxiContentService extends Service {
             this.error = this.intl.t('error_popup.message.client', { reason: error })
             return null
         }
+    }
+
+    openPage(name, target, force) {
+        debug(`openPage(name = ${name}, target = ${typeof target == 'symbol' ? target.toString() : target}, force = ${force})`)
+
+        if (this.#resolveTarget(target) == this.TARGET.POPUP) {
+            debug(`Transitioning to ${this.router.urlFor('openxpki.popup', name)}`)
+            return this.router.transitionTo('openxpki.popup', name, {
+                // add query parameter popupBackButton=1 if there is a previous popup page
+                queryParams: { ...(this.popup && { popupBackButton: 1 }) },
+            })
+        }
+        else {
+            // close popup
+            this.popup = null
+
+            // this also removes the popup related data from the URL
+            if (force) {
+                return this.router.transitionTo('openxpki', name, { queryParams: { force: (new Date()).valueOf() } })
+            }
+            else {
+                return this.router.transitionTo('openxpki', name)
+            }
+        }
+    }
+
+    openLink(href, target) {
+        debug(`openLink(href = ${href}, target = ${typeof target == 'symbol' ? target.toString() : target})`)
+
+        // close popup
+        this.popup = null
+
+        // open link
+        let realTarget = this.#resolveTarget(target, true)
+        window.open(href, realTarget == this.TARGET.TOP ? '_self' : '_blank')
+    }
+
+    closePopup() {
+        // close popup
+        this.popup = null
+        // transition to current route (keeps the current model/page) but without the "popup" part
+        return this.router.transitionTo('openxpki')
+    }
+
+    #resolveTarget(rawTarget = 'self', isLink) {
+        let target = (typeof rawTarget == 'symbol') ? rawTarget : null
+
+        // Pseudo-target "self" leads to content being shown in the currently active place.
+        if (rawTarget === 'self') target = this.popup ? this.TARGET.POPUP : this.TARGET.TOP
+        if (rawTarget === 'top') target = this.TARGET.TOP
+        if (rawTarget === 'popup') target = this.TARGET.POPUP
+        if (rawTarget === 'modal') target = this.TARGET.POPUP // FIXME remove support for legacy target 'modal'
+
+        /* eslint-disable-next-line no-console */
+        if (target === null) console.warn(`Invalid page/action/link target found: "${rawTarget}"`)
+
+        // Links are always opened as "top", i.e. they replace the current URL
+        if (isLink && target == this.TARGET.POPUP) target = this.TARGET.TOP
+
+        return target
     }
 
     #isBootstrapNeeded(session_id) {
@@ -152,14 +234,14 @@ export default class OxiContentService extends Service {
 
     // "Bootstrapping" - menu, user info, locale, ...
     async #bootstrap() {
+        debug("#bootstrap()")
         let doc = await this.#request({
             page: "bootstrap!structure",
             baseurl: window.location.pathname,
         }, true)
 
-        debug("#bootstrap(): response")
 
-        if (doc.rtoken) this.rtoken = doc.rtoken // CSRF token
+        if (doc.rtoken) this.#rtoken = doc.rtoken // CSRF token
         if (doc.language) this.oxiLocale.locale = doc.language
         this.user = doc.user // this also unsets the user on logout!
 
@@ -175,7 +257,6 @@ export default class OxiContentService extends Service {
         // keepalive ping
         if (doc.ping) {
             debug("#bootstrap(): setting ping = " + doc.ping)
-            if (this.ping) cancel(this.ping)
             this.#ping(doc.ping)
         }
 
@@ -185,7 +266,7 @@ export default class OxiContentService extends Service {
         return doc
     }
 
-    async #request(request, isQuiet = false) {
+    async #request(request) {
         debug("#request(" + ['page','action'].map(p=>request[p]?`${p} = ${request[p]}`:null).filter(e=>e!==null).join(", ") + ")")
 
         let data = {
@@ -198,7 +279,7 @@ export default class OxiContentService extends Service {
         let method
         if (request.action) {
             method = 'POST'
-            data._rtoken = this.rtoken
+            data._rtoken = this.#rtoken
         }
         // GET
         else {
@@ -226,26 +307,8 @@ export default class OxiContentService extends Service {
         }
     }
 
-    setPage(page) {
-        this.page = page
-        this.#refreshNavEntries()
-    }
-
     setTenant(tenant) {
         this.tenant = tenant
-    }
-
-    #resolveTarget(requestTarget) {
-        let target = requestTarget || 'self'
-        // Pseudo-target "self" is transformed so new content will be shown in the
-        // currently active place: a modal popup, an active tab or on top (i.e. single hidden tab)
-        if (target === 'self') {
-            if (this.popup) { target = 'popup' }
-            else if (this.tabs.length > 1) { target = 'active' }
-            else { target = 'top' }
-        }
-        if (target === 'modal') target = 'popup'; // FIXME remove support for legacy target 'modal'
-        return target
     }
 
     // Sets the loading state, i.e. dims the page and shows a banner with the
@@ -253,17 +316,17 @@ export default class OxiContentService extends Service {
     // If 'message' is set to null, the banner will be hidden.
     #setLoadingBanner(message) {
         // note that we cannot use the Ember "loading" event as this would only
-        // trigger on route changes, but not if we do updateRequest()
+        // trigger on route changes, but not if we do e.g. background updates via requestUpate()
         if (message) {
-            // remove focus from button to prevent user from doing another
-            // submit by hitting enter
+            // remove focus from button to prevent user from doing another request e.g. by hitting enter
             document.activeElement.blur()
         }
         this.loadingBanner = message
     }
 
     #ping(href, timeout) {
-        this.ping = later(this, () => {
+        if (this.pingTimer) cancel(this.pingTimer)
+        this.pingTimer = later(this, () => {
             fetch(href, {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
@@ -278,19 +341,27 @@ export default class OxiContentService extends Service {
         }, timeout)
     }
 
-    #autoRefreshOnce(href, timeout) {
-        this.refresh = later(this, function() {
-            this.updateRequest({ page: href })
+    #autoRefreshOnce(page, timeout) {
+        this.refreshTimer = later(this, function() {
+            this.requestPage({ page })
         }, timeout)
     }
 
-    #redirect(url, type = 'internal', banner = this.intl.t('site.banner.redirecting')) {
+    #redirect(url, target = this.TARGET.TOP, type = 'internal', banner = this.intl.t('site.banner.redirecting')) {
         if (type == 'external' || /^(http|\/)/.test(url)) {
-            this.#setLoadingBanner(banner); // never hide banner as browser will open a new page
+            this.#setLoadingBanner(banner) // never hide banner as browser will open a new page
             window.location.href = url
         }
         else {
-            this.router.transitionTo("openxpki", url)
+            /* Workaround for "TransitionAborted..." error. The error seemingly
+             * occurs in Embers rerendering triggered by changes to @tracked
+             * properties that we do before #redirect() is called. Ember's
+             * update handlers seem to be executed asynchronously and somehow
+             * cause the TransitionAborted error.
+             * Tested for Ember 4.12.0
+             */
+            next(this, function() { this.openPage(url, target) })
+            //this.openPage(url)
         }
     }
 
@@ -323,54 +394,41 @@ export default class OxiContentService extends Service {
         this.error = this.intl.t('error_popup.message.server', { code: status_code })
     }
 
-    #setPageContent(target, page, main, right, status) {
-        let newTab = {
-            active: true,
-            page,
-            main,
-            right,
-            status,
-        }
-
+    #setPageContent(target, requestedPageName, page, main, right, partial) {
         // Mark the first form on screen: only the first one is allowed to focus
         // its first input field.
-        let isFirst = true
-        for (const section of [...(newTab.main||[]), ...(newTab.right||[])]) {
+        for (const section of [...(main||[]), ...(right||[])]) {
             if (section.type === "form") {
-                section.content.isFirstForm = isFirst
-                if (isFirst) isFirst = false
+                section.content.isFirstForm = true
+                break
             }
         }
 
-        // Popup
-        if (target === "popup") {
-            this.popup = newTab
+        let obj
+        if (target === this.TARGET.POPUP) {
+            if (!this.popup) this.popup = new Page()
+            obj = this.popup
         }
-        // New tab
-        else if (target === "tab") {
-            let tabs = this.tabs
-            tabs.forEach(i => emSet(i, "active", false))
-            tabs.pushObject(newTab)
-        }
-        // Current tab
-        else if (target === "active") {
-            let tabs = this.tabs
-            let index = tabs.indexOf(tabs.find(i => i.active == true)) // findBy() is an EmberArray method
-            tabs.replace(index, 1, [newTab]) // top
-        }
-        // Set as only tab
         else {
-            this.tabs = [newTab]
+            // If it was a call to an action, requestedPageName == undefined.
+            // In this case we do not wipe the page data.
+            if (!this.top || (partial == false && requestedPageName)) this.top = new Page()
+            obj = this.top
         }
+        obj.setFromHash({
+            ...(requestedPageName && { name: requestedPageName }),
+            ...(page && { page }),
+            ...(main && { main }),
+            ...(right && { right }),
+        })
     }
 
     #refreshNavEntries() {
-        let page = this.page
         for (const entry of this.navEntries) {
-            emSet(entry, "active", (entry.key === page))
+            emSet(entry, "active", (entry.key === this?.top?.name))
             if (entry.entries) {
                 entry.entries.forEach(i => emSet(i, "active", false))
-                let subEntry = entry.entries.find(i => i.key == page)
+                let subEntry = entry.entries.find(i => i.key == this?.top?.name)
                 if (subEntry) {
                     emSet(subEntry, "active", true)
                     emSet(entry, "active", true)

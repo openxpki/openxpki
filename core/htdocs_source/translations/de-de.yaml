@@ -8,6 +8,7 @@ site:
     loading: "Laden..."
     redirecting: "Weiterleitung..."
   close_popup: "Schließen"
+  back: "Zurück"
   workflow_info: "Workflow"
   old_browser: "Sie benutzen eine veraltete Browser-Version: {browser}. Das kann zu Problemen bei der Benutzung von OpenXPKI führen."
 

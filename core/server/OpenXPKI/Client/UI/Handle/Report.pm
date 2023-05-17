@@ -41,10 +41,9 @@ sub render_report_list {
                 { sTitle => "_fetchid" },
             ],
             actions => [{
-                path => $self->_client->script_url . "?page=$fetchid!idx!{_fetchid}",
+                href => $self->_client->script_url . "?page=$fetchid!idx!{_fetchid}",
                 label => '',
                 icon => 'view',
-                target => '_blank',
             }],
             data => \@data,
             empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',

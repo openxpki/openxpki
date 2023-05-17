@@ -132,7 +132,7 @@ export default class OxiFieldTextComponent extends Component {
             // resolve referenced fields and their values
             let ref = this.args.encodeFields(this.acFieldRefParams.keys(), this.acFieldRefParams); // returns an Object
 
-            this.content.updateRequestQuiet({
+            this.content.requestUpdate({
                 action: this.args.content.autocomplete_query.action,
                 [this.args.content.name] : value, // [] denotes a dynamic key name
                 ...ref,

@@ -2486,9 +2486,6 @@ msgstr "状态"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "工作流程属性"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL"
-msgstr "返回信息"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_DESCRIPTION"
 msgstr ""
 "请输入要包含在批量操作中的工作流程的搜索条件。 您可以在下一页选择单个项目。"

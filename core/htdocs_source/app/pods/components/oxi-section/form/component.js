@@ -5,7 +5,7 @@ import { isArray } from '@ember/array';
 import { service } from '@ember/service';
 import { debug } from '@ember/debug';
 import Field from 'openxpki/data/field';
-import Button from 'openxpki/data/button';
+import ContainerButton from 'openxpki/data/container-button';
 
 /**
  * Draws a form.
@@ -34,16 +34,16 @@ export default class OxiSectionFormComponent extends Component {
     get buttons() {
         let buttons = []
 
-        // We cannot use Button.fromHash() here as the would prevent Ember from
+        // We cannot use ContainerButton.fromHash() here as the would prevent Ember from
         // tracking state changes.
-        let submit = new Button()
+        let submit = new ContainerButton()
         submit.label = this.args.def.submit_label || this.intl.t('component.oxisection_form.submit')
         submit.format = this.loading ? "loading" : "submit"
         submit.onClick = this.submit
         buttons.push(submit)
 
         if (this.args.def.reset) {
-            let reset = new Button()
+            let reset = new ContainerButton()
             reset.label = this.args.def.reset_label || this.intl.t('component.oxisection_form.reset')
             reset.format = "reset"
             reset.page = this.args.def.reset
@@ -257,7 +257,7 @@ export default class OxiSectionFormComponent extends Component {
 
         let fields = this.fields;
 
-        return this.content.updateRequest(request, true)
+        return this.content.requestUpdate(request)
         .then((doc) => {
             for (const newField of this.#prepareFields(doc.fields)) {
                 for (const oldField of fields) {
@@ -395,7 +395,7 @@ export default class OxiSectionFormComponent extends Component {
         let res
         try {
             this.loading = true;
-            res = await this.content.updateRequest(request)
+            res = await this.content.requestPage(request)
         }
         finally {
             this.loading = false;

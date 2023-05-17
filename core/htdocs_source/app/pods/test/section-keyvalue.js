@@ -58,7 +58,7 @@ export default {
                 value: {
                     page: "workflow!load!wf_id!13567",
                     label: 13567,
-                    target: "_blank",
+                    target: "top",
                 },
             },
             {

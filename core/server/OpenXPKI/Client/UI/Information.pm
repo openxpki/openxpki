@@ -68,7 +68,7 @@ sub init_issuer {
         className => 'cacertificate',
         content => {
             actions => [{
-                path => 'certificate!detail!identifier!{identifier}',
+                page => 'certificate!detail!identifier!{identifier}',
                 target => 'popup',
             }],
             columns => [

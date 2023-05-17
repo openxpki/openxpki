@@ -16,14 +16,12 @@ export default class OpenXpkiController extends Controller {
       https://api.emberjs.com/ember/release/classes/Controller
     */
     queryParams = [
-        "count",
         "limit",
         "startat",
         "force",
     ];
 
     // FIXME Remove those three?! (auto-injected by Ember, see queryParams above)
-    count = null;
     startat = null;
     limit = null;
 
@@ -88,10 +86,6 @@ export default class OpenXpkiController extends Controller {
         return `${agent.browser} ${known_version}`
     }
 
-    get showTabs() {
-        return this.model.tabs.length > 1
-    }
-
     // We don't use <ddm.LinkTo> but our own method to navigate to target page.
     // This way we can force Ember to do a transition even if the new page is
     // the same page as before by setting parameter "force" a timestamp.
@@ -99,42 +93,19 @@ export default class OpenXpkiController extends Controller {
     navigateTo(page, navbarCollapseFunc, event) {
         if (event) { event.stopPropagation(); event.preventDefault() }
         if (navbarCollapseFunc) navbarCollapseFunc()
-        this.router.transitionTo('openxpki', page, { queryParams: { force: (new Date()).valueOf() } })
+        this.content.openPage(page, this.content.TARGET.TOP, true)
     }
 
     @action
     logout(event) {
         if (event) { event.stopPropagation(); event.preventDefault() }
         this.content.setTenant(null);
-        this.navigateTo('logout');
-    }
-
-    @action
-    activateTab(entry) {
-        let tabs = this.model.tabs;
-        tabs.forEach(i => emSet(i, "active", false))
-        emSet(entry, "active", true);
-        return false;
-    }
-
-    @action
-    closeTab(entry) {
-        let tabs = this.model.tabs;
-        tabs.removeObject(entry);
-        if (!tabs.find(i => i.active == true)) {
-            emSet(tabs.at(-1), "active", true);
-        }
-        return false;
+        this.content.openPage('logout', this.content.TARGET.TOP, true)
     }
 
     @action
     reload() {
         return window.location.reload();
-    }
-
-    @action
-    clearPopupData() {
-        return this.model.popup = null
     }
 
     @action

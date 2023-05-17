@@ -35,7 +35,7 @@ export default class OxiLabelComponent extends Component {
     @action
     fetchTooltip(event) {
         if (this.tooltipContent) return;
-        this.content.updateRequestQuiet({
+        this.content.requestUpdate({
             page: this.args.tooltip_page,
             ...this.args.tooltip_page_args,
         }).then((doc) => {

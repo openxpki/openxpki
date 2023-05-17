@@ -40,6 +40,8 @@ export default class Base {
      * @memberOf Base
      */
     setFromHash(sourceHash) {
+        if (typeof sourceHash === 'undefined' || sourceHash === null) return
+
         // list our and their properties
         let ourProps = this.getPropertyNames()
         let theirProps = sourceHash instanceof Base ? sourceHash.getPropertyNames() : Object.keys(sourceHash)
@@ -54,7 +56,6 @@ export default class Base {
         }
 
         if (unknownProps.length > 0) {
-            /* eslint-disable-next-line no-console */
             debug(`Attempt to set unknown properties in ${this.constructor.name} instance "${sourceHash[this.constructor._idField] ?? '<unknown>'}": ${unknownProps.join(', ')}`)
             debug(`If you need to process these backend properties, please add them to ${this.constructor._type}.js or one of its ancestors.`)
         }

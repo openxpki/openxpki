@@ -186,20 +186,13 @@ sub init_context {
         large => 1,
     );
 
-    my %buttons;
-    %buttons = ( buttons => [{
-        page => 'workflow!info!wf_id!'.$wf_info->{workflow}->{id},
-        label => 'I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL',
-        format => "primary",
-    }]) if ($view eq 'result');
-
     $self->main->add_section({
         type => 'keyvalue',
         content => {
             label => '',
             data => $self->__render_fields( $wf_info, 'context'),
-            %buttons
-    }});
+        },
+    });
 
     return $self;
 
@@ -237,20 +230,13 @@ sub init_attribute {
         large => 1,
     );
 
-    my %buttons;
-    %buttons = ( buttons => [{
-        page => 'workflow!info!wf_id!'.$wf_info->{workflow}->{id},
-        label => 'I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL',
-        format => "primary",
-    }]) if ($view eq 'result');
-
     $self->main->add_section({
         type => 'keyvalue',
         content => {
             label => '',
             data => $self->__render_fields( $wf_info, 'attribute'),
-            %buttons
-    }});
+        },
+    });
 
     return $self;
 
@@ -635,7 +621,7 @@ sub init_result {
         className => 'workflow',
         content => {
             actions => [{
-                path => 'workflow!info!wf_id!{serial}',
+                page => 'workflow!info!wf_id!{serial}',
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
                 icon => 'view',
                 target => 'popup',
@@ -817,13 +803,6 @@ sub init_history {
 
     my $workflow_history = $self->send_command_v2( 'get_workflow_history', { id => $id } );
 
-    my %buttons;
-    %buttons = ( buttons => [{
-        page => 'workflow!info!wf_id!'.$id,
-        label => 'I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL',
-        format => "primary",
-    }]) if ($view eq 'result');
-
     $self->log->trace( "dumper result: " . Dumper $workflow_history) if $self->log->is_trace;
 
     my $i = 1;
@@ -854,7 +833,6 @@ sub init_history {
                 { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_NODE_LABEL' },
             ],
             data => \@result,
-            %buttons,
         },
     });
 
@@ -888,7 +866,7 @@ sub init_mine {
             reverse => 1,
         },
         actions => [{
-            path => 'workflow!info!wf_id!{serial}',
+            page => 'workflow!info!wf_id!{serial}',
             label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
             icon => 'view',
             target => 'popup',
@@ -964,13 +942,6 @@ sub init_log {
 
     my $result = $self->send_command_v2( 'get_workflow_log', { id => $id } );
 
-    my %buttons;
-    %buttons = ( buttons => [{
-        page => 'workflow!info!wf_id!'.$id,
-        label => 'I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL',
-        format => "primary",
-    }]) if ($view eq 'result');
-
     $result = [] unless($result);
 
     $self->log->trace( "dumper result: " . Dumper $result) if $self->log->is_trace;
@@ -986,7 +957,6 @@ sub init_log {
             ],
             data => $result,
             empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
-            %buttons,
         }
     });
 
@@ -1038,7 +1008,7 @@ sub __render_task_list {
         );
     }
 
-    my $actions = $item->{actions} // [{ path => 'redirect!workflow!load!wf_id!{serial}', icon => 'view' }];
+    my $actions = $item->{actions} // [{ page => 'redirect!workflow!load!wf_id!{serial}', icon => 'view' }];
 
     # create the header from the columns spec
     my ($header, $column, $rattrib) = $self->__render_list_spec( \@cols );

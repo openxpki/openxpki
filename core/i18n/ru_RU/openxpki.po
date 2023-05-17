@@ -3069,10 +3069,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL"
-msgstr "Родительский технологический процесс"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_DESCRIPTION"
 msgstr "Описания пока нет"
 

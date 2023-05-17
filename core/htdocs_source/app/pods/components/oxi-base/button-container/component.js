@@ -17,24 +17,25 @@ import ContainerButton from 'openxpki/data/container-button'
  * @extends Component
  */
 export default class OxiButtonContainerComponent extends Component {
-    get buttons() {
+    buttons
+    buttonGroups
+
+    constructor() {
+        super(...arguments)
+
+        // buttons
         let btns = this.args.buttons || []
-        return btns.map(def => ContainerButton.fromHash(def))
-    }
+        this.buttons = btns.map(def => ContainerButton.fromHash(def))
 
-    get buttonGroups() {
-        let groups = []
+        // button groups
+        this.buttonGroups = []
         let currentGroup = []
-
         for (const btn of this.buttons) {
-            if (btn.break_before) { groups.push(currentGroup); currentGroup = [] }
+            if (btn.break_before) { this.buttonGroups.push(currentGroup); currentGroup = [] }
             currentGroup.push(btn)
-            if (btn.break_after)  { groups.push(currentGroup); currentGroup = [] }
+            if (btn.break_after)  { this.buttonGroups.push(currentGroup); currentGroup = [] }
         }
-
-        groups.push(currentGroup)
-
-        return groups
+        this.buttonGroups.push(currentGroup)
     }
 
     get hasDescription() {

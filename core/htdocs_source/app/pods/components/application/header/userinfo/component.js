@@ -36,6 +36,6 @@ export default class ApplicationHeaderUserinfo extends Component {
     setTenant(tenant) {
         if (tenant.value == this.content.tenant) return;
         this.content.setTenant(tenant.value);
-        this.openxpki.navigateTo('welcome');
+        this.content.openPage('welcome', this.content.TARGET.TOP, true)
     }
 }

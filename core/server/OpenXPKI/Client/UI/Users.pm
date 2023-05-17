@@ -299,9 +299,9 @@ sub __render_result_table {
         className => 'users',
         content => {
             actions => [{
+                page => 'workflow!index!wf_type!edit_user!username!{I18N_OPENXPKI_UI_USER_USERNAME}',
                 label => 'I18N_OPENXPKI_UI_USER_EDIT_USER',
-                path => 'workflow!index!wf_type!edit_user!username!{I18N_OPENXPKI_UI_USER_USERNAME}',
-                target => 'main',
+                target => 'top',
             }],
             columns => @columns,
             data => $entries,

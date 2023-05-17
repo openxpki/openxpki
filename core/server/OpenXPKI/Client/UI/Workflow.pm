@@ -60,7 +60,7 @@ has __default_wfdetails => (
             field => 'id',
             link => {
                 page => 'workflow!load!wf_id![% id %]',
-                target => '_blank',
+                target => 'top',
             },
         },
         {
@@ -597,10 +597,10 @@ sub __render_from_workflow {
                         className => 'workflow',
                         content => {
                             actions => ($field->{action} ? [{
-                                path => $field->{action},
+                                page => $field->{action},
                                 label => '',
                                 icon => 'view',
-                                target => ($field->{target} ? $field->{target} : 'tab'),
+                                target => ($field->{target} ? $field->{target} : 'top'),
                             }] : undef),
                             columns =>  $field->{header},
                             data => $field->{value},
@@ -1393,7 +1393,7 @@ sub __render_output_field {
             $item->{value}  = {
                 label => $workflow_id,
                 page => 'workflow!load!wf_id!'.$workflow_id,
-                target => '_blank',
+                target => 'top',
                 value => $workflow_id,
             };
         } else {
@@ -1638,7 +1638,7 @@ sub __render_output_field {
             $item->{header} = [ @head = map { { 'sTitle' => '' } } @{$item->{value}->[0]} ];
         }
         $item->{action} = $field->{action};
-        $item->{target} = $field->{target} ?  $field->{target} : 'tab';
+        $item->{target} = $field->{target} ? $field->{target} : 'top';
 
     } elsif ($item->{format} eq "chart") {
 

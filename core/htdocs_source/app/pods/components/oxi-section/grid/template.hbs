@@ -63,17 +63,19 @@
                         <td>
                             <BsDropdown as |dd|>
                                 <dd.toggle><span class="glyphicon glyphicon-cog"></span></dd.toggle>
-                                <dd.menu @renderInPlace={{false}} as |ddm|>
-                                    {{#each @def.actions as |action|}}
+                                <dd.menu @renderInPlace={{true}} as |ddm|>
+                                    {{#each row.actions as |rowAction|}}
                                         <ddm.item>
-                                            <button
-                                                class="dropdown-item" type="button" {{on "click" (fn this.executeAction row action)}}
-                                            >
-                                                {{action.label}}
-                                                {{#if action.icon}}
-                                                    <span class="float-end glyphicon glyphicon-{{action.icon}}"></span>
-                                                {{/if}}
-                                            </button>
+                                            <OxiBase::Clickable @clickable={{rowAction}} as |clickHandler isLoading|>
+                                                <button
+                                                    class="dropdown-item" type="button" {{on "click" clickHandler}}
+                                                >
+                                                    {{rowAction.label}}
+                                                    {{#if rowAction.icon}}
+                                                        <span class="float-end glyphicon glyphicon-{{rowAction.icon}}"></span>
+                                                    {{/if}}
+                                                </button>
+                                            </OxiBase::Clickable>
                                         </ddm.item>
                                     {{/each}}
                                 </dd.menu>
@@ -81,15 +83,23 @@
                         </td>
                     {{/if}}
                     {{#each row.data as |value|}}
-                        {{!-- template-lint-disable require-presentational-children --}}
-                        <td {{on "click" (fn this.executeAction row this.firstAction)}} role="button">
-                            <OxiBase::Formatted @format={{value.format}} @value={{value.value}}/>
-                        </td>
+                        {{#if this.hasAction}}
+                            {{!!-- template-lint-disable require-presentational-children --}}
+                            <OxiBase::Clickable @clickable={{row.actions.[0]}} as |clickHandler isLoading|>
+                                <td {{on "click" clickHandler}} role="button">
+                                    <OxiBase::Formatted @format={{value.format}} @value={{value.value}}/>
+                                </td>
+                            </OxiBase::Clickable>
+                        {{else}}
+                            <td>
+                                <OxiBase::Formatted @format={{value.format}} @value={{value.value}}/>
+                            </td>
+                        {{/if}}
                     {{/each}}
                 </tr>
            {{else}}
                 <tr><td colspan="{{this.formattedColumns.length}}">
-                    {{if @def.empty @def.empty "&nbsp;"}}
+                    {{try @def.empty "&nbsp;"}}
                 </td></tr>
            {{/each}}
         </tbody>
@@ -101,13 +111,6 @@
             </tfoot>
         {{/if}}
     </table>
-    <div class="dropdown">
-        <ul class="dropdown-menu" role="menu">
-            {{#each @def.actions as |action|}}
-                <button class="dropdown-item" tabindex="-1" href="#" type="button">{{action.label}}</button>
-            {{/each}}
-        </ul>
-    </div>
 </div>
 
 <div class="row">

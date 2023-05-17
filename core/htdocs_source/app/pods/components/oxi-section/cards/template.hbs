@@ -4,7 +4,7 @@
 
         <div class="col-md-10">
         {{#each this.cards as |card|}}
-            <OxiBase::Button::Raw @button={{card._button}} class="card w-100 mx-0 my-4 p-0 text-start bg-light">
+            <OxiBase::Button @button={{card._clickable}} class="card w-100 mx-0 my-4 p-0 text-start bg-light">
                 {{#if card.label}}
                     <div class="card-header w-100 text-body-secondary text-center bg-secondary text-light">
                         <h5 class="card-title">
@@ -31,7 +31,7 @@
                         {{defuse card.footer}}
                     </div>
                 {{/if}}
-            </OxiBase::Button::Raw>
+            </OxiBase::Button>
         {{/each}}
         </div>
 
@@ -40,7 +40,7 @@
         <div class="row row-cols-1 row-cols-md-3 g-4">
         {{#each this.cards as |card|}}
             <div class="col">
-                <OxiBase::Button::Raw @button={{card._button}} class="card h-100 w-100 m-0 p-0 text-start align-items-center bg-light">
+                <OxiBase::Button @button={{card._clickable}} class="card h-100 w-100 m-0 p-0 text-start align-items-center bg-light">
                     {{#if card.label}}
                         <div class="card-header w-100 text-body-secondary text-center bg-secondary text-light">
                             <h5 class="card-title">
@@ -61,7 +61,7 @@
                             {{defuse card.footer}}
                         </div>
                     {{/if}}
-                </OxiBase::Button::Raw>
+                </OxiBase::Button>
             </div>
         {{/each}}
         </div>
