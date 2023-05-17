@@ -159,7 +159,10 @@ export default class OxiContentService extends Service {
 
         if (this.#resolveTarget(target) == this.TARGET.POPUP) {
             debug(`Transitioning to ${this.router.urlFor('openxpki.popup', name)}`)
-            return this.router.transitionTo('openxpki.popup', name)
+            return this.router.transitionTo('openxpki.popup', name, {
+                // add query parameter popupBackButton=1 if there is a previous popup page
+                queryParams: { ...(this.popup && { popupBackButton: 1 }) },
+            })
         }
         else {
             // close popup

@@ -20,7 +20,16 @@
                 <OxiSection @content={{mainEntry}}/>
             {{/each}}
         </Modal.body>
-        <Modal.footer>
+        <Modal.footer class={{if this.popupBackButton "justify-content-start"}}>
+            {{#if this.popupBackButton}}
+                <BsButton
+                    @type=""
+                    class="btn-primary me-auto"
+                    @onClick={{this.goBack}}
+                >
+                    <i class="glyphicon glyphicon-chevron-left"></i> {{t 'site.back'}}
+                </BsButton>
+            {{/if}}
             <BsButton {{on "click" Modal.close}}>{{t 'site.close_popup'}}</BsButton>
         </Modal.footer>
     </BsModal>
