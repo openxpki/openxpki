@@ -2,9 +2,10 @@ import Controller from '@ember/controller'
 import { tracked } from '@glimmer/tracking'
 import { action, set as emSet } from '@ember/object'
 import { service } from '@ember/service'
-import lite from 'caniuse-lite'
-import { detect } from 'detect-browser'
 import { A } from '@ember/array'
+import { debug } from '@ember/debug'
+import { detect } from 'detect-browser'
+import lite from 'caniuse-lite'
 
 export default class OpenXpkiController extends Controller {
     @service('oxi-config') config;
@@ -16,21 +17,23 @@ export default class OpenXpkiController extends Controller {
       defines the supported query parameters. Ember makes them available as this.count etc.
       https://api.emberjs.com/ember/release/classes/Controller
     */
+    // binds the query parameter to the object property
     queryParams = [
-        "limit",
-        "startat",
-        "force",
-    ];
-
-    // FIXME Remove those three?! (auto-injected by Ember, see queryParams above)
-    startat = null;
-    limit = null;
+        'startat',
+        'limit',
+        'force',
+        // 'breadcrumbAction' -- not neccessary as we only evaluate it in route.js/model()
+    ]
+    @tracked startat = null
+    @tracked limit = null
+    @tracked force = null
+    // @tracked breadcrumbAction = null
 
     @tracked loading = false;
     @tracked showInfoBlock = false;
 
     get breadcrumbs() {
-        let bc = (this.model.top.page.breadcrumb || []).filter(el => el.label)
+        let bc = (this.model.breadcrumbs || []).filter(el => el.label)
         return A(bc) // Ember Array allows to query .lastObject
     }
 

@@ -121,12 +121,24 @@
     <div class="row">
         <div class="col oxi-pagehead">
             {{#each this.breadcrumbs as |bc|}}
-                <span class="badge rounded-pill bg-secondary oxi-breadcrumb mb-3 {{bc.className}}">
-                    {{bc.label}}
-                </span>
+                {{#let (concat "badge rounded-pill oxi-breadcrumb mb-3 " bc.class) as |css|}}
+                {{#if bc.page}}
+                    <a
+                        class="btn btn-primary {{css}}"
+                        role="button"
+                        {{on "click" (fn this.model.gotoBreadcrumb bc)}}
+                    >
+                        {{bc.label}}
+                    </a>
+                {{else}}
+                    <span class="{{css}} bg-secondary">
+                        {{bc.label}}
+                    </span>
+                {{/if}}
                 {{#unless (eq bc this.breadcrumbs.lastObject)}}
                     <i class="glyphicon glyphicon-chevron-right text-secondary mx-2"></i>
                 {{/unless}}
+                {{/let}}
             {{/each}}
             {{#if this.model.top.page.label}}
                 <h3>{{this.model.top.page.label}}</h3>

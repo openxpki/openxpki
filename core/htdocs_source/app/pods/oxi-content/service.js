@@ -3,7 +3,7 @@ import { service } from '@ember/service'
 import { tracked } from '@glimmer/tracking'
 import { later, next, cancel } from '@ember/runloop'
 import { isArray } from '@ember/array'
-import { set as emSet } from '@ember/object'
+import { action, set as emSet } from '@ember/object'
 import { debug } from '@ember/debug'
 import fetch from 'fetch'
 import Page from 'openxpki/data/page'
@@ -32,6 +32,7 @@ export default class OxiContentService extends Service {
 
     @tracked top = null
     @tracked popup = null
+    @tracked breadcrumbs = []
 
     @tracked error = null
     @tracked loadingBanner = null
@@ -88,7 +89,7 @@ export default class OxiContentService extends Service {
      * @param {hash} options - Set `{ verbose: true }` to show loading banner. Set `{ partial: true }` to prevent resetting the whole page
      * @return {Promise} Promise receiving the JSON document on success or `{}` on error
      */
-    async requestPage(request, { partial = false, verbose = true } = {}) {
+    async requestPage(request, { partial = false, verbose = true, ignoreBreadcrumbs = false } = {}) {
         debug(`requestPage({ ..., target = ${typeof request.target == 'symbol' ? request.target.toString() : request.target} }, partial = ${partial ? true : false}, verbose = ${verbose ? true : false})`)
         if (verbose) this.#setLoadingBanner(this.intl.t('site.banner.loading'))
 
@@ -138,7 +139,7 @@ export default class OxiContentService extends Service {
             }
 
             // Set page contents
-            this.#setPageContent(realTarget, request.page, doc.page, doc.main, doc.right, partial)
+            this.#setPageContent(realTarget, request.page, doc.page, doc.main, doc.right, partial, ignoreBreadcrumbs)
 
             if (realTarget === this.TARGET.TOP) this.#refreshNavEntries()
 
@@ -154,27 +155,30 @@ export default class OxiContentService extends Service {
         }
     }
 
-    openPage(name, target, force) {
+    openPage(name, target, force = false, params = null) {
         debug(`openPage(name = ${name}, target = ${typeof target == 'symbol' ? target.toString() : target}, force = ${force})`)
 
         if (this.#resolveTarget(target) == this.TARGET.POPUP) {
             debug(`Transitioning to ${this.router.urlFor('openxpki.popup', name)}`)
             return this.router.transitionTo('openxpki.popup', name, {
                 // add query parameter popupBackButton=1 if there is a previous popup page
-                queryParams: { ...(this.popup && { popupBackButton: 1 }) },
+                queryParams: {
+                    ...params,
+                    ...(this.popup && { popupBackButton: 1 }),
+                },
             })
         }
         else {
             // close popup
             this.popup = null
-
-            // this also removes the popup related data from the URL
-            if (force) {
-                return this.router.transitionTo('openxpki', name, { queryParams: { force: (new Date()).valueOf() } })
-            }
-            else {
-                return this.router.transitionTo('openxpki', name)
-            }
+            // this transition also removes the popup related data from the URL
+            debug(`Transitioning to ${this.router.urlFor('openxpki', name)}`)
+            return this.router.transitionTo('openxpki', name, {
+                queryParams: {
+                    ...params,
+                    ...(force && { force: (new Date()).valueOf() }),
+                }
+            })
         }
     }
 
@@ -194,6 +198,16 @@ export default class OxiContentService extends Service {
         this.popup = null
         // transition to current route (keeps the current model/page) but without the "popup" part
         return this.router.transitionTo('openxpki')
+    }
+
+    @action
+    gotoBreadcrumb(bc) {
+        let i = this.breadcrumbs.findIndex(el => el === bc)
+        debug(`Navigating to breadcrumb #${i}: ${bc.page}`)
+        // cut breadcrumbs list back to the one we're navigating to
+        this.breadcrumbs = this.breadcrumbs.slice(0, i+1)
+        // open breadcrumb's page
+        this.openPage(bc.page, this.TARGET.TOP, false, { breadcrumbAction: 1 })
     }
 
     #resolveTarget(rawTarget = 'self', isLink) {
@@ -394,7 +408,7 @@ export default class OxiContentService extends Service {
         this.error = this.intl.t('error_popup.message.server', { code: status_code })
     }
 
-    #setPageContent(target, requestedPageName, page, main, right, partial) {
+    #setPageContent(target, requestedPageName, page, main, right, partial, ignoreBreadcrumbs) {
         // Mark the first form on screen: only the first one is allowed to focus
         // its first input field.
         for (const section of [...(main||[]), ...(right||[])]) {
@@ -405,15 +419,36 @@ export default class OxiContentService extends Service {
         }
 
         let obj
+        // Popup
         if (target === this.TARGET.POPUP) {
             if (!this.popup) this.popup = new Page()
             obj = this.popup
         }
+        // Main page
         else {
             // If it was a call to an action, requestedPageName == undefined.
             // In this case we do not wipe the page data.
             if (!this.top || (partial == false && requestedPageName)) this.top = new Page()
             obj = this.top
+
+            // breadcrumbs
+            let bc = page?.breadcrumb
+            if (bc) {
+                if (ignoreBreadcrumbs) {
+                    debug('Ignoring server-sent breadcrumbs during breadcrumb-initiated navigation')
+                }
+                else {
+                    if (bc.is_root) this.breadcrumbs = []
+                    if (this.breadcrumbs.length == 0 || this.breadcrumbs.at(-1).label != bc.label) {
+                        this.breadcrumbs.push({
+                            label: bc.label || page.label || '',
+                            ...(bc.class && { class: bc.class }),
+                            ...(requestedPageName && { page: requestedPageName }),
+                        })
+                        this.breadcrumbs = this.breadcrumbs
+                    }
+                }
+            }
         }
         obj.setFromHash({
             ...(requestedPageName && { name: requestedPageName }),

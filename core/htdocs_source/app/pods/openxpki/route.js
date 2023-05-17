@@ -16,7 +16,8 @@ export default class OpenXpkiRoute extends Route {
         // hooks for this route (and any child routes) will re-fire
         startat:  { refreshModel: true },
         limit:    { refreshModel: true },
-        force:    { refreshModel: true },
+        force:    { refreshModel: true }, // not evaluated, only used to trigger model refresh
+        // breadcrumbAction -- not neccessary as we only evaluate it in model() below
     }
     topTarget = ["login", "login!logout", "welcome"]
 
@@ -34,15 +35,18 @@ export default class OpenXpkiRoute extends Route {
          */
         if (!this.content.top || page != this.content.top.name) {
             // URL-configurable pager variables for <OxiSection::Grid>
-            let limit = transition.to.queryParams.limit
-            let startat = transition.to.queryParams.startat
+            let limit = transition.to.queryParams.limit ?? null
+            let startat = transition.to.queryParams.startat ?? null
+            let breadcrumbAction = transition.to.queryParams.breadcrumbAction ?? false
 
             // assemble request
             await this.content.requestPage({
                 page,
                 target: this.content.TARGET.TOP,
-                ...(limit ? { limit } : {}),
-                ...(startat ? { startat } : {}),
+                ...(limit && { limit }),
+                ...(startat && { startat }),
+            }, {
+                ignoreBreadcrumbs: breadcrumbAction ? true : false,
             })
         }
 

@@ -18,7 +18,7 @@ has 'description' => (
 
 has 'breadcrumb' => (
     is => 'rw',
-    isa => 'ArrayRef',
+    isa => 'HashRef',
 );
 
 has 'css_class' => (

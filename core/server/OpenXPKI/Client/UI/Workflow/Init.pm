@@ -358,6 +358,10 @@ sub init_search {
     $self->set_page(
         label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_LABEL',
         description => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_DESC',
+        breadcrumb => {
+            is_root => 1,
+            class => 'workflow-search',
+        },
     );
 
     my $workflows = $self->send_command_v2( 'get_workflow_instance_types' );
@@ -568,10 +572,10 @@ sub init_result {
         $self->set_page(
             label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_LABEL',
             description => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION' . $criteria ,
-            breadcrumb => [
-                { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_LABEL', className => 'workflow-search' },
-                { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_TITLE', className => 'workflow-search-result' }
-            ],
+            breadcrumb => {
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_TITLE',
+                class => 'workflow-search-result',
+            },
         );
     }
 

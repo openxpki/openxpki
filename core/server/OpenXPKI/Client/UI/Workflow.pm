@@ -2019,30 +2019,31 @@ sub __get_breadcrumb {
     my $self = shift;
     my $wf_info = shift;
     my $state_label = shift;
-    # we set the breadcrumb only if the workflow has a title set
-    # fallback to label if title is not DEFINED is done in the API
-    # setting title to the empty string will suppress breadcrumbs
-    my @breadcrumb;
-    if ($wf_info->{workflow}->{title}) {
-        if ($wf_info->{workflow}->{id}) {
-            push @breadcrumb, {
-                className => 'workflow-type' ,
-                label => sprintf("%s (#%01d)", $wf_info->{workflow}->{title}, $wf_info->{workflow}->{id})
-            };
-        } elsif ($wf_info->{workflow}->{state} eq 'INITIAL') {
-            push @breadcrumb, {
-                className => 'workflow-type',
-                label => sprintf("%s", $wf_info->{workflow}->{title})
-            };
-        }
+
+    # We set the breadcrumb only if the workflow has a title set.
+    # Fallback to label if title is not DEFINED is done in the API.
+    # Setting title to the empty string will suppress breadcrumbs.
+    return {} unless $wf_info->{workflow}->{title};
+
+    if ($state_label) {
+        return {
+            class => 'workflow-state',
+            label => $state_label,
+        };
     }
-
-    if (@breadcrumb && $state_label) {
-        push @breadcrumb, { className => 'workflow-state', label => $state_label };
+    if ($wf_info->{workflow}->{id}) {
+        return {
+            class => 'workflow-type' ,
+            label => sprintf("%s (#%01d)", $wf_info->{workflow}->{title}, $wf_info->{workflow}->{id})
+        };
     }
-
-    return \@breadcrumb;
-
+    if ($wf_info->{workflow}->{state} eq 'INITIAL') {
+        return {
+            class => 'workflow-type',
+            label => sprintf("%s", $wf_info->{workflow}->{title})
+        };
+    }
+    return {};
 }
 
   # helper sub to render the pages description text from state/action using a template
