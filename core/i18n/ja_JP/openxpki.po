@@ -2573,9 +2573,6 @@ msgstr "状態"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "ワークフロー属性"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL"
-msgstr "戻る"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_DESCRIPTION"
 msgstr ""
 "一括処理に含めるワークフローの検索条件を入力してください。次のページで個々の"

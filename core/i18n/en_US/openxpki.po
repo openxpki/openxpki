@@ -2335,9 +2335,6 @@ msgstr "Archive at"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "Workflow Attributes"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL"
-msgstr "Back to Info"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_DESCRIPTION"
 msgstr ""
 "Please enter search criteria for the workflows to be included in your bulk "

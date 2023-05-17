@@ -2871,10 +2871,6 @@ msgstr "Stato"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "Stato"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL"
-msgstr "Ulteriori Informazioni"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_DESCRIPTION"
 msgstr ""
 "Inserisci i criteri di ricerca per selezionare i Workflow da includere nella "

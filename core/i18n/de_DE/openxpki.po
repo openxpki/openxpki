@@ -2435,9 +2435,6 @@ msgstr "Archiviere am"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "Workflow-Meta-Daten"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL"
-msgstr "Zurück zur Übersicht"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_DESCRIPTION"
 msgstr ""
 "Geben Sie bitte Suchkriterien für die Abfrage der Workflows ein. Sie können "
