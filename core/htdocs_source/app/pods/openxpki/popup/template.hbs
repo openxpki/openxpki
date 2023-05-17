@@ -11,6 +11,15 @@
         as |Modal|
     >
         <Modal.header class="bg-secondary text-white">
+            {{#if this.popupBackButton}}
+                <BsButton
+                    @type=""
+                    class="btn-outline-light me-3"
+                    @onClick={{this.goBack}}
+                >
+                    <i class="glyphicon glyphicon-chevron-left"></i> {{t 'site.back'}}
+                </BsButton>
+            {{/if}}
             <h4 class="modal-title">
                 {{if popup.page.shortlabel popup.page.shortlabel popup.page.label}}
             </h4>
@@ -20,16 +29,7 @@
                 <OxiSection @content={{mainEntry}}/>
             {{/each}}
         </Modal.body>
-        <Modal.footer class={{if this.popupBackButton "justify-content-start"}}>
-            {{#if this.popupBackButton}}
-                <BsButton
-                    @type=""
-                    class="btn-primary me-auto"
-                    @onClick={{this.goBack}}
-                >
-                    <i class="glyphicon glyphicon-chevron-left"></i> {{t 'site.back'}}
-                </BsButton>
-            {{/if}}
+        <Modal.footer>
             <BsButton {{on "click" Modal.close}}>{{t 'site.close_popup'}}</BsButton>
         </Modal.footer>
     </BsModal>
