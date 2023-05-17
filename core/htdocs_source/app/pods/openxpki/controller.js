@@ -34,6 +34,10 @@ export default class OpenXpkiController extends Controller {
         return A(bc) // Ember Array allows to query .lastObject
     }
 
+    get showInfo() {
+        return this.model.top.right && this.showInfoBlock
+    }
+
     get oldBrowser() {
         const old_age = 2 * 365
 
