@@ -1,9 +1,10 @@
-import Controller from '@ember/controller';
-import { tracked } from '@glimmer/tracking';
-import { action, set as emSet } from '@ember/object';
-import { service } from '@ember/service';
-import lite from 'caniuse-lite';
+import Controller from '@ember/controller'
+import { tracked } from '@glimmer/tracking'
+import { action, set as emSet } from '@ember/object'
+import { service } from '@ember/service'
+import lite from 'caniuse-lite'
 import { detect } from 'detect-browser'
+import { A } from '@ember/array'
 
 export default class OpenXpkiController extends Controller {
     @service('oxi-config') config;
@@ -28,12 +29,9 @@ export default class OpenXpkiController extends Controller {
     @tracked loading = false;
     @tracked showInfoBlock = false;
 
-    @action
-    getStatusClass(level) {
-        if (level === "error") { return "alert-danger" }
-        if (level === "success") { return "alert-success" }
-        if (level === "warn") { return "alert-warning" }
-        return "alert-info";
+    get breadcrumbs() {
+        let bc = (this.model.top.page.breadcrumb || []).filter(el => el.label)
+        return A(bc) // Ember Array allows to query .lastObject
     }
 
     get oldBrowser() {
@@ -84,6 +82,14 @@ export default class OpenXpkiController extends Controller {
 
         console.info(`Detected browser "${agent.browser} ${known_version}" is ${age} days old (max. supported browser age: ${old_age} days)`)
         return `${agent.browser} ${known_version}`
+    }
+
+    @action
+    getStatusClass(level) {
+        if (level === "error") { return "alert-danger" }
+        if (level === "success") { return "alert-success" }
+        if (level === "warn") { return "alert-warning" }
+        return "alert-info";
     }
 
     // We don't use <ddm.LinkTo> but our own method to navigate to target page.

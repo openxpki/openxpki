@@ -131,13 +131,14 @@
                         }}
                         <div class="row">
                             <div class="col oxi-pagehead">
-                                {{#if top.page.breadcrumb.length}}
-                                    <ol class="breadcrumb">
-                                        {{#each top.page.breadcrumb as |bc|}}
-                                            {{#if bc.label}}<li class="breadcrumb-item {{bc.className}}">{{bc.label}}</li>{{/if}}
-                                        {{/each}}
-                                    </ol>
-                                {{/if}}
+                                {{#each this.breadcrumbs as |bc|}}
+                                    <span class="badge rounded-pill bg-secondary oxi-breadcrumb {{bc.className}}">
+                                        {{bc.label}}
+                                    </span>
+                                    {{#unless (eq bc this.breadcrumbs.lastObject)}}
+                                        <i class="glyphicon glyphicon-chevron-right text-secondary mx-2"></i>
+                                    {{/unless}}
+                                {{/each}}
                                 {{#if top.page.label}}
                                     <h3>{{top.page.label}}</h3>
                                 {{/if}}

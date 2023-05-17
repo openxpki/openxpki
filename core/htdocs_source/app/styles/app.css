@@ -188,38 +188,30 @@ img.toplogo {
  * Breadcrumbs
  */
 
-.breadcrumb {
-  padding: 0;
-  margin-bottom: 1rem;
-  background-color: transparent;
-  border-radius: 0;
-  color: #a0a0a0;
+.oxi-breadcrumb + .oxi-breadcrumb::before {
+  color: #ffffff;
 }
 
-.breadcrumb-item + .breadcrumb-item::before {
-  color: #a0a0a0;
-}
-
-.breadcrumb-item::before {
+.oxi-breadcrumb::before {
   font-family: "Glyphicons Halflings";
   padding-right: 0.5rem;
 }
 
-.breadcrumb .workflow-type::before {
+.oxi-breadcrumb.workflow-type::before {
   content: "\e136";
 }
 
-.breadcrumb .workflow-state::before {
+.oxi-breadcrumb.workflow-state::before {
   content: "\e062";
 }
 
-.breadcrumb .workflow-search::before,
-.breadcrumb .cert-search::before {
+.oxi-breadcrumb.workflow-search::before,
+.oxi-breadcrumb.cert-search::before {
   content: "\e003";
 }
 
-.breadcrumb .workflow-search-result::before,
-.breadcrumb .cert-search-result::before {
+.oxi-breadcrumb.workflow-search-result::before,
+.oxi-breadcrumb.cert-search-result::before {
   content: "\e056";
 }
 
