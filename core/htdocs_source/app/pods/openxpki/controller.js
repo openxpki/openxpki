@@ -35,7 +35,7 @@ export default class OpenXpkiController extends Controller {
     }
 
     get showInfo() {
-        return this.model.top.right && this.showInfoBlock
+        return this.model?.top?.right && this.showInfoBlock
     }
 
     get oldBrowser() {
