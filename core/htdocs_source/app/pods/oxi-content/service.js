@@ -429,9 +429,6 @@ export default class OxiContentService extends Service {
     }
 
     #setPageContent(target, requestedPageName, page, main, right, partial, trigger) {
-        let ignoreBreadcrumbs = trigger === 'breadcrumb'
-        let resetBreadcrumbs = trigger === 'nav'
-
         // Mark the first form on screen: only the first one is allowed to focus
         // its first input field.
         for (const section of [...(main||[]), ...(right||[])]) {
@@ -453,25 +450,7 @@ export default class OxiContentService extends Service {
             // In this case we do not wipe the page data.
             if (!this.top || (partial == false && requestedPageName)) this.top = new Page()
             obj = this.top
-
-            // breadcrumbs
-            let bc = page?.breadcrumb
-            if (bc) {
-                if (ignoreBreadcrumbs) {
-                    debug('Ignoring server-sent breadcrumbs during breadcrumb-initiated navigation')
-                }
-                else {
-                    if (bc.is_root || resetBreadcrumbs) this.breadcrumbs = []
-                    if (this.breadcrumbs.length == 0 || this.breadcrumbs.at(-1).label != bc.label) {
-                        this.breadcrumbs.push({
-                            label: bc.label || page.label || '',
-                            ...(bc.class && { class: bc.class }),
-                            ...(requestedPageName && { page: requestedPageName }),
-                        })
-                        this.breadcrumbs = this.breadcrumbs
-                    }
-                }
-            }
+            this.#setBreadcrumbs(page, trigger, requestedPageName)
         }
         obj.setFromHash({
             ...(requestedPageName && { name: requestedPageName }),
@@ -479,6 +458,54 @@ export default class OxiContentService extends Service {
             ...(main && { main }),
             ...(right && { right }),
         })
+    }
+
+    #setBreadcrumbs(page, trigger, requestedPageName) {
+        let bc = page?.breadcrumb || {}
+        let ignoreBreadcrumbs = trigger === 'breadcrumb'
+        let navAction = trigger === 'nav'
+
+        if (ignoreBreadcrumbs) {
+            debug('Ignoring server-sent breadcrumbs during breadcrumb-initiated navigation')
+            return
+        }
+
+        if (bc.is_root) this.breadcrumbs = []
+
+        // Set defaults from server
+        let breadcrumb = {
+            ...(bc.label && { label: bc.label }),
+            ...(bc.class && { class: bc.class }),
+            ...(requestedPageName && { page: requestedPageName }),
+        }
+
+        // Special handling for nav menu clicks
+        if (navAction) {
+            // reset breadcrumbs
+            this.breadcrumbs = []
+            // use nav menu label if server sent no label
+            if (!breadcrumb.label) {
+                let flatList = this.navEntries.reduce((p, n) => p.concat(n, n.entries || []), []);
+                const navItem = flatList.find(i => i.key == requestedPageName)
+                if (navItem) breadcrumb.label = navItem.label
+            }
+            // suppress link (it's the same as clicking the nav menu item)
+            delete breadcrumb.page
+        }
+
+        // Remove previous breadcrumb if it is not the first one and is
+        // insignificant (= has no URL/page associated, like workflow actions)
+        if (this.breadcrumbs.length > 1 && ! this.breadcrumbs.at(-1).page) this.breadcrumbs.pop()
+
+        // Breadcrumb may be suppressed by setting empty workflow label, see OpenXPKI::Client::UI::Workflow->__get_breadcrumb()
+        if (! (breadcrumb && breadcrumb.label)) return
+
+        // Skip if previous breadcrumb is the same
+        if (this.breadcrumbs.length > 0 && this.breadcrumbs.at(-1).label == breadcrumb.label) return
+
+        this.breadcrumbs.push(breadcrumb)
+        // trigger Ember refresh
+        this.breadcrumbs = this.breadcrumbs
     }
 
     #refreshNavEntries() {
