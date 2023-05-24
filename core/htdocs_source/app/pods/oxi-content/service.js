@@ -370,6 +370,8 @@ export default class OxiContentService extends Service {
     }
 
     #redirect(url, target = this.TARGET.TOP, type = 'internal', banner = this.intl.t('site.banner.redirecting')) {
+        debug(`#redirect() - redirecting to ${url}`)
+
         if (type == 'external' || /^(http|\/)/.test(url)) {
             this.#setLoadingBanner(banner) // never hide banner as browser will open a new page
             window.location.href = url
@@ -404,7 +406,6 @@ export default class OxiContentService extends Service {
                 // Redirect
                 else if (handler.redirect) {
                     // we intentionally do NOT remove the loading banner here
-                    debug(`Exception - redirecting to ${handler.redirect}`)
                     this.#redirect(handler.redirect)
                 }
                 return

@@ -21,6 +21,11 @@ export default class OpenXpkiRoute extends Route {
     }
     topTarget = ["login", "login!logout", "welcome"]
 
+    // // Reserved Ember function
+    // async beforeModel(transition) {
+    //     let page = transition.to.parent.params.page // to = openxpki.index
+    // }
+
     // Reserved Ember function
     async model(params, transition) {
         await this.config.ready // localconfig.js might change rootURL, so first thing is to query it
