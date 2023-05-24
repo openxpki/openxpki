@@ -20,6 +20,7 @@ export default class OpenXpkiRoute extends Route {
         // breadcrumbAction -- not neccessary as we only evaluate it in model() below
     }
     topTarget = ["login", "login!logout", "welcome"]
+    previousParams = []
 
     // // Reserved Ember function
     // async beforeModel(transition) {
@@ -33,16 +34,24 @@ export default class OpenXpkiRoute extends Route {
         let page = params.page
         debug("openxpki/route - model: page = " + page)
 
+        let force = transition.to.queryParams.force ?? null
+        let breadcrumbAction = transition.to.queryParams.breadcrumbAction ?? false
+        // URL-configurable pager variables for <OxiSection::Grid> :
+        let limit = transition.to.queryParams.limit ?? null
+        let startat = transition.to.queryParams.startat ?? null
+
+        const equalArrays = (a1, a2) => a1.size === a2.size && a1.every((key, i) => a1.at(i) === a2.at(i))
+
         /*
-         * Load requested page if different from current page.
-         * If the popup content changes then this top page is requested again
-         * but does not change as it stays in the background.
+         * Load requested top page only if different from previous page:
+         * if a popup is opened or the popup content changes then this model()
+         * hook is fired again (for this top page in the background) as part
+         * of the URL. But the top page does not change so we must prevent
+         * repeated background requests for the same content.
          */
-        if (!this.content.top || page != this.content.top.name) {
-            // URL-configurable pager variables for <OxiSection::Grid>
-            let limit = transition.to.queryParams.limit ?? null
-            let startat = transition.to.queryParams.startat ?? null
-            let breadcrumbAction = transition.to.queryParams.breadcrumbAction ?? false
+        let currentParams = [page, limit, startat, force]
+        if (! equalArrays(currentParams, this.previousParams)) {
+            this.previousParams = currentParams
 
             // assemble request
             await this.content.requestPage({

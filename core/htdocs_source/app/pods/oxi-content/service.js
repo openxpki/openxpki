@@ -215,7 +215,7 @@ export default class OxiContentService extends Service {
         // cut breadcrumbs list back to the one we're navigating to
         this.breadcrumbs = this.breadcrumbs.slice(0, i+1)
         // open breadcrumb's page
-        this.openPage(bc.page, this.TARGET.TOP, false, { breadcrumbAction: 1 })
+        this.openPage(bc.page, this.TARGET.TOP, true, { breadcrumbAction: 1 })
     }
 
     #resolveTarget(rawTarget = 'self', isLink) {
