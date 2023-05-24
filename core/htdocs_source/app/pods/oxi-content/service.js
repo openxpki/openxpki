@@ -161,10 +161,17 @@ export default class OxiContentService extends Service {
         if (this.#resolveTarget(target) == this.TARGET.POPUP) {
             debug(`Transitioning to ${this.router.urlFor('openxpki.popup', name)}`)
             return this.router.transitionTo('openxpki.popup', name, {
-                // add query parameter popupBackButton=1 if there is a previous popup page
                 queryParams: {
                     ...params,
-                    ...(this.popup && { popupBackButton: 1 }),
+                    /*
+                     * Set popupBackButton=true if there is a previous popup page.
+                     * We must alway set the parameter even if it is "false"
+                     * and not just omit it because Ember keeps the controller
+                     * objects like the popup page. If we would not set it to
+                     * "false" on opening a new popup the old state in the
+                     * existing popup controller would be reused.
+                     */
+                    popupBackButton: (this.popup ? true : false),
                 },
             })
         }
@@ -193,6 +200,7 @@ export default class OxiContentService extends Service {
         window.open(href, realTarget == this.TARGET.TOP ? '_self' : '_blank')
     }
 
+    @action
     closePopup() {
         // close popup
         this.popup = null

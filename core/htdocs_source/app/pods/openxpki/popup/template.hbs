@@ -7,7 +7,7 @@
         @backdropClose={{false}}
         @size={{if popup.page.isLarge "xl" "lg"}}
         @scrollable={{true}}
-        @onHidden={{this.closePopup}}
+        @onHidden={{this.content.closePopup}}
         as |Modal|
     >
         <Modal.header class="bg-secondary text-white">
