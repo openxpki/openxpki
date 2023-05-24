@@ -17,7 +17,7 @@ export default class OpenXpkiRoute extends Route {
         startat:  { refreshModel: true },
         limit:    { refreshModel: true },
         force:    { refreshModel: true }, // not evaluated, only used to trigger model refresh
-        // breadcrumbAction -- not neccessary as we only evaluate it in model() below
+        // trigger -- not neccessary as we only evaluate it in model() below
     }
     topTarget = ["login", "login!logout", "welcome"]
     previousParams = []
@@ -29,16 +29,17 @@ export default class OpenXpkiRoute extends Route {
 
     // Reserved Ember function
     async model(params, transition) {
-        await this.config.ready // localconfig.js might change rootURL, so first thing is to query it
-
         let page = params.page
-        debug("openxpki/route - model: page = " + page)
 
         let force = transition.to.queryParams.force ?? null
-        let breadcrumbAction = transition.to.queryParams.breadcrumbAction ?? false
+        let trigger = transition.to.queryParams.trigger ?? ''
         // URL-configurable pager variables for <OxiSection::Grid> :
         let limit = transition.to.queryParams.limit ?? null
         let startat = transition.to.queryParams.startat ?? null
+
+        debug(`openxpki/route - model(): page = ${page}, trigger = ${trigger}, force = ${force}`)
+
+        await this.config.ready // localconfig.js might change rootURL, so first thing is to query it
 
         const equalArrays = (a1, a2) => a1.size === a2.size && a1.every((key, i) => a1.at(i) === a2.at(i))
 
@@ -60,7 +61,7 @@ export default class OpenXpkiRoute extends Route {
                 ...(limit && { limit }),
                 ...(startat && { startat }),
             }, {
-                ignoreBreadcrumbs: breadcrumbAction ? true : false,
+                trigger,
             })
         }
 

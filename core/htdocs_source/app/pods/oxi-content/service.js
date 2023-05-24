@@ -89,8 +89,19 @@ export default class OxiContentService extends Service {
      * @param {hash} options - Set `{ verbose: true }` to show loading banner. Set `{ partial: true }` to prevent resetting the whole page
      * @return {Promise} Promise receiving the JSON document on success or `{}` on error
      */
-    async requestPage(request, { partial = false, verbose = true, ignoreBreadcrumbs = false } = {}) {
-        debug(`requestPage({ ..., target = ${typeof request.target == 'symbol' ? request.target.toString() : request.target} }, partial = ${partial ? true : false}, verbose = ${verbose ? true : false})`)
+    async requestPage(request, { partial = false, verbose = true, trigger = '' } = {}) {
+        debug(
+            'requestPage(' +
+                '{ ' +
+                    (request.page ? 'page = '+request.page : 'action = '+request.action) + ', ' +
+                    'target = ' + (typeof request.target == 'symbol' ? request.target.toString() : request.target) + ' ' +
+                '}, ' +
+                `partial = ${partial ? true : false}, ` +
+                `verbose = ${verbose ? true : false}, ` +
+                `trigger = ${trigger}, ` +
+            ')'
+        )
+
         if (verbose) this.#setLoadingBanner(this.intl.t('site.banner.loading'))
 
         if (this.refreshTimer) {
@@ -139,7 +150,7 @@ export default class OxiContentService extends Service {
             }
 
             // Set page contents
-            this.#setPageContent(realTarget, request.page, doc.page, doc.main, doc.right, partial, ignoreBreadcrumbs)
+            this.#setPageContent(realTarget, request.page, doc.page, doc.main, doc.right, partial, trigger)
 
             if (realTarget === this.TARGET.TOP) this.#refreshNavEntries()
 
@@ -215,7 +226,7 @@ export default class OxiContentService extends Service {
         // cut breadcrumbs list back to the one we're navigating to
         this.breadcrumbs = this.breadcrumbs.slice(0, i+1)
         // open breadcrumb's page
-        this.openPage(bc.page, this.TARGET.TOP, true, { breadcrumbAction: 1 })
+        this.openPage(bc.page, this.TARGET.TOP, true, { trigger: 'breadcrumb' })
     }
 
     #resolveTarget(rawTarget = 'self', isLink) {
@@ -417,7 +428,10 @@ export default class OxiContentService extends Service {
         this.error = this.intl.t('error_popup.message.server', { code: status_code })
     }
 
-    #setPageContent(target, requestedPageName, page, main, right, partial, ignoreBreadcrumbs) {
+    #setPageContent(target, requestedPageName, page, main, right, partial, trigger) {
+        let ignoreBreadcrumbs = trigger === 'breadcrumb'
+        let resetBreadcrumbs = trigger === 'nav'
+
         // Mark the first form on screen: only the first one is allowed to focus
         // its first input field.
         for (const section of [...(main||[]), ...(right||[])]) {
@@ -447,7 +461,7 @@ export default class OxiContentService extends Service {
                     debug('Ignoring server-sent breadcrumbs during breadcrumb-initiated navigation')
                 }
                 else {
-                    if (bc.is_root) this.breadcrumbs = []
+                    if (bc.is_root || resetBreadcrumbs) this.breadcrumbs = []
                     if (this.breadcrumbs.length == 0 || this.breadcrumbs.at(-1).label != bc.label) {
                         this.breadcrumbs.push({
                             label: bc.label || page.label || '',

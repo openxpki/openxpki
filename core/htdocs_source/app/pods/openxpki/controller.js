@@ -22,12 +22,12 @@ export default class OpenXpkiController extends Controller {
         'startat',
         'limit',
         'force',
-        // 'breadcrumbAction' -- not neccessary as we only evaluate it in route.js/model()
+        // 'trigger' -- not neccessary as we only evaluate it in route.js/model()
     ]
     @tracked startat = null
     @tracked limit = null
     @tracked force = null
-    // @tracked breadcrumbAction = null
+    // @tracked trigger = null
 
     @tracked loading = false;
     @tracked showInfoBlock = false;
@@ -106,7 +106,7 @@ export default class OpenXpkiController extends Controller {
     navigateTo(page, navbarCollapseFunc, event) {
         if (event) { event.stopPropagation(); event.preventDefault() }
         if (navbarCollapseFunc) navbarCollapseFunc()
-        this.content.openPage(page, this.content.TARGET.TOP, true)
+        this.content.openPage(page, this.content.TARGET.TOP, true, { trigger: 'nav' })
     }
 
     @action
