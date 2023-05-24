@@ -272,6 +272,7 @@ sub get_realm_encryption_key {
 Generate a new encryption key
 
 =cut
+
 sub create_realm_encryption_key {
     my ($self, %args) = named_args(\@_,   # OpenXPKI::MooseParams
         safe_id         => { isa => 'Str', optional => 1 },
@@ -325,6 +326,62 @@ sub create_realm_encryption_key {
 
 }
 
+=head2  rekey_realm_encryption_key
+
+Wrap the "inner" symmetric keys from one datavault token to another one
+
+=cut
+
+sub rekey_realm_encryption_key {
+    my ($self, $key_id, $safe_id) = positional_args(\@_, # OpenXPKI::MooseParams
+        { isa => 'Str' },
+        { isa => 'Str', optional => 1 },
+    );
+
+    my $realm = CTX('session')->data->pki_realm;
+
+    my $result = $self->get_entry($realm, 'sys.datapool.keys', $key_id);
+    OpenXPKI::Exception->throw(message => 'Key not found', params => { key => $key_id })
+        unless($result);
+
+    my ($old_safe_id) = $result->{encryption_key} =~ m{ \A p7:(.*) }xms;
+    my $plain_key_value = $self->decrypt_passwordsafe($old_safe_id, $result->{datapool_value});
+
+    # use the safe_id from the arguments or get the current one
+    $safe_id ||= $self->get_active_safe_id();
+
+    if ('p7:'.$safe_id eq $result->{encryption_key}) {
+        CTX('log')->system()->warn(sprintf('Rekey request with target equal current token (Token: %s, Key: %s)', $safe_id, $key_id));
+        return;
+    }
+
+    # store the old key as backup - as we do not set force this can crash on an old backup
+    $self->set_entry(
+        pki_realm  => $realm,
+        namespace  => 'sys.datapool.keys.backup',
+        key        => $key_id,
+        value      => $result->{datapool_value},
+        enc_key_id => $result->{encryption_key},
+    );
+
+    my $enc_value = $self->encrypt_passwordsafe($safe_id, $plain_key_value);
+    ##! 16: "Save rekeyed vault key $key_id to $safe_id"
+    $self->set_entry(
+        pki_realm  => $realm,
+        namespace  => 'sys.datapool.keys',
+        key        => $key_id,
+        value      => $enc_value,
+        enc_key_id => 'p7:' . $safe_id, # 'p7' = PKCS#7 encryption,
+        force => 1,
+    );
+
+    CTX('log')->audit('system')->info('Datapool encryption key was rekeyed', {
+        source => $old_safe_id,
+        target => $safe_id,
+        keyid  => $key_id,
+    });
+
+}
 
 # Asymmetric encryption using the given token
 # Note: encryption does not need any key an can be done using
