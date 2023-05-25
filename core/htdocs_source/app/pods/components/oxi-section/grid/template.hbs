@@ -84,7 +84,7 @@
                     {{/if}}
                     {{#each row.data as |value|}}
                         {{#if this.hasAction}}
-                            {{!!-- template-lint-disable require-presentational-children --}}
+                            {{!-- template-lint-disable require-presentational-children --}}
                             <OxiBase::Clickable @clickable={{row.actions.[0]}} as |clickHandler isLoading|>
                                 <td {{on "click" clickHandler}} role="button">
                                     <OxiBase::Formatted @format={{value.format}} @value={{value.value}}/>
