@@ -136,6 +136,8 @@ export default class OxiContentService extends Service {
             else {
                 this.popup = null
 
+                this.#setBreadcrumbs(request.page, trigger, doc.page)
+
                 // Auto refresh
                 if (doc.refresh) {
                     debug("requestPage(): response - \"refresh\" " + doc.refresh.href + ", " + doc.refresh.timeout)
@@ -450,7 +452,6 @@ export default class OxiContentService extends Service {
             // In this case we do not wipe the page data.
             if (!this.top || (partial == false && requestedPageName)) this.top = new Page()
             obj = this.top
-            this.#setBreadcrumbs(page, trigger, requestedPageName)
         }
         obj.setFromHash({
             ...(requestedPageName && { name: requestedPageName }),
@@ -460,7 +461,7 @@ export default class OxiContentService extends Service {
         })
     }
 
-    #setBreadcrumbs(page, trigger, requestedPageName) {
+    #setBreadcrumbs(requestedPageName, trigger, page = {}) {
         let bc = page?.breadcrumb || {}
         let ignoreBreadcrumbs = trigger === 'breadcrumb'
         let navAction = trigger === 'nav'
@@ -481,6 +482,7 @@ export default class OxiContentService extends Service {
 
         // Special handling for nav menu clicks
         if (navAction) {
+            debug(`#setBreadcrumbs(): navigation item "${requestedPageName}" detected, resetting breadcrumbs`)
             // reset breadcrumbs
             this.breadcrumbs = []
             // use nav menu label if server sent no label
