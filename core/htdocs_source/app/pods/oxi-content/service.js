@@ -485,6 +485,8 @@ export default class OxiContentService extends Service {
             debug(`#setBreadcrumbs(): navigation item "${requestedPageName}" detected, resetting breadcrumbs`)
             // reset breadcrumbs
             this.breadcrumbs = []
+            // special handling for "logout" page
+            if (requestedPageName == 'logout') return
             // always use nav menu label if available
             let flatList = this.navEntries.reduce((p, n) => p.concat(n, n.entries || []), []);
             const navItem = flatList.find(i => i.key == requestedPageName)
