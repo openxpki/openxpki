@@ -485,11 +485,12 @@ export default class OxiContentService extends Service {
             debug(`#setBreadcrumbs(): navigation item "${requestedPageName}" detected, resetting breadcrumbs`)
             // reset breadcrumbs
             this.breadcrumbs = []
-            // use nav menu label if server sent no label
-            if (!breadcrumb.label) {
-                let flatList = this.navEntries.reduce((p, n) => p.concat(n, n.entries || []), []);
-                const navItem = flatList.find(i => i.key == requestedPageName)
-                if (navItem) breadcrumb.label = navItem.label
+            // always use nav menu label if available
+            let flatList = this.navEntries.reduce((p, n) => p.concat(n, n.entries || []), []);
+            const navItem = flatList.find(i => i.key == requestedPageName)
+            if (navItem) {
+                debug('#setBreadcrumbs(): using navigation item label for breadcrumb')
+                breadcrumb.label = navItem.label
             }
             // suppress link (it's the same as clicking the nav menu item)
             delete breadcrumb.page
