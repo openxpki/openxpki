@@ -2021,9 +2021,9 @@ sub __get_breadcrumb {
     my $state_label = shift;
 
     # We set the breadcrumb only if the workflow has a title set.
-    # Fallback to label if title is not DEFINED is done in the API.
     # Setting title to the empty string will suppress breadcrumbs.
-    return {} unless $wf_info->{workflow}->{title};
+    # Fallback to label if title is not DEFINED is done in the API.
+    return { suppress => 1 } unless $wf_info->{workflow}->{title};
 
     if ($state_label) {
         return {

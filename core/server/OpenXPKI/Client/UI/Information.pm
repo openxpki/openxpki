@@ -43,7 +43,7 @@ sub init_issuer {
     $self->log->trace("result: " . Dumper $issuers) if $self->log->is_trace;
 
     $self->page->label('I18N_OPENXPKI_UI_ISSUERS_LIST');
-
+    $self->page->suppress_breadcrumb;
 
     my @result;
     foreach my $cert (@{$issuers}) {

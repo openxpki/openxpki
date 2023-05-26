@@ -39,4 +39,10 @@ has 'canonical_uri' => (
     isa => 'Str',
 );
 
+sub suppress_breadcrumb {
+    my $self = shift;
+
+    $self->breadcrumb({ suppress => 1 });
+}
+
 __PACKAGE__->meta->make_immutable;
