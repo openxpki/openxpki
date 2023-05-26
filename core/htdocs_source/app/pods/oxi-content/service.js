@@ -56,6 +56,8 @@ export default class OxiContentService extends Service {
         BLANK: Symbol("BLANK"),
     })
 
+    LOGIN_PAGES = ['login', 'login!logout', 'logout']
+
     get tenantCssClass() {
         if (!this.tenant) return ''
         return 'tenant-'
@@ -128,6 +130,9 @@ export default class OxiContentService extends Service {
             // last request sets the global status, whether it's a "top" or "popup" target
             this.status = doc.status
 
+            // Set page contents (must be done before setting breadcrumbs)
+            if (!doc.goto) this.#setPageContent(realTarget, request.page, doc.page, doc.main, doc.right, partial, trigger)
+
             // Popup
             if (realTarget === this.TARGET.POPUP) {
                 if (doc.refresh || doc.goto) console.warn("'refresh'/'goto' not supported for popup contents")
@@ -150,9 +155,6 @@ export default class OxiContentService extends Service {
                     return this.#redirect(doc.goto, realTarget, doc.type, doc.loading_banner)
                 }
             }
-
-            // Set page contents
-            this.#setPageContent(realTarget, request.page, doc.page, doc.main, doc.right, partial, trigger)
 
             if (realTarget === this.TARGET.TOP) this.#refreshNavEntries()
 
@@ -465,52 +467,73 @@ export default class OxiContentService extends Service {
         let bc = page?.breadcrumb || {}
         let ignoreBreadcrumbs = trigger === 'breadcrumb'
         let navAction = trigger === 'nav'
+        let breadcrumb
 
         if (ignoreBreadcrumbs) {
-            debug('Ignoring server-sent breadcrumbs during breadcrumb-initiated navigation')
+            debug('#setBreadcrumbs(): ignoring server-sent breadcrumbs during breadcrumb-initiated navigation')
             return
         }
 
-        if (bc.is_root) this.breadcrumbs = []
+        debug(`#setBreadcrumbs(): page = ${requestedPageName??'<none>'}, trigger = ${trigger??'<none>'}, breadcrumb = ${page?.breadcrumb?.label??'<none>'}`)
 
-        // Set defaults from server
-        let breadcrumb = {
-            ...(bc.label && { label: bc.label }),
-            ...(bc.class && { class: bc.class }),
-            ...(requestedPageName && { page: requestedPageName }),
-        }
-
-        // Special handling for nav menu clicks
+        // Reset breadcrumbs for nav menu clicks
         if (navAction) {
-            debug(`#setBreadcrumbs(): navigation item "${requestedPageName}" detected, resetting breadcrumbs`)
-            // reset breadcrumbs
+            debug(`#setBreadcrumbs(): navigation item detected, resetting breadcrumbs`)
             this.breadcrumbs = []
-            // special handling for "logout" page
-            if (requestedPageName == 'logout') return
-            // always use nav menu label if available
-            let flatList = this.navEntries.reduce((p, n) => p.concat(n, n.entries || []), []);
-            const navItem = flatList.find(i => i.key == requestedPageName)
-            if (navItem) {
-                debug('#setBreadcrumbs(): using navigation item label for breadcrumb')
-                breadcrumb.label = navItem.label
-            }
-            // suppress link (it's the same as clicking the nav menu item)
-            delete breadcrumb.page
         }
 
-        // Remove previous breadcrumb if it is not the first one and is
-        // insignificant (= has no URL/page associated, like workflow actions)
-        if (this.breadcrumbs.length > 1 && ! this.breadcrumbs.at(-1).page) this.breadcrumbs.pop()
+        // login or logout pages
+        if (this.LOGIN_PAGES.indexOf(this?.top?.name) != -1) {
+            debug(`#setBreadcrumbs(): login/logout page detected, suppressing breadcrumbs`)
+            this.breadcrumbs = []
+            return
+        }
 
-        // Breadcrumb may be suppressed by setting empty workflow label, see OpenXPKI::Client::UI::Workflow->__get_breadcrumb()
-        if (! (breadcrumb && breadcrumb.label)) return
+        // Breadcrumb may be suppressed by setting empty workflow label.
+        // See OpenXPKI::Client::UI::Workflow->__get_breadcrumb()
+        let suppressBreadcrumb = (Object.keys(page).length == 0) || (bc.suppress??0 == 1)
+        if (suppressBreadcrumb) debug('#setBreadcrumbs(): server sent empty hash - suppressing new breadcrumb')
 
-        // Skip if previous breadcrumb is the same
-        if (this.breadcrumbs.length > 0 && this.breadcrumbs.at(-1).label == breadcrumb.label) return
+        if (! suppressBreadcrumb) {
+            if (bc.is_root) this.breadcrumbs = []
 
+            // Set defaults from server
+            breadcrumb = {
+                ...(bc.label && { label: bc.label }),
+                ...(bc.class && { class: bc.class }),
+                page: requestedPageName ?? this.top.name,
+            }
+
+            // Default to page label
+            if (!breadcrumb.label) breadcrumb.label = page.label
+
+            // Special handling for nav menu clicks
+            if (navAction) {
+                // always use nav menu label if available
+                let flatList = this.navEntries.reduce((p, n) => p.concat(n, n.entries || []), []);
+                const navItem = flatList.find(i => i.key == requestedPageName)
+                if (navItem) {
+                    debug('#setBreadcrumbs(): using navigation item label for breadcrumb')
+                    breadcrumb.label = navItem.label
+                }
+            }
+
+            // Remove trailing items if current page equals previous one in the breadcrumbs
+            let alreadySeenAt = this.breadcrumbs.findIndex(
+                el => (el.page == (breadcrumb.page) || (el.label??'-') == (breadcrumb.label??'--'))
+            )
+            if (alreadySeenAt != -1) {
+                debug('#setBreadcrumbs(): breadcrumb already in list - replacing it (to get new label)')
+                this.breadcrumbs = this.breadcrumbs.slice(0, alreadySeenAt)
+            }
+        }
+
+        // stop if there is nothing to add
+        if (suppressBreadcrumb || !(breadcrumb && breadcrumb.label)) return
+
+        // add new breadcrumb
         this.breadcrumbs.push(breadcrumb)
-        // trigger Ember refresh
-        this.breadcrumbs = this.breadcrumbs
+        this.breadcrumbs = this.breadcrumbs // trigger Ember refresh
     }
 
     #refreshNavEntries() {
