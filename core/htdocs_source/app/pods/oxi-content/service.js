@@ -72,16 +72,67 @@ export default class OxiContentService extends Service {
         super(...arguments)
     }
 
-    /**
-     * Send AJAX request quietly, i.e. without showing the "loading" banner or
-     * dimming the page.
-     *
-     * @param {hash} request - Request data
-     * @param {hash} options - Set `{ verbose: true }` to show loading banner
-     * @return {Promise} Promise receiving the JSON document on success or `{}` on error
-     */
-    async requestUpdate(request, { verbose = false } = {}) {
-        return this.requestPage(request, { verbose, partial: true })
+    openPage(name, target, force = false, params = null) {
+        debug(`openPage(name = ${name}, target = ${typeof target == 'symbol' ? target.toString() : target}, force = ${force})`)
+
+        if (this.#resolveTarget(target) == this.TARGET.POPUP) {
+            debug(`Transitioning to ${this.router.urlFor('openxpki.popup', name)}`)
+            return this.router.transitionTo('openxpki.popup', name, {
+                queryParams: {
+                    ...params,
+                    /*
+                     * Set popupBackButton=true if there is a previous popup page.
+                     * We must alway set the parameter even if it is "false"
+                     * and not just omit it because Ember keeps the controller
+                     * objects like the popup page. If we would not set it to
+                     * "false" on opening a new popup the old state in the
+                     * existing popup controller would be reused.
+                     */
+                    popupBackButton: (this.popup ? true : false),
+                },
+            })
+        }
+        else {
+            // close popup
+            this.popup = null
+            // this transition also removes the popup related data from the URL
+            debug(`Transitioning to ${this.router.urlFor('openxpki', name)}`)
+            return this.router.transitionTo('openxpki', name, {
+                queryParams: {
+                    ...params,
+                    ...(force && { force: (new Date()).valueOf() }),
+                }
+            })
+        }
+    }
+
+    openLink(href, target) {
+        debug(`openLink(href = ${href}, target = ${typeof target == 'symbol' ? target.toString() : target})`)
+
+        // close popup
+        this.popup = null
+
+        // open link
+        let realTarget = this.#resolveTarget(target, true)
+        window.open(href, realTarget == this.TARGET.TOP ? '_self' : '_blank')
+    }
+
+    @action
+    closePopup() {
+        // close popup
+        this.popup = null
+        // transition to current route (keeps the current model/page) but without the "popup" part
+        return this.router.transitionTo('openxpki')
+    }
+
+    @action
+    gotoBreadcrumb(bc) {
+        let i = this.breadcrumbs.findIndex(el => el === bc)
+        debug(`Navigating to breadcrumb #${i}: ${bc.page}`)
+        // cut breadcrumbs list back to the one we're navigating to
+        this.breadcrumbs = this.breadcrumbs.slice(0, i+1)
+        // open breadcrumb's page
+        this.openPage(bc.page, this.TARGET.TOP, true, { trigger: 'breadcrumb' })
     }
 
     /**
@@ -170,67 +221,16 @@ export default class OxiContentService extends Service {
         }
     }
 
-    openPage(name, target, force = false, params = null) {
-        debug(`openPage(name = ${name}, target = ${typeof target == 'symbol' ? target.toString() : target}, force = ${force})`)
-
-        if (this.#resolveTarget(target) == this.TARGET.POPUP) {
-            debug(`Transitioning to ${this.router.urlFor('openxpki.popup', name)}`)
-            return this.router.transitionTo('openxpki.popup', name, {
-                queryParams: {
-                    ...params,
-                    /*
-                     * Set popupBackButton=true if there is a previous popup page.
-                     * We must alway set the parameter even if it is "false"
-                     * and not just omit it because Ember keeps the controller
-                     * objects like the popup page. If we would not set it to
-                     * "false" on opening a new popup the old state in the
-                     * existing popup controller would be reused.
-                     */
-                    popupBackButton: (this.popup ? true : false),
-                },
-            })
-        }
-        else {
-            // close popup
-            this.popup = null
-            // this transition also removes the popup related data from the URL
-            debug(`Transitioning to ${this.router.urlFor('openxpki', name)}`)
-            return this.router.transitionTo('openxpki', name, {
-                queryParams: {
-                    ...params,
-                    ...(force && { force: (new Date()).valueOf() }),
-                }
-            })
-        }
-    }
-
-    openLink(href, target) {
-        debug(`openLink(href = ${href}, target = ${typeof target == 'symbol' ? target.toString() : target})`)
-
-        // close popup
-        this.popup = null
-
-        // open link
-        let realTarget = this.#resolveTarget(target, true)
-        window.open(href, realTarget == this.TARGET.TOP ? '_self' : '_blank')
-    }
-
-    @action
-    closePopup() {
-        // close popup
-        this.popup = null
-        // transition to current route (keeps the current model/page) but without the "popup" part
-        return this.router.transitionTo('openxpki')
-    }
-
-    @action
-    gotoBreadcrumb(bc) {
-        let i = this.breadcrumbs.findIndex(el => el === bc)
-        debug(`Navigating to breadcrumb #${i}: ${bc.page}`)
-        // cut breadcrumbs list back to the one we're navigating to
-        this.breadcrumbs = this.breadcrumbs.slice(0, i+1)
-        // open breadcrumb's page
-        this.openPage(bc.page, this.TARGET.TOP, true, { trigger: 'breadcrumb' })
+    /**
+     * Send AJAX request quietly, i.e. without showing the "loading" banner or
+     * dimming the page.
+     *
+     * @param {hash} request - Request data
+     * @param {hash} options - Set `{ verbose: true }` to show loading banner
+     * @return {Promise} Promise receiving the JSON document on success or `{}` on error
+     */
+    async requestUpdate(request, { verbose = false } = {}) {
+        return this.requestPage(request, { verbose, partial: true })
     }
 
     #resolveTarget(rawTarget = 'self', isLink) {
