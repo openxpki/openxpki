@@ -68,10 +68,16 @@ export default class OxiContentService extends Service {
           .replace(/-+/g, '-')
     }
 
-    constructor() {
-        super(...arguments)
-    }
-
+    /**
+     * Open the given OpenXPKI page via Ember route transition, i.e. change the
+     * URL.
+     *
+     * @param {string} name - OpenXPKI page to open
+     * @param {string} target - Target: 'self' (same target as the caller), 'top' or 'popup'
+     * @param {boolean} force - Forces a transition even if the new page equals the current one
+     * @param {hash} params - Additional `queryParams` for Ember Router's `transitionTo()`
+     * @return {Promise} Promise that resolves when the route transition finished
+     */
     openPage(name, target, force = false, params = null) {
         debug(`openPage(name = ${name}, target = ${typeof target == 'symbol' ? target.toString() : target}, force = ${force})`)
 
@@ -106,6 +112,12 @@ export default class OxiContentService extends Service {
         }
     }
 
+    /**
+     * Open the given (external) browser URL via `window.open()`.
+     *
+     * @param {string} href - URL
+     * @param {string} target - Browser target
+     */
     openLink(href, target) {
         debug(`openLink(href = ${href}, target = ${typeof target == 'symbol' ? target.toString() : target})`)
 
@@ -117,6 +129,9 @@ export default class OxiContentService extends Service {
         window.open(href, realTarget == this.TARGET.TOP ? '_self' : '_blank')
     }
 
+    /**
+     * Ember action to close the popup.
+     */
     @action
     closePopup() {
         // close popup
@@ -125,6 +140,13 @@ export default class OxiContentService extends Service {
         return this.router.transitionTo('openxpki')
     }
 
+    /**
+     * Ember action to go back to the given breadcrumb via `this.openPage()`.
+     * Also truncates the breadcrumbs list.
+     *
+     * @param {hash} bc - Breadcrumb definition
+     * @return {Promise} Promise that resolves when the route transition finished
+     */
     @action
     gotoBreadcrumb(bc) {
         let i = this.breadcrumbs.findIndex(el => el === bc)
