@@ -72,13 +72,14 @@ export default class OxiContentService extends Service {
      * Open the given OpenXPKI page via Ember route transition, i.e. change the
      * URL.
      *
-     * @param {string} name - OpenXPKI page to open
-     * @param {string} target - Target: 'self' (same target as the caller), 'top' or 'popup'
-     * @param {boolean} force - Forces a transition even if the new page equals the current one
-     * @param {hash} params - Additional `queryParams` for Ember Router's `transitionTo()`
+     * @param {object} page - Page specification
+     * @param {string} page.name - OpenXPKI page to open
+     * @param {string|symbol} page.target - Target: `'self'` (same target as the caller), `'top'`, `'popup'` or `this.TARGET.SELF`, `this.TARGET.TOP`, `this.TARGET.POPUP`
+     * @param {boolean} [page.force=false] - Forces a transition even if the new page equals the current one
+     * @param {hash} [page.params] - Additional `queryParams` for Ember Router's `transitionTo()`
      * @return {Promise} Promise that resolves when the route transition finished
      */
-    openPage(name, target, force = false, params = null) {
+    openPage({ name, target, force = false, params = null }) {
         debug(`openPage(name = ${name}, target = ${typeof target == 'symbol' ? target.toString() : target}, force = ${force})`)
 
         if (this.#resolveTarget(target) == this.TARGET.POPUP) {
@@ -154,14 +155,17 @@ export default class OxiContentService extends Service {
         // cut breadcrumbs list back to the one we're navigating to
         this.breadcrumbs = this.breadcrumbs.slice(0, i+1)
         // open breadcrumb's page
-        this.openPage(bc.page, this.TARGET.TOP, true, { trigger: 'breadcrumb' })
+        this.openPage({ name: bc.page, target: this.TARGET.TOP, force: true, params: { trigger: 'breadcrumb' } })
     }
 
     /**
      * Send AJAX request.
      *
      * @param {hash} request - Request data
-     * @param {hash} options - Set `{ verbose: true }` to show loading banner. Set `{ partial: true }` to prevent resetting the whole page
+     * @param {hash} options
+     * @param {boolean} [options.partial=false] - set to `true` to prevent resetting the whole page (data)
+     * @param {boolean} [options.verbose=true] - set to `false` to suppress "loading" banner
+     * @param {string} [options.trigger] - trigger that caused the request: might be `nav` or `breadcrumb`
      * @return {Promise} Promise receiving the JSON document on success or `{}` on error
      */
     async requestPage(request, { partial = false, verbose = true, trigger = '' } = {}) {
@@ -421,8 +425,8 @@ export default class OxiContentService extends Service {
              * cause the TransitionAborted error.
              * Tested for Ember 4.12.0
              */
-            next(this, function() { this.openPage(url, target) })
-            //this.openPage(url)
+            next(this, function() { this.openPage({ name: url, target: target }) })
+            //this.openPage({ name: url, target: target })
         }
     }
 

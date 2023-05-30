@@ -106,14 +106,14 @@ export default class OpenXpkiController extends Controller {
     navigateTo(page, navbarCollapseFunc, event) {
         if (event) { event.stopPropagation(); event.preventDefault() }
         if (navbarCollapseFunc) navbarCollapseFunc()
-        this.content.openPage(page, this.content.TARGET.TOP, true, { trigger: 'nav' })
+        this.content.openPage({ name: page, target: this.content.TARGET.TOP, force: true, params: { trigger: 'nav' } })
     }
 
     @action
     logout(event) {
         if (event) { event.stopPropagation(); event.preventDefault() }
         this.content.setTenant(null);
-        this.content.openPage('logout', this.content.TARGET.TOP, true, { trigger: 'nav' })
+        this.content.openPage({ name: 'logout', target: this.content.TARGET.TOP, force: true, params: { trigger: 'nav' } })
     }
 
     @action

@@ -19,7 +19,6 @@ export default class OpenXpkiRoute extends Route {
         force:    { refreshModel: true }, // not evaluated, only used to trigger model refresh
         // trigger -- not neccessary as we only evaluate it in model() below
     }
-    topTarget = ["login", "login!logout", "welcome"]
     previousParams = []
 
     // // Reserved Ember function
