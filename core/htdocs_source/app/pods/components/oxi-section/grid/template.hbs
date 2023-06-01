@@ -3,7 +3,7 @@
     <div class="row mb-2">
         <div class="col-12">
             <OxiSection::Grid::Pagination
-                @pager={{@def.pager}}
+                @pager={{this.pager}}
                 @pages={{this.pages}}
                 @pagesizes={{this.pagesizes}}
                 @setPage={{this.updatePage}}
@@ -120,7 +120,7 @@
     <div class="col-lg-6">
         {{#if @def.pager}}
             <OxiSection::Grid::Pagination
-                @pager={{@def.pager}}
+                @pager={{this.pager}}
                 @pages={{this.pages}}
                 @pagesizes={{this.pagesizes}}
                 @setPage={{this.updatePage}}
