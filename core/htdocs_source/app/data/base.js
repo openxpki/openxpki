@@ -52,7 +52,31 @@ export default class Base {
                 unknownProps.push(prop)
                 continue
             }
-            this[prop] = sourceHash[prop]
+            let val = sourceHash[prop]
+
+            /* HACK:
+             * We use another instance to check the property types because
+             * even a check via "typeof" on this.* would already trigger this
+             * Ember error:
+             * "You attempted to update `pagesizes` on `Pager`, but it had
+             * already been used previously in the same computation.
+             * Attempting to update a value after using it in a computation
+             * can cause logical errors, infinite revalidation bugs, and
+             * performance issues, and is not supported." */
+            let dummy = new this.constructor()
+
+            if (typeof dummy[prop] === 'string') {
+                this[prop] = ''+val
+            }
+            else if (typeof dummy[prop] === 'number') {
+                this[prop] = Number.parseFloat(val)
+            }
+            else if (typeof dummy[prop] === 'boolean') {
+                this[prop] = !!val
+            }
+            else {
+                this[prop] = val
+            }
         }
 
         if (unknownProps.length > 0) {
