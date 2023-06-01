@@ -129,7 +129,7 @@ export default class OxiSectionGridComponent extends Component {
         .filter( size => (size <= limit))
         .map( size => {
             return {
-                active: size === pager.limit,
+                active: size == pager.limit,
                 limit: size,
                 startat: (pager.startat / size >> 0) * size,
                 order: pager.order,
