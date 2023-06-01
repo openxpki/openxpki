@@ -18,7 +18,7 @@ has 'description' => (
 
 has 'breadcrumb' => (
     is => 'rw',
-    isa => 'ArrayRef',
+    isa => 'HashRef',
 );
 
 has 'css_class' => (
@@ -38,5 +38,11 @@ has 'canonical_uri' => (
     is => 'rw',
     isa => 'Str',
 );
+
+sub suppress_breadcrumb {
+    my $self = shift;
+
+    $self->breadcrumb({ suppress => 1 });
+}
 
 __PACKAGE__->meta->make_immutable;

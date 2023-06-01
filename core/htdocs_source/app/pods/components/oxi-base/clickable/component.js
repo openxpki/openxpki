@@ -92,7 +92,7 @@ export default class OxiClickableComponent extends Component {
             else if (c.page) {
                 debug(`oxi-base/clickable: executeAction - transition to page '${c.page}`)
                 c.loading = true
-                this.content.openPage(c.page, c.target)
+                this.content.openPage({ name: c.page, target: c.target })
                 .finally(() => c.loading = false)
             }
             else {

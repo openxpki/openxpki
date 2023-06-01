@@ -3,7 +3,7 @@ import { service } from '@ember/service'
 import { tracked } from '@glimmer/tracking'
 import { later, next, cancel } from '@ember/runloop'
 import { isArray } from '@ember/array'
-import { set as emSet } from '@ember/object'
+import { action, set as emSet } from '@ember/object'
 import { debug } from '@ember/debug'
 import fetch from 'fetch'
 import Page from 'openxpki/data/page'
@@ -32,6 +32,7 @@ export default class OxiContentService extends Service {
 
     @tracked top = null
     @tracked popup = null
+    @tracked breadcrumbs = []
 
     @tracked error = null
     @tracked loadingBanner = null
@@ -55,6 +56,8 @@ export default class OxiContentService extends Service {
         BLANK: Symbol("BLANK"),
     })
 
+    LOGIN_PAGES = ['login', 'login!logout', 'logout']
+
     get tenantCssClass() {
         if (!this.tenant) return ''
         return 'tenant-'
@@ -65,31 +68,119 @@ export default class OxiContentService extends Service {
           .replace(/-+/g, '-')
     }
 
-    constructor() {
-        super(...arguments)
+    /**
+     * Open the given OpenXPKI page via Ember route transition, i.e. change the
+     * URL.
+     *
+     * @param {object} page - Page specification
+     * @param {string} page.name - OpenXPKI page to open
+     * @param {string|symbol} page.target - Target: `'self'` (same target as the caller), `'top'`, `'popup'` or `this.TARGET.SELF`, `this.TARGET.TOP`, `this.TARGET.POPUP`
+     * @param {boolean} [page.force=false] - Forces a transition even if the new page equals the current one
+     * @param {hash} [page.params] - Additional `queryParams` for Ember Router's `transitionTo()`
+     * @return {Promise} Promise that resolves when the route transition finished
+     */
+    openPage({ name, target, force = false, params = null }) {
+        debug(`openPage(name = ${name}, target = ${typeof target == 'symbol' ? target.toString() : target}, force = ${force})`)
+
+        if (this.#resolveTarget(target) == this.TARGET.POPUP) {
+            debug(`Transitioning to ${this.router.urlFor('openxpki.popup', name)}`)
+            return this.router.transitionTo('openxpki.popup', name, {
+                queryParams: {
+                    ...params,
+                    /*
+                     * Set popupBackButton=true if there is a previous popup page.
+                     * We must alway set the parameter even if it is "false"
+                     * and not just omit it because Ember keeps the controller
+                     * objects like the popup page. If we would not set it to
+                     * "false" on opening a new popup the old state in the
+                     * existing popup controller would be reused.
+                     */
+                    popupBackButton: (this.popup ? true : false),
+                },
+            })
+        }
+        else {
+            // close popup
+            this.popup = null
+            // this transition also removes the popup related data from the URL
+            debug(`Transitioning to ${this.router.urlFor('openxpki', name)}`)
+            return this.router.transitionTo('openxpki', name, {
+                queryParams: {
+                    ...params,
+                    ...(force && { force: (new Date()).valueOf() }),
+                }
+            })
+        }
     }
 
     /**
-     * Send AJAX request quietly, i.e. without showing the "loading" banner or
-     * dimming the page.
+     * Open the given (external) browser URL via `window.open()`.
      *
-     * @param {hash} request - Request data
-     * @param {hash} options - Set `{ verbose: true }` to show loading banner
-     * @return {Promise} Promise receiving the JSON document on success or `{}` on error
+     * @param {string} href - URL
+     * @param {string} target - Browser target
      */
-    async requestUpdate(request, { verbose = false } = {}) {
-        return this.requestPage(request, { verbose, partial: true })
+    openLink(href, target) {
+        debug(`openLink(href = ${href}, target = ${typeof target == 'symbol' ? target.toString() : target})`)
+
+        // close popup
+        this.popup = null
+
+        // open link
+        let realTarget = this.#resolveTarget(target, true)
+        window.open(href, realTarget == this.TARGET.TOP ? '_self' : '_blank')
+    }
+
+    /**
+     * Ember action to close the popup.
+     */
+    @action
+    closePopup() {
+        // close popup
+        this.popup = null
+        // transition to current route (keeps the current model/page) but without the "popup" part
+        return this.router.transitionTo('openxpki')
+    }
+
+    /**
+     * Ember action to go back to the given breadcrumb via `this.openPage()`.
+     * Also truncates the breadcrumbs list.
+     *
+     * @param {hash} bc - Breadcrumb definition
+     * @return {Promise} Promise that resolves when the route transition finished
+     */
+    @action
+    gotoBreadcrumb(bc) {
+        let i = this.breadcrumbs.findIndex(el => el === bc)
+        debug(`Navigating to breadcrumb #${i}: ${bc.page}`)
+        // cut breadcrumbs list back to the one we're navigating to
+        this.breadcrumbs = this.breadcrumbs.slice(0, i+1)
+        // open breadcrumb's page
+        this.openPage({ name: bc.page, target: this.TARGET.TOP, force: true, params: { trigger: 'breadcrumb' } })
     }
 
     /**
      * Send AJAX request.
      *
      * @param {hash} request - Request data
-     * @param {hash} options - Set `{ verbose: true }` to show loading banner. Set `{ partial: true }` to prevent resetting the whole page
+     * @param {hash} options
+     * @param {boolean} [options.partial=false] - set to `true` to prevent resetting the whole page (data)
+     * @param {boolean} [options.verbose=true] - set to `false` to suppress "loading" banner
+     * @param {string} [options.trigger] - trigger that caused the request: might be `nav` or `breadcrumb`
      * @return {Promise} Promise receiving the JSON document on success or `{}` on error
      */
-    async requestPage(request, { partial = false, verbose = true } = {}) {
-        debug(`requestPage({ ..., target = ${typeof request.target == 'symbol' ? request.target.toString() : request.target} }, partial = ${partial ? true : false}, verbose = ${verbose ? true : false})`)
+    async requestPage(request, { partial = false, verbose = true, trigger = '' } = {}) {
+        debug(
+            'requestPage(' +
+                '{ ' +
+                    (request.page ? 'page = '+request.page : 'action = '+request.action) + ', ' +
+                    'target = ' + (typeof request.target == 'symbol' ? request.target.toString() : request.target) + ' ' +
+                '}, ' +
+                `partial = ${partial ? true : false}, ` +
+                `verbose = ${verbose ? true : false}, ` +
+                `trigger = ${trigger}, ` +
+            ')'
+        )
+
         if (verbose) this.#setLoadingBanner(this.intl.t('site.banner.loading'))
 
         if (this.refreshTimer) {
@@ -116,6 +207,9 @@ export default class OxiContentService extends Service {
             // last request sets the global status, whether it's a "top" or "popup" target
             this.status = doc.status
 
+            // Set page contents (must be done before setting breadcrumbs)
+            if (!doc.goto) this.#setPageContent(realTarget, request.page, doc.page, doc.main, doc.right, partial, trigger)
+
             // Popup
             if (realTarget === this.TARGET.POPUP) {
                 if (doc.refresh || doc.goto) console.warn("'refresh'/'goto' not supported for popup contents")
@@ -123,6 +217,8 @@ export default class OxiContentService extends Service {
             // Page
             else {
                 this.popup = null
+
+                this.#setBreadcrumbs(request.page, trigger, doc.page)
 
                 // Auto refresh
                 if (doc.refresh) {
@@ -136,9 +232,6 @@ export default class OxiContentService extends Service {
                     return this.#redirect(doc.goto, realTarget, doc.type, doc.loading_banner)
                 }
             }
-
-            // Set page contents
-            this.#setPageContent(realTarget, request.page, doc.page, doc.main, doc.right, partial)
 
             if (realTarget === this.TARGET.TOP) this.#refreshNavEntries()
 
@@ -154,46 +247,16 @@ export default class OxiContentService extends Service {
         }
     }
 
-    openPage(name, target, force) {
-        debug(`openPage(name = ${name}, target = ${typeof target == 'symbol' ? target.toString() : target}, force = ${force})`)
-
-        if (this.#resolveTarget(target) == this.TARGET.POPUP) {
-            debug(`Transitioning to ${this.router.urlFor('openxpki.popup', name)}`)
-            return this.router.transitionTo('openxpki.popup', name, {
-                // add query parameter popupBackButton=1 if there is a previous popup page
-                queryParams: { ...(this.popup && { popupBackButton: 1 }) },
-            })
-        }
-        else {
-            // close popup
-            this.popup = null
-
-            // this also removes the popup related data from the URL
-            if (force) {
-                return this.router.transitionTo('openxpki', name, { queryParams: { force: (new Date()).valueOf() } })
-            }
-            else {
-                return this.router.transitionTo('openxpki', name)
-            }
-        }
-    }
-
-    openLink(href, target) {
-        debug(`openLink(href = ${href}, target = ${typeof target == 'symbol' ? target.toString() : target})`)
-
-        // close popup
-        this.popup = null
-
-        // open link
-        let realTarget = this.#resolveTarget(target, true)
-        window.open(href, realTarget == this.TARGET.TOP ? '_self' : '_blank')
-    }
-
-    closePopup() {
-        // close popup
-        this.popup = null
-        // transition to current route (keeps the current model/page) but without the "popup" part
-        return this.router.transitionTo('openxpki')
+    /**
+     * Send AJAX request quietly, i.e. without showing the "loading" banner or
+     * dimming the page.
+     *
+     * @param {hash} request - Request data
+     * @param {hash} options - Set `{ verbose: true }` to show loading banner
+     * @return {Promise} Promise receiving the JSON document on success or `{}` on error
+     */
+    async requestUpdate(request, { verbose = false } = {}) {
+        return this.requestPage(request, { verbose, partial: true })
     }
 
     #resolveTarget(rawTarget = 'self', isLink) {
@@ -348,6 +411,8 @@ export default class OxiContentService extends Service {
     }
 
     #redirect(url, target = this.TARGET.TOP, type = 'internal', banner = this.intl.t('site.banner.redirecting')) {
+        debug(`#redirect() - redirecting to ${url}`)
+
         if (type == 'external' || /^(http|\/)/.test(url)) {
             this.#setLoadingBanner(banner) // never hide banner as browser will open a new page
             window.location.href = url
@@ -360,8 +425,8 @@ export default class OxiContentService extends Service {
              * cause the TransitionAborted error.
              * Tested for Ember 4.12.0
              */
-            next(this, function() { this.openPage(url, target) })
-            //this.openPage(url)
+            next(this, function() { this.openPage({ name: url, target: target }) })
+            //this.openPage({ name: url, target: target })
         }
     }
 
@@ -382,7 +447,6 @@ export default class OxiContentService extends Service {
                 // Redirect
                 else if (handler.redirect) {
                     // we intentionally do NOT remove the loading banner here
-                    debug(`Exception - redirecting to ${handler.redirect}`)
                     this.#redirect(handler.redirect)
                 }
                 return
@@ -394,7 +458,7 @@ export default class OxiContentService extends Service {
         this.error = this.intl.t('error_popup.message.server', { code: status_code })
     }
 
-    #setPageContent(target, requestedPageName, page, main, right, partial) {
+    #setPageContent(target, requestedPageName, page, main, right, partial, trigger) {
         // Mark the first form on screen: only the first one is allowed to focus
         // its first input field.
         for (const section of [...(main||[]), ...(right||[])]) {
@@ -405,10 +469,12 @@ export default class OxiContentService extends Service {
         }
 
         let obj
+        // Popup
         if (target === this.TARGET.POPUP) {
             if (!this.popup) this.popup = new Page()
             obj = this.popup
         }
+        // Main page
         else {
             // If it was a call to an action, requestedPageName == undefined.
             // In this case we do not wipe the page data.
@@ -421,6 +487,79 @@ export default class OxiContentService extends Service {
             ...(main && { main }),
             ...(right && { right }),
         })
+    }
+
+    #setBreadcrumbs(requestedPageName, trigger, page = {}) {
+        let bc = page?.breadcrumb || {}
+        let ignoreBreadcrumbs = trigger === 'breadcrumb'
+        let navAction = trigger === 'nav'
+        let breadcrumb
+
+        if (ignoreBreadcrumbs) {
+            debug('#setBreadcrumbs(): ignoring server-sent breadcrumbs during breadcrumb-initiated navigation')
+            return
+        }
+
+        debug(`#setBreadcrumbs(): page = ${requestedPageName??'<none>'}, trigger = ${trigger??'<none>'}, breadcrumb = ${page?.breadcrumb?.label??'<none>'}`)
+
+        // Reset breadcrumbs for nav menu clicks
+        if (navAction) {
+            debug(`#setBreadcrumbs(): navigation item detected, resetting breadcrumbs`)
+            this.breadcrumbs = []
+        }
+
+        // login or logout pages
+        if (this.LOGIN_PAGES.indexOf(this?.top?.name) != -1) {
+            debug(`#setBreadcrumbs(): login/logout page detected, suppressing breadcrumbs`)
+            this.breadcrumbs = []
+            return
+        }
+
+        // Breadcrumb may be suppressed by setting empty workflow label.
+        // See OpenXPKI::Client::UI::Workflow->__get_breadcrumb()
+        let suppressBreadcrumb = (Object.keys(page).length == 0) || (bc.suppress??0 == 1)
+        if (suppressBreadcrumb) debug('#setBreadcrumbs(): server sent empty hash - suppressing new breadcrumb')
+
+        if (! suppressBreadcrumb) {
+            if (bc.is_root) this.breadcrumbs = []
+
+            // Set defaults from server
+            breadcrumb = {
+                ...(bc.label && { label: bc.label }),
+                ...(bc.class && { class: bc.class }),
+                page: requestedPageName ?? this.top.name,
+            }
+
+            // Default to page label
+            if (!breadcrumb.label) breadcrumb.label = page.label
+
+            // Special handling for nav menu clicks
+            if (navAction) {
+                // always use nav menu label if available
+                let flatList = this.navEntries.reduce((p, n) => p.concat(n, n.entries || []), []);
+                const navItem = flatList.find(i => i.key == requestedPageName)
+                if (navItem) {
+                    debug('#setBreadcrumbs(): using navigation item label for breadcrumb')
+                    breadcrumb.label = navItem.label
+                }
+            }
+
+            // Remove trailing items if current page equals previous one in the breadcrumbs
+            let alreadySeenAt = this.breadcrumbs.findIndex(
+                el => (el.page == (breadcrumb.page) || (el.label??'-') == (breadcrumb.label??'--'))
+            )
+            if (alreadySeenAt != -1) {
+                debug('#setBreadcrumbs(): breadcrumb already in list - replacing it (to get new label)')
+                this.breadcrumbs = this.breadcrumbs.slice(0, alreadySeenAt)
+            }
+        }
+
+        // stop if there is nothing to add
+        if (suppressBreadcrumb || !(breadcrumb && breadcrumb.label)) return
+
+        // add new breadcrumb
+        this.breadcrumbs.push(breadcrumb)
+        this.breadcrumbs = this.breadcrumbs // trigger Ember refresh
     }
 
     #refreshNavEntries() {

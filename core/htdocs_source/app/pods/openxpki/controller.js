@@ -1,9 +1,11 @@
-import Controller from '@ember/controller';
-import { tracked } from '@glimmer/tracking';
-import { action, set as emSet } from '@ember/object';
-import { service } from '@ember/service';
-import lite from 'caniuse-lite';
+import Controller from '@ember/controller'
+import { tracked } from '@glimmer/tracking'
+import { action, set as emSet } from '@ember/object'
+import { service } from '@ember/service'
+import { A } from '@ember/array'
+import { debug } from '@ember/debug'
 import { detect } from 'detect-browser'
+import lite from 'caniuse-lite'
 
 export default class OpenXpkiController extends Controller {
     @service('oxi-config') config;
@@ -15,25 +17,28 @@ export default class OpenXpkiController extends Controller {
       defines the supported query parameters. Ember makes them available as this.count etc.
       https://api.emberjs.com/ember/release/classes/Controller
     */
+    // binds the query parameter to the object property
     queryParams = [
-        "limit",
-        "startat",
-        "force",
-    ];
-
-    // FIXME Remove those three?! (auto-injected by Ember, see queryParams above)
-    startat = null;
-    limit = null;
+        'startat',
+        'limit',
+        'force',
+        // 'trigger' -- not neccessary as we only evaluate it in route.js/model()
+    ]
+    @tracked startat = null
+    @tracked limit = null
+    @tracked force = null
+    // @tracked trigger = null
 
     @tracked loading = false;
     @tracked showInfoBlock = false;
 
-    @action
-    getStatusClass(level) {
-        if (level === "error") { return "alert-danger" }
-        if (level === "success") { return "alert-success" }
-        if (level === "warn") { return "alert-warning" }
-        return "alert-info";
+    get breadcrumbs() {
+        let bc = (this.model.breadcrumbs || []).filter(el => el.label)
+        return A(bc) // Ember Array allows to query .lastObject
+    }
+
+    get showInfo() {
+        return this.model?.top?.right && this.showInfoBlock
     }
 
     get oldBrowser() {
@@ -86,6 +91,14 @@ export default class OpenXpkiController extends Controller {
         return `${agent.browser} ${known_version}`
     }
 
+    @action
+    getStatusClass(level) {
+        if (level === "error") { return "alert-danger" }
+        if (level === "success") { return "alert-success" }
+        if (level === "warn") { return "alert-warning" }
+        return "alert-info";
+    }
+
     // We don't use <ddm.LinkTo> but our own method to navigate to target page.
     // This way we can force Ember to do a transition even if the new page is
     // the same page as before by setting parameter "force" a timestamp.
@@ -93,14 +106,14 @@ export default class OpenXpkiController extends Controller {
     navigateTo(page, navbarCollapseFunc, event) {
         if (event) { event.stopPropagation(); event.preventDefault() }
         if (navbarCollapseFunc) navbarCollapseFunc()
-        this.content.openPage(page, this.content.TARGET.TOP, true)
+        this.content.openPage({ name: page, target: this.content.TARGET.TOP, force: true, params: { trigger: 'nav' } })
     }
 
     @action
     logout(event) {
         if (event) { event.stopPropagation(); event.preventDefault() }
         this.content.setTenant(null);
-        this.content.openPage('logout', this.content.TARGET.TOP, true)
+        this.content.openPage({ name: 'logout', target: this.content.TARGET.TOP, force: true, params: { trigger: 'nav' } })
     }
 
     @action

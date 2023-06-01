@@ -85,7 +85,13 @@ sub init_search {
     my $self = shift;
     my $args = shift;
 
-    $self->set_page(label => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_LABEL');
+    $self->set_page(
+        label => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_LABEL',
+        breadcrumb => {
+            is_root => 1,
+            class => 'cert-search',
+        },
+    );
 
     my $form = $self->main->add_form(
         action => 'certificate!search',
@@ -251,10 +257,10 @@ sub init_result {
     $self->set_page(
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_LABEL',
         description => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_DESC' . $criteria ,
-        breadcrumb => [
-            { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_LABEL', className => 'cert-search' },
-            { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_TITLE', className => 'cert-search-result' }
-        ],
+        breadcrumb => {
+            label => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_TITLE',
+            class => 'cert-search-result',
+        },
     );
 
     my $pager = $self->__render_pager( $result, { limit => $limit, startat => $startat } );

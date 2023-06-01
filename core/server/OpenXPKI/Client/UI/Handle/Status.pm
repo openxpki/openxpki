@@ -15,12 +15,12 @@ sub render_process_status {
 
     $self->logger()->trace( 'render_process_status: ' . Dumper $args ) if $self->logger->is_trace;
 
-
     my $process = $self->send_command_v2( 'list_process' );
 
     $self->logger()->trace("result: " . Dumper $process ) if $self->logger->is_trace;
 
     $self->page->label('I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES');
+    $self->page->suppress_breadcrumb;
 
     my @result;
     my $now = time;
@@ -70,6 +70,7 @@ sub render_system_status {
     my $critical = 0;
 
     $self->page->label('I18N_OPENXPKI_UI_STATUS_SYSTEM_HEAD');
+    $self->page->suppress_breadcrumb;
 
     if ($status->{secret_offline}) {
         push @fields, {
