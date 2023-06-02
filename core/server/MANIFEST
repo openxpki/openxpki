@@ -33,6 +33,7 @@ OpenXPKI/Template/Plugin/Profile.pm
 OpenXPKI/Template/Plugin/RandomPassword.pm
 OpenXPKI/Template/Plugin/Utils.pm
 OpenXPKI/Template/Plugin/Workflow.pm
+OpenXPKI/Util.pm
 OpenXPKI/VERSION.pm
 
 ## Client
