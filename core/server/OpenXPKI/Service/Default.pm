@@ -576,6 +576,8 @@ sub __handle_COMMAND : PRIVATE {
     my $command = $data->{PARAMS}->{COMMAND};
     my $params = $data->{PARAMS}->{PARAMS};
     my $api_version = $data->{PARAMS}->{API} || 2;
+    my $timeout = $data->{PARAMS}->{TIMEOUT} || $max_execution_time{$ident};
+    my $request_id = $data->{PARAMS}->{REQUEST_ID};
 
     OpenXPKI::Exception->throw(
         message => 'I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_COMMAND_MISSING',
@@ -585,6 +587,8 @@ sub __handle_COMMAND : PRIVATE {
         message => "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_UNKNWON_COMMAND_API_VERSION",
         params  => $data->{PARAMS},
     ) unless $api_version =~ /^2$/;
+
+    Log::Log4perl::MDC->put('rid', $request_id) if $request_id;
 
     # API2 instance
     # (late initialization because CTX('config') needs CTX('session'), i.e. logged in user)
@@ -603,7 +607,6 @@ sub __handle_COMMAND : PRIVATE {
         # execution timeout
         my $sh;
 
-        my $timeout = $data->{PARAMS}->{TIMEOUT} || $max_execution_time{$ident};
         if ($timeout) {
             ##! 16: 'running command with timeout of ' . $timeout
             $sh = set_sig_handler( 'ALRM' ,sub {
@@ -634,6 +637,8 @@ sub __handle_COMMAND : PRIVATE {
         # reset timeout
         sig_alarm(0) if $sh;
     };
+
+    Log::Log4perl::MDC->put('rid', undef);
 
     if (my $error = $EVAL_ERROR) {
         # rollback DBI (should not matter as we throw exception anyway)

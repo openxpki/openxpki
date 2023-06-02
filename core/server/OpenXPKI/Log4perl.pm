@@ -112,7 +112,7 @@ sub init_or_fallback {
 sub _add_patternlayout_spec {
     Log::Log4perl::Layout::PatternLayout::add_global_cspec('i', sub {
         my $layout = shift;
-        my @order = qw( user role sid wftype wfid scepid pki_realm );
+        my @order = qw( user role sid rid wftype wfid scepid pki_realm );
         my $mdc = Log::Log4perl::MDC->get_context;
         my %keys = ( map { $_ => $_ } grep { defined $mdc->{$_} } sort keys %{$mdc} );
         my @keys_ordered = ();

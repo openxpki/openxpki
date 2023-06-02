@@ -46,6 +46,13 @@ has log => (
     default => sub { return Log::Log4perl->get_logger; }
 );
 
+has id => (
+    is => 'ro',
+    isa => 'Str',
+    lazy => 1,
+    default => sub { my $id="".shift; $id =~ s/.*\(0x([^\)]+)\)/$1/; $id },
+);
+
 has _prefix_base64 => (
     is => 'ro',
     isa => 'Str',
