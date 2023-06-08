@@ -453,7 +453,7 @@ sub notify {
         }
 
         if (!$vars{to}) {
-            CTX('log')->system()->warn("Failed sending notification - no receipient");
+            CTX('log')->system()->warn("Failed sending notification $msg - no receipient");
 
             push @failed, $handle;
             next MAIL_HANDLE;
