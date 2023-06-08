@@ -16,7 +16,6 @@ EXTERNAL=				\
 	Class__Observable \
 	Config__Merge \
 	Crypt__Argon2 \
-	Crypt__LibSCEP \
 	Crypt__OpenSSL__AES \
 	Crypt__PKCS10 \
 	Crypt__X509 \
@@ -33,6 +32,9 @@ EXTERNAL=				\
 	Connector \
 	Workflow
 
+EXTRA = \
+    Crypt__LibSCEP
+
 CORE = \
 	CGI \
 	JSON__PP \
@@ -47,7 +49,7 @@ cpan: cpan_dependency
 
 cpan_dependency: $(EXTERNAL)
 
-release: cpan_dependency Crypt__LibSCEP openxpki
+release: cpan_dependency openxpki
 
 default:	clean
 	$(MAKE) $(EXTERNAL)
@@ -58,7 +60,7 @@ default:	clean
 # run dh-make-perl with --install --recursive to auto-build/add missing dependancies
 # for Buster this is required for at least Feature::Compat::Try pulling in
 # Syntax::Keyword::Try and other deps that are too old in buster repos
-$(EXTERNAL):
+$(EXTERNAL) $(EXTRA):
 	test -d deb || mkdir deb
 	test -d deb/cpan || mkdir deb/cpan/
 	cd deb/cpan/ && DEBEMAIL=debian@openxpki.org DEBFULLNAME="OpenXPKI Foundation" DEB_BUILD_OPTIONS=nocheck dh-make-perl --build $($@_BUILDOPTS) --recursive --install --cpan $(subst __,::,$@)
