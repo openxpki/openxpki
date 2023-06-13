@@ -242,8 +242,9 @@ sub _build_dbix_handler {
                 # custom on_connect actions
                 $self->driver->on_connect($dbh);
                 # on_connect_do is (also) called after fork():
-                # then we get a new DBI handle and a previous transaction is invalid
-                $self->_clear_txn_starter;
+                # then we get a new DBI handle and a previous transaction is invalid.
+                # So we check the PID here and clear the old transaction if it differs.
+                $self->_clear_txn_starter if ($self->in_txn and $self->_txn_starter->[3] != $$);
             },
         }
     );
@@ -517,12 +518,7 @@ sub start_txn {
     return $self->log->warn("AutoCommit is on, start_txn() is useless")
       if $self->autocommit;
 
-    # we have to enforce the actual DB connection which clears
-    # $self->_txn_starter at this point as otherwise the very first commit()
-    # thinks that there is no running transaction.
-    $self->ping;
-
-    my $caller = [ caller ];
+    my $caller = [ caller, $$ ];
     if ($self->in_txn) {
         $self->log->debug(
             sprintf "transaction start requested during a running transaction (started in %s:%i) in %s:%i",
