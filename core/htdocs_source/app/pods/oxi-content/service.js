@@ -477,7 +477,7 @@ export default class OxiContentService extends Service {
         // Main page
         else {
             // If it was a call to an action, requestedPageName == undefined.
-            // In this case we do not wipe the page data.
+            // In this case we leave the page data untouched.
             if (!this.top || (partial == false && requestedPageName)) this.top = new Page()
             obj = this.top
         }
@@ -493,6 +493,7 @@ export default class OxiContentService extends Service {
         let bc = page?.breadcrumb || {}
         let ignoreBreadcrumbs = trigger === 'breadcrumb'
         let navAction = trigger === 'nav'
+        let pageName = requestedPageName ?? this.top.name
         let breadcrumb
 
         if (ignoreBreadcrumbs) {
@@ -509,7 +510,7 @@ export default class OxiContentService extends Service {
         }
 
         // login or logout pages
-        if (this.LOGIN_PAGES.indexOf(this?.top?.name) != -1) {
+        if (this.LOGIN_PAGES.findIndex(p => pageName.startsWith(p)) != -1) {
             debug(`#setBreadcrumbs(): login/logout page detected, suppressing breadcrumbs`)
             this.breadcrumbs = []
             return
@@ -527,7 +528,7 @@ export default class OxiContentService extends Service {
             breadcrumb = {
                 ...(bc.label && { label: bc.label }),
                 ...(bc.class && { class: bc.class }),
-                page: requestedPageName ?? this.top.name,
+                page: pageName,
             }
 
             // Default to page label
