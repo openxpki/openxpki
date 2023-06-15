@@ -64,7 +64,7 @@ Start with a debian minimal install, we recommend to add "SSH Server" and "Web S
 
 To avoid an "untrusted package" warning, you should add our package signing key (you might need to install gpg before)::
 
-    wget https://packages.openxpki.org/v3/debian/Release.key -O - | apt-key add -
+    wget https://packages.openxpki.org/v3/debian/Release.key -O - 2>/dev/null | tee Release.key | gpg -o /usr/share/keyrings/openxpki.pgp --dearmor
 
 The https connection is protected by a Let's Encrypt certificate but if you want to validate the key on your own, the fingerprint is::
 
@@ -75,7 +75,7 @@ You can also find the key on the github repository in `package/debian/Release.ke
 
 Add the repository to your source list (buster)::
 
-    echo "deb http://packages.openxpki.org/v3/debian/ buster release" > /etc/apt/sources.list.d/openxpki.list
+    echo -e "Types: deb\nURIs: https://packages.openxpki.org/v3/debian/\nSuites: buster\nComponents: release\nSigned-By: /usr/share/keyrings/openxpki.pgp" > /etc/apt/sources.list.d/openxpki.sources
     apt update
 
 Please do not disable the installation of "recommend" packages as this will very likely leave you with an unusable system.
