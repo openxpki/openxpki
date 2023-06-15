@@ -14,8 +14,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 
 # CPAN modules
-use Try::Tiny;
-
+use Feature::Compat::Try;
 
 =head1 COMMANDS
 
@@ -146,12 +145,12 @@ command "import_chain" => {
             push @imported, $db_insert;
             CTX('log')->system()->info("Certificate $cert_identifier sucessfully imported");
         }
-        catch {
-            my $err = $_;
-            $err = $_->message if ref $_ eq 'OpenXPKI::Exception';
-            CTX('log')->system->error("Import of certificate $cert_identifier failed with $err");
-            push @failed, { cert_identifier => $cert_identifier, error => $err };
-        };
+        catch ($err) {
+            my $msg = $err;
+            $msg = $err->message if ref $err eq 'OpenXPKI::Exception';
+            CTX('log')->system->error("Import of certificate $cert_identifier failed with: $msg");
+            push @failed, { cert_identifier => $cert_identifier, error => $msg };
+        }
 
     }
 

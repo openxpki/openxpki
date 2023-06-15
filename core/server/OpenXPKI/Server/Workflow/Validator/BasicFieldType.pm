@@ -8,7 +8,6 @@ use Encode;
 
 # CPAN modules
 use Workflow::Exception qw( validation_error );
-use Try::Tiny;
 
 # Project modules
 use OpenXPKI::Debug;

@@ -24,7 +24,7 @@ use POSIX;
 
 # CPAN modules
 use Log::Log4perl::MDC;
-use Try::Tiny;
+use Feature::Compat::Try;
 
 # Project modules
 use OpenXPKI::Debug;
@@ -478,12 +478,10 @@ sub run {
         #
         $self->__main_loop;
     }
-    catch {
-        # make OpenXPKI::Exception compatible with Try::Tiny
-        local $@ = $_;
+    catch ($err) {
         # make sure the cleanup code does not die as this would escape run()
-        eval { CTX('log')->system->error($_) };
-    };
+        eval { CTX('log')->system->error($err) };
+    }
 
     eval { $self->{dbi}->disconnect };
     eval { CTX('config')->cleanup() };
@@ -549,10 +547,10 @@ sub __main_loop {
             $self->_exception_count(0);
 
         }
-        catch {
+        catch ($err) {
             $self->_exception_count($self->_exception_count + 1);
 
-            my $error_msg = "Watchdog fatal error: $_";
+            my $error_msg = "Watchdog fatal error: $err";
             my $sleep = $self->interval_sleep_exception();
 
             print STDERR $error_msg, "\n";
@@ -571,7 +569,7 @@ sub __main_loop {
 
             # sleep to give the system a chance to recover
             sleep($sleep);
-        };
+        }
     }
 }
 
@@ -858,9 +856,9 @@ sub __auto_archive_workflows {
             $workflow->set_archived;
         }
     }
-    catch {
-        CTX('log')->system->error(sprintf('Error archiving wf %s: %s', $id, $_));
-    };
+    catch ($err) {
+        CTX('log')->system->error(sprintf('Error archiving wf %s: %s', $id, $err));
+    }
 
     $self->_next_auto_archiving( time + $self->interval_auto_archiving );
 }
@@ -910,11 +908,11 @@ sub __flag_for_archiving {
     # So in the meantime another watchdog process might have picked up this
     # workflow and changed the database. Two things can happen:
     # 1. other process did not commit -> timeout exception because of DB row lock
-    catch {
+    catch ($err) {
         $self->{dbi}->rollback;
-        CTX('log')->system->warn(sprintf('watchdog: auto-archiving wf %d failed (most probably other process does same job): %s', $wf_id, $_));
+        CTX('log')->system->warn(sprintf('watchdog: auto-archiving wf %d failed (most probably other process does same job): %s', $wf_id, $err));
         return;
-    };
+    }
     # 2. other process committed changes -> our update's where clause misses ($update_count = 0).
     if ($update_count < 1) {
         CTX('log')->system->warn(sprintf('watchdog: auto-archiving wf %d failed (already archived by other process)', $wf_id));

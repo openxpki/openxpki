@@ -15,8 +15,8 @@ use IO::Dir 1.03;
 use Scalar::Util qw( blessed );
 
 # CPAN modules
-use Try::Tiny;
 use Type::Params qw( signature_for );
+use Feature::Compat::Try;
 
 # Project modules
 use OpenXPKI::Server::Log;
@@ -241,12 +241,12 @@ sub _build_commands {
     try {
         $pkg_map = _list_modules($self->namespace."::");
     }
-    catch {
+    catch ($err) {
         OpenXPKI::Exception->throw (
             message => "Error listing API plugins",
-            params => { namespace => $self->namespace, error => $_ }
+            params => { namespace => $self->namespace, error => $err }
         );
-    };
+    }
 
     return $self->_load_plugins($pkg_map);
 }
@@ -265,12 +265,13 @@ sub _load_plugins {
 
     for my $pkg (keys %{ $pkg_map }) {
         my $file = $pkg_map->{$pkg};
-        my $ok;
-        try { load $pkg; $ok = 1; }
-        catch {
-            $self->log->warn("Error loading API plugin $pkg (".$pkg_map->{$pkg}."): $_");
-        };
-        next if not $ok; # continue on errors
+        try {
+            load $pkg;
+        }
+        catch ($err) {
+            $self->log->warn("Error loading API plugin $pkg (".$pkg_map->{$pkg}."): $err");
+            next; # continue on errors
+        }
 
         if (not $pkg->DOES($self->command_role)) {
             $self->log->debug("API - ignore $pkg (does not consume ".$self->command_role.") - $file");
@@ -381,21 +382,21 @@ sub dispatch ($self, $arg) {
             ->new(rawapi => $self)
             ->execute($command, $all_params);
     }
-    catch {
-        my $err = $_;
-        if (blessed($_)) {
-            if ($_->isa("OpenXPKI::Exception")) {
-                $_->rethrow;
+    catch ($err) {
+        my $msg = $err;
+        if (blessed($err)) {
+            if ($err->isa("OpenXPKI::Exception")) {
+                $err->rethrow;
             }
-            elsif ($_->isa("Moose::Exception")) {
-                $err = $_->message;
+            elsif ($err->isa("Moose::Exception")) {
+                $msg = $err->message;
             }
         }
         OpenXPKI::Exception->throw(
             message => "Error while executing API command",
-            params => { command => $command, error => $err, caller => sprintf("%s:%s", ($self->my_caller())[1,2]) }, # stringify in case error is an object
+            params => { command => $command, error => $msg, caller => sprintf("%s:%s", ($self->my_caller())[1,2]) }, # stringify in case error is an object
         );
-    };
+    }
 
     return $result;
 }

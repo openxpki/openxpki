@@ -13,7 +13,7 @@ related plugins that provides some utility methods
 # Core modules
 
 # CPAN modules
-use Try::Tiny;
+use Feature::Compat::Try;
 use Type::Params qw( signature_for );
 
 # Project modules
@@ -423,18 +423,17 @@ sub decrypt_passwordsafe ($self, $safe_id, $enc_value) {
     try {
         $value = $safe_token->command({ COMMAND => 'pkcs7_decrypt', PKCS7 => $enc_value });
     }
-    catch {
-        local $@ = $_; # makes OpenXPKI::Exception compatible with Try::Tiny
-        if (my $exc = OpenXPKI::Exception->caught) {
-            if ($exc->message eq 'I18N_OPENXPKI_TOOLKIT_COMMAND_FAILED') {
+    catch ($err) {
+        if (blessed $err and $err->isa('OpenXPKI::Exception')) {
+            if ($err->message eq 'I18N_OPENXPKI_TOOLKIT_COMMAND_FAILED') {
                 OpenXPKI::Exception->throw(
                     message => 'Encryption key needed to decrypt password safe entry is unavailable',
                     params => { token_id => $safe_id }
                 );
             }
-            $exc->rethrow;
+            $err->rethrow;
         }
-    };
+    }
 
     return $value;
 }

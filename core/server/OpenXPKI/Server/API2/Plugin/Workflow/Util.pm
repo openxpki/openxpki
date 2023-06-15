@@ -3,7 +3,7 @@ use Moose;
 
 # Core modules
 use English;
-use Try::Tiny;
+use Feature::Compat::Try;
 
 # CPAN modules
 use Type::Params qw( signature_for );
@@ -287,13 +287,11 @@ sub _execute_activity_async {
 
         # DB commits are done inside the workflow engine
     }
-    catch {
-        # make OpenXPKI::Exception compatible with Try::Tiny
-        local $@ = $_;
-        # make sure the cleanup code does not die as this would escape this method
-        eval { CTX('log')->system->error($_) };
+    catch ($err) {
+        # make sure the error handler code does not die as this would escape this method
+        eval { CTX('log')->system->error($err) };
         # DB rollback is not needed as this process will terminate now anyway
-    };
+    }
 
     eval { CTX('dbi')->disconnect };
     eval { CTX('config')->cleanup() };

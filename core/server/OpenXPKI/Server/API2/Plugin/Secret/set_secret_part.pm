@@ -8,7 +8,7 @@ OpenXPKI::Server::API2::Plugin::Secret::set_secret_part
 =cut
 
 # CPAN modules
-use Try::Tiny;
+use Feature::Compat::Try;
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
@@ -55,13 +55,14 @@ command "set_secret_part" => {
             group => $params->secret,
             $params->has_part ? (part => $params->part) : (),
         });
-    } catch {
+    }
+    catch ($err) {
         CTX('log')->audit('system')->warn("incorrect secret given", {
             group => $params->secret,
             $params->has_part ? (part => $params->part) : (),
-            error => "$_",
+            error => "$err",
         });
-        die $_;
+        die $err;
     };
 
     return 1;

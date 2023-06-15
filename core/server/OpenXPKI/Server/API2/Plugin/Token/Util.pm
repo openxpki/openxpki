@@ -15,7 +15,7 @@ use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 
 # CPAN modules
-use Try::Tiny;
+use Feature::Compat::Try;
 use Type::Params qw( signature_for );
 
 use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
@@ -36,8 +36,7 @@ signature_for is_token_usable => (
 );
 sub is_token_usable ($self, $token, $check) {
     ##! 1: 'start'
-    my $result = try {
-
+    try {
         CTX('log')->application()->debug("Check if token is usable using $check operation");
 
         ##! 64: 'Entering test'
@@ -76,12 +75,10 @@ sub is_token_usable ($self, $token, $check) {
         }
         return 1;
     }
-    catch {
+    catch ($err) {
         ##! 8: 'pkcs7 roundtrip failed'
         return undef;
-    };
-
-    return $result;
+    }
 }
 
 =head2 validity_to_epoch

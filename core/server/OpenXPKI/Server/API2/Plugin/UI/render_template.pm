@@ -7,7 +7,7 @@ OpenXPKI::Server::API2::Plugin::UI::render_template
 
 =cut
 
-use Try::Tiny;
+use Feature::Compat::Try;
 use YAML::Loader;
 use Data::Dumper;
 
@@ -110,12 +110,12 @@ command "render_yaml_template" => {
     try {
         $value = YAML::Loader->new->load($result);
     }
-    catch {
-        OpenXPKI::Exception->throw (
+    catch ($err) {
+        OpenXPKI::Exception->throw(
             message => "Error parsing YAML in 'yaml_template'",
-            params => { error => $_, yaml => $result }
+            params => { error => $err, yaml => $result }
         );
-    };
+    }
 
     $value = $value->{OXI_PLACEHOLDER} if ($has_head);
     $log->trace('Parsed Perl structure: ' . Dumper($value)) if $log->is_trace;

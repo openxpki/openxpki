@@ -13,7 +13,7 @@ use Test::More;
 use Test::Deep;
 use Test::Exception;
 use Data::UUID;
-use Try::Tiny;
+use Feature::Compat::Try;
 
 # use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Workflow::Persister.*'} = 32;
 
@@ -27,9 +27,9 @@ try {
     require OpenXPKI::Server::Workflow::Persister::Archiver;
     plan tests => 8;
 }
-catch {
+catch ($err) {
     plan skip_all => "persister 'Archiver' no available";
-};
+}
 
 sub archive_at_ok($$$) {
     my ($testname, $config, $archive_at) = @_;

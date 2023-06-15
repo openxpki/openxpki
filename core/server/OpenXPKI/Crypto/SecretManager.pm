@@ -8,7 +8,7 @@ use Digest::SHA qw(sha256_hex sha1_base64);
 use Crypt::Argon2;
 use Crypt::PK::ECC;
 use Template;
-use Try::Tiny;
+use Feature::Compat::Try;
 
 # Project modules
 use OpenXPKI::Debug;
@@ -241,9 +241,10 @@ sub _create_object {
                     my $share;
                     try {
                         $share = OpenXPKI::FileUtils->read_file($share_name);
-                    } catch {
-                        CTX('log')->application->warn("Could not open encrypted share: $_");
-                    };
+                    }
+                    catch ($err) {
+                        CTX('log')->application->warn("Could not open encrypted share: $err");
+                    }
                     return $share;
                 };
             }

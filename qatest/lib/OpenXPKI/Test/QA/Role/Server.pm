@@ -37,7 +37,7 @@ use Test::More;
 
 # CPAN modules
 use Proc::Daemon;
-use Try::Tiny;
+use Feature::Compat::Try;
 
 # Project modules
 use OpenXPKI::Control;
@@ -154,9 +154,9 @@ around 'init_server' => sub {
             $self->init_session_and_context; # this step from OpenXPKI::Test->BUILD would otherwise not be executed as we never return
             $self->_start_openxpki_server;
         }
-        catch {
-            eval { Log::Log4perl->get_logger()->error($_) };
-        };
+        catch ($err) {
+            eval { Log::Log4perl->get_logger->error($err) };
+        }
         exit;
     }
     # Proc::Daemon parent ...

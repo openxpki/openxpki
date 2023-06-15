@@ -11,8 +11,8 @@ use Carp qw( croak carp );
 use Scalar::Util qw( blessed );
 
 # CPAN modules
-use Try::Tiny;
 use Workflow::Exception qw( workflow_error );
+use Feature::Compat::Try;
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
@@ -216,14 +216,14 @@ sub execute_action {
         }
     }
     # catch exceptions during initialization to do database rollback
-    catch {
+    catch ($err) {
         ##! 8: 'Error during startup ' . $_
         # make sure the cleanup code does not die as this would escape this method
         eval { CTX('dbi')->rollback() unless $autorun };
         # $autorun = 1 means nested workflow action, rollback will then be
         # performed on a higher level by code further down
-        die $_; # rethrow
-    };
+        die $err; # rethrow
+    }
 
     CTX('log')->application()->debug("Execute action $action_name");
 

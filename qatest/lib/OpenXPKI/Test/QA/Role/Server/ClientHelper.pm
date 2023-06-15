@@ -37,7 +37,7 @@ use Test::More;
 use Test::Exception;
 
 # CPAN modules
-use Try::Tiny;
+use Feature::Compat::Try;
 
 # Project modules
 use OpenXPKI::Client;
@@ -117,9 +117,10 @@ sub connect {
                 SOCKETFILE => $self->socket_file,
             })
         );
-    } catch {
-        BAIL_OUT("Could not create client instance: $_");
-    };
+    }
+    catch ($err) {
+        BAIL_OUT("Could not create client instance: $err");
+    }
 }
 
 =head2 init_session
@@ -153,9 +154,10 @@ sub init_session {
             $self->is_service_msg("GET_PKI_REALM") or $self->is_service_msg("GET_AUTHENTICATION_STACK")
               or die "expected next step GET_PKI_REALM or GET_AUTHENTICATION_STACK",
         }
-    } catch {
-        BAIL_OUT("Could not initialize client session: $_");
-    };
+    }
+    catch ($err) {
+        BAIL_OUT("Could not initialize client session: $err");
+    }
 }
 
 =head2 login
@@ -197,9 +199,10 @@ sub login {
 
         $self->send('GET_PASSWD_LOGIN', { LOGIN => $user, PASSWD => $self->password });
         $self->is_service_msg("SERVICE_READY") or die "expected next step SERVICE_READY";
-    } catch {
-        BAIL_OUT("Client login failed: $_");
-    };
+    }
+    catch ($err) {
+        BAIL_OUT("Client login failed: $err");
+    }
 
     return $self;
 }

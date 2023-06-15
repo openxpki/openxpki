@@ -361,7 +361,6 @@ WriteMakefile(
         'Test::Pod'                     => '1.00',
         'Text::CSV_XS'                  => '0.23',
         'Time::HiRes'                   => '1',
-        'Try::Tiny'                     => '0.28',
         'Type::Tiny'                    => '2.000001',
         'URI::Escape'                   => 0,           # should be part of the core modules but who knows
         'Workflow'                      => '1.60',
