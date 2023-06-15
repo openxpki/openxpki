@@ -82,6 +82,7 @@ use English;
 # CPAN modules
 use POSIX ();
 use IO::Handle;
+use Log::Log4perl;
 
 # Project modules
 use OpenXPKI::Debug;
@@ -235,6 +236,8 @@ sub new_child {
     # Re-seed Perl random number generator
     srand(time ^ $PROCESS_ID);
 
+    $self->_reopen_log4perl_files;
+
     return $pid;
 }
 
@@ -372,6 +375,19 @@ sub _try_fork {
         message => 'fork() failed due to insufficient memory, tried $max_tries times',
         log => { priority => 'fatal', facility => 'system' }
     );
+}
+
+# Reopen files in Log4perl appenders that contain the methods 'filename' and
+# 'file_switch' (Log::Log4perl::Appender::File and maybe derived classes)
+sub _reopen_log4perl_files {
+    my $appenders = Log::Log4perl->appenders;
+
+    for my $appname (keys %{ $appenders }) {
+        my $app = $appenders->{$appname}->{appender};
+        if ($app->can('filename') and $app->can('file_switch')) {
+            $app->file_switch($app->filename); # switch to same file = reopen
+        }
+    }
 }
 
 __PACKAGE__->meta->make_immutable;
