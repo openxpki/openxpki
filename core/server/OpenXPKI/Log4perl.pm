@@ -1,5 +1,8 @@
 package OpenXPKI::Log4perl;
 
+# Core modules
+use List::Util qw( none );
+
 # CPAN modules
 use Log::Log4perl;
 use Log::Log4perl::Level;
@@ -113,8 +116,14 @@ sub _add_patternlayout_spec {
     Log::Log4perl::Layout::PatternLayout::add_global_cspec('i', sub {
         my $layout = shift;
         my @order = qw( user role sid rid wftype wfid scepid pki_realm );
+        my @hide = qw( command_id );
         my $mdc = Log::Log4perl::MDC->get_context;
-        my %keys = ( map { $_ => $_ } grep { defined $mdc->{$_} } sort keys %{$mdc} );
+        my %keys = (
+            map { $_ => $_ }
+            grep { my $k = $_; none { $k eq $_ } @hide }
+            grep { defined $mdc->{$_} }
+            sort keys $mdc->%*
+        );
         my @keys_ordered = ();
         # Add keys in our desired order if they exist
         for my $k (@order) {

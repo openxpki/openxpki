@@ -534,7 +534,7 @@ watchdog and user initiated requests).
 
 sub get_pids {
     my $proc = Proc::ProcessTable->new;
-    my $result = { 'server' => 0, 'watchdog' => [], 'worker' => [], 'workflow' => [] };
+    my $result = { 'server' => 0, 'watchdog' => [], 'worker' => [], 'workflow' => [], 'prometheus' => 0 };
     my $pgrp = getpgrp($$); # Process Group of myself
     for my $p ( @{$proc->table} ) {
         next unless $pgrp == $p->pgrp;
@@ -551,6 +551,9 @@ sub get_pids {
         }
         if ($cmd =~ / ^ openxpkid .* workflow /x) {
             push @{$result->{workflow}}, $p->pid; next;
+        }
+        if ($cmd =~ / ^ openxpkid .* Prometheus /x) {
+            $result->{prometheus} = $p->pid; next;
         }
     }
     return $result;

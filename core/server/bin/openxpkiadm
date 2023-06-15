@@ -1402,7 +1402,7 @@ if ($cmd eq 'initdb') {
         );
         __init();
 
-        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','dbi_log','api2','crypto_layer','dbi'], SILENT => 1, CLI => 1});
+        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','dbi_log','metrics','api2','crypto_layer','dbi'], SILENT => 1, CLI => 1});
 
         $ret = certificate_id();
 
@@ -1438,7 +1438,7 @@ if ($cmd eq 'initdb') {
 
         __init();
 
-        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','dbi_log','api2','crypto_layer','dbi'], SILENT => 1, CLI => 1});
+        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','dbi_log','metrics','api2','crypto_layer','dbi'], SILENT => 1, CLI => 1});
 
         if (!$params{file}) {
             die "You need to specify the certificate to import with --file\n";
@@ -1461,7 +1461,7 @@ if ($cmd eq 'initdb') {
         );
         __init();
 
-        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','dbi_log','api2','crypto_layer','dbi'], SILENT => 1, CLI => 1});
+        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','dbi_log','metrics','api2','crypto_layer','dbi'], SILENT => 1, CLI => 1});
 
         __check_realm() if ($params{realm});
 
@@ -1479,7 +1479,7 @@ if ($cmd eq 'initdb') {
         );
         __init();
 
-        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','dbi_log','api2','crypto_layer','dbi'], SILENT => 1, CLI => 1});
+        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','dbi_log','metrics','api2','crypto_layer','dbi'], SILENT => 1, CLI => 1});
 
         $ret = certificate_chain();
 
@@ -1492,7 +1492,7 @@ if ($cmd eq 'initdb') {
         );
         __init();
 
-        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','dbi_log','api2','crypto_layer','dbi'], SILENT => 1, CLI => 1});
+        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','dbi_log','metrics','api2','crypto_layer','dbi'], SILENT => 1, CLI => 1});
 
         __check_realm();
 
@@ -1525,7 +1525,7 @@ if ($cmd eq 'initdb') {
     );
     __init();
 
-    OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','dbi_log','api2','crypto_layer','dbi'], SILENT => 1, CLI => 1});
+    OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','dbi_log','metrics','api2','crypto_layer','dbi'], SILENT => 1, CLI => 1});
 
     __check_realm() if (!$params{realm} || $params{realm} ne '_global');
 
@@ -1553,7 +1553,7 @@ if ($cmd eq 'initdb') {
         );
         __init();
 
-        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','api2','dbi'], SILENT => 1, CLI => 1});
+        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','metrics','api2','dbi'], SILENT => 1, CLI => 1});
 
         __check_realm();
 
@@ -1567,7 +1567,7 @@ if ($cmd eq 'initdb') {
           plain
     );
     __init();
-    OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','api2','dbi'], SILENT => 1, CLI => 1});
+    OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','metrics','api2','dbi'], SILENT => 1, CLI => 1});
 
     if (!$params{scheme}) {
         $params{scheme} = 'ssha256';

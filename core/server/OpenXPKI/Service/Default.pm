@@ -23,6 +23,7 @@ use OpenXPKI::Server;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
 use Log::Log4perl::MDC;
+use Data::UUID;
 
 
 my %state_of :ATTR;     # the current state of the service
@@ -30,6 +31,8 @@ my %state_of :ATTR;     # the current state of the service
 my %max_execution_time  : ATTR( :set<max_execution_time> );
 
 my %api :ATTR; # API instance
+
+my $UUID = Data::UUID->new;
 
 sub init {
     my $self  = shift;
@@ -593,6 +596,7 @@ sub __handle_COMMAND : PRIVATE {
     # API2 instance
     # (late initialization because CTX('config') needs CTX('session'), i.e. logged in user)
     if (not $api{$ident}) {
+        CTX('log')->system->debug("Initialization internal API for client command processing");
         my $enable_acls = not CTX('config')->get(['api','acl','disabled']);
         $api{$ident} = OpenXPKI::Server::API2->new(
             enable_acls => $enable_acls,
@@ -602,7 +606,7 @@ sub __handle_COMMAND : PRIVATE {
 
     my $result;
     eval {
-        CTX('log')->system->debug("Executing command $command");
+        CTX('log')->system->debug("Executing client command '$command'");
 
         # execution timeout
         my $sh;
@@ -610,7 +614,7 @@ sub __handle_COMMAND : PRIVATE {
         if ($timeout) {
             ##! 16: 'running command with timeout of ' . $timeout
             $sh = set_sig_handler( 'ALRM' ,sub {
-                CTX('log')->system->error("Service command ".$command." was aborted after " . $timeout);
+                CTX('log')->system->error("Client command '$command' was aborted after ${timeout}s");
                 CTX('log')->system->trace("Call was " . Dumper $data->{PARAMS} );
                 OpenXPKI::Exception::Timeout->throw(
                     message => "Command took too long to - aborted!",
@@ -629,15 +633,24 @@ sub __handle_COMMAND : PRIVATE {
             ) if (@violated);
         }
 
+        # create command ID
+        my ($id) = split /-/, $UUID->create_str; # take only first part of UUID
+        Log::Log4perl::MDC->put('command_id', $id);
+
+        my $metric_id = CTX('metrics')->start("service:${command}") if CTX('metrics')->ready;
+
         # execute command enclosed with DBI transaction
         CTX('dbi')->start_txn();
         $result = $api{$ident}->dispatch(command => $command, params => $params);
         CTX('dbi')->commit();
 
+        CTX('metrics')->stop($metric_id) if CTX('metrics')->ready;
+
         # reset timeout
         sig_alarm(0) if $sh;
     };
 
+    Log::Log4perl::MDC->put('command_id', undef);
     Log::Log4perl::MDC->put('rid', undef);
 
     if (my $error = $EVAL_ERROR) {

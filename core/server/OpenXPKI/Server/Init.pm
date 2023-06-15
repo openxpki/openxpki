@@ -30,6 +30,7 @@ use OpenXPKI::Workflow::Handler;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Bedroom;
+use OpenXPKI::Metrics;
 
 
 # define an array of hash refs mapping the task id to the corresponding
@@ -44,6 +45,7 @@ my @INIT_TASKS = qw(
   dbi
   dbi_log
   crypto_layer
+  metrics
   api2
   workflow_factory
   volatile_vault
@@ -370,6 +372,24 @@ sub __do_init_terminal {
 
     OpenXPKI::Server::Context::setcontext({
         'terminal' => $manager
+    });
+}
+
+sub __do_init_metrics {
+    my $enabled = CTX('config')->get('system.metrics.enabled') ? 1 : 0;
+    my $cache_dir = CTX('config')->get('system.metrics.cache_dir') // '/var/tmp/openxpki.metrics';
+    my $cache_user = CTX('config')->get('system.server.user');
+    my $cache_group = CTX('config')->get('system.server.group');
+
+    my $metrics = OpenXPKI::Metrics->new(
+        enabled => $enabled,
+        cache_dir => $cache_dir,
+        $cache_user ? (cache_user => $cache_user) : (),
+        $cache_group ? (cache_group => $cache_group) : (),
+    );
+
+    OpenXPKI::Server::Context::setcontext({
+        'metrics' => $metrics
     });
 }
 

@@ -16,6 +16,9 @@ use Net::Server::Daemonize qw( set_uid set_gid );
 use English;
 use Socket;
 use Scalar::Util qw( blessed );
+use Metrics::Any::Adapter 'Prometheus';
+use Feature::Compat::Try;
+
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
@@ -138,7 +141,13 @@ sub pre_server_close_hook {
         ##! 4: 'pid_file removed'
     }
 
-    return 1;
+    # try to stop the metrics server if this is the main process
+    if ($main_pid and $main_pid == $$) {
+        eval {
+            require OpenXPKI::Metrics::Prometheus; # this is EE code
+            OpenXPKI::Metrics::Prometheus->terminate();
+        };
+    }
 }
 
 sub DESTROY {
@@ -277,6 +286,27 @@ sub pre_loop_hook {
     # Start watchdog late in Net::Server startup phase so that Net::Server's
     # SIGCHLD handler has been set.
     OpenXPKI::Server::Watchdog->start_or_reload(keep_parent_sigchld => $is_forking);
+
+    # Start metrics server
+    try {
+        my $enabled = CTX('config')->get('system.metrics.enabled') ? 1 : 0;
+
+        if ($enabled) {
+            require OpenXPKI::Metrics::Prometheus; # this is EE code
+            OpenXPKI::Metrics::Prometheus->start(
+                config => CTX('config')->get_hash('system.metrics') // {},
+                keep_parent_sigchld => $is_forking,
+            );
+        }
+    }
+    catch ($err) {
+        if ($err =~ m{locate OpenXPKI/Prometheus\.pm in \@INC}) {
+            CTX('log')->system->info('Skipping Prometheus agent start - EE code not found');
+        }
+        else {
+            die $err;
+        }
+    }
 }
 
 # calles with PreFork when child is forked

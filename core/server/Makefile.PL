@@ -350,6 +350,7 @@ WriteMakefile(
         'Proc::Daemon'                  => '0.23',
         'Proc::ProcessTable'            => '0.43',
         'Proc::SafeExec'                => '1.4',
+        'Prometheus::Tiny::Shared'      => '0.026',
         'Regexp::Common'                => '2',
         'SOAP::Lite'                    => 0,
         'SQL::Abstract::More'           => '1.38',      # OpenXPKI::Server::Database

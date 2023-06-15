@@ -60,6 +60,9 @@ Vagrant.configure("2") do |config|
 
       # TCP ports - Oracle WebUI (http://127.0.0.1:1080/apex)
       dev.vm.network :forwarded_port, guest: 1080, host: 1080, host_ip: "0.0.0.0"
+
+      # Prometheus
+      dev.vm.network :forwarded_port, guest: 9090, host: 9090, host_ip: "0.0.0.0"
   end
 
   config.vm.provider :virtualbox do |vb|
