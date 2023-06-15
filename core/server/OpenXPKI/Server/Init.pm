@@ -352,7 +352,10 @@ sub __do_init_terminal {
         require OpenXPKI::Server::ProcTerminal;
     }
     catch ($err) {
-        return if $err =~ m{locate OpenXPKI/Server/ProcTerminal\.pm in \@INC}; # silently fail if file does not exist
+        if ($err =~ m{locate OpenXPKI/Server/ProcTerminal\.pm in \@INC}) {
+            log_wrapper("NOT initializing 'terminal' - EE class not found");
+            return;
+        }
         die $err;
     }
 
