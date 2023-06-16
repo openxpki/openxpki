@@ -7,15 +7,17 @@ use Workflow 1.36;
 use base qw( Workflow::Factory );
 use English;
 use Scalar::Util qw( blessed );
+use Type::Params qw( signature_for );
 
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Workflow;
 use OpenXPKI::Workflow::Context;
-use OpenXPKI::MooseParams;
 use OpenXPKI::Workflow::Field;
 use Workflow::Exception qw( configuration_error workflow_error );
+
+use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
 
 sub new {
     my $class = ref $_[0] || $_[0];
@@ -189,13 +191,16 @@ sub get_field_info {
 
 # Returns a HashRef with configuration details (actions, states) of the given
 # workflow type and state.
-sub get_action_and_state_info {
-    my ($self, $type, $state, $actions, $context) = positional_args(\@_,   # OpenXPKI::MooseParams
-        { isa => 'Str', },
-        { isa => 'Str', },
-        { isa => 'ArrayRef', },
-        { isa => 'HashRef|Undef', optional => 1, default => sub { {} } },
-    );
+signature_for get_action_and_state_info => (
+    method => 1,
+    positional => [
+        'Str',
+        'Str',
+        'ArrayRef',
+        'Optional[ HashRef | Undef ]', { default => {} },
+    ],
+);
+sub get_action_and_state_info ($self, $type, $state, $actions, $context) {
     ##! 4: 'start'
 
     my $head = CTX('config')->get_hash([ 'workflow', 'def', $type, 'head' ]);

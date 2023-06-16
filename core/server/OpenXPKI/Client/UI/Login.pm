@@ -4,16 +4,11 @@ use Moose;
 extends 'OpenXPKI::Client::UI::Result';
 
 use Data::Dumper;
+use Type::Params qw( signature_for );
 
-use OpenXPKI::MooseParams;
+use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
 
 my $meta = __PACKAGE__->meta;
-
-sub BUILD {
-
-    my $self = shift;
-
-}
 
 =head2 init_realm_cards
 
@@ -33,11 +28,11 @@ B<Parameters:>
 =back
 
 =cut
-sub init_realm_cards {
-    my ($self, $realms) = positional_args(\@_, # OpenXPKI::MooseParams
-        { isa => 'ArrayRef[HashRef]' },
-    );
-
+signature_for init_realm_cards => (
+    method => 1,
+    positional => [ 'ArrayRef[HashRef]' ],
+);
+sub init_realm_cards ($self, $realms) {
     $self->set_page(
         label => 'I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN',
         description => 'I18N_OPENXPKI_UI_LOGIN_REALM_SELECTION_DESC'

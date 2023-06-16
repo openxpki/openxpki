@@ -1,9 +1,11 @@
 package OpenXPKI::Server::Session;
 use Moose;
-use utf8;
 
 # Core modules
 use Scalar::Util qw( blessed );
+
+# CPAN modules
+use Type::Params qw( signature_for );
 
 # Project modules
 use OpenXPKI::Exception;
@@ -11,7 +13,8 @@ use OpenXPKI::Server::Session::Data;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Log;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::MooseParams;
+
+use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
 
 =head1 NAME
 
@@ -324,12 +327,15 @@ will update the I<modified> timestamp of the stored session.
 =back
 
 =cut
-sub persist {
-    my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
-        force => { isa => 'Bool', optional => 1 },
-    );
+signature_for persist => (
+    method => 1,
+    named => [
+        force => 'Optional[ Bool ]',
+    ],
+);
+sub persist ($self, $arg) {
     ##! 1: "persist()"
-    return unless ($self->is_initialized and ($self->data->is_dirty or $params{force}));
+    return unless ($self->is_initialized and ($self->data->is_dirty or $arg->force));
     ##! 4: "- data is set and dirty (or 'force' was specified)"
     $self->data->modified(time);        # update timestamp
     $self->driver->save($self->data);   # implemented by the class that consumes this role

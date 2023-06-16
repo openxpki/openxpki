@@ -9,15 +9,16 @@ OpenXPKI::Server::API2::Plugin::Cert::import_certificate
 
 # CPAN modules
 use Data::Dumper;
+use Type::Params qw( signature_for );
 
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
-use OpenXPKI::MooseParams;
 use OpenXPKI::Crypt::X509;
-
 use OpenXPKI::Server::Database; # to get AUTO_ID
+
+use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
 
 =head1 COMMANDS
 
@@ -316,16 +317,17 @@ command "import_certificate" => {
 
 # Returns the certificate issuer DB hash or C<SELF> if it's self signed or
 # C<undef> if no issuer was found (and force_nochain = 1).
-sub _get_issuer {
-    my ($self, %args) = named_args(\@_,   # OpenXPKI::MooseParams
-        cert            => { isa => 'OpenXPKI::Crypt::X509' },
-        explicit_issuer => { isa => 'Maybe[Str]' },
-        force_nochain   => { isa => 'Maybe[Bool]' },
-    );
-    my $cert            = $args{cert};
+signature_for _get_issuer => (
+    method => 1,
+    named => [
+        cert            => 'OpenXPKI::Crypt::X509',
+        explicit_issuer => 'Maybe[Str]',
+        force_nochain   => 'Maybe[Bool]',
+    ],
+);
+sub _get_issuer ($self, $arg) {
+    my $cert            = $arg->cert;
     my $cert_identifier = $cert->get_cert_identifier;
-    my $explicit_issuer = $args{explicit_issuer};
-    my $force_nochain   = $args{force_nochain};
 
     my $condition;
 
@@ -352,7 +354,7 @@ sub _get_issuer {
     #
 
     # Explicit issuer wins over issuer query
-    $condition = { identifier => $explicit_issuer } if $explicit_issuer;
+    $condition = { identifier => $arg->explicit_issuer } if $arg->explicit_issuer;
 
     my $db_result = CTX('dbi')->select_hashes(
         from  => 'certificate',
@@ -362,7 +364,7 @@ sub _get_issuer {
 
     # No issuer found
     if (scalar @{$db_result} == 0) {
-        if ($force_nochain) {
+        if ($arg->force_nochain) {
             CTX('log')->system()->warn("Importing certificate without issuer! $cert_identifier / " . $cert->get_subject());
             return;
         }
@@ -386,30 +388,30 @@ sub _get_issuer {
     return $db_result->[0];
 }
 
-sub _is_issuer_valid  {
-    my ($self, %args) = named_args(\@_,   # OpenXPKI::MooseParams
-        cert           => { isa => 'OpenXPKI::Crypt::X509' },
-        issuer_cert    => { isa => 'HashRef' },
-        force_nochain  => { isa => 'Maybe[Bool]' },
-    );
-    my $default_token   = $self->api->get_default_token();
-    my $cert            = $args{cert};
-    my $cert_identifier = $cert->get_cert_identifier;
-    my $issuer_cert     = $args{issuer_cert};
-    my $force_nochain   = $args{force_nochain};
+signature_for _is_issuer_valid => (
+    method => 1,
+    named => [
+        cert           => 'OpenXPKI::Crypt::X509',
+        issuer_cert    => 'HashRef',
+        force_nochain  => 'Maybe[Bool]',
+    ],
+);
+sub _is_issuer_valid ($self, $arg) {
+    my $default_token   = $self->api->get_default_token;
+    my $cert_identifier = $arg->cert->get_cert_identifier;
 
-    ##! 64: 'Cert ' . Dumper $cert
+    ##! 64: 'Cert ' . Dumper $arg->cert
     #
     # If issuer is already a root
     #
-    if ($issuer_cert->{identifier} eq $issuer_cert->{issuer_identifier}) {
-        ##! 32: 'Validate self-signed ' . $issuer_cert->{identifier}
+    if ($arg->issuer_cert->{identifier} eq $arg->issuer_cert->{issuer_identifier}) {
+        ##! 32: 'Validate self-signed ' . $arg->issuer_cert->{identifier}
         return $default_token->command({
             COMMAND => 'verify_cert',
-            CERTIFICATE => $cert->pem,
-            TRUSTED => $issuer_cert->{data},
+            CERTIFICATE => $arg->cert->pem,
+            TRUSTED => $arg->issuer_cert->{data},
             # TODO - replace with NOVALIDITY once we have openssl 1.1 - see #446
-            ATTIME => $cert->notbefore + 1,
+            ATTIME => $arg->cert->notbefore + 1,
         });
     }
 
@@ -418,7 +420,7 @@ sub _is_issuer_valid  {
     #
 
     # validate_certificate
-    my $chain = $self->api->get_chain( start_with => $issuer_cert->{identifier}, format => 'PEM' );
+    my $chain = $self->api->get_chain( start_with => $arg->issuer_cert->{identifier}, format => 'PEM' );
 
     # verify a complete chain
     ##! 64: 'Validate chain ' . Dumper $chain
@@ -428,9 +430,9 @@ sub _is_issuer_valid  {
 
         my $res = $default_token->command({
             COMMAND => 'verify_cert',
-            CERTIFICATE => $cert->pem,
+            CERTIFICATE => $arg->cert->pem,
             # TODO - replace with NOVALIDITY once we have openssl 1.1 - see #446
-            ATTIME => $cert->notbefore + 1,
+            ATTIME => $arg->cert->notbefore + 1,
             TRUSTED => $root,
             CHAIN => join "\n", @work_chain
         });
@@ -439,8 +441,8 @@ sub _is_issuer_valid  {
     }
 
     # Accept an incomplete chain
-    if ($force_nochain) {
-        CTX('log')->system()->warn("Importing certificate with incomplete chain! $cert_identifier / " . $cert->get_subject());
+    if ($arg->force_nochain) {
+        CTX('log')->system()->warn("Importing certificate with incomplete chain! $cert_identifier / " . $arg->cert->get_subject());
         return 1;
     }
 

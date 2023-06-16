@@ -13,12 +13,12 @@ related API methods
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::MooseParams;
 
 # CPAN modules
 use Try::Tiny;
+use Type::Params qw( signature_for );
 
-
+use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
 
 =head2 is_token_usable
 
@@ -27,12 +27,14 @@ Checks if the given token (I<OpenXPKI::Crypto::API>) is usable by doing an encry
 Returns C<1> if everything went fine, C<undef> otherwise.
 
 =cut
-sub is_token_usable {
-    my ($self, $token, $check) = positional_args(\@_, # OpenXPKI::MooseParams
-        { isa => 'OpenXPKI::Crypto::API' },
-        { isa => 'Str', default => 'sign' },
-    );
-
+signature_for is_token_usable => (
+    method => 1,
+    positional => [
+        'OpenXPKI::Crypto::API',
+        'Str', { default => 'sign' },
+    ],
+);
+sub is_token_usable ($self, $token, $check) {
     ##! 1: 'start'
     my $result = try {
 

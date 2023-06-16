@@ -1,6 +1,5 @@
 package OpenXPKI::Server::API2;
 use Moose;
-use utf8;
 
 =head1 NAME
 
@@ -17,13 +16,15 @@ use Scalar::Util qw( blessed );
 
 # CPAN modules
 use Try::Tiny;
+use Type::Params qw( signature_for );
 
 # Project modules
 use OpenXPKI::Server::Log;
 use OpenXPKI::Exception;
-use OpenXPKI::MooseParams;
 use OpenXPKI::Server::API2::PluginRole;
 use OpenXPKI::Server::API2::Autoloader;
+
+use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
 
 =head1 SYNOPSIS
 
@@ -342,40 +343,43 @@ B<Named parameters>
 =back
 
 =cut
+signature_for dispatch => (
+    method => 1,
+    named => [
+        command => 'Str',
+        params  => 'Optional[ HashRef ]', { default => {} },
+    ],
+);
+sub dispatch ($self, $arg) {
+    my $command = $arg->command;
 
-sub dispatch {
-    my ($self, %p) = named_args(\@_,   # OpenXPKI::MooseParams
-        command => { isa => 'Str' },
-        params  => { isa => 'HashRef', optional => 1, default => sub { {} } },
-    );
-
-    my $package = $self->commands->{ $p{command} }
+    my $package = $self->commands->{ $command }
         or OpenXPKI::Exception->throw(
             message => "Unknown API command",
-            params => { command => $p{command}, caller => sprintf("%s:%s", ($self->my_caller())[1,2]) },
+            params => { command => $command, caller => sprintf("%s:%s", ($self->my_caller())[1,2]) },
         );
 
     my $all_params;
     if ($self->enable_acls) {
-        my $rules = $self->_get_acl_rules($p{command})
+        my $rules = $self->_get_acl_rules($command)
             or OpenXPKI::Exception->throw(
                 message => "ACL does not permit call to API command",
-                params => { command => $p{command}, caller => sprintf("%s:%s", ($self->my_caller())[1,2]) }
+                params => { command => $command, caller => sprintf("%s:%s", ($self->my_caller())[1,2]) }
             );
 
-        $all_params = $self->_apply_acl_rules($p{command}, $rules, $p{params});
+        $all_params = $self->_apply_acl_rules($command, $rules, $arg->params);
     }
     else {
-        $all_params = $p{params};
+        $all_params = $arg->params;
     }
 
-    $self->log->debug("API call to '$p{command}'") if $self->log->is_debug;
+    $self->log->debug("API call to '$command'") if $self->log->is_debug;
 
     my $result;
     try {
         $result = $package
             ->new(rawapi => $self)
-            ->execute($p{command}, $all_params);
+            ->execute($command, $all_params);
     }
     catch {
         my $err = $_;
@@ -389,9 +393,10 @@ sub dispatch {
         }
         OpenXPKI::Exception->throw(
             message => "Error while executing API command",
-            params => { command => $p{command}, error => $err, caller => sprintf("%s:%s", ($self->my_caller())[1,2]) }, # stringify in case error is an object
+            params => { command => $command, error => $err, caller => sprintf("%s:%s", ($self->my_caller())[1,2]) }, # stringify in case error is an object
         );
     };
+
     return $result;
 }
 

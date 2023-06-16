@@ -354,7 +354,6 @@ WriteMakefile(
         'Regexp::Common'                => '2',
         'SOAP::Lite'                    => 0,
         'SQL::Abstract::More'           => '1.38',      # OpenXPKI::Server::Database
-        'Sub::Exporter'                 => 0,           # OpenXPKI::MooseParams
         'Sys::SigAction'                => '0.06',
         'Template'                      => '2.15',
         'Test::More'                    => '1.001008',
@@ -363,6 +362,7 @@ WriteMakefile(
         'Text::CSV_XS'                  => '0.23',
         'Time::HiRes'                   => '1',
         'Try::Tiny'                     => '0.28',
+        'Type::Tiny'                    => '2.000001',
         'URI::Escape'                   => 0,           # should be part of the core modules but who knows
         'Workflow'                      => '1.60',
         'YAML::Tiny'                    => '1.69',

@@ -3,13 +3,14 @@ use Moose;
 
 use Test::More;
 use Test::Exception;
-use OpenXPKI::MooseParams;
 use Log::Log4perl;
 use Moose::Util::TypeConstraints;
+use Type::Params qw( signature_for );
 
 use FindBin qw( $Bin );
 require "$Bin/DatabaseTestConnection.pm";
 
+use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
 
 has 'columns' => (
     is => 'rw',
@@ -69,11 +70,11 @@ sub shall_test {
     return ($self->test_all_dbs or $self->_test_db(sub {/^\Q$dbtype\E$/}));
 }
 
-sub get_dbi_params {
-    my ($self, $db_type) = positional_args(\@_,
-        { isa => 'DBMS' },
-    );
-
+signature_for get_dbi_params => (
+    method => 1,
+    positional => [ 'DBMS' ],
+);
+sub get_dbi_params ($self, $db_type) {
     my %common = (
         lock_timeout => 1,
     );
@@ -135,13 +136,11 @@ sub get_dbi_params {
 }
 
 # Run the given tests against all available DBMS
-sub run {
-    my ($self, $name, $plan, $tests) = positional_args(\@_,
-        { isa => 'Str'},
-        { isa => 'Int'},
-        { isa => 'CodeRef' },
-    );
-
+signature_for run => (
+    method => 1,
+    positional => [ 'Str', 'Int', 'CodeRef' ],
+);
+sub run ($self, $name, $plan, $tests) {
     # creates and executes subtests
     my $SUBTEST = sub {
         my ($dbtype, $dbi_driver, $env_var, $testname) = @_;

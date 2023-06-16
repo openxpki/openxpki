@@ -1,8 +1,5 @@
 package OpenXPKI::Test;
-
 use Moose;
-
-use utf8;
 
 =head1 NAME
 
@@ -161,6 +158,7 @@ use Test::Deep::NoTest qw( eq_deeply bag ); # use eq_deeply() without beeing in 
 use Digest::SHA;
 use MIME::Base64;
 use YAML::Tiny;
+use Type::Params qw( signature_for );
 
 # Project modules
 use OpenXPKI::Config;
@@ -168,7 +166,6 @@ use OpenXPKI::Log4perl;
 use Log::Log4perl::Appender;
 use Log::Log4perl::Filter::MDC;
 use Log::Log4perl::Layout::NoopLayout;
-use OpenXPKI::MooseParams;
 use OpenXPKI::Server::Database;
 use OpenXPKI::Server::Context;
 use OpenXPKI::Server::Init;
@@ -177,6 +174,8 @@ use OpenXPKI::Server::Session;
 use OpenXPKI::Test::ConfigWriter;
 use OpenXPKI::Test::CertHelper::Database;
 use OpenXPKI::Test::Log4perlCallerFilter;
+
+use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
 
 Moose::Exporter->setup_import_methods(
     as_is     => [ \&OpenXPKI::Server::Context::CTX ],
@@ -1104,21 +1103,23 @@ B<Parameters>
 =back
 
 =cut
-sub insert_testcerts {
-    my ($self, %args) = named_args(\@_,
-        exclude => { isa => 'ArrayRef', optional => 1 },
-        only => { isa => 'ArrayRef', optional => 1 },
-    );
-
-    die "Either specify 'only' or 'exclude', not both." if $args{only} && $args{exclude};
+signature_for insert_testcerts => (
+    method => 1,
+    named => [
+        exclude => 'Optional[ ArrayRef ]',
+        only    => 'Optional[ ArrayRef ]',
+    ],
+);
+sub insert_testcerts ($self, $arg) {
+    die "Either specify 'only' or 'exclude', not both." if ($arg->only and $arg->exclude);
 
     my $certhelper = $self->certhelper_database;
     my $certnames;
-    if ($args{only}) {
-        $certnames = $args{only};
+    if ($arg->only) {
+        $certnames = $arg->only;
     }
-    elsif ($args{exclude}) {
-        my $exclude = { map { $_ => 1 } @{ $args{exclude} } };
+    elsif ($arg->exclude) {
+        my $exclude = { map { $_ => 1 } @{ $arg->exclude } };
         $certnames = [ grep { not $exclude->{$_} } $certhelper->all_cert_names ];
     }
     else {

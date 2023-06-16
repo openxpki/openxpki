@@ -38,8 +38,8 @@ $db->run("SQL INSERT", 11, sub {
             dummytestparameter => "test",
             values => { id => 1, text => "Flatscreen", entropy => 10 },
         );
-    } "OpenXPKI::Exception", "fail if wrong method parameters are given";
-    like $@, qr/(dummytestparameter)/i, "return correct error message";
+    } "Error::TypeTiny", "fail if wrong method parameters are given";
+    like $@, qr/required parameter/i, "return correct error message";
 
     lives_ok { $dbi->rollback() } "rollback";
 

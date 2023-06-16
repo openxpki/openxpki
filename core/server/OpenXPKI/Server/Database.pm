@@ -1,6 +1,6 @@
 package OpenXPKI::Server::Database;
 use Moose;
-use utf8;
+
 =head1 Name
 
 OpenXPKI::Server::Database - Handles database connections and encapsulates DB
@@ -10,7 +10,6 @@ specific drivers/functions.
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
-use OpenXPKI::MooseParams;
 use OpenXPKI::Server::Database::Role::Driver;
 use OpenXPKI::Server::Database::QueryBuilder;
 use OpenXPKI::Server::Database::Query;
@@ -19,6 +18,9 @@ use DBI::Const::GetInfoType; # provides %GetInfoType hash
 use Math::BigInt;
 use SQL::Abstract::More;
 use Moose::Exporter;
+use Type::Params qw( signature_for );
+
+use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
 
 # Export AUTO_ID
 Moose::Exporter->setup_import_methods(with_meta => [ 'AUTO_ID' ]);
@@ -316,11 +318,14 @@ sub ping {
 }
 
 # Execute given query
-sub run {
-    my ($self, $query, $return_rownum) = positional_args(\@_,
-        { isa => 'OpenXPKI::Server::Database::Query|Str' },
-        { isa => 'Bool', optional => 1, default => 0 },
-    );
+signature_for run => (
+    method => 1,
+    positional => [
+        'OpenXPKI::Server::Database::Query | Str',
+        'Optional[ Bool ]', { default => 0 },
+    ],
+);
+sub run ($self, $query, $return_rownum) {
     my $query_string;
     my $query_params;
     if (ref $query) {
@@ -399,19 +404,22 @@ sub count {
 
 # INSERT
 # Returns: DBI statement handle
-sub insert {
-    my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
-        into     => { isa => 'Str' },
-        values   => { isa => 'HashRef' },
-    );
-
+signature_for insert => (
+    method => 1,
+    named => [
+        into     => 'Str',
+        values   => 'HashRef',
+    ],
+    bless => !!0, # return a HashRef instead of an Object
+);
+sub insert ($self, $arg) {
     # Replace AUTO_ID with value of next_id()
-    for (keys %{ $params{values} }) {
-        $params{values}->{$_} = $self->next_id($params{into})
-            if (ref $params{values}->{$_} eq "OpenXPKI::Server::Database::AUTOINCREMENT");
+    for (keys %{ $arg->{values} }) {
+        $arg->{values}->{$_} = $self->next_id($arg->{into})
+            if (ref $arg->{values}->{$_} eq "OpenXPKI::Server::Database::AUTOINCREMENT");
     }
 
-    my $query = $self->query_builder->insert(%params);
+    my $query = $self->query_builder->insert($arg->%*);
     return $self->run($query, 1); # 1 = return number of affected rows
 }
 
@@ -425,23 +433,26 @@ sub update {
 
 # MERGE
 # Returns: DBI statement handle
-sub merge {
-    my ($self, %args) = named_args(\@_,   # OpenXPKI::MooseParams
-        into     => { isa => 'Str' },
-        set      => { isa => 'HashRef' },
-        set_once => { isa => 'HashRef', optional => 1, default => {} },
+signature_for merge => (
+    method => 1,
+    named => [
+        into     => 'Str',
+        set      => 'HashRef',
+        set_once => 'Optional[ HashRef ]', { default => {} },
         # The WHERE specification contains the primary key columns.
         # In case of an INSERT these will be used as normal values. Therefore
         # we only allow scalars as hash values (which are translated to AND
         # connected "equals" conditions by SQL::Abstract::More).
-        where    => { isa => 'HashRef[Value]' },
-    );
+        where    => 'HashRef[Value]',
+    ],
+);
+sub merge ($self, $arg) {
     my $query = $self->driver->merge_query(
         $self,
-        $self->query_builder->_add_namespace_to($args{into}),
-        $args{set},
-        $args{set_once},
-        $args{where},
+        $self->query_builder->_add_namespace_to($arg->into),
+        $arg->set,
+        $arg->set_once,
+        $arg->where,
     );
     return $self->run($query, 1); # 1 = return number of affected rows
 }

@@ -5,13 +5,18 @@ use Moose;
 use English;
 use Try::Tiny;
 
+# CPAN modules
+use Type::Params qw( signature_for );
+
 # Project modules
 use OpenXPKI::Server;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Connector::WorkflowContext;
-use OpenXPKI::MooseParams;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
+
+use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
+
 
 has factory => (
     is => 'rw',
@@ -388,21 +393,24 @@ workflow actions and state
 =back
 
 =cut
-sub get_wf_info {
-    my ($self, %args) = named_args(\@_,   # OpenXPKI::MooseParams
-        id        => { isa => 'Int',  optional => 1 },
-        workflow  => { isa => 'OpenXPKI::Server::Workflow', optional => 1 },
-        activity  => { isa => 'Str',  optional => 1, },
-        with_attributes => { isa => 'Bool', optional => 1, default => 0 },
-        with_ui_info => { isa => 'Bool', optional => 1, default => 0 },
-    );
+signature_for get_wf_info => (
+    method => 1,
+    named => [
+        id              => 'Optional[ Int ]',
+        workflow        => 'Optional[ OpenXPKI::Server::Workflow ]',
+        activity        => 'Optional[ Str ]',
+        with_attributes => 'Optional[ Bool ]', { default => 0 },
+        with_ui_info    => 'Optional[ Bool ]', { default => 0 },
+    ],
+);
+sub get_wf_info ($self, $arg) {
     ##! 2: 'start'
 
-    die "Please specify either 'id' or 'workflow'" unless ($args{id} or $args{workflow});
+    die "Please specify either 'id' or 'workflow'" unless ($arg->id or $arg->workflow);
 
-    my $workflow = $args{workflow}
-        ? $args{workflow}
-        : CTX('workflow_factory')->get_workflow({ ID => $args{id} });
+    my $workflow = $arg->workflow
+        ? $arg->workflow
+        : CTX('workflow_factory')->get_workflow({ ID => $arg->id });
 
     ##! 2: 'workflow type = ' . $workflow->type
 
@@ -423,19 +431,19 @@ sub get_wf_info {
             reap_at     => $workflow->reap_at,
             archive_at  => $workflow->archive_at,
             context     => { %{$workflow->context->param } }, # make a copy
-            $args{with_attributes} ? ( attribute => $workflow->attrib ) : (),
+            $arg->with_attributes ? ( attribute => $workflow->attrib ) : (),
         }
     };
 
-    ##! 64: Dumper($basic_wf_info) unless $args{with_ui_info}
+    ##! 64: Dumper($basic_wf_info) unless $arg->with_ui_info
 
-    return $basic_wf_info unless $args{with_ui_info};
+    return $basic_wf_info unless $arg->with_ui_info;
 
     my $action_state_info = $self->factory->get_action_and_state_info(
         $workflow->type,
         $workflow->state,
         # fetch actions of current state (or use given action):
-        [ $args{activity} ? $args{activity} : $workflow->get_current_actions() ],
+        [ $arg->activity ? $arg->activity : $workflow->get_current_actions() ],
         { %{$workflow->context->param } }, # make a copy
     );
 

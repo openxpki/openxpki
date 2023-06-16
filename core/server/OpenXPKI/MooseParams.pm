@@ -5,13 +5,35 @@ use utf8;
 
 =head1 Name
 
-OpenXPKI::MooseParams - Wrapper around some of L<MooseX::Params::Validate>'s
-functions.
+OpenXPKI::MooseParams - DEPRECATED
+
+=head1 Description
+
+DEPRECATED - Please do not use this class anymore.
+
+Instead, use L<Type::Params>:
+
+    use Type::Params qw( signature_for );
+    use experimental 'signatures';
+
+    signature_for merge => (
+        method => 1,
+        named => [
+            into     => 'Str',
+            set      => 'HashRef',
+            set_once => 'Optional[ HashRef ]', { default => {} },
+            where    => 'HashRef[Value]',
+        ],
+    );
+    sub merge ($self, $arg) {
+        if ($arg->set_once) ...
+    }
 
 =cut
 
 use MooseX::Params::Validate ();
 use OpenXPKI::Debug;
+use OpenXPKI::Server::Context qw( CTX );
 
 use Sub::Exporter -setup => {
     exports => [
@@ -49,6 +71,7 @@ Usage:
 
 =cut
 sub named_args {
+    eval { CTX('log')->deprecated->error('Call to OpenXPKI::MooseParams->named_args') };
     # Extract the instance reference from argument 0 (ArrayRef of the calling method's parameters).
     # MooseX::Params::Validate is able to recognize blessed instances but fails
     # for class names, i.e. when called by class methods. OpenXPKI uses class
@@ -89,6 +112,7 @@ Usage:
 
 =cut
 sub positional_args {
+    eval { CTX('log')->deprecated->error('Call to OpenXPKI::MooseParams->positional_args') };
     my $object = shift @{$_[0]}; # argument 0 is an ArrayRef of the calling method's parameters
     my @result;
     eval {

@@ -7,7 +7,6 @@ use Data::Dumper;
 # Project modules
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
-use OpenXPKI::MooseParams;
 use OpenXPKI::Server::Context qw( CTX );
 
 has 'config' => (

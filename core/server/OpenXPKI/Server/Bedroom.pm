@@ -83,11 +83,13 @@ use English;
 use POSIX ();
 use IO::Handle;
 use Log::Log4perl;
+use Type::Params qw( signature_for );
 
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
-use OpenXPKI::MooseParams;
+
+use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
 
 #
 has old_sig_set => (
@@ -172,27 +174,28 @@ child: set C<SIGCHLD> to C<default>. Default: 0
 =back
 
 =cut
-
-sub new_child {
-    my ($self, %args) = named_args(\@_,   # OpenXPKI::MooseParams
-        max_fork_redo => { isa => 'Int', optional => 1,default => 5 },
-        sighup_handler => { isa => 'CodeRef', optional => 1 },
-        sigterm_handler => { isa => 'CodeRef', optional => 1 },
-        uid => { isa => 'Int', optional => 1 },
-        gid => { isa => 'Int', optional => 1 },
-        keep_parent_sigchld => { isa => 'Bool', optional => 1, default => 0 },
-        capture_stdout => { isa => 'Bool', optional => 1, default => 0 },
-    );
-
+signature_for new_child => (
+    method => 1,
+    named => [
+        max_fork_redo       => 'Optional[ Int ]', { default => 5 },
+        sighup_handler      => 'Optional[ CodeRef ]',
+        sigterm_handler     => 'Optional[ CodeRef ]',
+        uid                 => 'Optional[ Int ]',
+        gid                 => 'Optional[ Int ]',
+        keep_parent_sigchld => 'Optional[ Bool ]', { default => 0 },
+        capture_stdout      => 'Optional[ Bool ]', { default => 0 },
+    ],
+);
+sub new_child ($self, $arg) {
     ##! 1: 'start - $SIG{"CHLD"}: ' . ($SIG{'CHLD'}//'<undef>')
 
     # Reap child processes while allowing e.g. system() to work properly.
-    $SIG{'CHLD'} = \&_catch_them_all if not $args{keep_parent_sigchld};
+    $SIG{'CHLD'} = \&_catch_them_all if not $arg->keep_parent_sigchld;
 
     ##! 1: 'start - $SIG{"CHLD"}: ' . ($SIG{'CHLD'}//'<undef>')
 
     # FORK!
-    my ($pid, $fh_from_child)  = $self->_try_fork($args{max_fork_redo}, $args{capture_stdout});
+    my ($pid, $fh_from_child)  = $self->_try_fork($arg->max_fork_redo, $arg->capture_stdout);
 
     # parent process: return on successful fork
     if ($pid > 0) {
@@ -207,24 +210,24 @@ sub new_child {
 
     # Set DEFAULT SIGCHLD handler to allow execution of system() etc. unless
     # parent set our special handler that does the same and more.
-    $SIG{'CHLD'} = 'DEFAULT' if $args{keep_parent_sigchld};
+    $SIG{'CHLD'} = 'DEFAULT' if $arg->keep_parent_sigchld;
 
-    $SIG{'HUP'}  = $args{sighup_handler}  if $args{sighup_handler};
-    $SIG{'TERM'} = $args{sigterm_handler} if $args{sigterm_handler};
+    $SIG{'HUP'}  = $arg->sighup_handler  if $arg->sighup_handler;
+    $SIG{'TERM'} = $arg->sigterm_handler if $arg->sigterm_handler;
 
-    if ($args{gid}) {
-        POSIX::setgid($args{gid});
+    if ($arg->gid) {
+        POSIX::setgid($arg->gid);
     }
-    if ($args{uid}) {
-        POSIX::setuid($args{uid});
-        $ENV{USER} = getpwuid($args{uid});
-        $ENV{HOME} = ((getpwuid($args{uid}))[7]);
+    if ($arg->uid) {
+        POSIX::setuid($arg->uid);
+        $ENV{USER} = getpwuid($arg->uid);
+        $ENV{HOME} = ((getpwuid($arg->uid))[7]);
     }
 
     umask 0;
     chdir '/';
     open STDIN,  '<',  '/dev/null';
-    if ($args{capture_stdout}) {
+    if ($arg->capture_stdout) {
         # STDOUT is already redirected to parent's $fh_from_child
         open(STDERR, '>&', STDOUT) if -t STDERR; # only touch STDERR if it's not already redirected to a file
     }
@@ -255,10 +258,11 @@ B<Parameters>
 =back
 
 =cut
-sub get_stdout_fh {
-    my ($self, $pid) = positional_args(\@_,     # OpenXPKI::MooseParams
-        { isa => 'Int' },
-    );
+signature_for get_stdout_fh => (
+    method => 1,
+    positional => [ 'Int' ],
+);
+sub get_stdout_fh ($self, $pid) {
     return $children{$pid};
 }
 

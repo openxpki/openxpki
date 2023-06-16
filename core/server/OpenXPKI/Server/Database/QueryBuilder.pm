@@ -1,16 +1,22 @@
 package OpenXPKI::Server::Database::QueryBuilder;
 use Moose;
-use utf8;
+use namespace::autoclean;
+
 =head1 Name
 
 OpenXPKI::Server::Database::QueryBuilder - Programmatic interface to SQL queries
 
 =cut
 
+# CPAN modules
+use SQL::Abstract::More; # TODO Use SQL::Maker instead of SQL::Abstract::More? (but the former only supports Oracle type LIMITs)
+use Type::Params qw( signature_for );
+
+# Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Database::Query;
-use OpenXPKI::MooseParams;
-use SQL::Abstract::More; # TODO Use SQL::Maker instead of SQL::Abstract::More? (but the former only supports Oracle type LIMITs)
+
+use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
 
 ################################################################################
 # Attributes
@@ -41,32 +47,30 @@ has 'namespace' => ( # database namespace (i.e. schema) to prepend to tables
 
 # Prefixes the given DB table name with a namespace (if there's not already
 # one part of the table name)
-sub _add_namespace_to {
-    my ($self, $obj_param) = positional_args(\@_, # OpenXPKI::MooseParams
-        { isa => 'Str | ArrayRef[Str]' },
-    );
+signature_for _add_namespace_to => (
+    method => 1,
+    positional => [ 'Str' ],
+);
+sub _add_namespace_to ($self, $name) {
     # no namespace defined
-    return $obj_param unless $self->namespace;
-    # make sure we always have an ArrayRef
-    my $obj_list = ref $obj_param eq 'ARRAY' ? $obj_param : [ $obj_param ];
+    return $name unless $self->namespace;
     # add namespace if there's not already a namespace in the object name
-    $obj_list = [ map { m/\./ ? $_ : $self->namespace.'.'.$_ } @$obj_list ];
-    # return same type as argument was (ArrayRef or scalar)
-    return ref $obj_param eq 'ARRAY' ? $obj_list : $obj_list->[0];
+    return $name =~ m/\./ ? $name : $self->namespace.'.'.$name;
 }
 
 # Calls the given SQL::Abstract::More method after converting the parameters.
 # Sets $self->sql_str and $self->sql_params
-sub _make_query {
-    my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
-        method    => { isa => 'Str' },
-        args      => { isa => 'HashRef' },
-        query_obj => { isa => 'OpenXPKI::Server::Database::Query', optional => 1 },
-    );
-    my $method = $params{method};
-    my $args = $params{args};
-    my $query = $params{query_obj} // OpenXPKI::Server::Database::Query->new;
-
+signature_for _make_query => (
+    method => 1,
+    positional => [
+        'Str',
+        'HashRef',
+        'Optional[OpenXPKI::Server::Database::Query]' => {
+            default => sub { OpenXPKI::Server::Database::Query->new },
+        },
+    ]
+);
+sub _make_query ($self, $method, $args, $query_obj) {
     # Workaround for passing literal WHERE queries.
     # Required because:
     #  - SQL::Abstract::More expects a Scalar while (the later invoked)
@@ -78,7 +82,7 @@ sub _make_query {
     }
 
     # Prefix arguments with dash "-"
-    my %sqlam_args = map { '-'.$_ => $args->{$_} } keys %$args;
+    my %sqlam_args = map { '-'.$_ => $args->{$_} } keys $args->%*;
 
     ##! 4: "SQL::Abstract::More->$method(" . join(", ", map { sprintf "%s = %s", $_, Data::Dumper->new([$sqlam_args{$_}])->Indent(0)->Terse(1)->Dump } sort keys %sqlam_args) . ")"
 
@@ -88,50 +92,53 @@ sub _make_query {
     # Custom SQL replacements to support non-standard SQL (e.g. FROM_UNIXTIME)
     $sql = $self->driver->do_sql_replacements($sql);
 
-    $query->string($sql);
-    $query->add_params(@bind); # there might already be bind values from a JOIN
+    $query_obj->string($sql);
+    $query_obj->add_params(@bind); # there might already be bind values from a JOIN
 
-    return $query;
+    return $query_obj;
 }
 
-sub select {
-    my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
-        columns   => { isa => 'ArrayRef[Str]' },
-        from      => { isa => 'Str | ArrayRef[Str]', optional => 1 },
-        from_join => { isa => 'Str', optional => 1 },
-        where     => { isa => 'ScalarRef | ArrayRef | HashRef', optional => 1 },
-        group_by  => { isa => 'Str | ArrayRef', optional => 1 },
-        having    => { isa => 'Str | ArrayRef | HashRef', optional => 1, depends => ['group_by'] },
-        order_by  => { isa => 'Str | ArrayRef', optional => 1 },
-        limit     => { isa => 'Int', optional => 1 },
-        offset    => { isa => 'Int', optional => 1 },
-        distinct  => { isa => 'Bool', optional => 1 },
-    );
-
+signature_for select => (
+    method => 1,
+    named => [
+        columns   => 'ArrayRef[Str]',
+        from      => 'Optional[ Str | ArrayRef[Str] ]',
+        from_join => 'Optional[ Str ]',
+        where     => 'Optional[ ScalarRef | ArrayRef | HashRef ]',
+        group_by  => 'Optional[ Str | ArrayRef ]',
+        having    => 'Optional[ Str | ArrayRef | HashRef ]',
+        order_by  => 'Optional[ Str | ArrayRef ]',
+        limit     => 'Optional[ Int ]',
+        offset    => 'Optional[ Int ]',
+        distinct  => 'Optional[ Bool ]',
+    ],
+    bless => !!0, # return a HashRef instead of an Object
+);
+sub select ($self, $arg) {
     # FIXME order_by: if ArrayRef then check for "asc" and "desc" as they are reserved words (https://metacpan.org/pod/SQL::Abstract::More#select)
 
     OpenXPKI::Exception->throw(message => "There must be at least one column name in 'columns'")
-        unless scalar @{$params{'columns'}} > 0;
+        unless scalar @{$arg->{columns}} > 0;
 
     OpenXPKI::Exception->throw(message => "Either 'from' or 'from_join' must be specified")
-        unless ($params{'from'} or $params{'from_join'});
+        unless ($arg->{from} or $arg->{from_join});
 
     # Add namespace to table name
-    $params{'from'} = $self->_add_namespace_to($params{'from'}) if $params{'from'};
+    $arg->{from} = $self->_add_namespace_to($arg->{from}) if $arg->{from};
 
-    if ($params{'distinct'}) {
-        delete $params{'distinct'};
-        $params{'columns'} = [ -distinct => @{$params{'columns'}} ];
+    if ($arg->{distinct}) {
+        delete $arg->{distinct};
+        $arg->{columns} = [ -distinct => @{$arg->{columns}} ];
     }
 
     # Provide nicer syntax for joins than SQL::Abstract::More
     # TODO Test JOIN syntax (especially ON conditions, see https://metacpan.org/pod/SQL::Abstract::More#join)
     my $query;
-    if ($params{'from_join'}) {
+    if ($arg->{from_join}) {
         die "You cannot specify 'from' and 'from_join' at the same time"
-            if $params{'from'};
-        my @join_spec = split(/\s+/, $params{'from_join'});
-        delete $params{'from_join'};
+            if $arg->{from};
+        my @join_spec = split(/\s+/, $arg->{from_join});
+        delete $arg->{from_join};
         # Add namespace to table names (= all even indexes in join spec list)
         for (my $i=0; $i<scalar(@join_spec); $i+=2) {
             my @parts = split /\|/, $join_spec[$i];   # "table" / "table|alias"
@@ -141,7 +148,7 @@ sub select {
         # Translate JOIN spec into SQL syntax - taken from SQL::Abstract::More->select.
         # (string is converted into the list that SQL::Abstract::More->join expects)
         my $join_info = $self->sqlam->join(@join_spec);
-        $params{'from'} = \($join_info->{sql});
+        $arg->{from} = \($join_info->{sql});
 
         if ($join_info) {
             $query = OpenXPKI::Server::Database::Query->new;
@@ -149,75 +156,81 @@ sub select {
         }
     }
 
-    return $self->_make_query(
-        method => 'select',
-        args => \%params,
-        $query ? (query_obj => $query) : ()
-    );
+    return $self->_make_query('select' => $arg, $query // ());
 }
 
-sub subselect {
-    my ($self, $operator, $query) = positional_args(\@_, # OpenXPKI::MooseParams
-        { isa => 'Str' },
-        { isa => 'HashRef' },
-    );
-
+signature_for subselect => (
+    method => 1,
+    positional => [ 'Str', 'HashRef' ],
+);
+sub subselect ($self, $operator, $query) {
     my $subquery = $self->select(%$query);
     my $subquery_and_op = sprintf "%s (%s)", $operator, $subquery->string;
 
     return \[ $subquery_and_op => @{ $subquery->params }]
 }
 
-sub insert {
-    my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
-        into     => { isa => 'Str' },
-        values   => { isa => 'HashRef' },
-    );
-
+signature_for insert => (
+    method => 1,
+    named => [
+        into => 'Str',
+        values => 'HashRef',
+    ],
+    bless => !!0, # return a HashRef instead of an Object
+);
+sub insert ($self, $arg) {
     # Add namespace to table name
-    $params{'into'} = $self->_add_namespace_to($params{'into'}) if $params{'into'};
+    $arg->{into} = $self->_add_namespace_to($arg->{into});
 
-    return $self->_make_query(method => 'insert', args => \%params);
+    return $self->_make_query('insert' => $arg);
 }
 
-sub update {
-    my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
-        table => { isa => 'Str' },
-        set   => { isa => 'HashRef' },
-        where => { isa => 'ScalarRef | ArrayRef | HashRef' }, # require WHERE clause to prevent accidential updates on all rows
-    );
+signature_for update => (
+    method => 1,
+    named => [
+        table => 'Str',
+        set   => 'HashRef',
+        where => 'ScalarRef | ArrayRef | HashRef', # require WHERE clause to prevent accidential updates on all rows
+    ],
+    bless => !!0, # return a HashRef instead of an Object
+);
+sub update ($self, $arg) {
     # Add namespace to table name
-    $params{'table'} = $self->_add_namespace_to($params{'table'});
+    $arg->{table} = $self->_add_namespace_to($arg->{table});
 
-    return $self->_make_query(method => 'update', args => \%params);
+    return $self->_make_query('update' => $arg);
 }
 
-sub delete {
-    my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
-        from      => { isa => 'Str' },
-        where     => { isa => 'ScalarRef | ArrayRef | HashRef', optional => 1 },
-        all       => { isa => 'Bool', optional => 1 },
-    );
+signature_for delete => (
+    method => 1,
+    named => [
+        from  => 'Str',
+        where => 'Optional[ ScalarRef | ArrayRef | HashRef ]',
+        all   => 'Optional[ Bool ]',
+    ],
+    bless => !!0, # return a HashRef instead of an Object
+);
+sub delete ($self, $arg) {
     OpenXPKI::Exception->throw(message => "Either 'where' or 'all' must be specified")
-        unless ($params{'where'} or $params{'all'});
+        unless ($arg->{where} or $arg->{all});
 
     OpenXPKI::Exception->throw(message => "Empty parameter 'where' not allowed, use 'all' to enforce deletion of all rows")
-        if ($params{'where'} and (
-            ( ref $params{'where'} eq "ARRAY" and not scalar @{$params{'where'}} )
+        if ($arg->{where} and (
+            ( ref $arg->{where} eq "ARRAY" and not scalar @{$arg->{where}} )
             or
-            ( ref $params{'where'} eq "HASH" and not scalar keys %{$params{'where'}} )
+            ( ref $arg->{where} eq "HASH" and not scalar keys %{$arg->{where}} )
         ));
 
     # Add namespace to table name
-    $params{'from'} = $self->_add_namespace_to($params{'from'}) if $params{'from'};
+    $arg->{from} = $self->_add_namespace_to($arg->{from});
 
     # Delete all rows
-    if ($params{'all'}) {
-        $params{'where'} = {};
-        delete $params{'all'};
+    if ($arg->{all}) {
+        $arg->{where} = {};
+        delete $arg->{all};
     }
 
-    return $self->_make_query(method => 'delete', args => \%params);
+    return $self->_make_query('delete' => $arg);
 }
 
 __PACKAGE__->meta->make_immutable;
