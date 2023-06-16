@@ -1,5 +1,5 @@
 
-EXTRA_DIRS=packages repository extra
+EXTRA_DIRS=packages
 
 -include Makefile.local
 
@@ -33,7 +33,7 @@ repo: repository extra packages
 		-v $(abspath packages):/packages \
 		-v $(abspath secret/debian2021.key):/signkey:ro oxibuilder4debian repo
 
-%: packages
+.DEFAULT: packages
 	docker run --rm -ti \
 	    -v $(abspath ../../):/openxpki:ro \
 		-v $(abspath deps):/deps \
