@@ -14,8 +14,7 @@ use Test::Deep;
 use Test::Exception;
 use Feature::Compat::Try;
 use Log::Log4perl qw(:easy);
-Log::Log4perl->easy_init({ level => $OFF });
-#Log::Log4perl->easy_init({ level => $TRACE, file => '>>/tmp/oxi-proc-terminal.log', layout => '%-5p %P %C | %m%n' });
+Log::Log4perl->easy_init({ level => $ENV{TEST_VERBOSE} ? $DEBUG : $OFF, layout => '# %m%n' });
 
 # Project modules
 try {
