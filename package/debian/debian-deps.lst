@@ -36,7 +36,6 @@ libdigest-sha-perl
 libexception-class-perl
 libfile-find-rule-perl
 libfilter-perl
-libgit-pureperl-perl
 libhtml-parser-perl
 libintl-perl
 libio-digest-perl
@@ -67,13 +66,11 @@ libsql-abstract-more-perl
 libswitch-perl
 libsys-sigaction-perl
 libtemplate-perl
-libtemplate-perl
 libtest-pod-coverage-perl
 libtest-pod-perl
 libtext-csv-xs-perl
 libtimedate-perl
 libtree-dagnode-perl
 libworkflow-perl
-libxml-simple-perl
 libyaml-libyaml-perl
 libyaml-perl
