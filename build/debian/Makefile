@@ -16,10 +16,10 @@ debian-deps.lst:
 	cp ../../package/debian/debian-deps.lst .
 
 build: build-deps.lst
-	docker build -t oxibuilder4debian .
+	docker build -t oxibuilder4bookworm .
 
 build-nocache: build-deps.lst
-	docker build --no-cache -t oxibuilder4debian .
+	docker build --no-cache -t oxibuilder4bookworm .
 
 upload:
 	rsync -av repository/* packages.openxpki.org:/var/www/hosts/packages.openxpki.org/v3/debian/
@@ -35,7 +35,7 @@ repo:
 		-v $(abspath repository):/repository \
 		-v $(abspath extra:/extra-packages) \
 		-v $(abspath packages):/packages \
-		-v $(abspath secret/debian2023.key):/signkey:ro oxibuilder4debian repo
+		-v $(abspath secret/debian2023.key):/signkey:ro oxibuilder4bookworm repo
 
 .DEFAULT: packages
 	docker run --rm -ti \
@@ -44,4 +44,4 @@ repo:
 		-v $(abspath packages):/packages \
 		-e OPENXPKI_BUILD_DEBUG=${OPENXPKI_BUILD_DEBUG} \
 		-e OPENXPKI_BUILD_TAG=${OPENXPKI_BUILD_TAG} \
-		oxibuilder4debian $@
+		oxibuilder4bookworm $@

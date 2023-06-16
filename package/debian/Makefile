@@ -14,31 +14,22 @@ DEBIAN_VERSION = $(shell cat /etc/debian_version)
 # build-deps.list as they will otherwise built again!
 EXTERNAL=				\
 	Class__Observable \
-	Config__Merge \
 	Connector \
-	Crypt__Argon2 \
 	Crypt__OpenSSL__AES \
 	Crypt__PKCS10 \
-	Crypt__X509 \
 	DBIx__Handler \
 	DBIx__TransactionManager \
-	Feature__Compat__Try \
-	JSON__MaybeXS \
 	Log__Log4perl__Layout__JSON \
 	Proc__SafeExec \
-	Syntax__Keyword__Try \
-	Type__Tiny \
-	Workflow \
-	XS__Parse__Keyword
+	Workflow
 
-EXTRA = \
-    Crypt__LibSCEP
+# Bookworm ships with v0.55 so as long as we dont update
+# (or debian keeps pace) we dont need to build this ourselves
+EXTRA= \
+	Crypt__X509
 
 CORE = \
-	CGI \
-	JSON__PP \
-	Module__Build__Tiny \
-	Module__Load
+	CGI
 
 .PHONY : $(PACKAGES) $(EXTERNAL) CGI
 

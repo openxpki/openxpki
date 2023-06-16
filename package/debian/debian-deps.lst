@@ -34,6 +34,7 @@ libdbix-transactionmanager-perl
 libdevel-stacktrace-perl
 libdigest-sha-perl
 libexception-class-perl
+libfeature-compat-try-perl
 libfile-find-rule-perl
 libfilter-perl
 libhtml-parser-perl
@@ -41,6 +42,7 @@ libintl-perl
 libio-digest-perl
 libio-prompt-perl
 libjson-perl
+libjson-pp-perl
 liblog-log4perl-perl
 libmail-rfc822-address-perl
 libmoose-perl
@@ -63,6 +65,7 @@ libproc-safeexec-perl
 libregexp-common-perl
 libsoap-lite-perl
 libsql-abstract-more-perl
+libsyntax-keyword-try-perl
 libswitch-perl
 libsys-sigaction-perl
 libtemplate-perl

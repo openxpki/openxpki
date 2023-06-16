@@ -1,5 +1,5 @@
 # build container
-FROM debian:buster AS builder
+FROM debian:bookworm AS builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG OPENXPKI_NOCONFIG=1
