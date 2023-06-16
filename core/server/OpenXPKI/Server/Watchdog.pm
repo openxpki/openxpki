@@ -34,7 +34,7 @@ use OpenXPKI::Server;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::DateTime;
-
+use OpenXPKI::Util;
 
 our $TERMINATE = 0;
 our $RELOAD = 0;
@@ -352,9 +352,15 @@ sub start_or_reload {
 
         return 0 if $config->get('system.watchdog.disabled');
 
+        my (undef, $uid, undef, $gid) = OpenXPKI::Util->resolve_user_group(
+            $config->get('system.server.user'),
+            $config->get('system.server.group'),
+            'server process'
+        );
+
         my $watchdog = OpenXPKI::Server::Watchdog->new();
-        $watchdog->userid( OpenXPKI::Server::__get_numerical_user_id ( $config->get('system.server.user')  )),
-        $watchdog->groupid(OpenXPKI::Server::__get_numerical_group_id( $config->get('system.server.group') )),
+        $watchdog->userid($uid),
+        $watchdog->groupid($gid),
         $watchdog->keep_parent_sigchld($args{keep_parent_sigchld} ? 1 : 0);
         $watchdog->run;
     }

@@ -25,6 +25,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Watchdog;
 use OpenXPKI::Server::Notification::Handler;
+use OpenXPKI::Util;
 
 our $stop_soon = 0;
 our $main_pid;
@@ -592,45 +593,6 @@ sub __init_user_interfaces {
     return 1;
 }
 
-# returns numerical user id for specified user (name or id)
-# undef if not found
-sub __get_numerical_user_id {
-    my $arg = shift;
-
-    return unless defined $arg;
-
-    my ($pw_name,$pw_passwd,$pw_uid,$pw_gid,
-        $pw_quota,$pw_comment,$pw_gcos,$pw_dir,$pw_shell,$pw_expire) =
-        getpwnam ($arg);
-
-    if (! defined $pw_uid && ($arg =~ m{ \A \d+ \z }xms)) {
-    ($pw_name,$pw_passwd,$pw_uid,$pw_gid,
-     $pw_quota,$pw_comment,$pw_gcos,$pw_dir,$pw_shell,$pw_expire) =
-         getpwuid ($arg);
-    }
-
-    return $pw_uid;
-}
-
-# returns numerical group id for specified group (name or id)
-# undef if not found
-sub __get_numerical_group_id {
-    my $arg = shift;
-
-    return unless defined $arg;
-
-    my ($gr_name,$gr_passwd,$gr_gid,$gr_members) =
-        getgrnam ($arg);
-
-    if (! defined $gr_gid && ($arg =~ m{ \A \d+ \z }xms)) {
-    ($gr_name,$gr_passwd,$gr_gid,$gr_members) =
-        getgrgid ($arg);
-    }
-
-    return $gr_gid;
-}
-
-
 sub __get_server_config {
     my $self = shift;
     my %params = ();
@@ -706,74 +668,28 @@ sub __get_server_config {
         }
     }
 
-    my $user = __get_numerical_user_id($params{user});
-    if (not defined $user or $user eq '') {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_USER",
-            params  => { "USER" => $params{"user"} },
-            log => {
-                message => "Incorrect system user '$params{user}'",
-                facility => 'system',
-                priority => 'fatal',
-            },
+    try {
+        # resolve process owner, die on empty user/group
+        (undef, $params{user}, undef, $params{group})
+          = OpenXPKI::Util->resolve_user_group($params{user}, $params{group}, 'server process');
+
+        # check if we have different ownership settings for the socket
+        my $socket_owner = $config->get('system.server.socket_owner');
+        my $socket_group = $config->get('system.server.socket_group');
+
+        # resolve socket owner, allow and pass through empty user/group
+        my (undef, $socket_uid, undef, $socket_gid)
+          = OpenXPKI::Util->resolve_user_group($socket_owner, $socket_group, 'socket', 1);
+
+        $params{socket_owner} = $socket_uid if defined $socket_uid;
+        $params{socket_group} = $socket_gid if defined $socket_gid;
+    }
+    catch ($err) {
+        OpenXPKI::Exception->throw(
+            message => "Error in 'system.server' configuration: $err",
+            log => { priority => 'fatal' },
         );
     }
-    # convert user id to numerical
-    $params{user} = __get_numerical_user_id($user);
-
-    my $group = __get_numerical_group_id($params{group});
-    if (not defined $group or $group eq '') {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_DAEMON_GROUP",
-            params  => { "GROUP" => $params{"group"} },
-            log => {
-                message => "Incorrect system group '$params{group}'",
-                facility => 'system',
-                priority => 'fatal',
-            },
-        );
-    }
-    # convert group id to numerical
-    $params{group} = __get_numerical_group_id($group);
-
-    # check if we have different ownership settings for the socket
-    my $socket_owner = $config->get('system.server.socket_owner');
-    if (defined $socket_owner) {
-        # convert user id to numerical
-        $params{socket_owner} = __get_numerical_user_id($socket_owner);
-
-        if (not defined $params{socket_owner} or $params{socket_owner} eq '') {
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_SOCKET_OWNER",
-                params  => {
-                    "SOCKET_OWNER" => $socket_owner,
-                },
-                log => {
-                    message => "Incorrect socket owner '$socket_owner'",
-                    facility => 'system',
-                    priority => 'fatal',
-                },
-            );
-        }
-    }
-
-    my $socket_group = $config->get('system.server.socket_group');
-    if (defined $socket_group) {
-        # convert group id to numerical
-        $params{socket_group} = __get_numerical_group_id($socket_group);
-
-        if (not defined $params{socket_group} or $params{socket_group} eq '') {
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_SOCKET_OWNER_GROUP",
-                params  => { "SOCKET_GROUP" => $socket_group },
-                log => {
-                    message => "Incorrect socket group '$socket_group'",
-                    facility => 'system',
-                    priority => 'fatal',
-                },
-            );
-        }
-    };
 
     ##! 1: "finished"
 
