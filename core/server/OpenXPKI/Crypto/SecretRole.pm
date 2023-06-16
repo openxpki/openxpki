@@ -8,7 +8,7 @@ use OpenXPKI::Server::Context qw( CTX );
 
 =head1 NAME
 
-OpenXPKI::Server::API2::SecretRole - Base role for all types of 'secrets'
+OpenXPKI::Crypto::SecretRole - Base role for all types of 'secrets'
 
 =cut
 
