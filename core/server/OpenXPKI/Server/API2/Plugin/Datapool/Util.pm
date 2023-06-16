@@ -431,8 +431,8 @@ sub decrypt_passwordsafe ($self, $safe_id, $enc_value) {
                     params => { token_id => $safe_id }
                 );
             }
-            $err->rethrow;
         }
+        die $err;
     }
 
     return $value;
