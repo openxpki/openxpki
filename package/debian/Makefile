@@ -15,6 +15,7 @@ DEBIAN_VERSION = $(shell cat /etc/debian_version)
 EXTERNAL=				\
 	Class__Observable \
 	Config__Merge \
+	Connector \
 	Crypt__Argon2 \
 	Crypt__OpenSSL__AES \
 	Crypt__PKCS10 \
@@ -22,15 +23,13 @@ EXTERNAL=				\
 	DBIx__Handler \
 	DBIx__TransactionManager \
 	Feature__Compat__Try \
-	Syntax__Keyword__Try \
-	Git__PurePerl \
 	JSON__MaybeXS \
 	Log__Log4perl__Layout__JSON \
 	Proc__SafeExec \
-	YAML__Tiny \
-	XS__Parse__Keyword \
-	Connector \
-	Workflow
+	Syntax__Keyword__Try \
+	Type__Tiny \
+	Workflow \
+	XS__Parse__Keyword
 
 EXTRA = \
     Crypt__LibSCEP

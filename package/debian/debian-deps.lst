@@ -71,6 +71,7 @@ libtest-pod-perl
 libtext-csv-xs-perl
 libtimedate-perl
 libtree-dagnode-perl
+libtype-tiny-perl
 libworkflow-perl
 libyaml-libyaml-perl
 libyaml-perl
