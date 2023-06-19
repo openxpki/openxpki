@@ -533,12 +533,12 @@ If you have a replace request (signed renewal with signer validity outside
 the renewal window), you can trigger the automatic revocation of the signer
 certificate. Setting a reason code is mandatory, supported
 values can be taken from the openssl man page (mind the CamelCasing), the
-delayed_revocation_time is optional and can be relative or absolute date as consumed
+delay_revocation_time is optional and can be relative or absolute date as consumed
 by OpenXPKI::DateTime, any empty value becomes "now"::
 
     revoke_on_replace:
         reason_code: superseded
-        delayed_revocation_time: +000002
+        delay_revocation_time: +000002
 
 The above gives your friendly admins a 48h window to replace the certificates
 before they show up on the next CRL.
