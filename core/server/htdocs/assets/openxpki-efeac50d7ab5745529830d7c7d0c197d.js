@@ -426,7 +426,7 @@ let l=e.pagersize
 if(o.length>l){let e,t,r={num:"...",disabled:!0}
 l-=1,e=t=l>>1,t+=1&l,n<=e?o.splice(l-1,o.length-l,r):n>=o.length-1-t?o.splice(1,o.length-l,r):(o.splice(n+t-1,o.length-1-(n+t-1),r),o.splice(1,n-(e-1),r))}return o.prev={disabled:0===n,startat:(n-1)*e.limit,limit:e.limit,order:e.order,reverse:e.reverse},o.next={disabled:n===t-1,startat:(n+1)*e.limit,limit:e.limit,order:e.order,reverse:e.reverse},o}get pagesizes(){let e=this.pager
 if(!e.pagesizes)return[]
-let t=e.pagesizes.filter((t=>t>=e.count)),n=Math.min.apply(null,t)
+let t=e.pagesizes.filter((t=>t>=e.count)),n=Math.min(...t)
 return e.pagesizes.filter((e=>e<=n)).map((t=>({active:t==e.limit,limit:t,startat:(e.startat/t>>0)*t,order:e.order,reverse:e.reverse})))}get formattedColumns(){let e=[]
 for(const t of this.visibleColumns){let n=this.hasPager?t.sortkey:t.sTitle,o=this.pager.order&&this.pager.order===n,l=!!o&&!this.pager.reverse
 e.push({index:t.index,sTitle:t.sTitle,format:t.format,sortable:!!t.sortkey,isSorted:o,sortPage:{limit:this.pager.limit,order:n,reverse:l,startat:this.pager.startat}})}return e}get data(){let e=this.formattedColumns,t=this.rawColumns.map((e=>e.sTitle)),n=t.indexOf("_status");-1===n&&(n=t.indexOf("_className"))

@@ -123,10 +123,14 @@ export default class OxiSectionGridComponent extends Component {
     get pagesizes() {
         let pager = this.pager;
         if (!pager.pagesizes) { return [] }
-        let greater = pager.pagesizes.filter(size => (size >= pager.count));
-        let limit = Math.min.apply(null, greater);
+
+        // list all pager sizes bigger than no. of items
+        let tooBig = pager.pagesizes.filter(size => (size >= pager.count));
+        // use the smallest of those big pager sizes as threshold
+        let upperThreshold = Math.min(...tooBig);
+
         return pager.pagesizes
-        .filter( size => (size <= limit))
+        .filter( size => (size <= upperThreshold))
         .map( size => {
             return {
                 active: size == pager.limit,
