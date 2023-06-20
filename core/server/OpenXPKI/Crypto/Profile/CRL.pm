@@ -31,7 +31,7 @@ If no profile is given, the config layer is checked for a profile
 matching the name of the ca alias name. If no such profile is found,
 all values are loaded from I<crl.default>.
 
-A profile must define validity and digest, extension values are inherited 
+A profile must define validity and digest, extension values are inherited
 from the default profile in case they are not set in the special profile.
 
 =over
@@ -75,12 +75,12 @@ sub new {
     bless $self, $class;
 
     my $keys = { @_ };
-    
+
     OpenXPKI::Exception->throw (
         message => "I18N_OPENXPKI_CRYPTO_PROFILE_CRL_NEW_MISSING_CA"
     ) if (not $keys->{CA});
-    
-    $self->{CA} = $keys->{CA};    
+
+    $self->{CA} = $keys->{CA};
     $self->{ID} = $keys->{ID} if ($keys->{ID});
     $self->{VALIDITY} =  $keys->{VALIDITY} if ($keys->{VALIDITY});
     $self->{CA_VALIDITY} =  $keys->{CA_VALIDITY} if ($keys->{CA_VALIDITY});
@@ -104,9 +104,9 @@ sub __load_profile
 {
     my $self = shift;
 
-    my $config = CTX('config');  
+    my $config = CTX('config');
     my $pki_realm = CTX('session')->data->pki_realm;
-    my @basepath = ("crl");    
+    my @basepath = ("crl");
     my $validity;
 
     if ($self->{ID}) {
@@ -123,6 +123,10 @@ sub __load_profile
 
     ##! 16: 'Using config at ' . $basepath[1];
     $self->{PROFILE}->{DIGEST} = $config->get([ @basepath, 'digest' ]);
+
+    # check for pss padding mode
+    my $padding = $config->get_hash([ @basepath, 'padding']);
+    $self->set_padding($padding) if ($padding && keys %$padding);
 
     # use local setting for validity
     if ($self->{VALIDITY}) {

@@ -137,6 +137,11 @@ sub __load_profile
         }
     }
 
+    # check for pss padding mode
+    my $padding = $config->get_hash(['profile', $profile_name, 'padding']);
+    $padding = $config->get_hash(['profile', 'default', 'padding']) unless ($padding && keys %$padding);
+    $self->set_padding($padding) if ($padding && keys %$padding);
+
     ###########################################################################
     # determine certificate validity
 

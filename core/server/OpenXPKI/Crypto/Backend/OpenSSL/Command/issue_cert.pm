@@ -83,6 +83,20 @@ sub get_command
     push @command, ('-out', $self->get_outfile());
     push @command, ('-in', $self->write_temp_file( $self->{CSR}) );
 
+    # Support for PSS Padding, see #811
+    if (my $padding = $profile->get_padding()) {
+        # shortcut - scalar value to use defaults
+        if (ref $padding ne 'HASH') { $padding->{mode} = $padding // 'pkcs1' };
+        # nothing to do yet
+        if ($padding->{mode} eq 'pss') {
+            push @command, '-sigopt', 'rsa_padding_mode:pss';
+            push @command, '-sigopt', sprintf('rsa_pss_saltlen:%s', $padding->{saltlen} // '32');
+            push @command, '-sigopt', sprintf('rsa_mgf1_md:%s', $padding->{mgf1_digest} // 'sha256');
+        } elsif ($padding->{mode} ne 'pkcs1') {
+            OpenXPKI::Exception->throw (message => "Unsupported padding mode " . $padding->{mode} );
+        }
+    }
+
     if (defined $passwd)
     {
         push @command, ('-passin', 'env:pwd');

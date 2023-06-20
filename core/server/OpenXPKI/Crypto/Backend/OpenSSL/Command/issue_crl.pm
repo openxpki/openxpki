@@ -27,8 +27,6 @@ sub get_command
     }
     $self->{CONFIG}->set_profile($self->{PROFILE});
 
-
-
     ## ENGINE key's cert: no parameters
     ## normal cert: engine (optional), passwd, key
 
@@ -73,27 +71,42 @@ sub get_command
 
     ## build the command
 
-    my $command  = "ca -gencrl";
-    #done by CLI
-    #$command .= " -config $config";
-    $command .= " -engine $engine" if ($engine);
+    my @command  = ('ca','-gencrl');
+    push @command, '-engine', $engine if ($engine);
+
     if ($self->{ENGINE}->get_engine() eq "pkcs11" and
         (ref $self->{ENGINE}) =~ m{^OpenXPKI::Crypto::Backend::OpenSSL::Engine::SafeNetProtectServer$}xms)
     {
         ## The OpenSSL patch for the SafeNet ProtectServer requires
         ## that the option -keyfile is used.
-        $command .= " -keyfile ".$self->{KEYFILE};
+        push @command, '-keyfile', $self->{KEYFILE};
     }
-    $command .= " -keyform $keyform" if ($keyform);
-    $command .= " -out ".$self->get_outfile();
+
+    push @command, '-keyform', $keyform if ($keyform);
+    push @command, '-out', $self->get_outfile();
+
+     # Support for PSS Padding, see #811
+    if (my $padding = $self->{PROFILE}->get_padding()) {
+        # shortcut - scalar value to use defaults
+        if (ref $padding ne 'HASH') { $padding->{mode} = $padding // 'pkcs1' };
+        # nothing to do yet
+
+        if ($padding->{mode} eq 'pss') {
+            push @command, '-sigopt', 'rsa_padding_mode:pss';
+            push @command, '-sigopt', sprintf('rsa_pss_saltlen:%s', $padding->{saltlen} // '32');
+            push @command, '-sigopt', sprintf('rsa_mgf1_md:%s', $padding->{mgf1_digest} // 'sha256');
+        } elsif ($padding->{mode} ne 'pkcs1') {
+            OpenXPKI::Exception->throw (message => "Unsupported padding mode " . $padding->{mode} );
+        }
+    }
 
     if (defined $passwd)
     {
-        $command .= " -passin env:pwd";
+        push @command, ('-passin', 'env:pwd');
         $self->set_env ("pwd" => $passwd);
     }
 
-    return [ $command ];
+    return [ \@command ];
 }
 
 sub hide_output

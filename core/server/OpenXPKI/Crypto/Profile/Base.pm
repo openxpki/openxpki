@@ -534,6 +534,17 @@ sub has_extension
 
 }
 
+sub set_padding {
+    my $self = shift;
+    $self->{PROFILE}->{PADDING} = shift;
+    return 1;
+}
+
+sub get_padding {
+    my $self = shift;
+    return $self->{PROFILE}->{PADDING};
+}
+
 sub set_serial
 {
     my $self = shift;
