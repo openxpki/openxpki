@@ -54,7 +54,7 @@ use OpenXPKI::VERSION;
 use OpenXPKI::Debug;
 
 
-=head2 start {CONFIG, SILENT, PID, FOREGROUND, DEBUG, KEEP_TEMP}
+=head2 start {CONFIG, SILENT, PID, DEBUG, KEEP_TEMP}
 
 Start the server.
 
@@ -64,9 +64,6 @@ Parameters:
 
 =item PID
 Pid to check for a running server
-
-=item FOREGROUND (0|1)
-Weather to start the daemon in foreground (implies restart)
 
 =item RESTART (0|1)
 Weather to restart a running server
@@ -95,8 +92,8 @@ sub start {
     my $args = shift;
     my $silent = $args->{SILENT};
     my $pid        = $args->{PID};
-    my $foreground = $args->{FOREGROUND} || $args->{NODETACH};
-    my $restart = $args->{RESTART} || $args->{FOREGROUND};
+    my $foreground = $args->{NODETACH};
+    my $restart = $args->{RESTART};
     my $debug_level = $args->{DEBUG_LEVEL} || 0;
     my $debug_bitmask = $args->{DEBUG_BITMASK} || 0;
     my $debug_nocensor = $args->{DEBUG_NOCENSOR} || 0;
@@ -291,7 +288,7 @@ sub start {
             require OpenXPKI::Server;
             my $server = OpenXPKI::Server->new(
                 'SILENT' => $silent ? 1 : 0,
-                'TYPE'   => ($args->{FOREGROUND} ? 'Simple' : $config->{TYPE}),
+                'TYPE'   => $config->{TYPE},
                 'NODETACH' => $args->{NODETACH}
             );
             $server->start;

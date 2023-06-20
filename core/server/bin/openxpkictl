@@ -38,7 +38,6 @@ GetOptions(\%params,
           debug=s@
           keep-temp-files=s
           quiet
-          fg|foreground
           nd|no-detach
           nocensor
           )) or pod2usage(-verbose => 0);
@@ -90,10 +89,6 @@ if ($cmd eq 'version') {
 
     if ($cmd eq 'restart') {
         $args->{RESTART} = 1;
-    }
-
-    if (defined $params{fg}) {
-        $args->{FOREGROUND} = 1;
     }
 
     if (defined $params{nd}) {
@@ -374,14 +369,6 @@ B<WARNING>: Files might contain confidential data!
 
 Do not fork away the control process - useful to run inside containers
 or from systemd.
-
-=item B<--foreground|fg>
-
-Does not fork program away and B<uses a non-forking server>. This
-limits the OpenXPKI server to handle only one request at a time, so
-this is pretty much useful only for debugging and profiling.
-
-B<DO NOT USE THIS FOR PRODUCTION>.
 
 =back
 
