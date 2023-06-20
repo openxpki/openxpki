@@ -284,11 +284,6 @@ sub init_result {
                 label => 'I18N_OPENXPKI_UI_DOWNLOAD_LABEL',
                 icon => 'download',
                 target => 'popup'
-            },{
-                page => 'certificate!detail!identifier!{identifier}',
-                label => 'I18N_OPENXPKI_UI_DOWNLOAD_LABEL',
-                icon => 'download',
-                target => 'popup'
             }],
             columns => $header,
             data => \@result,
