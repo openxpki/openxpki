@@ -177,7 +177,7 @@ export default class OxiContentService extends Service {
                 '}, ' +
                 `partial = ${partial ? true : false}, ` +
                 `verbose = ${verbose ? true : false}, ` +
-                `trigger = ${trigger}, ` +
+                `trigger = ${trigger??'<none>'}, ` +
             ')'
         )
 

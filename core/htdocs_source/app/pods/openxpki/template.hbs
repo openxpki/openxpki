@@ -89,30 +89,26 @@
 
     {{!
       *************************************
-      Show (error) message if no page exists yet
+      Show status messages
       *************************************
     }}
-    {{#unless this.model.top.main}}
-        <div class="row">
-            <div class="col oxi-message">
-                {{#let (echo this.getStatusClass this.model.status.level) as |cssClass|}}
-                    {{#if this.model.status.message}}
-                        {{#if this.model.status.href}}
-                            <a href="{{this.model.status.href}}" target="_blank" rel="noopener noreferrer">
-                                <div class="alert {{cssClass}}">
-                                    <OxiBase::Formatted @format="nl2br" @value={{this.model.status.message}}/>
-                                </div>
-                            </a>
-                        {{else}}
-                            <div class="alert {{cssClass}}">
-                                <OxiBase::Formatted @format="nl2br" @value={{this.model.status.message}}/>
-                            </div>
-                        {{/if}}
-                    {{/if}}
-                {{/let}}
-            </div>
+    <div class="row">
+        <div class="col oxi-message">
+            {{#if this.model.status.message}}
+                {{#if this.model.status.href}}
+                    <a href="{{this.model.status.href}}" target="_blank" rel="noopener noreferrer">
+                        <div class="alert {{echo this.getStatusClass this.model.status.level}}">
+                            <OxiBase::Formatted @format="nl2br" @value={{this.model.status.message}}/>
+                        </div>
+                    </a>
+                {{else}}
+                    <div class="alert {{echo this.getStatusClass this.model.status.level}}">
+                        <OxiBase::Formatted @format="nl2br" @value={{this.model.status.message}}/>
+                    </div>
+                {{/if}}
+            {{/if}}
         </div>
-    {{/unless}}
+    </div>
 
     {{!
       *************************************
