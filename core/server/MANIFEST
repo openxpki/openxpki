@@ -635,9 +635,6 @@ OpenXPKI/Service/SCEP/Command.pm
 # Outside of namespace
 CGI_Session_Driver/openxpki.pm
 
-# Helpers for workflow tests
-OpenXPKI/Tests.pm
-
 # Control Scripts
 bin/openxpkiadm
 bin/openxpkictl
