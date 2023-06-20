@@ -1,128 +1,73 @@
 use strict;
 use warnings;
-use Test::More skip_all => 'See Issue #188 [fix password access to travis-ci]';
+
+# Core modules
+use FindBin qw( $Bin );
 use Data::Dumper;
 
-# use Smart::Comments;
+# CPAN modules
+use Test::More;
+use Test::Exception;
 
-use OpenXPKI::Debug;
-if ($ENV{DEBUG}) {
-    $OpenXPKI::Debug::LEVEL{'.*'} = 128;
-    $OpenXPKI::Debug::LEVEL{'OpenXPKI::XML::Cache'} = 0;
-}
-
-require OpenXPKI::Server::Init;
+# Project modules
+use lib "$Bin/../lib";
+use OpenXPKI::Test;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 
-print STDERR "OpenXPKI::Server::Context\n" if $ENV{VERBOSE};
-ok(1);
+#
+# Setup env
+#
+my $oxitest = OpenXPKI::Test->new();
 
-$ENV{OPENXPKI_CONF_DB} = 't/config.git/';
-
-## init XML cache
-ok(OpenXPKI::Server::Init::init(
-       {
-	   TASKS  => [ 'api',
-	           'config_versioned',
-		       'log',
-		       'dbi',
-               ],
-       }));
+require OpenXPKI::Server::Init;
 
 my $var;
 
-### try to get basic (database) object...
+### try to
 $var = undef;
-eval {
+lives_and {
     $var = CTX('dbi');
-};
-if (my $exc = OpenXPKI::Exception->caught()) {
-    ok(0);
-} else {
-    ok(defined $var);
-}
+    ok defined $var;
+} 'get basic (database) object';
 
-### try to set a supported custom context entry to undef...
-eval {
+throws_ok {
     OpenXPKI::Server::Context::setcontext({'server' => undef});
-};
-if (my $exc = OpenXPKI::Exception->caught()) {
-    ok(1);
-} else {
-    ok(0);
-}
+} qr/I18N_OPENXPKI_SERVER_CONTEXT_SETCONTEXT_UNDEFINED_VALUE/, 'try to set a supported custom context entry to undef';
 
-
-### try to set a supported custom context entry...
-eval {
+lives_ok {
     OpenXPKI::Server::Context::setcontext({'server' => 'foobar'});
-};
-if (my $exc = OpenXPKI::Exception->caught()) {
-    ok(0);
-} else {
-    ok(1);
-}
+} 'set a supported custom context entry';
 
-### try to overwrite a supported custom context entry...
-eval {
+###
+throws_ok {
     OpenXPKI::Server::Context::setcontext({'server' => 'baz'});
-};
-if (my $exc = OpenXPKI::Exception->caught()) {
-    ok($exc->message(),
-       "I18N_OPENXPKI_SERVER_CONTEXT_SETCONTEXT_ALREADY_DEFINED"); # expected error
-} else {
-    ok(0);
-}
+} qr/I18N_OPENXPKI_SERVER_CONTEXT_SETCONTEXT_ALREADY_DEFINED/, 'try to overwrite a supported custom context entry';
 
-### try to get custom context...
 $var = undef;
-eval {
+lives_and {
     $var = CTX('server');
-};
-if (my $exc = OpenXPKI::Exception->caught()) {
-    ok(0);
-} else {
-    ok($var, 'foobar');
-}
+    is $var, 'foobar';
+} 'get custom context';
 
-### try to set an illegal custom variable...
-eval {
+throws_ok {
     OpenXPKI::Server::Context::setcontext({'foo' => 'bar'});
-};
-if (my $exc = OpenXPKI::Exception->caught()) {
-    ok($exc->message(),
-       "I18N_OPENXPKI_SERVER_CONTEXT_SETCONTEXT_ILLEGAL_ENTRY"); # expected error
-} else {
-    ok(0);
-}
+} qr/I18N_OPENXPKI_SERVER_CONTEXT_SETCONTEXT_ILLEGAL_ENTRY/, 'try to set an illegal custom variable';
 
-### try to get an illegal custom variable...
+###
 $var = undef;
-eval {
+throws_ok {
     $var = CTX('foo');
-};
-if (my $exc = OpenXPKI::Exception->caught()) {
-    ok($exc->message(),
-       "I18N_OPENXPKI_SERVER_CONTEXT_CTX_OBJECT_NOT_FOUND"); # expected error
-} else {
-    ok(0);
-}
+} qr/I18N_OPENXPKI_SERVER_CONTEXT_CTX_OBJECT_NOT_FOUND/, 'try to get an illegal custom variable';
 
-### trying to get multiple entries at once
+### trying to
 my $var1;
 my $var2;
-eval {
+lives_and {
     ($var1, $var2)  = CTX('log', 'config');
-};
-if (my $exc = OpenXPKI::Exception->caught()) {
-    ok(0);
-    ok(0);
-} else {
-    my $tmp = CTX('log');
-    ok($var1 == $tmp);
-    $tmp = CTX('config');
-    ok($var2 == $tmp);
-}
+    my $tmp1 = CTX('log');
+    my $tmp2 = CTX('config');
+    ok ($var1 == $tmp1 and $var2 == $tmp2);
+} 'get multiple entries at once';
 
-1;
+done_testing;

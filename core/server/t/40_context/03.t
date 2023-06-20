@@ -1,67 +1,28 @@
 use strict;
 use warnings;
-use Test::More skip_all => 'See Issue #188 [fix password access to travis-ci]';
+
+# Core modules
+use FindBin qw( $Bin );
 use Data::Dumper;
 use Scalar::Util qw( blessed );
 
-# use Smart::Comments;
+# CPAN modules
+use Test::More;
+use Test::Exception;
 
-use OpenXPKI::Server::Init;
+# Project modules
+use lib "$Bin/../lib";
+use OpenXPKI::Test;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 
-#plan tests => 10;
 
-note "OpenXPKI::Server::Context - global context entries\n";
+my $oxitest = OpenXPKI::Test->new();
 
-$ENV{OPENXPKI_CONF_DB} = 't/config.git/';
+is ref CTX('config'), 'OpenXPKI::Config', "CTX('config')";
+is ref CTX('log'), 'OpenXPKI::Server::Log', "CTX('log')";
+is ref CTX('dbi'), 'OpenXPKI::Server::Database', "CTX('dbi')";
+is ref CTX('api2'), 'OpenXPKI::Server::API2::Autoloader', "CTX('api2')";
+is ref CTX('authentication'), 'OpenXPKI::Server::Authentication', "CTX('authentication')";
 
-## init Context
-ok(OpenXPKI::Server::Init::init(
-       {
-       TASKS  => [
-                'api2',
-               'config_versioned',
-               'i18n',
-               'dbi_log',
-               'log',
-               'dbi',
-               'crypto_layer',
-               'volatile_vault',
-#               'acl',
-               'authentication',
-               ],
-       }));
-
-
-is(ref CTX('config'),
-    'OpenXPKI::Config', "CTX('config')");
-
-is(ref CTX('crypto_layer'),
-    'OpenXPKI::Crypto::TokenManager', "CTX('crypto_layer')");
-
-is(ref CTX('volatile_vault'),
-   'OpenXPKI::Crypto::VolatileVault', "CTX('volatile_vault')");
-
-is(ref CTX('log'),
-    'OpenXPKI::Server::Log', "CTX('log')");
-
-is(ref CTX('dbi'),
-   'OpenXPKI::Server::Database', "CTX('dbi')"
-);
-
-is(ref CTX('api2'),
-   'OpenXPKI::Server::API2', "CTX('api2')"
-);
-
-is(ref CTX('authentication'),
-   'OpenXPKI::Server::Authentication', "CTX('authentication')"
-);
-
-eval {
-    CTX('server');
-};
-my $exc = OpenXPKI::Exception->caught();
-is($exc->message(), "I18N_OPENXPKI_SERVER_CONTEXT_CTX_OBJECT_NOT_DEFINED", 'Undefined object -> exception'); # expected error
-
-1;
+done_testing;
