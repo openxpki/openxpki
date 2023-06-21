@@ -118,17 +118,15 @@ sub __persistCertificateInformation {
     my $cert_data = $x509 ->db_hash();
     my $identifier = $cert_data->{identifier};
 
-    my $serializer = OpenXPKI::Serialization::Simple->new();
-
     if ($persist_data && (scalar keys %{$persist_data})) {
-        my $serialized_data = $serializer->serialize( $persist_data );
         ##! 16: 'Persist certificate: ' . $identifier
         ##! 32: 'persisted data: ' . Dumper( $persist_data )
         CTX('api2')->set_data_pool_entry(
             pki_realm => $pki_realm,
             namespace => 'nice.certificate.information',
             key       => $identifier,
-            value     => $serialized_data,
+            value     => $persist_data,
+            serialize => 'simple',
             encrypt   => 0,
             force     => 1,
         );
@@ -191,6 +189,8 @@ sub __persistCertificateInformation {
             status            => 'ISSUED',
         },
     );
+
+    my $serializer = OpenXPKI::Serialization::Simple->new;
 
     my @structured_subject_alt_names = @{$x509->get_subject_alt_name()};
     ##! 32: 'sans (structured): ' . Dumper \@structured_subject_alt_names
@@ -285,15 +285,14 @@ sub __fetchPersistedCertificateInformation {
 
     my $pki_realm = CTX('api2')->get_pki_realm();
 
-    my $serialized_data = CTX('api2')->get_data_pool_entry(
+    my $data = CTX('api2')->get_data_pool_entry(
         pki_realm => $pki_realm,
         namespace => 'nice.certificate.information',
         key => $certificate_identifier,
+        deserialize => 'simple',
     );
 
-    my $serializer = OpenXPKI::Serialization::Simple->new();
-
-    return $serializer->deserialize( $serialized_data->{value} );
+    return $data->{value};
 
 }
 

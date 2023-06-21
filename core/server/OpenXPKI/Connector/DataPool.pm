@@ -32,7 +32,7 @@ sub get {
 
     my $self = shift;
     my $args = shift;
-    my $params = shift;
+    my $params = shift // {};
 
     my @args = $self->_build_path( $args );
 
@@ -55,6 +55,7 @@ sub get {
     my $result = CTX('api2')->get_data_pool_entry(
         'namespace' => $self->LOCATION(),
         'key' => $parsed_key,
+        $params->{try_deserialize} ? ('try_deserialize' => $params->{try_deserialize}) : (),
     );
 
     if (!defined $result) {
@@ -68,69 +69,57 @@ sub get {
 sub get_list {
 
     my $self = shift;
+    my $args = shift;
+    my $params = shift // {};
+    $params->{try_deserialize} = 'simple';
 
-    my $val = $self->get( @_ );
+    my $val = $self->get($args, $params);
 
-    if (!defined $val) {
-        return;
-    }
+    return unless defined $val;
 
-    my $res;
-    eval {
-        $res = OpenXPKI::Serialization::Simple->new()->deserialize( $val );
-    };
-    if (!defined $res || ref $res ne 'ARRAY') {
+    if (ref $val ne 'ARRAY') {
         die "requested value is not a list";
     }
-    return @{$res};
+    return @{$val};
 
 }
 
 sub get_hash {
 
     my $self = shift;
+    my $args = shift;
+    my $params = shift // {};
+    $params->{try_deserialize} = 'simple';
 
-    my $val = $self->get( @_ );
+    my $val = $self->get($args, $params);
 
-    if (!defined $val) {
-        return;
-    }
+    return unless defined $val;
 
-    my $res;
-    eval {
-        $res = OpenXPKI::Serialization::Simple->new()->deserialize( $val );
-    };
-    if (!defined $res || ref $res ne 'HASH') {
+    if (ref $val ne 'HASH') {
         die "requested value is not a hash";
     }
-    return $res;
+    return $val;
 
 }
 
 sub get_meta {
 
     my $self = shift;
+    my $args = shift;
+    my $params = shift // {};
+    $params->{try_deserialize} = 'simple';
 
-    my $val = $self->get( @_ );
+    my $val = $self->get($args, $params);
 
-    if (!defined $val) {
-        return;
-    }
+    return unless defined $val;
 
-    my $res;
-    eval {
-        $res = OpenXPKI::Serialization::Simple->new()->deserialize( $val );
+    my $map = {
+        '' => 'scalar',
+        'ARRAY' => 'list',
+        'HASH' => 'hash',
     };
-    if (!defined $res || ref $res eq '') {
-        # Treat it as a scalar
-        return {TYPE  => "scalar" };
-    } elsif (ref $res eq 'ARRAY') {
-        return {TYPE  => "list" };
-    } elsif (ref $res eq 'HASH') {
-        return {TYPE  => "hash" };
-    }
-
-    die "Unknown data structure";
+    my $type = $map->{ref $val} or die "Unknown data structure";
+    return { TYPE => $type };
 
 }
 
@@ -155,33 +144,37 @@ sub set {
         $ttarg->{EXTRA} = $params->{extra};
     }
 
-    $self->log()->trace('Template args ' . Dumper $ttarg ) if $self->log->is_trace;
+    $self->log->trace('Template args ' . Dumper $ttarg ) if $self->log->is_trace;
     # Process the key using template
     my $key = $self->key();
     my $parsed_key;
-    $template->process(\$key, $ttarg, \$parsed_key) || die "Error processing argument template.";
+    $template->process(\$key, $ttarg, \$parsed_key) || die "Error processing argument template";
 
     # Parse values
     my $dpval;
     my $valmap = $self->value();
+    my $serialize = 0;
 
     if (ref $valmap eq '') {
         $template->process(\$valmap, $ttarg, \$dpval);
-    } else {
+    } elsif (ref $valmap eq 'HASH') {
         foreach my $key (keys %{$valmap}) {
             my $val;
             $template->process(\$valmap->{$key}, $ttarg, \$val);
             $dpval->{$key} = $val if ($val);
         }
-        $dpval = OpenXPKI::Serialization::Simple->new()->serialize( $dpval );
+        $serialize = 1;
+    } else {
+        die "Wrong value type: expected scalar or HASH ref, got: " . ref $valmap;
     }
 
-    $self->log()->debug('Namespace key is' . $parsed_key . ', values ' . $dpval);
+    $self->log->debug("Namespace key = '$parsed_key', value = " . Dumper $dpval) if $self->log->is_debug;
 
     CTX('api2')->set_data_pool_entry(
         'namespace' => $self->LOCATION(),
         'key' => $parsed_key,
         'value' => $dpval,
+        $serialize ? ('serialize' => 'simple') : (),
         'encrypt' => $self->encrypt(),
         'force' => 1
     );

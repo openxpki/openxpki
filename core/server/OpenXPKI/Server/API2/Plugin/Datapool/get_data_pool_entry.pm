@@ -11,6 +11,9 @@ OpenXPKI::Server::API2::Plugin::Datapool::get_data_pool_entry
 
 # Core modules
 
+# CPAN modules
+use Feature::Compat::Try;
+
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
@@ -59,6 +62,10 @@ of the currently active session is accepted.
 
 =item * C<decrypt> I<Bool> - set to 0 to skip decryption of encrypted items
 
+=item * C<deserialize> L<SerializationFormat|OpenXPKI::Server::API2::Types/SerializationFormat> - deserialization format for complex values. Optional
+
+=item * C<try_deserialize> L<SerializationFormat|OpenXPKI::Server::API2::Types/SerializationFormat> - like C<deserialize> but returns C<undef> instead of throwing an exception if deserialization fails. Optional
+
 =back
 
 =cut
@@ -69,6 +76,8 @@ command "get_data_pool_entry" => {
     # TODO Change type of "key" back to "AlphaPunct" once we have a private method to get encrypted data pool entries (where keys have more characters)
     key       => { isa => 'Str|Email', required => 1, },
     decrypt   => { isa => 'Bool', default => 1 },
+    deserialize => { isa => 'SerializationFormat' },
+    try_deserialize => { isa => 'SerializationFormat' },
 } => sub {
     my ($self, $params) = @_;
     ##! 8: "Reading datapool entry: realm=".$params->pki_realm.", namespace=".$params->namespace.", key=".$params->key
@@ -87,30 +96,48 @@ command "get_data_pool_entry" => {
 
     # no entry found, do not raise exception but simply return undef
     if (not $result) {
-        CTX('log')->system()->debug("Data pool entry not found");
+        CTX('log')->system->debug("Data pool entry '$key' not found");
         return;
     }
 
-    my $value;
+    my $value = $result->{datapool_value};
 
-    # encrypted value
+    # decryption
     if (($params->decrypt) && (my $encryption_key = $result->{encryption_key})) {
         # asymmetric decryption of password safe entry
         if (my ($safe_id) = $encryption_key =~ m{ \A p7:(.*) }xms ) {
             ##! 16: "Asymmetric decryption (safe_id = $safe_id)"
             # $safe_id: alias of password safe token, e.g. server-vault-1
-            $value = $self->decrypt_passwordsafe($safe_id, $result->{datapool_value}); # from ::Util
+            $value = $self->decrypt_passwordsafe($safe_id, $value); # from ::Util
         }
         # symmetric decryption
         else {
             ##! 16: "Symmetric decryption (key = $encryption_key)"
-            $value = $self->_decrypt_symmetric($realm, $encryption_key, $result->{datapool_value});
+            $value = $self->_decrypt_symmetric($realm, $encryption_key, $value);
         }
     }
-    # plaintext value
-    else {
-        ##! 16: "Plaintext value"
-        $value = $result->{datapool_value};
+
+    # deserialization
+    my $ser;
+    $ser = $params->deserialize if $params->has_deserialize;
+    $ser = $params->try_deserialize if $params->has_try_deserialize;
+
+    if ($ser) {
+        ##! 16: "deserialization with format '$ser'"
+        if ('simple' eq $ser) {
+            try {
+                $value = OpenXPKI::Serialization::Simple->new->deserialize($value);
+            }
+            catch ($err) {
+                # fail unless "try_deserialize" was specified
+                if (not $params->has_try_deserialize) {
+                    OpenXPKI::Exception->throw(
+                        message => "Could not deserialize Datapool value: $err",
+                        params => { pki_realm => $params->pki_realm, namespace => $params->namespace, key => $params->key }
+                    );
+                }
+            }
+        }
     }
 
     return {

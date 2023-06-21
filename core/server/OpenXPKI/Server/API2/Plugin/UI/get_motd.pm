@@ -17,7 +17,7 @@ use OpenXPKI::Server::API2::Types;
 
 =head2 get_motd
 
-Returns the message of the day (MOTD, from the datapool).
+Returns the message of the day (MOTD) from the datapool.
 
 By default, the MOTD for the current users' role is returned. Another role
 can be specified.
@@ -36,28 +36,21 @@ command "get_motd" => {
 } => sub {
     my ($self, $params) = @_;
 
-
     my $role = $params->has_role ? $params->role : CTX('session')->data->role;
 
+    my $datapool;
     # role is used as DP Key, can also be "_any"
-    my $datapool = $self->api->get_data_pool_entry(
-        namespace => 'webui.motd',
-        key       => $role,
-    );
-    ##! 16: 'Item for role ' . $role .': ' . Dumper $datapool
-
-    # nothing found for given role, so try _any
-    if (not $datapool) {
+    for my $r ($role, '_any') {
         $datapool = $self->api->get_data_pool_entry(
             namespace => 'webui.motd',
-            key       => '_any'
+            key => $role,
+            deserialize => 'simple',
         );
-        ##! 16: 'Item for _any: ' . Dumper $datapool
+        last if $datapool;
+        ##! 16: "Item for role '$r'": " . Dumper $datapool
     }
 
-    return unless $datapool;
-
-    return OpenXPKI::Serialization::Simple->new->deserialize($datapool->{value});
+    return $datapool;
 };
 
 __PACKAGE__->meta->make_immutable;

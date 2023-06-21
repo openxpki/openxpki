@@ -253,6 +253,19 @@ also be I<VALID>.
 =cut
 enum 'CertStatus', [qw( ISSUED REVOKED CRL_ISSUANCE_PENDING EXPIRED VALID )];
 
+=head2 SerializationFormat
+
+Enumeration of supported serialization formats:
+
+=over
+
+=item * C<simple> - using L<OpenXPKI::Serialization::Simple>
+
+=back
+
+=cut
+enum 'SerializationFormat', [qw( simple )];
+
 =head1 COERCION
 
 For some of the types you must also specify C<coerce =E<gt> 1> for the automatic

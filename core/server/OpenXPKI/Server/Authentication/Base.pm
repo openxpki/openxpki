@@ -124,11 +124,11 @@ sub register_login {
     my $dp_val = CTX('api2')->get_data_pool_entry(
         namespace => "sys.auth.history",
         key =>  $userid,
+        deserialize => 'simple',
     );
 
-    my $ser = OpenXPKI::Serialization::Simple->new();
     if ($dp_val) {
-        my $val = $ser->deserialize($dp_val->{value});
+        my $val = $dp_val->{value};
         $handle->userinfo()->{last_login} = $val->{last_login};
         $self->logger->trace('Got last_login from datapool: ' . Dumper $val) if ($self->logger->is_trace);
     } else {
@@ -139,7 +139,8 @@ sub register_login {
     my %item = (
         namespace => "sys.auth.history",
         key => sha256_hex($handle->userid()),
-        value => $ser->serialize({last_login => time()}),
+        value => { last_login => time() },
+        serialize => 'simple',
         force => 1,
     );
 

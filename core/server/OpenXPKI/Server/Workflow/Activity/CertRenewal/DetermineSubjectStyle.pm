@@ -6,7 +6,6 @@ use base qw( OpenXPKI::Server::Workflow::Activity );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
-use OpenXPKI::Serialization::Simple;
 
 
 sub execute {
@@ -14,7 +13,6 @@ sub execute {
     ##! 1: 'start'
     my ($self, $workflow) = @_;
     my $pki_realm  = CTX('session')->data->pki_realm;
-    my $serializer = OpenXPKI::Serialization::Simple->new();
     my $context    = $workflow->context();
 
     my $cert_identifier = $self->param('cert_identifier') // $context->param('cert_identifier');

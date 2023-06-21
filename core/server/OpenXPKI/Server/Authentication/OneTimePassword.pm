@@ -52,12 +52,14 @@ sub handleInput {
     my $val = CTX('api2')->get_data_pool_entry(
         namespace => $self->namespace(),
         key => $hashed_key,
+        deserialize => 'simple',
     );
+    my $data = $val->{value};
 
     return OpenXPKI::Server::Authentication::Handle->new(
         username => $token,
         error => OpenXPKI::Server::Authentication::Handle::USER_UNKNOWN
-    ) if (!$val->{value});
+    ) unless $data;
 
     $self->logger->trace('Got OTP token ' . Dumper $val ) if ($self->logger->is_trace);
 
@@ -65,8 +67,6 @@ sub handleInput {
         username => $token,
         error => OpenXPKI::Server::Authentication::Handle::USER_LOCKED
     ) if ($val->{expiration_date} && $val->{expiration_date} < time());
-
-    my $data = OpenXPKI::Serialization::Simple->new()->deserialize($val->{value});
 
     return OpenXPKI::Server::Authentication::Handle->new(
         username => $token,

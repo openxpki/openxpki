@@ -7,12 +7,12 @@ use base qw( OpenXPKI::Server::Workflow::Activity );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
-use OpenXPKI::Serialization::Simple;
 use OpenXPKI::DateTime;
 use DateTime;
 use Template;
 use Workflow::Exception qw( workflow_error configuration_error );
 
+use Feature::Compat::Try;
 
 sub execute {
     ##! 1: 'start'
@@ -68,20 +68,20 @@ sub execute {
         CTX('log')->application()->info('Delete (implicit) datapool entry for key '.$params->{key}.' in namespace '.$params->{namespace});
         return 1;
 
-    } elsif (ref $params->{ value }) {
-        ##! 32: 'its a ref! ' . ref $params->{ value }
-        ##! 64: $params->{ value }
-        # Datapool handles only scalar values so we need to serialize
-        # any non scalar items
-        workflow_error ('Datapool value is not a scalar - set the serialize parameter to enable automatic serialization')
-            unless($self->param('serialize'));
-        $params->{ value } = OpenXPKI::Serialization::Simple->new()->serialize( $params->{ value } );
     }
 
-    ##! 32: 'Params ' . Dumper $params
-    CTX('api2')->set_data_pool_entry(%$params);
+    try {
+        if (ref $params->{value} and $self->param('serialize')) {
+            $params->{serialize} = 'simple';
+        }
+        ##! 32: 'Params ' . Dumper $params
+        CTX('api2')->set_data_pool_entry(%$params);
+    }
+    catch ($err) {
+        workflow_error($err);
+    }
 
-    CTX('log')->application()->info('Set datapool entry for key '.$params->{key}.' in namespace '.$params->{namespace});
+    CTX('log')->application->info('Set datapool entry: key = '.$params->{key}.', namespace = '.$params->{namespace});
 
     return 1;
 }

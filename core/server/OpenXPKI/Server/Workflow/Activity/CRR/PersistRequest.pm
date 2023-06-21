@@ -6,7 +6,6 @@ use base qw( OpenXPKI::Server::Workflow::Activity );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
-use OpenXPKI::Serialization::Simple;
 use DateTime;
 
 sub execute
@@ -17,7 +16,6 @@ sub execute
     my $workflow   = shift;
     my $context    = $workflow->context();
     my $pki_realm  = CTX('api2')->get_pki_realm();
-    my $serializer = OpenXPKI::Serialization::Simple->new();
     my $dbi        = CTX('dbi');
 
     CTX('log')->deprecated->error('Using PersistRequest for revocations is deprecated - see NICE::RevokeCertificate');
