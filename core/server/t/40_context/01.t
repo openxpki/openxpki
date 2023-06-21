@@ -15,12 +15,8 @@ use OpenXPKI::Test;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 
-#
-# Setup env
-#
-my $oxitest = OpenXPKI::Test->new();
 
-require OpenXPKI::Server::Init;
+my $oxitest = OpenXPKI::Test->new();
 
 my $var;
 
