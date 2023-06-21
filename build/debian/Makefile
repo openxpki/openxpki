@@ -35,7 +35,7 @@ repo:
 		-v $(abspath repository):/repository \
 		-v $(abspath extra:/extra-packages) \
 		-v $(abspath packages):/packages \
-		-v $(abspath secret/debian2021.key):/signkey:ro oxibuilder4debian repo
+		-v $(abspath secret/debian2023.key):/signkey:ro oxibuilder4debian repo
 
 .DEFAULT: packages
 	docker run --rm -ti \

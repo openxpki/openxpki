@@ -4,4 +4,4 @@ Codename: buster
 Architectures: amd64
 Components: release
 Description: Repository for the OpenXPKI core software and its dependencies.
-SignWith: 0x055AA2CCB6D0C7A8
+SignWith: 0x8F7B8EC1D616E831
