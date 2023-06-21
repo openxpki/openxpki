@@ -17,7 +17,7 @@ use lib $Bin, "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 
 
-plan tests => 34;
+plan tests => 51;
 
 
 #
@@ -198,6 +198,52 @@ lives_and {
 } "Modify entry via 'modify_data_pool_entry' to not expire";
 
 #
+# Insert and read data (serialized)
+#
+set_entry_fails { key => "pill-77", value => { 'data' => 'important' }, serialize => 'nope' },
+    qr/failed.*nope/, "Serialized: store entry with wrong serialization format";
+
+set_entry_ok { key => "pill-77", value => { 'data' => 'important' }, serialize => 'simple' },
+    "Serialized: store entry";
+
+entry_is "pill-77", superhashof({ value => re(qr/data.*important/) }), "Serialized: read value without deserialization";
+
+lives_and {
+    my $result = $oxitest->api2_command('get_data_pool_entry' => {
+        namespace => $namespace,
+        key => "pill-77",
+        deserialize => 'simple',
+    });
+    cmp_deeply $result->{value}, { 'data' => 'important' };
+} "Serialized: read value";
+
+throws_ok {
+    $oxitest->api2_command('get_data_pool_entry' => {
+        namespace => $namespace,
+        key => "pill-01",
+        deserialize => 'simple',
+    });
+} qr/deserialize/, "Serialized: attempt to deserialize plain value";
+
+lives_and {
+    my $result = $oxitest->api2_command('get_data_pool_entry' => {
+        namespace => $namespace,
+        key => "pill-01",
+        try_deserialize => 'simple',
+    });
+    is $result->{value}, 'blue';
+} "Serialized: soft attempt to deserialize plain value";
+
+lives_and {
+    my $result = $oxitest->api2_command('get_data_pool_entry' => {
+        namespace => $namespace,
+        key => "pill-77",
+        try_deserialize => 'simple',
+    });
+    cmp_deeply $result->{value}, { 'data' => 'important' };
+} "Serialized: soft attempt to deserialize serialized value";
+
+#
 # Insert and read data (encrypted)
 #
 set_entry_ok { key => "pill-99", value => "green", encrypt => 1 },
@@ -227,6 +273,21 @@ is scalar(@$secrets), 1,
 # Read test data (encrypted) using cached key
 entry_is "pill-99", superhashof({ value => "green" }),
     "Encrypted: entry matches again the one we stored";
+
+#
+# Insert and read data (serialized and encrypted)
+#
+set_entry_ok { key => "pill-44", value => { 'color' => 'yellow' }, encrypt => 1, serialize => 'simple' },
+    "Encrypted + serialized: store entry";
+
+lives_and {
+    my $result = $oxitest->api2_command('get_data_pool_entry' => {
+        namespace => $namespace,
+        key => "pill-44",
+        deserialize => 'simple',
+    });
+    cmp_deeply $result->{value}, { 'color' => 'yellow' };
+} "Encrypted + serialized: fetch entry";
 
 #
 # Access to other PKI realm should be forbidden in subclasses of OpenXPKI::Server::Workflow
@@ -269,5 +330,31 @@ throws_ok {
 }
     qr/namespace/i,
     "Complain about access to system namespace from within OpenXPKI::Server::Workflow";
+
+###############################################################################
+# Connector
+###############################################################################
+
+package main;
+
+require_ok 'OpenXPKI::Connector::DataPool';
+
+my $conn = OpenXPKI::Connector::DataPool->new(
+    LOCATION => '',
+    key => 'pill-55',
+);
+
+# scalar value
+$conn->value('plain');
+lives_ok { $conn->set($namespace) } "Connector: set scalar";
+lives_and { is $conn->get($namespace), 'plain' } "Connector: fetch scalar";
+lives_and { is $conn->get_meta($namespace)->{TYPE}, 'scalar' } "Connector: get scalar meta info";
+
+# HashRef
+$conn->value({ mydata => 'id-[% EXTRA.one %]', thydata => 'plain' });
+lives_ok { $conn->set($namespace, undef, { extra => { one => 1 } }) } "Connector: set hashref";
+lives_and { like $conn->get($namespace), qr/mydata.*id-1/ } "Connector: fetch hashref as serialized string";
+lives_and { cmp_deeply $conn->get_hash($namespace), { mydata => 'id-1', thydata => 'plain' } } "Connector: fetch hashref";
+lives_and { is $conn->get_meta($namespace)->{TYPE}, 'hash' } "Connector: get hashref meta info";
 
 $oxitest->delete_testcerts;
