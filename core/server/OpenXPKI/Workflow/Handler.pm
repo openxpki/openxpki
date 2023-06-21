@@ -90,27 +90,6 @@ sub get_workflow {
         );
     }
 
-    # We have now obtained the configuration id that was active during
-    # creation of the workflow instance. However, if for some reason
-    # the matching configuration is not available we have two options:
-    # 1. bail out with an error
-    # 2. accept that there is an error and continue anyway with a different
-    #    configuration
-    # Option 1 is not ideal: if the corresponding configuration has for
-    # some reason be deleted from the database the workflow cannot be
-    # instantiated any longer. This is often not really a problem but
-    # sometimes this will lead to severe problems, e. g. for long
-    # running workflows. unfortunately, if a workflow cannot be instantiated
-    # it can neither be displayed, nor executed.
-    # In order to make things a bit more robust fall back to using a newer
-    # configuration than the one missing. As we don't have a timestamp
-    # for the configuration, a safe bet is to use the current configuration.
-    # Caveat: the current workflow definition might not be compatible with
-    # the particular workflow instance. There is a risk that the workflow
-    # instance gets stuck in an unreachable state.
-    # In comparison to not being able to even view the workflow this seems
-    # to be an acceptable tradeoff.
-
     my $factory = $self->get_factory;
 
     ##! 64: 'factory: ' . Dumper $factory

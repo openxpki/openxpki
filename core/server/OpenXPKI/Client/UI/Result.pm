@@ -365,9 +365,9 @@ sub send_command_v2 {
     $self->log->trace("Raw backend reply to '$command': ". Dumper $reply) if $self->log->is_trace;
 
     if ( $reply->{SERVICE_MSG} ne 'COMMAND' ) {
+        $self->log->error("command $command failed ($reply->{SERVICE_MSG})");
+        $self->log->trace("command reply ". Dumper $reply) if $self->log->is_trace;
         if (!$flags->{nostatus}) {
-            $self->log->error("command $command failed ($reply->{SERVICE_MSG})");
-            $self->log->trace("command reply ". Dumper $reply) if $self->log->is_trace;
             $self->set_status_from_error_reply( $reply );
         }
         return undef;

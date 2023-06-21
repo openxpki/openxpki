@@ -137,7 +137,7 @@ sub init_load {
     my $wf_info = $self->send_command_v2( 'get_workflow_info',  {
         id => $id,
         with_ui_info => 1,
-    });
+    }, { nostatus  => 1 });
 
     if (!$wf_info) {
         $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION') unless $self->status->is_set;
@@ -174,7 +174,7 @@ sub init_context {
     my $wf_info = $self->send_command_v2( 'get_workflow_info',  {
         id => $id,
         with_ui_info => 1,
-    });
+    }, { nostatus  => 1 });
 
     if (!$wf_info) {
         $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION') unless $self->status->is_set;
@@ -218,7 +218,7 @@ sub init_attribute {
         id => $id,
         with_attributes => 1,
         with_ui_info => 1,
-    });
+    }, { nostatus  => 1 });
 
     if (!$wf_info) {
         $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION') unless $self->status->is_set;
@@ -262,10 +262,17 @@ sub init_info {
     my $wf_info = $self->send_command_v2( 'get_workflow_info',  {
         id => $id,
         with_ui_info => 1,
-    });
+    }, { nostatus  => 1 });
 
     if (!$wf_info) {
-        $self->page->description('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION');
+         $self->set_page(
+            shortlabel => '',
+        );
+        $self->main->add_section({
+            type => 'text',
+            content => {
+                description => 'I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION',
+        }});
         $self->log->warn('Unable to load workflow info for id ' . $id);
         return $self;
     }
