@@ -170,17 +170,6 @@ sub execute_action {
     try {
         $self->persist_context(1);
 
-        # The workflow module internally caches conditions and does NOT clear
-        # this cache if you just refetch a workflow! As the workflow state
-        # object is shares, this leads to wrong states in the condition cache
-        # if you reopen two different workflows in the same state!
-        my $wf_state = $self->_get_workflow_state();
-
-        ##! 16: 'Clear cache for state ' . $wf_state->state
-        $wf_state->clear_condition_cache();
-
-        ##! 128: 'state object cond. cache ' . Dumper $wf_state->{_condition_result_cache}
-
         #set "reap at" info
         my $action = $self->_get_action($action_name);
 
