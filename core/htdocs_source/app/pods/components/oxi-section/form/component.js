@@ -64,6 +64,12 @@ export default class OxiSectionFormComponent extends Component {
         this.#updateCloneFields();
     }
 
+    /**
+     * Convert an array of field definition hashes into an array of Field objects.
+     * Create multiple cloned fields if multiple values are given.
+     * Properly set current key and value for input fields with dynamic (choosable)
+     * key.
+     */
     #prepareFields(fields) {
         let result = [];
         for (const fieldHash of fields) {
@@ -259,6 +265,7 @@ export default class OxiSectionFormComponent extends Component {
 
         return this.content.requestUpdate(request)
         .then((doc) => {
+            // replace fields in case the response contains an updated version
             for (const newField of this.#prepareFields(doc.fields)) {
                 for (const oldField of fields) {
                     if (oldField.name === newField.name) {
