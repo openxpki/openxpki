@@ -16,7 +16,6 @@ use Net::Server::Daemonize qw( set_uid set_gid );
 use English;
 use Socket;
 use Scalar::Util qw( blessed );
-use Metrics::Any::Adapter 'Prometheus';
 use Feature::Compat::Try;
 
 use OpenXPKI::Debug;
