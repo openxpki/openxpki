@@ -10,6 +10,7 @@ use Type::Params qw( signature_for );
 # Project modules
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
+use OpenXPKI::Serialization::Simple;
 
 use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
 
@@ -302,7 +303,6 @@ sub thaw ($self, $frozen) {
     my $data_hash;
     # backwards compatibility
     if ($frozen =~ /^HASH\n/ ) {
-        use OpenXPKI::Serialization::Simple;
         $data_hash = OpenXPKI::Serialization::Simple->new->deserialize($frozen);
     }
     else {
