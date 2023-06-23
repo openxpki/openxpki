@@ -203,8 +203,13 @@ $(dirname $0)/oxi-install "${oxi_install_params[@]}" | sed -u 's/^/    /mg'
 echo -e "\nDisable version check"
 sed -zri 's/depend:\s*\n\s+core:[^\n]+\n//' /etc/openxpki/config.d/system/version.yaml
 
+# Set user and group to root (allows to e.g. run under a /root/.plenv environment)
+echo -e "Set user and group to 'root'"
+sed -ri 's/^(user:)\s*.*/\1 root/' /etc/openxpki/config.d/system/server.yaml
+sed -ri 's/^(group:)\s*.*/\1 root/' /etc/openxpki/config.d/system/server.yaml
+
 # configure web server
-echo -e "\nConfigure Apache web server"
+echo -e "Configure Apache web server"
 cat $OXI_TEST_SAMPLECONFIG_DIR/contrib/apache2-openxpki-site.conf \
  | perl -pe 's{^(\s*RewriteRule \^\.\*\$ https://)}{#$1}'\
  > /etc/apache2/sites-available/openxpki.conf
