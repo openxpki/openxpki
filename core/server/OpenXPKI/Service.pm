@@ -1,13 +1,7 @@
-## OpenXPKI::Service.pm
-##
-## Written 2006 by Martin Bartosch for the OpenXPKI project
-## (C) Copyright 2005-2006 by The OpenXPKI Project
-
 package OpenXPKI::Service;
 
 use strict;
 use warnings;
-use utf8;
 use English;
 
 use Class::Std;

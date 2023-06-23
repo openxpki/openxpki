@@ -1,13 +1,7 @@
-## OpenXPKI::Exception
-##
-## Written by Michael Bell for the OpenXPKI project
-## Copyright (C) 2005 by The OpenXPKI Project
-
 package OpenXPKI::Exception;
 
 use strict;
 use warnings;
-use utf8;
 
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context;

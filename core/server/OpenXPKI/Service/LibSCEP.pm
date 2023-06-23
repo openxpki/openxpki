@@ -4,7 +4,6 @@ use base qw( OpenXPKI::Service );
 
 use strict;
 use warnings;
-use utf8;
 use English;
 
 use Class::Std;

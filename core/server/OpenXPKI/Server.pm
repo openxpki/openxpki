@@ -1,12 +1,7 @@
-## OpenXPKI::Server.pm
-##
-## Written 2005 by Michael Bell for the OpenXPKI project
-## (C) Copyright 2005-2006 by The OpenXPKI Project
 package OpenXPKI::Server;
 
 use strict;
 use warnings;
-use utf8;
 
 use base qw( Net::Server::MultiType );
 use Net::Server::Daemonize qw( set_uid set_gid );

@@ -1,7 +1,5 @@
 package OpenXPKI::Test::QA::Role::Workflows::Instance;
 use Moose;
-use utf8;
-
 # Core modules
 use Test::More;
 use Test::Exception;

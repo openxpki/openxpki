@@ -2,7 +2,6 @@ package OpenXPKI::Server::Workflow::Persister::DBI;
 
 use strict;
 use base qw( Workflow::Persister );
-use utf8;
 use English;
 
 use Sys::Hostname;

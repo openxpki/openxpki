@@ -22,8 +22,6 @@ Will output the verbose label of the referenced profile.
 
 use strict;
 use warnings;
-use utf8;
-
 use base qw( Template::Plugin );
 use Template::Plugin;
 

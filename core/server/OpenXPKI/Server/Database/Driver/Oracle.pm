@@ -1,6 +1,6 @@
 package OpenXPKI::Server::Database::Driver::Oracle;
 use Moose;
-use utf8;
+
 with qw(
     OpenXPKI::Server::Database::Role::SequenceSupport
     OpenXPKI::Server::Database::Role::MergeEmulation

@@ -1,7 +1,5 @@
 package OpenXPKI::Test::QA::Role::Server::ClientHelper;
 use Moose;
-use utf8;
-
 =head1 NAME
 
 OpenXPKI::Test::QA::Role::Server::ClientHelper - Helper functions to test

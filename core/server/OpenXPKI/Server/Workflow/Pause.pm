@@ -1,14 +1,7 @@
-## OpenXPKI::Server::Workflow::Pause
-##
-## Written by Dieter Siebeck for the OpenXPKI project
-## Copyright (C) 2012 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Pause;
 
 use strict;
 use warnings;
-use utf8;
-
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context;
 

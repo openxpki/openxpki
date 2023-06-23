@@ -1,6 +1,6 @@
 package OpenXPKI::Server::Session::DriverRole;
+
 use Moose::Role;
-use utf8;
 
 # Project modules
 use OpenXPKI::Exception;

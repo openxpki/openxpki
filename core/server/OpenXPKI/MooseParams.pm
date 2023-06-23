@@ -1,7 +1,7 @@
 package OpenXPKI::MooseParams;
+
 use strict;
 use warnings;
-use utf8;
 
 =head1 Name
 

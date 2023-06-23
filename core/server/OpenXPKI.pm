@@ -1,15 +1,7 @@
-## OpenXPKI
-##
-## Written 2005 by Michael Bell and Martin Bartosch
-## for the OpenXPKI project
-## (C) Copyright 2005-2006 by The OpenXPKI Project
 package OpenXPKI;
 
 use strict;
 use warnings;
-#use diagnostics;
-use utf8;
-#use encoding 'utf8';
 
 use OpenXPKI::VERSION;
 our $VERSION = $OpenXPKI::VERSION::VERSION;

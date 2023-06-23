@@ -2,8 +2,6 @@ package OpenXPKI::Template::Plugin::RandomPassword;
 
 use strict;
 use warnings;
-use utf8;
-
 use base qw( Template::Plugin );
 use Template::Plugin;
 

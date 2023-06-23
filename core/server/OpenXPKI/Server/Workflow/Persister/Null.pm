@@ -1,10 +1,7 @@
-# OpenXPKI::Server::Workflow::Persister::Null
-
 package OpenXPKI::Server::Workflow::Persister::Null;
 
 use strict;
 use base qw( Workflow::Persister );
-use utf8;
 use English;
 
 use OpenXPKI::Debug;

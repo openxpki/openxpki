@@ -1,7 +1,5 @@
 package OpenXPKI::Test::WorkflowMock;
 use Moose;
-use utf8;
-
 # CPAN modules
 use Workflow::Context;
 use Workflow::Factory qw( FACTORY );

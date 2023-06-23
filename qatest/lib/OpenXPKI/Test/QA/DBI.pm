@@ -1,7 +1,5 @@
 package OpenXPKI::Test::QA::DBI;
 use Moose;
-use utf8;
-
 =head1 NAME
 
 OpenXPKI::Test::QA::DBI - Test helper to get a database handle

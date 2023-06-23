@@ -1,6 +1,7 @@
 package OpenXPKI::Server::Database::Role::SequenceSupport;
+
 use Moose::Role;
-use utf8;
+
 =head1 Name
 
 OpenXPKI::Server::Database::Role::SequenceSupport - Moose role for database

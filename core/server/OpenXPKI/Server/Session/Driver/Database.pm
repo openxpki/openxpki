@@ -1,6 +1,5 @@
 package OpenXPKI::Server::Session::Driver::Database;
 use Moose;
-use utf8;
 with "OpenXPKI::Server::Session::DriverRole";
 
 =head1 NAME

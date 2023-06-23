@@ -1,6 +1,6 @@
 package OpenXPKI::Server::Database::Role::CountEmulation;
 use Moose::Role;
-use utf8;
+
 =head1 Name
 
 OpenXPKI::Server::Database::Role::CountEmulation - Moose role for database

@@ -1,6 +1,5 @@
 package OpenXPKI::Server::Database::Role::Driver;
 use Moose::Role;
-use utf8;
 
 =head1 NAME
 

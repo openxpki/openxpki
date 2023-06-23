@@ -18,8 +18,6 @@ export the methods, you need to address them with the plugin name, e.g.
 
 use strict;
 use warnings;
-use utf8;
-
 use base qw( Template::Plugin );
 use Template::Plugin;
 use OpenXPKI::DateTime;

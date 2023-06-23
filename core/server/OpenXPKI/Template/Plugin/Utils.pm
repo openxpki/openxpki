@@ -4,8 +4,6 @@ use Moose;
 use MooseX::NonMoose;
 extends 'Template::Plugin';
 
-use utf8;
-
 use Template::Plugin;
 use MIME::Base64;
 use Digest::SHA qw(sha256_hex hmac_sha256_hex);

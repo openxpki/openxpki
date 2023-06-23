@@ -2,7 +2,7 @@ package OpenXPKI::Util;
 
 use strict;
 use warnings;
-use utf8;
+
 use English;
 
 sub resolve_user_group {

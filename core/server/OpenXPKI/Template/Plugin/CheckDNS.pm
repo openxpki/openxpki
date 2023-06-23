@@ -17,8 +17,6 @@ to the "USE" statement:
 
 =cut
 
-use utf8;
-
 use Net::DNS;
 
 use Moose::Util::TypeConstraints;

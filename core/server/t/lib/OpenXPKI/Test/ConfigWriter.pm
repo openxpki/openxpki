@@ -1,7 +1,5 @@
 package OpenXPKI::Test::ConfigWriter;
 use Moose;
-use utf8;
-
 =head1 NAME
 
 OpenXPKI::Test::ConfigWriter - Create test configuration files (YAML)

@@ -1,7 +1,6 @@
 package OpenXPKI::Server::API2::Autoloader;
 use strict;
 use warnings;
-use utf8;
 
 =head1 NAME
 

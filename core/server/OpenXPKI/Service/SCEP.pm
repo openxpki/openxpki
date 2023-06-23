@@ -1,15 +1,9 @@
-## OpenXPKI::Service::SCEP
-##
-## Written 2006 by Alexander Klink for the OpenXPKI project
-## (C) Copyright 2006 by The OpenXPKI Project
-
 package OpenXPKI::Service::SCEP;
 
 use base qw( OpenXPKI::Service::LibSCEP );
 
 use strict;
 use warnings;
-use utf8;
 use English;
 
 use Class::Std;

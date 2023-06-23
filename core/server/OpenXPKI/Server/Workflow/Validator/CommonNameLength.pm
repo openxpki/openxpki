@@ -3,8 +3,6 @@ package OpenXPKI::Server::Workflow::Validator::CommonNameLength;
 use Moose;
 extends 'OpenXPKI::Server::Workflow::Validator';
 
-use utf8;
-
 use Workflow::Exception qw( validation_error );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Debug;

@@ -2,7 +2,6 @@ package OpenXPKI::Server::Workflow::Persister::NoHistory;
 
 use strict;
 use base qw( OpenXPKI::Server::Workflow::Persister::DBI );
-use utf8;
 use English;
 
 sub create_history {

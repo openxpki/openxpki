@@ -1,10 +1,6 @@
-# OpenXPKI::Serialization::Simple.pm
-# Written 2006 by Michael Bell for the OpenXPKI project
-# (C) Copyright 2006 by The OpenXPKI Project
-
 use strict;
 use warnings;
-use utf8;
+
 use JSON;
 use Encode;
 

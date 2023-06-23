@@ -1,13 +1,7 @@
-## OpenXPKI::Crypto::Toolkit
-## Written 2006 by Alexander Klink for the OpenXPKI project
-## based on OpenXPKI::Crypto::Backend::OpenSSL,
-## written by Michael Bell for the OpenXPKI project
-## (C) Copyright 2006 by The OpenXPKI Project
 package OpenXPKI::Crypto::Toolkit;
 
 use strict;
 use warnings;
-use utf8; ## pack/unpack is too slow
 
 use Class::Std;
 

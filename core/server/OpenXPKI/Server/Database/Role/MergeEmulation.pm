@@ -1,6 +1,6 @@
 package OpenXPKI::Server::Database::Role::MergeEmulation;
 use Moose::Role;
-use utf8;
+
 =head1 Name
 
 OpenXPKI::Server::Database::Role::MergeEmulation - Moose role for database

@@ -3,8 +3,6 @@ package OpenXPKI::Server::Session::Data::SCEP;
 use Moose;
 extends 'OpenXPKI::Server::Session::Data';
 
-use utf8;
-
 =head1 NAME
 
 OpenXPKI::Server::Session::Data::SCEP - specialized data object for SCEP

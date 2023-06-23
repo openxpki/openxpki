@@ -1,7 +1,5 @@
 package OpenXPKI::Test::CertHelper::Database::Cert;
 use Moose;
-use utf8;
-
 =head1 NAME
 
 OpenXPKI::Test::CertHelper::Database::Cert - represents a test certificate (PEM + meta data)

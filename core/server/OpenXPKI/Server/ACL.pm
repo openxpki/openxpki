@@ -1,15 +1,8 @@
-## OpenXPKI::Server::ACL.pm
-##
-## Written by Michael Bell 2006
-## cleaned up a bit to support multiple PKI realms
-## by Alexander Klink 2007
-## Copyright (C) 2006 by The OpenXPKI Project
-
 package OpenXPKI::Server::ACL;
 
 use strict;
 use warnings;
-use utf8;
+
 use English;
 
 use OpenXPKI::Debug;

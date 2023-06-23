@@ -1,6 +1,7 @@
 package OpenXPKI::Server::Database::Role::SequenceEmulation;
+
 use Moose::Role;
-use utf8;
+
 =head1 Name
 
 OpenXPKI::Server::Database::Role::SequenceEmulation - Moose role for database

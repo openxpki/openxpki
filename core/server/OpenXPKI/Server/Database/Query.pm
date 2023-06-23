@@ -1,6 +1,6 @@
 package OpenXPKI::Server::Database::Query;
 use Moose;
-use utf8;
+
 =head1 Name
 
 OpenXPKI::Server::Database::Query - Container for SQL query string and bind
