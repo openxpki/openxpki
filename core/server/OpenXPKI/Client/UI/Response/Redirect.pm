@@ -1,7 +1,7 @@
 package OpenXPKI::Client::UI::Response::Redirect;
 use OpenXPKI::Client::UI::Response::DTO;
 
-use Moose::Util::TypeConstraints qw( enum );
+use Moose::Util::TypeConstraints qw( enum ); # PLEASE NOTE: this enables all warnings via Moose::Exporter
 
 has 'to' => (
     is => 'rw',

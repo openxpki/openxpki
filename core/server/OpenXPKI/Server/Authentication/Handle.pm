@@ -2,7 +2,7 @@ package OpenXPKI::Server::Authentication::Handle;
 
 use Moose;
 
-use Moose::Util::TypeConstraints;
+use Moose::Util::TypeConstraints; # PLEASE NOTE: this enables all warnings via Moose::Exporter
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );

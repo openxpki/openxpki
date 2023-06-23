@@ -12,7 +12,7 @@ use OpenXPKI::Dumper;
 use JSON;
 use Log::Log4perl;
 use Crypt::JWT qw( decode_jwt );
-use Moose::Util::TypeConstraints;
+use Moose::Util::TypeConstraints; # PLEASE NOTE: this enables all warnings via Moose::Exporter
 
 
 has cgi => (

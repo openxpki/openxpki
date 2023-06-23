@@ -4,7 +4,7 @@ use Moose;
 use Test::More;
 use Test::Exception;
 use Log::Log4perl;
-use Moose::Util::TypeConstraints;
+use Moose::Util::TypeConstraints; # PLEASE NOTE: this enables all warnings via Moose::Exporter
 use Type::Params qw( signature_for );
 
 use FindBin qw( $Bin );

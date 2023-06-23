@@ -7,7 +7,7 @@ use MIME::Base64 qw( encode_base64 decode_base64 );
 
 # CPAN modules
 use Crypt::CBC;
-use Moose::Util::TypeConstraints;
+use Moose::Util::TypeConstraints; # PLEASE NOTE: this enables all warnings via Moose::Exporter
 
 =head1 NAME
 

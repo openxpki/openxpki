@@ -8,7 +8,7 @@ OpenXPKI::Server::API2::Plugin::Workflow::search_workflow_instances
 =cut
 
 # CPAN modules
-use Moose::Util::TypeConstraints;
+use Moose::Util::TypeConstraints; # PLEASE NOTE: this enables all warnings via Moose::Exporter
 
 # Project modules
 use OpenXPKI::Debug;

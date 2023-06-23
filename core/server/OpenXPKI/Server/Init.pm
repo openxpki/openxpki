@@ -9,7 +9,6 @@ use Errno;
 
 # CPAN modules
 use Log::Log4perl;
-use Feature::Compat::Try;
 use Scalar::Util qw( blessed );
 
 # Project modules
@@ -20,7 +19,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Config;
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::VolatileVault;
-use OpenXPKI::Server::Database;
+use OpenXPKI::Server::Database; # PLEASE NOTE: this enables all warnings via Moose::Exporter
 use OpenXPKI::Server::Log;
 use OpenXPKI::Server::Log::CLI;
 use OpenXPKI::Server::API2;
@@ -32,6 +31,7 @@ use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Bedroom;
 use OpenXPKI::Metrics;
 
+use Feature::Compat::Try; # should be done after other imports to safely disable warnings
 
 # define an array of hash refs mapping the task id to the corresponding
 # init code. the order of the array elements is also the default execution

@@ -14,7 +14,7 @@ use Encode;
 use CGI 4.08 qw( -utf8 );
 use HTML::Entities;
 use JSON;
-use Moose::Util::TypeConstraints;
+use Moose::Util::TypeConstraints; # PLEASE NOTE: this enables all warnings via Moose::Exporter
 use Data::UUID;
 use Crypt::JWT qw( encode_jwt );
 use Crypt::PRNG;

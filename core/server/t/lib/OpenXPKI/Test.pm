@@ -152,7 +152,7 @@ use Module::Load qw( autoload );
 use Moose::Exporter;
 use Moose::Util;
 use Moose::Meta::Class;
-use Moose::Util::TypeConstraints;
+use Moose::Util::TypeConstraints; # PLEASE NOTE: this enables all warnings via Moose::Exporter
 use Test::More;
 use Test::Deep::NoTest qw( eq_deeply bag ); # use eq_deeply() without beeing in a test
 use Digest::SHA;

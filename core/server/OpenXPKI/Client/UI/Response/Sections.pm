@@ -2,7 +2,7 @@ package OpenXPKI::Client::UI::Response::Sections;
 use OpenXPKI::Client::UI::Response::DTO;
 
 # CPAN modules
-use Moose::Util::TypeConstraints;
+use Moose::Util::TypeConstraints; # PLEASE NOTE: this enables all warnings via Moose::Exporter
 use Moose::Util qw( does_role );
 
 # Project modules

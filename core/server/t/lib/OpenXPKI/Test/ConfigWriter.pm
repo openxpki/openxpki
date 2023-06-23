@@ -11,7 +11,7 @@ use File::Path qw(make_path);
 use File::Spec;
 
 # CPAN modules
-use Moose::Util::TypeConstraints;
+use Moose::Util::TypeConstraints; # PLEASE NOTE: this enables all warnings via Moose::Exporter
 use YAML::Tiny 1.69;
 use Test::More;
 use Test::Exception;

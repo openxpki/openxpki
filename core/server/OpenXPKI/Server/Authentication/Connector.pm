@@ -9,7 +9,7 @@ use OpenXPKI::Debug;
 use OpenXPKI::Server::Authentication::Handle;
 use OpenXPKI::Server::Context qw( CTX );
 
-use Moose::Util::TypeConstraints;
+use Moose::Util::TypeConstraints; # PLEASE NOTE: this enables all warnings via Moose::Exporter
 
 
 has '+role' => (

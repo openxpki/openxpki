@@ -10,7 +10,7 @@ use IO::Uncompress::Gunzip qw(gunzip $GunzipError);
 
 # CPAN modules
 use Moose::Meta::Class;
-use Moose::Util::TypeConstraints;
+use Moose::Util::TypeConstraints; # PLEASE NOTE: this enables all warnings via Moose::Exporter
 
 # Project modules
 use OpenXPKI::Debug;

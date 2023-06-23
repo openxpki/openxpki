@@ -1,5 +1,5 @@
 package OpenXPKI::Server::API2::Types;
-use Moose::Util::TypeConstraints;
+use Moose::Util::TypeConstraints; # PLEASE NOTE: this enables all warnings via Moose::Exporter
 
 # Core modules
 use Math::BigInt;

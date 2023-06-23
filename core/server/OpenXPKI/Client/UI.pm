@@ -14,8 +14,8 @@ use CGI::Session;
 use URI::Escape;
 use Log::Log4perl::MDC;
 use Crypt::JWT qw( encode_jwt decode_jwt );
+use Moose::Util::TypeConstraints qw( enum ); # PLEASE NOTE: this enables all warnings via Moose::Exporter
 use Feature::Compat::Try;
-use Moose::Util::TypeConstraints qw( enum );
 
 # Project modules
 use OpenXPKI::Template;
