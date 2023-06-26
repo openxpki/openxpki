@@ -96,7 +96,7 @@ sub init_search {
     my $form = $self->main->add_form(
         action => 'certificate!search',
         description => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_DESC',
-        submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
+        submit_label => 'I18N_OPENXPKI_UI_SEARCH_SUBMIT_LABEL',
     );
 
     my $profile = $self->send_command_v2( 'list_used_profiles' );
@@ -178,7 +178,7 @@ sub init_search {
     $self->main->add_form(
         action => 'certificate!find',
         description => 'I18N_OPENXPKI_UI_CERTIFICATE_BY_IDENTIFIER_OR_SERIAL',
-        submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
+        submit_label => 'I18N_OPENXPKI_UI_SEARCH_SUBMIT_LABEL',
     )->add_field(
         name => 'cert_identifier', label => 'I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER',
         type => 'text', is_optional => 1, value => $preset->{cert_identifier},

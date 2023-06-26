@@ -384,7 +384,7 @@ sub init_search {
     $self->main->add_form(
         action => 'workflow!load',
         label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_BY_ID_TITLE',
-        submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
+        submit_label => 'I18N_OPENXPKI_UI_SEARCH_SUBMIT_LABEL',
     )->add_field(
         name => 'wf_id',
         label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL',
@@ -410,7 +410,7 @@ sub init_search {
     my $form = $self->main->add_form(
         action => 'workflow!search',
         label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_DATABASE_TITLE',
-        submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
+        submit_label => 'I18N_OPENXPKI_UI_SEARCH_SUBMIT_LABEL',
     )
     ->add_field(
         name => 'wf_type',

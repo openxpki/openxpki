@@ -4883,7 +4883,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_PLACEHOLDER"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL"
+msgid "I18N_OPENXPKI_UI_SEARCH_SUBMIT_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy

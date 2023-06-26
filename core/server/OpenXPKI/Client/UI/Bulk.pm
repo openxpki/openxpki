@@ -34,7 +34,7 @@ sub init_index {
             action => 'bulk!result',
             label => $bulk->{label},
             description => $bulk->{description},
-            submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
+            submit_label => 'I18N_OPENXPKI_UI_SEARCH_SUBMIT_LABEL',
         )->add_field(
             name => 'wf_creator',
             label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_LABEL',
