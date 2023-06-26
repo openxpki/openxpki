@@ -103,9 +103,10 @@ sub __handle_error {
 
     my $cgi = shift;
     my $error = shift;
+
     # only echo UI error messages to prevent data leakage
     if (!$error || $error !~ /I18N_OPENXPKI_UI/) {
-        $log->info($error || '__handle_error() was called with undef');
+        $log->error($error || '__handle_error() was called with undef');
         $error = i18nGettext('I18N_OPENXPKI_UI_APPLICATION_ERROR');
     } else {
         $error = i18nTokenizer($error);
