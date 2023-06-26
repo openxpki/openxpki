@@ -367,6 +367,8 @@ sub __load_class {
     if ($is_action) {
         @variants = (
             sprintf("OpenXPKI::Client::UI::%s::Action::%s", ucfirst($class), ucfirst($method)),
+            sprintf("OpenXPKI::Client::UI::%s::action_%s", ucfirst($class), $method),
+            sprintf("OpenXPKI::Client::UI::%s::%s", ucfirst($class), ucfirst($method)),
             sprintf("OpenXPKI::Client::UI::%s::Action", ucfirst($class)),
             sprintf("OpenXPKI::Client::UI::%s", ucfirst($class)),
         );
@@ -374,6 +376,8 @@ sub __load_class {
     # init!...
     else {
         @variants = (
+            sprintf("OpenXPKI::Client::UI::%s::Init::%s", ucfirst($class), ucfirst($method)),
+            sprintf("OpenXPKI::Client::UI::%s::init_%s", ucfirst($class), $method),
             sprintf("OpenXPKI::Client::UI::%s::%s", ucfirst($class), ucfirst($method)),
             sprintf("OpenXPKI::Client::UI::%s::Init", ucfirst($class)),
             sprintf("OpenXPKI::Client::UI::%s", ucfirst($class)),
