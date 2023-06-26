@@ -120,7 +120,7 @@ sub init_search {
     if ($args->{preset}) {
         $preset = $args->{preset};
     } elsif (my $queryid = $self->param('query')) {
-        my $result = $self->_client->session()->param('query_cert_'.$queryid);
+        my $result = $self->session_param('query_cert_'.$queryid);
         $preset = $result->{input};
     } else {
         foreach my $key (('subject','san')) {
@@ -151,7 +151,7 @@ sub init_search {
         'keys' => $self->__validity_options(), value => $preset->{validity_options} || [ { key => 'valid_at', value => '' }],
     );
 
-    my $attributes = $self->_client->session()->param('certsearch')->{default}->{attributes};
+    my $attributes = $self->session_param('certsearch')->{default}->{attributes};
     my @meta_description;
     if (defined $attributes && (ref $attributes eq 'ARRAY')) {
         my @attrib;
@@ -226,7 +226,7 @@ sub init_result {
     if ($limit > 500) {  $limit = 500; }
 
     # Load query from session
-    my $result = $self->_client->session()->param('query_cert_'.$queryid);
+    my $result = $self->session_param('query_cert_'.$queryid);
 
     # result expired or broken id
     if (!$result || !$result->{count}) {
@@ -336,7 +336,7 @@ sub init_export {
 
 
     # Load query from session
-    my $result = $self->_client->session()->param('query_cert_'.$queryid);
+    my $result = $self->session_param('query_cert_'.$queryid);
 
     # result expired or broken id
     if (!$result || !$result->{count}) {
@@ -438,7 +438,7 @@ sub init_pager {
     my $queryid = $self->param('id');
 
     # Load query from session
-    my $result = $self->_client->session()->param('query_cert_'.$queryid);
+    my $result = $self->session_param('query_cert_'.$queryid);
 
     # result expired or broken id
     if (!$result || !$result->{count}) {
@@ -532,7 +532,7 @@ sub init_mine {
             'count' => $result_count,
             'query' => $query,
         };
-        $self->_client->session()->param('query_cert_'.$queryid, $_query );
+        $self->session_param('query_cert_'.$queryid, $_query );
         $pager = $self->__render_pager( $_query, { limit => $limit, startat => $startat } )
 
     }
@@ -737,7 +737,7 @@ sub init_detail {
 
     # certificate metadata - show only for certificates from the current or empty realm
     sub {
-        my $metadata_config = $self->_client->session()->param('certdetails')->{metadata};
+        my $metadata_config = $self->session_param('certdetails')->{metadata};
         return unless ($metadata_config);
         return unless (!$cert->{pki_realm} || $cert->{pki_realm} eq $self->_session->param('pki_realm'));
         my $cert_attrs = $self->send_command_v2( get_cert_attributes => {
@@ -1259,8 +1259,8 @@ sub action_find {
             # found more than one item with serial
             # this is a legal use case when using external CAs
             my $queryid = $self->__generate_uid();
-            my $spec = $self->_client->session()->param('certsearch')->{default};
-            $self->_client->session()->param('query_cert_'.$queryid, {
+            my $spec = $self->session_param('certsearch')->{default};
+            $self->session_param('query_cert_'.$queryid, {
                 'id' => $queryid,
                 'type' => 'certificate',
                 'count' => scalar @{$search_result},
@@ -1359,7 +1359,7 @@ sub action_search {
     }
 
     # Read the query pattern for extra attributes from the session
-    my $spec = $self->_client->session()->param('certsearch')->{default};
+    my $spec = $self->session_param('certsearch')->{default};
     my $attr = $self->__build_attribute_subquery( $spec->{attributes} );
 
     if ($attr) {
@@ -1449,7 +1449,7 @@ sub action_search {
     }
 
     my $queryid = $self->__generate_uid();
-    $self->_client->session()->param('query_cert_'.$queryid, {
+    $self->session_param('query_cert_'.$queryid, {
         'id' => $queryid,
         'type' => 'certificate',
         'count' => $result_count,

@@ -59,7 +59,7 @@ sub init_index {
         }
 
         my $id = $self->__generate_uid();
-        $self->_client->session()->param('bulk_'.$id, $bulk );
+        $self->session_param('bulk_'.$id, $bulk );
         $form->add_field(
             name => 'formid',
             type => 'hidden',
@@ -78,7 +78,7 @@ sub action_result {
     my $queryid = $self->param('formid');
 
     # Read query pattern and list info from persisted data
-    my $spec = $self->_client->session()->param('bulk_'.$queryid);
+    my $spec = $self->session_param('bulk_'.$queryid);
     if (!$spec) {
         return $self->redirect->to('bulk!index');
     }

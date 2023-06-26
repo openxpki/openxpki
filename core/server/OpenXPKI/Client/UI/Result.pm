@@ -501,6 +501,28 @@ sub __tenant {
     return ();
 }
 
+=head2 session_param
+
+Read or write a CGI session parameter, a shortcut to L<CGI::Session/param>.
+
+Specify only a C<$key> to read a parameter and an additional value to write it.
+
+B<Parameters>
+
+=over
+
+=item * I<Str> C<$key> - parameter name to read or write
+
+=item * I<Str> C<$value> - optional parameter value to write
+
+=back
+
+=cut
+sub session_param {
+    my $self = shift;
+    return $self->_session->param(@_);
+}
+
 sub __persist_status {
     my $self = shift;
     my $status = shift;

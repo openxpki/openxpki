@@ -277,7 +277,7 @@ sub init_info {
         return $self;
     }
 
-    my $fields = $self->__render_workflow_info( $wf_info, $self->_client->session()->param('wfdetails') );
+    my $fields = $self->__render_workflow_info( $wf_info, $self->session_param('wfdetails') );
 
     push @{$fields}, {
         label => "I18N_OPENXPKI_UI_FIELD_ERROR_CODE",
@@ -868,7 +868,7 @@ sub init_mine {
         description => 'I18N_OPENXPKI_UI_MY_WORKFLOW_DESCRIPTION',
     );
 
-    my $tasklist = $self->_client->session()->param('tasklist')->{mine};
+    my $tasklist = $self->session_param('tasklist')->{mine};
 
     my $default = {
         query => {
@@ -916,7 +916,7 @@ sub init_task {
 
     $self->page->label('I18N_OPENXPKI_UI_WORKFLOW_OUTSTANDING_TASKS_LABEL');
 
-    my $tasklist = $self->_client->session()->param('tasklist')->{default};
+    my $tasklist = $self->session_param('tasklist')->{default};
 
     if (!@$tasklist) {
         return $self->redirect->to('home');

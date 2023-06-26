@@ -36,7 +36,7 @@ sub init_index {
         'pager'  => {},
         'criteria' => []
     };
-    $self->_client->session()->param('query_users_'.$queryid, $result);
+    $self->session_param('query_users_'.$queryid, $result);
     # construct query that fetches the first 25 users
     my $query={};
     $query->{limit} = 25;
@@ -74,7 +74,7 @@ sub init_result {
     if ($limit > 500) {  $limit = 500; }
 
     # Load query from session
-    my $result = $self->_client->session()->param('query_users_'.$queryid);
+    my $result = $self->session_param('query_users_'.$queryid);
 
     # result expired or broken id
     if (!$result || !$result->{count}) {
@@ -135,7 +135,7 @@ sub init_pager {
     my $queryid = $self->param('id');
 
     # Load query from session
-    my $result = $self->_client->session()->param('query_users_'.$queryid);
+    my $result = $self->session_param('query_users_'.$queryid);
 
     # result expired or broken id
     if (!$result || !$result->{count}) {
@@ -244,7 +244,7 @@ sub action_search {
     }
     # store search query in session for paging etc...
     my $queryid = $self->__generate_uid();
-    $self->_client->session()->param('query_users_'.$queryid, {
+    $self->session_param('query_users_'.$queryid, {
         'id' => $queryid,
         'type' => 'users',
         'count' => $result_count,
@@ -378,7 +378,7 @@ sub init_search {
     # check if there are any preset values for the search fields
     my $preset;
     if (my $queryid = $self->param('query')) {
-        my $result = $self->_client->session()->param('query_users_'.$queryid);
+        my $result = $self->session_param('query_users_'.$queryid);
         $preset = $result->{input};
     }
 

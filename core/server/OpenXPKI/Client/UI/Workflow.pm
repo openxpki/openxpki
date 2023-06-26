@@ -641,7 +641,7 @@ sub __render_from_workflow {
     #
     if ($wf_info->{workflow}->{id}) {
 
-        my $wfdetails_config = $self->_client->session()->param('wfdetails');
+        my $wfdetails_config = $self->session_param('wfdetails');
         # undef = no right box
         if (defined $wfdetails_config) {
 
@@ -2054,7 +2054,7 @@ sub __get_templated_description {
     my $page_def = shift;
     my $description;
     if ($page_def->{template}) {
-        my $user = $self->_client->session()->param('user');
+        my $user = $self->session_param('user');
         $description = $self->send_command_v2( 'render_template', {
             template => $page_def->{template}, params => {
                 context => $wf_info->{workflow}->{context},
@@ -2185,7 +2185,7 @@ sub __save_query {
     my $id = (ref $_[0] ne 'HASH') ? shift : $self->__generate_uid;
     my $query = shift;
 
-    $self->_client->session->param("query_wfl_${id}" => {
+    $self->session_param("query_wfl_${id}" => {
         %{ $query },
         'id' => $id,
     });
@@ -2198,7 +2198,7 @@ sub __load_query {
     my $id = shift;
 
     # load query from session
-    my $result = $self->_client->session->param("query_wfl_${id}");
+    my $result = $self->session_param("query_wfl_${id}");
 
     # check expired or broken id
     if (not $result or not $result->{count}) {
