@@ -206,11 +206,13 @@ img.toplogo {
 }
 
 .oxi-breadcrumb.workflow-search::before,
-.oxi-breadcrumb.cert-search::before {
+.oxi-breadcrumb.cert-search::before,
+.oxi-breadcrumb.datapool-search::before {
   content: "\e003";
 }
 
 .oxi-breadcrumb.workflow-search-result::before,
+.oxi-breadcrumb.datapool-search-result::before,
 .oxi-breadcrumb.cert-search-result::before {
   content: "\e056";
 }
