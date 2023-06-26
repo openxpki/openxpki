@@ -33,7 +33,7 @@ use OpenXPKI::Server::Context qw( CTX );
 
 use Memoize;
 
-sub __set_engine_params() {
+sub __set_engine_params {
 
     my $self = shift;
     my $keys = shift;

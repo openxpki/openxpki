@@ -931,7 +931,7 @@ sub handle_login {
 
 }
 
-sub _recreate_frontend_session() {
+sub _recreate_frontend_session {
 
     my $self = shift;
     my $session = shift;

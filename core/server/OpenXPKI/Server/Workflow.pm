@@ -872,7 +872,7 @@ sub _fail {
     }
 }
 
-sub is_running(){
+sub is_running {
     my $self = shift;
     return ( $self->proc_state eq 'running');
 }

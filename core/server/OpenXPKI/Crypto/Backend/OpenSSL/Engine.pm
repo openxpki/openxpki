@@ -57,7 +57,7 @@ sub new {
     return $self;
 }
 
-sub __set_engine_params() {
+sub __set_engine_params {
     # set special engine parameters in child classes
     my $self = shift;
     my $keys = shift;

@@ -343,7 +343,7 @@ string if parsing fails.
 
 =cut
 
-sub parse_uri() {
+sub parse_uri {
 
     my $self = shift;
 
@@ -387,7 +387,7 @@ Returns the config hashref for the current endpoint.
 
 =cut
 
-sub config() {
+sub config {
 
     my $self = shift;
     my $config;
