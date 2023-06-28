@@ -137,22 +137,27 @@ sub _build_prom {
     die('Attempt to store metrics while they are either disabled or not available. Please check via method ready() before use.') unless $self->ready;
 
     my $dir = $self->cache_dir;
+    my $dir_exists = -e $dir;
 
     # metrics collector instance
     require Prometheus::Tiny::Shared;
     my $prom = Prometheus::Tiny::Shared->new(filename => $dir);
 
-    # set directory permissions
-    my ($user, $uid, $group, $gid) = OpenXPKI::Util->resolve_user_group(
-        $self->cache_user,
-        $self->cache_group,
-        'metrics server process'
-    );
-    File::Find::find(
-        sub { chown $uid, $gid, $_ or die "Could not chown '$_': $!" },
-        $dir
-    );
-    CTX('log')->system->info("Ownership of metrics cache dir $dir set to $user:$group");
+    CTX('log')->system->info("Using metrics cache dir $dir");
+
+    # set directory permissions if we created it
+    unless ($dir_exists) {
+        my ($user, $uid, $group, $gid) = OpenXPKI::Util->resolve_user_group(
+            $self->cache_user,
+            $self->cache_group,
+            'metrics server process'
+        );
+        File::Find::find(
+            sub { chown $uid, $gid, $_ or die "Could not chown '$_': $!" },
+            $dir
+        );
+        CTX('log')->system->info("Ownership of metrics cache dir $dir set to $user:$group");
+    }
 
     return $prom;
 }
