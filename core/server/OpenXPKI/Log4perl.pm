@@ -115,10 +115,11 @@ sub init_or_fallback {
 sub _add_patternlayout_spec {
     Log::Log4perl::Layout::PatternLayout::add_global_cspec('i', sub {
         my $layout = shift;
-        my @order = qw( user role sid rid wftype wfid scepid pki_realm );
+        my @order = qw( pid user role sid rid wftype wfid scepid pki_realm );
         my @hide = qw( command_id );
         my $mdc = Log::Log4perl::MDC->get_context;
-        my %keys = (
+        $mdc->{pid} = $$ if $layout->{curlies} eq 'with_pid';
+        my %filtered = (
             map { $_ => $_ }
             grep { my $k = $_; none { $k eq $_ } @hide }
             grep { defined $mdc->{$_} }
@@ -127,10 +128,10 @@ sub _add_patternlayout_spec {
         my @keys_ordered = ();
         # Add keys in our desired order if they exist
         for my $k (@order) {
-            push @keys_ordered, delete($keys{$k}) if $keys{$k};
+            push @keys_ordered, delete($filtered{$k}) if $filtered{$k};
         }
         # Add remaining existing keys (those we did not list in @order)
-        push @keys_ordered, keys(%keys);
+        push @keys_ordered, keys(%filtered);
         # present the result
         return join("|", map { $_.'='.$mdc->{$_} } @keys_ordered);
     });
