@@ -2,17 +2,18 @@ package OpenXPKI::Server;
 
 use strict;
 use warnings;
-
-use base qw( Net::Server::MultiType );
-use Net::Server::Daemonize qw( set_uid set_gid );
-
-## used modules
-
 use English;
+use base qw( Net::Server::MultiType );
+
+# Core modules
 use Socket;
 use Scalar::Util qw( blessed );
-use Feature::Compat::Try;
 
+# CPAN modules
+use Net::Server::Daemonize qw( set_uid set_gid );
+use Log::Log4perl qw(:levels);
+
+# Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
@@ -20,6 +21,9 @@ use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Watchdog;
 use OpenXPKI::Server::Notification::Handler;
 use OpenXPKI::Util;
+
+use Feature::Compat::Try; # should be done after other imports to safely disable warnings
+
 
 our $stop_soon = 0;
 our $main_pid;
@@ -162,6 +166,17 @@ sub DESTROY {
     }
 
     return 1;
+}
+
+# Net::Server method
+sub write_to_log_hook {
+    my $self = shift;
+    my $syslog_level = shift; # Net::Server/log_level: 0=>'err', 1=>'warning', 2=>'notice', 3=>'info', 4=>'debug'.
+    my $msg = shift;
+
+    my %syslog_to_l4p = ( 0 => $ERROR, 1 => $WARN, 2 => $INFO, 3 => $DEBUG, 4 => $TRACE );
+
+    CTX('log')->system->log($syslog_to_l4p{$syslog_level}, $msg);
 }
 
 # from Net::Server:
