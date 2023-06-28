@@ -7,72 +7,6 @@ OpenXPKI::Server::Bedroom - Helper module to... err... make child processes
 
 =head1 DESCRIPTION
 
-=head2 Note on SIGCHLD
-
-The requirements for a proper C<SIGCHLD> handling are:
-
-=over
-
-=item * avoid zombie processes of our forked children by calling C<waitpid()>
-on them,
-
-=item * allow follow up code to evaluate the status of e.g. C<sytem()> calls
-or doing own C<waitpid()> on children not forked by C<OpenXPKI::Server::Bedroom>,
-
-=item * avoid interfering with L<Net::Server>'s C<SIGCHLD> handler,
-
-=item * keep the C<OpenXPKI::Server::Bedroom> instance that contains the C<SIGCHLD>
-handler alive as long as there are child processes. Destroying the instance
-too early could lead to errors: without resetting C<SIGCHLD> handler to
-C<'IGNORE'> a finished child process would raise the error
-I<"Signal SIGCHLD received, but no signal handler set">. When set to C<'IGNORE'>
-e.g. a following C<system()> call from code higher up the hierarchy would fail.
-
-=back
-
-The most compatible way to handle C<SIGCHLD> is to set it to C<'DEFAULT'>,
-letting Perl handle it. This way commands like C<system()> will work properly.
-
-But for the C<OpenXPKI::Server::Bedroom> parent process to be able to reap its child
-processes we need a custom C<SIGCHLD> handler to call C<waitpid()> on them.
-So in our custom handler we keep track of the PIDs of our own forked children
-and only reap those. Other children (e.g. forked via C<system()>) are left
-untouched.
-
-Thus there are two usage modes:
-
-=over
-
-=item 1. Default (C<keep_parent_sigchld =E<gt> 0>):
-
-Parent: install custom C<SIGCHLD> handler (NOT compatible with C<Net::Server>
-parent process, reaps children forked by us, C<system()> compatible)
-
-Child: inherit parent's custom handler
-
-=item 2. C<keep_parent_sigchld =E<gt> 1> (for use in C<Net::Server> parent
-process):
-
-Parent: do not touch C<SIGCHLD> handler (to keep C<Net::Server>'s handler,
-reaps children forked by us via existing handler, NOT C<system()> compatible)
-
-Child: set C<$SIG{'CHLD'} = 'DEFAULT'>.
-
-=back
-
-If this object is destroyed while the C<$SIG{'CHLD'}> still refers to our
-handler then children exiting later on will raise the internal Perl error
-I<"Signal SIGCHLD received, but no signal handler set.">
-
-That is why in L</DEMOLISH> we explicitely hand over child reaping to the
-operating system. But this also means after this the process will not be
-able to call C<system()> and the like anymore. So a better solution is to
-keep this object alive as long as possible, ideally until C<OpenXPKI::Server>
-shuts down.
-
-Also see L<https://github.com/Perl/perl5/issues/17662>, might be related.
-
-Also see L<https://perldoc.perl.org/perlipc#Signals>.
 
 =cut
 
@@ -166,12 +100,87 @@ B<Parameters>
 
 =item * C<gid> I<Int> - optional: group ID to set for the newly forked child process. Default: do not change ID.
 
-=item * C<keep_parent_sigchld> I<Bool> - optional: C<1> = parent: keep currently installed C<SIGCHLD> handler,
-child: set C<SIGCHLD> to C<default>. Default: 0
+=item * C<keep_parent_sigchld> I<Bool> - optional:
+
+=over
+
+=item * C<0> (default) - parent: install our custom C<SIGCHLD> handler (see L</Note on SIGCHLD>); child: also use custom handler.
+
+=item * C<1> - parent: keep currently installed C<SIGCHLD> handler; child: set default C<SIGCHLD> handler to make C<system()> etc. work.
+
+=back
 
 =item * C<capture_stdout> I<Bool> - optional: C<1> = redirect child process I<STDOUT> to a filehandle that can be queried using L</get_stdout_fh>. Default: 0
 
 =back
+
+=head2 Note on SIGCHLD
+
+The requirements for a proper C<SIGCHLD> handling are:
+
+=over
+
+=item * avoid zombie processes of our forked children by calling C<waitpid()>
+on them,
+
+=item * allow follow up code to evaluate the status of e.g. C<sytem()> calls
+or doing own C<waitpid()> on children that were not forked by us,
+
+=item * avoid interfering with L<Net::Server>'s C<SIGCHLD> handler,
+
+=item * keep the C<OpenXPKI::Server::Bedroom> instance that contains the
+C<SIGCHLD> handler alive as long as there are child processes. Destroying the
+instance too early could lead to errors: without resetting C<SIGCHLD> handler
+to C<'IGNORE'> a finished child process would raise the error
+I<"Signal SIGCHLD received, but no signal handler set">. When set to
+C<'IGNORE'> too early a following call to e.g. C<system()> from code higher up
+the hierarchy would fail.
+
+=back
+
+The most compatible way to handle C<SIGCHLD> is to set it to C<'DEFAULT'>,
+letting Perl handle it. This way commands like C<system()> will work properly.
+
+But for the C<OpenXPKI::Server::Bedroom> parent process to be able to reap its child
+processes we need a custom C<SIGCHLD> handler to call C<waitpid()> on them.
+So in our custom handler we keep track of the PIDs of our own forked children
+and only reap those. Other children (e.g. forked via C<system()>) are left
+untouched.
+
+Thus there are two usage modes for C<new_child>:
+
+=over
+
+=item 1. Default (C<keep_parent_sigchld =E<gt> 0>):
+
+Parent: install custom C<SIGCHLD> handler (NOT compatible with C<Net::Server>
+parent process, reaps children forked by us, C<system()> compatible)
+
+Child: inherit parent's custom handler
+
+=item 2. C<keep_parent_sigchld =E<gt> 1> (for use in C<Net::Server> parent
+process):
+
+Parent: do not touch C<SIGCHLD> handler (to keep C<Net::Server>'s handler,
+reaps children forked by us via existing handler, NOT C<system()> compatible)
+
+Child: set C<$SIG{'CHLD'} = 'DEFAULT'>.
+
+=back
+
+If this object is destroyed while the C<$SIG{'CHLD'}> still refers to our
+handler then children exiting later on will raise the internal Perl error
+I<"Signal SIGCHLD received, but no signal handler set.">
+
+That is why in L</DEMOLISH> we explicitely hand over child reaping to the
+operating system. But this also means after this the process will not be
+able to call C<system()> and the like anymore. So a better solution is to
+keep this object alive as long as possible, ideally until C<OpenXPKI::Server>
+shuts down.
+
+Also see L<https://github.com/Perl/perl5/issues/17662>, might be related.
+
+Also see L<https://perldoc.perl.org/perlipc#Signals>.
 
 =cut
 signature_for new_child => (
@@ -190,7 +199,7 @@ sub new_child ($self, $arg) {
     ##! 1: 'start - $SIG{"CHLD"}: ' . ($SIG{'CHLD'}//'<undef>')
 
     # Reap child processes while allowing e.g. system() to work properly.
-    $SIG{'CHLD'} = \&_catch_them_all if not $arg->keep_parent_sigchld;
+    $SIG{'CHLD'} = \&_catch_them_all unless $arg->keep_parent_sigchld;
 
     ##! 1: 'start - $SIG{"CHLD"}: ' . ($SIG{'CHLD'}//'<undef>')
 

@@ -270,12 +270,13 @@ sub pre_loop_hook {
         }
     }
 
-    # For Net::Server::Fork (and PreFork) we don't overwrite the SIGCHLD handler
+    # For Net::Server::Fork and ::PreFork we don't overwrite the SIGCHLD handler
     # to not interfere with their child tracking.
-    # The child processes of Fork and PreFork will set SIGCHLD set to 'DEFAULT'
+    # The *child* processes of Fork and PreFork will set SIGCHLD set to 'DEFAULT'
     # so that calls to system() etc. work.
-    # For Net::Server::Single we do use our special SIGCHLD handler to make
-    # subsequent calls to system() work (which happen in the same process).
+    # For Net::Server::Single we do use our special SIGCHLD handler by setting
+    # keep_parent_sigchld => 0 to make subsequent calls to system() work (as
+    # they happen in the same process in this case).
     my $is_forking = $self->{TYPE} eq 'Fork' || $self->{TYPE} eq 'PreFork';
 
     # Start watchdog late in Net::Server startup phase so that Net::Server's
