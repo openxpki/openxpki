@@ -6,6 +6,7 @@ use warnings;
 # Core modules
 use English;
 use Errno;
+use File::Spec;
 
 # CPAN modules
 use Log::Log4perl;
@@ -376,16 +377,22 @@ sub __do_init_terminal {
 }
 
 sub __do_init_metrics {
-    my $enabled = CTX('config')->get('system.metrics.enabled') ? 1 : 0;
-    my $cache_dir = CTX('config')->get('system.metrics.cache_dir') // '/var/tmp/openxpki.metrics';
-    my $cache_user = CTX('config')->get('system.server.user');
-    my $cache_group = CTX('config')->get('system.server.group');
+    my $enabled = CTX('config')->get('system.server.metrics.enabled') ? 1 : 0;
+
+    my $cache_conf = CTX('config')->get_hash('system.server.metrics.cache') // {};
+    my $cache_dir = $cache_conf->{dir}
+        // File::Spec->catdir(
+            CTX('config')->get('system.server.tmpdir') // '/var/tmp',
+            'openxpki.metrics'
+        );
+    my $cache_user  = $cache_conf->{user}  // CTX('config')->get('system.server.user');
+    my $cache_group = $cache_conf->{group} // CTX('config')->get('system.server.group');
 
     my $metrics = OpenXPKI::Metrics->new(
         enabled => $enabled,
         cache_dir => $cache_dir,
-        $cache_user ? (cache_user => $cache_user) : (),
-        $cache_group ? (cache_group => $cache_group) : (),
+        cache_user => $cache_user,
+        cache_group => $cache_group,
     );
 
     OpenXPKI::Server::Context::setcontext({

@@ -41,20 +41,22 @@ has cache_dir => (
     required => 1,
 );
 
-=item * B<cache_user> I<Str> - user to be set as owner of the cache directory (optional)
+=item * B<cache_user> I<Str> - user to be set as owner of the cache directory
 
 =cut
 has cache_user => (
     is => 'ro',
     isa => 'Str',
+    required => 1,
 );
 
-=item * B<cache_group> I<Str> - group to be set as owner of the cache directory (optional)
+=item * B<cache_group> I<Str> - group to be set as owner of the cache directory
 
 =cut
 has cache_group => (
     is => 'ro',
     isa => 'Str',
+    required => 1,
 );
 
 =back
@@ -135,25 +137,22 @@ sub _build_prom {
     die('Attempt to store metrics while they are either disabled or not available. Please check via method ready() before use.') unless $self->ready;
 
     my $dir = $self->cache_dir;
-    my $user = $self->cache_user;
-    my $group = $self->cache_group;
 
     # metrics collector instance
     require Prometheus::Tiny::Shared;
     my $prom = Prometheus::Tiny::Shared->new(filename => $dir);
 
     # set directory permissions
-    if ($user and $group) {
-        my ($user, $uid, $group, $gid) =
-          OpenXPKI::Util->resolve_user_group($user, $group, 'metrics server process');
-
-        File::Find::find(
-            sub { chown $uid, $gid, $_ or die "Could not chown '$_': $!" },
-            $dir
-        );
-        CTX('log')->system->info("Ownership of metrics cache dir $dir set to $user:$group");
-
-    }
+    my ($user, $uid, $group, $gid) = OpenXPKI::Util->resolve_user_group(
+        $self->cache_user,
+        $self->cache_group,
+        'metrics server process'
+    );
+    File::Find::find(
+        sub { chown $uid, $gid, $_ or die "Could not chown '$_': $!" },
+        $dir
+    );
+    CTX('log')->system->info("Ownership of metrics cache dir $dir set to $user:$group");
 
     return $prom;
 }

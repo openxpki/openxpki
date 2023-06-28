@@ -285,12 +285,14 @@ sub pre_loop_hook {
 
     # Start metrics server
     try {
-        my $enabled = CTX('config')->get('system.metrics.enabled') ? 1 : 0;
-
-        if ($enabled) {
+        if (CTX('config')->get('system.server.metrics.enabled')) {
+            my $agent = CTX('config')->get_hash('system.server.metrics.agent') // {};
             require OpenXPKI::Metrics::Prometheus; # this is EE code
             OpenXPKI::Metrics::Prometheus->start(
-                config => CTX('config')->get_hash('system.metrics') // {},
+                user  => $agent->{user}  // CTX('config')->get('system.server.user'),
+                group => $agent->{group} // CTX('config')->get('system.server.group'),
+                host  => $agent->{host}  // '*',
+                port  => $agent->{port}  // 7070,
                 keep_parent_sigchld => $is_forking,
             );
         }
