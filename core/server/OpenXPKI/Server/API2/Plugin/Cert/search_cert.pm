@@ -1,6 +1,8 @@
 package OpenXPKI::Server::API2::Plugin::Cert::search_cert;
 use OpenXPKI::Server::API2::EasyPlugin;
 
+with 'OpenXPKI::Server::API2::TenantRole';
+
 =head1 NAME
 
 OpenXPKI::Server::API2::Plugin::Cert::search_cert
@@ -18,7 +20,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Database::Legacy;
 use OpenXPKI::Server::API2::Plugin::Cert::DateCondition;
-with 'OpenXPKI::Server::API2::TenantRole';
+use OpenXPKI::Util;
 
 has 'return_columns_default' => (
     isa => 'ArrayRef',
@@ -366,10 +368,7 @@ sub _make_db_query {
     for my $key (qw( subject issuer_dn )) {
         my $predicate = "has_$key";
         next unless $po->$predicate;
-        my $tmp = $po->$key;
-        $tmp =~ s/\*/%/g;
-        $tmp =~ s/%%+/%/g;
-        $po->$key($tmp);
+        $po->$key(OpenXPKI::Util->asterisk_to_sql_wildcard($po->$key));
     }
     $where->{'certificate.subject'}                   = { -like => $po->subject }       if $po->has_subject;
     $where->{'certificate.issuer_dn'}                 = { -like => $po->issuer_dn }     if $po->has_issuer_dn;
@@ -468,8 +467,7 @@ sub _make_db_query {
             $attrib->{OPERATOR} //= 'LIKE';
             # sanitize wildcards (don't overdo it...)
             if ($attrib->{OPERATOR} eq 'LIKE' && !(ref $attrib->{VALUE})) {
-                $attrib->{VALUE} =~ s/\*/%/g;
-                $attrib->{VALUE} =~ s/%%+/%/g;
+                $attrib->{VALUE} = OpenXPKI::Util->asterisk_to_sql_wildcard($attrib->{VALUE});
             }
             # TODO #legacydb search_cert's CERT_ATTRIBUTES allows old DB layer syntax
             $where->{ "$table_alias.attribute_value" } =

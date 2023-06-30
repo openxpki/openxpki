@@ -1,6 +1,8 @@
 package OpenXPKI::Server::API2::Plugin::Workflow::search_workflow_instances;
 use OpenXPKI::Server::API2::EasyPlugin;
 
+with 'OpenXPKI::Server::API2::TenantRole';
+
 =head1 NAME
 
 OpenXPKI::Server::API2::Plugin::Workflow::search_workflow_instances
@@ -15,7 +17,7 @@ use OpenXPKI::Debug;
 use OpenXPKI::DateTime;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
-with 'OpenXPKI::Server::API2::TenantRole';
+use OpenXPKI::Util;
 
 subtype 'StateName',
     as 'Str',
@@ -347,8 +349,7 @@ sub _make_query_params {
             $cond->{OPERATOR} //= 'EQUAL';
             # sanitize wildcards (don't overdo it...)
             if ($cond->{OPERATOR} eq 'LIKE') {
-                $cond->{VALUE} =~ s/\*/%/g;
-                $cond->{VALUE} =~ s/%%+/%/g;
+                $cond->{VALUE} = OpenXPKI::Util->asterisk_to_sql_wildcard($cond->{VALUE});
             }
             # TODO #legacydb search_workflow_instances' ATTRIBUTE allows old DB layer syntax
             $where->{ "$table_alias.attribute_value" } =

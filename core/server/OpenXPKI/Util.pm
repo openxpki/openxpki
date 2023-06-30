@@ -67,4 +67,31 @@ sub resolve_user_group {
     return ($u, $uid, $g, $gid);
 };
 
+=head2 asterisk_to_sql_wildcard
+
+Convert user query string into SQL pattern, i.e. convert (multiple) asterisks
+C<*> into percent sign C<%>.
+
+    my $sql_str = OpenXPKI::Util->asterisk_to_sql_wildcard("**test*");
+    # "%test%"
+
+B<Parameters>
+
+=over
+
+=item * B<$query> I<Str> - user query string that may include asterisks
+
+=back
+
+=cut
+sub asterisk_to_sql_wildcard {
+    my $class = shift if ($_[0] // '') eq __PACKAGE__; # support call via -> and ::
+    my $query = shift;
+
+    $query =~ s/\*/%/g;
+    $query =~ s/%%+/%/g;
+
+    return $query;
+}
+
 1;
