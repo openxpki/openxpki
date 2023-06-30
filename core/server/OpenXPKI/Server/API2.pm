@@ -265,13 +265,8 @@ sub _load_plugins {
 
     for my $pkg (keys %{ $pkg_map }) {
         my $file = $pkg_map->{$pkg};
-        try {
-            load $pkg;
-        }
-        catch ($err) {
-            $self->log->warn("Error loading API plugin $pkg (".$pkg_map->{$pkg}."): $err");
-            next; # continue on errors
-        }
+
+        Module::Load::load $pkg;
 
         if (not $pkg->DOES($self->command_role)) {
             $self->log->debug("API - ignore $pkg (does not consume ".$self->command_role.") - $file");
