@@ -12,7 +12,7 @@ OpenXPKI::Server::API2::Plugin::Datapool::list_data_pool_entries
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
-
+use OpenXPKI::Util;
 
 
 =head1 COMMANDS
@@ -40,6 +40,10 @@ of the currently active session is accepted.
 
 =item * C<namespace> I<Str> - datapool namespace (custom string to organize entries)
 
+=item * C<key_name> I<Str> - search pattern for datapool keys. Optional.
+
+Supports asterisk C<*> as wildcard to do a substring search.
+
 =item * C<limit> I<Int> - max. number of entries returned. Optional.
 
 =item * C<metadata> I<Bool> - add mtime and expiration date to the result (epoch)
@@ -48,10 +52,11 @@ of the currently active session is accepted.
 
 =cut
 command "list_data_pool_entries" => {
-    namespace => { isa => 'AlphaPunct', },
     pki_realm => { isa => 'AlphaPunct', default => sub { CTX('session')->data->pki_realm } },
-    limit     => { isa => 'Int', },
-    metadata  => { isa => 'Bool', },
+    namespace => { isa => 'AlphaPunct' },
+    key_name  => { isa => 'Str' },
+    limit     => { isa => 'Int' },
+    metadata  => { isa => 'Bool', default => 0 },
 } => sub {
     my ($self, $params) = @_;
 
@@ -62,12 +67,16 @@ command "list_data_pool_entries" => {
     # chain we assume it's ok.
     $self->assert_current_pki_realm_within_workflow($requested_pki_realm);
 
+    # convert asterisk wildcard to SQL percent
+    $params->key_name(OpenXPKI::Util->asterisk_to_sql_wildcard($params->key_name)) if $params->has_key_name;
+
     my @colums = (
         'namespace',
         'datapool_key',
         $params->metadata ? (
             'last_update',
             'notafter',
+            'CASE WHEN encryption_key IS NULL THEN 0 ELSE 1 END AS encrypted',
         ) : (),
     );
 
@@ -77,6 +86,7 @@ command "list_data_pool_entries" => {
         where => {
             pki_realm => $requested_pki_realm,
             $params->has_namespace ? (namespace => $params->namespace) : (),
+            $params->has_key_name ? (datapool_key => { -like => $params->key_name }) : (),
             notafter => [ { '>' => time }, undef ],
         },
         order_by => [ 'datapool_key', 'namespace' ],
