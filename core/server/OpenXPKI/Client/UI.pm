@@ -398,7 +398,8 @@ sub __load_class ($self, $arg) {
             $self->log->debug("Handler class '$pkg' loaded");
         }
         catch ($err) {
-            next;
+            next if $err =~ /^Can't locate/;
+            die $err;
         }
 
         die "Package $pkg must inherit from OpenXPKI::Client::UI::Result"
