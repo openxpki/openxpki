@@ -62,13 +62,16 @@ command "list_data_pool_entries" => {
     # chain we assume it's ok.
     $self->assert_current_pki_realm_within_workflow($requested_pki_realm);
 
+    my @colums = (
+        'namespace',
+        'datapool_key',
+        $params->metadata ? (
+            'last_update',
+            'notafter',
+        ) : (),
+    );
 
-    my @colums = qw( namespace datapool_key );
-    if ($params->has_metadata && $params->metadata) {
-        push @colums, "last_update", "notafter";
-    }
-
-    my $result = CTX('dbi')->select_hashes(
+    my $data = CTX('dbi')->select_hashes(
         from   => 'datapool',
         columns => \@colums,
         where => {
@@ -80,21 +83,21 @@ command "list_data_pool_entries" => {
         $params->has_limit ? ( limit => $params->limit ) : (),
     );
 
-    my @res;
-    if ($params->has_metadata && $params->metadata) {
-        @res = map { {
-            namespace => $_->{namespace},
-            key       => $_->{datapool_key},
-            mtime     => $_->{last_update},
-            expiration_date => $_->{notafter} // '',
-        } } @$result
-    } else {
-        @res = map { {
-            namespace => $_->{namespace},
-            key       => $_->{datapool_key},
-        } } @$result
-    }
-    return \@res;
+    # translate SQL columns to returned hash keys
+    my %translate = (
+        datapool_key => 'key',
+        last_update => 'mtime',
+        notafter => 'expiration_date',
+    );
+
+    my @result = map {
+        my $tuple = $_;
+        +{
+            map { ($translate{$_} // $_) => $tuple->{$_} } keys $tuple->%*
+        }
+    } $data->@*;
+
+    return \@result;
 
 };
 
