@@ -62,7 +62,9 @@ OpenXPKI/Client/UI/Handle/Status.pm
 OpenXPKI/Client/UI/Home.pm
 OpenXPKI/Client/UI/Information.pm
 OpenXPKI/Client/UI/Login.pm
+OpenXPKI/Client/UI/PagerRole.pm
 OpenXPKI/Client/UI/Profile.pm
+OpenXPKI/Client/UI/QueryRole.pm
 OpenXPKI/Client/UI/Request.pm
 OpenXPKI/Client/UI/Response.pm
 OpenXPKI/Client/UI/Response/DTO.pm

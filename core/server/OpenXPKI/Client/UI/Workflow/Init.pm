@@ -2,6 +2,10 @@ package OpenXPKI::Client::UI::Workflow::Init;
 use Moose;
 
 extends 'OpenXPKI::Client::UI::Workflow';
+with qw(
+    OpenXPKI::Client::UI::QueryRole
+    OpenXPKI::Client::UI::PagerRole
+);
 
 # Core modules
 use Data::Dumper;
@@ -10,6 +14,7 @@ use Encode;
 # Project modules
 use OpenXPKI::DateTime;
 use OpenXPKI::i18n qw( i18nTokenizer i18nGettext );
+use OpenXPKI::Util;
 
 =head1 UI Methods
 
@@ -504,7 +509,7 @@ sub __wf_search_presets {
     my $preset;
 
     if (my $queryid = $self->param('query')) {
-        my $result = $self->__load_query($queryid);
+        my $result = $self->__load_query(workflow => $queryid);
         $preset = $result->{input} if $result;
 
     } else {
@@ -545,10 +550,10 @@ sub init_result {
     if ($limit > 500) {  $limit = 500; }
 
     # Load query from session
-    my $result = $self->__load_query($queryid) or return $self->init_search();
+    my $cache = $self->__load_query(workflow => $queryid) or return $self->init_search();
 
     # Add limits
-    my $query = $result->{query};
+    my $query = $cache->{query};
 
     if ($limit) {
         $query->{limit} = $limit;
@@ -565,17 +570,17 @@ sub init_result {
         }
     }
 
-    $self->log->trace( "persisted query: " . Dumper $result) if $self->log->is_trace;
+    $self->log->trace( "persisted query: " . Dumper $cache) if $self->log->is_trace;
 
     my $search_result = $self->send_command_v2( 'search_workflow_instances', $query );
 
     $self->log->trace( "search result: " . Dumper $search_result) if $self->log->is_trace;
 
     # Add page header from result - optional
-    if ($result->{page} && ref $result->{page} eq 'HASH') {
-        $self->set_page(%{ $result->{page} });
+    if ($cache->{page} && ref $cache->{page} eq 'HASH') {
+        $self->set_page(%{ $cache->{page} });
     } else {
-        my $criteria = $result->{criteria} ? '<br>' . (join ", ", @{$result->{criteria}}) : '';
+        my $criteria = $cache->{criteria} ? '<br>' . (join ", ", @{$cache->{criteria}}) : '';
         $self->set_page(
             label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_LABEL',
             description => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION' . $criteria ,
@@ -586,24 +591,30 @@ sub init_result {
         );
     }
 
-    my $pager_args = $result->{pager} || {};
+    my $pager = $self->__build_pager(
+        pagename => $cache->{pagename},
+        id => $queryid,
+        query => $query,
+        count => $cache->{count},
+        %{$cache->{pager_args} // {}},
+        limit => $query->{limit},
+        startat => $query->{start},
+    );
 
-    my $pager = $self->__render_pager( $result, { %$pager_args, limit => $query->{limit}, startat => $query->{start} } );
-
-    my $body = $result->{column};
+    my $body = $cache->{column};
     $body = $self->__default_grid_row() if(!$body);
 
     my @lines = $self->__render_result_list( $search_result, $body );
 
     $self->log->trace( "dumper result: " . Dumper \@lines) if $self->log->is_trace;
 
-    my $header = $result->{header};
+    my $header = $cache->{header};
     $header = $self->__default_grid_head() if(!$header);
 
     # buttons - from result (used in bulk) or default
     my @buttons;
-    if ($result->{button} && ref $result->{button} eq 'ARRAY') {
-        @buttons = @{$result->{button}};
+    if ($cache->{button} && ref $cache->{button} eq 'ARRAY') {
+        @buttons = @{$cache->{button}};
     } else {
 
         push @buttons, { label => 'I18N_OPENXPKI_UI_SEARCH_REFRESH',
@@ -614,7 +625,7 @@ sub init_result {
             label => 'I18N_OPENXPKI_UI_SEARCH_RELOAD_FORM',
             page => 'workflow!search!query!' .$queryid,
             format => 'alternative',
-        } if ($result->{input});
+        } if $cache->{input};
 
         push @buttons,{ label => 'I18N_OPENXPKI_UI_SEARCH_NEW_SEARCH',
             page => 'workflow!search',
@@ -669,10 +680,10 @@ sub init_export {
     if ($limit > 500) {  $limit = 500; }
 
     # Load query from session
-    my $result = $self->__load_query($queryid) or return $self->init_search();
+    my $cache = $self->__load_query(workflow => $queryid) or return $self->init_search();
 
     # Add limits
-    my $query = $result->{query};
+    my $query = $cache->{query};
     $query->{limit} = $limit;
     $query->{start} = $startat;
 
@@ -683,13 +694,13 @@ sub init_export {
         }
     }
 
-    $self->log->trace( "persisted query: " . Dumper $result) if $self->log->is_trace;
+    $self->log->trace( "persisted query: " . Dumper $cache) if $self->log->is_trace;
 
     my $search_result = $self->send_command_v2( 'search_workflow_instances', $query );
 
-    $self->log->trace( "search result: " . Dumper $search_result) if $self->log->is_trace;
+    $self->log->trace( "search cache: " . Dumper $search_result) if $self->log->is_trace;
 
-    my $header = $result->{header};
+    my $header = $cache->{header};
     $header = $self->__default_grid_head() if(!$header);
 
     my @head;
@@ -707,7 +718,7 @@ sub init_export {
 
     my $buffer = join("\t", @head)."\n";
 
-    my $body = $result->{column};
+    my $body = $cache->{column};
     $body = $self->__default_grid_row() if(!$body);
 
     my @lines = $self->__render_result_list( $search_result, $body );
@@ -748,7 +759,7 @@ sub init_pager {
     my $queryid = $self->param('id');
 
     # Load query from session
-    my $result = $self->__load_query($queryid) or return $self->init_search();
+    my $cache = $self->__load_query(workflow => $queryid) or return $self->init_search();
 
     my $startat = $self->param('startat');
 
@@ -760,7 +771,7 @@ sub init_pager {
     $startat = int($startat / $limit) * $limit;
 
     # Add limits
-    my $query = $result->{query};
+    my $query = $cache->{query};
     $query->{limit} = $limit;
     $query->{start} = $startat;
 
@@ -772,16 +783,16 @@ sub init_pager {
         $query->{reverse} = $self->param('reverse');
     }
 
-    $self->log->trace( "persisted query: " . Dumper $result) if $self->log->is_trace;
+    $self->log->trace( "persisted query: " . Dumper $cache) if $self->log->is_trace;
     $self->log->trace( "executed query: " . Dumper $query) if $self->log->is_trace;
 
-    my $search_result = $self->send_command_v2( 'search_workflow_instances', $query );
+    my $search_result = $self->send_command_v2(search_workflow_instances => $query);
 
     $self->log->trace( "search result: " . Dumper $search_result) if $self->log->is_trace;
 
 
-    my $body = $result->{column};
-    $body = $self->__default_grid_row() if(!$body);
+    my $body = $cache->{column};
+    $body = $self->__default_grid_row() unless $body;
 
     my @result = $self->__render_result_list( $search_result, $body );
 
@@ -1002,11 +1013,6 @@ sub __render_task_list {
         }
     }
 
-    my $pager_args = { limit => $limit };
-    if ($item->{pager}) {
-        $pager_args = $item->{pager};
-    }
-
     my @cols;
     if ($item->{cols}) {
         @cols = @{$item->{cols}};
@@ -1052,18 +1058,29 @@ sub __render_task_list {
             my %count_query = %{$query};
             delete $count_query{order};
             delete $count_query{reverse};
+
             my $result_count= $self->send_command_v2( 'search_workflow_instances_count', \%count_query  );
-            my $queryid = $self->__generate_uid();
-            my $_query = {
-                'id' => $queryid,
-                'type' => 'workflow',
-                'count' => $result_count,
-                'query' => $query,
-                'column' => $column,
-                'pager' => $pager_args,
+
+            my $pager_args = OpenXPKI::Util::filter_hash($item->{pager}, qw(limit pagesizes pagersize));
+
+            my $cache = {
+                pagename => 'workflow',
+                query => $query,
+                count => $result_count,
+                column => $column,
+                pager_args => $pager_args,
             };
-            $self->__save_query($queryid => $_query);
-            $pager = $self->__render_pager( $_query, $pager_args );
+
+            my $queryid = $self->__save_query($cache);
+
+            $pager = $self->__build_pager(
+                pagename => 'workflow',
+                id => $queryid,
+                query => $query,
+                count => $result_count,
+                limit => $limit,
+                %$pager_args,
+            );
         }
 
     }

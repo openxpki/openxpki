@@ -2,12 +2,16 @@ package OpenXPKI::Client::UI::Workflow::Action;
 use Moose;
 
 extends 'OpenXPKI::Client::UI::Workflow';
+with 'OpenXPKI::Client::UI::QueryRole';
 
 # Core modules
 use Data::Dumper;
 
 # CPAN modules
 use Log::Log4perl::MDC;
+
+# Project modules
+use OpenXPKI::Util;
 
 =head1 UI Methods
 
@@ -463,17 +467,17 @@ sub action_search {
     }
 
     my $queryid = $self->__save_query({
-        'type' => 'workflow',
-        'count' => $result_count,
-        'query' => $query,
-        'input' => $input,
-        'header' => $header,
-        'column' => $body,
-        'pager'  => $spec->{pager} || {},
-        'criteria' => \@criteria,
+        pagename => 'workflow',
+        count => $result_count,
+        query => $query,
+        input => $input,
+        header => $header,
+        column => $body,
+        pager_args => OpenXPKI::Util::filter_hash($spec->{pager}, qw(limit pagesizes pagersize)),
+        criteria => \@criteria,
     });
 
-    $self->redirect->to('workflow!result!id!'.$queryid);
+    $self->redirect->to("workflow!result!id!${queryid}");
 
     return $self;
 
@@ -628,9 +632,9 @@ sub action_bulk {
 
     # persist the selected ids and add button to recheck the status
     my $queryid = $self->__save_query({
-        'type' => 'workflow',
-        'count' => scalar @serials,
-        'query' => { id => \@serials },
+        pagename => 'workflow',
+        count => scalar @serials,
+        query => { id => \@serials },
     });
 
     $self->main->add_section({
@@ -638,7 +642,7 @@ sub action_bulk {
         content => {
             buttons => [{
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RECHECK_BUTTON',
-                page => 'redirect!workflow!result!id!' .$queryid,
+                page => "redirect!workflow!result!id!${queryid}",
                 format => 'expected',
             }]
         }

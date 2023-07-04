@@ -2,6 +2,10 @@ package OpenXPKI::Client::UI::Certificate;
 use Moose;
 
 extends 'OpenXPKI::Client::UI::Result';
+with qw(
+    OpenXPKI::Client::UI::QueryRole
+    OpenXPKI::Client::UI::PagerRole
+);
 
 # Core modules
 use Data::Dumper;
@@ -15,7 +19,7 @@ use DateTime;
 use OpenXPKI::DN;
 use OpenXPKI::i18n qw( i18nGettext );
 use OpenXPKI::Serialization::Simple;
-
+use OpenXPKI::Util;
 
 has __default_grid_head => (
     is => 'rw',
@@ -120,7 +124,7 @@ sub init_search {
     if ($args->{preset}) {
         $preset = $args->{preset};
     } elsif (my $queryid = $self->param('query')) {
-        my $result = $self->session_param('query_cert_'.$queryid);
+        my $result = $self->__load_query(certificate => $queryid);
         $preset = $result->{input};
     } else {
         foreach my $key (('subject','san')) {
@@ -226,16 +230,11 @@ sub init_result {
     if ($limit > 500) {  $limit = 500; }
 
     # Load query from session
-    my $result = $self->session_param('query_cert_'.$queryid);
-
-    # result expired or broken id
-    if (!$result || !$result->{count}) {
-        $self->status->error('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY');
-        return $self->init_search();
-    }
+    my $cache = $self->__load_query(certificate => $queryid)
+        or return $self->init_search();
 
     # Add limits
-    my $query = $result->{query};
+    my $query = $cache->{query};
     $query->{limit} = $limit;
     $query->{start} = $startat;
 
@@ -246,13 +245,13 @@ sub init_result {
         }
     }
 
-    $self->log->trace( "persisted query: " . Dumper $result) if $self->log->is_trace;
+    $self->log->trace( "persisted query: " . Dumper $cache) if $self->log->is_trace;
 
     my $search_result = $self->send_command_v2( 'search_cert', $query );
 
     $self->log->trace( "search result: " . Dumper $search_result) if $self->log->is_trace;
 
-    my $criteria = '<br>' . (join ", ", @{$result->{criteria}});
+    my $criteria = '<br>' . (join ", ", @{$cache->{criteria}});
 
     $self->set_page(
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_LABEL',
@@ -263,12 +262,20 @@ sub init_result {
         },
     );
 
-    my $pager = $self->__render_pager( $result, { limit => $limit, startat => $startat } );
+    my $pager = $self->__build_pager(
+        pagename => 'certificate',
+        id => $queryid,
+        query => $query,
+        count => $cache->{count},
+        %{$cache->{pager_args} // {}},
+        limit => $limit,
+        startat => $startat,
+    );
 
-    my $body = $result->{column};
+    my $body = $cache->{column};
     $body = $self->__default_grid_row() if(!$body);
 
-    my $header = $result->{header};
+    my $header = $cache->{header};
     $header = $self->__default_grid_head() if(!$header);
 
     my @result = $self->__render_result_list( $search_result, $body );
@@ -336,13 +343,8 @@ sub init_export {
 
 
     # Load query from session
-    my $result = $self->session_param('query_cert_'.$queryid);
-
-    # result expired or broken id
-    if (!$result || !$result->{count}) {
-        $self->status->error('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY');
-        return $self->init_search();
-    }
+    my $result = $self->__load_query(certificate => $queryid)
+        or return $self->init_search();
 
     # Add limits
     my $query = $result->{query};
@@ -438,13 +440,8 @@ sub init_pager {
     my $queryid = $self->param('id');
 
     # Load query from session
-    my $result = $self->session_param('query_cert_'.$queryid);
-
-    # result expired or broken id
-    if (!$result || !$result->{count}) {
-        $self->status->error('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY');
-        return $self->init_search();
-    }
+    my $result = $self->__load_query(certificate => $queryid)
+        or return $self->init_search();
 
     # will be removed once inline paging works
     my $startat = $self->param('startat');
@@ -525,16 +522,21 @@ sub init_mine {
 
         $result_count = $self->send_command_v2( 'search_cert_count', \%count_query );
 
-        my $queryid = $self->__generate_uid();
         my $_query = {
-            'id' => $queryid,
-            'type' => 'certificate',
-            'count' => $result_count,
-            'query' => $query,
+            pagename => 'certificate',
+            count => $result_count,
+            query => $query,
         };
-        $self->session_param('query_cert_'.$queryid, $_query );
-        $pager = $self->__render_pager( $_query, { limit => $limit, startat => $startat } )
+        my $queryid = $self->__save_query($_query);
 
+        $pager = $self->__build_pager(
+            pagename => 'certificate',
+            id => $queryid,
+            query => $query,
+            count => $result_count,
+            limit => $limit,
+            startat => $startat,
+        );
     }
 
     $self->log->trace( "search result: " . Dumper $search_result) if $self->log->is_trace;
@@ -1258,21 +1260,18 @@ sub action_find {
         } else {
             # found more than one item with serial
             # this is a legal use case when using external CAs
-            my $queryid = $self->__generate_uid();
             my $spec = $self->session_param('certsearch')->{default};
-            $self->session_param('query_cert_'.$queryid, {
-                'id' => $queryid,
-                'type' => 'certificate',
-                'count' => scalar @{$search_result},
-                'query' => { cert_serial => $serial, entity_only => 1, $self->__tenant() },
-                'input' => { cert_serial => scalar $self->param('cert_serial') },
-                'header' =>  $self->__default_grid_head,
-                'column' => $self->__default_grid_row,
-                'pager'  => {},
-                'criteria' => [ sprintf '<nobr><b>I18N_OPENXPKI_UI_CERTIFICATE_SERIAL:</b> <i>%s</i></nobr>', $self->param('cert_serial') ]
+            my $queryid = $self->__save_query({
+                pagename => 'certificate',
+                count => scalar @{$search_result},
+                query => { cert_serial => $serial, entity_only => 1, $self->__tenant() },
+                input => { cert_serial => scalar $self->param('cert_serial') },
+                header => $self->__default_grid_head,
+                column => $self->__default_grid_row,
+                criteria => [ sprintf '<nobr><b>I18N_OPENXPKI_UI_CERTIFICATE_SERIAL:</b> <i>%s</i></nobr>', $self->param('cert_serial') ]
             });
 
-            return $self->redirect->to('certificate!result!id!'.$queryid);
+            return $self->redirect->to("certificate!result!id!${queryid}");
         }
     } else {
         $self->status->error('I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_MUST_PROIVDE_IDENTIFIER_OR_SERIAL');
@@ -1448,17 +1447,15 @@ sub action_search {
         push @criteria, sprintf '<nobr><b>%s:</b> <i>%s</i></nobr>', $item->{label}, $val;
     }
 
-    my $queryid = $self->__generate_uid();
-    $self->session_param('query_cert_'.$queryid, {
-        'id' => $queryid,
-        'type' => 'certificate',
-        'count' => $result_count,
-        'query' => $query,
-        'input' => $input,
-        'header' => $header,
-        'column' => $body,
-        'pager'  => $spec->{pager} || {},
-        'criteria' => \@criteria
+    my $queryid = $self->__save_query({
+        pagename => 'certificate',
+        count => $result_count,
+        query => $query,
+        input => $input,
+        header => $header,
+        column => $body,
+        pager_args => OpenXPKI::Util::filter_hash($spec->{pager}, qw(limit pagesizes pagersize)),
+        criteria => \@criteria,
     });
 
     $self->redirect->to('certificate!result!id!'.$queryid);

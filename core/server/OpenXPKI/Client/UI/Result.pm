@@ -24,7 +24,6 @@ use OpenXPKI::i18n qw( i18n_walk );
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Client::UI::Response;
 
-
 # Attributes set via constructor
 
 has req => (
@@ -821,55 +820,6 @@ sub __generate_uid {
     ## RFC 3548 URL and filename safe base64
     $uid =~ tr/+\//-_/;
     return $uid;
-}
-
-=head2 __render_pager
-
-Return a pager definition hash with default settings, requires the query
-result hash as argument. Defaults can be overriden passing a hash as second
-argument.
-
-=cut
-sub __render_pager {
-
-    my $self = shift;
-    my $result = shift;
-    my $args = shift;
-
-    my $limit = ($args->{limit} * 1); # cast to integer for json
-    if (!$limit) { $limit = 50; }
-    # Safety rule
-    elsif ($limit > 500) {  $limit = 500; }
-
-    my $startat = int($args->{startat} || 0);
-
-    if (!$args->{pagesizes}) {
-        $args->{pagesizes} = [25,50,100,250,500];
-    } elsif (!ref $args->{pagesizes}) {
-        $args->{pagesizes} = [ (split /\s*,\s*/, $args->{pagesizes}) ];
-    }
-
-    if (!grep (/^$limit$/, @{$args->{pagesizes}}) ) {
-        push @{$args->{pagesizes}}, $limit;
-        $args->{pagesizes} = [ sort { $a <=> $b } @{$args->{pagesizes}} ];
-    }
-
-    if (!$args->{pagersize}) {
-        $args->{pagersize} = 20;
-    }
-
-    $self->log->trace('pager query' . Dumper $args) if $self->log->is_trace;
-
-    return {
-        startat => $startat,
-        limit =>  $limit,
-        count => $result->{count} * 1,
-        pagesizes => $args->{pagesizes},
-        pagersize => $args->{pagersize},
-        pagerurl => $result->{'type'}.'!pager!id!'.$result->{id},
-        order => $result->{query}->{order} || '',
-        reverse => $result->{query}->{reverse} ? 1 : 0,
-    }
 }
 
 =head2 __build_attribute_subquery

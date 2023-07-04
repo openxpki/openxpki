@@ -94,4 +94,34 @@ sub asterisk_to_sql_wildcard {
     return $query;
 }
 
+=head2 filter_hash
+
+Filters the given I<HashRef> so that at maximum the resulting hash only the given
+keys.
+
+B<Parameters>
+
+=over
+
+=item * B<$hash> I<HashRef> - source hash to be filtered (may be C<undef> -
+this will return an empty I<HashRef>)
+
+=item * B<@keys> I<list> - list of keys that shall be extracted from the source hash
+
+=back
+
+B<Returns>
+
+A I<HashRef> containing the given keys (or less, depending on the source hash).
+
+=cut
+sub filter_hash {
+    my $class = shift if ($_[0] // '') eq __PACKAGE__; # support call via -> and ::
+    my $hash = shift // {};
+    my @keys = @_;
+
+    my %filter_hash = map { exists $hash->{$_} ? ($_ => $hash->{$_}) : () } @keys;
+    return \%filter_hash;
+}
+
 1;

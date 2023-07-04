@@ -6,6 +6,7 @@ use Data::Dumper;
 use Date::Parse;
 
 extends 'OpenXPKI::Client::UI::Workflow';
+with 'OpenXPKI::Client::UI::QueryRole';
 
 =head1 OpenXPKI::Client::UI::Bulk
 
@@ -176,7 +177,7 @@ sub action_result {
     };
 
     $self->__save_query($queryid => {
-        'type' => 'workflow',
+        pagename => 'workflow',
         'count' => $result_count,
         'query' => $query,
         'input' => {},
@@ -190,7 +191,7 @@ sub action_result {
         'button' => \@buttons,
     });
 
-    $self->redirect->to('workflow!result!id!'.$queryid);
+    $self->redirect->to("workflow!result!id!${queryid}");
 
     return $self;
 

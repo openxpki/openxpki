@@ -2180,35 +2180,6 @@ sub __render_workflow_action_body {
     }
 }
 
-sub __save_query {
-    my $self = shift;
-    my $id = (ref $_[0] ne 'HASH') ? shift : $self->__generate_uid;
-    my $query = shift;
-
-    $self->session_param("query_wfl_${id}" => {
-        %{ $query },
-        'id' => $id,
-    });
-
-    return $id;
-}
-
-sub __load_query {
-    my $self = shift;
-    my $id = shift;
-
-    # load query from session
-    my $result = $self->session_param("query_wfl_${id}");
-
-    # check expired or broken id
-    if (not $result or not $result->{count}) {
-        $self->status->error('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY');
-        return;
-    }
-
-    return $result;
-}
-
 =head1 Example workflow configuration
 
 =head2 State with default rendering

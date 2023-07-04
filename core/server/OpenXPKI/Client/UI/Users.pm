@@ -2,6 +2,10 @@ package OpenXPKI::Client::UI::Users;
 use Moose;
 
 extends 'OpenXPKI::Client::UI::Result';
+with qw(
+    OpenXPKI::Client::UI::QueryRole
+    OpenXPKI::Client::UI::PagerRole
+);
 
 use Data::Dumper;
 
@@ -14,6 +18,7 @@ Default shows the search form as well as a paged table that contains all users
 sub init_index {
     my $self = shift;
     my $args = shift;
+
     # render title + empty search form
     $self->set_page(
         label => 'I18N_OPENXPKI_UI_USER_TITLE'
@@ -24,19 +29,18 @@ sub init_index {
         },
     );
     $self->render_search_form();
+
     # count users + store result object in session to allow paging
-    my $result_count = $self->send_command_v2( 'search_users_count', {}  );
-    my $queryid = $self->__generate_uid();
-    my $result={
-        'id' => $queryid,
-        'type' => 'users',
-        'count' => $result_count,
-        'query' => {},
-        'input' => {},
-        'pager'  => {},
-        'criteria' => []
+    my $result_count = $self->send_command_v2('search_users_count');
+    my $querymeta = {
+        pagename => 'users',
+        count => $result_count,
+        query => {},
+        input => {},
+        criteria => [],
     };
-    $self->session_param('query_users_'.$queryid, $result);
+    my $queryid = $self->__save_query($querymeta);
+
     # construct query that fetches the first 25 users
     my $query={};
     $query->{limit} = 25;
@@ -49,9 +53,9 @@ sub init_index {
         }
     }
     # fetch+render the first 25 entries
-    my $query_result = $self->send_command_v2( 'search_users',$query);
-    my @result=$self->__render_result_list( $query_result );
-    $self->__render_result_table($result,\@result,25,0);
+    my $query_result = $self->send_command_v2(search_users => $query);
+    my @result = $self->__render_result_list($query_result);
+    $self->__render_result_table($queryid, $querymeta, \@result, 25, 0);
     return $self;
 }
 
@@ -74,13 +78,8 @@ sub init_result {
     if ($limit > 500) {  $limit = 500; }
 
     # Load query from session
-    my $result = $self->session_param('query_users_'.$queryid);
-
-    # result expired or broken id
-    if (!$result || !$result->{count}) {
-        $self->status->error('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY');
-        return $self->render_search_form();
-    }
+    my $result = $self->__load_query(users => $queryid)
+        or return $self->render_search_form();
 
     # Add limits
     my $query = $result->{query};
@@ -111,10 +110,9 @@ sub init_result {
         },
     );
 
-    my $pager = $self->__render_pager( $result, { limit => $limit, startat => $startat } );
     my @result = $self->__render_result_list( $query_result);
     $self->log->trace( "dumper result: " . Dumper @result) if $self->log->is_trace;
-    $self->__render_result_table($result,\@result,$limit,$startat);
+    $self->__render_result_table($queryid, $result, \@result,$limit,$startat);
     return $self;
 
 }
@@ -135,13 +133,8 @@ sub init_pager {
     my $queryid = $self->param('id');
 
     # Load query from session
-    my $result = $self->session_param('query_users_'.$queryid);
-
-    # result expired or broken id
-    if (!$result || !$result->{count}) {
-        $self->status->error('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY');
-        return $self->render_search_form();
-    }
+    my $result = $self->__load_query(users => $queryid)
+        or return $self->render_search_form();
 
     # will be removed once inline paging works
     my $startat = $self->param('startat');
@@ -243,15 +236,13 @@ sub action_search {
         return $self->render_search_form({ preset => $input });
     }
     # store search query in session for paging etc...
-    my $queryid = $self->__generate_uid();
-    $self->session_param('query_users_'.$queryid, {
-        'id' => $queryid,
-        'type' => 'users',
-        'count' => $result_count,
-        'query' => $query,
-        'input' => $input,
-        'pager'  => {},
-        'criteria' => \@criteria
+    my $queryid = $self->__save_query({
+        pagename => 'users',
+        id => $queryid,
+        count => $result_count,
+        query => $query,
+        input => $input,
+        criteria => \@criteria,
     });
     # after handling the search: redirect to result page
     $self->redirect->to('users!result!id!'.$queryid);
@@ -288,18 +279,18 @@ Takes four arguments: the stored result object, the entries to display, limit an
 =cut
 sub __render_result_table {
     my $self = shift;
-    my $result= shift;
-    my $entries=shift;
-    my $limit=shift;
-    my $startat=shift;
+    my $queryid = shift;
+    my $result = shift;
+    my $entries = shift;
+    my $limit = shift;
+    my $startat = shift;
 
     # columns of the result table
     my @columns=[
         { sTitle => "I18N_OPENXPKI_UI_USER_USERNAME" },
-        { sTitle => "I18N_OPENXPKI_UI_USER_MAIL"},
-        { sTitle => "I18N_OPENXPKI_UI_USER_REALNAME"},
-        { sTitle => "I18N_OPENXPKI_UI_USER_ROLE"}
-
+        { sTitle => "I18N_OPENXPKI_UI_USER_MAIL" },
+        { sTitle => "I18N_OPENXPKI_UI_USER_REALNAME" },
+        { sTitle => "I18N_OPENXPKI_UI_USER_ROLE" },
     ];
     $self->main->add_section({
         type => 'grid',
@@ -313,17 +304,26 @@ sub __render_result_table {
             columns => @columns,
             data => $entries,
             empty => 'I18N_OPENXPKI_UI_USER_LIST_EMPTY_LABEL',
-            pager =>  $self->__render_pager( $result, { limit => $limit, startat => $startat } ),
+            pager => $self->__build_pager(
+                pagename => 'users',
+                id => $queryid,
+                query => $result->{query},
+                count => $result->{count},
+                limit => $limit,
+                startat => $startat,
+            ),
             buttons => [
-                { label => 'I18N_OPENXPKI_UI_SEARCH_RELOAD_FORM',
-                  page => 'users!search!query!' .$result->{id},
-                  format => 'expected'
+                {
+                    label => 'I18N_OPENXPKI_UI_SEARCH_RELOAD_FORM',
+                    page => "users!search!query!${queryid}",
+                    format => 'expected',
                 },
-                { label => 'I18N_OPENXPKI_UI_USER_ADD_USER',
-                  page => 'workflow!index!wf_type!add_user',
-                  format => 'optional'
+                {
+                    label => 'I18N_OPENXPKI_UI_USER_ADD_USER',
+                    page => 'workflow!index!wf_type!add_user',
+                    format => 'optional',
                 },
-            ]
+            ],
         }
     });
 }
@@ -378,7 +378,7 @@ sub init_search {
     # check if there are any preset values for the search fields
     my $preset;
     if (my $queryid = $self->param('query')) {
-        my $result = $self->session_param('query_users_'.$queryid);
+        my $result = $self->__load_query(users => $queryid);
         $preset = $result->{input};
     }
 
