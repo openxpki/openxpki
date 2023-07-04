@@ -172,7 +172,7 @@ sub action_result {
 
     push @buttons, {
         label => 'I18N_OPENXPKI_UI_SEARCH_NEW_SEARCH',
-        page => 'bulk!index!' . $self->__generate_uid(),
+        page => 'bulk!index',
     };
 
     $self->__save_query($queryid => {
