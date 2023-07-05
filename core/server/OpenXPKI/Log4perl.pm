@@ -118,7 +118,7 @@ sub _add_patternlayout_spec {
         my @order = qw( pid user role sid rid wftype wfid scepid pki_realm );
         my @hide = qw( command_id );
         my $mdc = Log::Log4perl::MDC->get_context;
-        $mdc->{pid} = $$ if $layout->{curlies} eq 'with_pid';
+        $mdc->{pid} = $$ if ($layout->{curlies}//'') eq 'with_pid';
         my %filtered = (
             map { $_ => $_ }
             grep { my $k = $_; none { $k eq $_ } @hide }
