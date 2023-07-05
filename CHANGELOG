@@ -1,6 +1,8 @@
 Please list items to be added to the final release comment here
 
 New Features
+ + Support PSS padding when signing certificates and CRLs
+ + New parameter keep_expire in crl profile to control content of CRL
 
 Upgrades, Improvements and Bugfixes
   + Certificate profile fields (profile.template.*.yaml) now support the same attributes as workflow fields
@@ -13,3 +15,5 @@ Removals, Deprecations, Breaking Changes
   + Remove API command "get_cert_subject_styles"
   + Remove unused method OpenXPKI::Client::UI::Result::__register_wf_token_initial()
   + Remove openxpkictl option --foreground (use --no-detach instead)
+  + Parameters validity, reason_code, remove_expired to IssueCRL are deprecated and will be removed with next reason
+  + Default behaviour of IssueCRL does now exclude expired certificates (compliant to RFC5280)

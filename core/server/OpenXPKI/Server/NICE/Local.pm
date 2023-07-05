@@ -327,8 +327,6 @@ sub issueCRL {
     my $dbi = CTX('dbi');
 
     my $crl_validity = $param->{validity};
-    my $delta_crl = $param->{validity};
-
     my $profile = $param->{crl_profile};
 
     my $remove_expired = $param->{remove_expired};
@@ -336,7 +334,7 @@ sub issueCRL {
 
     OpenXPKI::Exception->throw(
         message => "I18N_OPENXPKI_SERVER_NICE_LOCAL_CRL_NO_DELTA_CRL_SUPPORT",
-    ) if $delta_crl;
+    ) if ($param->{delta_crl});
 
     my $serializer = OpenXPKI::Serialization::Simple->new();
 
@@ -345,6 +343,10 @@ sub issueCRL {
 
     # Get the certificate identifier to filter in the database
     my $ca_identifier = $ca_info->{identifier};
+
+    foreach my $pp (qw(validity reason_code remove_expired)) {
+        CTX('log')->deprecated()->error("Passing $pp as parameter to IssueCRL is deprecated and will be removed with the next release!");
+    }
 
     # Build Profile (from ..Workflow::Activity::CRLIssuance::GetCRLProfile)
     my $crl_profile = OpenXPKI::Crypto::Profile::CRL->new(
@@ -382,14 +384,48 @@ sub issueCRL {
 
     my @cert_timestamps; # array with certificate data and timestamp
 
-    my %extra_where;
-    if ($remove_expired) {
-        $extra_where{notafter} = { '>', time()},
+    my $extra_where;
+    my $keep_expired = $crl_profile->{PROFILE}->{KEEP_EXPIRED};
+    ##! 32: $keep_expired
+
+    if (defined $remove_expired) {
+        CTX('log')->deprecated()->error('Passing remove_expired as parameter to IssueCRL is deprecated and will be removed with the next release!');
+        if ($remove_expired eq '0') {
+            $keep_expired = '_any';
+        }
     }
 
-    if ($reason_code) {
-        $extra_where{reason_code} = $param->{reason_code};
+    # Breaking change introduced with v3.26 - we follow RFC5280 and do
+    # NOT include expired certificates onto the CRL unless advised
+    # This parameter can be a list of reason codes to keep or the
+    # magic word I<_any>
+    if (!$keep_expired) {
+        $extra_where = {
+            '-or' => [
+                { notafter => { '>', time }, status => 'REVOKED' },
+                { status => 'CRL_ISSUANCE_PENDING' }
+            ]
+        };
+    } elsif ($keep_expired->[0] eq '_any') {
+        $extra_where = {
+            status => [ 'REVOKED', 'CRL_ISSUANCE_PENDING' ]
+        };
+    } else {
+        # include certificates if those are either expired
+        # or have one of the chose reason codes (or both)
+        $extra_where = {
+            '-or' => [
+                { status => 'REVOKED', '-or' => [
+                    reason_code => $keep_expired,
+                    notafter => { '>', time }
+                ]},
+                { status => 'CRL_ISSUANCE_PENDING' }
+            ]
+        };
     }
+
+    # deprecated
+    $extra_where->{reason_code} = $param->{reason_code} if ($reason_code);
 
     my $max_revocation_id;
     if ($self->use_revocation_id()) {
@@ -406,9 +442,10 @@ sub issueCRL {
             ##! 64: 'set max_revocation_id from activity'
             $max_revocation_id = $param->{max_revocation_id};
         }
-        $extra_where{revocation_id} = { '<=', $max_revocation_id };
+        $extra_where->{revocation_id} = { '<=', $max_revocation_id };
     }
 
+    ##! 64: $extra_where
     my $certs = $dbi->select(
         from => 'certificate',
         columns => [ 'cert_key', 'identifier',
@@ -417,8 +454,7 @@ sub issueCRL {
         where => {
             'certificate.pki_realm' => $pki_realm,
             issuer_identifier => $ca_identifier,
-            status => [ 'REVOKED', 'CRL_ISSUANCE_PENDING' ],
-            %extra_where
+            %$extra_where
         },
         order_by => [ 'notbefore', 'req_key' ]
     );

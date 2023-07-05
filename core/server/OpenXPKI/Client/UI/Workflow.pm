@@ -1326,7 +1326,7 @@ sub __render_output_field {
     }
     $item->{label} ||= $fieldname;
 
-    my $field_type = $field->{type};
+    my $field_type = $field->{type} // '';
 
     # we have several formats that might have non-scalar values
     if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {

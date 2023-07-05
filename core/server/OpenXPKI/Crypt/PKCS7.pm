@@ -453,10 +453,15 @@ sub find_oid {
 sub decode_tag {
 
     my $raw = shift;
+
+    # return undef if we dont get any data
+    return unless($raw);
+
     # the raw content starts with tag and length as bytes sequences
     # the length of each sequence is itself encoded in the first bit
     # tagbytes is the number of bytes that are used to encode the tag
     my ($tagbytes, $tag) = asn_decode_tag($raw);
+
     # length starts after the tag so we need to use tagbytes as offset
     my ($lengthbytes, $length) = asn_decode_length(substr($raw, $tagbytes));
 

@@ -446,10 +446,10 @@ sub __revoked_certs_list {
         my @v = ($cert->{'revocationDate'}->{'generalTime'} // $cert->{'revocationDate'}->{'utcTime'} // 0, undef);
         foreach my $ext (@{$cert->{crlEntryExtensions}}) {
             if ( $ext->{'extnID'} eq '2.5.29.21' ) { # OID for crlReason
-                my $reason = $parser->decode( $ext->{'extnValue'} );
-                if (!$parser->error && defined $reason) {
-                    $v[1] = $crl_reason_list->[$reason];
-                }
+                # The value portion is an enum item which consists of 3 bytes
+                # the last one is the assigned integer of the enum structure
+                my $rc = ord(substr($_->{extnValue},2));
+                $v[1] = $crl_reason_list->[$rc] if (defined $rc);
                 last;
             }
         }

@@ -206,6 +206,11 @@ sub __load_profile
         }
     }
 
+    if (my @keep_expired = $config->get_scalar_as_list([ @basepath, 'keep_expired' ])) {
+        ##! 64: $keep_expired
+        $self->{PROFILE}->{KEEP_EXPIRED} = \@keep_expired;
+    }
+
     # TODO - implement crl_number (but not here ...)
     # possibly:
     # RFC 3280, 5.2.5 - issuing_distributing_point (if someone really
