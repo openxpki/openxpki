@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2023-01-18 15:22+0100\n"
+"PO-Revision-Date: 2023-06-27 12:20+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -16,6 +16,9 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "Die ausgewählte Aktion ist nicht verfügbar"
+
+msgid "I18N_OPENXPKI_UI_API_TOKEN"
+msgstr "API-Token/Passwort"
 
 msgid "I18N_OPENXPKI_UI_APPLICATION_ERROR"
 msgstr "Unerwarteter Fehler in der Anwendung"
@@ -347,9 +350,6 @@ msgstr "unbekannt"
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_VALID"
 msgstr "gültig"
 
-msgid "I18N_OPENXPKI_UI_CERT_SUBJECT_PARTS"
-msgstr "Subjectkomponenten"
-
 msgid "I18N_OPENXPKI_UI_CLEAR_LOGIN"
 msgstr "Anmeldung zurücksetzen"
 
@@ -435,10 +435,6 @@ msgstr "Challenge Password"
 
 msgid "I18N_OPENXPKI_UI_CSR_KEY_GENERATION_FAILED"
 msgstr "Schlüsselerzeugung fehlgeschlagen"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CUST"
-msgstr "ja"
 
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION"
 msgstr ""
@@ -574,6 +570,9 @@ msgstr "Das Subject des Zertifikates ist fehlerhaft!"
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_RENEWAL_NOT_ALLOWED"
 msgstr "Erneuerung nicht zulässig"
+
+msgid "I18N_OPENXPKI_UI_ENTITY_NOT_FOUND"
+msgstr "Die angeforderte Entität konnte nicht gefunden werden."
 
 msgid "I18N_OPENXPKI_UI_ERROR_DURING_PUBLICATION"
 msgstr "Systemfehler während der Veröffentlichung"
@@ -770,6 +769,9 @@ msgstr "Aussteller dieser CRL unbekannt!"
 
 msgid "I18N_OPENXPKI_UI_INVALID_PROFILE"
 msgstr "Ungültiges Profil"
+
+msgid "I18N_OPENXPKI_UI_INVALID_TOKEN"
+msgstr "Das eingegebene Token/Passwort ist nicht korrekt."
 
 msgid "I18N_OPENXPKI_UI_ISSUERS_LIST"
 msgstr "Aussteller-Zertifikate in dieser CA"
@@ -997,6 +999,17 @@ msgid "I18N_OPENXPKI_UI_MENU_MY_WORKFLOW"
 msgstr "Meine Workflows"
 
 msgid "I18N_OPENXPKI_UI_MENU_PKI_OPERATION"
+msgstr "PKI-Operationen"
+
+msgid "I18N_OPENXPKI_UI_MENU_PREREGISTER_CERTIFICATE"
+msgstr "Zertifikat Vorregistrierung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_PREREGISTER_DELETE"
+msgstr "Zertifikat Vorregistrierung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_PREREGISTRATION"
 msgstr "PKI-Operationen"
 
 msgid "I18N_OPENXPKI_UI_MENU_PROCESS_INFORMATION"
@@ -1288,8 +1301,8 @@ msgstr "Eigentümer (E-Mail)"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_OWNER_CONTACT_DESC"
 msgstr ""
-"E-Mail-Adresse des Eigentümers - wird verwendet, um u.a. die "
-"Ablaufbenachrichtigung zu versenden."
+"E-Mail-Adresse des Eigentümers (Gruppen-Postfach) - wird verwendet, um u.a. "
+"die Ablaufbenachrichtigung zu versenden."
 
 msgid "I18N_OPENXPKI_UI_PROFILE_OWNER_GROUP"
 msgstr "Eigentümer (Gruppe)"
@@ -1637,6 +1650,12 @@ msgstr "Automatische Enrollments auf Genehmigung wartend"
 
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_LABEL"
 msgstr "Automatische Enrollments"
+
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_PREREG_DESCRIPTION"
+msgstr "Anträge für die Zuweisung eines Enrollment-Token."
+
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_PREREG_LABEL"
+msgstr "Anträge zur Vorregistrierung"
 
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_REQUEST_DESCRIPTION"
 msgstr "Zertifikatsanträge auf Genehmigung wartend"
@@ -2323,6 +2342,18 @@ msgstr "Bitte geben Sie eine Begründung für die Abweichung von der Policy an."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_POLICY_VIOLATION_COMMENT_LABEL"
 msgstr "Begründung für Policy-Abweichung"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_PREREG_DELETE_INITIAL_DESC"
+msgstr ""
+"Bitte geben Sie den namen der Entität / den FQDN ein für den die "
+"Vorregistrierung gelöscht werden soll. Beachten Sie bitte, dass sie zum "
+"Abschluß dieses Vorgangs das entsprechende API-Token/Passwort benötigen."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_PREREG_DELETE_INITIAL_LABEL"
+msgstr "Vorregistrierung aufheben"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_PREREG_ENTER_SECRET_LABEL"
+msgstr "API-Token/Passwort eingeben"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REJECT_CRR_DESC"
 msgstr "Sperrantrag ablehnen"
 
@@ -2646,6 +2677,14 @@ msgstr " Kopieren Sie das PEM kodierte Zertifikat in das Feld"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTSIGN_TOKEN"
 msgstr "Ausstellende CA"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_EXTENSION_PARTS_DESC"
+msgstr "Bestandteile zum Aufbau des Subject Alternative Name."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_EXTENSION_PARTS_LABEL"
+msgstr "SubjectAltName Bestandteile"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_DESC"
 msgstr ""
@@ -3003,6 +3042,9 @@ msgstr " "
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_LABEL"
 msgstr "Schlüsselparameter"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_HASH"
+msgstr "Meta-Daten (key/value)"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_DESC"
 msgstr "E-Mail-Adresse des Verantwortlichen für dieses Zertifikat."
 
@@ -3034,15 +3076,13 @@ msgstr "Eigentümer (Gruppe)"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_LABEL"
 msgstr "Antragsteller/Verantwortlicher"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SUPPORT_CONTACT_DESC"
 msgstr ""
-"E-Mail-Adresse des Eigentümers - wird verwendet, um u.a. die "
+"E-Mail-Adresse des Zuständigen - wird verwendet, um u.a. die "
 "Ablaufbenachrichtigung zu versenden."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SUPPORT_CONTACT_LABEL"
-msgstr "Eigentümer (E-Mail)"
+msgstr "Ansprechpartner (E-Mail)"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SYSTEM_ID_DESC"
 msgstr "System Identifier"
@@ -3705,6 +3745,9 @@ msgstr "Pausierte Aktion"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PAUSE_REASON_LABEL"
 msgstr "Grund"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PREREG_DELETE_SUCCESS_DESC"
+msgstr "Die Vorregistrierung wurde gelöscht, der API Schlüssel wurde entfernt."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_HINT"
 msgstr "Interner Prozessstatus des Workflows."
 
@@ -4261,6 +4304,16 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_LABEL"
 msgstr "Policyverletzung"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PROVIDE_SECRET_DESC"
+msgstr ""
+"Bitte geben Sie das API-Token/Passwort ein, welches ihnen während der "
+"Registrierung für diese Entität zugewiesen wurde. Falls Sie nicht mehr im "
+"Besitz des entsprechenden Passwortes sind, wenden Sie sich bitte an das "
+"Support-Team."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PROVIDE_SECRET_LABEL"
+msgstr "API-Token/Passwort erforderlich"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_CERT_EXISTS_DESC"
 msgstr ""
 "Es wurde ein gültiges RA-Token gefunden, das noch nicht erneuert werden "
@@ -4474,6 +4527,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_LABEL"
 msgstr "CA-Zertifikate und CRL publizieren"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_PREREG_DELETE_DESC"
+msgstr "Löschung eines zuvor zugeteilten API-Schlüssels."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_PREREG_DELETE_LABEL"
+msgstr "Zertifikat Vorregistrierung aufheben"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_PREREG_REQUEST_DESC"
 msgstr ""
 "Antrag zur Registrierung eines API-Schlüssels zur späteren Ausstellung eines "
@@ -4510,15 +4569,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_PREREG_LABEL"
 msgstr "Zertifikatsantrag (Vorregistrierung)"
 
-# fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_DESC"
-msgstr ""
-"Antrag zur Registrierung eines API-Schlüssels zur späteren Ausstellung eines "
-"Zertifikates über eine automatische Schnittstelle."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_LABEL"
-msgstr "Auswertung Zertifikatsantrag (Vorregistrierung)"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_DESC"
 msgstr "Veröffentlicht das Zertifikat zu definierten Zielen."
 
@@ -4530,6 +4580,14 @@ msgstr "Ändern der Meta-Daten eines Zertifikates"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CHANGE_METADATA_LABEL"
 msgstr "Meta-Daten ändern"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_EXPORT_DESC"
+msgstr "Importiert Sperrlisten von externen CAs"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_EXPORT_LABEL"
+msgstr "Sperrliste importieren"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_IMPORT_DESC"
 msgstr "Importiert Sperrlisten von externen CAs"
@@ -4692,3 +4750,19 @@ msgstr "aufwecken"
 
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "ja"
+
+#~ msgid "I18N_OPENXPKI_UI_CERT_SUBJECT_PARTS"
+#~ msgstr "Subjectkomponenten"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CUST"
+#~ msgstr "ja"
+
+# fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_DESC"
+#~ msgstr ""
+#~ "Antrag zur Registrierung eines API-Schlüssels zur späteren Ausstellung "
+#~ "eines Zertifikates über eine automatische Schnittstelle."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_LABEL"
+#~ msgstr "Auswertung Zertifikatsantrag (Vorregistrierung)"

@@ -18,6 +18,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "找不到请求的动作"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_API_TOKEN"
+msgstr "用户名"
+
 msgid "I18N_OPENXPKI_UI_APPLICATION_ERROR"
 msgstr "未知的应用程序错误"
 
@@ -358,11 +362,6 @@ msgstr "未知"
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_VALID"
 msgstr "有效"
 
-# Remove?
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CERT_SUBJECT_PARTS"
-msgstr "证书状态"
-
 msgid "I18N_OPENXPKI_UI_CLEAR_LOGIN"
 msgstr "重置登录"
 
@@ -455,11 +454,6 @@ msgstr "挑战密码"
 
 msgid "I18N_OPENXPKI_UI_CSR_KEY_GENERATION_FAILED"
 msgstr "密钥生成失败"
-
-# Remove?
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CUST"
-msgstr "是"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION"
@@ -600,6 +594,10 @@ msgstr "主题无效"
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_RENEWAL_NOT_ALLOWED"
 msgstr "不允许续订"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ENTITY_NOT_FOUND"
+msgstr "找不到请求的动作"
 
 msgid "I18N_OPENXPKI_UI_ERROR_DURING_PUBLICATION"
 msgstr "在发布期间出现了后端错误"
@@ -807,6 +805,10 @@ msgid "I18N_OPENXPKI_UI_IMPORT_CRL_ISSUER_NOT_FOUND"
 msgstr "找不到CRL的颁发者证书！"
 
 msgid "I18N_OPENXPKI_UI_INVALID_PROFILE"
+msgstr "无效配置文件"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_INVALID_TOKEN"
 msgstr "无效配置文件"
 
 msgid "I18N_OPENXPKI_UI_ISSUERS_LIST"
@@ -1063,6 +1065,18 @@ msgid "I18N_OPENXPKI_UI_MENU_MY_WORKFLOW"
 msgstr "我的工作流程"
 
 msgid "I18N_OPENXPKI_UI_MENU_PKI_OPERATION"
+msgstr "PKI操作"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_PREREGISTER_CERTIFICATE"
+msgstr "申请证书"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_PREREGISTER_DELETE"
+msgstr "请求"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_PREREGISTRATION"
 msgstr "PKI操作"
 
 msgid "I18N_OPENXPKI_UI_MENU_PROCESS_INFORMATION"
@@ -1755,6 +1769,14 @@ msgstr "SCEP注册工作流程正在等待批准。"
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_LABEL"
 msgstr "注册"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_PREREG_DESCRIPTION"
+msgstr "证书申请正在等待批准。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_PREREG_LABEL"
+msgstr "证书请求"
+
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_REQUEST_DESCRIPTION"
 msgstr "证书申请正在等待批准。"
 
@@ -2385,6 +2407,18 @@ msgstr "请说明为什么您需要提交不符合策略规定的证书申请。
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_POLICY_VIOLATION_COMMENT_LABEL"
 msgstr "提供理由"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_PREREG_DELETE_INITIAL_DESC"
+msgstr "此工作流程最终失败，无法重新启动"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_PREREG_DELETE_INITIAL_LABEL"
+msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_PREREG_ENTER_SECRET_LABEL"
+msgstr "开始吊销"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REJECT_CRR_DESC"
 msgstr "拒绝此吊销请求。"
 
@@ -2696,6 +2730,14 @@ msgstr "复制或上传PEM编码的证书"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTSIGN_TOKEN"
 msgstr "颁发CA"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_EXTENSION_PARTS_DESC"
+msgstr "组件形成证书使用者替代名称。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_EXTENSION_PARTS_LABEL"
+msgstr "SubjectAltName部分"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_DESC"
 msgstr ""
@@ -3045,6 +3087,10 @@ msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_LABEL"
 msgstr "密钥参数"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_HASH"
+msgstr "该证书负责人的电子邮件地址。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_DESC"
 msgstr "该证书负责人的电子邮件地址。"
@@ -3730,6 +3776,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_PAUSE_REASON_LABEL"
 msgstr "暂停原因"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PREREG_DELETE_SUCCESS_DESC"
+msgstr "此工作流程已成功完成，无法重新启动"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_HINT"
 msgstr "运行状态"
 
@@ -4241,6 +4291,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_LABEL"
 msgstr "违反策略待处理"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PROVIDE_SECRET_DESC"
+msgstr "该请求最终被拒绝，无法重新启动。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PROVIDE_SECRET_LABEL"
+msgstr "请求被拒绝"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_CERT_EXISTS_DESC"
 msgstr "此工作流程已成功完成，无法重新启动"
 
@@ -4426,6 +4484,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_LABEL"
 msgstr "发布CA信息"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_PREREG_DELETE_DESC"
+msgstr "证书签名请求（CSR）"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_PREREG_DELETE_LABEL"
+msgstr "证书签名请求（CSR）"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_PREREG_REQUEST_DESC"
 msgstr "证书签名请求（CSR）"
 
@@ -4459,14 +4525,6 @@ msgstr "证书注册工作流程，用于通过自动界面（例如SCEP，RPC�
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_PREREG_LABEL"
 msgstr "证书注册"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_DESC"
-msgstr "证书导出"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_LABEL"
-msgstr "证书导出"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_DESC"
 msgstr "将证书信息发布到已定义的存储库。"
 
@@ -4478,6 +4536,14 @@ msgstr "更改证书元数据。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CHANGE_METADATA_LABEL"
 msgstr "更改元数据"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_EXPORT_DESC"
+msgstr "证书导出"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_EXPORT_LABEL"
+msgstr "证书导出"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_IMPORT_DESC"
@@ -4641,3 +4707,21 @@ msgstr "唤醒"
 # Remove?
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "是"
+
+# Remove?
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CERT_SUBJECT_PARTS"
+#~ msgstr "证书状态"
+
+# Remove?
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CUST"
+#~ msgstr "是"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_DESC"
+#~ msgstr "证书导出"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_LABEL"
+#~ msgstr "证书导出"

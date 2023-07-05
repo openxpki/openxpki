@@ -17,6 +17,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "リクエストされたアクションが見つかりません"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_API_TOKEN"
+msgstr "ユーザ名"
+
 msgid "I18N_OPENXPKI_UI_APPLICATION_ERROR"
 msgstr "Application error"
 
@@ -372,11 +376,6 @@ msgstr "不明"
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_VALID"
 msgstr "有効"
 
-# Remove?
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CERT_SUBJECT_PARTS"
-msgstr "証明書ステータス"
-
 msgid "I18N_OPENXPKI_UI_CLEAR_LOGIN"
 msgstr "ログインをリセット"
 
@@ -470,10 +469,6 @@ msgstr "チャレンジパスワード"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CSR_KEY_GENERATION_FAILED"
 msgstr "キー識別子"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CUST"
-msgstr "はい"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION"
@@ -617,6 +612,10 @@ msgstr "件名が正しくありません。"
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_RENEWAL_NOT_ALLOWED"
 msgstr "更新が許可されていません。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ENTITY_NOT_FOUND"
+msgstr "リクエストされたアクションが見つかりません"
 
 msgid "I18N_OPENXPKI_UI_ERROR_DURING_PUBLICATION"
 msgstr "公開処理中に内部エラーが発生しました。"
@@ -836,6 +835,10 @@ msgid "I18N_OPENXPKI_UI_IMPORT_CRL_ISSUER_NOT_FOUND"
 msgstr "CRLの発行者証明書を見つけることができません"
 
 msgid "I18N_OPENXPKI_UI_INVALID_PROFILE"
+msgstr "無効なプロファイル"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_INVALID_TOKEN"
 msgstr "無効なプロファイル"
 
 msgid "I18N_OPENXPKI_UI_ISSUERS_LIST"
@@ -1093,6 +1096,18 @@ msgid "I18N_OPENXPKI_UI_MENU_MY_WORKFLOW"
 msgstr "自分のワークフロー"
 
 msgid "I18N_OPENXPKI_UI_MENU_PKI_OPERATION"
+msgstr "PKIオペレーション"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_PREREGISTER_CERTIFICATE"
+msgstr "証明書申請"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_PREREGISTER_DELETE"
+msgstr "リクエスト"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_PREREGISTRATION"
 msgstr "PKIオペレーション"
 
 msgid "I18N_OPENXPKI_UI_MENU_PROCESS_INFORMATION"
@@ -1797,6 +1812,14 @@ msgstr "SCEP登録ワークフローは承認待ちです。"
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_LABEL"
 msgstr "登録"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_PREREG_DESCRIPTION"
+msgstr "承認待ちの証明書リクエスト。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_PREREG_LABEL"
+msgstr "認証リクエスト"
+
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_REQUEST_DESCRIPTION"
 msgstr "承認待ちの証明書リクエスト。"
 
@@ -2463,6 +2486,18 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_POLICY_VIOLATION_COMMENT_LABEL"
 msgstr "正当性を提供する"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_PREREG_DELETE_INITIAL_DESC"
+msgstr "このワークフローは正常に終了しました。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_PREREG_DELETE_INITIAL_LABEL"
+msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_PREREG_ENTER_SECRET_LABEL"
+msgstr "失効を開始する"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REJECT_CRR_DESC"
 msgstr "この失効リクエストを拒否します。"
 
@@ -2791,6 +2826,14 @@ msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTSIGN_TOKEN"
 msgstr "CAの発行"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_EXTENSION_PARTS_DESC"
+msgstr "証明書を構成する構成要素は別名を使用します。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_EXTENSION_PARTS_LABEL"
+msgstr "別名の一部"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_DESC"
 msgstr ""
@@ -3152,6 +3195,10 @@ msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_LABEL"
 msgstr "キーパラメータ"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_HASH"
+msgstr "この証明書の担当者のメールアドレス"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_DESC"
 msgstr "この証明書の担当者のメールアドレス"
@@ -3882,6 +3929,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_PAUSE_REASON_LABEL"
 msgstr "停止理由"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PREREG_DELETE_SUCCESS_DESC"
+msgstr "このワークフローは成功して終了し、再実行はできません"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_HINT"
 msgstr "実行状態"
 
@@ -4405,6 +4456,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_LABEL"
 msgstr "保留中のポリシー違反"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PROVIDE_SECRET_DESC"
+msgstr "リクエストは拒否され、再実効はできません。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PROVIDE_SECRET_LABEL"
+msgstr "リクエスト拒否"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_CERT_EXISTS_DESC"
 msgstr "このワークフローは成功して終了し、再実行はできません"
 
@@ -4590,6 +4649,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_LABEL"
 msgstr "CA情報を公開する"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_PREREG_DELETE_DESC"
+msgstr "証明書署名リクエスト(CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_PREREG_DELETE_LABEL"
+msgstr "証明書署名リクエスト(CSR)"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_PREREG_REQUEST_DESC"
 msgstr "証明書署名リクエスト(CSR)"
 
@@ -4623,14 +4690,6 @@ msgstr "証明書を登録します。"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_PREREG_LABEL"
 msgstr "証明書の登録"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_DESC"
-msgstr "証明書をエクスポートします。"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_LABEL"
-msgstr "証明書のエクスポート"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_DESC"
 msgstr "定義されたリポジトリに証明書情報を公開します。"
 
@@ -4642,6 +4701,14 @@ msgstr "証明書のメタデータを変更します。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CHANGE_METADATA_LABEL"
 msgstr "メタデータの変更"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_EXPORT_DESC"
+msgstr "証明書をエクスポートします。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_EXPORT_LABEL"
+msgstr "証明書のエクスポート"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_IMPORT_DESC"
@@ -4817,3 +4884,20 @@ msgstr "実行"
 
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "はい"
+
+# Remove?
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CERT_SUBJECT_PARTS"
+#~ msgstr "証明書ステータス"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CUST"
+#~ msgstr "はい"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_DESC"
+#~ msgstr "証明書をエクスポートします。"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_LABEL"
+#~ msgstr "証明書のエクスポート"

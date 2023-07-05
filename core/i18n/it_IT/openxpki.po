@@ -23,6 +23,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "Azione richiesta non trovata"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_API_TOKEN"
+msgstr "Nome utente"
+
 msgid "I18N_OPENXPKI_UI_APPLICATION_ERROR"
 msgstr "Errore sconosciuto dell’applicazione"
 
@@ -426,11 +430,6 @@ msgstr "sconosciuto"
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_VALID"
 msgstr "Valido"
 
-# Remove?
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CERT_SUBJECT_PARTS"
-msgstr "Stato del Certificato"
-
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CLEAR_LOGIN"
 msgstr "Algoritmo della Chiave"
@@ -540,11 +539,6 @@ msgstr "Password della Chiave"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CSR_KEY_GENERATION_FAILED"
 msgstr "Cifratura"
-
-# Remove?
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CUST"
-msgstr "Chiave"
 
 # This is just a prefix
 #, fuzzy
@@ -746,6 +740,10 @@ msgstr "Errore sconosciuto"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_RENEWAL_NOT_ALLOWED"
 msgstr "Errore sconosciuto"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ENTITY_NOT_FOUND"
+msgstr "Azione richiesta non trovata"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_ERROR_DURING_PUBLICATION"
@@ -995,6 +993,10 @@ msgstr "Pagina richiesta non trovata"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_INVALID_PROFILE"
+msgstr "Numero di serie del certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_INVALID_TOKEN"
 msgstr "Numero di serie del certificato"
 
 #, fuzzy
@@ -1271,6 +1273,18 @@ msgid "I18N_OPENXPKI_UI_MENU_MY_WORKFLOW"
 msgstr "Workflow"
 
 msgid "I18N_OPENXPKI_UI_MENU_PKI_OPERATION"
+msgstr "Operazioni PKI"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_PREREGISTER_CERTIFICATE"
+msgstr "Richiesta Certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_PREREGISTER_DELETE"
+msgstr "Richiesta"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_PREREGISTRATION"
 msgstr "Operazioni PKI"
 
 msgid "I18N_OPENXPKI_UI_MENU_PROCESS_INFORMATION"
@@ -2030,6 +2044,14 @@ msgstr "Workflow Adesione SCEP in attesa di approvazione."
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_LABEL"
 msgstr "Registrazione"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_PREREG_DESCRIPTION"
+msgstr "Richiesta Certificato in attesa di approvazione."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_PREREG_LABEL"
+msgstr "Richiesta Certificato"
+
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_REQUEST_DESCRIPTION"
 msgstr "Richiesta Certificato in attesa di approvazione."
 
@@ -2760,6 +2782,18 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_POLICY_VIOLATION_COMMENT_LABEL"
 msgstr "Fornisci Giustificazione"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_PREREG_DELETE_INITIAL_DESC"
+msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_PREREG_DELETE_INITIAL_LABEL"
+msgstr "Stato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_PREREG_ENTER_SECRET_LABEL"
+msgstr "Inizia la Revoca"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REJECT_CRR_DESC"
 msgstr "Respingi questa richiesta di revoca."
 
@@ -3112,6 +3146,16 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTSIGN_TOKEN"
 msgstr ""
 "Il Nome Alternativo (oppure i Nomi Alternativi) per il campo Soggetto (SAN = "
 "Subject Alternative Name)."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_EXTENSION_PARTS_DESC"
+msgstr ""
+"Componenti che formano il Nome Alternativo per il campo Soggetto del "
+"certificato."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_EXTENSION_PARTS_LABEL"
+msgstr "Componenti SAN SubjectAltName"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_DESC"
 msgstr ""
@@ -3498,6 +3542,11 @@ msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_LABEL"
 msgstr "Parametri Chiave"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_HASH"
+msgstr ""
+"Indirizzo Email della persona fisica responsabile per questo certificato."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_DESC"
 msgstr ""
@@ -4275,6 +4324,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_PAUSE_REASON_LABEL"
 msgstr "Motivo Sospensione"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PREREG_DELETE_SUCCESS_DESC"
+msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_HINT"
 msgstr "Stato Esecuzione"
 
@@ -4839,6 +4892,16 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_LABEL"
 msgstr "Violazione Policy Pendente"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PROVIDE_SECRET_DESC"
+msgstr ""
+"La Richiesta di revoca è stata definitivamente rifiutata e non può essere "
+"riavviata."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PROVIDE_SECRET_LABEL"
+msgstr "Revoca Rifiutata"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_CERT_EXISTS_DESC"
 msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 
@@ -5045,6 +5108,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_LABEL"
 msgstr "Pubblica Informazioni CA"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_PREREG_DELETE_DESC"
+msgstr "Richiesta Revoca Certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_PREREG_DELETE_LABEL"
+msgstr "Richiesta Revoca Certificato (CRR, Certificate Revocation Request)"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_PREREG_REQUEST_DESC"
 msgstr "Richiesta Revoca Certificato"
 
@@ -5081,14 +5152,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_PREREG_LABEL"
 msgstr "Esporta Certificato"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_DESC"
-msgstr "Esporta il Certificato nel formato desiderato"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_LABEL"
-msgstr "Esporta Certificato"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_DESC"
 msgstr ""
 "Pubblica le Informazioni sulla Autorità di certificazione (CA, Certification "
@@ -5104,6 +5167,14 @@ msgstr "Modifica i Metadati di un certificato."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CHANGE_METADATA_LABEL"
 msgstr "Modifica Metadati"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_EXPORT_DESC"
+msgstr "Esporta il Certificato nel formato desiderato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_EXPORT_LABEL"
+msgstr "Esporta Certificato"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_IMPORT_DESC"
@@ -5300,3 +5371,21 @@ msgstr "Riavvia"
 
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "Sì"
+
+# Remove?
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CERT_SUBJECT_PARTS"
+#~ msgstr "Stato del Certificato"
+
+# Remove?
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CUST"
+#~ msgstr "Chiave"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_DESC"
+#~ msgstr "Esporta il Certificato nel formato desiderato"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_LABEL"
+#~ msgstr "Esporta Certificato"
