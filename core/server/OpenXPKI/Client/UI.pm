@@ -81,8 +81,8 @@ has 'static_dir' => (
 # Only if realm_mode=path: a map of realms to URL paths
 # {
 #     realma => [
-#         { url_path => 'realm-a', stack => 'LocalPassword' },
-#         { url_path => 'realm-a-cert', stack => 'Certificate' },
+#         { url => 'realm-a', stack => 'LocalPassword' },
+#         { url => 'realm-a-cert', stack => 'Certificate' },
 #     ],
 #     realmb => ...
 # }
