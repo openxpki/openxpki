@@ -694,6 +694,7 @@ sub handle_login {
                             description => $realms->{$realm}->{DESCRIPTION},
                             footer => $footer,
                             image => $realms->{$realm}->{IMAGE},
+                            color => $realms->{$realm}->{COLOR},
                             href => $def->{url},
                         };
                     }
@@ -706,6 +707,7 @@ sub handle_login {
                         label => $realms->{$_}->{LABEL},
                         description => $realms->{$_}->{DESCRIPTION},
                         image => $realms->{$_}->{IMAGE},
+                        color => $realms->{$_}->{COLOR},
                         action => 'login!realm',
                         action_params => {
                             pki_realm => $realms->{$_}->{NAME},

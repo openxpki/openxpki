@@ -17,6 +17,7 @@ import Clickable from 'openxpki/data/clickable'
  *              footer: 'Auto-Login',
  *              image: 'data:image/webp;base64,UklGRsIdAAB...',
  *              href: '/demo-ca/',
+ *              color: '#BEB'
  *          },
  *          {
  *              ...

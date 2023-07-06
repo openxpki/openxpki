@@ -732,7 +732,8 @@ sub __list_pki_realms : PRIVATE {
             NAME => $realm,
             LABEL => $label,
             DESCRIPTION => CTX('config')->get("system.realms.$realm.description") || $label,
-            IMAGE =>CTX('config')->get("system.realms.$realm.image") || '',
+            IMAGE => CTX('config')->get("system.realms.$realm.image") || '',
+            COLOR => CTX('config')->get("system.realms.$realm.color") || '',
             # auth stack info is needed to display stack label on realm selection page
             AUTH_STACKS => CTX('authentication')->list_authentication_stacks_of($realm),
         };
