@@ -649,7 +649,7 @@ sub handle_login {
             # back to the ember page - try if the session has a baseurl
             my $url = $self->session()->param('baseurl');
             # if not, get the path from the referer
-            if (!$url && ($ENV{HTTP_REFERER}//'' =~ m{https?://[^/]+(/[\w/]*[\w])/?}i)) {
+            if (!$url && (($ENV{HTTP_REFERER}//'') =~ m{https?://[^/]+(/[\w/]*[\w])/?}i)) {
                 $url = $1;
                 $self->log->debug('Restore redirect from referer');
             }
