@@ -1059,6 +1059,15 @@ sub _set_menu {
         $self->log->trace("Got $key: " . Dumper $menu->{$key}) if $self->log->is_trace;
     }
 
+    foreach my $key (qw(datapool)) {
+        if (ref $menu->{$key} eq 'HASH' and $menu->{$key}->{default}) {
+            $session->param($key, $menu->{$key} );
+        } else {
+            $session->param($key, { default => {} });
+        }
+        $self->log->trace("Got $key: " . Dumper $menu->{$key}) if $self->log->is_trace;
+    }
+
     # Check syntax of "certdetails".
     # (the sub{} below allows using "return" instead of nested "if"-structures)
     my $certdetails = sub {
