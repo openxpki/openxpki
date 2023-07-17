@@ -11,7 +11,6 @@ with 'OpenXPKI::Client::UI::QueryRole';
 =head1 OpenXPKI::Client::UI::Bulk
 
 Inherits from workflow, offers methods for workflow bulk processing.
-This is experimental, most parameters are hardcoded.
 
 =cut
 
