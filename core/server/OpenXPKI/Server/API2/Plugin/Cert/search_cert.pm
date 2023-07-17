@@ -280,7 +280,7 @@ command "search_cert" => {
 
 =head2 search_cert_count
 
-Similar to L</cert_search> but only returns the number of matching rows.
+Similar to L</search_cert> but only returns the number of matching rows.
 
 B<Parameters>
 
