@@ -17,8 +17,8 @@ use OpenXPKI::Server::API2::Types;
 
 =head2 get_menu
 
-Returns the UI menu definition (I<HashRef>) for the current role (or for pseudo
-role I<_default> if there is no config for the current role).
+Returns the UI menu and page definitions (I<HashRef>) for the current role (or
+for pseudo role I<_default> if there is no configuration for the current role).
 
 =cut
 command "get_menu" => {

@@ -107,7 +107,7 @@ sub render_subject_form {
     #   uihandle: OpenXPKI::Client::UI::Handle::Profile::render_subject_form!mode!renewal
     if ($param) {
         my @param = split /!/, $param;
-        # Legacy format, section only
+        # TODO Legacy format, section only
         if (@param == 1) {
             $extra{'section'} = $param[0];
         } elsif (@param == 2 && $param[0] =~ m{(section|mode)}) {
