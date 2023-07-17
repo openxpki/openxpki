@@ -502,7 +502,7 @@ sub init_mine {
 
     my $query = {
         cert_attributes => {
-            'system_cert_owner' => { '=', $self->_session->param('user')->{name} }
+            'system_cert_owner' => { '=', $self->session_param('user')->{name} }
         },
         order => 'notbefore',
         reverse => 1,
@@ -633,7 +633,7 @@ sub init_detail {
 
     # check if this is a entity certificate from the current realm
     my $is_local_entity = 0;
-    if ($cert->{req_key} && $cert->{pki_realm} eq $self->_session->param('pki_realm')) {
+    if ($cert->{req_key} && $cert->{pki_realm} eq $self->session_param('pki_realm')) {
         $self->log->debug("cert is local entity");
         $is_local_entity = 1;
     }
@@ -741,7 +741,7 @@ sub init_detail {
     sub {
         my $metadata_config = $self->session_param('certdetails')->{metadata};
         return unless ($metadata_config);
-        return unless (!$cert->{pki_realm} || $cert->{pki_realm} eq $self->_session->param('pki_realm'));
+        return unless (!$cert->{pki_realm} || $cert->{pki_realm} eq $self->session_param('pki_realm'));
         my $cert_attrs = $self->send_command_v2( get_cert_attributes => {
                 identifier => $cert_identifier,
                 attribute => 'meta_%',
@@ -825,7 +825,7 @@ sub init_detail {
 
 
     # hide the related link if there is no data to display or cert is not from this realm
-    if (($cert->{pki_realm} eq $self->_session->param('pki_realm')) &&
+    if (($cert->{pki_realm} eq $self->session_param('pki_realm')) &&
         ($self->send_command_v2 ( "get_cert_attributes", {
             identifier => $cert_identifier,
             attribute => "system_workflow%",
@@ -1171,7 +1171,7 @@ sub action_autocomplete {
 
         if (!$search_result) {
 
-        } elsif ($search_result->{pki_realm} ne $self->_session->param('pki_realm')) {
+        } elsif ($search_result->{pki_realm} ne $self->session_param('pki_realm')) {
             # silently swallow this result and stop searching
             $term = "";
         } else {

@@ -461,7 +461,7 @@ sub init_search {
     );
 
     # Searchable attributes are read from the 'uicontrol' config section
-    my $attributes = $self->_session->param('wfsearch')->{default}->{attributes};
+    my $attributes = $self->session_param('wfsearch')->{default}->{attributes};
     my @meta_descr;
     if ($attributes && (ref $attributes eq 'ARRAY')) {
         my @attrib;
@@ -513,7 +513,7 @@ sub __wf_search_presets {
         $preset = $result->{input} if $result;
 
     } else {
-        $preset = $self->_session->param('wfsearch')->{default}->{preset} || {};
+        $preset = $self->session_param('wfsearch')->{default}->{preset} || {};
         # convert preset for last_update
         foreach my $key (qw(last_update_before last_update_after)) {
             next unless ($preset->{$key});
@@ -883,7 +883,7 @@ sub init_mine {
 
     my $default = {
         query => {
-            attribute => { 'creator' => $self->_session->param('user')->{name} },
+            attribute => { 'creator' => $self->session_param('user')->{name} },
             order => 'workflow_id',
             reverse => 1,
         },

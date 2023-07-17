@@ -527,7 +527,7 @@ sub __persist_status {
     my $status = shift;
 
     my $session_key = $self->__generate_uid();
-    $self->_session->param($session_key, $status);
+    $self->session_param($session_key, $status);
     $self->_session->expire($session_key, 15);
 
     return '_status_id!' . $session_key;
@@ -539,7 +539,7 @@ sub __fetch_status {
     my $session_key = $self->param('_status_id');
     return unless $session_key;
 
-    my $status = $self->_session->param($session_key);
+    my $status = $self->session_param($session_key);
     return unless ($status && ref $status eq 'HASH');
 
     $self->log->debug("Set persisted status: " . $status->{message});
@@ -605,8 +605,8 @@ sub _render_body_to_str {
     my $result = $self->resp->resolve;
 
     # show message of the day if we have a page section (may overwrite status)
-    if ($self->page->is_set && (my $motd = $self->_session->param('motd'))) {
-        $self->_session->param('motd', undef);
+    if ($self->page->is_set && (my $motd = $self->session_param('motd'))) {
+        $self->session_param('motd', undef);
         $result->{status} = $motd;
     }
     # add session ID
@@ -672,7 +672,7 @@ sub render {
 
         # if url does not start with http or slash, prepend baseurl + route name
         if ($url !~ m{\A http|/}x) {
-            my $baseurl = $self->_session->param('baseurl');
+            my $baseurl = $self->session_param('baseurl');
             $url = sprintf("%sopenxpki/%s", $baseurl, $url);
         }
 
@@ -717,7 +717,7 @@ sub __register_wf_token {
     my $id = $self->__generate_uid();
     $self->log->debug('wf token id ' . $id);
     $self->log->trace('token info ' . Dumper  $token) if $self->log->is_trace;
-    $self->_session->param($id, $token);
+    $self->session_param($id, $token);
     return { name => 'wf_token', type => 'hidden', value => $id };
 }
 
@@ -738,7 +738,7 @@ sub __fetch_wf_token {
 
     $self->log->debug( "load wf_token " . $id );
 
-    my $token = $self->_session->param($id);
+    my $token = $self->session_param($id);
     $self->_session->clear($id) if($purge);
     return $token;
 
@@ -780,7 +780,7 @@ sub __persist_response {
     my $id = $self->__generate_uid;
     $self->log->debug('persist response ' . $id);
 
-    $self->_session->param('response_'.$id, $data );
+    $self->session_param('response_'.$id, $data );
     $self->_session->expire('response_'.$id, $expire) if $expire;
 
     return  "cache!fetch!id!$id";
@@ -800,7 +800,7 @@ sub __fetch_response {
     my $id = shift;
 
     $self->log->debug('fetch response ' . $id);
-    my $response = $self->_session->param('response_'.$id);
+    my $response = $self->session_param('response_'.$id);
     if (!$response) {
         $self->log->error( "persisted response with id $id does not exist" );
         return;
@@ -965,7 +965,7 @@ sub decrypted_param {
     my $item = $self->param($param_name)
         or return;
 
-    if ($item->{__jwt_key} ne $self->_session->param('jwt_encryption_key')) {
+    if ($item->{__jwt_key} ne $self->session_param('jwt_encryption_key')) {
         $self->log->debug("Parameter '".$param_name."'' was not JWT encrypted");
         return;
     }
@@ -981,10 +981,10 @@ sub _encrypt_jwt {
     die "Only values of type HashRef are supported for encrypted input fields\n"
       unless ref $value eq 'HASH';
 
-    my $key = $self->_session->param('jwt_encryption_key');
+    my $key = $self->session_param('jwt_encryption_key');
     if (not $key) {
         $key = Crypt::PRNG::random_bytes(32);
-        $self->_session->param('jwt_encryption_key', $key);
+        $self->session_param('jwt_encryption_key', $key);
     }
 
     my $token = encode_jwt(

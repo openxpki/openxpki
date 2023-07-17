@@ -60,7 +60,7 @@ ENTITY_ONLY     Bool: show only certificates issued by this ca (where CSR_SERIAL
     my $query = {
         CERT_ATTRIBUTES => [{
             KEY => 'system_cert_owner',
-            VALUE =>  $self->_session->param('user')->{name},
+            VALUE =>  $self->session_param('user')->{name},
             OPERATOR => 'EQUAL'
         }],
         ORDER => 'CERTIFICATE.NOTBEFORE',

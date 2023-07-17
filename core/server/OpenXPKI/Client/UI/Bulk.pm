@@ -25,7 +25,7 @@ sub init_index {
     );
 
     # Spec holds additional search attributes and list definition
-    my @bulklist = @{$self->_session->param('bulk')->{default}};
+    my @bulklist = @{$self->session_param('bulk')->{default}};
 
     BULKITEM:
     foreach my $bulk (@bulklist) {

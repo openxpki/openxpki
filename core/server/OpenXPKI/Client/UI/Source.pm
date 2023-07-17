@@ -123,7 +123,7 @@ sub _build_path {
         return $self;
     }
 
-    my $realm_path = $self->_session->param('pki_realm') || 'default';
+    my $realm_path = $self->session_param('pki_realm') || 'default';
 
     my $path = $self->_basepath();
     # Check if there is a directory for this realm

@@ -410,7 +410,7 @@ sub action_search {
     }
 
     # Read the query pattern for extra attributes from the session
-    my $spec = $self->_session->param('wfsearch')->{default};
+    my $spec = $self->session_param('wfsearch')->{default};
     my $attr = $self->__build_attribute_subquery( $spec->{attributes} );
 
     if (my $wf_creator = $self->param('wf_creator')) {
