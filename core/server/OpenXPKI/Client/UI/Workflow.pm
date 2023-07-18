@@ -3,6 +3,8 @@ use Moose;
 
 extends 'OpenXPKI::Client::UI::Result';
 
+with 'OpenXPKI::Client::UI::Role::OutputField';
+
 # Core modules
 use DateTime;
 use POSIX;
@@ -1258,7 +1260,22 @@ sub __render_fields {
 
     ##! 64: "Context: " . Dumper($context)
     foreach my $field (@fields_to_render) {
-        my $item = $self->__render_output_field($wf_info, $field) or next;
+        my $name = $field->{name} || '';
+        $field->{value} //= ($wf_info->{workflow}->{context}->{$name} // '');
+
+        my $item = $self->render_output_field( # from OpenXPKI::Client::UI::Role::OutputField
+            $field,
+            # additional custom field render methods
+            {
+                "redirect" => \&__render_field_redirect,
+                "request_info" => \&__render_field_request_info,
+                "cert_info" => \&__render_field_cert_info,
+            },
+            # additional argument to pass to render methods
+            $wf_info,
+        );
+
+        next unless $item;
 
         # do not push items that are empty
         if (!(defined $item->{value} &&
@@ -1284,545 +1301,111 @@ sub __render_fields {
 
 }
 
-=head2 __render_output_field
+# add a redirect command to the page
+sub __render_field_redirect {
+    my ($self, $field, $item, $wf_info) = @_;
 
-Renders a single profile output field, i.e. translates the field definition
-from the config into the the specification expected by the web UI.
+    if (ref $item->{value}) {
+        my $v = $item->{value};
+        my $target = $v->{target} || 'workflow!load!wf_id!'.$wf_info->{workflow}->{id};
+        my $pause = $v->{pause} || 1;
+        $self->set_refresh(uri => $target, timeout => $pause);
+        if ($v->{label}) {
+            $self->status->message($v->{label});
+            $self->status->level($v->{level}) if $v->{level};
+        }
+    } else {
+        $self->redirect->to($item->{value});
+    }
+    return -1; # do not output this field
+}
 
-=cut
+# certificate request info
+sub __render_field_request_info {
+    my ($self, $field, $item, $wf_info) = @_;
 
-sub __render_output_field {
+    $item->{format} = 'unilist';
 
-    my $self = shift;
-    my $wf_info = shift;
-    my $field = shift;
-    my $context = $wf_info->{workflow}->{context};
-
-    my $fieldname = $field->{name} || '';
-    ##! 64: "Context value for field $fieldname: " . (defined $context->{$fieldname} ? Dumper($context->{$fieldname}) : '')
-
-    my $item = {
-        name => $fieldname,
-        value => $field->{value} // (defined $context->{$fieldname} ? $context->{$fieldname} : ''),
-        format =>  $field->{format} || ''
+    my $default_formats = {
+        email => 'email',
+        requestor_email => 'email',
+        owner_contact => 'email',
     };
 
-    if ($field->{uiclass}) {
-        $item->{className} = $field->{uiclass};
-    }
-
-    if ($item->{format} eq 'spacer') {
-        return { format => 'head', className => $item->{className} || 'spacer' };
-    }
-
-    # Suppress key material, exceptions are vollatile and download fields
-    if ($item->{value} =~ /-----BEGIN[^-]*PRIVATE KEY-----/ && $item->{format} ne 'download' && substr($fieldname,0,1) ne '_') {
-        $item->{value} = 'I18N_OPENXPKI_UI_WORKFLOW_SENSITIVE_CONTENT_REMOVED_FROM_CONTEXT';
-    }
-
-    # Label, Description, Tooltip
-    foreach my $prop (qw(label description tooltip preamble)) {
-        $item->{$prop} = $field->{$prop} if $field->{$prop};
-    }
-    $item->{label} ||= $fieldname;
-
-    my $field_type = $field->{type} // '';
-
-    # we have several formats that might have non-scalar values
-    if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
-        $item->{value} = $self->serializer->deserialize( $item->{value} );
-    }
-
-    # auto-assign format based on some assumptions if no format is set
-    if (!$item->{format}) {
-
-        # create a link on cert_identifier fields
-        if ( $fieldname =~ m{ cert_identifier \z }x ||
-            $field_type eq 'cert_identifier') {
-            $item->{format} = 'cert_identifier';
-        }
-
-        # Code format any PEM blocks
-        if (( $fieldname =~ m{ \A (pkcs10|pkcs7) \z }x ) ||
-            ( ref $item->{value} eq '' &&
-                $item->{value} =~ m{ \A \s* -----BEGIN([A-Z ]+)-----.*-----END([A-Z ]+)---- }xms)) {
-            $item->{format} = 'code';
-            $item->{value} =~ s{(\A\s*|\s*\z)}{}sg;
-        } elsif ($field_type eq 'textarea') {
-            $item->{format} = 'nl2br';
-        }
-
-        if (ref $item->{value}) {
-            if (ref $item->{value} eq 'HASH') {
-                $item->{format} = 'deflist';
-            } elsif (ref $item->{value} eq 'ARRAY') {
-                $item->{format} = 'ullist';
-            }
-        }
-        ##! 64: 'Auto applied format: ' . $item->{format}
-    }
-
-    # convert format cert_identifier into a link
-    if ($item->{format} eq "cert_identifier") {
-        $item->{format} = 'link';
-
-        # do not create if the field is empty
-        if ($item->{value}) {
-            my $label = $item->{value};
-
-            my $cert_identifier = $item->{value};
-            $item->{value}  = {
-                label => $label,
-                page => 'certificate!detail!identifier!'.$cert_identifier,
-                target => 'popup',
-                # label is usually formated to a human readable string
-                # but we sometimes need the raw value in the UI for extras
-                value => $cert_identifier,
-            };
-        }
-
-        $self->log->trace( 'item ' . Dumper $item) if $self->log->is_trace;
-
-    # open another workflow - performs ACL check
-    } elsif ($item->{format} eq "workflow_id") {
-
-        my $workflow_id = $item->{value};
-        return unless $workflow_id;
-
-        my $can_access = $self->send_command_v2(check_workflow_acl => { id => $workflow_id  });
-        if ($can_access) {
-            $item->{format} = 'link';
-            $item->{value}  = {
-                label => $workflow_id,
-                page => 'workflow!load!wf_id!'.$workflow_id,
-                target => 'top',
-                value => $workflow_id,
-            };
-        } else {
-            $item->{format} = '';
-        }
-
-        $self->log->trace( 'item ' . Dumper $item) if $self->log->is_trace;
-
-    # add a redirect command to the page
-    } elsif ($item->{format} eq "redirect") {
-
-        if (ref $item->{value}) {
-            my $v = $item->{value};
-            my $target = $v->{target} || 'workflow!load!wf_id!'.$wf_info->{workflow}->{id};
-            my $pause = $v->{pause} || 1;
-            $self->set_refresh(uri => $target, timeout => $pause);
-            if ($v->{label}) {
-                $self->status->message($v->{label});
-                $self->status->level($v->{level}) if $v->{level};
-            }
-        } else {
-            $self->redirect->to($item->{value});
-        }
-        # we dont want this to show up in the result so we unset its value
-        $item = undef;
-
-    # create a link to download the given filename
-    } elsif ($item->{format} =~ m{ \A download(\/([\w_\/-]+))? }xms ) {
-
-        # legacy - format is "download/mime/type"
-        my $mime = $2 || 'application/octect-stream';
-        $item->{format} = 'download';
-
-        # value is empty
-        return unless $item->{value};
-
-        # parameters given in the field definition
-        my $param = $field->{param} || {};
-
-        # Arguments for the UI field
-        # label => STR           # text above the download field
-        # type => "plain" | "base64" | "link",  # optional, default: "plain"
-        # data => STR,           # plain data, Base64 data or URL
-        # mimetype => STR,       # optional: mimetype passed to browser
-        # filename => STR,       # optional: filename, default: depends on data
-        # autodownload => BOOL,  # optional: set to 1 to auto-start download
-        # hide => BOOL,          # optional: set to 1 to hide input and buttons (requires autodownload)
-
-        my $vv = $item->{value};
-        # scalar value
-        if (!ref $vv) {
-            # if an explicit filename is set, we assume it is v3.10 or
-            # later so we assume the value is the data and config is in
-            # the field parameters
-            if ($param->{filename}) {
-                $vv = { filename => $param->{filename}, data => $vv };
-            } else {
-                $vv = { filename => $vv, source => 'file:'.$vv };
-            }
-        }
-
-        # very old legacy format where file was given without source
-        if ($vv->{file}) {
-            $vv->{source} = "file:".$vv->{file};
-            $vv->{filename} = $vv->{file} unless($vv->{filename});
-            delete $vv->{file};
-        }
-
-        # merge items from field param
-        map { $vv->{$_} ||= $param->{$_}  } ('mime','label','binary','hide','auto','filename');
-
-        # guess filename from a file source
-        if (!$vv->{filename} && $vv->{source} && $vv->{source} =~ m{ file:.*?([^\/]+(\.\w+)?) \z }xms) {
-            $vv->{filename} = $1;
-        }
-
-        # set mime to default / from format
-        $vv->{mime} ||= $mime;
-
-        # we have an external source so we need a link
-        if ($vv->{source}) {
-             my $target = $self->__persist_response({
-                source => $vv->{source},
-                attachment =>  $vv->{filename},
-                mime => $vv->{mime}
-            });
-            $item->{value}  = {
-                label => 'I18N_OPENXPKI_UI_CLICK_TO_DOWNLOAD',
-                type => 'link',
-                filename => $vv->{filename},
-                data => $self->_client->script_url . "?page=$target",
-            };
-        } else {
-            my $type;
-            # payload is binary, so encode it and set type to base64
-            if ($vv->{binary}) {
-                $type = 'base64';
-                $vv->{data} = encode_base64($vv->{data}, '');
-            } elsif ($vv->{base64}) {
-                $type = 'base64';
-            }
-            $item->{value}  = {
-                label=> $vv->{label},
-                mimetype => $vv->{mime},
-                filename => $vv->{filename},
-                type => $type,
-                data => $vv->{data},
-            };
-        }
-
-        if ($vv->{hide}) {
-            $item->{value}->{autodownload} = 1;
-            $item->{value}->{hide} = 1;
-        } elsif ($vv->{auto}) {
-            $item->{value}->{autodownload} = 1;
-        }
-
-    # format for cert_info block
-    } elsif ($item->{format} eq "request_info") {
-        $item->{format} = 'unilist';
-
-        my $default_formats = {
-            email => 'email',
-            requestor_email => 'email',
-            owner_contact => 'email',
-        };
-
-        my $cert_values = ($item->{value} and ref $item->{value} eq 'HASH') ? $item->{value} : {};
-        $self->log->trace("Field '$fieldname': values = " . Dumper $cert_values) if $self->log->is_trace;
-
-        my @val;
-        my $cert_profile = $context->{cert_profile};
-        my $cert_subject_style = $context->{cert_subject_style};
-
-        # use customized field list from profile if we find profile and subject in the context
-        if ($cert_profile and $cert_subject_style) {
-
-            my $cert_fields = $self->send_command_v2(get_field_definition => {
-                profile => $cert_profile,
-                style => $cert_subject_style,
-                section => 'info',
-            });
-
-            foreach my $cert_field (@$cert_fields) {
-                my $cert_fieldname = $cert_field->{name};
-                my $value = $cert_values->{$cert_fieldname} or next;
-
-                push @val, {
-                    format => $cert_field->{format} // $default_formats->{$cert_fieldname} // 'text',
-                    label => $cert_field->{label},
-                    value => $value,
-                };
-            }
-        # otherwise transform raw values to a text list
-        } else {
-            foreach my $key (sort keys %{$cert_values}) {
-                push @val, {
-                    format => $default_formats->{$key} // 'text',
-                    label => $key,
-                    value => $cert_values->{$key},
-                };
-            }
-        }
-
-        $self->log->trace("Field '$fieldname': unilist values = " . Dumper \@val) if $self->log->is_trace;
-        $item->{value} = \@val;
-
-    # legacy format for cert_info block
-    } elsif ($item->{format} eq "cert_info") {
-        $item->{format} = 'deflist';
-
-        my $raw = $item->{value};
-
-        # this requires that we find the profile and subject in the context
-        my @val;
-        my $cert_profile = $context->{cert_profile};
-        my $cert_subject_style = $context->{cert_subject_style};
-        if ($cert_profile && $cert_subject_style) {
-
-            if (!$raw || ref $raw ne 'HASH') {
-                $raw = {};
-            }
-
-            my $fields = $self->send_command_v2(get_field_definition => {
-                profile => $cert_profile,
-                style => $cert_subject_style,
-                section => 'info',
-            });
-            $self->log->trace('Profile fields = ' . Dumper $fields) if $self->log->is_trace;
-
-            foreach my $field (@$fields) {
-                my $key = $field->{name}; # Name of the context key
-                if ($raw->{$key}) {
-                    push @val, { label => $field->{label}, value => $raw->{$key}, key => $key };
-                }
-            }
-        } else {
-            # if nothing is found, transform raw values to a deflist
-            my $kv = $item->{value} || {};
-            @val = map { { key => $_, label => $_, value => $kv->{$_}} } sort keys %{$kv};
-
-        }
-
-        $item->{value} = \@val;
-
-    } elsif ($item->{format} eq "ullist" || $item->{format} eq "rawlist") {
-        # nothing to do here
-
-    } elsif ($item->{format} eq "itemcnt") {
-
-        my $list = $item->{value};
-
-        if (ref $list eq 'ARRAY') {
-            $item->{value} = scalar @{$list};
-        } elsif (ref $list eq 'HASH') {
-            $item->{value} = scalar keys %{$list};
-        } else {
-            $item->{value} = '??';
-        }
-        $item->{format} = '';
-
-    } elsif ($item->{format} eq "deflist") {
-
-        # Sort by label
-        my @val;
-        if ($item->{value} && (ref $item->{value} eq 'HASH')) {
-            @val = map { { label => $_, value => $item->{value}->{$_}} } sort keys %{$item->{value}};
-            $item->{value} = \@val;
-        }
-
-    } elsif ($item->{format} eq "grid") {
-
-        my @head;
-        # item value can be data or grid specification
-        if (ref $item->{value} eq 'HASH') {
-            my $hv = $item->{value};
-            $item->{header} = [ map { { 'sTitle' => $_ } } @{$hv->{header}} ];
-            $item->{value} = $hv->{value};
-        } elsif ($field->{header}) {
-            $item->{header} = [ @head = map { { 'sTitle' => $_ } } @{$field->{header}} ];
-        } else {
-            $item->{header} = [ @head = map { { 'sTitle' => '' } } @{$item->{value}->[0]} ];
-        }
-        $item->{action} = $field->{action};
-        $item->{target} = $field->{target} ? $field->{target} : 'top';
-
-    } elsif ($item->{format} eq "chart") {
-
-        my @head;
-
-        my $param = $field->{param} || {};
-
-        $item->{options} = {
-            type => 'line',
-        };
-
-        # read options from the fields param method
-        foreach my $key ('width','height','type','title') {
-            $item->{options}->{$key} = $param->{$key} if (defined $param->{$key});
-        }
-
-        # series can be a hash based on the datas keys or an array
-        my $series = $param->{series};
-        if (ref $series eq 'ARRAY') {
-            $item->{options}->{series} = $series;
-        }
-
-        my $start_at = 0;
-        my $interval = 'months';
-
-        # item value can be data (array) or chart specification (hash)
-        if (ref $item->{value} eq 'HASH') {
-            # single data row chart with keys as groups
-            my $hv = $item->{value};
-            my @series;
-            my @keys;
-            if (ref $series eq 'HASH') {
-                # series contains label as key / value hash
-                @keys = sort keys %{$series};
-                map {
-                    # series value can be a scalar (label) or a full hash
-                    my $ll = $series->{$_};
-                    push @series, (ref $ll ? $ll : { label => $ll });
-                    $_;
-                } @keys;
-
-            } elsif (ref $series eq 'ARRAY') {
-                @keys = map {
-                    my $kk = $_->{key};
-                    delete $_->{key};
-                    $kk;
-                } @{$series};
-
-            } else {
-
-                @keys = grep { ref $hv->{$_} ne 'HASH' } sort keys %{$hv};
-                if (my $prefix = $param->{label}) {
-                    # label is a prefix to be merged with the key names
-                    @series = map { { label => $prefix.'_'.uc($_) } } @keys;
-                } else {
-                    @series = map {  { label => $_ } } @keys;
-                }
-            }
-
-            # check if we have a single row or multiple, we also assume
-            # that all keys have the same value count so we just take the
-            # first one
-            if (ref $hv->{$keys[0]}) {
-                # get the number of items per row
-                my $ic = scalar @{$hv->{$keys[0]}};
-
-                # if start_at is not set, we do a backward calculation
-                $start_at ||= DateTime->now()->subtract ( $interval => ($ic-1) );
-                my $val = [];
-                for (my $drw = 0; $drw < $ic; $drw++) {
-                    my @row = (undef) x @keys;
-                    unshift @row, $start_at->epoch();
-                    $start_at->add( $interval => 1 );
-                    $val->[$drw] = \@row;
-                    for (my $idx = 0; $idx < @keys; $idx++) {
-                        $val->[$drw]->[$idx+1] = $hv->{$keys[$idx]}->[$drw];
-                    }
-                }
-                $item->{value} = $val;
-
-            } elsif ($item->{options}->{type} eq 'pie') {
-
-                my $sum = 0;
-                my @val = map { $sum+=$hv->{$_}; $hv->{$_} || 0 } @keys;
-                if ($sum) {
-                    my $divider = 100 / $sum;
-
-                    @val = map {  $_ * $divider } @val;
-
-                    unshift @val, '';
-                    $item->{value} = [ \@val ];
-                }
-
-            } else {
-                # only one row so this is easy
-                my @val = map { $hv->{$_} || 0 } @keys;
-                unshift @val, '';
-                $item->{value} = [ \@val ];
-            }
-            $item->{options}->{series} = \@series if (@series);
-
-        } elsif (ref $item->{value} eq 'ARRAY' && @{$item->{value}}) {
-            if (!ref $item->{value}->[0]) {
-                $item->{value} = [ $item->{value} ];
-            }
-        }
-
-    } elsif ($field_type eq 'select' && !$field->{template} && $field->{option} && ref $field->{option} eq 'ARRAY') {
-        foreach my $option (@{$field->{option}}) {
-            return unless defined $option->{value};
-            if ($item->{value} eq $option->{value}) {
-                $item->{value} = $option->{label};
-                last;
-            }
-        }
-    }
-
-    if ($field->{template}) {
-
-        $self->log->trace("Render output using template on field '$fieldname', template: ".$field->{template}.', value: ' . Dumper $item->{value}) if $self->log->is_trace;
-
-        # Rendering target depends on value format
-        # deflist: iterate over each label/value pair and render the value template
-        if ($item->{format} eq "deflist") {
-            $item->{value} = [
-                map {
-                    my $val = $self->send_command_v2('render_template', { template => $field->{template}, params => $_ });
-                    {
-                        # $_ is a HashRef: { label => STR, key => STR, value => STR } where key is the field name (not needed here)
-                        label => $_->{label},
-                        value => [ split (/\|/, $val) ],
-                        format => 'raw',
-                    }
-                }
-                @{ $item->{value} }
-            ];
-
-        # bullet list, put the full list to tt and split at the | as sep (as used in profile)
-        } elsif ($item->{format} eq "ullist" || $item->{format} eq "rawlist") {
-            my $out = $self->send_command_v2('render_template', {
-                template => $field->{template},
-                params => { value => $item->{value} },
-            });
-            $self->log->debug('Rendered template: ' . $out);
-            if ($out) {
-                my @val = split /\s*\|\s*/, $out;
-                $self->log->trace('Split ' . Dumper \@val) if $self->log->is_trace;
-                $item->{value} = \@val;
-            } else {
-                $item->{value} = undef; # prevent pushing emtpy lists
-            }
-
-        } elsif (ref $item->{value} eq 'HASH' && $item->{value}->{label}) {
-            $item->{value}->{label} = $self->send_command_v2('render_template', {
-                template => $field->{template},
-                params => { value => $item->{value}->{label} },
-            });
-
-        } else {
-            $item->{value} = $self->send_command_v2('render_template', {
-                template => $field->{template},
-                params => { value => $item->{value} },
-            });
-        }
-
-    } elsif ($field->{yaml_template}) {
-        ##! 64: 'Rendering value: ' . $item->{value}
-        $self->log->trace('Template value: ' . SDumper $item ) if $self->log->is_trace;
-        my $structure = $self->send_command_v2('render_yaml_template', {
-            template => $field->{yaml_template},
-            params => { value => $item->{value} },
+    my $cert_values = ($item->{value} and ref $item->{value} eq 'HASH') ? $item->{value} : {};
+
+    my @val;
+    my $profile = $wf_info->{workflow}->{context}->{cert_profile};
+    my $style = $wf_info->{workflow}->{context}->{cert_subject_style};
+
+    # use customized field list from profile if we find profile and subject in the context
+    if ($profile and $style) {
+        my $cert_fields = $self->send_command_v2(get_field_definition => {
+            profile => $profile,
+            style => $style,
+            section => 'info',
         });
-        $self->log->trace('Rendered YAML template: ' . SDumper $structure) if $self->log->is_trace;
-        ##! 64: 'Rendered YAML template: ' . $out
-        if (defined $structure) {
-            $item->{value} = $structure;
-        } else {
-            $item->{value} = undef; # prevent pushing emtpy lists
+
+        foreach my $cert_field (@$cert_fields) {
+            my $cert_fieldname = $cert_field->{name};
+            my $value = $cert_values->{$cert_fieldname} or next;
+
+            push @val, {
+                format => $cert_field->{format} // $default_formats->{$cert_fieldname} // 'text',
+                label => $cert_field->{label},
+                value => $value,
+            };
+        }
+    # otherwise transform raw values to a text list
+    } else {
+        foreach my $key (sort keys %{$cert_values}) {
+            push @val, {
+                format => $default_formats->{$key} // 'text',
+                label => $key,
+                value => $cert_values->{$key},
+            };
         }
     }
 
-    return $item;
+    $item->{value} = \@val;
+}
+
+# legacy format for certificate request info
+sub __render_field_cert_info {
+    my ($self, $field, $item, $wf_info) = @_;
+
+    $item->{format} = 'deflist';
+
+    my $raw = $item->{value};
+    $raw = {} unless ($raw and ref $raw eq 'HASH');
+
+    # this requires that we find the profile and subject in the context
+    my @val;
+    my $profile = $wf_info->{workflow}->{context}->{cert_profile};
+    my $style = $wf_info->{workflow}->{context}->{cert_subject_style};
+
+    if ($profile && $style) {
+        my $fields = $self->send_command_v2(get_field_definition => {
+            profile => $profile,
+            style => $style,
+            section => 'info',
+        });
+        $self->log->trace('Profile fields = ' . Dumper $fields) if $self->log->is_trace;
+
+        foreach my $field (@$fields) {
+            my $key = $field->{name}; # Name of the context key
+            if ($raw->{$key}) {
+                push @val, { label => $field->{label}, value => $raw->{$key}, key => $key };
+            }
+        }
+    } else {
+        # if nothing is found, transform raw values to a deflist
+        my $kv = $item->{value} || {};
+        @val = map { { key => $_, label => $_, value => $kv->{$_}} } sort keys %{$kv};
+
+    }
+
+    $item->{value} = \@val;
 }
 
 =head2 __render_workflow_info

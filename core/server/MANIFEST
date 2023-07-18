@@ -81,6 +81,7 @@ OpenXPKI/Client/UI/Response/Sections.pm
 OpenXPKI/Client/UI/Response/Status.pm
 OpenXPKI/Client/UI/Response/User.pm
 OpenXPKI/Client/UI/Result.pm
+OpenXPKI/Client/UI/Role/OutputField.pm
 OpenXPKI/Client/UI/Secret.pm
 OpenXPKI/Client/UI/SessionCookie.pm
 OpenXPKI/Client/UI/Source.pm
