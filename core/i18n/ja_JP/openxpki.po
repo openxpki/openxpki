@@ -460,6 +460,92 @@ msgstr "詳細不明/その他の理由"
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
 msgstr "証明書を失効する理由を指定します。"
 
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_DELETE_ENTRY"
+msgstr "キー"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_ENCRYPTED"
+msgstr "キー"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_ENCRYPTED_NO"
+msgstr "キー"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_ENCRYPTED_YES"
+msgstr "キー"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_EXPIRATION_DATE"
+msgstr "最終更新日"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_EXPIRES_AFTER"
+msgstr "最終更新日"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_EXPIRES_BEFORE"
+msgstr "最終更新日"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_KEY"
+msgstr "キー"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
+msgstr "ユーザ名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_MTIME"
+msgstr "ユーザ名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_MTIME_AFTER"
+msgstr "ユーザ名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_MTIME_BEFORE"
+msgstr "ユーザ名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_NAMESPACE"
+msgstr "ユーザ名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_SEARCH_DESC"
+msgstr "SCEPワークフロー検索"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_SEARCH_KEY_PLACEHOLDER"
+msgstr "状態"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_SEARCH_NAMESPACE_PLACEHOLDER"
+msgstr "状態"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_SEARCH_RESULT_DESC"
+msgstr "検索結果と一致する証明書をクリックすると、詳細情報が表示されます。 "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_SEARCH_RESULT_LABEL"
+msgstr "証明書検索結果"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_SEARCH_RESULT_TITLE"
+msgstr "証明書検索結果"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_VALUE"
+msgstr "キー"
+
 msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr "遅延失効がリクエストされました。"
 
@@ -977,6 +1063,10 @@ msgstr "証明書失効リスト（CRL）の発行"
 
 msgid "I18N_OPENXPKI_UI_MENU_CSR_CHECK"
 msgstr "リクエストチェック"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_DATAPOOL"
+msgstr "SCEPワークフロー検索"
 
 # Remove?
 msgid "I18N_OPENXPKI_UI_MENU_ENROLLMENT_SEARCH"

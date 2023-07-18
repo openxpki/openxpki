@@ -451,6 +451,70 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
 msgstr ""
 
+msgid "I18N_OPENXPKI_UI_DATAPOOL_DELETE_ENTRY"
+msgstr "Löschen"
+
+msgid "I18N_OPENXPKI_UI_DATAPOOL_ENCRYPTED"
+msgstr "Format"
+
+msgid "I18N_OPENXPKI_UI_DATAPOOL_ENCRYPTED_NO"
+msgstr "Klartext"
+
+msgid "I18N_OPENXPKI_UI_DATAPOOL_ENCRYPTED_YES"
+msgstr "Verschlüsselt"
+
+msgid "I18N_OPENXPKI_UI_DATAPOOL_EXPIRATION_DATE"
+msgstr "Ablaufdatum"
+
+msgid "I18N_OPENXPKI_UI_DATAPOOL_EXPIRES_AFTER"
+msgstr "Ablauf nach"
+
+msgid "I18N_OPENXPKI_UI_DATAPOOL_EXPIRES_BEFORE"
+msgstr "Ablauf vor"
+
+msgid "I18N_OPENXPKI_UI_DATAPOOL_KEY"
+msgstr "Eintrag"
+
+msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
+msgstr "Ändern"
+
+msgid "I18N_OPENXPKI_UI_DATAPOOL_MTIME"
+msgstr "Letzte Änderung"
+
+msgid "I18N_OPENXPKI_UI_DATAPOOL_MTIME_AFTER"
+msgstr "Geändert nach"
+
+msgid "I18N_OPENXPKI_UI_DATAPOOL_MTIME_BEFORE"
+msgstr "Geändert vor"
+
+msgid "I18N_OPENXPKI_UI_DATAPOOL_NAMESPACE"
+msgstr "Namespace"
+
+msgid "I18N_OPENXPKI_UI_DATAPOOL_SEARCH_DESC"
+msgstr ""
+"Wählen Sie Namespace und ggf. Suchmuster zur Bearbeitung von Datapool-"
+"Einträgen."
+
+msgid "I18N_OPENXPKI_UI_DATAPOOL_SEARCH_KEY_PLACEHOLDER"
+msgstr "Suchmuster für Eintragsname, Platzhalter sind erlaubt"
+
+msgid "I18N_OPENXPKI_UI_DATAPOOL_SEARCH_NAMESPACE_PLACEHOLDER"
+msgstr "Bitte Namespace wählen"
+
+msgid "I18N_OPENXPKI_UI_DATAPOOL_SEARCH_RESULT_DESC"
+msgstr ""
+"Datapool-Einträge, die ihren Suchkriterien entsprechen. Zum Bearbeiten "
+"klicken Sie bitte eine Zeile an."
+
+msgid "I18N_OPENXPKI_UI_DATAPOOL_SEARCH_RESULT_LABEL"
+msgstr "Ergebnis der Datapool-Suche"
+
+msgid "I18N_OPENXPKI_UI_DATAPOOL_SEARCH_RESULT_TITLE"
+msgstr "Suchergebnis"
+
+msgid "I18N_OPENXPKI_UI_DATAPOOL_VALUE"
+msgstr "Wert"
+
 msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr "verzögerte Sperrung beantragt"
 
@@ -964,6 +1028,9 @@ msgstr "Sperrliste (CRL) erzeugen"
 
 msgid "I18N_OPENXPKI_UI_MENU_CSR_CHECK"
 msgstr "Antragsprüfung"
+
+msgid "I18N_OPENXPKI_UI_MENU_DATAPOOL"
+msgstr "Datapool"
 
 msgid "I18N_OPENXPKI_UI_MENU_ENROLLMENT_SEARCH"
 msgstr "Enrollment-Workflows suchen"

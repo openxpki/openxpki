@@ -475,6 +475,92 @@ msgstr "未指定/其他原因"
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
 msgstr "指定您希望吊销证书的原因。"
 
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_DELETE_ENTRY"
+msgstr "密钥"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_ENCRYPTED"
+msgstr "密钥"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_ENCRYPTED_NO"
+msgstr "密钥"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_ENCRYPTED_YES"
+msgstr "密钥"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_EXPIRATION_DATE"
+msgstr "最后更新"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_EXPIRES_AFTER"
+msgstr "最后更新"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_EXPIRES_BEFORE"
+msgstr "最后更新"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_KEY"
+msgstr "密钥"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
+msgstr "用户名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_MTIME"
+msgstr "用户名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_MTIME_AFTER"
+msgstr "用户名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_MTIME_BEFORE"
+msgstr "用户名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_NAMESPACE"
+msgstr "用户名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_SEARCH_DESC"
+msgstr "SCEP工作流程搜索"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_SEARCH_KEY_PLACEHOLDER"
+msgstr "状态"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_SEARCH_NAMESPACE_PLACEHOLDER"
+msgstr "状态"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_SEARCH_RESULT_DESC"
+msgstr "与您的搜索匹配的证书，单击行以显示详细信息。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_SEARCH_RESULT_LABEL"
+msgstr "您的搜索查询结果"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_SEARCH_RESULT_TITLE"
+msgstr "证书搜索结果"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_VALUE"
+msgstr "密钥"
+
 msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr "已请求延迟吊销。"
 
@@ -1017,6 +1103,10 @@ msgstr "颁发证书吊销列表（CRL）"
 
 msgid "I18N_OPENXPKI_UI_MENU_CSR_CHECK"
 msgstr "请求检查器"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_DATAPOOL"
+msgstr "SCEP工作流程搜索"
 
 # Remove?
 #, fuzzy

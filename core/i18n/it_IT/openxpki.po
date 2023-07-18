@@ -566,6 +566,94 @@ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
 msgstr ""
 "Ulteriori informazioni utili a spiegare il motivo della richiesta di revoca."
 
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_DELETE_ENTRY"
+msgstr "Chiave"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_ENCRYPTED"
+msgstr "Chiave"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_ENCRYPTED_NO"
+msgstr "Chiave"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_ENCRYPTED_YES"
+msgstr "Chiave"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_EXPIRATION_DATE"
+msgstr "mostra le liste di revoca precedenti"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_EXPIRES_AFTER"
+msgstr "mostra le liste di revoca precedenti"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_EXPIRES_BEFORE"
+msgstr "mostra le liste di revoca precedenti"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_KEY"
+msgstr "Chiave"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
+msgstr "Nome utente"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_MTIME"
+msgstr "Nome utente"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_MTIME_AFTER"
+msgstr "Nome utente"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_MTIME_BEFORE"
+msgstr "Nome utente"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_NAMESPACE"
+msgstr "Nome utente"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_SEARCH_DESC"
+msgstr "Ricerca Certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_SEARCH_KEY_PLACEHOLDER"
+msgstr "Stato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_SEARCH_NAMESPACE_PLACEHOLDER"
+msgstr "Stato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_SEARCH_RESULT_DESC"
+msgstr ""
+"Certificati corrispondenti alla tua ricerca, clicca su una riga per "
+"visualizzare informazioni dettagliate sul certificato corrispondente."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_SEARCH_RESULT_LABEL"
+msgstr "Risultati Ricerca Certificati"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_SEARCH_RESULT_TITLE"
+msgstr "Risultati Ricerca Certificati"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_VALUE"
+msgstr "Chiave"
+
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr ""
@@ -1225,6 +1313,10 @@ msgstr "Emissione Lista Revoche (CRL)"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_MENU_CSR_CHECK"
 msgstr "Mostra Liste Revoche (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_DATAPOOL"
+msgstr "Ricerca Certificato"
 
 # Remove?
 #, fuzzy
