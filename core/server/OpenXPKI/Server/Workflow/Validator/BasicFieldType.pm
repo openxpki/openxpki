@@ -49,11 +49,10 @@ sub _validate {
 
         if ($regex) {
             my @value = ref $val ? @{$val} : ($val);
-            $regex = qr/$regex/;
             foreach my $vv (@value) {
                 # skip empty
                 next if (!defined $vv || $vv eq '');
-                next if ($vv =~ $regex);
+                next if ($vv =~ m{$regex}xs);
                 ##! 8: "$field - regex $regex failed on value '$vv'"
                 push @no_value, { name => $field, error => "I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED" };
                 last;
