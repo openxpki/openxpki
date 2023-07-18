@@ -49,7 +49,7 @@ command "get_token_info" => {
 
     my $token = CTX('crypto_layer')->get_token({ TYPE => $token_type, NAME => $params->alias });
 
-    $token->get_key_info();
+    return $token->get_key_info();
 };
 
 __PACKAGE__->meta->make_immutable;
