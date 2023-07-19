@@ -364,10 +364,27 @@ sub select {
 }
 
 # SELECT - return first row
-# Returns: DBI statement handle
+# Returns: HashRef
 sub select_one {
     my $self = shift;
     return $self->select(@_, limit => 1)->fetchrow_hashref;
+}
+
+# SELECT - return first column from first row
+# Returns: Scalar
+sub select_value {
+    my $self = shift;
+    my $row = $self->select(@_, limit => 1)->fetchrow_arrayref;
+    return unless ($row);
+    return $row->[0];
+}
+
+# SELECT - return first column from all rows
+# Returns: ArrayRef[Scalar]
+sub select_column {
+    my $self = shift;
+    my $result = $self->select(@_)->fetchall_arrayref([]);
+    return [ map { $_->[0] } @$result ];
 }
 
 # SELECT - return all rows as list of arrays
@@ -798,7 +815,28 @@ Operators can be e.g. C<'IN'>, C<'NOT IN'>, C<'E<gt> MAX'> or C<'E<lt> ALL'>.
 
 =back
 
+=head2 select_value
 
+Selects one row from the database and returns the content of the first
+column.
+
+For parameters see L</select>.
+
+Returns C<undef> if the query had no results.
+
+Please note that C<NULL> values will be converted to Perl C<undef>.
+
+
+=head2 select_column
+
+Selects the first column from all rows in the result set and return
+them as ArrayRef.
+
+For parameters see L</select>.
+
+Returns an empty list if the query had no results.
+
+Please note that C<NULL> values will be converted to Perl C<undef>.
 
 =head2 select_one
 
