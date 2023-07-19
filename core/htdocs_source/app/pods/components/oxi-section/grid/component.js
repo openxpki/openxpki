@@ -29,6 +29,7 @@ export default class OxiSectionGridComponent extends Component {
     actions // generic actions that contain variables instead of real URLs, e.g. page = "wf_id!{serial}"
     @tracked pager
     buttons
+    colByName = new Map()
 
     constructor() {
         super(...arguments)
@@ -64,7 +65,7 @@ export default class OxiSectionGridComponent extends Component {
     get visibleColumns() {
         return this.rawColumns
         .map( (col, index) => { col.index = index; return col })
-        .filter(col => col.sTitle[0] !== "_" && col.bVisible !== 0);
+        .filter(col => col.sTitle[0] !== "_" && col.bVisible != 0);
     }
 
     get pages() {
