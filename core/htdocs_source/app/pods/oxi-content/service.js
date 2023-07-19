@@ -29,6 +29,7 @@ export default class OxiContentService extends Service {
     #rtoken = null
     @tracked tenant = null
     @tracked status = null
+    @tracked popupStatus = null
 
     @tracked top = null
     @tracked popup = null
@@ -204,18 +205,25 @@ export default class OxiContentService extends Service {
             // chain backend calls via Promise
             if (this.#isBootstrapNeeded(doc.session_id)) await this.#bootstrap()
 
-            // last request sets the global status, whether it's a "top" or "popup" target
-            this.status = doc.status
+            // "goto" in a popup will refresh the top page instead
+            if (realTarget === this.TARGET.POPUP && doc.goto) realTarget = this.TARGET.TOP
+
+            // last request sets the status
+            if (realTarget === this.TARGET.POPUP) {
+                this.popupStatus = doc.status
+            } else {
+                this.status = doc.status
+            }
 
             // Set page contents (must be done before setting breadcrumbs)
             if (!doc.goto) this.#setPageContent(realTarget, request.page, doc.page, doc.main, doc.right, partial, trigger)
 
             // Popup
             if (realTarget === this.TARGET.POPUP) {
-                if (doc.refresh || doc.goto) console.warn("'refresh'/'goto' not supported for popup contents")
+                if (doc.refresh) console.warn("'refresh' not supported for popup contents")
             }
             // Page
-            else {
+            if (realTarget !== this.TARGET.POPUP) {
                 this.popup = null
 
                 this.#setBreadcrumbs(request.page, trigger, doc.page)

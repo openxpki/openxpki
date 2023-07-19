@@ -93,21 +93,7 @@
       *************************************
     }}
     <div class="row">
-        <div class="col oxi-message">
-            {{#if this.model.status.message}}
-                {{#if this.model.status.href}}
-                    <a href="{{this.model.status.href}}" target="_blank" rel="noopener noreferrer">
-                        <div class="alert {{echo this.getStatusClass this.model.status.level}}">
-                            <OxiBase::Formatted @format="nl2br" @value={{this.model.status.message}}/>
-                        </div>
-                    </a>
-                {{else}}
-                    <div class="alert {{echo this.getStatusClass this.model.status.level}}">
-                        <OxiBase::Formatted @format="nl2br" @value={{this.model.status.message}}/>
-                    </div>
-                {{/if}}
-            {{/if}}
-        </div>
+        <OxiBase::Status @def={{this.model.status}}/>
     </div>
 
     {{!

@@ -1,0 +1,15 @@
+<div class="col oxi-message">
+    {{#if @def.message}}
+        {{#if @def.href}}
+            <a href="{{@def.href}}" target="_blank" rel="noopener noreferrer">
+                <div class="alert {{echo this.getStatusClass @def.level}}">
+                    <OxiBase::Formatted @format="nl2br" @value={{@def.message}}/>
+                </div>
+            </a>
+        {{else}}
+            <div class="alert {{echo this.getStatusClass @def.level}}">
+                <OxiBase::Formatted @format="nl2br" @value={{@def.message}}/>
+            </div>
+        {{/if}}
+    {{/if}}
+</div>

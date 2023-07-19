@@ -25,6 +25,8 @@
             </h4>
         </Modal.header>
         <Modal.body>
+            <OxiBase::Status @def={{this.model.popupStatus}}/>
+
             {{#each popup.main as |mainEntry|}}
                 <OxiSection @content={{mainEntry}}/>
             {{/each}}

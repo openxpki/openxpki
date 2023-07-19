@@ -91,14 +91,6 @@ export default class OpenXpkiController extends Controller {
         return `${agent.browser} ${known_version}`
     }
 
-    @action
-    getStatusClass(level) {
-        if (level === "error") { return "alert-danger" }
-        if (level === "success") { return "alert-success" }
-        if (level === "warn") { return "alert-warning" }
-        return "alert-info";
-    }
-
     // We don't use <ddm.LinkTo> but our own method to navigate to target page.
     // This way we can force Ember to do a transition even if the new page is
     // the same page as before by setting parameter "force" a timestamp.
