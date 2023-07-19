@@ -1343,9 +1343,11 @@ sub __render_output_field {
         }
 
         # Code format any PEM blocks
-        if ( $fieldname =~ m{ \A (pkcs10|pkcs7) \z }x  ||
-            $item->{value} =~ m{ \A -----BEGIN([A-Z ]+)-----.*-----END([A-Z ]+)---- }xms) {
+        if (( $fieldname =~ m{ \A (pkcs10|pkcs7) \z }x ) ||
+            ( ref $item->{value} eq '' &&
+                $item->{value} =~ m{ \A \s* -----BEGIN([A-Z ]+)-----.*-----END([A-Z ]+)---- }xms)) {
             $item->{format} = 'code';
+            $item->{value} =~ s{(\A\s*|\s*\z)}{}sg;
         } elsif ($field_type eq 'textarea') {
             $item->{format} = 'nl2br';
         }

@@ -14,13 +14,15 @@ sub execute {
     my $context    = $workflow->context();
 
     my $certificate = $self->param('certificate') // $context->param('certificate');
-
     return unless($certificate);
 
-    my $cert_identifier  = CTX('api2')->get_cert_identifier(cert => $certificate);
+    ##! 32: $certificate
+    $certificate =~ m{(-----BEGIN[^-]*CERTIFICATE-----(.+)-----END[^-]*CERTIFICATE-----)}xms;
+    my $cert_identifier  = CTX('api2')->get_cert_identifier(cert => $1);
 
     CTX('log')->application()->debug('Identifier of certificate is ' . $cert_identifier);
 
+    ##! 32: $cert_identifier
     my $target_key = $self->param('target_key') || 'cert_identifier';
     $context->param( $target_key  => $cert_identifier );
 
