@@ -1,15 +1,11 @@
-# OpenXPKI::Server::Workflow::Activity::CSR:PersistRequest:
-# Written by Alexander Klink for the OpenXPKI project 2006
-# Copyright (c) 2006 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Activity::CSR::PersistRequest;
 
 use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
 use Crypt::PKCS10 1.8;
+use Workflow::Exception qw( workflow_error configuration_error );
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 
@@ -25,63 +21,52 @@ sub execute
 
     my $type = $self->param('csr_type') || 'pkcs10';
 
+    configuration_error('Invalid value given for request type (only pkcs10 is supported)')
+        if ($type ne 'pkcs10');
+
     my $profile = $self->param('cert_profile');
     $profile = $context->param('cert_profile') unless ($profile);
-    if (! defined $profile) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_PROFILE_UNDEFINED',
-        );
-    }
 
+    configuration_error('No profile given to PersistCSR')
+        unless ($profile);
 
     my $subject = $self->param('cert_subject');
     $subject = $context->param('cert_subject') unless($subject);
-    if (! defined $subject) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_SUBJECT_UNDEFINED',
-        );
-    }
 
-    my $data;
-    if ($type eq 'spkac') {
-        $data = $context->param('spkac');
-    }
-    elsif ($type eq 'pkcs10') {
-        $data = $context->param('pkcs10');
+    configuration_error('No subject given to PersistCSR')
+        unless(defined $subject);
 
-        if (!$self->param('keepformat')) {
-            Crypt::PKCS10->setAPIversion(1);
-            my $csr = Crypt::PKCS10->new( $data, ignoreNonBase64 => 1, verifySignature => 0  );
-            if (!$csr) {
-                OpenXPKI::Exception->throw(
-                    message => 'Unable to parse PKCS10 container in CSR::PersistRequest'
-                );
-            }
-            $data = $csr->csrRequest(1);
-        }
-    }
-    else {
-        OpenXPKI::Exception->throw(
-            message   => 'I18N_OPENXPKI_ACTIVITY_CSR_INSERTREQUEST_UNSUPPORTED_CSR_TYPE',
-            params => {
-                TYPE => $type,
-            },
-        );
+    my $data = $context->param('pkcs10');
+
+    configuration_error('No PKCS10 request container given to PersistCSR')
+        unless($data);
+
+
+    if (!$self->param('keepformat')) {
+        Crypt::PKCS10->setAPIversion(1);
+        my $csr = Crypt::PKCS10->new( $data, ignoreNonBase64 => 1, verifySignature => 0  );
+
+        workflow_error('Unable to parse PKCS10 container in CSR::PersistRequest')
+            unless($csr);
+
+        $data = $csr->csrRequest(1);
     }
 
     my $source_ref = $serializer->deserialize($context->param('sources')) || {};
 
     my $csr_serial = $dbi->next_id('csr');
 
-    $dbi->insert( into => 'csr', values => {
-        'pki_realm'  => $pki_realm,
-        'req_key'    => $csr_serial,
-        'format'     => $type,
-        'data'       => $data,
-        'profile'    => $profile,
-        'subject'    => $subject,
-    });
-
+    $dbi->insert(
+        into => 'csr',
+        values => {
+            'pki_realm'  => $pki_realm,
+            'req_key'    => $csr_serial,
+            'format'     => $type,
+            'data'       => $data,
+            'profile'    => $profile,
+            'subject'    => $subject,
+        }
+    );
 
     my $san_serialized = $context->param('cert_subject_alt_name');
     if ($san_serialized) {
@@ -203,17 +188,18 @@ it can then be used by the certificate issuance workflow.
 
 =item csr_type
 
-pkcs10 (default) or spkac (not used currrently)
+Anything other than pkcs10 was removed so I<pkcs10> is the default and
+also the single value that is supported.
 
 =item keepformat
 
-By default, PKCS10 requests are reformatted to a normalized format, which
-is removal of all whitespace and non-base64 characters and proper line wrap.
-This is very important as current openssl version choke when handling
-requests that are not formated as expected.
+By default, PKCS10 requests are reformatted to a normalized format,
+which is removal of all whitespace and non-base64 characters and proper
+line wrap. This is very important as current openssl version choke when
+handling requests that are not formated as expected.
 
-If you want to persist the CSR "as is", set this to a true value and we
-wont touch it.
+If you want to persist the CSR "as is", set this to a true value and the
+incoming data will be written to the database without modifications.
 
 =item cert_profile
 
