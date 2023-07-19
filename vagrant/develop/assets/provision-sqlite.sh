@@ -1,9 +1,12 @@
 #!/bin/bash
-# Provision a Vagrant box (VirtualBox VM) for testing and development:
+set -euo pipefail
 # Install SQLite client and set up database
 
-ROOTDIR="$(dirname "$0")/.."; mountpoint -q /vagrant && ROOTDIR=/vagrant/assets
-. "$ROOTDIR/functions.sh"
+SCRIPTDIR="$(dirname "$0")"
+. "$SCRIPTDIR/functions.sh"
+
+# Read config written by previous provisioning scripts
+while read def; do export $def; done < /etc/environment
 
 #
 # Config

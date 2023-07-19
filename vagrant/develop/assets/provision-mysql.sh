@@ -1,9 +1,9 @@
 #!/bin/bash
-# Provision a Vagrant box (VirtualBox VM) for testing and development:
 # Install MySQL client and set up database
+set -euo pipefail
 
-ROOTDIR="$(dirname "$0")/.."; mountpoint -q /vagrant && ROOTDIR=/vagrant/assets
-. "$ROOTDIR/functions.sh"
+SCRIPTDIR="$(dirname "$0")"
+. "$SCRIPTDIR/functions.sh"
 
 #
 # Config
@@ -22,7 +22,6 @@ while read def; do export $def; done < /etc/environment
 #
 # Run Docker container
 #
-echo "MySQL: downloading and starting Docker container (mariadb) with database"
 docker rm -f mariadb >/dev/null 2>&1
 docker run -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root \
            --name mariadb mariadb:10.5 >$LOG 2>&1 || _exit $?

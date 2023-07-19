@@ -1,12 +1,12 @@
 #!/bin/bash
 # Install Docker CE
+set -euo pipefail
 
 set +e
 docker_count=$(dpkg -s docker-ce 2>&1 | grep -c "Status:.*installed")
 set -e
 
 if [ $docker_count -eq 0 ]; then
-  echo "Docker CE"
   KEYRING=/usr/share/keyrings/docker-archive-keyring.gpg
 
   curl -fsSL https://download.docker.com/linux/debian/gpg \

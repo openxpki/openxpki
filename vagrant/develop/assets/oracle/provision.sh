@@ -2,14 +2,14 @@
 # Provision a Vagrant box (VirtualBox VM) for testing and development:
 # Install Oracle XE client and set up database
 
-ROOTDIR="$(dirname "$0")/.."; mountpoint -q /vagrant && ROOTDIR=/vagrant/assets
-. "$ROOTDIR/functions.sh"
+SCRIPTDIR="$(dirname "$0")/.."
+. "$SCRIPTDIR/../functions.sh"
+
+LOG=$(mktemp)
 
 #
 # Config
 #
-SCRIPT_DIR=/vagrant/assets/oracle
-
 if ! $(grep -q OXI_TEST_DB_ORACLE_NAME /etc/environment); then
     echo "OXI_TEST_DB_ORACLE_NAME=XE"           >> /etc/environment
     echo "OXI_TEST_DB_ORACLE_USER=oxitest"      >> /etc/environment
@@ -20,7 +20,7 @@ while read def; do export $def; done < /etc/environment
 #
 # Check if installation package exists
 #
-if [ ! -f $SCRIPT_DIR/docker/setup/packages/oracle-xe-11.2*.rpm.zip ]; then
+if [ ! -f $SCRIPTDIR/docker/setup/packages/oracle-xe-11.2*.rpm.zip ]; then
     cat <<__ERROR >&2
 ================================================================================
 ERROR - Missing Oracle XE setup file
@@ -41,7 +41,7 @@ fi
 if ! $(docker image ls | grep -q '^oracle-image'); then
     set -e
     echo "Oracle: building Docker image - have a break, this will take a while :)"
-    docker build $SCRIPT_DIR/docker -t oracle-image                   >$LOG 2>&1
+    docker build $SCRIPTDIR/docker -t oracle-image                   >$LOG 2>&1
     set +e
 else
     echo "Oracle: NOT building Docker image as it already exists"
@@ -62,13 +62,13 @@ if [ $installed -eq 0 ]; then
     # quiet mode -q=2 implies -y
     echo "Oracle: building and installing client (and required packages)"
     apt-get -q=2 install fakeroot alien libaio1                       >$LOG 2>&1
-    fakeroot alien -i $SCRIPT_DIR/oracle-instantclient12.1-*.rpm      >$LOG 2>&1
+    fakeroot alien -i $SCRIPTDIR/oracle-instantclient12.1-*.rpm      >$LOG 2>&1
     echo "/usr/lib/oracle/12.1/client64/lib/" > /etc/ld.so.conf.d/oracle.conf
     ldconfig                                                          >$LOG 2>&1
     set +e
 
     # Oracle database connection id
-    sed "s/%hostname%/$HOSTNAME/g" $SCRIPT_DIR/tnsnames.ora  > /etc/tnsnames.ora
+    sed "s/%hostname%/$HOSTNAME/g" $SCRIPTDIR/tnsnames.ora  > /etc/tnsnames.ora
 
     # Set TNS_ADMIN for sqlplus64 to find tnsnames.ora, ORACLE_HOME for Perl module DBD::Oracle
     echo "export TNS_ADMIN=/etc"                             > /etc/profile.d/oracle.sh

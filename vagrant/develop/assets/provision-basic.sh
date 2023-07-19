@@ -3,8 +3,8 @@ set -euo pipefail
 
 # Basic Vagrant Box setup
 
-ROOTDIR="$(dirname "$0")"; mountpoint -q /vagrant && ROOTDIR=/vagrant/assets
-. "$ROOTDIR/functions.sh"
+SCRIPTDIR="$(dirname "$0")"
+. "$SCRIPTDIR/functions.sh"
 
 VBOX_VERSION="$1"
 
