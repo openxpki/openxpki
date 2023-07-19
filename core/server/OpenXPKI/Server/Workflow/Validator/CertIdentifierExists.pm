@@ -16,6 +16,8 @@ sub _preset_args {
 sub _validate {
     my ( $self, $wf, $cert_identifier ) = @_;
 
+    return unless($cert_identifier);
+
     ##! 1: 'start'
     ##! 16: 'check identifier' . $cert_identifier
     my $cert = CTX('dbi')->select_one(
