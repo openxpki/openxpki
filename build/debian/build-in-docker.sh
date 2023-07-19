@@ -13,7 +13,7 @@ fi
 makerepo() {
 
     if [ -z "$SOURCE" ]; then
-        SOURCE="deb http://packages.openxpki.org/v3/debian/ buster release"
+        SOURCE="deb http://packages.openxpki.org/v3/debian/ bookworm release"
     fi
 
     if [ -e "/signkey" ]; then
@@ -27,7 +27,7 @@ makerepo() {
         CONFDIR="--confdir /openxpki/build/debian/reprepro"
     fi
     find /packages /extra-packages -name "*.deb" | \
-        xargs -L1 --no-run-if-empty reprepro $CONFDIR --basedir /repository includedeb buster;
+        xargs -L1 --no-run-if-empty reprepro $CONFDIR --basedir /repository includedeb bookworm;
 
     # Add the apt config
     echo $SOURCE > /repository/openxpki.list

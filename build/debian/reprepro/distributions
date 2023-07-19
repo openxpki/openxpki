@@ -1,6 +1,6 @@
 Origin: The OpenXPKI Project
 Label: The OpenXPKI Project
-Codename: buster
+Codename: bookworm 
 Architectures: amd64
 Components: release
 Description: Repository for the OpenXPKI core software and its dependencies.

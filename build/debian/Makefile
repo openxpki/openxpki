@@ -22,7 +22,7 @@ build-nocache: build-deps.lst
 	docker build --no-cache -t oxibuilder4bookworm .
 
 upload:
-	rsync -av repository/* packages.openxpki.org:/var/www/hosts/packages.openxpki.org/v3/debian/
+	rsync -av repository/* packages.openxpki.org:/var/www/hosts/packages.openxpki.org/v3/bookworm/
 
 $(EXTRA_DIRS):
 	@mkdir -m 755 -p $@
