@@ -395,7 +395,7 @@ sub __load_class ($self, $arg) {
     for my $pkg (@variants) {
         try {
             Module::Load::load($pkg);
-            $self->log->debug("Handler class '$pkg' loaded");
+            $self->log->debug("$pkg loaded, testing method availability");
         }
         catch ($err) {
             next if $err =~ /^Can't locate/;
@@ -511,7 +511,6 @@ sub handle_page {
                 $self->log->trace("Internal redirect to: $page") if $self->log->is_trace;
             }
         } else {
-            $self->log->error("No class found for action '$action'");
             $self->resp->status->error('I18N_OPENXPKI_UI_ACTION_NOT_FOUND');
         }
     }
@@ -534,7 +533,6 @@ sub handle_page {
             $result->status($redirected_from->status) if $redirected_from;
             $result->$method(@page_method_args);
         } else {
-            $self->log->error("No class found for page '$page'");
             $result = OpenXPKI::Client::UI::Bootstrap->new(
                 client => $self,
                 req => $req,
