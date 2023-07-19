@@ -158,21 +158,23 @@ export default class OxiSectionFormComponent extends Component {
 
     @action
     addClone(field) {
-        if (field._canAdd === false) return;
-        let index = this.fields.indexOf(field);
-        let fieldCopy = field.clone();
-        fieldCopy.value = "";
-        fieldCopy._focusClone = true;
-        this.fields.insertAt(index + 1, fieldCopy);
-        this.#updateCloneFields();
+        if (field._canAdd === false) return
+        let index = this.fields.indexOf(field)
+        let fieldCopy = field.clone()
+        fieldCopy.value = ""
+        fieldCopy._focusClone = true
+        this.fields.splice(index + 1, 0, fieldCopy)
+        this.fields = this.fields // trigger Ember refresh
+        this.#updateCloneFields()
     }
 
     @action
     delClone(field) {
-        if (field._canDelete === false) return;
-        let index = this.fields.indexOf(field);
-        this.fields.removeAt(index);
-        this.#updateCloneFields();
+        if (field._canDelete === false) return
+        let index = this.fields.indexOf(field)
+        this.fields.splice(index, 1)
+        this.fields = this.fields // trigger Ember refresh
+        this.#updateCloneFields()
     }
 
     // Turns all (non-empty) fields into request parameters (returns an Object)
