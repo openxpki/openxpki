@@ -3,6 +3,7 @@ package OpenXPKI::Client::UI::Handle::Profile;
 use Moose;
 use Data::Dumper;
 use English;
+use List::Util qw( any );
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::i18n qw( i18nGettext );
 
@@ -129,15 +130,44 @@ sub render_subject_form {
     my $cert_profile = $context->{'cert_profile'};
     my $cert_subject_style = $context->{'cert_subject_style'};
 
-    # Parse out the field name and type, we assume that there is only one activity with one field
-    $wf_action = (keys %{$wf_info->{activity}})[0] unless($wf_action);
-    my $parent_name = $wf_info->{activity}->{$wf_action}->{field}[0]->{name};
+    # Parse out the field name and type, we assume that there is only one activity
+    $wf_action = (keys %{$wf_info->{activity}})[0] unless $wf_action;
 
-    $section = substr($wf_info->{activity}->{$wf_action}->{field}[0]->{type}, 5) unless($section);
+    # Safety check
+    die "Could not determine current workflow action" unless $wf_action;
+
+    my %field2section = (
+        cert_info => 'info',
+        cert_subject_parts => 'subject',
+        cert_san_parts => 'san',
+    );
+
+    my $parent_name;
+
+    # Detect field to get section if not already set
+    # TODO Set field type in config as argument to "uihandle" and remove field detection
+    for my $field ($wf_info->{activity}->{$wf_action}->{field}->@*) {
+        if (my $detected_section = $field2section{ $field->{name} }) {
+            $parent_name = $field->{name};
+            if (not $section) {
+                $self->logger->debug("Field '$parent_name' detected - setting profile section to '$detected_section'");
+                $section = $detected_section;
+            } else {
+                if ($section ne $detected_section) {
+                    $self->logger->warn("Mismatch between section detected via field '$parent_name' and uihandle parameter: '$detected_section' != '$section'");
+                }
+            }
+            last;
+        }
+    }
+
+    # Safety check
+    die "Could not determine current UI section" unless $section;
+    die "Invalid UI section: $section" unless any { $_ eq $section } qw( info subject san );
 
     $self->logger->debug("Render subject for '$parent_name', section '$section' in '$wf_action'");
 
-    # Allowed types are cert_subject, cert_san, cert_info
+    # Allowed types are info, subject, san
     my $profile_fields = $self->send_command_v2(get_field_definition => {
         profile => $cert_profile,
         style => $cert_subject_style,
