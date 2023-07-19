@@ -38,6 +38,26 @@ sub AUTO_ID { return bless {}, "OpenXPKI::Server::Database::AUTOINCREMENT" }
 # Attributes
 #
 
+# the OpenXPKI version index of the database schema
+# based on the value stored in the datapool
+# this might NOT work on dedicated logger handles
+has 'version' => (
+    is => 'rw',
+    isa => 'Int',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        return $self->select_value(
+            from => 'datapool',
+            columns => [ 'datapool_value' ],
+            where => {
+                pki_realm => '',
+                namespace => 'config',
+                datapool_key => 'dbschema',
+        }) // 0;
+    }
+);
+
 has 'log' => (
     is => 'ro',
     isa => 'Object',
