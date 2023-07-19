@@ -331,6 +331,10 @@ msgstr "<b>更新</b>与此证书关联的元信息。"
 msgid "I18N_OPENXPKI_UI_CERT_EXPORT_EXCEEDS_LIMIT"
 msgstr "结果集大于导出限制，某些结果项未包含在此列表中！"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_ISSUER_UNKNOWN"
+msgstr "未知"
+
 msgid "I18N_OPENXPKI_UI_CERT_RELATED_HINT"
 msgstr "显示相关的工作流程"
 
@@ -1112,10 +1116,6 @@ msgstr "设置每日消息"
 msgid "I18N_OPENXPKI_UI_MENU_SYSTEM_STATUS"
 msgstr "系统状态"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_MENU_USERS"
-msgstr "请求"
-
 msgid "I18N_OPENXPKI_UI_MENU_WORKFLOW_SEARCH"
 msgstr "工作流程搜索"
 
@@ -1381,6 +1381,10 @@ msgid "I18N_OPENXPKI_UI_PROFILE_HOSTNAME_DESC"
 msgstr "输入系统的完全限定主机名（域名）。"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_IMPORTED_LABEL"
+msgstr "人员（安全电子邮件/身份验证）"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_LOCALITY_DESC"
 msgstr "国家"
 
@@ -1628,6 +1632,9 @@ msgstr "请求者"
 
 msgid "I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY"
 msgstr "搜索结果已过期或为空！"
+
+msgid "I18N_OPENXPKI_UI_SEARCH_SUBMIT_LABEL"
+msgstr "马上搜索"
 
 msgid "I18N_OPENXPKI_UI_SEARCH_TRANSACTION_ID_LABEL"
 msgstr "事务ID"
@@ -2349,6 +2356,14 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_IMPORTCRL_UPLOAD_LABEL"
 msgstr "上传CSR (PKCS10)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_CERTIFICATE_UPLOAD_DESC"
+msgstr "证书签名请求（CSR）"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_CERTIFICATE_UPLOAD_LABEL"
+msgstr "证书签名请求（CSR）"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_ISSUE_CRL_DESC"
 msgstr ""
@@ -3926,9 +3941,6 @@ msgstr "状态"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_PLACEHOLDER"
 msgstr "状态"
 
-msgid "I18N_OPENXPKI_UI_SEARCH_SUBMIT_LABEL"
-msgstr "马上搜索"
-
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_HINT"
 msgstr "类型"
@@ -4511,6 +4523,14 @@ msgstr "证书签名请求（CSR）"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_LABEL"
 msgstr "证书签名请求（CSR）"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_UPLOAD_DESC"
+msgstr "证书签名请求（CSR）"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_UPLOAD_LABEL"
+msgstr "证书签名请求（CSR）"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_DESC"
 msgstr "证书注册工作流程，用于通过自动界面（例如SCEP，RPC）进行证书注册。"
 
@@ -4717,6 +4737,10 @@ msgstr "是"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CUST"
 #~ msgstr "是"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_MENU_USERS"
+#~ msgstr "请求"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_DESC"

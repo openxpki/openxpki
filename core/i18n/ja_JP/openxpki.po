@@ -344,6 +344,10 @@ msgstr "メタデータの更新"
 msgid "I18N_OPENXPKI_UI_CERT_EXPORT_EXCEEDS_LIMIT"
 msgstr "結果がエクスポート制限より大きい場合、正しくエクスポートできません。"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_ISSUER_UNKNOWN"
+msgstr "不明"
+
 msgid "I18N_OPENXPKI_UI_CERT_RELATED_HINT"
 msgstr "関連するワークフローを表示する"
 
@@ -1143,10 +1147,6 @@ msgstr "今日のメッセージを設定する"
 msgid "I18N_OPENXPKI_UI_MENU_SYSTEM_STATUS"
 msgstr "システムステータス"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_MENU_USERS"
-msgstr "リクエスト"
-
 msgid "I18N_OPENXPKI_UI_MENU_WORKFLOW_SEARCH"
 msgstr "ワークフロー検索"
 
@@ -1417,6 +1417,10 @@ msgid "I18N_OPENXPKI_UI_PROFILE_HOSTNAME_DESC"
 msgstr "システムに最も適したホスト名（ドメイン名）を入力します。"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_IMPORTED_LABEL"
+msgstr "データセーフトークン"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_LOCALITY_DESC"
 msgstr "国"
 
@@ -1668,6 +1672,9 @@ msgstr "依頼者"
 
 msgid "I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY"
 msgstr "検索結果が期限切れまたは空です。"
+
+msgid "I18N_OPENXPKI_UI_SEARCH_SUBMIT_LABEL"
+msgstr "今すぐ検索"
 
 msgid "I18N_OPENXPKI_UI_SEARCH_TRANSACTION_ID_LABEL"
 msgstr "トランザクションId"
@@ -2416,6 +2423,14 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_IMPORTCRL_UPLOAD_LABEL"
 msgstr "CSR(PKCS10)のアップロード"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_CERTIFICATE_UPLOAD_DESC"
+msgstr "証明書署名リクエスト(CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_CERTIFICATE_UPLOAD_LABEL"
+msgstr "証明書署名リクエスト(CSR)"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_ISSUE_CRL_DESC"
 msgstr ""
@@ -4079,9 +4094,6 @@ msgstr "状態"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_PLACEHOLDER"
 msgstr "状態"
 
-msgid "I18N_OPENXPKI_UI_SEARCH_SUBMIT_LABEL"
-msgstr "今すぐ検索"
-
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_HINT"
 msgstr "タイプ"
@@ -4676,6 +4688,14 @@ msgstr "証明書署名リクエスト(CSR)"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_LABEL"
 msgstr "証明書署名リクエスト(CSR)"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_UPLOAD_DESC"
+msgstr "証明書署名リクエスト(CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_UPLOAD_LABEL"
+msgstr "証明書署名リクエスト(CSR)"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_DESC"
 msgstr "証明書を登録します。"
 
@@ -4893,6 +4913,10 @@ msgstr "はい"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CUST"
 #~ msgstr "はい"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_MENU_USERS"
+#~ msgstr "リクエスト"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_DESC"

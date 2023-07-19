@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2023-06-27 12:20+0200\n"
+"PO-Revision-Date: 2023-07-19 17:57+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -319,6 +319,9 @@ msgid "I18N_OPENXPKI_UI_CERT_EXPORT_EXCEEDS_LIMIT"
 msgstr ""
 "Anzahl der Treffer ist größer als die gesetzte Exportbegrenzung. Die Liste "
 "enthält nicht alle Treffer!"
+
+msgid "I18N_OPENXPKI_UI_CERT_ISSUER_UNKNOWN"
+msgstr "Der Aussteller des Zertifikates ist unbekannt"
 
 msgid "I18N_OPENXPKI_UI_CERT_RELATED_HINT"
 msgstr "Zugeordnete Workflows"
@@ -1004,13 +1007,11 @@ msgstr "PKI-Operationen"
 msgid "I18N_OPENXPKI_UI_MENU_PREREGISTER_CERTIFICATE"
 msgstr "Zertifikat Vorregistrierung"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_MENU_PREREGISTER_DELETE"
-msgstr "Zertifikat Vorregistrierung"
+msgstr "Vorregistrierung löschen"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_MENU_PREREGISTRATION"
-msgstr "PKI-Operationen"
+msgstr "Vorregistrierung"
 
 msgid "I18N_OPENXPKI_UI_MENU_PROCESS_INFORMATION"
 msgstr "Prozessinformationen"
@@ -1041,9 +1042,6 @@ msgstr "Systemnachrichten verwalten"
 
 msgid "I18N_OPENXPKI_UI_MENU_SYSTEM_STATUS"
 msgstr "Systemstatus"
-
-msgid "I18N_OPENXPKI_UI_MENU_USERS"
-msgstr "Benutzer"
 
 msgid "I18N_OPENXPKI_UI_MENU_WORKFLOW_SEARCH"
 msgstr "Workflow-Suche"
@@ -1287,6 +1285,9 @@ msgstr "Servername"
 msgid "I18N_OPENXPKI_UI_PROFILE_HOSTNAME_DESC"
 msgstr "Geben Sie bitte den FQDN (Hostname) des Systems an."
 
+msgid "I18N_OPENXPKI_UI_PROFILE_IMPORTED_LABEL"
+msgstr "Importiertes Zertifikat"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_LOCALITY_DESC"
 msgstr "Ort / Lokalität (L)"
 
@@ -1526,6 +1527,9 @@ msgstr "Antragsteller"
 
 msgid "I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY"
 msgstr "Das Suchergebnis ist leer oder die Speicherdauer abgelaufen."
+
+msgid "I18N_OPENXPKI_UI_SEARCH_SUBMIT_LABEL"
+msgstr "Suche starten"
 
 msgid "I18N_OPENXPKI_UI_SEARCH_TRANSACTION_ID_LABEL"
 msgstr "Transaktions-ID"
@@ -2272,6 +2276,15 @@ msgstr "Importieren Sie eine extern erstellte CRL in diesen Realm."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_IMPORTCRL_UPLOAD_LABEL"
 msgstr "CRL hochladen"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_CERTIFICATE_UPLOAD_DESC"
+msgstr ""
+"Kopieren Sie das PEM kodierte Zertifikat in das Eingabefeld. Bitte beachten "
+"Sie dass nur Zertifikate hochgeladen werden können, deren Aussteller in der "
+"PKI bereits bekannt ist."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_CERTIFICATE_UPLOAD_LABEL"
+msgstr "Zertifikat hochladen"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_ISSUE_CRL_DESC"
 msgstr ""
 "Dieser Workflow löst das Erstellen neuer Sperrlisten für alle aktiven CAs im "
@@ -2282,17 +2295,11 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_ISSUE_CRL_LABEL"
 msgstr "Sperrliste (CRL) erzeugen"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_TRUSTGROUP_IMPORT_DESC"
-msgstr ""
-"Dieser Workflow löst das Erstellen neuer Sperrlisten für alle aktiven CAs im "
-"aktuellen Realm aus. Eine neue Sperrliste wird erzeugt, wenn neue Sperrungen "
-"vorhanden sind oder das Ende der Gültigkeit der CRL bald erreicht ist. Sie "
-"können das Erstellen neuer Sperrlisten nachfolgend erzwingen."
+msgstr "Importiert ein Zertifikat und weist es einer Vertrauensliste zu."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_TRUSTGROUP_IMPORT_LABEL"
-msgstr "Trigger CRL Issue"
+msgstr "Import in eine Vertrauensliste"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ISSUE_CRL_DESC"
 msgstr "Sperrliste ausstellen"
@@ -2678,13 +2685,11 @@ msgstr " Kopieren Sie das PEM kodierte Zertifikat in das Feld"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTSIGN_TOKEN"
 msgstr "Ausstellende CA"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_EXTENSION_PARTS_DESC"
-msgstr "Bestandteile zum Aufbau des Subject Alternative Name."
+msgstr "Bestandteile zum Aufbau der Zertifikats-Erweiterungen."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_EXTENSION_PARTS_LABEL"
-msgstr "SubjectAltName Bestandteile"
+msgstr "Erweiterungen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_DESC"
 msgstr ""
@@ -3204,9 +3209,8 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_TOOLTIP"
 msgstr "Ihr PKCS#10 Zertifikatsantrag"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_DESC"
-msgstr " "
+msgstr "  "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_LABEL"
 msgstr "PKCS#7 Container"
@@ -3888,9 +3892,6 @@ msgstr "Zustand"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_PLACEHOLDER"
 msgstr "Exakte Suche nach Status. z.B. SUCCESS oder PENDING"
 
-msgid "I18N_OPENXPKI_UI_SEARCH_SUBMIT_LABEL"
-msgstr "Suche starten"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_HINT"
 msgstr "Finde nur Workflows dieses Typs."
 
@@ -4082,19 +4083,14 @@ msgstr "Schlüsselkennwort festlegen"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SAN_LABEL"
 msgstr "Erweiterte Zertifikatsinhalte festlegen"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SUBJECT_DESC"
-msgstr ""
-"Dieser Workflow wurde erfolgreich beenden und kann nicht erneut gestartet "
-"werden."
+msgstr "Aus diesen Informationen wird das Subject des Zertifikates erstellt."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SUBJECT_LABEL"
 msgstr "Zertifikatsinhalte festlegen"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_INITIAL_DESC"
-msgstr ""
-"Dieser Workflow ist fehlgeschlagen und kann nicht erneut gestartet werden."
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_INITIAL_LABEL"
 msgstr " "
@@ -4553,6 +4549,12 @@ msgstr "Antrag zur Ausstellung eines Zertifikates"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_LABEL"
 msgstr "Zertifikatsantrag (CSR)"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_UPLOAD_DESC"
+msgstr "Ermöglicht den Upload von extern erstellten Zertifikaten."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_UPLOAD_LABEL"
+msgstr "Zertifikat hochladen"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_DESC"
 msgstr ""
 "Workflow zum automatischen Ausstellen von Zertifikaten (z. B. über SCEP, "
@@ -4581,13 +4583,11 @@ msgstr "Ändern der Meta-Daten eines Zertifikates"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CHANGE_METADATA_LABEL"
 msgstr "Meta-Daten ändern"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_EXPORT_DESC"
-msgstr "Importiert Sperrlisten von externen CAs"
+msgstr "Exportiert Sperrlisten der CAs"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_EXPORT_LABEL"
-msgstr "Sperrliste importieren"
+msgstr "Sperrlisten exportieren"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_IMPORT_DESC"
 msgstr "Importiert Sperrlisten von externen CAs"
@@ -4757,6 +4757,9 @@ msgstr "ja"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CUST"
 #~ msgstr "ja"
+
+#~ msgid "I18N_OPENXPKI_UI_MENU_USERS"
+#~ msgstr "Benutzer"
 
 # fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_DESC"

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2023-06-27 13:39+0200\n"
+"PO-Revision-Date: 2023-07-19 17:58+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -321,6 +321,9 @@ msgid "I18N_OPENXPKI_UI_CERT_EXPORT_EXCEEDS_LIMIT"
 msgstr ""
 "Result set is larger than the export limit, some result items are not "
 "included in this list!"
+
+msgid "I18N_OPENXPKI_UI_CERT_ISSUER_UNKNOWN"
+msgstr "Certificate issuer is unknown"
 
 msgid "I18N_OPENXPKI_UI_CERT_RELATED_HINT"
 msgstr "Show related workflows"
@@ -1045,9 +1048,6 @@ msgstr "Set Message of the Day"
 msgid "I18N_OPENXPKI_UI_MENU_SYSTEM_STATUS"
 msgstr "System Status"
 
-msgid "I18N_OPENXPKI_UI_MENU_USERS"
-msgstr "Manage Users"
-
 msgid "I18N_OPENXPKI_UI_MENU_WORKFLOW_SEARCH"
 msgstr "Workflow Search"
 
@@ -1278,6 +1278,9 @@ msgstr "Hostname"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_HOSTNAME_DESC"
 msgstr "Enter the fully qualified hostname (domain name) of your system."
+
+msgid "I18N_OPENXPKI_UI_PROFILE_IMPORTED_LABEL"
+msgstr "Imported Certificate"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_LOCALITY_DESC"
 msgstr "Locality (L)"
@@ -1517,6 +1520,9 @@ msgstr "Requester"
 
 msgid "I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY"
 msgstr "Search result expired or empty!"
+
+msgid "I18N_OPENXPKI_UI_SEARCH_SUBMIT_LABEL"
+msgstr "Search now"
 
 msgid "I18N_OPENXPKI_UI_SEARCH_TRANSACTION_ID_LABEL"
 msgstr "Transaction Id"
@@ -2194,6 +2200,15 @@ msgstr "Upload externally generated CRL into this realm."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_IMPORTCRL_UPLOAD_LABEL"
 msgstr "Upload CRL"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_CERTIFICATE_UPLOAD_DESC"
+msgstr ""
+"Please put the PEM encoded certificate into the box below. Please note that "
+"you can only upload certificates where the issuer certificate is already "
+"known by the PKI."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_CERTIFICATE_UPLOAD_LABEL"
+msgstr "Certificate Upload"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_ISSUE_CRL_DESC"
 msgstr ""
@@ -3726,9 +3741,6 @@ msgstr "State"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_PLACEHOLDER"
 msgstr "exact match of an internal state name, e.g. SUCCESS or PENDING"
 
-msgid "I18N_OPENXPKI_UI_SEARCH_SUBMIT_LABEL"
-msgstr "Search now"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_HINT"
 msgstr "Filter on the selected workflow type."
 
@@ -4313,6 +4325,12 @@ msgstr "Certificate Signing Request (CSR)"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_LABEL"
 msgstr "Certificate Signing Request (CSR)"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_UPLOAD_DESC"
+msgstr "Allows the upload of an externally managed certificate."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_UPLOAD_LABEL"
+msgstr "Certificate Upload"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_DESC"
 msgstr ""
 "Certificate Enrollment workflow used for certificate enrollment via "
@@ -4513,6 +4531,9 @@ msgstr "Yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CUST"
 #~ msgstr "Yes"
+
+#~ msgid "I18N_OPENXPKI_UI_MENU_USERS"
+#~ msgstr "Manage Users"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_DESC"

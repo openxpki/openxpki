@@ -397,6 +397,10 @@ msgstr "Aggiorna i Metadati"
 msgid "I18N_OPENXPKI_UI_CERT_EXPORT_EXCEEDS_LIMIT"
 msgstr "Richiesta"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_ISSUER_UNKNOWN"
+msgstr "sconosciuto"
+
 msgid "I18N_OPENXPKI_UI_CERT_RELATED_HINT"
 msgstr "Mostra i workflow correlati"
 
@@ -1322,10 +1326,6 @@ msgstr "Home"
 msgid "I18N_OPENXPKI_UI_MENU_SYSTEM_STATUS"
 msgstr "Stato del Sistema"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_MENU_USERS"
-msgstr "Richiesta"
-
 msgid "I18N_OPENXPKI_UI_MENU_WORKFLOW_SEARCH"
 msgstr "Cerca Workflow"
 
@@ -1610,6 +1610,10 @@ msgstr ""
 "tuo sistema."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_IMPORTED_LABEL"
+msgstr "Token Datasafe"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_LOCALITY_DESC"
 msgstr "Paese"
 
@@ -1885,6 +1889,9 @@ msgstr "Creatore"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY"
 msgstr "Stato del Certificato"
+
+msgid "I18N_OPENXPKI_UI_SEARCH_SUBMIT_LABEL"
+msgstr "cerca adesso"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_TRANSACTION_ID_LABEL"
@@ -2708,6 +2715,14 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_IMPORTCRL_UPLOAD_LABEL"
 msgstr "Carica CSR (PKCS10)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_CERTIFICATE_UPLOAD_DESC"
+msgstr "Richiesta Revoca Certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_CERTIFICATE_UPLOAD_LABEL"
+msgstr "Richiesta Revoca Certificato (CRR, Certificate Revocation Request)"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_ISSUE_CRL_DESC"
 msgstr ""
@@ -4478,9 +4493,6 @@ msgstr "Stato"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_PLACEHOLDER"
 msgstr "Stato"
 
-msgid "I18N_OPENXPKI_UI_SEARCH_SUBMIT_LABEL"
-msgstr "cerca adesso"
-
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_HINT"
 msgstr "Tipo"
@@ -5136,6 +5148,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_LABEL"
 msgstr "Richiesta Firma Certificato (CSR)"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_UPLOAD_DESC"
+msgstr "Richiesta Revoca Certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_UPLOAD_LABEL"
+msgstr "Richiesta Revoca Certificato (CRR, Certificate Revocation Request)"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_DESC"
 msgstr "Esporta il Certificato nel formato desiderato"
 
@@ -5381,6 +5401,10 @@ msgstr "Sì"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CUST"
 #~ msgstr "Chiave"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_MENU_USERS"
+#~ msgstr "Richiesta"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_DESC"
