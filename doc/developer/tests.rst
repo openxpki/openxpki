@@ -35,8 +35,8 @@ test Oracle connectivity, please use the Vagrant method below.
 Using Vagrant
 -------------
 
-This method creates a complete interactive test environment inside a Virtualbox
-VM (i.e. "Vagrant Box").
+This method creates a complete interactive test environment inside a VirtualBox
+VM (i.e., "Vagrant Box").
 
 *Prerequisites: Virtualbox, Vagrant, Oracle XE 11.2 setup*
 
@@ -67,7 +67,7 @@ VM (i.e. "Vagrant Box").
 2. Refresh the code
 
    To make sure all dependencies inside the VM are in sync with the files on
-   your host (e.g. after code changes), refresh them inside Vagrant::
+   your host (e.g., after code changes), refresh them inside Vagrant::
 
        sudo su
        oxi-refresh
@@ -123,7 +123,7 @@ Please note that the tests currently use the database that is configured in ``/e
 Automatically via Travis-CI
 ---------------------------
 
-Whenever a new commit of the code is pushed onto Github, a Travis-CI test run
+Whenever a new commit of the code is pushed onto GitHub, a Travis-CI test run
 is triggered that runs all of the active tests.
 
 You can find the results at `<https://travis-ci.org/openxpki/openxpki>`_.
@@ -133,7 +133,7 @@ For more details see ``.travis.yml`` in the projects' root directory.
 Writing tests
 #############
 
-Tests are important and we are glad if you want to contribute a test, e.g. for a
+Tests are important and we are glad if you want to contribute a test, e.g., for a
 bug you have found or a new/untested feature!
 
 OpenXPKI itself is quite complex. That is why there is a bunch of Perl classes

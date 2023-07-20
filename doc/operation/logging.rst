@@ -58,14 +58,14 @@ Parameters
 
 Each log message consists of a fixed string describing the event plus a
 list of normalized parameters which are appended as key/value pairs to
-the message so it is easy to search the log for certain or feed it to a
-log analysis programm like logstash.
+the message, so it is easy to search the log for certain or feed it to a
+log analysis program like logstash.
 
 * cakey/key: subject key identifier of the used key
 * certid: certificate identifier
 * wfid: id of the workflow
 * action: name of a workflow action or called API method
-* token: alias name of the token/key, e.g. "ca-signer-1"
+* token: alias name of the token/key, e.g., "ca-signer-1"
 * pki_realm: name of the pki realm
 
 Example (line breaks are for verbosity, logfile is one line)::
