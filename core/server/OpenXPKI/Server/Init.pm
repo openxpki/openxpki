@@ -289,7 +289,6 @@ sub __do_init_dbi {
     my $db_version = CTX('dbi')->version();
     if (!$db_version) {
         warn "Please set database schema version!";
-        CTX('log')->deprecated->error("Please set database schema version");
     }
     ##! 32: 'db schema version is ' . $db_version
     CTX('config')->set('system.version.dbschema', $db_version );
