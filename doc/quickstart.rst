@@ -16,12 +16,6 @@ If you need help, please use the mailing list and do **NOT** open items
 in the issue tracker on GitHub. For details and additional support options
 have a look at http://www.openxpki.org/support.html.
 
-Vagrant
--------
-
-We have a vagrant setup for debian buster. If you have vagrant you can just
-checkout the git repo, go to vagrant/debian and run "vagrant up test". Provisioning takes some
-minutes and will give you a ready to run OXI install available at https://localhost:8443/openxpki/.
 
 Docker
 ------
@@ -52,13 +46,10 @@ in your config!
 Debian Builds
 -------------
 
-New users should use the v3 release branch which is available for Debian 10 (Buster), for
-those running a v2 version we still maintain security and major bug fixes for the old release.
-
-**Packages are for Debian 10 (Buster) / 64bit (arch amd64). The en_US.utf8 locale must be
+**Packages are for Debian 12 (Bookworm) / 64bit (arch amd64). The en_US.utf8 locale must be
 installed as the translation system will crash otherwise! The packages do NOT work
 on Ubuntu or 32bit systems. Packages for SLES/CentOS/RHEL/Ubuntu are available
-via subscription**
+via an enterprise subscription**
 
 Start with a debian minimal install, we recommend to add "SSH Server" and "Web Server" in the package selection menu, as this will speed up the install later.
 
@@ -73,16 +64,16 @@ The https connection is protected by a Let's Encrypt certificate but if you want
 
 You can also find the key on the github repository in `package/debian/Release.key`.
 
-Add the repository to your source list (buster)::
+Add the repository to your source list (bookworm)::
 
-    echo -e "Types: deb\nURIs: https://packages.openxpki.org/v3/debian/\nSuites: buster\nComponents: release\nSigned-By: /usr/share/keyrings/openxpki.pgp" > /etc/apt/sources.list.d/openxpki.sources
+    echo -e "Types: deb\nURIs: https://packages.openxpki.org/v3/bookworm/\nSuites: bookworm\nComponents: release\nSigned-By: /usr/share/keyrings/openxpki.pgp" > /etc/apt/sources.list.d/openxpki.sources
     apt update
 
 Please do not disable the installation of "recommend" packages as this will very likely leave you with an unusable system.
 
 As OpenXPKI can run with different RDBMS, the package does not list any of them as dependency. You therefore need to install the required perl bindings and server software yourself::
 
-    apt install default-mysql-server libdbd-mysql-perl
+    apt install mariadb-server libdbd-mariadb-perl
 
 We strongly recommend to use a fastcgi module as it speeds up the UI, we recommend mod_fcgid as it is in the official main repository (mod_fastcgi will also work but is only available in the non-free repo)::
 
@@ -99,7 +90,7 @@ Now install the OpenXPKI core package, session driver and the translation packag
 use the openxpkiadm command to verify if the system was installed correctly::
 
     openxpkiadm version
-    Version (core): 3.10.0
+    Version (core): 3.26.0
 
 Now, create an empty database and assign a database user::
 
@@ -112,7 +103,7 @@ Now, create an empty database and assign a database user::
 
     main:
        debug: 0
-       type: MariaDB
+       type: MariaDB2
        name: openxpki
        host: localhost
        port: 3306
@@ -122,14 +113,16 @@ Now, create an empty database and assign a database user::
 
 Starting with the v3.8 release we added a MariaDB driver that makes use of MariaDB internal
 sequences instead of the emulation code and we recommend any new installations to use it!
+While the ``MariaDB``drivers uses the old mysql binding the newer ``MariaDB2`` uses the
+modern mariadb perl module which is the recommended driver on modern operating systems.
 
 Please create the empty database schema from the provided schema file. mariadb/mysql and
 postgresql should work out of the box, the oracle schema is good for testing but needs some
 extra indices to perform properly.
 
-Example call when debian packages >= v3.8 are installed::
+Example call when debian packages are installed::
 
-    zcat /usr/share/doc/libopenxpki-perl/examples/schema-mariadb.sql.gz | \
+    cat /usr/share/doc/libopenxpki-perl/examples/schema-mariadb.sql | \
          mysql -u root --password --database  openxpki
 
 If you do not use debian packages, you can get a copy from ``contrib/sql/`` in the
