@@ -17,3 +17,4 @@ Removals, Deprecations, Breaking Changes
   + Remove openxpkictl option --foreground (use --no-detach instead)
   + Parameters validity, reason_code, remove_expired to IssueCRL are deprecated and will be removed with next reason
   + Default behaviour of IssueCRL does now exclude expired certificates (compliant to RFC5280)
+  + Code of the old SCEP layers has been removed (SCEP and LibSCEP)

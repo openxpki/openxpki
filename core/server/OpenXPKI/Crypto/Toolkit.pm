@@ -561,7 +561,7 @@ OpenXPKI::Crypto::Toolkit - an ABSTRACT superclass for Backends and Tools
 =head1 Description
 
 This class provides an abstraction for both Backends and Tools, i.e.
-OpenXPKI::Crypto::Backend::OpenSSL or OpenXPKI::Crypto::Tool::SCEP
+OpenXPKI::Crypto::Backend::OpenSSL.
 Note that it can not be instantiated.
 
 =head1 Functions
@@ -590,4 +590,3 @@ as first parameter followed by a hash with parameters.
 =head1 See Also
 
 OpenXPKI::Crypto::Backend::OpenSSL
-OpenXPKI::Crypto::Tool::SCEP

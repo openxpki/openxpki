@@ -39,7 +39,6 @@ OpenXPKI/VERSION.pm
 ## Client
 OpenXPKI/Client.pm
 OpenXPKI/Client/Config.pm
-OpenXPKI/Client/SCEP.pm
 OpenXPKI/Client/Simple.pm
 
 # Wrappers for EST, RPC...
@@ -135,39 +134,6 @@ OpenXPKI/Crypto/Tool/CreateJavaKeystore/API.pm
 OpenXPKI/Crypto/Tool/CreateJavaKeystore/CLI.pm
 OpenXPKI/Crypto/Tool/CreateJavaKeystore/Command/create_keystore.pm
 OpenXPKI/Crypto/Tool/CreateJavaKeystore/Engine/OpenSSL.pm
-
-OpenXPKI/Crypto/Tool/LibSCEP.pm
-OpenXPKI/Crypto/Tool/LibSCEP/API.pm
-OpenXPKI/Crypto/Tool/LibSCEP/Command/create_certificate_reply.pm
-OpenXPKI/Crypto/Tool/LibSCEP/Command/create_crl_reply.pm
-OpenXPKI/Crypto/Tool/LibSCEP/Command/create_error_reply.pm
-OpenXPKI/Crypto/Tool/LibSCEP/Command/create_nextca_reply.pm
-OpenXPKI/Crypto/Tool/LibSCEP/Command/create_pending_reply.pm
-OpenXPKI/Crypto/Tool/LibSCEP/Command/get_getcert_serial.pm
-OpenXPKI/Crypto/Tool/LibSCEP/Command/get_issuer.pm
-OpenXPKI/Crypto/Tool/LibSCEP/Command/get_message_type.pm
-OpenXPKI/Crypto/Tool/LibSCEP/Command/get_pkcs10.pm
-OpenXPKI/Crypto/Tool/LibSCEP/Command/get_signer_cert.pm
-OpenXPKI/Crypto/Tool/LibSCEP/Command/get_transaction_id.pm
-OpenXPKI/Crypto/Tool/LibSCEP/Command/unwrap.pm
-OpenXPKI/Crypto/Tool/LibSCEP/Engine/OpenSSL.pm
-
-OpenXPKI/Crypto/Tool/SCEP.pm
-OpenXPKI/Crypto/Tool/SCEP/API.pm
-OpenXPKI/Crypto/Tool/SCEP/CLI.pm
-OpenXPKI/Crypto/Tool/SCEP/Command/create_certificate_reply.pm
-OpenXPKI/Crypto/Tool/SCEP/Command/create_crl_reply.pm
-OpenXPKI/Crypto/Tool/SCEP/Command/create_error_reply.pm
-OpenXPKI/Crypto/Tool/SCEP/Command/create_nextca_reply.pm
-OpenXPKI/Crypto/Tool/SCEP/Command/create_pending_reply.pm
-OpenXPKI/Crypto/Tool/SCEP/Command/get_getcert_serial.pm
-OpenXPKI/Crypto/Tool/SCEP/Command/get_getcrl_issuer_serial.pm
-OpenXPKI/Crypto/Tool/SCEP/Command/get_message_type.pm
-OpenXPKI/Crypto/Tool/SCEP/Command/get_pkcs10.pm
-OpenXPKI/Crypto/Tool/SCEP/Command/get_signer_cert.pm
-OpenXPKI/Crypto/Tool/SCEP/Command/get_transaction_id.pm
-OpenXPKI/Crypto/Tool/SCEP/Engine/OpenSSL.pm
-
 
 ## OpenSSL layer
 
@@ -370,7 +336,6 @@ OpenXPKI/Server/Context.pm
 OpenXPKI/Server/Init.pm
 OpenXPKI/Server/Session.pm
 OpenXPKI/Server/Session/Data.pm
-OpenXPKI/Server/Session/Data/SCEP.pm
 OpenXPKI/Server/Session/DriverRole.pm
 OpenXPKI/Server/Session/Driver/Database.pm
 OpenXPKI/Server/Session/Driver/File.pm
@@ -620,21 +585,6 @@ OpenXPKI/Serialization/Legacy.pm
 OpenXPKI/Service.pm
 OpenXPKI/Service/Default.pm
 
-OpenXPKI/Service/LibSCEP.pm
-OpenXPKI/Service/LibSCEP/Command.pm
-OpenXPKI/Service/LibSCEP/Command/GetCACaps.pm
-OpenXPKI/Service/LibSCEP/Command/GetCACert.pm
-OpenXPKI/Service/LibSCEP/Command/GetNextCACert.pm
-OpenXPKI/Service/LibSCEP/Command/PKIOperation.pm
-
-OpenXPKI/Service/SCEP.pm
-OpenXPKI/Service/SCEP/Command/PKIOperation.pm
-OpenXPKI/Service/SCEP/Command/GetCACert.pm
-OpenXPKI/Service/SCEP/Command/GetNextCACert.pm
-OpenXPKI/Service/SCEP/Command/GetCACaps.pm
-OpenXPKI/Service/SCEP/Command.pm
-
-
 # Outside of namespace
 CGI_Session_Driver/openxpki.pm
 
@@ -645,7 +595,6 @@ bin/openxpkicli
 bin/openxpkicmd
 
 # cgi stuff
-cgi-bin/scep.fcgi
 cgi-bin/scepv3.fcgi
 cgi-bin/webui.fcgi
 cgi-bin/soap.fcgi

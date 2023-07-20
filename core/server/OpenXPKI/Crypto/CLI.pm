@@ -377,4 +377,3 @@ undef $cli;
 =head1 See also
 
 OpenXPKI::Crypto::Backend::OpenSSL::CLI - The CLI class for OpenSSL
-OpenXPKI::Crypto::Tool::SCEP::CLI       - The CLI class for openca-scep

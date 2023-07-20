@@ -114,21 +114,6 @@ sub driver_ok {
             ok not $factory->()->resume($id);
         } "delete session";
 
-        # SCEP data object
-        use_ok "OpenXPKI::Server::Session::Data::SCEP";
-
-        my $session4;
-        lives_and {
-            # persist
-            $session4 = $factory->(data_class => "OpenXPKI::Server::Session::Data::SCEP")->create;
-            $session4->data->profile("low");
-            $session4->persist;
-            # resume
-            my $temp = $factory->(data_class => "OpenXPKI::Server::Session::Data::SCEP")->resume($session4->id);
-            # check
-            is $temp->data->profile, "low";
-            $session4->delete;
-        } "create, persist and resume session with SCEP data object";
     }
 }
 

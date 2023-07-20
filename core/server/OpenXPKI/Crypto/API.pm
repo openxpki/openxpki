@@ -303,7 +303,7 @@ OpenXPKI::Crypto::API - API for cryptographic functions - abstract superclass.
 =head1 Description
 
 This is the ABSTRACT superclass for crypto APIs, such as
-OpenXPKI::Crypto::Backend::API, OpenXPKI::Crypto::Tool::SCEP::API, ...
+OpenXPKI::Crypto::Backend::API.
 As an abstract superclass, it just implements basic command validation,
 more functionality has to be implemented in the specific subclasses.
 Note that it can not be instantiated.
@@ -338,4 +338,3 @@ be inapropriate for the requested operation.
 =head1 See also:
 
 OpenXPKI::Crypto::Backend::API - API for generic crypto backends
-OpenXPKI::Tool::SCEP::API      - API for the SCEP tool
