@@ -3,8 +3,8 @@ use Moose;
 
 extends 'OpenXPKI::Client::UI::Result';
 with qw(
-    OpenXPKI::Client::UI::QueryRole
-    OpenXPKI::Client::UI::PagerRole
+    OpenXPKI::Client::UI::Role::QueryCache
+    OpenXPKI::Client::UI::Role::Pager
 );
 
 # Core modules

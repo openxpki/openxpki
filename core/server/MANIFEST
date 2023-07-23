@@ -61,9 +61,7 @@ OpenXPKI/Client/UI/Handle/Status.pm
 OpenXPKI/Client/UI/Home.pm
 OpenXPKI/Client/UI/Information.pm
 OpenXPKI/Client/UI/Login.pm
-OpenXPKI/Client/UI/PagerRole.pm
 OpenXPKI/Client/UI/Profile.pm
-OpenXPKI/Client/UI/QueryRole.pm
 OpenXPKI/Client/UI/Request.pm
 OpenXPKI/Client/UI/Response.pm
 OpenXPKI/Client/UI/Response/DTO.pm
@@ -81,6 +79,8 @@ OpenXPKI/Client/UI/Response/Status.pm
 OpenXPKI/Client/UI/Response/User.pm
 OpenXPKI/Client/UI/Result.pm
 OpenXPKI/Client/UI/Role/OutputField.pm
+OpenXPKI/Client/UI/Role/Pager.pm
+OpenXPKI/Client/UI/Role/QueryCache.pm
 OpenXPKI/Client/UI/Secret.pm
 OpenXPKI/Client/UI/SessionCookie.pm
 OpenXPKI/Client/UI/Source.pm

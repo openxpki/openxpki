@@ -6,7 +6,7 @@ use Data::Dumper;
 use Date::Parse;
 
 extends 'OpenXPKI::Client::UI::Workflow';
-with 'OpenXPKI::Client::UI::QueryRole';
+with 'OpenXPKI::Client::UI::Role::QueryCache';
 
 =head1 OpenXPKI::Client::UI::Bulk
 

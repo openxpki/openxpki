@@ -2,7 +2,7 @@ package OpenXPKI::Client::UI::Workflow::Action;
 use Moose;
 
 extends 'OpenXPKI::Client::UI::Workflow';
-with 'OpenXPKI::Client::UI::QueryRole';
+with 'OpenXPKI::Client::UI::Role::QueryCache';
 
 # Core modules
 use Data::Dumper;
