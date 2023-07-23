@@ -371,6 +371,13 @@ tr.gridrow-danger:hover > td {background-color: #e6c1c7 !important;}
   font-weight: bold;
 }
 
+.styled-encrypted {
+  color: #721c24;
+}
+.styled-encrypted:before {
+  content: '\1F510 ';
+}
+
 /* same colors as Bootstrap's "alert-danger" */
 .oxi-status-danger {
   background-color:#f8d7da;
