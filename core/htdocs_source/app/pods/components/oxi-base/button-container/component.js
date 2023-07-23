@@ -42,4 +42,8 @@ export default class OxiButtonContainerComponent extends Component {
         if (!this.buttons) { return false }
         return this.buttons.some(i => i.description)
     }
+
+    get hasButtons() {
+        return this.buttons.length > 0
+    }
 }
