@@ -1,5 +1,5 @@
 {{~#each (arrayify @text) as |txt|~}}
-    <div class="{{@class}} {{this.cssClasses}}">
+    <span class="{{@class}} {{this.cssClasses}}">
         {{#if @tooltip}}
             <Tippy
                 @delay={{array this.config.tooltipDelay 50}}
@@ -32,5 +32,5 @@
     {{else}}
         {{txt}}
     {{/if}}
-    </div>
+    </span>
 {{~/each~}}
