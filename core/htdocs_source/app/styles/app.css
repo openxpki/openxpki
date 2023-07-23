@@ -331,11 +331,6 @@ tr.gridrow-danger:hover > td {background-color: #e6c1c7 !important;}
   color: #9cA5Ad;
 }
 
-.oxi-keyvalue-head.spacer {
-  margin-top: 1rem;
-  background-color: #eee;
-}
-
 .oxi-truncate {
   /* like Bootstraps "text-truncate" class */
   overflow: hidden;
