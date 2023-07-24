@@ -25,7 +25,7 @@ signature_for __build_pager => (
         query => 'Dict['.
             'order => Optional[Str],'.
             'reverse => Optional[Bool],'.
-            'Slurpy[ HashRef[Defined] ]'.
+            'Slurpy[ HashRef ]'.
         ']',
         count => 'Int',
         limit => 'Int', { default => 50 },
