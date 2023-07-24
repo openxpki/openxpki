@@ -333,15 +333,9 @@ sub __load_class ($self, $arg) {
     my $params = {};
     # the request is encoded in an encrypted jwt structure
     if ($class eq 'encrypted') {
-        # TODO - consolidate with JWT code from Request.pm
-        my $jwt_key = $self->session->param('jwt_encryption_key');
-        unless ($jwt_key) {
-            $self->log->debug("JWT encrypted request but client session contains no decryption key");
-            return;
-        }
         # as the token has non-word characters the above regex does not contain the full payload
         # we therefore read the payload directly from call stripping the class name
-        my $decoded = $arg->req->_decrypt_jwt($remainder);
+        my $decoded = $arg->req->_decrypt_jwt($remainder) or return;
         if ($decoded->{page}) {
             $self->log->debug("Encrypted request with page " . $decoded->{page});
             ($class, $method) = ($decoded->{page} =~ /\A (\w+)\!? (\w+)? \z/xms);
@@ -349,11 +343,14 @@ sub __load_class ($self, $arg) {
             $class = $decoded->{class};
             $method = $decoded->{method};
         }
-        my %secure = map { $_ => $decoded->{$_} } grep { $_ !~ m{\A(page|class|method)\z} } keys %$decoded;
+        my $secure = $decoded->{params} // {};
+        $params->{__secure} = {
+            $secure->%*,
+            # pass on JWT key so decrypted_param('__secure') can validate it later on
+            __jwt_key => $decoded->{__jwt_key}, # $decoded->{__jwt_key} is injected by _decrypt_jwt()
+        };
         $self->log->debug("Encrypted request to $class / $method");
-        $self->log->trace("Encrypted request secure params " . Dumper \%secure )
-            if ($self->log->is_trace && (keys %secure));
-        $params->{__secure} = { %secure, (__jwt_key => $jwt_key ) };
+        $self->log->trace("Secure params: " . Dumper $secure) if ($self->log->is_trace and keys $secure->%*);
     }
     else {
         ($method, $param_raw) = ($remainder =~ /\A (\w+)? \!?(.*) \z/xms);

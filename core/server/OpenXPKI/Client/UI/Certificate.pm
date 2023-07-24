@@ -801,10 +801,12 @@ sub init_detail {
                 my $page;
                 if ($item->{autorun} || $item->{param}) {
                     my $action = {
-                        %{$item->{param} // {}},
                         page => 'workflow!' . ($item->{autorun} ? 'start' : 'index'),
-                        cert_identifier => $cert_identifier,
-                        wf_type => $item->{workflow},
+                        params => {
+                            %{$item->{param} // {}},
+                            cert_identifier => $cert_identifier,
+                            wf_type => $item->{workflow},
+                        },
                     };
                     $self->log->trace("compile token" . Dumper $action) if $self->log->is_trace;
                     my $token = $self->_encrypt_jwt($action);
