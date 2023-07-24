@@ -800,17 +800,16 @@ sub init_detail {
             foreach my $item (@{$reply->{workflow}}) {
                 my $page;
                 if ($item->{autorun} || $item->{param}) {
-                    my $action = {
+                    $page = $self->secure_call(
                         page => 'workflow!' . ($item->{autorun} ? 'start' : 'index'),
-                        params => {
-                            %{$item->{param} // {}},
-                            cert_identifier => $cert_identifier,
+                        secure_param => {
                             wf_type => $item->{workflow},
+                            wf_params => {
+                                %{$item->{param} // {}},
+                                cert_identifier => $cert_identifier,
+                            },
                         },
-                    };
-                    $self->log->trace("compile token" . Dumper $action) if $self->log->is_trace;
-                    my $token = $self->_encrypt_jwt($action);
-                    $page = 'encrypted!'.$token;
+                    );
                 } else {
                     $page = $baseurl.$item->{workflow};
                 }

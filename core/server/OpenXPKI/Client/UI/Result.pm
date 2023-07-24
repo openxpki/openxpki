@@ -18,11 +18,14 @@ use Moose::Util::TypeConstraints; # PLEASE NOTE: this enables all warnings via M
 use Data::UUID;
 use Crypt::JWT qw( encode_jwt );
 use Crypt::PRNG;
+use Type::Params qw( signature_for );
 
 # Project modules
 use OpenXPKI::i18n qw( i18n_walk );
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Client::UI::Response;
+
+use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
 
 # Attributes set via constructor
 
@@ -33,7 +36,15 @@ has req => (
     required => 1,
 );
 
+# extra parameters appended to a call via xxx!param!value
 has extra => (
+    is => 'rw',
+    isa => 'HashRef',
+    default => sub { {} },
+);
+
+# extra parameters from a secure JWT
+has extra_secure => (
     is => 'rw',
     isa => 'HashRef',
     default => sub { {} },
@@ -412,9 +423,17 @@ sub set_status_from_error_reply {
 
 =head2 param
 
-Returns a single input parameter value, i.e. real CGI parameters and those
-appended to the action name using C<!>. Parameters from the action name have
-precedence.
+Returns a single input parameter value, i.e.
+
+=over
+
+=item * secure parameters passed in a (serverside) JWT encoded hash,
+
+=item * those appended to the action name using C<!> and
+
+=item * real CGI parameters.
+
+A parameter name will be looked up in the listed order.
 
 If the input parameter is a list (multiple values) then only the first value is
 returned.
@@ -441,6 +460,31 @@ sub param {
 
     my @val = $self->__param($key);
     return $val[0];
+}
+
+=head2 secure_param
+
+Returns a single input parameter that was passed inside an encrypted JWT.
+
+B<Parameters>
+
+=over
+
+=item * I<Str> C<$key> - parameter name to retrieve.
+
+=back
+
+=cut
+
+sub secure_param {
+
+    my ($self, $key) = @_;
+
+    my $val = $self->extra_secure->{$key};
+    return $val if defined $val;
+
+    $self->log->trace("Requested secure parameter '$key' was not found") if $self->log->is_trace;
+    return;
 }
 
 =head2 multi_param
@@ -476,7 +520,9 @@ sub __param {
     confess "param() / multi_param() expect a single key (string) as argument\n" if (not $key or ref $key); # die
 
     my @queries = (
-        # Try extra parameters appended to action
+        # Try extra parameters from a secure JWT
+        sub { return $self->extra_secure->{$key} },
+        # Try extra parameters appended to a call via xxx!param!value
         sub { return $self->extra->{$key} },
         # Try parameter via request object
         sub { return $self->req->multi_param($key) },
@@ -999,6 +1045,42 @@ sub _encrypt_jwt {
     );
 
     return $token
+}
+
+=head2 secure_call
+
+Encrypt the given page and parameters using a JWT.
+
+Returns a string consisting of the pseudo page named C<encrypted> and the JWT
+as single parameter.
+
+B<Named parameters>
+
+=over
+
+=item * I<Str> C<page> - page to call.
+
+=item * I<HashRef> C<secure_param> - additional secure parameters that will be available via L</secure_param>.
+
+=back
+
+=cut
+
+signature_for secure_call => (
+    method => 1,
+    named => [
+        page => 'Str',
+        secure_param  => 'HashRef | Undef', { default => {} },
+    ],
+);
+sub secure_call ($self, $arg) {
+
+    my $token = $self->_encrypt_jwt({
+        page => $arg->page,
+        secure_param => $arg->secure_param // {},
+    });
+
+    return "encrypted!${token}";
 }
 
 =head2 make_autocomplete_query

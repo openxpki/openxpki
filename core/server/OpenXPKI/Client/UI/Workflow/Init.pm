@@ -66,15 +66,7 @@ sub init_start {
     my $self = shift;
     my $args = shift;
 
-    my $params = $self->decrypted_param('__secure');
-    my $wf_type;
-    if ($params) {
-        $wf_type = $params->{'wf_type'};
-        delete $params->{'wf_type'};
-    } else {
-        $wf_type = $self->param('wf_type');
-    }
-
+    my $wf_type = $self->param('wf_type');
     if (!$wf_type) {
         # todo - handle errors
         $self->log->error("No workflow given to init_start");
@@ -83,7 +75,7 @@ sub init_start {
 
     my $wf_info = $self->send_command_v2( 'create_workflow_instance', {
         workflow => $wf_type,
-        params => ($params // {}),
+        params => $self->secure_param('wf_params') // {},
         ui_info => 1,
         $self->__tenant(),
     });

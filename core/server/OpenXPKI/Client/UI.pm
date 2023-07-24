@@ -331,26 +331,22 @@ sub __load_class ($self, $arg) {
     }
 
     my $params = {};
+    my $secure_params = {};
     # the request is encoded in an encrypted jwt structure
     if ($class eq 'encrypted') {
         # as the token has non-word characters the above regex does not contain the full payload
         # we therefore read the payload directly from call stripping the class name
-        my $decoded = $arg->req->_decrypt_jwt($remainder) or return;
-        if ($decoded->{page}) {
-            $self->log->debug("Encrypted request with page " . $decoded->{page});
-            ($class, $method) = ($decoded->{page} =~ /\A (\w+)\!? (\w+)? \z/xms);
+        my $decrypted = $arg->req->_decrypt_jwt($remainder) or return;
+        if ($decrypted->{page}) {
+            $self->log->debug("Encrypted request with page " . $decrypted->{page});
+            ($class, $method) = ($decrypted->{page} =~ /\A (\w+)\!? (\w+)? \z/xms);
         } else {
-            $class = $decoded->{class};
-            $method = $decoded->{method};
+            $class = $decrypted->{class};
+            $method = $decrypted->{method};
         }
-        my $secure = $decoded->{params} // {};
-        $params->{__secure} = {
-            $secure->%*,
-            # pass on JWT key so decrypted_param('__secure') can validate it later on
-            __jwt_key => $decoded->{__jwt_key}, # $decoded->{__jwt_key} is injected by _decrypt_jwt()
-        };
+        $secure_params = $decrypted->{secure_param} // {};
         $self->log->debug("Encrypted request to $class / $method");
-        $self->log->trace("Secure params: " . Dumper $secure) if ($self->log->is_trace and keys $secure->%*);
+        $self->log->trace("Secure params: " . Dumper $secure_params) if ($self->log->is_trace and keys $secure_params->%*);
     }
     else {
         ($method, $param_raw) = ($remainder =~ /\A (\w+)? \!?(.*) \z/xms);
@@ -406,6 +402,7 @@ sub __load_class ($self, $arg) {
             client => $self,
             req => $arg->req,
             extra => $params,
+            extra_secure => $secure_params,
             resp => $self->resp,
         );
 
