@@ -27,6 +27,7 @@ has 'css_class' => (
     documentation => 'className',
 );
 
+# only for popups
 has 'large' => (
     is => 'rw',
     isa => 'Bool',
