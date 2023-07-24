@@ -55,11 +55,12 @@ export default class OxiFormattedComponent extends Component {
     }
 
     get styledValue() {
-        let m = this.args.value.match(/^(([a-z]+):)?(.*)$/m);
+        let val = this.args.value || ''
+        let m = val.match(/^(([a-z]+):)?(.*)$/m)
         return {
-            style: m[2],
-            label: m[3],
-        };
+            style: m[2] || '',
+            label: m[3] || '',
+        }
     }
 
     @action
