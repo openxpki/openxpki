@@ -32,7 +32,7 @@ sub render_output_field {
 
     my $item = {
         name => $name,
-        value => $field->{value},
+        value => $field->{value} // '',
         format =>  $field->{format} || ''
     };
 
