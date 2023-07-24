@@ -349,7 +349,7 @@ sub __load_class ($self, $arg) {
             $class = $decoded->{class};
             $method = $decoded->{method};
         }
-        my %secure = map { $_ =~ m{\A(page|class|method)\z} ? () : ($_ => $decoded->{$_})  } keys %$decoded;
+        my %secure = map { $_ => $decoded->{$_} } grep { $_ !~ m{\A(page|class|method)\z} } keys %$decoded;
         $self->log->debug("Encrypted request to $class / $method");
         $self->log->trace("Encrypted request secure params " . Dumper \%secure )
             if ($self->log->is_trace && (keys %secure));
