@@ -28,8 +28,7 @@ export default class OxiSectionFormComponent extends Component {
     @tracked fields = [];
 
     clonableRefNames = [];
-    focusFeedback = {}; // gets filled with the field feedback if they may receive the focus
-    initialFocussingDone = false;
+    domElements = {}; // DOM elements by field
 
     get buttons() {
         let buttons = []
@@ -298,7 +297,7 @@ export default class OxiSectionFormComponent extends Component {
     @action
     setFieldError(field, message) {
         debug(`oxi-section/form (${this.args.def.action}): setFieldError (${field.name} = ${message})`);
-        let domElement = this.focusFeedback[field._refName]
+        let domElement = this.domElements[field._refName]
         if (!domElement) return
 
         if (!message) message = '' // setCustomValidity() requires empty string to reset error
@@ -334,11 +333,15 @@ export default class OxiSectionFormComponent extends Component {
      * @memberOf OxiSection::Form
      */
     @action
-    setFocusInfoFor(field, element, mayFocus) { // 'field' is injected in our template via (fn ...)
+    registerField(field, element, takesInput) { // 'field' is injected in our template via (fn ...)
+        if (!takesInput) return
+
+        this.domElements[field._refName] = element;
+
         /*
          * A) Focus for newly added clone fields
          */
-        if (mayFocus && field._focusClone) {
+        if (field._focusClone) {
             element.focus();
             field._focusClone = false;
             return;
@@ -347,38 +350,9 @@ export default class OxiSectionFormComponent extends Component {
         /*
          * B) Initial form rendering focus
          */
-        if (this.initialFocussingDone) return;
-
-        // store DOM element if component may receive focus
-        // (NOTE: clone fields just "overwrite" the hash key with the same value)
-        this.focusFeedback[field._refName] = mayFocus ? element : null;
-
-        // if all form fields sent feedback, choose first focusable field
-        let feedbackCount = Object.keys(this.focusFeedback).length;
-        if (feedbackCount === this.originalFieldCount) {
-            this.focusFirstField();
-        }
-    }
-
-    focusFirstField() {
-        if (!this.args.def.isFirstForm) {
-            debug(`oxi-section/form (${this.args.def.action}): we are not the first form - NOT setting focus`);
-            return;
-        }
-        this.initialFocussingDone = true;
-        for (const field of this.visibleFields) {
-            if (this.focusFeedback[field._refName] !== null) {
-                debug(`oxi-section/form (${this.args.def.action}): first focusable field: ${field._refName}`);
-                let elementToFocus = this.focusFeedback[field._refName];
-                // Wrap the focus() in a setTimeout() as otherwise Ember will complain
-                // > You attempted to update `hoverState` on `<wrapperClass:ember197>`,
-                // > but it had already been used previously in the same computation.
-                // Obviously our {{on-init @setFocusInfo ...}} modifier gets triggered by focus changes.
-                setTimeout(() => elementToFocus.focus(), 1);
-                return;
-            }
-        }
-        debug(`oxi-section/form (${this.args.def.action}): no focusable field found`);
+        let meta = this.args.meta || {}
+        let index = this.fields.findIndex(f => f === field)
+        this.content.registerFocusElement(meta.isPopup, true, element, meta.sectionNo, index);
     }
 
     @action

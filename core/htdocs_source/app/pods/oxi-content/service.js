@@ -48,8 +48,10 @@ export default class OxiContentService extends Service {
             { ... }
         ]
     */
-    serverExceptions = [] // custom HTTP response code error handling
+    serverExceptions = []
 
+    #focusFavourite = null // hash containing element + rank for the current focus favourite
+    #willSetFocusOnNextRunLoop = false
 
     TARGET = Object.freeze({
         TOP: Symbol("TOP"),
@@ -382,6 +384,73 @@ export default class OxiContentService extends Service {
         this.tenant = tenant
     }
 
+    /**
+     * Calculates a "rank" for the given DOM element and registers it as the
+     * "favourite" one to receive the focus if its rank is lower than the best
+     * one seen so far.
+     *
+     * The rank is better if the element is inside a popup, if it's a form field,
+     * the lower the section number is and the lower the field number within a
+     * section is (if any).
+     *
+     * @param {bool} isPopup - whether the element resides in a popup
+     * @param {bool} isFormField - whether the element is a form field
+     * @param {object} element - the DOM element
+     * @param {number} sectionNo - section no. (or null)
+     * @param {number} fieldNo - field no. within a form (or null)
+     */
+    @action
+    registerFocusElement(isPopup=false, isFormField=false, element, sectionNo=-1, fieldNo=-1) {
+        let rank =
+              ((isPopup     ? 0 : 1) << 17)
+            + ((isFormField ? 0 : 1) << 16)
+            + ((sectionNo+1)         <<  8)
+            + (fieldNo+1)
+
+        // remove current favourite if it's gone or invisible
+        if (this.#focusFavourite && !this.#focusFavourite.element) this.#focusFavourite = null
+        if (this.#focusFavourite && !this.isElementVisible(this.#focusFavourite.element)) this.#focusFavourite = null
+
+        if (!this.#focusFavourite || rank < this.#focusFavourite.rank) {
+            this.#focusFavourite = { rank, element }
+            debug(`New favourite to receive focus is (isPopup=${isPopup}, isFormField=${isFormField}, sectionNo=${sectionNo}, fieldNo=${fieldNo}, ${element}) -> rank=${rank}`)
+
+            // set focus on favourite field in next cycle
+            // (this allows for all form fields to settle / register)
+            if (!this.#willSetFocusOnNextRunLoop) {
+                this.#willSetFocusOnNextRunLoop = true
+                next(() => this.setFocus())
+            }
+        }
+    }
+
+    isElementVisible(el) {
+        let rect = el.getBoundingClientRect()
+        return (
+            rect.top >= 0 &&
+            rect.left >= 0 &&
+            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+            rect.right <= (window.innerWidth || document.documentElement.clientWidth) &&
+            rect.width > 0 &&
+            rect.height > 0
+        )
+    }
+
+    /**
+     * Sets the focus to the current favourite DOM element.
+     */
+    @action
+    setFocus() {
+        this.#willSetFocusOnNextRunLoop = false
+
+        if (this.#focusFavourite && !this.#focusFavourite.element) this.#focusFavourite = null
+        if (this.#focusFavourite && !this.isElementVisible(this.#focusFavourite.element)) this.#focusFavourite = null
+        if (!this.#focusFavourite) return
+
+        debug('Setting focus to current favourite element')
+        this.#focusFavourite.element.focus()
+    }
+
     // Sets the loading state, i.e. dims the page and shows a banner with the
     // given message.
     // If 'message' is set to null, the banner will be hidden.
@@ -467,15 +536,6 @@ export default class OxiContentService extends Service {
     }
 
     #setPageContent(target, requestedPageName, page, main, right, partial, trigger) {
-        // Mark the first form on screen: only the first one is allowed to focus
-        // its first input field.
-        for (const section of [...(main||[]), ...(right||[])]) {
-            if (section.type === "form") {
-                section.content.isFirstForm = true
-                break
-            }
-        }
-
         let obj
         // Popup
         if (target === this.TARGET.POPUP) {

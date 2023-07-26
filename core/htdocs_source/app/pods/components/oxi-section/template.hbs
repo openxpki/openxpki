@@ -1,5 +1,5 @@
 <!-- components/oxi-section -->
-{{#if @renderAsCard}}
+{{#if @meta.renderAsCard}}
 
     <div class="card bg-light mb-3 ms-3">
 
@@ -15,7 +15,11 @@
         {{/if}}
 
         <div class="card-body px-0 {{unless @content.compact "py-2"}}" {{on-init this.initialized}}>
-            {{component this.type def=this.sectionData isInfoBox=@isInfoBox isCompact=@content.compact}}
+            {{component this.type
+                def=this.sectionData
+                isCompact=@content.compact
+                meta=@meta
+            }}
         </div>
     </div>
 
@@ -29,8 +33,12 @@
             <div class={{unless @content.compact "mb-3"}}>{{defuse @content.content.description}}</div>
         {{/if}}
 
-        <div {{on-init this.initialized}} class={{unless (or @isInfoBox @content.compact) "ms-3"}}>
-            {{component this.type def=this.sectionData isInfoBox=@isInfoBox isCompact=@content.compact}}
+        <div {{on-init this.initialized}} class={{unless (or @meta.isInfoBox @content.compact) "ms-3"}}>
+            {{component this.type
+                def=this.sectionData
+                isCompact=@content.compact
+                meta=@meta
+            }}
         </div>
     </div>
 
