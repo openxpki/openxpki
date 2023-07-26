@@ -126,7 +126,8 @@ module.exports = function(defaults) {
       // CSS assets
       miniCssExtractPluginOptions: {
         filename: `autoimport-[name].css`,
-      }
+      },
+      publicAssetURL: 'assets/', // use relative URL (without `{rootURL}/`) so that the old /openxpki/ backend path works
     },
 
     // broccoli-asset-rev - fingerprint assets in production build
