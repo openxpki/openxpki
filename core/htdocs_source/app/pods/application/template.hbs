@@ -11,7 +11,11 @@
         >
             <div class="oxi-push-footer">
                 <Application::Header/>
+
+                {{!-- Contents of sub-routes (i.e. the main Ember route /openxpki).
+                      "Each template will be rendered into the {{outlet}} of its parent route's template." --}}
                 {{outlet}}
+
             </div>
             <Application::Footer/>
         </div>

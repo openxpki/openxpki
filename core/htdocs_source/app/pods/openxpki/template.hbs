@@ -87,21 +87,12 @@
         </div>
     </div>
 
-    {{!
-      *************************************
-      Show status messages
-      *************************************
-    }}
-    <div class="row">
-        <OxiBase::Status @def={{this.model.status}}/>
-    </div>
-
-    {{!
-      *************************************
-      Breadcrumb and page title
-    }}
     <div class="row">
         <div class="col oxi-pagehead">
+            {{!
+              *************************************
+              Breadcrumbs
+            }}
             {{#each this.breadcrumbs as |bc|}}
                 {{#let (concat "badge text-bg-secondary rounded-pill oxi-breadcrumb mb-3 " bc.class) as |css|}}
                 {{#if bc.page}}
@@ -122,30 +113,44 @@
                 {{/unless}}
                 {{/let}}
             {{/each}}
+
+            {{!
+              *************************************
+              Status messages
+            }}
+            <div class="row">
+                <OxiBase::Status @def={{this.model.status}}/>
+            </div>
+
+            {{!
+              *************************************
+              Page title
+            }}
             {{#if this.model.top.page.label}}
                 <h3>{{this.model.top.page.label}}</h3>
             {{/if}}
         </div>
     </div>
 
-    {{!
-      *************************************
-      Page description
-    }}
-    {{#if this.model.top.page.description}}
-        <div class="row">
-            <div class="col mb-3">
-                {{defuse this.model.top.page.description}}
-            </div>
-        </div>
-    {{/if}}
-
     <div class="row">
-        {{!
-          *************************************
-          Main page content
-        }}
         <div class="col-11 {{if this.showInfo "col-lg-7"}} oxi-main order-0">
+
+            {{!
+              *************************************
+              Page description
+            }}
+            {{#if this.model.top.page.description}}
+                <div class="row">
+                    <div class="col mb-3">
+                        {{defuse this.model.top.page.description}}
+                    </div>
+                </div>
+            {{/if}}
+
+            {{!
+              *************************************
+              Main page content
+            }}
             {{#each this.model.top.main as |entry|}}
                 <!-- this.model.top.main item -->
                 {{! extra row/col level to restrict form width if info block
@@ -193,7 +198,8 @@
     </div>
 </div>
 
-{{!-- Contents of popup sub-route (if any) --}}
+{{!-- Contents of sub-routes (i.e. /openxpki/popup) if any.
+      "Each template will be rendered into the {{outlet}} of its parent route's template." --}}
 {{outlet}}
 
 <BsModal
