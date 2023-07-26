@@ -81,7 +81,7 @@ serve: docker-build ## run Ember.js development server
 #
 # Update Ember
 #
-update-ember: docker-build
+update-ember: docker-build ## update ember-cli and ember-cli-update
 	$(MANAGER) run $(MANAGER_OPTS_RUN) -ti --rm \
 	  -v $(abspath ./):/source:ro \
 	  -v $(abspath ./):/output \
@@ -91,7 +91,7 @@ update-ember: docker-build
 #
 # Update Javascript dependencies
 #
-update-deps: docker-build
+update-deps: docker-build ## update all dependencies in package.json
 	$(MANAGER) run $(MANAGER_OPTS_RUN) -ti --rm \
 	  -v $(abspath ./):/source:ro \
 	  -v $(abspath ./):/output \
@@ -101,7 +101,7 @@ update-deps: docker-build
 #
 # Generate JavaScript documentation
 #
-docs: docker-build ## compile Ember code using a Docker image
+docs: docker-build ## create Javascript API documentation in /docs-api
 	rm -rf ./docs-api
 	mkdir ./docs-api
 	$(MANAGER) run $(MANAGER_OPTS_RUN) -ti --rm \
