@@ -53,7 +53,7 @@
     "ember-cli-update": "^1.0.1",
     "ember-fetch": "^8.1.2",
     "ember-flatpickr": "^4.0.0",
-    "ember-intl": "git://github.com/ember-intl/ember-intl.git#f364dba",
+    "ember-intl": "^6.0.0-beta.6",
     "ember-load-initializers": "^2.1.2",
     "ember-modifier": "^4.1.0",
     "ember-page-title": "^7.0.0",
