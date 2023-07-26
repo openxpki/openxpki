@@ -99,6 +99,16 @@ update-deps: docker-build ## update all dependencies in package.json
 	  update-deps
 
 #
+# Update pnpm-lock.yaml
+#
+update-lockfile: docker-build ## update pnpm-lock.yaml (after you modified package.json)
+	$(MANAGER) run $(MANAGER_OPTS_RUN) -ti --rm \
+	  -v $(abspath ./):/source:ro \
+	  -v $(abspath ./):/output \
+	  $(IMAGE) \
+	  update-lockfile
+
+#
 # Generate JavaScript documentation
 #
 docs: docker-build ## create Javascript API documentation in /docs-api

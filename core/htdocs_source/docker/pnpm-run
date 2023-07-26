@@ -7,7 +7,7 @@ echo -e "\n[Copy source code without node_modules/]"
 OPTS=(--recursive --links --devices --specials --times --delete --inplace --quiet)
 
 # Do not use the bind-mounted node_modules/ from the host...
-if [ "$1" == "serve" ]; then
+if [ "serve" == "$1" ]; then
   # in "serve" mode continuously sync code to allow Ember to pick up changes
   # and do recompilation
   (while true; do \
@@ -46,7 +46,13 @@ elif [ "update-deps" == "$1" ]; then
   cp package.json pnpm-lock.yaml /output
   echo -e "\nDone.\npackage.json and pnpm-lock.yaml were updated on your host."
 
-else
+elif [ "update-lockfile" == "$1" ]; then
+  # in Dockerfile we run "pnpm install" so pnpm-lock.yaml is already updated
+  echo -e "\n[Copy pnpm-lock.yaml back to the host]"
+  cp pnpm-lock.yaml /output
+  echo -e "\nDone.\npnpm-lock.yaml was updated on your host."
+
+else # including "serve"
   cd /build
   echo -e "\n[pnpm run $1]"
   # The output path for compiled assets can be changed via
