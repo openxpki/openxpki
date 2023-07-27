@@ -106,7 +106,7 @@ sub render_output_field {
             next unless $item->{format} eq $test;
         }
         my $code = $handlers{$test}->($self, $field, $item, $custom_params);
-        return if $code == -1;
+        return if ($code//0) == -1;
         $match = 1;
     }
 
