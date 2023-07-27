@@ -1,7 +1,14 @@
 /* Ember supports plain CSS out of the box. More info: https://cli.emberjs.com/release/advanced-use/stylesheets/ */
 
+/*
+Does not work currently (2023-07-28), so we directly specify them in index.html.
+Possible causes:
+- Ember updates (esp. their refactoring regarding ember-cli-clean-css)
+- removal of {{rootURL}} in index.html
+
 @import url("bootstrap-v5-tweaks.css");
 @import url("glyphicons.css");
+*/
 
 /******************************************************************************
  * Common helpers

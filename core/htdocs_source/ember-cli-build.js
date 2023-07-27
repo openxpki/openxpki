@@ -100,6 +100,7 @@ module.exports = function(defaults) {
       options: {
         processImport: true,
         keepBreaks: true,
+        rebase: false,
       }
     },
 
