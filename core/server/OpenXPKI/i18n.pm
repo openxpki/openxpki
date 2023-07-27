@@ -17,7 +17,7 @@ use OpenXPKI::Debug;
 
 our $language = "";
 our $locale_prefix = "";
-our %_seen_refaddrs;
+our %_translated_refs;
 
 use vars qw (@ISA @EXPORT_OK);
 use base qw( Exporter );
@@ -70,7 +70,7 @@ sub i18n_walk {
     my $data = shift;
     die 'Parameter must be either HashRef or ArrayRef' unless (ref $data eq 'HASH' or ref $data eq 'ARRAY');
 
-    local %_seen_refaddrs;
+    local %_translated_refs;
     return _walk($data);
 }
 
@@ -88,22 +88,24 @@ sub _walk {
         return defined $translated ? $translated : undef;
     }
 
-    # References: skip if already seen
+    # References: return translated version if already seen
     my $refaddr = refaddr($val);
-    return $val if $_seen_refaddrs{$refaddr}++;
+    return $_translated_refs{$refaddr} if $_translated_refs{$refaddr};
 
     if (blessed $val) {
         $ref = reftype($val);
     }
 
-    # References: recurse if ArrayRef or HashRef
+    # return reference if not ArrayRef or HashRef (i.e. CodeRef)
     return $val unless $ref eq 'ARRAY' || $ref eq 'HASH';
 
-    if ($ref eq 'ARRAY') {
-        return [ map { _walk($_) } @$val ];
-    } else { # HASH
-        return { map { $_ => _walk($val->{$_}) } keys %$val };
-    }
+    my $translated = ($ref eq 'ARRAY')
+        ? [ map { _walk($_) } @$val ] # ArrayRef
+        : { map { $_ => _walk($val->{$_}) } keys %$val }; # HashRef
+
+    $_translated_refs{$refaddr} = $translated; # cache mapping from original to translated structure
+
+    return $translated;
 }
 
 sub set_language {
