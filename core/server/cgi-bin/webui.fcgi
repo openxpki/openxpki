@@ -270,7 +270,7 @@ while (my $cgi = CGI::Fast->new()) {
                 my ($realm, $stack) = split (/\s*;\s*/, $conf->{realm}->{$url_alias});
                 $realm_path_map->{$realm} //= [];
                 push $realm_path_map->{$realm}->@*, {
-                    url => sprintf("%s/%s", $realm_root_url, $url_alias),
+                    url => sprintf("%s/%s/", $realm_root_url, $url_alias),
                     stack => $stack,
                 }
             };
