@@ -31,7 +31,7 @@ pageTitle: "OpenXPKI - Open Source Trustcenter"
 #
 # Year shown in footer (unless footer is replaced using "footer")
 #
-copyrightYear: 2021
+copyrightYear: 2023
 
 #
 # Site header
@@ -56,7 +56,7 @@ header:
 #
 footer: |-
     <p class="text-center text-muted credit">
-        &copy; Copyright 2021
+        &copy; Copyright 2023
         &ndash; <a href="http://www.openxpki.org/">The OpenXPKI Project</a>
     </p>
 
