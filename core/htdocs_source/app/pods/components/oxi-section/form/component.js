@@ -28,7 +28,7 @@ export default class OxiSectionFormComponent extends Component {
     @tracked fields = [];
 
     clonableRefNames = [];
-    domElements = {}; // DOM elements by field
+    domElementsByFieldId = {};
 
     get buttons() {
         let buttons = []
@@ -297,7 +297,8 @@ export default class OxiSectionFormComponent extends Component {
     @action
     setFieldError(field, message) {
         debug(`oxi-section/form (${this.args.def.action}): setFieldError (${field.name} = ${message})`);
-        let domElement = this.domElements[field._refName]
+
+        let domElement = this.domElementsByFieldId[field._id]
         if (!domElement) return
 
         if (!message) message = '' // setCustomValidity() requires empty string to reset error
@@ -336,7 +337,7 @@ export default class OxiSectionFormComponent extends Component {
     registerField(field, element, takesInput) { // 'field' is injected in our template via (fn ...)
         if (!takesInput) return
 
-        this.domElements[field._refName] = element;
+        this.domElementsByFieldId[field._id] = element;
 
         /*
          * A) Focus for newly added clone fields

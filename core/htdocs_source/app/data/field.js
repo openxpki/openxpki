@@ -18,6 +18,7 @@ export default class Field extends Base {
     type
     name
     _refName // internal use: original name, needed for dynamic input fields where 'name' can change
+    _id = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER) // internal use: random ID
     value
     label
     is_optional
@@ -66,4 +67,16 @@ export default class Field extends Base {
      */
     rows
     allow_upload
+
+
+    /**
+     * Clones the object and returns a new instance with the same properties
+     * except for the `_id` which gets a new random value.
+     * @memberOf Field
+     */
+    clone() {
+        let cloneField = super.clone()
+        cloneField._id = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
+        return cloneField
+    }
 }
