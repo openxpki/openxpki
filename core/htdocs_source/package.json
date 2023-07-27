@@ -42,7 +42,7 @@
     "detect-browser": "^5.3.0",
     "ember-auto-import": "^2.6.3",
     "ember-bootstrap": "^5.1.1",
-    "ember-cli": "^4.12.0",
+    "ember-cli": "^5.1.0",
     "ember-cli-babel": "git://github.com/babel/ember-cli-babel.git#ea58db8",
     "ember-cli-dependency-checker": "^3.3.1",
     "ember-cli-head": "^2.0.0",
