@@ -5,7 +5,6 @@ module.exports = function (environment) {
     modulePrefix: 'openxpki',
     podModulePrefix: 'openxpki/pods',   // namespaced directory where resolver will look for resource files
     environment,
-    rootURL: '/webui/index/',  // https://guides.emberjs.com/release/configuring-ember/embedding-applications/#toc_specifying-a-root-url
     locationType: 'hash',   // https://guides.emberjs.com/release/configuring-ember/specifying-url-type/
     EmberENV: {
       EXTEND_PROTOTYPES: false,
@@ -30,6 +29,7 @@ module.exports = function (environment) {
    * Mode specific
    */
   if (environment === 'development') {
+    ENV.rootURL = '/webui/democa/'  // https://guides.emberjs.com/release/configuring-ember/embedding-applications/#toc_specifying-a-root-url
     /*
      * Set up logging
      * https://guides.emberjs.com/release/configuring-ember/debugging/
@@ -54,6 +54,7 @@ module.exports = function (environment) {
   }
 
   if (environment === 'production') {
+    ENV.rootURL = '/webui/'  // https://guides.emberjs.com/release/configuring-ember/embedding-applications/#toc_specifying-a-root-url
     // here you can enable a production-specific feature
   }
 
