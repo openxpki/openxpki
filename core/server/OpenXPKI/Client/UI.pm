@@ -1048,7 +1048,8 @@ sub _set_menu {
         } elsif (ref $menu->{$key} eq 'HASH') {
             $session->param($key, $menu->{$key} );
         } else {
-            $session->param($key, { 'default' => {} });
+            # empty hash is used to disable the search page
+            $session->param($key, {} );
         }
         $self->log->trace("Got $key: " . Dumper $menu->{$key}) if $self->log->is_trace;
     }

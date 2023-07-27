@@ -359,6 +359,11 @@ sub init_search {
     my $self = shift;
     my $args = shift;
 
+    my $opts = $self->session_param('wfsearch');
+    if (!exists $opts->{default}) {
+        return $self->redirect->to('home');
+    }
+
     $self->set_page(
         label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_LABEL',
         description => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_DESC',
@@ -453,7 +458,7 @@ sub init_search {
     );
 
     # Searchable attributes are read from the 'uicontrol' config section
-    my $attributes = $self->session_param('wfsearch')->{default}->{attributes};
+    my $attributes = $opts->{default}->{attributes};
     my @meta_descr;
     if ($attributes && (ref $attributes eq 'ARRAY')) {
         my @attrib;

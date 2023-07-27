@@ -89,6 +89,12 @@ sub init_search {
     my $self = shift;
     my $args = shift;
 
+
+    my $opts = $self->session_param('certsearch');
+    if (!exists $opts->{default}) {
+        return $self->redirect->to('home');
+    }
+
     $self->set_page(
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_LABEL',
         breadcrumb => {
@@ -155,7 +161,7 @@ sub init_search {
         'keys' => $self->__validity_options(), value => $preset->{validity_options} || [ { key => 'valid_at', value => '' }],
     );
 
-    my $attributes = $self->session_param('certsearch')->{default}->{attributes};
+    my $attributes = $opts->{default}->{attributes};
     my @meta_description;
     if (defined $attributes && (ref $attributes eq 'ARRAY')) {
         my @attrib;
