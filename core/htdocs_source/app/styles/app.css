@@ -103,6 +103,10 @@ img.toplogo {
   font-size: 80%;
 }
 
+.oxi-infobox .card {
+  overflow-x: scroll;
+}
+
 /******************************************************************************
  * Vertical resize "button" bar
  */

@@ -1,6 +1,5 @@
 .oxi-footer,.oxi-page{background-color:#f5f5f5}
 .oxi-page,.oxi-page>.row{min-height:100vh}
-.oxi-keyvalue-dots,.oxi-truncate{overflow:hidden}
 .text-break-hyphens{word-wrap:break-word!important;word-break:break-word!important;hyphens:auto}
 body,html{height:100%}
 .oxi-header{margin-bottom:0}
@@ -17,6 +16,8 @@ img.toplogo{height:40px}
 .oxi-push-footer{min-height:100%;height:auto!important;height:100%;margin:0 auto -60px;padding:0 0 60px}
 .oxi-footer{height:60px;padding-top:20px}
 .userinfo{font-size:80%}
+.oxi-infobox .card{overflow-x:scroll}
+.oxi-keyvalue-dots,.oxi-truncate{overflow:hidden}
 .oxi-resize-overlay{max-width:1.5rem;padding-top:10%!important;text-align:center;flex-grow:100}
 .oxi-width-restricted+.oxi-resize-overlay:hover{background-color:#007bff}
 .oxi-width-restricted+.oxi-resize-overlay span::after{content:"»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»";white-space:pre;visibility:hidden;color:#fff}
