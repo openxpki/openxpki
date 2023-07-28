@@ -12,7 +12,7 @@
                             <strong>{{btn.section}}</strong>
                         </div>
                     {{else}}
-                        <div class="col-6 col-md-4">
+                        <div class="col-12 col-sm-6 col-lg-4 order-2 order-sm-1 pb-2 pb-sm-0">
                             <OxiBase::Button @button={{btn}} class="d-block w-100">
                                 {{#if btn.tooltip}}
                                     <Tippy>{{btn.tooltip}}</Tippy>
@@ -20,8 +20,10 @@
                                 {{btn.label}}
                             </OxiBase::Button>
                         </div>
-                        <div class="col-6 col-md-8">
-                            {{btn.description}}
+                        <div class="col-12 col-sm-6 col-lg-8 order-1 order-sm-2">
+                            {{#if btn.description}}
+                                {{btn.description}}<span class="d-inline d-sm-none">:</span>
+                            {{/if}}
                         </div>
                     {{/if}}
                 </div>
@@ -34,18 +36,22 @@
                     {{#if (and (has-block) (eq index 0))}}
                         {{yield}}
                     {{/if}}
+                    <div class="row align-items-start my-2">
                     {{#each btnGroup as |btn|}}
+                        <div class="col-12 col-sm-auto pb-1">
                         {{#if btn.section}}
                             <!-- Section are not supported yet -->
                         {{else}}
-                            <OxiBase::Button @button={{btn}}>
+                            <OxiBase::Button @button={{btn}} class="d-block d-sm-flex w-100">
                                 {{#if btn.tooltip}}
                                     <Tippy>{{btn.tooltip}}</Tippy>
                                 {{/if}}
                                 {{btn.label}}
                             </OxiBase::Button>
                         {{/if}}
+                        </div>
                     {{/each}}
+                    </div>
                 </div>
             {{/each}}
 

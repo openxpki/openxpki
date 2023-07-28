@@ -17,7 +17,6 @@ img.toplogo{height:40px}
 .oxi-footer{height:60px;padding-top:20px}
 .userinfo{font-size:80%}
 .oxi-infobox .card{overflow-x:scroll}
-.oxi-keyvalue-dots,.oxi-truncate{overflow:hidden}
 .oxi-resize-overlay{max-width:1.5rem;padding-top:10%!important;text-align:center;flex-grow:100}
 .oxi-width-restricted+.oxi-resize-overlay:hover{background-color:#007bff}
 .oxi-width-restricted+.oxi-resize-overlay span::after{content:"»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»";white-space:pre;visibility:hidden;color:#fff}
@@ -76,14 +75,15 @@ tr.gridrow-warning:hover>td{background-color:#faf2cc!important}
 tr.gridrow-danger>td{background-color:#ebcccc!important}
 tr.gridrow-danger:hover>td{background-color:#e6c1c7!important}
 @media (min-width:768px){.oxi-keyvalue-label{flex:0 0 auto;width:auto;max-width:35%}
+.oxi-keyvalue-label-infobox{flex:0 0 auto;width:auto;max-width:42%}
 }
 @media (min-width:992px){.oxi-keyvalue-label{max-width:27%}
 }
 @media (min-width:1140px){.oxi-keyvalue-label{max-width:19%}
 }
-.oxi-keyvalue-label-infobox{flex:0 0 auto;width:auto;max-width:42%}
+.oxi-keyvalue-dots{overflow:hidden}
 .oxi-keyvalue-dots::after{content:". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";color:#9cA5Ad}
-.oxi-truncate{text-overflow:ellipsis}
+.oxi-truncate{overflow:hidden;text-overflow:ellipsis}
 .certstatus-issued,.dns-valid,.styled-valid{color:green}
 .certstatus-revoked,.dns-failed,.styled-failed{color:red}
 .certstatus-crl_issuance_pending,.dns-skipped,.styled-attention{color:orange}

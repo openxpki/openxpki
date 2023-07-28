@@ -114,16 +114,17 @@
 </div>
 
 <div class="row">
-    <div class="col-lg-6">
+    <div class="col-lg-6 order-2 order-lg-1">
         <OxiBase::ButtonContainer @buttons={{this.buttons}}/>
     </div>
-    <div class="col-lg-6">
+    <div class="col-lg-6 order-1 order-lg-2">
         {{#if @def.pager}}
             <OxiSection::Grid::Pagination
                 @pager={{this.pager}}
                 @pages={{this.pages}}
                 @pagesizes={{this.pagesizes}}
                 @setPage={{this.updatePage}}
+                class="mt-3"
             />
         {{/if}}
     </div>

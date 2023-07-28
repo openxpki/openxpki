@@ -300,6 +300,12 @@ tr.gridrow-danger:hover > td {background-color: #e6c1c7 !important;}
     width: auto;
     max-width: 35%; /* must be less than "col-5" = 41.6%, see app/pods/components/oxi-section/keyvalue/template.hbs */
   }
+
+  .oxi-keyvalue-label-infobox {
+    flex: 0 0 auto;
+    width: auto;
+    max-width: 42%;
+  }
 }
 
 /* above "lg" = 992px */
@@ -314,12 +320,6 @@ tr.gridrow-danger:hover > td {background-color: #e6c1c7 !important;}
   .oxi-keyvalue-label {
     max-width: 19%; /* must be less than "col-3" = 25.0% */
   }
-}
-
-.oxi-keyvalue-label-infobox {
-  flex: 0 0 auto;
-  width: auto;
-  max-width: 42%;
 }
 
 .oxi-keyvalue-dots {

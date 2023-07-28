@@ -9,6 +9,7 @@
 }}
 <BsNavbar
     @backgroundColor="secondary"
+    @toggleBreakpoint="lg"
     class="py-2 py-lg-0 mb-3 bg-opacity-10 border-2 border-bottom border-secondary"
     as |navbar|
 >
@@ -18,7 +19,7 @@
             {{#each this.model.navEntries as |navEntry|}}
                 {{!-- sub menu --}}
                 {{#if navEntry.entries.length}}
-                    <nav.dropdown class="mx-2" as |dd|>
+                    <nav.dropdown class="mx-lg-2" as |dd|>
                         <dd.toggle class="{{if navEntry.active "active"}}">
                             {{navEntry.label}}
                             <span class="caret"></span>
@@ -49,7 +50,7 @@
                     </nav.dropdown>
                 {{!-- plain menu item --}}
                 {{else}}
-                    <nav.item class="mx-2">
+                    <nav.item class="mx-lg-2">
                         <a
                             class="nav-link {{if navEntry.active "active"}}"
                             href="{{url-for "openxpki" navEntry.key}}"
@@ -73,7 +74,7 @@
     </navbar.content>
 </BsNavbar>
 
-<div class="container-fluid {{this.model.top.page.className}}">
+<div class="container-fluid pe-md-3 {{this.model.top.page.className}}">
     {{!
       *************************************
       Old browser warning
@@ -133,7 +134,7 @@
     </div>
 
     <div class="row">
-        <div class="col-11 {{if this.showInfo "col-lg-7"}} oxi-main order-0">
+        <div class="col-12 {{if this.model.top.right (if this.showInfo "col-lg-7" "col-lg-11")}} oxi-main order-0">
             {{!
               *************************************
               Page description
