@@ -37,7 +37,9 @@
                         <div class="col px-2 d-none d-md-block oxi-keyvalue-dots">
                         </div>
                     {{/if}}
-                    <div class="{{if this.hasLabels (if @meta.isInfoBox "col-6" "col-md-7 col-lg-8 col-xl-9") "col-12"}} px-2 ms-3 ms-md-0">
+                    {{! Infobox: at small screen size "md" we use MORE columns because the whole page layout
+                        is changed at that size and the infobox will take complete screen width }}
+                    <div class="{{if this.hasLabels (if @meta.isInfoBox "col-md-8 col-lg-6" "col-md-7 col-lg-8 col-xl-9") "col-12"}} px-2 ms-3 ms-md-0">
                         {{#if item.preamble}}<i>{{item.preamble}}</i><br/>{{/if}}
                         <OxiBase::Formatted
                             @format={{item.format}}
