@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2023-07-19 17:57+0200\n"
+"PO-Revision-Date: 2023-08-02 10:59+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -451,9 +451,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
 msgstr ""
 
-msgid "I18N_OPENXPKI_UI_DATAPOOL_DELETE_ENTRY"
-msgstr "Löschen"
-
 msgid "I18N_OPENXPKI_UI_DATAPOOL_ENCRYPTED"
 msgstr "Format"
 
@@ -474,9 +471,6 @@ msgstr "Ablauf vor"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_KEY"
 msgstr "Eintrag"
-
-msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
-msgstr "Ändern"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_MTIME"
 msgstr "Letzte Änderung"
@@ -1842,11 +1836,9 @@ msgstr "Suchergebnis"
 msgid "I18N_OPENXPKI_UI_USER_SEARCH_SUBMIT_LABEL"
 msgstr "Suche starten"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_USER_TITLE"
-msgstr "Aussteller Zertifikate in dieser CA"
+msgstr "Benutzerverwaltung"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_USER_USERNAME"
 msgstr "Benutzername"
 
@@ -2040,17 +2032,14 @@ msgstr "Initialize"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_LABEL"
 msgstr "Initialize"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_RETYPE_SERVER_PASSWORD_DESC"
 msgstr ""
-"Die PKI hat ein Passwort für Sie erstellt. Bitte notieren Sie sich dieses "
-"Passwort, da Sie es später benötigen, um den privaten Schlüssel des "
-"Zertifikates herunterzuladen und zu installieren. Um das Passwort zu "
-"bestätigen, geben Sie es bitte in das leere Feld ein!"
+"Diesen Schlüssel benötigen Sie um Zertifikate auf Basis dieser "
+"Vorregistrierung auszustellen. Bitte speichern Sie dieses Passwort in "
+"sicherer Art und Weise!"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_RETYPE_SERVER_PASSWORD_LABEL"
-msgstr "Passwort"
+msgstr "Ihr Registrierungsschlüssel"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_DATA_DESC"
 msgstr ""
@@ -2506,7 +2495,6 @@ msgstr ""
 "der ausstellenden CA gültig ist. Dies funktioniert nur, wenn sich die "
 "Gültigkeitszeiträume von CA und Zertifikat überlappen."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SHOWMETA_LOAD_DATA_DESC"
 msgstr ""
 "Geben Sie den Zeritifikatsidentifier an oder verwenden Sie die automatische "
@@ -2515,7 +2503,6 @@ msgstr ""
 "verwenden Sie bitte die Zertifikatssuche. Das Ergebnis enthält einen "
 "direkten Link, um die Änderung auszuführen."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SHOWMETA_LOAD_DATA_LABEL"
 msgstr "Zertifikat wählen"
 
@@ -4824,6 +4811,12 @@ msgstr "ja"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CUST"
 #~ msgstr "ja"
+
+#~ msgid "I18N_OPENXPKI_UI_DATAPOOL_DELETE_ENTRY"
+#~ msgstr "Löschen"
+
+#~ msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
+#~ msgstr "Ändern"
 
 #~ msgid "I18N_OPENXPKI_UI_MENU_USERS"
 #~ msgstr "Benutzer"

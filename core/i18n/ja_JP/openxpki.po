@@ -462,11 +462,6 @@ msgstr "証明書を失効する理由を指定します。"
 
 # Remove?
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_DATAPOOL_DELETE_ENTRY"
-msgstr "キー"
-
-# Remove?
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_DATAPOOL_ENCRYPTED"
 msgstr "キー"
 
@@ -496,10 +491,6 @@ msgstr "最終更新日"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DATAPOOL_KEY"
 msgstr "キー"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
-msgstr "ユーザ名"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DATAPOOL_MTIME"
@@ -4694,6 +4685,15 @@ msgstr "はい"
 
 #~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_CI_STATUS_OK_LABEL"
 #~ msgstr "作成者"
+
+# Remove?
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_DATAPOOL_DELETE_ENTRY"
+#~ msgstr "キー"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
+#~ msgstr "ユーザ名"
 
 #~ msgid "I18N_OPENXPKI_UI_DICE_UPDATE_DOMAINLIST"
 #~ msgstr "関連するワークフローを表示"
