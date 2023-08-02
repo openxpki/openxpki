@@ -474,17 +474,18 @@ while (my $cgi = CGI::Fast->new()) {
             #
             # Validation error
             #
-            my $reply = $client->last_reply();
-            $log->error(Dumper $reply);
 
             my $error = $client->last_error() || $err;
-
+            my $reply = $client->last_reply();
             # TODO this needs to be reworked
             if ($reply->{ERROR}
                 && ($reply->{ERROR}->{CLASS}//'') eq 'OpenXPKI::Exception::InputValidator'
                 && $reply->{ERROR}->{ERRORS}
             ) {
-                die failure( 40003, $reply->{ERROR}->{LABEL} // '', { fields => $reply->{ERROR}->{ERRORS} } );
+
+                $log->trace(Dumper $reply);
+                my $error = join ", ", map { $_->{name} }  @{$reply->{ERROR}->{ERRORS}};
+                die failure( 40003, $error // $reply->{ERROR}->{LABEL} // '', { fields => $reply->{ERROR}->{ERRORS} } );
 
             } else {
                 if ($reply->{ERROR} && $reply->{ERROR}->{LABEL}) {
