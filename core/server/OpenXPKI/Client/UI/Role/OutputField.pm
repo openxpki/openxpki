@@ -199,7 +199,7 @@ sub __render_cert_identifier {
 
     my $id = $item->{value};
     $item->{value}  = {
-        label => $label . " YO",
+        label => $label,
         page => "certificate!detail!identifier!${id}",
         target => 'popup',
         # label is usually formated to a human readable string
