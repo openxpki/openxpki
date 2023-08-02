@@ -405,13 +405,13 @@ tr.gridrow-danger:hover > td {background-color: #e6c1c7 !important;}
 code { white-space: pre; }
 
 /* certificate serial number in details popup */
-.certserial ul li:first-child::after { /* first child is the hex number */
+.certserial ul li:first-child div::after { /* first child is the hex number */
   content: "hex";
   font-size: .7em;
   vertical-align: sub;
   line-height: 1.8em;
 }
-.certserial ul li:last-child::after { /* last child is the decimal number */
+.certserial ul li:last-child div::after { /* last child is the decimal number */
   content: "dec";
   font-size: .7em;
   vertical-align: sub;

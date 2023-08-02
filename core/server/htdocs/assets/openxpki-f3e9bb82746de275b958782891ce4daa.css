@@ -95,8 +95,8 @@ tr.gridrow-danger:hover>td{background-color:#e6c1c7!important}
 .oxi-status-danger{background-color:#f8d7da;color:#721c24}
 .oxi-status-warning{background-color:#fff3cd;color:#856404}
 code{white-space:pre}
-.certserial ul li:first-child::after{content:"hex";font-size:.7em;vertical-align:sub;line-height:1.8em}
-.certserial ul li:last-child::after{content:"dec";font-size:.7em;vertical-align:sub}
+.certserial ul li:first-child div::after{content:"hex";font-size:.7em;vertical-align:sub;line-height:1.8em}
+.certserial ul li:last-child div::after{content:"dec";font-size:.7em;vertical-align:sub}
 .oxi-formatted-deflist,.oxi-formatted-linklist,.oxi-formatted-rawlist,.oxi-formatted-ullist,.oxi-formatted-unilist{margin-bottom:0}
 .oxi-compact .oxi-keyvalue .oxi-keyvalue-items:not(:first-child):before{content:" \2027 "}
 .refreshing{background-image:url("data:image/svg+xml,%3Csvg width='15' height='15' viewBox='0 0 15 15' fill='none' xmlns='http%3A//www.w3.org/2000/svg'%3E%3Cpath d='M9.875 7.5C9.875 8.81168 8.81168 9.875 7.5 9.875C6.18832 9.875 5.125 8.81168 5.125 7.5C5.125 6.18832 6.18832 5.125 7.5 5.125C8.81168 5.125 9.875 6.18832 9.875 7.5Z' fill='%23b1d0d6' /%3E%3C/svg%3E");background-repeat:no-repeat;background-position:top right}
