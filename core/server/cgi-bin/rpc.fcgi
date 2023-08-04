@@ -197,8 +197,6 @@ while (my $cgi = CGI::Fast->new()) {
         # check for request parameters in JSON data (HTTP body)
         my $method = $cgi->param('method');
         my $json_data;
-        my $pkcs7_content;
-        my $pkcs7;
         my $jwt_header;
         if (my $raw = $cgi->param('POSTDATA')) {
 
@@ -263,23 +261,6 @@ while (my $cgi = CGI::Fast->new()) {
 
                     die failure( 40009, [ 'JWT signature could not be verified', $err ] );
                 }
-
-            } elsif ($content_type =~ m{\Aapplication/pkcs7}) {
-                $pkcs7 = $raw;
-                eval {
-                    $client = $rpc->backend();
-                    $pkcs7_content = $client->run_command('unwrap_pkcs7_signed_data', {
-                        pkcs7 => $pkcs7,
-                    });
-                    $raw = $pkcs7_content->{value};
-                    $log->trace("PKCS7 content: " . Dumper  $pkcs7_content) if ($log->is_trace());
-                };
-                $eval_err = $EVAL_ERROR;
-                if ($eval_err || !$raw) {
-                    die failure( 50001, $eval_err );
-                }
-
-                $log->trace("PKCS7 payload: " . $raw) if ($log->is_trace());
 
             } elsif ($content_type =~ m{\Aapplication/json}) {
 
@@ -440,14 +421,6 @@ while (my $cgi = CGI::Fast->new()) {
             }
         } else {
             $log->debug("RPC unauthenticated (plain http)");
-        }
-
-        if ($pkcs7_content && $envkeys{'pkcs7'}) {
-            $param->{'_pkcs7'} = $pkcs7;
-        }
-
-        if ($pkcs7_content && $envkeys{'signer_cert'}) {
-            $param->{'signer_cert'} = $pkcs7_content->{signer};
         }
 
         if ($jwt_header && $envkeys{'signer_cert'}) {
