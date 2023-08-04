@@ -28,7 +28,9 @@ sub init_structure {
     # To issue redirects to the UI, we store the referrer
     # default is mainly relevant for test scripts
     my $baseurl = $self->param('baseurl') || '/openxpki';
-    $baseurl =~ s|/$||;
+    $baseurl =~ s{(\A\s+|\s+\z|/\z)}{}g;
+    # prevent injection of external urls
+    $baseurl =~ s{\w+://[^/]+}{};
     $session->param('baseurl',  $baseurl.'/#/');
     $session->flush;
     $self->log->debug("Baseurl from referrer: " . $baseurl);

@@ -214,6 +214,10 @@ sub handle_request {
     # Check for goto redirection first
     if ($action =~ /^redirect!(.+)/  || $page =~ /^redirect!(.+)/) {
         my $goto = $1;
+        if ($goto =~ m{[^\w\-\!]}) {
+            $goto = 'home';
+            $self->log->warn("Invalid redirect target found - aborting");
+        }
         my $result = OpenXPKI::Client::UI::Result->new(
             client => $self,
             req => $req,
