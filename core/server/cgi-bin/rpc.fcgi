@@ -83,20 +83,20 @@ sub failure {
 
     my $message = $error_msg->{$code} // 'Unknown error';
     my $data = { pid => $$ };
-    my $details_log;
-    my $details_public;
+    my $details_log = '';
+    my $details_public = '';
 
     # check remaining arguments
     for my $arg (@args) {
         # Scalar = additional error message
         if (not ref $arg and length($arg)) {
-            $details_public = $arg;
-            $details_log = $arg;
+            $details_public = ': '.$arg;
+            $details_log = ': '.$arg;
         }
         # ArrayRef = two different additional error messages [external, internal]
         elsif (ref $arg eq 'ARRAY') {
-            $details_public = $arg->[0];
-            $details_log = $arg->[1];
+            $details_public = ': '.$arg->[0];
+            $details_log = ': '.$arg->[1];
         }
         # HashRef = additional data
         elsif (ref $arg eq 'HASH') {
@@ -104,14 +104,13 @@ sub failure {
         }
     }
 
-    $message .= ': '.$details_log if ($details_log);
     # $log might not yet be initialised
-    $log ? $log->error("$code - $message") : warn "$code - $message";
+    $log ? $log->error("$code - $message$details_log") : warn "$code - $message";
 
     return {
         error => {
             code => $code,
-            message => $message,
+            message => $message.$details_public,
             data => $data,
         },
         rpc_failure => 1, # flag to help error handling
