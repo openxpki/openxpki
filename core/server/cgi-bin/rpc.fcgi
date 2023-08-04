@@ -12,6 +12,7 @@ use English;
 use Encode;
 
 # CPAN modules
+use Crypt::JWT qw(decode_jwt);
 use Feature::Compat::Try;
 use Log::Log4perl;
 use Log::Log4perl::MDC;
@@ -43,6 +44,10 @@ my $error_msg = {
     40005 => 'RAW post with unknown content type',
     40006 => 'Unknown RPC error',
     40007 => 'POST data contains invalid UTF8 octets',
+    40008 => 'Content type JOSE not enabled',
+    40009 => 'Processing JWS protected payload failed',
+    40010 => 'Method header is missing in JWS',
+    40011 => 'Unsupported JWS algorithm',
 
     40401 => 'Invalid method / setup incomplete',
     40402 => 'Resume requested but no workflow found',
@@ -194,6 +199,7 @@ while (my $cgi = CGI::Fast->new()) {
         my $json_data;
         my $pkcs7_content;
         my $pkcs7;
+        my $jwt_header;
         if (my $raw = $cgi->param('POSTDATA')) {
 
             die failure( 40004 ) unless $conf->{input}->{allow_raw_post};
@@ -206,12 +212,64 @@ while (my $cgi = CGI::Fast->new()) {
 
             $log->debug("RPC postdata with Content-Type: $content_type");
 
-            if ($content_type =~ m{\Aapplication/pkcs7}) {
+            # TODO - evaluate security implications regarding blessed objects
+            # and consider to filter out serialized objects for security reasons
+            $json->max_depth(  $conf->{input}->{parse_depth} || 5 );
+
+            if ($content_type =~ m{\Aapplication/jose}) {
+
+                die failure( 40008 ) unless $conf->{jose};
+
+                # The cert_identifier used to sign the token must be set as kid
+                # First run - set ignore_signature to just get the header with the kid
+                my ($cert_identifier, $cert);
+                ($jwt_header) = decode_jwt(token=> $raw, ignore_signature => 1, decode_header => 1, decode_payload => 0);
+
+                if ($jwt_header->{alg} !~ m{\A(R|E)S256\z}) {
+                    die failure( 40011, { alg => $jwt_header->{alg} } );
+                }
+
+                # we currently only support "known" certificates as signers
+                # the recommended way is to use the x5t header field
+                if ($jwt_header->{x5t}) {
+                    $cert_identifier = $jwt_header->{x5t};
+                    $log->debug("JWT header has x5t set to $cert_identifier");
+                # as a fallback we support passing the identifier in the kid field
+                # to allow adding other key patterns later we use a namespace
+                } elsif (substr(($jwt_header->{kid}//''), 0, 6) eq 'certid') {
+                    $cert_identifier = substr($jwt_header->{kid}, 7);
+                    $log->debug("JWT header has kid set to $cert_identifier");
+                } else {
+                    die failure( 40009, "No key id was found in the JWT header" );
+                }
+
+                # to prevent nasty attacks we require that the method name is part of the protected header
+                $method = $jwt_header->{method} || die failure( 40010 );
+
+                $client = $rpc->backend();
+                try {
+                    # this will die if the certificate was not found
+                    $cert = $client->run_command('get_cert', { identifier => $cert_identifier, format => 'PEM' });
+
+                    # use our json parser object to decode to limit parsing depth
+                    ($raw) = decode_jwt(token => $raw, key => \$cert, decode_payload => 0);
+                    $log->trace("Encoded JSON postdata: " . $raw) if ($log->is_trace());
+
+                    $jwt_header->{signer_cert} = $cert;
+
+                } catch ($err) {
+
+                    die failure( 40009, [ 'Given key id was not found', $err ] ) unless($cert);
+
+                    die failure( 40009, [ 'JWT signature could not be verified', $err ] );
+                }
+
+            } elsif ($content_type =~ m{\Aapplication/pkcs7}) {
                 $pkcs7 = $raw;
                 eval {
                     $client = $rpc->backend();
                     $pkcs7_content = $client->run_command('unwrap_pkcs7_signed_data', {
-                       pkcs7 => $pkcs7,
+                        pkcs7 => $pkcs7,
                     });
                     $raw = $pkcs7_content->{value};
                     $log->trace("PKCS7 content: " . Dumper  $pkcs7_content) if ($log->is_trace());
@@ -221,22 +279,21 @@ while (my $cgi = CGI::Fast->new()) {
                     die failure( 50001, $eval_err );
                 }
 
+                $log->trace("PKCS7 payload: " . $raw) if ($log->is_trace());
+
             } elsif ($content_type =~ m{\Aapplication/json}) {
-                # nothing to do here
+
+                $log->trace("Encoded JSON postdata: " . $raw) if ($log->is_trace());
+
             } else {
+
                 die failure( 40005, { type => $content_type } );
             }
 
-            # TODO - evaluate security implications regarding blessed objects
-            # and consider to filter out serialized objects for security reasons
-            $json->max_depth(  $conf->{input}->{parse_depth} || 5 );
-
-            $log->trace("RPC raw postdata : " . $raw) if ($log->is_trace());
-
             # decode JSON
-            eval{ $json_data = $json->decode($raw) };
-            die failure( 40002, [ undef, $EVAL_ERROR ] ) if (!$json_data or $EVAL_ERROR);
+            eval{ $json_data = $json->decode($raw) } if ($raw);
 
+            die failure( 40002, [ '', $EVAL_ERROR ] ) if (!$json_data or $EVAL_ERROR);
             # read "method" from JSON data if not found in URL before
             $method = $json_data->{method} unless $method;
         }
@@ -391,6 +448,10 @@ while (my $cgi = CGI::Fast->new()) {
 
         if ($pkcs7_content && $envkeys{'signer_cert'}) {
             $param->{'signer_cert'} = $pkcs7_content->{signer};
+        }
+
+        if ($jwt_header && $envkeys{'signer_cert'}) {
+            $param->{'signer_cert'} = $jwt_header->{signer_cert};
         }
 
         $log->trace( "Calling $method on ".$config->endpoint()." with parameters: " . Dumper $param ) if $log->is_trace;
