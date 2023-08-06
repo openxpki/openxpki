@@ -15,13 +15,14 @@ use English;
 
 __PACKAGE__->mk_accessors( qw( emptyok ) );
 
-sub _init {
+sub init {
 
     my ( $self, $params ) = @_;
 
+    $self->SUPER::init( $params );
+
     $self->emptyok( exists $params->{'emptyok'} ? $params->{'emptyok'} : 0 );
 
-    return 1;
 }
 
 

@@ -10,8 +10,11 @@ use OpenXPKI::Serialization::Simple;
 
 __PACKAGE__->mk_accessors(qw(regex error modifier field));
 
-sub _init {
+sub init {
     my ( $self, $params ) = @_;
+
+    $self->SUPER::init( $params );
+
     $self->regex( $params->{regex} // '' );
 
     # Default modifier is /xi

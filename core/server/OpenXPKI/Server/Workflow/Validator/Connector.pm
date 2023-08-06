@@ -8,26 +8,13 @@ use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use Workflow::Exception qw( validation_error configuration_error );
 
-__PACKAGE__->mk_accessors(qw(path error));
-
-sub _init {
-    my ( $self, $params ) = @_;
-    unless ( $params->{path} ) {
-        configuration_error
-            "You must define a value for path in ",
-            "declaration of validator ", $self->name;
-    }
-
-    $self->path( $params->{path} );
-    $self->error( 'I18N_OPENXPKI_UI_VALIDATOR_CONNECTOR_CHECK_FAILED' );
-    $self->error( $params->{error} ) if ($params->{error});
-}
-
 sub _validate {
 
     my ( $self, $wf, $value ) = @_;
 
     ##! 1: 'start'
+    my $path = $self->param('path') ||
+        configuration_error "You must define a value for path";
 
     # empty value
     ##! 16: ' value is ' . $value
@@ -36,7 +23,7 @@ sub _validate {
     ##! 16: 'Validating value ' . $value
     my $cfg = CTX('config');
 
-    my @path = split(/\./, $self->path());
+    my @path = split(/\./, $path);
 
     ##! 32: 'Validation Path is ' . join(".", @path);
     push @path, $value;
@@ -46,15 +33,15 @@ sub _validate {
     };
     if ($EVAL_ERROR) {
         ##! 32: 'got eval error during calling connector ' . $EVAL_ERROR
-        CTX('log')->application()->error("Exception while calling connector on path " . $self->path());
+        CTX('log')->application()->error("Exception while calling connector on path " . $path);
         validation_error( 'I18N_OPENXPKI_UI_VALIDATOR_CONNECTOR_EXCEPTION' );
         return 0;
     }
 
     ##! 32: 'Raw result is ' . (defined $result ? $result : 'undef')
     if (!$result) {
-        CTX('log')->application()->error("Validator failed on path " . $self->path());
-        validation_error( $self->error() );
+        CTX('log')->application()->error("Validator failed on path " . $path);
+        validation_error( $self->param('error') || 'I18N_OPENXPKI_UI_VALIDATOR_CONNECTOR_CHECK_FAILED' );
         return 0;
     }
 

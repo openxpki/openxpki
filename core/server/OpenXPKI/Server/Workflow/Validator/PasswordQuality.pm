@@ -167,10 +167,10 @@ has api_args => (
     default => sub { {} },
 );
 
-
-# called by Workflow::Validator->init()
-sub _init {
+sub init {
     my ($self, $params) = @_;
+
+    $self->SUPER::init( $params );
 
     my $api_args = {};
 

@@ -25,8 +25,10 @@ has 'workflow' => (
 );
 
 
-sub _init {
+sub init {
     my ( $self, $params ) = @_;
+
+    $self->SUPER::init( $params );
 
     # copy the source params
     my $params_merged = { % { $params }};
