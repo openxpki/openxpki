@@ -119,9 +119,10 @@ sub execute
     # x509 extensions - array of extension items
     my $cert_ext = $context->param('cert_extension');
     if ($cert_ext) {
+        my $ext_source = $source_ref->{'cert_extension'} || '';
         foreach my $ext (@{$serializer->deserialize($cert_ext)}) {
             ##! 32: 'Persist x509 extension ' . Dumper $ext
-            my $source = $source_ref->{'cert_extension'}->{$ext->{oid}} || '';
+            my $source =  (!ref $ext_source ? $ext_source : ($ext_source->{$ext->{oid}})) || '';
             $dbi->insert(
                 into => 'csr_attributes',
                 values => {
