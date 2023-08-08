@@ -293,8 +293,8 @@ sub _execute_activity_async {
         # DB rollback is not needed as this process will terminate now anyway
     }
 
-    eval { CTX('dbi')->disconnect };
-    eval { CTX('config')->cleanup() };
+    OpenXPKI::Server->cleanup();
+
     ##! 16: 'Backgrounded workflow finished - exit child'
     exit;
 }

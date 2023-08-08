@@ -489,8 +489,7 @@ sub run {
         eval { CTX('log')->system->error($err) };
     }
 
-    eval { $self->{dbi}->disconnect };
-    eval { CTX('config')->cleanup() };
+    OpenXPKI::Server->cleanup();
 
     ##! 1: 'End of run()'
     exit;   # child process MUST never leave run()

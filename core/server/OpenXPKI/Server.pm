@@ -123,6 +123,14 @@ sub start {
     $self->run(%{$self->{PARAMS}}); # from Net::Server::MultiType
 }
 
+sub cleanup() {
+    shift if (blessed($_[0]) // $_[0] // '') eq __PACKAGE__; # support object and instance calls via :: and
+
+    eval { CTX('config')->cleanup };
+    eval { CTX('dbi')->disconnect };
+    eval { CTX('dbi_log')->disconnect };
+}
+
 sub pre_server_close_hook {
     ##! 1: 'start'
     my $self = shift;
@@ -147,6 +155,8 @@ sub pre_server_close_hook {
             OpenXPKI::Metrics::Prometheus->terminate();
         };
     }
+
+    $self->cleanup();
 }
 
 sub DESTROY {
@@ -154,8 +164,7 @@ sub DESTROY {
     my $self = shift;
 
     if ($self->{TYPE} eq 'Simple') {
-        # for servers in the foreground, call the pre_server_close_hook
-        # on destruction ...
+        # for servers in the foreground, manually call the pre_server_close_hook
         $self->pre_server_close_hook();
     }
 
@@ -386,15 +395,13 @@ sub process_request {
     # each other.
     srand(time ^ $PROCESS_ID);
 
-    eval
-    {
-        $rc = do_process_request(@_);
-    };
+    eval { $rc = do_process_request(@_) };
+
     if (my $exc = OpenXPKI::Exception->caught()) {
         if ($exc->message() =~ m{ (?:
-                I18N_OPENXPKI_TRANSPORT.*CLOSED_CONNECTION
-                | I18N_OPENXPKI_SERVICE_COLLECT_TIMEOUT
-            ) }xms) {
+            I18N_OPENXPKI_TRANSPORT.*CLOSED_CONNECTION
+            | I18N_OPENXPKI_SERVICE_COLLECT_TIMEOUT
+        ) }xms) {
             # exit quietly
             return 1;
         }
