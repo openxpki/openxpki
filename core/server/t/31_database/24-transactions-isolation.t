@@ -36,17 +36,21 @@ my (undef, $sqlite_db) = tempfile(UNLINK => 1);
 my $tests = [
     {
         db_params => {
-            %{ DatabaseTest->new->get_dbi_params('sqlite') },
+            %{ DatabaseTest->new->get_dbi_params('SQLite') },
             name => $sqlite_db,
         }
     },
     {
         env_var => 'OXI_TEST_DB_MYSQL_NAME',
-        db_params => DatabaseTest->new->get_dbi_params('mariadb'),
+        db_params => DatabaseTest->new->get_dbi_params('MariaDB'),
+    },
+    {
+        env_var => 'OXI_TEST_DB_MYSQL_NAME',
+        db_params => DatabaseTest->new->get_dbi_params('MariaDB2'),
     },
     {
         env_var => 'OXI_TEST_DB_POSTGRES_NAME',
-        db_params => DatabaseTest->new->get_dbi_params('postgres'),
+        db_params => DatabaseTest->new->get_dbi_params('PostgreSQL'),
     },
 ];
 

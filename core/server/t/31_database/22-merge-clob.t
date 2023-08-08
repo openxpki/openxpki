@@ -29,7 +29,7 @@ my $db = DatabaseTest->new(
     data => [
         [ 1, "chirpychirpycheepcheepchirp" ],
     ],
-    test_only => ['oracle'],
+    test_only => ['Oracle'],
 );
 
 #

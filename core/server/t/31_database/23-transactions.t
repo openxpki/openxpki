@@ -52,7 +52,7 @@ $db->run("Transactions", 17, sub {
 
     # check with second DBI instance
     SKIP: {
-        skip "concurrent access not possible with SQLite", 1 if $t1->type eq 'sqlite';
+        skip "concurrent access not possible with SQLite", 1 if $t1->type eq 'SQLite';
         cmp_bag $t2->get_data, [
             [ 1, "Litfasssaeule" ],
             [ 2, "Buergersteig" ],
@@ -72,7 +72,7 @@ $db->run("Transactions", 17, sub {
 
     # check with second DBI instance
     SKIP: {
-        skip "concurrent access not possible with SQLite", 1 if $t1->type eq 'sqlite';
+        skip "concurrent access not possible with SQLite", 1 if $t1->type eq 'SQLite';
         cmp_bag $t2->get_data, [
             [ 1, "Litfasssaeule" ],
             [ 2, "Buergersteig" ],

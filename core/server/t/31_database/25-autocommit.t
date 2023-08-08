@@ -46,7 +46,7 @@ Log::Log4perl->init(\"
 my $log = Log::Log4perl->get_logger();
 
 my $db_params = {
-    %{ DatabaseTest->new()->get_dbi_params('mariadb') },
+    %{ DatabaseTest->new()->get_dbi_params('MariaDB2') },
     type => 'MySQLTest',
 };
 
