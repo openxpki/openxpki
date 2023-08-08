@@ -2,6 +2,7 @@ apache2
 libarchive-zip-perl
 libauthen-sasl-perl
 libcache-lru-perl
+libcapture-tiny-perl
 libcgi-fast-perl
 libcgi-session-perl
 libcgi-session-perl

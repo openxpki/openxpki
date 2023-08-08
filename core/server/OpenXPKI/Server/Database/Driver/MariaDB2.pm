@@ -14,9 +14,39 @@ OpenXPKI::Server::Database::Driver::MariaDB2
 
 =cut
 
+# Core modules
+use version 0.77;
+
+# CPAN modules
 use DBI qw(:sql_types);
 use DBI::Const::GetInfoType; # provides %GetInfoType hash
+use DBD::MariaDB;
+use Capture::Tiny qw( capture_stderr );
+
+# Project Modules
 use OpenXPKI::Exception;
+
+################################################################################
+# Monkey patch DBI::disconnect_all to suppress warnings that occur due to a bug
+# in DBD::MariaDB < v1.20.
+#
+# DBI has an END block which calls DBI->disconnect_all() which in turn calls the
+# driver's disconnect_all() method.
+# Due to a driver bug in DBD::MariaDB up to v1.11 the following warnings occur:
+#   DBD::MariaDB disconnect_all: 3 database handlers were not released (possible bug in driver) at /usr/local/lib/x86_64-linux-gnu/perl/5.28.1/DBI.pm line 759, <DATA> line 1.
+#   DBD::MariaDB disconnect_all: Client library was not properly deinitialized (possible bug in driver) at /usr/local/lib/x86_64-linux-gnu/perl/5.28.1/DBI.pm line 759, <DATA> line 1.
+if (version->parse($DBD::MariaDB::VERSION) < version->parse('1.20')) {
+    my $_disconnect_all_orig = \&DBI::disconnect_all;
+    no warnings qw(redefine);
+    *DBI::disconnect_all = sub {
+        my $class = shift;
+        # silence warnings that occur due to a bug in DBD::MariaDB < v1.20
+        my $stderr = capture_stderr {
+            $_disconnect_all_orig->($class);
+        };
+    };
+    use warnings qw(redefine);
+}
 
 ################################################################################
 # required by OpenXPKI::Server::Database::Role::Driver
