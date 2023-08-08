@@ -937,9 +937,6 @@ msgstr "AES 256bit"
 msgid "I18N_OPENXPKI_UI_KEY_ENC_IDEA"
 msgstr "IDEA"
 
-msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD"
-msgstr "暗号化パスワード"
-
 msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD_CLIENT"
 msgstr "自分でパスワードを選択する"
 
@@ -4478,6 +4475,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_PREREG_LABEL"
 msgstr "証明書登録(事前登録)"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_DESC"
+msgstr "証明書をエクスポートします。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_LABEL"
+msgstr "証明書のエクスポート"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_DESC"
 msgstr "定義されたリポジトリに証明書情報を公開します。"
 
@@ -4712,6 +4717,9 @@ msgstr "はい"
 
 #~ msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST94"
 #~ msgstr "GOST 94"
+
+#~ msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD"
+#~ msgstr "暗号化パスワード"
 
 #~ msgid "I18N_OPENXPKI_UI_MENU_USERS"
 #~ msgstr "ユーザを管理する。"

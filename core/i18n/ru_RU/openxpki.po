@@ -1177,15 +1177,6 @@ msgid "I18N_OPENXPKI_UI_KEY_ENC_IDEA"
 msgstr "Имя учетной записи"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD"
-msgstr ""
-"Используйте данный профиль сертификата только если Вы отчетливо "
-"представляете себе необходимую структуру имени субъекта сертификата, хорошо "
-"знаете компоненты этой структуры и соглашения об использовании имен в Вашей "
-"части инфраструктуры открытых ключей. Данный профиль позволяет использовать "
-"также произвольный набор альтернативных имен."
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD_CLIENT"
 msgstr ""
 "Используйте данный профиль сертификата только если Вы отчетливо "
@@ -5717,6 +5708,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_PREREG_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_DESC"
+msgstr "Экспорт"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_DESC"
 msgstr "Выпуск списка отзыва сертификатов (CRL)"
 
@@ -5951,6 +5950,15 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
 #~ msgstr "Профиль пользователя"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD"
+#~ msgstr ""
+#~ "Используйте данный профиль сертификата только если Вы отчетливо "
+#~ "представляете себе необходимую структуру имени субъекта сертификата, "
+#~ "хорошо знаете компоненты этой структуры и соглашения об использовании "
+#~ "имен в Вашей части инфраструктуры открытых ключей. Данный профиль "
+#~ "позволяет использовать также произвольный набор альтернативных имен."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_MENU_USERS"

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2023-08-02 10:59+0200\n"
+"PO-Revision-Date: 2023-08-08 09:19+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -906,9 +906,6 @@ msgstr "AES 256 Bit"
 
 msgid "I18N_OPENXPKI_UI_KEY_ENC_IDEA"
 msgstr "IDEA"
-
-msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD"
-msgstr "Schlüsselpasswort"
 
 msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD_CLIENT"
 msgstr "Passwort selbst festlegen"
@@ -4625,6 +4622,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_PREREG_LABEL"
 msgstr "Zertifikatsantrag (Vorregistrierung)"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_DESC"
+msgstr "Exportiert Zertifikate über die RPC API"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_LABEL"
+msgstr "Zertifikat exportieren"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_DESC"
 msgstr "Veröffentlicht das Zertifikat zu definierten Zielen."
 
@@ -4817,6 +4820,9 @@ msgstr "ja"
 
 #~ msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
 #~ msgstr "Ändern"
+
+#~ msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD"
+#~ msgstr "Schlüsselpasswort"
 
 #~ msgid "I18N_OPENXPKI_UI_MENU_USERS"
 #~ msgstr "Benutzer"

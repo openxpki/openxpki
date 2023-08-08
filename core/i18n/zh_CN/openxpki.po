@@ -965,9 +965,6 @@ msgstr "AES 256bit"
 msgid "I18N_OPENXPKI_UI_KEY_ENC_IDEA"
 msgstr "IDEA"
 
-msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD"
-msgstr "加密密码"
-
 msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD_CLIENT"
 msgstr "自己选择密码"
 
@@ -4626,6 +4623,14 @@ msgstr "证书注册工作流程，用于通过自动界面（例如SCEP，RPC�
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_PREREG_LABEL"
 msgstr "证书注册"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_DESC"
+msgstr "证书导出"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_LABEL"
+msgstr "证书导出"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_DESC"
 msgstr "将证书信息发布到已定义的存储库。"
 
@@ -4827,6 +4832,9 @@ msgstr "是"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
 #~ msgstr "用户名"
+
+#~ msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD"
+#~ msgstr "加密密码"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_MENU_USERS"

@@ -1160,10 +1160,6 @@ msgstr "AES 256bit"
 msgid "I18N_OPENXPKI_UI_KEY_ENC_IDEA"
 msgstr "IDEA"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD"
-msgstr "Scegli tu stesso la password"
-
 msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD_CLIENT"
 msgstr "Scegli tu stesso la password"
 
@@ -5255,6 +5251,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_PREREG_LABEL"
 msgstr "Esporta Certificato"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_DESC"
+msgstr "Esporta il Certificato nel formato desiderato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_LABEL"
+msgstr "Esporta Certificato"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_DESC"
 msgstr ""
 "Pubblica le Informazioni sulla Autorità di certificazione (CA, Certification "
@@ -5493,6 +5497,10 @@ msgstr "Sì"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
 #~ msgstr "Nome utente"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD"
+#~ msgstr "Scegli tu stesso la password"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_MENU_USERS"
