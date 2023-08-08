@@ -254,6 +254,7 @@ sub _build_dbix_handler {
                 my ($msg, $dbh, $retval) = @_;
                 $self->_dbi_error_handler($msg, $dbh);
             },
+            # AutoInactiveDestroy => 1, -- automatically set by DBIx::Handler
             %params,
             %params_from_config,
         },
