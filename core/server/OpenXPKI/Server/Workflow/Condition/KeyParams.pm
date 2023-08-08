@@ -42,7 +42,7 @@ sub _evaluate
         }
 
         # get the list of allowed algorithms from the config
-        my $algs = CTX('api2')->get_key_algs( profile => $cert_profile, nohide => 1 );
+        my $algs = CTX('api2')->get_key_algs( profile => $cert_profile, showall => 1 );
 
         ##! 32: 'Alg expected ' . Dumper $algs
 
