@@ -445,7 +445,6 @@ sub run {
         OpenXPKI::Server::Context::setcontext({ session => $session, force => 1 });
         Log::Log4perl::MDC->put('sid', CTX('session')->short_id);
 
-        $self->{dbi}                      = CTX('dbi');
         $self->{hanging_workflows}        = {};
         $self->{hanging_workflows_warned} = {};
         $self->{original_pid}             = $PID;
@@ -608,17 +607,17 @@ sub __purge_crl {
 
     CTX('log')->system()->debug("Init crl purge from watchdog");
     eval {
-        $self->{dbi}->start_txn;
-        $self->{dbi}->delete(
+        CTX('dbi')->start_txn;
+        CTX('dbi')->delete(
             from => 'crl',
             where => {
                 'next_update'  => { '<', time() },
             },
         );
-        $self->{dbi}->commit;
+        CTX('dbi')->commit;
     };
     if ($EVAL_ERROR) {
-        $self->{dbi}->rollback;
+        CTX('dbi')->rollback;
         CTX('log')->system()->error("database error during crl purge: $EVAL_ERROR");
     }
     $self->_next_crl_purge( time + $self->interval_crl_purge );
@@ -676,7 +675,7 @@ sub __scan_for_paused_workflows {
     # Search table for paused workflows that are ready to wake up
     # There is no ordering here, so we might not get the earliest hit
     # This is useful in distributed environments to prevent locks/races
-    my $workflow = $self->{dbi}->select_one(
+    my $workflow = CTX('dbi')->select_one(
         from  => 'workflow',
         columns => [ qw(
             workflow_id
@@ -739,7 +738,7 @@ sub __flag_for_wakeup {
     CTX('log')->workflow()->debug(sprintf( 'watchdog: paused wf %d found, mark with flag "%s"', $wf_id, $rand_key ));
 
 
-    $self->{dbi}->start_txn;
+    CTX('dbi')->start_txn;
 
     # it is necessary to explicitely set WORKFLOW_LAST_UPDATE,
     # because otherwise ON UPDATE CURRENT_TIMESTAMP will set (maybe) a non UTC timestamp
@@ -749,7 +748,7 @@ sub __flag_for_wakeup {
     # (see OpenXPKI::Server::Workflow::Persister::DBI::update_workflow())
     my $row_count;
     eval {
-        $row_count = $self->{dbi}->update(
+        $row_count = CTX('dbi')->update(
             table => 'workflow',
             set => {
                 watchdog_key => $rand_key,
@@ -761,7 +760,7 @@ sub __flag_for_wakeup {
                 workflow_id         => $wf_id,
             },
         );
-        $self->{dbi}->commit;
+        CTX('dbi')->commit;
     };
     # We use DB transaction isolation level "READ COMMITTED":
     # So in the meantime another watchdog process might have picked up this
@@ -770,7 +769,7 @@ sub __flag_for_wakeup {
     # 2. other process did not commit -> timeout exception because of DB row lock
     if ($@ or $row_count < 1) {
         ##! 16: sprintf('some other process took wf %s, return', $wf_id)
-        $self->{dbi}->rollback;
+        CTX('dbi')->rollback;
         CTX('log')->system()->warn(sprintf( 'watchdog, paused wf %d: update with mark "%s" failed', $wf_id, $rand_key ));
         return;
     }
@@ -791,7 +790,7 @@ sub __wake_up_workflow {
 
     $self->__restore_session($args->{pki_realm}, $args->{workflow_session});
 
-    $self->{dbi}->start_txn;
+    CTX('dbi')->start_txn;
 
     ##! 1: 'call wakeup'
     my $wf_info = CTX('api2')->wakeup_workflow(
@@ -830,7 +829,7 @@ sub __auto_archive_workflows {
     CTX('log')->system->debug("Init workflow auto archiving from watchdog");
 
     # Search for paused workflows that are ready to be archived.
-    my $rows = $self->{dbi}->select_hashes(
+    my $rows = CTX('dbi')->select_hashes(
         from  => 'workflow',
         columns => [ qw(
             workflow_id
@@ -889,7 +888,7 @@ sub __flag_for_archiving {
 
     CTX('log')->workflow->debug(sprintf('watchdog: auto-archiving wf %d, setting flag', $wf_id));
 
-    $self->{dbi}->start_txn;
+    CTX('dbi')->start_txn;
 
     # Flag workflow as "being archived" by setting "workflow_archive_at" to
     # an intermediate value of "0". It is updated to undef once archiving is
@@ -897,7 +896,7 @@ sub __flag_for_archiving {
     # severe error during archiving.
     my $update_count;
     try {
-        $update_count = $self->{dbi}->update(
+        $update_count = CTX('dbi')->update(
             table => 'workflow',
             set => {
                 workflow_archive_at => 0,
@@ -907,14 +906,14 @@ sub __flag_for_archiving {
                 workflow_id         => $wf_id,
             },
         );
-        $self->{dbi}->commit;
+        CTX('dbi')->commit;
     }
     # We use DB transaction isolation level "READ COMMITTED":
     # So in the meantime another watchdog process might have picked up this
     # workflow and changed the database. Two things can happen:
     # 1. other process did not commit -> timeout exception because of DB row lock
     catch ($err) {
-        $self->{dbi}->rollback;
+        CTX('dbi')->rollback;
         CTX('log')->system->warn(sprintf('watchdog: auto-archiving wf %d failed (most probably other process does same job): %s', $wf_id, $err));
         return;
     }
