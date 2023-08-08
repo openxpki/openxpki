@@ -106,7 +106,7 @@ sub render_output_field {
             next unless $item->{format} eq $test;
         }
         my $code = $handlers{$test}->($self, $field, $item, $custom_params);
-        return if ($code//0) == -1;
+        return if ($code || 0) == -1;
         $match = 1;
     }
 
@@ -206,6 +206,8 @@ sub __render_cert_identifier {
         # but we sometimes need the raw value in the UI for extras
         value => $id,
     };
+
+    return 1;
 }
 
 # link to another workflow - performs ACL check
@@ -227,6 +229,8 @@ sub __render_workflow_id {
     } else {
         $item->{format} = '';
     }
+
+    return 1;
 }
 
 # create a link to download the given filename
@@ -319,6 +323,8 @@ sub __render_download {
     } elsif ($vv->{auto}) {
         $item->{value}->{autodownload} = 1;
     }
+
+    return 1;
 }
 
 sub __render_itemcnt {
@@ -334,6 +340,8 @@ sub __render_itemcnt {
         $item->{value} = '??';
     }
     $item->{format} = '';
+
+    return 1;
 }
 
 sub __render_deflist {
@@ -345,6 +353,8 @@ sub __render_deflist {
         @val = map { { label => $_, value => $item->{value}->{$_}} } sort keys %{$item->{value}};
         $item->{value} = \@val;
     }
+
+    return 1;
 }
 
 sub __render_grid {
@@ -362,6 +372,8 @@ sub __render_grid {
     }
     $item->{action} = $field->{action};
     $item->{target} = $field->{target} ? $field->{target} : 'top';
+
+    return 1;
 }
 
 sub __render_chart {
@@ -465,6 +477,8 @@ sub __render_chart {
             $item->{value} = [ $item->{value} ];
         }
     }
+
+    return 1;
 }
 
 1;

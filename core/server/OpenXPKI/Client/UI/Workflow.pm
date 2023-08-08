@@ -1368,6 +1368,7 @@ sub __render_field_request_info {
     }
 
     $item->{value} = \@val;
+    return 1;
 }
 
 # legacy format for certificate request info
@@ -1406,6 +1407,7 @@ sub __render_field_cert_info {
     }
 
     $item->{value} = \@val;
+    return 1;
 }
 
 =head2 __render_workflow_info
