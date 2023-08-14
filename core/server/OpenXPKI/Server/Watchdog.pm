@@ -746,7 +746,7 @@ sub __flag_for_wakeup {
     # watchdog key will be reset automatically, when the workflow is updated from within
     # the API (via factory::save_workflow()), which happens immediately, when the action is executed
     # (see OpenXPKI::Server::Workflow::Persister::DBI::update_workflow())
-    my $row_count;
+    my $row_count = 0;
     eval {
         $row_count = CTX('dbi')->update(
             table => 'workflow',
@@ -894,7 +894,7 @@ sub __flag_for_archiving {
     # an intermediate value of "0". It is updated to undef once archiving is
     # finished, so when checking workflows later on a "0" indicates a
     # severe error during archiving.
-    my $update_count;
+    my $update_count = 0;
     try {
         $update_count = CTX('dbi')->update(
             table => 'workflow',
