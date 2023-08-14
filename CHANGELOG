@@ -19,7 +19,7 @@ Removals, Deprecations, Breaking Changes
   + Remove API command "get_cert_subject_styles"
   + Remove unused method OpenXPKI::Client::UI::Result::__register_wf_token_initial()
   + Remove openxpkictl option --foreground (use --no-detach instead)
-  + Parameters validity, reason_code, remove_expired to IssueCRL are deprecated and will be removed with next release 
+  + Parameters validity, reason_code, remove_expired to IssueCRL are deprecated and will be removed with next release
   + Default behaviour of IssueCRL does now exclude expired certificates (compliant to RFC5280)
   + Code of the old SCEP layers has been removed (SCEP and LibSCEP)
-  + Drop Support for PKCS7 wrapped JSON in RPC Layer
+  + Usage of PKCS7 wrapped JSON in RPC layer now requires explicit activation in wrapper config
