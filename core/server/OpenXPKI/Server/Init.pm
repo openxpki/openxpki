@@ -391,8 +391,8 @@ sub __do_init_metrics {
             CTX('config')->get('system.server.tmpdir') // '/var/tmp',
             'openxpki.metrics'
         );
-    my $cache_user  = $cache_conf->{user}  // CTX('config')->get('system.server.user');
-    my $cache_group = $cache_conf->{group} // CTX('config')->get('system.server.group');
+    my $cache_user  = $cache_conf->{user}  // CTX('config')->get('system.server.user') // $EUID;
+    my $cache_group = $cache_conf->{group} // CTX('config')->get('system.server.group') // (split ' ', $EGID)[0];
 
     my $metrics = OpenXPKI::Metrics->new(
         enabled => $enabled,
