@@ -433,6 +433,8 @@ Returns a single input parameter value, i.e.
 
 =item * real CGI parameters.
 
+=back
+
 A parameter name will be looked up in the listed order.
 
 If the input parameter is a list (multiple values) then only the first value is
