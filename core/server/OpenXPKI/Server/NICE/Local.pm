@@ -391,7 +391,7 @@ sub issueCRL {
     if (defined $remove_expired) {
         CTX('log')->deprecated()->error('Passing remove_expired as parameter to IssueCRL is deprecated and will be removed with the next release!');
         if ($remove_expired eq '0') {
-            $keep_expired = '_any';
+            $keep_expired = ['_any'];
         }
     }
 
