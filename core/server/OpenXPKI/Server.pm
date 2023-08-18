@@ -270,17 +270,19 @@ sub pre_loop_hook {
         # Set verbose process name
         OpenXPKI::Server::__set_process_name("server");
 
-        if ( $self->{PARAMS}->{process_group} ne $EGID ){
-            $self->log(2, "Setting gid to \"$self->{PARAMS}->{process_group}\"");
-            CTX('log')->system->debug("Setting gid to \"$self->{PARAMS}->{process_group}\"");
+        my $gid = $self->{PARAMS}->{process_group};
+        if ( $gid ne $EGID ){
+            $self->log(2, "Setting GID to '$gid'");
+            CTX('log')->system->debug("Setting GID to '$gid'");
 
-            set_gid( $self->{PARAMS}->{process_group} );
+            set_gid( $gid );
         }
-        if ( $self->{PARAMS}->{process_owner} ne $EUID ){
-            $self->log(2, "Setting uid to \"$self->{PARAMS}->{process_owner}\"");
-            CTX('log')->system->debug("Setting uid to \"$self->{PARAMS}->{process_owner}\"");
+        my $uid = $self->{PARAMS}->{process_owner};
+        if ( $uid ne $EUID ){
+            $self->log(2, "Setting UID to '$uid'");
+            CTX('log')->system->debug("Setting UID to '$uid'");
 
-            set_uid( $self->{PARAMS}->{process_owner} );
+            set_uid( $uid );
         }
     };
     if ($EVAL_ERROR){
