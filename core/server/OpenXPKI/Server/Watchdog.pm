@@ -406,7 +406,10 @@ sub run {
     my $self = shift;
     ##! 1: 'start'
 
-    CTX('log')->system->info('Starting watchdog');
+    my @userinfo;
+    push @userinfo, sprintf("UID = %s", $self->userid) if $self->userid;
+    push @userinfo, sprintf("GID = %s", $self->groupid) if $self->groupid;
+    CTX('log')->system->info('Starting watchdog' . (scalar @userinfo ? ' with '.join(',', @userinfo) : ''));
 
     # Check if we already have a watchdog running
     my $result = OpenXPKI::Control::get_pids();

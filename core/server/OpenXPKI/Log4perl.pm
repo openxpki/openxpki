@@ -90,7 +90,7 @@ sub init_or_fallback {
                 $config = undef;
             }
         } elsif (!(ref $config eq 'SCALAR' or ref $config eq 'HASH')) {
-            push @warnings, "Log4perl configuration  unsupported format";
+            push @warnings, "Unsupported format for Log4perl configuration (expected: filename, ScalarRef or HashRef)";
             $config = undef;
         }
     # pass an empty string to tell us you are fine with the default logger
