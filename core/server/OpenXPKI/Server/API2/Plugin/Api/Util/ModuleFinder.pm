@@ -1,6 +1,7 @@
 package OpenXPKI::Server::API2::Plugin::Api::Util::ModuleFinder;
 use strict;
 use warnings;
+use English;
 
 =head1 NAME
 
@@ -47,7 +48,7 @@ sub new {
         push @{$self->{search_path} }, '.','lib';
 
         # don't add if superuser
-        if ($< && $> && -d "blib") {   # don't be looking too hard now!
+        if ($UID && $EUID && -d "blib") {   # don't be looking too hard now!
             push @{ $self->{search_path} }, 'blib';
         }
     }

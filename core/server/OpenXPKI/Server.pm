@@ -270,13 +270,13 @@ sub pre_loop_hook {
         # Set verbose process name
         OpenXPKI::Server::__set_process_name("server");
 
-        if ( $self->{PARAMS}->{process_group} ne $) ){
+        if ( $self->{PARAMS}->{process_group} ne $EGID ){
             $self->log(2, "Setting gid to \"$self->{PARAMS}->{process_group}\"");
             CTX('log')->system->debug("Setting gid to \"$self->{PARAMS}->{process_group}\"");
 
             set_gid( $self->{PARAMS}->{process_group} );
         }
-        if ( $self->{PARAMS}->{process_owner} ne $> ){
+        if ( $self->{PARAMS}->{process_owner} ne $EUID ){
             $self->log(2, "Setting uid to \"$self->{PARAMS}->{process_owner}\"");
             CTX('log')->system->debug("Setting uid to \"$self->{PARAMS}->{process_owner}\"");
 
@@ -284,10 +284,10 @@ sub pre_loop_hook {
         }
     };
     if ($EVAL_ERROR){
-        if ($> == 0) {
+        if ($EUID == 0) {
             CTX('log')->system->fatal($EVAL_ERROR);
             die $EVAL_ERROR;
-        } elsif($< == 0) {
+        } elsif($UID == 0) {
             CTX('log')->system->warn("Effective UID changed, but Real UID is 0: $EVAL_ERROR");
         } else {
             CTX('log')->system->error($EVAL_ERROR);
