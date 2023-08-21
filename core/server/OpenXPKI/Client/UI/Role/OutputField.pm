@@ -91,7 +91,7 @@ sub render_output_field {
     my %handlers = (
         "cert_identifier" => \&__render_cert_identifier,
         "workflow_id" => \&__render_workflow_id,
-        qr{ \A download(\/([\w_\/-]+))? }xms => \&__render_download,
+        "download" => \&__render_download,
         "itemcnt" => \&__render_itemcnt,
         "deflist" => \&__render_deflist,
         "grid" => \&__render_grid,
@@ -100,11 +100,7 @@ sub render_output_field {
     );
     my $match;
     foreach my $test (keys %handlers) {
-        if (ref $test eq 'Regexp') {
-            next unless $item->{format} =~ $test;
-        } else {
-            next unless $item->{format} eq $test;
-        }
+        next unless $item->{format} eq $test;
         my $code = $handlers{$test}->($self, $field, $item, $custom_params);
         return if ($code || 0) == -1;
         $match = 1;
@@ -237,8 +233,7 @@ sub __render_workflow_id {
 sub __render_download {
     my ($self, $field, $item) = @_;
 
-    # legacy - format is "download/mime/type"
-    my $mime = $2 || 'application/octect-stream';
+    my $mime = 'application/octect-stream';
     $item->{format} = 'download';
 
     return -1 unless $item->{value}; # do not output this field if there is no value
