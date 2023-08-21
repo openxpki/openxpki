@@ -32,17 +32,6 @@ has trust_anchors => (
     lazy => 1
 );
 
-has default_role => (
-    is => 'rw',
-    isa => 'Str',
-    lazy => 1,
-    default => sub {
-        my $self = shift;
-        CTX('log')->deprecated()->error('Please use role instead of default_role');
-        return $self->role();
-    }
-);
-
 has user_arg => (
     is => 'rw',
     isa => 'Str',
@@ -58,6 +47,10 @@ sub BUILD {
     ##! 2: "load name and description for handler"
 
     my $config = CTX('config');
+
+    OpenXPKI::Exception->throw(
+        message => 'x509 authentication does no longer accept the parameter default_role - use role instead'
+    ) if (CTX('config')->exists([ @prefix, 'default_role' ]));
 
     OpenXPKI::Exception->throw(
         message => 'x509 authentication requires default role or user handler!',
@@ -142,7 +135,7 @@ sub _validation_result {
     }
 
     # fetch userinfo from handler
-    my $role = $self->default_role();
+    my $role = $self->role();
     my $tenants;
     my $userinfo;
     if (CTX('config')->exists([ @prefix, 'user' ])) {

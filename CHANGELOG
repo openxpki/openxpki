@@ -23,3 +23,4 @@ Removals, Deprecations, Breaking Changes
   + Default behaviour of IssueCRL does now exclude expired certificates (compliant to RFC5280)
   + Code of the old SCEP layers has been removed (SCEP and LibSCEP)
   + Usage of PKCS7 wrapped JSON in RPC layer now requires explicit activation in wrapper config
+  + x509 based auth handlers do no longer accept the default_role parameter, role must be used instead
