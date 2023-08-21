@@ -549,7 +549,7 @@ while (my $cgi = CGI::Fast->new()) {
 
                 $log->trace(Dumper $reply);
                 my $error = join ", ", map { $_->{name} }  @{$reply->{ERROR}->{ERRORS}};
-                die failure( 40003, $error // $reply->{ERROR}->{LABEL} // '', { fields => $reply->{ERROR}->{ERRORS} } );
+                die failure( 40003, $error || $reply->{ERROR}->{LABEL} || '', { fields => $reply->{ERROR}->{ERRORS} } );
 
             } else {
                 if ($reply->{ERROR} && $reply->{ERROR}->{LABEL}) {
