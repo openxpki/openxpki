@@ -2151,6 +2151,14 @@ msgstr "批准吊销"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_DESC"
 msgstr "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_DESC"
+msgstr "请仅在确定此信息正确无误的情况下，验证给定的信息并批准吊销请求。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_LABEL"
+msgstr "批准吊销"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_DESC"
 msgstr "初始化"
 
@@ -2166,6 +2174,14 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_RETYPE_SERVER_PASSWORD_LABEL"
 msgstr "你的密钥密码"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_AUTH_INIT_DESC"
+msgstr "拒绝此吊销请求。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_AUTH_INIT_LABEL"
+msgstr "睡眠中"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_DATA_DESC"
 msgstr ""
@@ -2605,6 +2621,10 @@ msgstr "请更新/完成以下信息。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "更新请求"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_APPROVE_BUTTON"
+msgstr "返回"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
@@ -3184,6 +3204,10 @@ msgstr "密钥参数"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_HASH"
 msgstr "该证书负责人的电子邮件地址。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_AUTH_ENDPOINT_LABEL"
+msgstr "端点"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_DESC"
 msgstr "该证书负责人的电子邮件地址。"
@@ -3883,6 +3907,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROPERTY_ACCESS_NOT_ALLOWED_FOR_ROLE"
 msgstr "您当前的角色禁止访问此工作流程属性"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REJECT_BUTTON"
+msgstr "返回"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_RELOAD_RELATED_LIST"
 msgstr "提示填写表格字段"
 
@@ -3953,6 +3981,10 @@ msgstr "证书状态报告"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE"
 msgstr "请求的操作不可用-打开当前状态"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REQUEST_BUTTON"
+msgstr "返回"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_RESET_BUTTON"
 msgstr "返回"
@@ -4372,6 +4404,22 @@ msgstr ""
 "该工作流程已暂停，稍后将由系统继续。 您可以在下面找到有关暂停原因和计划的唤醒"
 "时间的其他信息。"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_DESC"
+msgstr "此吊销请求需要批准。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_LABEL"
+msgstr "等待批准"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_USER_DESC"
+msgstr "此吊销请求需要批准。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_USER_LABEL"
+msgstr "等待批准"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_DESC"
 msgstr ""
 "此请求未通过一项或多项策略检查，但所有者请求批准。 有关详细信息，请参见下面的"
@@ -4609,6 +4657,14 @@ msgstr "证书签名请求（CSR）"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_UPLOAD_LABEL"
 msgstr "证书签名请求（CSR）"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_AUTH_DESC"
+msgstr "将证书信息发布到已定义的存储库。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_AUTH_LABEL"
+msgstr "发布证书"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_DESC"
 msgstr "证书注册工作流程，用于通过自动界面（例如SCEP，RPC）进行证书注册。"
 
@@ -4839,6 +4895,22 @@ msgstr "是"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_MENU_USERS"
 #~ msgstr "请求"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_PENDING_DESC"
+#~ msgstr "此吊销请求需要批准。"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_PENDING_LABEL"
+#~ msgstr "等待批准"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_REVIEW_DESC"
+#~ msgstr "此工作流程最终失败。"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_REVIEW_LABEL"
+#~ msgstr "失败"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_DESC"

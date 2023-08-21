@@ -2471,6 +2471,16 @@ msgstr ""
 "Per favore convalida le informazioni fornite e approva la Revoca solo se sei "
 "sicuro che queste informazioni siano corrette."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_DESC"
+msgstr ""
+"Per favore convalida le informazioni fornite e approva la Revoca solo se sei "
+"sicuro che queste informazioni siano corrette."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_LABEL"
+msgstr "Approva Revoca"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_DESC"
 msgstr "Inizializza"
 
@@ -2488,6 +2498,14 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_RETYPE_SERVER_PASSWORD_LABEL"
 msgstr "La tua Password per la chiave privata"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_AUTH_INIT_DESC"
+msgstr "Respingi questa richiesta di revoca."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_AUTH_INIT_LABEL"
+msgstr "Termina Workflow"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_DATA_DESC"
 msgstr ""
@@ -2990,6 +3008,10 @@ msgstr "Per favore Aggiorna / Completa le informazioni qui sotto."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Richiesta Aggiornamento"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_APPROVE_BUTTON"
+msgstr "Forza Ripristino"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
@@ -3641,6 +3663,10 @@ msgstr "Parametri Chiave"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_HASH"
 msgstr ""
 "Indirizzo Email della persona fisica responsabile per questo certificato."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_AUTH_ENDPOINT_LABEL"
+msgstr "Commento"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_DESC"
 msgstr ""
@@ -4433,6 +4459,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROPERTY_ACCESS_NOT_ALLOWED_FOR_ROLE"
 msgstr "Consenti Retry"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REJECT_BUTTON"
+msgstr "Forza Ripristino"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_RELOAD_RELATED_LIST"
 msgstr "Suggerimenti per la compilazione dei campi del modulo:"
 
@@ -4508,6 +4538,10 @@ msgstr "Report Riassuntivo Certificati"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE"
 msgstr "Azione richiesta non disponibile"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REQUEST_BUTTON"
+msgstr "Forza Ripristino"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_RESET_BUTTON"
@@ -4973,6 +5007,22 @@ msgstr "Questa Richiesta di Revoca è in attesa di approvazione."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PAUSE_DESC"
 msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_DESC"
+msgstr "Questa Richiesta di Revoca è in attesa di approvazione."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_LABEL"
+msgstr "In Attesa di Approvazione"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_USER_DESC"
+msgstr "Questa Richiesta di Revoca è in attesa di approvazione."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_USER_LABEL"
+msgstr "In Attesa di Approvazione"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_DESC"
 msgstr ""
 "Questa richiesta non soddisfa uno o più criteri della policy, tuttavia il "
@@ -5233,6 +5283,17 @@ msgstr "Richiesta Revoca Certificato"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_UPLOAD_LABEL"
 msgstr "Richiesta Revoca Certificato (CRR, Certificate Revocation Request)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_AUTH_DESC"
+msgstr ""
+"Pubblica le Informazioni sulla Autorità di certificazione (CA, Certification "
+"Authority), ovvero Certificati della CA e Liste Revoche (CRL) in archivi "
+"predefiniti."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_AUTH_LABEL"
+msgstr "Pubblica Informazioni CA"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_DESC"
@@ -5505,6 +5566,22 @@ msgstr "Sì"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_MENU_USERS"
 #~ msgstr "Richiesta"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_PENDING_DESC"
+#~ msgstr "Questa Richiesta di Revoca è in attesa di approvazione."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_PENDING_LABEL"
+#~ msgstr "In Attesa di Approvazione"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_REVIEW_DESC"
+#~ msgstr "Questo Workflow è definitivamente fallito."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_REVIEW_LABEL"
+#~ msgstr "FALLIMENTO"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_DESC"

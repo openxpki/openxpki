@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2023-08-08 09:18+0200\n"
+"PO-Revision-Date: 2023-08-17 13:48+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -294,7 +294,7 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_VALID_AT"
 msgstr "valid at"
 
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_AUTHORIZE"
-msgstr "Authorize"
+msgstr "Request <b>authorization</b> as registrar"
 
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_ESCROW_KEY"
 msgstr "Download key restore file."
@@ -602,7 +602,7 @@ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_KEY_DUPLICATE"
 msgstr "Policy failed (key reuse detected)"
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_NOT_FOUND"
-msgstr "Policy definition not found/loaded."
+msgstr "Policy definition not found/loaded"
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_SUBJECT_DUPLICATE"
 msgstr "Policy failed (subject duplicate)"
@@ -611,25 +611,25 @@ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_VIOLATED"
 msgstr "Policy failed (too many valid certificates)"
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_REJECTED"
-msgstr "Request was rejected."
+msgstr "Request was rejected"
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_REQUEST_DUPLICATE"
 msgstr "Policy failed (request duplicate)"
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_REQUEST_NOT_AUTHORIZED"
-msgstr "Request was not properly authorized. "
+msgstr "Request was not properly authorized"
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_EXPIRED"
 msgstr "Signer certificate is expired."
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_NOT_AUTHORIZED"
-msgstr "Requester is not in authorized signer list. "
+msgstr "Requester is not in authorized signer list"
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_REVOKED"
-msgstr "Signer certificate is revoked."
+msgstr "Signer certificate is revoked"
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_UNKNOWN"
-msgstr "Signer certificate is unknown."
+msgstr "Signer certificate is unknown"
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SUBJECT_INVALID"
 msgstr "Subject is invalid"
@@ -638,10 +638,10 @@ msgid "I18N_OPENXPKI_UI_ENROLLMENT_RENEWAL_NOT_ALLOWED"
 msgstr "Renewal is not allowed"
 
 msgid "I18N_OPENXPKI_UI_ENTITY_NOT_FOUND"
-msgstr "The requested entity was not found."
+msgstr "The requested entity was not found"
 
 msgid "I18N_OPENXPKI_UI_ERROR_DURING_PUBLICATION"
-msgstr "Backend error during publishing "
+msgstr "Backend error during publishing"
 
 msgid "I18N_OPENXPKI_UI_ERROR_ON_REMOTE_BACKEND"
 msgstr "The remote backend responded with an error"
@@ -654,7 +654,7 @@ msgstr "The entered invalidity time is after the certificates expiration date!"
 
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_BEFORE_CERT_NOTBEFORE"
 msgstr ""
-"The entered invalidity time is earlier than  the certificates notbefore date!"
+"The entered invalidity time is earlier than the certificates notbefore date!"
 
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_CERTIFICATE_NOT_FOUND_IN_DB"
 msgstr "The certificate given as reference was not found."
@@ -1978,6 +1978,14 @@ msgstr "Approve Revocation"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_DESC"
 msgstr "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_DESC"
+msgstr ""
+"Please validate the given information and approve the request only if you "
+"are sure that this information is correct."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_LABEL"
+msgstr "Approve Request"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_DESC"
 msgstr "Initialize"
 
@@ -1991,6 +1999,12 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_RETYPE_SERVER_PASSWORD_LABEL"
 msgstr "Your Enrollment Key"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_AUTH_INIT_DESC"
+msgstr "Select the endpoint for which you want to request the authorization."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_AUTH_INIT_LABEL"
+msgstr "Registrar Authorization"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_DATA_DESC"
 msgstr ""
@@ -2430,6 +2444,9 @@ msgstr "Please update / complete the information below."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Update Request"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_APPROVE_BUTTON"
+msgstr "Approve Request"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
 msgstr "Archive at"
@@ -2974,6 +2991,9 @@ msgstr "Key Params"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_HASH"
 msgstr "Metadata (key/value)"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_AUTH_ENDPOINT_LABEL"
+msgstr "Endpoint Auth."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_DESC"
 msgstr "Email address of the responsible person for this certificate."
@@ -3671,6 +3691,9 @@ msgstr "Run State"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROPERTY_ACCESS_NOT_ALLOWED_FOR_ROLE"
 msgstr "Access to this workflow property is forbidden for your current role"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REJECT_BUTTON"
+msgstr "Reject Request"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_RELOAD_RELATED_LIST"
 msgstr "Re-evaluate Related"
 
@@ -3735,6 +3758,9 @@ msgstr "All Issued Certificates"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE"
 msgstr "Requested action not available - opening current state"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REQUEST_BUTTON"
+msgstr "Submit Request"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_RESET_BUTTON"
 msgstr "Go Back"
@@ -4161,6 +4187,21 @@ msgstr ""
 "can find additional information on the pause reason and scheduled wakeup "
 "time below."
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_DESC"
+msgstr "This request is awaiting approval by an registration officer."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_LABEL"
+msgstr "Approval Pending"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_USER_DESC"
+msgstr ""
+"Please review your request and use the \"submit\" button if you are "
+"confident that the information is correct. If you want to abort the request, "
+"use the \"cancel\" button to terminate this request."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_USER_LABEL"
+msgstr "Request Review "
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_DESC"
 msgstr ""
 "This request fails one or more policy checks but the owner requested "
@@ -4389,6 +4430,13 @@ msgstr "Allows the upload of an externally managed certificate."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_UPLOAD_LABEL"
 msgstr "Certificate Upload"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_AUTH_DESC"
+msgstr ""
+"Assign authorization to use a certificate as OnBehalf signer for an endpoint"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_AUTH_LABEL"
+msgstr "Registrar Authorization"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_DESC"
 msgstr ""
 "Certificate Enrollment workflow used for certificate enrollment via "
@@ -4607,6 +4655,21 @@ msgstr "Yes"
 
 #~ msgid "I18N_OPENXPKI_UI_MENU_USERS"
 #~ msgstr "Manage Users"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_PENDING_DESC"
+#~ msgstr "This request requires approval."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_PENDING_LABEL"
+#~ msgstr "Approval Pending"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_REVIEW_DESC"
+#~ msgstr "This workflow failed finally."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_REVIEW_LABEL"
+#~ msgstr "FAILURE"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_DESC"
