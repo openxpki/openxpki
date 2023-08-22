@@ -103,18 +103,21 @@ Now, create an empty database and assign a database user::
 
     main:
        debug: 0
-       type: MariaDB2
+       type: MariaDB
        name: openxpki
        host: localhost
        port: 3306
        user: openxpki
        passwd: openxpki
 
-
 Starting with the v3.8 release we added a MariaDB driver that makes use of MariaDB internal
 sequences instead of the emulation code and we recommend any new installations to use it!
 While the ``MariaDB``drivers uses the old mysql binding the newer ``MariaDB2`` uses the
 modern mariadb perl module which is the recommended driver on modern operating systems.
+*Note:* It looks like the DBD::MariaDB module shipped with bookworm has an issue with reference
+counters leading to very messy log output and **might** also have implications on security or
+system stability - we therefore recommend to stick with the ``MariaDB`` module in combination
+with the old ``libdbd-mysql-perl`` driver until there is a fixed version available.
 
 Please create the empty database schema from the provided schema file. mariadb/mysql and
 postgresql should work out of the box, the oracle schema is good for testing but needs some
@@ -127,6 +130,8 @@ Example call when debian packages are installed::
 
 If you do not use debian packages, you can get a copy from ``contrib/sql/`` in the
 config repository https://github.com/openxpki/openxpki-config.
+
+Please also read `Session Storage`__ as you might need an additonal SQL user there.
 
 System Setup
 ------------
@@ -401,11 +406,8 @@ Install SCEP Wrapper
 
 Starting with v3.18, the default configuration uses a pure perl implementation
 for the SCEP server so there is no need to install any additional tools anymore.
-
-If you run an older configuration or want to stick with LibSCEP for any reason,
-you have to install the library and perl bindings with::
-
-    apt install libcrypt-libscep-perl libscep
+As of v3.26 the two old implementations are no longer provided so you **MUST**
+upgrade to the new implementation!
 
 The remaining SCEP logic is already included in the core distribution. The package
 installs a wrapper script into */usr/lib/cgi-bin/* and creates a suitable alias in

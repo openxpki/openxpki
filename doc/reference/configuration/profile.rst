@@ -62,8 +62,6 @@ The input fields are summarized in three groups: subject, san and info::
                 - hostname
                 - hostname2
                 - port
-            san:
-                - san_ipv4
             info:
                 - requestor_gname
                 - requestor_name

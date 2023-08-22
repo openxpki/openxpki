@@ -103,42 +103,6 @@ sections `token`, `workflow` and `response` are only used by SCEP, the
 `export_certificate` is only applicable to the RPC output. The remainder
 of the configuration is the same for all subsystems::
 
-    # By default, all scep endpoints wll use the default token defined
-    # by the scep token group, if you pass a name here, it is considered
-    # a group name from the alias table
-    #token: ca-one-special-scep
-
-    workflow:
-        type: certificate_enroll
-        param:
-            # key: name in workflow context, value: parameter from scep wrapper
-            # server and interface are always set, the mapping below is
-            # the default set that is used when no map is given
-            transaction_id: transaction_id
-            signer_cert: signer_cert
-            pkcs10: pkcs10
-            _url_params: url_params
-            #_pkcs7: pkcs7
-
-    response:
-        # The scep standard is a bit unclear if the root should be in the chain
-        # or not. We consider it a security risk (trust should be always set
-        # by hand) but as most clients seem to expect it, we include the root
-        # by default.
-        # The getca response contains the certificate of the SCEP server itself
-        # and of the current active issuer (which can but need not to be the same!)
-        # You can define weather to have only the certificate itself (endentity),
-        # the chain without the root (chain)  or the chain including the root
-        # (fullchain).
-        # Note: The response is cached internally in the datapool so changes
-        # will not show up immediately - to list the cached items use
-        # openxpkicli list_data_pool_entries  --arg namespace=scep.cache.getca
-        # You can delete by setting the empty string as value with
-        # set_data_pool_entry (value="" force=1)
-        getca:
-            ra:     fullchain
-            issuer: fullchain
-
     # A renewal request is only accpeted if the used certificate will
     # expire within this period of time.
     renewal_period: 000060
@@ -186,9 +150,6 @@ of the configuration is the same for all subsystems::
         # to exist at the same time, deducted by one if a renewal is seen
         # set to 0 if you dont want to check for duplicates at all
         max_active_certs: 1
-
-        # option will be removed
-        # allow_expired_signer: 0
 
         # If an initial enrollment is seen
         # all existing certificates with the same subject are revoked
