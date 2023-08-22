@@ -49,63 +49,6 @@ sub new {
     return $self;
 }
 
-sub __init_server {
-    my $self = shift;
-
-    eval {
-        # we need to get a usable logger as soon as possible, hence:
-        # initialize configuration, i18n and log
-        OpenXPKI::Server::Init::init({
-            TASKS  => [ 'config_versioned', 'i18n', 'log' ],
-            SILENT => $self->{SILENT},
-        });
-
-        # from now on we can assume that we have CTX('log') available
-        # perform the rest of the initialization
-        my %p = ( SILENT => $self->{SILENT} );
-        if (!$self->{BACKGROUND}) {
-            $p{SKIP} = [ 'redirect_stderr' ];
-        }
-        OpenXPKI::Server::Init::init( \%p );
-    };
-    $self->__log_and_die($EVAL_ERROR, 'server initialization') if $EVAL_ERROR;
-}
-
-sub __init_net_server {
-    my $self = shift;
-
-    ##! 1: "start"
-
-    eval {
-        $self->{PARAMS} = $self->__get_server_config();
-
-        # Net::Server does not provide a hook that lets us change the
-        # ownership of the created socket properly: it chowns the socket
-        # file itself just before set_uid/set_gid. hence we make Net::Server
-        # believe that it does not have to set_uid/set_gid itself and do this
-        # a little later in the pre_loop_hook
-        # to make this work, delete the corresponding settings from the
-        # Net::Server init params
-        if (exists $self->{PARAMS}->{user}) {
-            $self->{PARAMS}->{process_owner} = $self->{PARAMS}->{user};
-            delete $self->{PARAMS}->{user};
-        }
-        if (exists $self->{PARAMS}->{group}) {
-            $self->{PARAMS}->{process_group} = $self->{PARAMS}->{group};
-            delete $self->{PARAMS}->{group};
-        }
-
-        unlink ($self->{PARAMS}->{socketfile});
-        CTX('log')->system()->info("Server initialization completed");
-
-        $self->{PARAMS}->{no_client_stdout} = 1;
-    };
-    $self->__log_and_die($EVAL_ERROR, 'server daemon setup') if $EVAL_ERROR;
-
-    ##! 1: "finished"
-
-}
-
 sub start {
     my $self = shift;
 
@@ -549,6 +492,63 @@ sub do_process_request {
 
 ###########################################################################
 # private methods
+
+sub __init_server {
+    my $self = shift;
+
+    eval {
+        # we need to get a usable logger as soon as possible, hence:
+        # initialize configuration, i18n and log
+        OpenXPKI::Server::Init::init({
+            TASKS  => [ 'config_versioned', 'i18n', 'log' ],
+            SILENT => $self->{SILENT},
+        });
+
+        # from now on we can assume that we have CTX('log') available
+        # perform the rest of the initialization
+        my %p = ( SILENT => $self->{SILENT} );
+        if (!$self->{BACKGROUND}) {
+            $p{SKIP} = [ 'redirect_stderr' ];
+        }
+        OpenXPKI::Server::Init::init( \%p );
+    };
+    $self->__log_and_die($EVAL_ERROR, 'server initialization') if $EVAL_ERROR;
+}
+
+sub __init_net_server {
+    my $self = shift;
+
+    ##! 1: "start"
+
+    eval {
+        $self->{PARAMS} = $self->__get_server_config();
+
+        # Net::Server does not provide a hook that lets us change the
+        # ownership of the created socket properly: it chowns the socket
+        # file itself just before set_uid/set_gid. hence we make Net::Server
+        # believe that it does not have to set_uid/set_gid itself and do this
+        # a little later in the pre_loop_hook
+        # to make this work, delete the corresponding settings from the
+        # Net::Server init params
+        if (exists $self->{PARAMS}->{user}) {
+            $self->{PARAMS}->{process_owner} = $self->{PARAMS}->{user};
+            delete $self->{PARAMS}->{user};
+        }
+        if (exists $self->{PARAMS}->{group}) {
+            $self->{PARAMS}->{process_group} = $self->{PARAMS}->{group};
+            delete $self->{PARAMS}->{group};
+        }
+
+        unlink ($self->{PARAMS}->{socketfile});
+        CTX('log')->system()->info("Server initialization completed");
+
+        $self->{PARAMS}->{no_client_stdout} = 1;
+    };
+    $self->__log_and_die($EVAL_ERROR, 'server daemon setup') if $EVAL_ERROR;
+
+    ##! 1: "finished"
+
+}
 
 sub __init_user_interfaces {
     my $self = shift;
