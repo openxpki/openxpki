@@ -152,7 +152,7 @@ rsync -a --delete --exclude=.git/ --exclude=node_modules/ $OXI_SOURCE_DIR/core/ 
 # Copy EE Perl modules
 if [ -d $OXI_EE_SOURCE_DIR/opt/myperl/site_perl/OpenXPKI ]; then
     echo "  --> incl. EE code"
-    rsync -a $OXI_EE_SOURCE_DIR/opt/myperl/site_perl/OpenXPKI/  $OXI_CORE_DIR/server/OpenXPKI/ >$LOG 2>&1
+    rsync -a $OXI_EE_SOURCE_DIR/opt/myperl/site_perl/  $OXI_CORE_DIR/server/ >$LOG 2>&1
 fi
 
 # Copy web UI files
@@ -173,7 +173,7 @@ if [ -d $OXI_EE_SOURCE_DIR/opt/myperl/bin ]; then
 
     # inject EE scripts into Makefile.PL's EXE_FILES array
     files=$(find $OXI_EE_SOURCE_DIR/opt/myperl/bin/ -type f -printf "bin/%f ")
-    echo "  $files"
+    echo "$files" | sed 's/ /\n/g; s/^/  /mg'
     echo "$files" | $OXI_SOURCE_DIR/tools/scripts/add-exe-to-makefile.pl $OXI_CORE_DIR/server/Makefile.PL \
       > $OXI_CORE_DIR/server/Makefile.PL.new \
       && mv $OXI_CORE_DIR/server/Makefile.PL.new $OXI_CORE_DIR/server/Makefile.PL
