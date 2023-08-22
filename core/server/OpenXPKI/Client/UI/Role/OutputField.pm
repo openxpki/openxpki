@@ -233,7 +233,7 @@ sub __render_workflow_id {
 sub __render_download {
     my ($self, $field, $item) = @_;
 
-    my $mime = 'application/octect-stream';
+    my $mime = 'application/octet-stream';
     $item->{format} = 'download';
 
     return -1 unless $item->{value}; # do not output this field if there is no value
