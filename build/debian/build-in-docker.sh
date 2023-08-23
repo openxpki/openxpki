@@ -13,7 +13,7 @@ fi
 makerepo() {
 
     if [ -z "$SOURCE" ]; then
-        SOURCE="deb http://packages.openxpki.org/v3/debian/ bookworm release"
+        SOURCE="http://packages.openxpki.org/v3/bookworm/"
     fi
 
     if [ -e "/signkey" ]; then
@@ -30,7 +30,7 @@ makerepo() {
         xargs -L1 --no-run-if-empty reprepro $CONFDIR --basedir /repository includedeb bookworm;
 
     # Add the apt config
-    echo $SOURCE > /repository/openxpki.list
+    echo -e "Types: deb\nURIs: $SOURCE\nSuites: bookworm\nComponents: release\nSigned-By: /usr/share/keyrings/openxpki.pgp" > /repository/openxpki.sources
     gpg --export --armor > /repository/Release.key
 
 }
