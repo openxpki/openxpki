@@ -269,7 +269,7 @@ sub _load_plugins {
         Module::Load::load $pkg;
 
         if (not $pkg->DOES($self->command_role)) {
-            $self->log->debug("API - ignore $pkg (does not consume ".$self->command_role.") - $file");
+            $self->log->trace("API - ignore $pkg (does not consume ".$self->command_role.") - $file");
             next;
         }
 
