@@ -252,7 +252,12 @@ sub _build_dbix_handler {
             PrintError => 0,
             HandleError => sub {
                 my ($msg, $dbh, $retval) = @_;
-                $self->_dbi_error_handler($msg, $dbh);
+                # avoid access to $self during global destruction (might be undef then)
+                if (${^GLOBAL_PHASE} eq "DESTRUCT") {
+                    warn "$msg [pid=$$]\n";
+                } else {
+                    $self->_dbi_error_handler($msg, $dbh);
+                }
             },
             # AutoInactiveDestroy => 1, -- automatically set by DBIx::Handler
             %params,
