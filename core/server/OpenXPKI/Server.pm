@@ -21,6 +21,7 @@ use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Watchdog;
 use OpenXPKI::Server::Notification::Handler;
 use OpenXPKI::Util;
+use OpenXPKI::Control;
 
 use Feature::Compat::Try; # should be done after other imports to safely disable warnings
 
@@ -53,7 +54,16 @@ sub start {
     my $self = shift;
 
     umask $self->{umask};
+
     $self->__init_server;
+
+    CTX('log')->system->info(sprintf("Server: %s", OpenXPKI::Control::get_version(config => CTX('config'))));
+    CTX('log')->system->info(sprintf("Perl: %s", $^V->normal));
+    if (CTX('log')->system->is_debug) {
+        CTX('log')->system->debug("Environment:");
+        CTX('log')->system->debug(sprintf(" - %s = %s", $_, $ENV{$_})) for sort keys %ENV;
+    }
+
     $self->__init_user_interfaces;
     $self->__init_net_server;
 

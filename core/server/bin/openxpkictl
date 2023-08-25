@@ -75,7 +75,7 @@ my $cmd = shift;
 
 if ($cmd eq 'version') {
 
-    OpenXPKI::Control::version( $args );
+    print OpenXPKI::Control::get_version( config_args => $args ) . "\n";
     exit 0;
 
 } elsif ($cmd eq 'status') {

@@ -48,11 +48,14 @@ use File::Temp;
 
 # CPAN modules
 use Proc::ProcessTable;
+use Feature::Compat::Try;
+use Type::Params qw( signature_for );
 
 # Project modules
 use OpenXPKI::VERSION;
 use OpenXPKI::Debug;
 
+use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
 
 =head2 start {CONFIG, SILENT, PID, DEBUG, KEEP_TEMP}
 
@@ -181,15 +184,8 @@ sub start {
     }
 
     if (not $silent) {
-        eval {require OpenXPKI::Enterprise;};
-        if ($EVAL_ERROR) {
-            print STDOUT "Starting OpenXPKI Community Edition v$OpenXPKI::VERSION::VERSION\n";
-        } else {
-            print STDOUT "Starting OpenXPKI Enterprise Edition v$OpenXPKI::VERSION::VERSION\n";
-            if ($config->{license}) {
-                print STDOUT OpenXPKI::Enterprise::get_license_string($config->{license})."\n";
-            }
-        }
+        my $version = get_version(config => $config->{oxi_config});
+        print STDOUT "Starting $version\n";
     }
     unlink $pidfile if ($pidfile && -e $pidfile);
 
@@ -440,18 +436,34 @@ sub status {
     return 0;
 }
 
-sub version {
+signature_for get_version => (
+    named => [
+        config => 'OpenXPKI::Config', { optional => 1 },
+        config_args => 'HashRef', { optional => 1 },
+    ],
+);
+sub get_version ($arg) {
 
-    my $args = shift;
-    my $config = OpenXPKI::Control::__probe_config( $args );
-    eval {require OpenXPKI::Enterprise;};
-    if ($EVAL_ERROR) {
-        print STDOUT "OpenXPKI Community Edition v$OpenXPKI::VERSION::VERSION\n\n";
-    } else {
-        print STDOUT "OpenXPKI Enterprise Edition v$OpenXPKI::VERSION::VERSION\n";
-        print STDOUT OpenXPKI::Enterprise::get_license_string($config->{license})."\n";
+    my $is_enterprise = 0;
+    try {
+        require OpenXPKI::Enterprise;
+        $is_enterprise = 1;
     }
-    return 0;
+    catch ($err) {
+        # suppress "module not found" but fail loudly on any other error
+        die $err unless $err =~ m{locate OpenXPKI/Enterprise\.pm in \@INC};
+    }
+
+    if ($is_enterprise) {
+        my $license = $arg->config
+            ? $arg->config->get('system.license')
+            : OpenXPKI::Control::__probe_config( $arg->config_args )->{license};
+        my $version = "OpenXPKI Enterprise Edition v$OpenXPKI::VERSION::VERSION";
+        $version .= "\n" . OpenXPKI::Enterprise::get_license_string($license) if $license;
+        return $version;
+    } else {
+        return "OpenXPKI Community Edition v$OpenXPKI::VERSION::VERSION";
+    }
 
 }
 
@@ -643,6 +655,7 @@ sub __probe_config {
         TYPE => $config->get('system.server.type') || 'Fork',
         depend => $config->get_hash('system.version.depend') || undef,
         license => $config->get('system.license') || '',
+        oxi_config => $config,
     };
 
 }
