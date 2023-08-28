@@ -18,7 +18,7 @@ def virtualbox_version()
 end
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "debian/contrib-buster64"
+  config.vm.box = "debian/bookworm64"
 
   # Do not try to update VirtualBox Guest Additions (which fails anyway).
   # Instead we do that manually in assets/provision-basic.sh
@@ -39,7 +39,7 @@ Vagrant.configure("2") do |config|
 
       dev.vm.provision "Create /run-env", :type => "shell", :inline => "mkdir -p /run-env && chmod 0777 /run-env"
 
-      dev.vm.provision "Provisioning", :type => "shell", :path => "provision.sh", :args => virtualbox_version()
+      dev.vm.provision "Provisioning", :type => "shell", :path => "provision.sh", :args => [ virtualbox_version() ]
 
       # TCP ports - OpenXPKI
       dev.vm.network :forwarded_port, guest: 80,   host: 9080, host_ip: "0.0.0.0"
