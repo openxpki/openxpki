@@ -784,7 +784,7 @@ The method name given is either not defined or has no workflow defined
 =item 40402 - Resume requested but nothing to pickup
 
 The method name has an execute statement but no workflow to be continued
-was found using  the given pickup rules
+was found using the given pickup rules
 
 =item 40403 - Resume requested but workflow is not in manual state
 

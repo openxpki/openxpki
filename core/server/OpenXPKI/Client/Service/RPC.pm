@@ -115,8 +115,10 @@ sub openapi_spec {
             next unless ($conf->{$method}->{workflow});
             my $in = $conf->{$method}->{param} || '';
             my $out = $conf->{$method}->{output} || '';
+            my $action = $conf->{$method}->{execute_action};
             my $method_spec = $client->run_command('get_rpc_openapi_spec', {
                 workflow => $conf->{$method}->{workflow},
+                ($action ? (action => $action) : ()),
                 input => [ split /\s*,\s*/, $in ],
                 output => [ split /\s*,\s*/, $out ]
             });

@@ -92,6 +92,7 @@ B<Parameters>
 =cut
 command "get_rpc_openapi_spec" => {
     workflow => { isa => 'Str', required => 1, },
+    action   => { isa => 'Str', required => 0, },
     input => { isa => 'ArrayRef[Str]', required => 0, default => sub { [] } },
     output => { isa => 'ArrayRef[Str]', required => 0, default => sub { [] } },
 } => sub {
@@ -117,9 +118,30 @@ command "get_rpc_openapi_spec" => {
         @{ $params->output }                                    # output field names
     };
 
+    my $action;
+    if ($params->has_action) {
+        $action = $params->action;
+        my $prefix = $head->{prefix};
+        if ($action !~ qr/\A(global|$prefix)_/) {
+            $action =  $prefix.'_'.$action;
+        }
+    } else {
+        # fetch actions in state INITIAL from the config
+        my $wf_config = $self->factory->_get_workflow_config($params->workflow);
+        for my $state (@{$wf_config->{state}}) {
+            next unless $state->{name} eq 'INITIAL';
+            ($action) = map { $_->{name} } @{$state->{action}};
+            last;
+        }
+        OpenXPKI::Exception->throw(
+            message => 'No INIITAL action found in workflow',
+            params => { workflow_type => $workflow }
+        ) unless $action;
+    }
+
     return {
         description => $head->{description} ? i18nGettext($head->{description}) : $workflow,
-        input_schema => $self->_openapi_field_schema($workflow, $self->_get_input_fields($workflow, 'INITIAL'), $params->input),
+        input_schema => $self->_openapi_field_schema($workflow, $self->_get_input_fields($workflow, $action), $params->input),
         output_schema => $self->_openapi_field_schema($workflow, $output, $params->output),
     };
 };
@@ -254,54 +276,18 @@ sub _openapi_field_schema {
 
 # Returns a HashRef with field names and their definition
 sub _get_input_fields {
-    my ($self, $workflow, $query_state) = @_;
+    my ($self, $workflow, $action) = @_;
 
     my $result = {};
-    my $wf_config = $self->factory->_get_workflow_config($workflow);
-    my $state_info = $wf_config->{state};
 
-    #
-    # fetch actions in state $query_state from the config
-    #
-    my @actions = ();
-
-    # get name of first action of $query_state
-    my $first_action;
-    for my $state (@$state_info) {
-        if ($state->{name} eq $query_state) {
-            $first_action = $state->{action}->[0]->{name} ;
-            last;
-        }
+    my $action_info = $self->factory->get_action_info($action, $workflow);
+    my $fields = $action_info->{field};
+    for my $f (@$fields) {
+        $result->{$f->{name}} = {
+            %$f,
+            action => $action
+        };
     }
-    OpenXPKI::Exception->throw(
-        message => 'State not found in workflow',
-        params => { workflow_type => $workflow, state => $query_state }
-    ) unless $first_action;
-
-    push @actions, $first_action;
-
-    # get names of further actions in $query_state
-    # TODO This depends on the internal naming of follow up actions in Workflow.
-    #      Alternatively we could parse actions again as in OpenXPKI::Server::API2::Plugin::Workflow::Util->_get_config_details which is also not very elegant
-    my $followup_state_re = sprintf '^%s_%s_\d+$', $query_state, uc($first_action);
-    for my $state (@$state_info) {
-        if ($state->{name} =~ qr/$followup_state_re/) {
-            push @actions, $state->{action}->[0]->{name} ;
-        }
-    }
-
-    # get field informations
-    for my $action (@actions) {
-        my $action_info = $self->factory->get_action_info($action, $workflow);
-        my $fields = $action_info->{field};
-        for my $f (@$fields) {
-            $result->{$f->{name}} = {
-                %$f,
-                action => $action
-            };
-        }
-    }
-
     return $result;
 }
 
