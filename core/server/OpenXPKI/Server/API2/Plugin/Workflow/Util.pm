@@ -293,7 +293,12 @@ sub _execute_activity_async {
         # DB rollback is not needed as this process will terminate now anyway
     }
 
-    OpenXPKI::Server->cleanup();
+    OpenXPKI::Server::__set_process_name("workflow: id %d (detached - cleanup)", $workflow->id());
+
+    try {
+        OpenXPKI::Server->cleanup();
+    }
+    catch ($err) { warn $err }
 
     ##! 16: 'Backgrounded workflow finished - exit child'
     exit;
