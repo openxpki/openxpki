@@ -182,7 +182,7 @@ if [[ $IS_DBCONFIG -eq 1 ]]; then
     cat <<__DB > /etc/openxpki/config.d/system/database.yaml
     main:
         debug: 0
-        type: MariaDB
+        type: MariaDB2
         host: $OXI_TEST_DB_MYSQL_DBHOST
         port: $OXI_TEST_DB_MYSQL_DBPORT
         name: $OXI_TEST_DB_MYSQL_NAME

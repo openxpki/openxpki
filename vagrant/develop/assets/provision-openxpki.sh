@@ -99,3 +99,16 @@ echo "Install OpenXPKI from host sources"
 $OXI_SOURCE_DIR/tools/testenv/oxi-refresh --full 2>&1 | tee $LOG | sed -u 's/^/    /mg'
 
 set +e
+
+#
+# Helper scripts
+#
+tools_dir="$OXI_SOURCE_DIR/tools/testenv"
+if ! grep -q "$tools_dir" /root/.bashrc; then
+    echo "Set \$PATH and run 'oxi-help' on login"
+    echo "export PATH=\$PATH:$tools_dir" >> /root/.bashrc
+    if [[ -d /home/vagrant ]]; then
+        echo "export PATH=\$PATH:$tools_dir" >> /home/vagrant/.profile
+        echo "$tools_dir/oxi-help"           >> /home/vagrant/.profile
+    fi
+fi

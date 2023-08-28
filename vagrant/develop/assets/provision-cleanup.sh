@@ -5,9 +5,6 @@ set -euo pipefail
 SCRIPTDIR="$(dirname "$0")"
 . "$SCRIPTDIR/functions.sh"
 
-#
-# Cleanup
-#
 set +e
 
 echo "Clean up Docker"
