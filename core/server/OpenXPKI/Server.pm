@@ -73,6 +73,16 @@ sub start {
 
     CTX('log')->audit('system')->info('server was started');
 
+    # Disconnect database before Net::Server forks esp. to fix warnings when
+    # using DBD::MariaDB (DBI occasionally warns: "DBI active kids (-1) < 0").
+    # DBIx::Handler sets (Auto)InactiveDestroy which should prevent such
+    # problems but DBD::MariaDB does not seem to properly handle it.
+    # Also see https://github.com/perl5-dbi/DBD-MariaDB/pull/175.
+    # This workaround should not cause problems because DBIx::Handler does a
+    # reconnect if neccessary.
+    eval { CTX('dbi')->disconnect };
+    eval { CTX('dbi_log')->disconnect };
+
     $self->run(%{$self->{PARAMS}}); # from Net::Server::MultiType
 }
 
