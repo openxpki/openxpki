@@ -413,9 +413,10 @@ sub command {
         );
     }
     ##! 2: "Command: $cmd"
+    my $cmd_ref;
 
     my $ret = eval {
-        my $cmd_ref = $cmd->new({
+        $cmd_ref = $cmd->new({
             %{$command_params_of{$ident}},
             %{$arg_ref},
             TOKEN_TYPE => $token_type_of{$ident},
@@ -477,12 +478,14 @@ sub command {
     {
         ##! 16: 'exception: ' . Dumper $exc
         ##! 16: 'eval_error: ' . $EVAL_ERROR
+        $cmd_ref->cleanup() if $cmd_ref;
         $cli_of{$ident}->cleanup(); ## this is safe
         OpenXPKI::Exception->throw (
             message  => "I18N_OPENXPKI_TOOLKIT_COMMAND_FAILED",
             params   => {"COMMAND" => $cmd},
             children => [ $exc ]);
     } elsif ($EVAL_ERROR ne '') {
+        $cmd_ref->cleanup() if $cmd_ref;
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_TOOLKIT_COMMAND_EVAL_ERROR',
             params => {
@@ -490,6 +493,7 @@ sub command {
             },
         );
     } else {
+        $cmd_ref->cleanup() if $cmd_ref;
         ##! 4: "end"
         return $ret;
     }

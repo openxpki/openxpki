@@ -176,12 +176,6 @@ sub get_result
     return $ret;
 }
 
-sub DESTROY
-{
-    my $self = shift;
-    $self->cleanup();
-}
-
 1;
 
 __END__
