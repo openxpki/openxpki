@@ -111,33 +111,27 @@ sub pre_server_close_hook {
         ##! 4: 'pid_file removed'
     }
 
-    # try to stop the metrics server if this is the main process
+    # if this is the main process
     if ($main_pid and $main_pid == $$) {
-        eval {
+        # stop metrics server
+        try {
             require OpenXPKI::Metrics::Prometheus; # this is EE code
-            OpenXPKI::Metrics::Prometheus->terminate();
-        };
+            OpenXPKI::Metrics::Prometheus->terminate;
+        }
+        catch ($err) { warn $err }
+
+        # stop watchdog
+        try {
+            ##! 1: 'pre_server_close_hook() in main server - terminate watchdog'
+            OpenXPKI::Server::Watchdog->terminate;
+        }
+        catch ($err) { warn $err }
     }
 
-    $self->cleanup();
-}
-
-sub DESTROY {
-    ##! 1: 'start'
-    my $self = shift;
-
-    if ($self->{TYPE} eq 'Simple') {
-        # for servers in the foreground, manually call the pre_server_close_hook
-        $self->pre_server_close_hook();
+    try {
+        $self->cleanup;
     }
-
-    # if this is the main process try to kill the watchdog
-    if ($main_pid && $main_pid == $$) {
-        ##! 1: 'DESTROY in main server - terminate watchdog'
-        OpenXPKI::Server::Watchdog->terminate;
-    }
-
-    return 1;
+    catch ($err) { warn $err }
 }
 
 # Net::Server method
