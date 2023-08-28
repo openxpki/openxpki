@@ -1,27 +1,7 @@
 Please list items to be added to the final release comment here
 
 New Features
- + Support PSS padding when signing certificates and CRLs
- + New parameter keep_expire in crl profile to control content of CRL
- + Browser for Datapool items (EE only)
- + Support JSON Web Signature in RPC Wrapper
 
 Upgrades, Improvements and Bugfixes
-  + Certificate profile fields (profile.template.*.yaml) now support the same attributes as workflow fields
-  + Fix broken server response if custom translation strings contain special characters
-  + Visual improvements of UI form fields (label hyphenation, continuation dots, sizing)
-  + Breadcrumbs on most pages make it possible to see the latest actions at a glance
-  + Popups now provide a Back button on follow-up popup pages
-  + Auto-generated realm selection page
-  + Debian packaging is now on Debian 12 "Bookworm"
 
 Removals, Deprecations, Breaking Changes
-  + Remove API command "get_cert_subject_styles"
-  + Remove unused method OpenXPKI::Client::UI::Result::__register_wf_token_initial()
-  + Remove openxpkictl option --foreground (use --no-detach instead)
-  + Parameters validity, reason_code, remove_expired to IssueCRL are deprecated and will be removed with next release
-  + Default behaviour of IssueCRL does now exclude expired certificates (compliant to RFC5280)
-  + Code of the old SCEP layers has been removed (SCEP and LibSCEP)
-  + Usage of PKCS7 wrapped JSON in RPC layer now requires explicit activation in wrapper config
-  + x509 based auth handlers do no longer accept the default_role parameter, role must be used instead
-  + Legacy format spec including mime type for download fields is no longer supported (format: download/mime/type)
