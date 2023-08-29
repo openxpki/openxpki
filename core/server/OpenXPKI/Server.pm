@@ -80,8 +80,8 @@ sub start {
     # Also see https://github.com/perl5-dbi/DBD-MariaDB/pull/175.
     # This workaround should not cause problems because DBIx::Handler does a
     # reconnect if neccessary.
-    eval { CTX('dbi')->disconnect };
-    eval { CTX('dbi_log')->disconnect };
+    eval { CTX('dbi')->disconnect if OpenXPKI::Server::Context::hascontext('dbi') };
+    eval { CTX('dbi_log')->disconnect if OpenXPKI::Server::Context::hascontext('dbi_log') };
 
     $self->run(%{$self->{PARAMS}}); # from Net::Server::MultiType
 }

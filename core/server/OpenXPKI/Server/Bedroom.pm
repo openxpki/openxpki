@@ -22,6 +22,7 @@ use Type::Params qw( signature_for );
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
+use OpenXPKI::Server::Context qw( CTX );
 
 use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
 
@@ -202,6 +203,16 @@ sub new_child ($self, $arg) {
     $SIG{'CHLD'} = \&_catch_them_all unless $arg->keep_parent_sigchld;
 
     ##! 1: 'start - $SIG{"CHLD"}: ' . ($SIG{'CHLD'}//'<undef>')
+
+    # Disconnect database before forking esp. to fix warnings when
+    # using DBD::MariaDB (DBI occasionally warns: "DBI active kids (-1) < 0").
+    # DBIx::Handler sets (Auto)InactiveDestroy which should prevent such
+    # problems but DBD::MariaDB does not seem to properly handle it.
+    # Also see https://github.com/perl5-dbi/DBD-MariaDB/pull/175.
+    # This workaround should not cause problems because DBIx::Handler does a
+    # reconnect if neccessary.
+    eval { CTX('dbi')->disconnect if OpenXPKI::Server::Context::hascontext('dbi') };
+    eval { CTX('dbi_log')->disconnect if OpenXPKI::Server::Context::hascontext('dbi_log') };
 
     # FORK!
     my ($pid, $fh_from_child)  = $self->_try_fork($arg->max_fork_redo, $arg->capture_stdout);
