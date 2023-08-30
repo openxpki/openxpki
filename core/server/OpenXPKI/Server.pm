@@ -114,11 +114,13 @@ sub pre_server_close_hook {
     # if this is the main process
     if ($main_pid and $main_pid == $$) {
         # stop metrics server
-        try {
-            require OpenXPKI::Metrics::Prometheus; # this is EE code
-            OpenXPKI::Metrics::Prometheus->terminate;
+        if (CTX('metrics')->enabled) {
+            try {
+                require OpenXPKI::Metrics::Prometheus; # this is EE code
+                OpenXPKI::Metrics::Prometheus->terminate;
+            }
+            catch ($err) { warn $err }
         }
-        catch ($err) { warn $err }
 
         # stop watchdog
         try {
