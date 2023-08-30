@@ -2,20 +2,24 @@ package OpenXPKI::Server::Authentication;
 
 use strict;
 use warnings;
-
 use English;
-use OpenXPKI::Debug;
+
+# Core modules
 use Data::Dumper;
-use Crypt::JWT qw(decode_jwt);
 use Digest::SHA qw(sha1);
 use MIME::Base64 qw(encode_base64url decode_base64);
+
+# CPAN modules
+use Crypt::JWT qw(decode_jwt);
+use Feature::Compat::Try;
+
+# Project modules
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
-
 use OpenXPKI::Server::Authentication::Handle;
+use OpenXPKI::Server::Authentication::Base; # preload to get debug working
 
-# preload to get debug working
-use  OpenXPKI::Server::Authentication::Base;
 ## constructor and destructor stuff
 
 sub new {
@@ -159,6 +163,8 @@ sub __load_handler
     return 1;
 }
 
+# Fills $self->{PKI_REALM}->{$realm}->{TENANT} in OpenXPKI Enterprise Edition.
+# Does nothing in Community Edition.
 sub __load_tenant {
 
     ##! 4: "start"
@@ -170,11 +176,23 @@ sub __load_tenant {
 
     my $conf = $config->get_hash(['auth', 'roles', $role, 'tenant']);
 
-    return unless ($conf);
+    return unless $conf;
 
     # always add the null handler if it does not exist
     if (!$self->{PKI_REALM}->{$realm}->{TENANT}->{_default}) {
-        eval "use OpenXPKI::Server::AccessControl::Tenant::Null;1";
+        try {
+            # this is EE code
+            require OpenXPKI::Server::AccessControl::Tenant::Null;
+        }
+        catch ($err) {
+            # fail silently on "module not found" but loudly on any other error
+            if ($err =~ m{locate OpenXPKI/Server/AccessControl/Tenant/Null\.pm in \@INC}) {
+                CTX('log')->system->warn("Ignoring tenant configuration: tenants are a feature of OpenXPKI Enterprise Edition");
+                return;
+            } else {
+                die $err;
+            }
+        }
         $self->{PKI_REALM}->{$realm}->{TENANT}->{_default} = OpenXPKI::Server::AccessControl::Tenant::Null->new();
         CTX('log')->auth()->info('Loaded tenant null handler');
     }
