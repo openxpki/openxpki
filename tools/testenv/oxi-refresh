@@ -149,7 +149,16 @@ if [ $test_auth_exists -eq 0 ]; then
     echo "- add authentication stack 'Testing'"
     # add test auth stack (e.g. user: raop / password: openxpki)
     sed -zri 's/^/Testing:\n    handler: TestAccounts\n    type: passwd\n\n/' /etc/openxpki/config.d/realm/democa/auth/stack.yaml
-    cat <<__HANDLER >> /etc/openxpki/config.d/realm/democa/auth/handler.yaml
+fi
+
+# add "tenant: { type: Base }" to "RA Operator"
+sed -zri 's/(RA Operator[^\n]+\n([\t ]+[^\n]+\n)+)/\1    tenant:\n        type: Base\n/' /etc/openxpki/config.d/realm/democa/auth/roles.yaml
+
+# remove probably existing TestAccounts
+sed -zri 's/(TestAccounts:\n([\t ]+[^\n]+\n|\n)+)//' /etc/openxpki/config.d/realm.tpl/auth/handler.yaml
+
+# add our TestAccounts
+cat <<__HANDLER >> /etc/openxpki/config.d/realm/democa/auth/handler.yaml
 
 TestAccounts:
     type: Password
@@ -165,13 +174,15 @@ TestAccounts:
             role: RA Operator
             realname: Richard Alfred Op
             email: ra@example.org
+            tenant:
+                - Alice Group
+                - Bob the Builder
         user:
             digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
             role: User
             realname: User No. 1
             email: user@example.org
 __HANDLER
-fi
 
 # set /var/tmp instead of /tmp (where only root has write access)
 sed -ri 's/(LOCATION:)\s*\/tmp.*/\1 \/var\/tmp/g' /etc/openxpki/config.d/realm/democa/publishing.yaml
