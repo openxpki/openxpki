@@ -76,6 +76,7 @@ sub __load_pki_realm
 
     # Fake Session for Config!
     CTX('session')->data->pki_realm( $realm );
+    Log::Log4perl::MDC->put('pki_realm', $realm);
 
     my %handlers;
 
@@ -122,6 +123,8 @@ sub __load_pki_realm
     ##! 64: "Realm auth config " . Dumper $self->{PKI_REALM}->{$realm}
 
     CTX('session')->data->pki_realm( $restore_realm ) if $restore_realm;
+    Log::Log4perl::MDC->put('pki_realm', $restore_realm);
+
     ##! 4: "end"
     return 1;
 }
