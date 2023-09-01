@@ -1,7 +1,7 @@
 /* Ember supports plain CSS out of the box. More info: https://cli.emberjs.com/release/advanced-use/stylesheets/ */
 
 /*
-Does not work currently (2023-07-28), so we directly specify them in index.html.
+Imports do not work currently (2023-07-28), so we directly specify them in index.html.
 Possible causes:
 - Ember updates (esp. their refactoring regarding ember-cli-clean-css)
 - removal of {{rootURL}} in index.html
@@ -10,6 +10,9 @@ Possible causes:
 @import url("glyphicons.css");
 */
 
+/*
+inset: 0px 100% auto auto;
+*/
 /******************************************************************************
  * Common helpers
  */
@@ -102,6 +105,21 @@ img.toplogo {
 .userinfo {
   font-size: 80%;
 }
+
+.oxi-tenant-selection.ss-main {
+  display: inline-flex;
+  width: auto;
+  font-weight: bold;
+}
+
+.oxi-tenant-selection.ss-main:not(.ss-open-below) {
+  border: 1px solid transparent;
+}
+
+.oxi-tenant-selection.ss-main .ss-values .ss-single {
+  margin: 0;
+}
+
 
 .oxi-infobox .card {
   overflow-x: scroll;
@@ -656,3 +674,8 @@ div.required input.flatpickr-input {
 
 /* Change the background color of the dropdown button when the dropdown content is shown */
 .hover-element:hover .content { border-color: #bfe0a8 }
+
+/* slim-select: use link color to indicate that it is clickable */
+.ss-main {
+  color: RGBA(var(--bs-primary-rgb), var(--bs-link-opacity, 1)) !important;
+}
