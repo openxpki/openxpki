@@ -106,23 +106,22 @@ img.toplogo {
   font-size: 80%;
 }
 
-.oxi-tenant-selection.ss-main {
+.oxi-infobox .card {
+  overflow-x: scroll;
+}
+
+/* oxi-base/select - inline select field */
+.oxi-inline-select.ss-main {
+  color: RGBA(var(--bs-primary-rgb), var(--bs-link-opacity, 1)) !important; /* use link color to indicate that it is clickable */
   display: inline-flex;
   width: auto;
   font-weight: bold;
 }
-
-.oxi-tenant-selection.ss-main:not(.ss-open-below) {
+.oxi-inline-select.ss-main:not(.ss-open-below) {
   border: 1px solid transparent;
 }
-
-.oxi-tenant-selection.ss-main .ss-values .ss-single {
+.oxi-inline-select.ss-main .ss-values .ss-single {
   margin: 0;
-}
-
-
-.oxi-infobox .card {
-  overflow-x: scroll;
 }
 
 /******************************************************************************
@@ -522,13 +521,12 @@ div.oxifield-upload {
   padding-bottom: 34px;
 }
 
-/* Clonable fields */
-
-/* column holding the clonable buttons */
+/* Clonable fields - column holding the clonable buttons */
 .clonable-btn-group {
   white-space: nowrap;
 }
 
+/* Autocomplete */
 .oxi-autocomplete {
   padding-top: 6pt;
   color: #777;
@@ -674,8 +672,3 @@ div.required input.flatpickr-input {
 
 /* Change the background color of the dropdown button when the dropdown content is shown */
 .hover-element:hover .content { border-color: #bfe0a8 }
-
-/* slim-select: use link color to indicate that it is clickable */
-.ss-main {
-  color: RGBA(var(--bs-primary-rgb), var(--bs-link-opacity, 1)) !important;
-}
