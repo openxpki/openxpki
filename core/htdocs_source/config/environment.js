@@ -41,7 +41,10 @@ module.exports = function (environment) {
     ENV.APP.LOG_VIEW_LOOKUPS = true;
   }
 
+  // note that Embroider also seems to run with environment === "test"
   if (environment === 'test') {
+    ENV.rootURL = '/webui/democa/'  // https://guides.emberjs.com/release/configuring-ember/embedding-applications/#toc_specifying-a-root-url
+
     // Testem prefers this...
     ENV.locationType = 'none';
 
