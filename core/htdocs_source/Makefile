@@ -47,6 +47,10 @@ else
 #	MANAGER_OPTS = --add-host host.containers.internal:host-gateway
 endif
 
+.PHONY: help ember nocache debug serve \
+		update-ember update-deps update-lockfile \
+		docs docker-build prune npm-cache
+
 help:
 	@grep '^[a-zA-Z]' Makefile | awk -F ':.*?## ' 'NF==2 {printf "  %-26s%s\n", $$1, $$2}'
 
@@ -130,3 +134,16 @@ docker-build:
 
 prune: ## remove Docker image
 	$(MANAGER) rmi $(IMAGE)
+
+npm-cache: ## run local NPM cache "verdaccio" (will be used by containers)
+	$(MANAGER) run $(MANAGER_OPTS_RUN) -ti --rm \
+	  --name verdaccio \
+	  -p $(call port,$(NPM_CUSTOM_REGISTRY)):4873 \
+	  verdaccio/verdaccio
+
+add/%: ## add modules to package.json as devDependencies
+	$(MANAGER) run $(MANAGER_OPTS_RUN) -ti --rm \
+	  -v $(abspath ./):/source:ro \
+	  -v $(abspath ./):/output \
+	  $(IMAGE) \
+	  add "$*"

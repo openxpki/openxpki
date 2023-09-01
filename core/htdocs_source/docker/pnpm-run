@@ -31,7 +31,6 @@ fi
 # ...instead use /node_modules/ from the container
 mv /node_modules /build/node_modules
 
-
 if [ "update-ember" == "$1" ]; then
   echo -e "\n[Update ember-cli and ember-cli-update]"
   pnpm remove ember-cli ember-cli-update
@@ -51,6 +50,20 @@ elif [ "update-lockfile" == "$1" ]; then
   echo -e "\n[Copy pnpm-lock.yaml back to the host]"
   cp pnpm-lock.yaml /output
   echo -e "\nDone.\npnpm-lock.yaml was updated on your host."
+
+elif [ "add" == "$1" ]; then
+  module_list="$2"
+  echo -e "\n[Adding new modules to package.json as devDependencies]"
+  # https://github.com/dylanaraps/pure-bash-bible/blob/master/README.md#split-a-string-on-a-delimiter
+  set +e
+  IFS=$'\n' read -d "" -ra modules <<< "${module_list//,/$'\n'}"
+  set -e
+
+  for mod in "${modules[@]}"; do printf ' - %s\n' "$mod"; done
+  pnpm add --save-dev "${modules[@]}"
+
+  cp package.json pnpm-lock.yaml /output
+  echo -e "\nDone.\npackage.json and pnpm-lock.yaml were updated on your host."
 
 else # including "serve"
   cd /build
