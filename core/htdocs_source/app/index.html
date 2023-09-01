@@ -6,10 +6,10 @@
 
         {{content-for "head"}}
 
-        <link integrity="" rel="stylesheet" href="assets/vendor.css">
-        <link integrity="" rel="stylesheet" href="assets/glyphicons.css">
-        <link integrity="" rel="stylesheet" href="assets/bootstrap-v5-tweaks.css">
-        <link integrity="" rel="stylesheet" href="assets/openxpki.css">
+        <link integrity="" rel="stylesheet" href="{{rootURL}}assets/vendor.css">
+        <link integrity="" rel="stylesheet" href="{{rootURL}}assets/glyphicons.css">
+        <link integrity="" rel="stylesheet" href="{{rootURL}}assets/bootstrap-v5-tweaks.css">
+        <link integrity="" rel="stylesheet" href="{{rootURL}}assets/openxpki.css">
         <link rel="shortcut icon" href="favicon.png">
 
         {{content-for "head-footer"}}
@@ -26,7 +26,7 @@
 
         {{content-for "body-footer"}}
 
-        <script src="assets/vendor.js"></script>
-        <script src="assets/openxpki.js"></script>
+        <script src="{{rootURL}}assets/vendor.js"></script>
+        <script src="{{rootURL}}assets/openxpki.js"></script>
     </body>
 </html>

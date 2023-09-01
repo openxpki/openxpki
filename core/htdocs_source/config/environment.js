@@ -28,7 +28,11 @@ module.exports = function (environment) {
   /*
    * Mode specific
    */
-  if (environment === 'development') {
+  if ('development' === environment) {
+    /*
+     * /webui/democa/ is required in development as "ember serve" will
+     * redirect asset requests to the backend otherwise (no hot reload etc.).
+     */
     ENV.rootURL = '/webui/democa/'  // https://guides.emberjs.com/release/configuring-ember/embedding-applications/#toc_specifying-a-root-url
     /*
      * Set up logging
@@ -41,9 +45,9 @@ module.exports = function (environment) {
     ENV.APP.LOG_VIEW_LOOKUPS = true;
   }
 
-  // note that Embroider also seems to run with environment === "test"
-  if (environment === 'test') {
-    ENV.rootURL = '/webui/democa/'  // https://guides.emberjs.com/release/configuring-ember/embedding-applications/#toc_specifying-a-root-url
+  // Embroider also seems to run with env "test" when doing "ember serve"
+  if ('test' === environment) {
+    ENV.rootURL = '/webui/democa/'
 
     // Testem prefers this...
     ENV.locationType = 'none';
@@ -56,9 +60,13 @@ module.exports = function (environment) {
     ENV.APP.autoboot = false;
   }
 
-  if (environment === 'production') {
-    ENV.rootURL = '/webui/'  // https://guides.emberjs.com/release/configuring-ember/embedding-applications/#toc_specifying-a-root-url
-    // here you can enable a production-specific feature
+  if ('production' === environment) {
+    /*
+     * An empty rootURL results in relative asset URLs instead of absolute
+     * ones in index.html. This allows the application to run on any server
+     * path like /webui/REALM/ or /openxpki/ or others.
+     */
+    ENV.rootURL = ''
   }
 
   return ENV;
