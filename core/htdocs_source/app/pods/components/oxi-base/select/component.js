@@ -1,11 +1,19 @@
-import Component from '@glimmer/component';
-import { action } from "@ember/object";
-import { debug } from '@ember/debug';
+import Component from '@glimmer/component'
+import { action } from "@ember/object"
+import { debug } from '@ember/debug'
+import SlimSelect from 'slimselect'
+
 /**
  * Shows a drop-down list of options.
  *
  * ```html
- * <OxiBase::Select @list={{data.keys}} @selected={{data.name}} @onChange={{myFunc}} @onInsert={{otherFunc}}/>
+ * <OxiBase::Select
+ *   @list={{data.keys}}
+ *   @selected={{data.name}}
+ *   @onChange={{myFunc}}
+ *   @onInsert={{otherFunc}}
+ *   @inline={{true}}
+ * />
  * ```
  *
  * @param { array } list - List of hashes defining the options.
@@ -23,28 +31,51 @@ import { debug } from '@ember/debug';
  * @class OxiBase::Select
  */
 export default class OxiSelectComponent extends Component {
+    cssClasses
+    selectTarget = null // only for @inline
+
+    constructor() {
+        super(...arguments)
+        this.cssClasses = (this.args.inline)
+            ? 'oxi-inline-select'
+            : 'form-control form-select text-truncate'
+    }
+
     @action
-    listChanged(event) {
-        this.notifyOnChange(event.target.selectedIndex);
+    initSelectTarget(element) {
+        this.selectTarget = element
     }
 
     // initially trigger the onChange event to handle the case
     // when the calling code has no "current selection" defined.
     @action
     startup(element) {
-        if (this.args.onInsert) this.args.onInsert(element);
-        this.notifyOnChange(element.selectedIndex);
+        if (this.args.inline) {
+            new SlimSelect({
+                select: element,
+                settings: {
+                    contentLocation: this.selectTarget,
+                }
+            })
+        }
+        if (this.args.onInsert) this.args.onInsert(element)
+        this.notifyOnChange(element.selectedIndex)
+    }
+
+    @action
+    listChanged(event) {
+        this.notifyOnChange(event.target.selectedIndex)
     }
 
     notifyOnChange(index) {
         if (index === -1) { return } // there might be no options on page initialization, before field is hidden by a "partial" request
         let item = this.args.list[index];
-        debug(`oxi-select: notifyOnChange (value="${item.value}", label="${item.label}")`);
+        debug(`oxi-select: notifyOnChange (value="${item.value}", label="${item.label}")`)
         if (typeof this.args.onChange !== "function") {
             /* eslint-disable-next-line no-console */
-            console.error("<OxiBase::Select>: Wrong type parameter type for @onChange. Expected: function, given: " + (typeof this.args.onChange));
-            return;
+            console.error("<OxiBase::Select>: Wrong type parameter type for @onChange. Expected: function, given: " + (typeof this.args.onChange))
+            return
         }
-        this.args.onChange(item.value, item.label);
+        this.args.onChange(item.value, item.label)
     }
 }

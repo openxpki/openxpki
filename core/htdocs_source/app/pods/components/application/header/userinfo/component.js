@@ -2,28 +2,10 @@ import Component from '@glimmer/component';
 import { service } from '@ember/service';
 import { inject as controller } from '@ember/controller';
 import { action } from '@ember/object';
-import SlimSelect from 'slimselect';
 
 export default class ApplicationHeaderUserinfo extends Component {
     @service('oxi-content') content;
     @controller('openxpki') openxpki;
-
-    selectTarget = null
-
-    @action
-    initSelectTarget(element) {
-        this.selectTarget = element
-    }
-
-    @action
-    initSelect(element) {
-        new SlimSelect({
-            select: element,
-            settings: {
-                contentLocation: this.selectTarget,
-            }
-        })
-    }
 
     get currentTenant() {
         if (!this.content.tenant || !this.content.user.tenants) return null;
@@ -51,8 +33,7 @@ export default class ApplicationHeaderUserinfo extends Component {
     }
 
     @action
-    setTenant(event) {
-        let tenant = event.target.value
+    selectTenant(tenant) {
         if (tenant == this.content.tenant) return
         this.content.setTenant(tenant)
         this.content.openPage({ name: 'welcome', target: this.content.TARGET.TOP, force: true })

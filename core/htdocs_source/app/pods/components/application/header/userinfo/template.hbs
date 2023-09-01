@@ -20,16 +20,12 @@
                 <li class="text-end tenant">
                     {{#if this.hasMultipleTenants}}
                         {{t 'userinfo.tenant'}}
-                        <span {{on-init this.initSelectTarget}}></span>
-                        <select
-                            {{on-init this.initSelect}}
-                            {{on "change" this.setTenant}}
-                            class="text-start oxi-tenant-selection"
-                        >
-                            {{#each this.content.user.tenants as |t|}}
-                                <option value="{{t.value}}">{{t.label}}</option>
-                            {{/each}}
-                        </select>
+                        <OxiBase::Select
+                            @list={{this.content.user.tenants}}
+                            @selected={{this.content.tenant}}
+                            @onChange={{this.selectTenant}}
+                            @inline={{true}}
+                        />
                     {{else}}
                         {{t 'userinfo.tenant'}} <strong>{{this.currentTenant}}</strong>
                     {{/if}}
