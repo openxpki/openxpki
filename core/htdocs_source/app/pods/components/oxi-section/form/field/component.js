@@ -1,6 +1,8 @@
-import Component from '@glimmer/component';
-import { action } from "@ember/object";
-import { service } from '@ember/service';
+import Component from '@glimmer/component'
+import { action } from '@ember/object'
+import { service } from '@ember/service'
+import { importSync } from '@embroider/macros'
+import { ensureSafeComponent } from '@embroider/util'
 
 export default class OxiFieldMainComponent extends Component {
     @service('oxi-backend') backend;
@@ -16,8 +18,9 @@ export default class OxiFieldMainComponent extends Component {
         return field;
     }
 
-    get type() {
-        return `oxi-section/form/field/${this.args.field.type}`;
+    get fieldComponent() {
+        let module = importSync(`./${this.args.field.type}`)
+        return ensureSafeComponent(module.default, this)
     }
 
     get isSmall() {

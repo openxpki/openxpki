@@ -1,9 +1,12 @@
 import Component from '@glimmer/component'
-import { action } from "@ember/object"
+import { action } from '@ember/object'
+import { importSync } from '@embroider/macros'
+import { ensureSafeComponent } from '@embroider/util'
 
 export default class OxiSectionComponent extends Component {
-    get type() {
-        return `oxi-section/${this.args.content.type}`;
+    get sectionComponent() {
+        let module = importSync(`./${this.args.content.type}`)
+        return ensureSafeComponent(module.default, this)
     }
 
     get sectionData() {

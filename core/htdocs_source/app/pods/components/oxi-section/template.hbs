@@ -15,11 +15,11 @@
         {{/if}}
 
         <div class="card-body px-2 {{unless @content.compact "py-2"}}" {{on-init this.initialized}}>
-            {{component this.type
-                def=this.sectionData
-                isCompact=@content.compact
-                meta=@meta
-            }}
+            <this.sectionComponent
+                def={{this.sectionData}}
+                isCompact={{@content.compact}}
+                meta={{@meta}}
+            />
         </div>
     </div>
 
@@ -34,11 +34,11 @@
         {{/if}}
 
         <div {{on-init this.initialized}} class={{unless (or @meta.isInfoBox @content.compact) "ms-md-3"}}>
-            {{component this.type
-                def=this.sectionData
-                isCompact=@content.compact
-                meta=@meta
-            }}
+            <this.sectionComponent
+                def={{this.sectionData}}
+                isCompact={{@content.compact}}
+                meta={{@meta}}
+            />
         </div>
     </div>
 

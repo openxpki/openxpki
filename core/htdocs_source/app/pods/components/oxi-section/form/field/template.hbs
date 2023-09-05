@@ -44,21 +44,15 @@
 
     {{!-- template-lint-disable no-invalid-interactive --}}
     <div class={{if this.isLarge "col" (if this.isSmall "col-md-3" "col-md-6")}} {{on "keydown" this.onKeydown}}>
-        {{#let
-            (component
-                this.type
-                content=this.field
-                onChange=this.onChange
-                onError=this.onError
-                setFocusInfo=@setFocusInfo
-                encodeFields=@encodeFields
-                error=@field._error
-            ) as |FieldInstance|
-        }}
-            {{defuse (concat '<!-- field: ' @field.name ' -->')}}
-            <FieldInstance>
-            </FieldInstance>
-        {{/let}}
+        {{defuse (concat '<!-- field: ' @field.name ' -->')}}
+        <this.fieldComponent
+            content={{this.field}}
+            onChange={{this.onChange}}
+            onError={{this.onError}}
+            setFocusInfo={{@setFocusInfo}}
+            encodeFields={{@encodeFields}}
+            error={{@field._error}}
+        />
     </div>
 
     {{#if @field.clonable}}
