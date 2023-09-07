@@ -1,0 +1,674 @@
+/* Ember supports plain CSS out of the box. More info: https://cli.emberjs.com/release/advanced-use/stylesheets/ */
+
+/*
+Imports do not work currently (2023-07-28), so we directly specify them in index.html.
+Possible causes:
+- Ember updates (esp. their refactoring regarding ember-cli-clean-css)
+- removal of {{rootURL}} in index.html
+
+@import url("bootstrap-v5-tweaks.css");
+@import url("glyphicons.css");
+*/
+
+/*
+inset: 0px 100% auto auto;
+*/
+/******************************************************************************
+ * Common helpers
+ */
+
+/* break text incl. hyphens, extended version of Bootstrap's .text-break */
+.text-break-hyphens {
+  word-wrap: break-word !important;
+  word-break: break-word !important;
+  hyphens: auto;
+}
+
+/******************************************************************************
+ * Header, page structure, basic elements
+ */
+
+html,
+body {
+  height: 100%;
+}
+
+/* Header */
+.oxi-header {
+  margin-bottom: 0;
+}
+
+.oxi-header-bar {
+  color: #757373;
+}
+
+img.toplogo {
+  height: 40px;
+}
+
+/* Content */
+.oxi-page {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.oxi-page > .row {
+  min-height: 100vh;
+}
+
+.oxi-content {
+  background-color: #fff;
+}
+
+/* Shrink application width for large screens */
+@media (min-width: 1600px) {
+  .oxi-width-restricted {
+    flex: 0 0 83.333333%; /* = col-10 */
+    max-width: 83.333333%;
+  }
+}
+@media (min-width: 2000px) {
+  .oxi-width-restricted {
+    flex: 0 0 66.666667%; /* = col-8 */
+    max-width: 66.666667%;
+  }
+}
+@media (min-width: 2600px) {
+  .oxi-width-restricted {
+    flex: 0 0 50%; /* = col-6 */
+    max-width: 50%;
+  }
+}
+
+.oxi-width-full {
+  flex: 0 0 calc(100% - 1.5rem);
+  max-width: calc(100% - 1.5rem);
+}
+
+/* Only used to push down the footer element */
+.oxi-push-footer {
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+  /* Negative indent footer by its height */
+  margin: 0 auto -60px;
+  /* Pad bottom by footer height */
+  padding: 0 0 60px;
+}
+
+.oxi-footer {
+  height: 60px;
+  padding-top: 20px;
+  background-color: #f5f5f5;
+}
+
+.userinfo {
+  font-size: 80%;
+}
+
+.oxi-infobox .card {
+  overflow-x: scroll;
+}
+
+/* oxi-base/select - inline select field */
+.oxi-inline-select.ss-main {
+  color: RGBA(var(--bs-primary-rgb), var(--bs-link-opacity, 1)) !important; /* use link color to indicate that it is clickable */
+  display: inline-flex;
+  width: auto;
+  font-weight: bold;
+}
+.oxi-inline-select.ss-main:not(.ss-open-below) {
+  border: 1px solid transparent;
+}
+.oxi-inline-select.ss-main .ss-values .ss-single {
+  margin: 0;
+}
+
+/******************************************************************************
+ * Vertical resize "button" bar
+ */
+
+.oxi-resize-overlay {
+  max-width: 1.5rem;
+  padding-top: 10% !important;
+  text-align: center;
+  flex-grow: 100; /* to win over flex sizing of oxi-the-void, i.e. get max-width */
+}
+.oxi-resize-overlay span::after {
+}
+
+/* Restricted size page container */
+.oxi-width-restricted + .oxi-resize-overlay:hover {
+  background-color: #007bff;
+}
+
+.oxi-width-restricted + .oxi-resize-overlay span::after {
+  content: "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" ;
+  white-space: pre;
+  visibility: hidden;
+  color: #fff;
+}
+
+.oxi-width-restricted + .oxi-resize-overlay:hover span::after {
+  visibility: visible;
+}
+
+/* Full size page container */
+.oxi-width-full + .oxi-resize-overlay span::after {
+  content: "«" '\A' "«" '\A' "«" '\A' "«" '\A' "«" '\A' "«" '\A' "«" '\A' "«" '\A' "«" '\A' "«" ;
+  white-space: pre;
+}
+
+/******************************************************************************
+ * Pagination
+ */
+.pagination li:not(.disabled) > a {
+  cursor: pointer;
+}
+
+/******************************************************************************
+ * Loading indicators
+ */
+
+.dimmer {
+  position:fixed;
+  top:0;
+  bottom:0;
+  left:0;
+  right:0;
+  background-color:#fff;
+  opacity:0.7;
+  z-index:1001;
+}
+
+.oxi-loading-banner {
+  position: fixed;
+  top: 1%;
+  right: 1%;
+  z-index:1002;
+}
+
+.oxi-refresh-banner {
+  position: fixed;
+  top: 3%;
+  right: 1%;
+  z-index:1002;
+}
+
+.spin {
+  -webkit-animation: spin 1000ms infinite linear;
+  animation: spin 1000ms infinite linear;
+}
+.spin-slow {
+  -webkit-animation: spin 5000ms infinite linear;
+  animation: spin 5000ms infinite linear;
+}
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(359deg); transform: rotate(359deg); }
+}
+@keyframes spin {
+  0% { -webkit-transform: rotate(0deg); transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(359deg); transform: rotate(359deg); }
+}
+
+/******************************************************************************
+ * Breadcrumbs
+ */
+
+.oxi-breadcrumb + .oxi-breadcrumb::before {
+  color: #ffffff;
+}
+
+.oxi-breadcrumb::before {
+  font-family: "Glyphicons Halflings";
+  padding-right: 0.5rem;
+}
+
+.oxi-breadcrumb.workflow-type::before {
+  content: "\e136";
+}
+
+.oxi-breadcrumb.workflow-state::before {
+  content: "\e062";
+}
+
+.oxi-breadcrumb.workflow-search::before,
+.oxi-breadcrumb.cert-search::before,
+.oxi-breadcrumb.datapool-search::before {
+  content: "\e003";
+}
+
+.oxi-breadcrumb.workflow-search-result::before,
+.oxi-breadcrumb.datapool-search-result::before,
+.oxi-breadcrumb.cert-search-result::before {
+  content: "\e056";
+}
+
+/******************************************************************************
+ * Grid
+ */
+
+.oxi-grid-container {
+  padding-bottom: 40px;
+}
+
+div.oxi-grid th.sortable {
+  cursor: pointer;
+  -webkit-user-select: none;
+}
+
+.oxi-grid {
+  white-space: nowrap;
+}
+
+/* plain grid-row without status */
+tr.gridrow > td {}
+tr.gridrow:hover > td {background-color: #E7E7E7 !important;}
+
+/* certificate specific classes: issued, expired, revoked */
+tr.gridrow-issued > td {}
+tr.gridrow-issued:hover > td {background-color: #E7E7E7 !important;}
+tr.gridrow-expired > td {background-color:#fcf8e3 !important;}
+tr.gridrow-expired:hover > td {background-color: #E7E7E7 !important;}
+tr.gridrow-revoked > td {background-color: #f2dede !important;}
+tr.gridrow-revoked:hover > td {background-color: #e6c1c7 !important;}
+
+/* ca certificat/token specific classes: online, offline, upcomging */
+tr.gridrow-online > td {background-color:#dff0d8 !important;}
+tr.gridrow-online:hover > td {background-color: #E7E7E7 !important;}
+tr.gridrow-offline > td {background-color:#f2dede !important;}
+tr.gridrow-offline:hover > td {background-color: #E7E7E7 !important;}
+tr.gridrow-upcoming > td {background-color:#d9edf7 !important;}
+tr.gridrow-upcoming:hover > td {background-color: #E7E7E7 !important;}
+
+/* workflow specific classes: finished, exception, manual, pause, failed */
+tr.gridrow-finished > td {background-color: #e8f0e4!important;}
+tr.gridrow-finished:hover > td {background-color: #c9e2b3 !important;}
+tr.gridrow-failed > td {background-color: #f3d3d3!important;}
+tr.gridrow-failed:hover > td {background-color: #e6a1ac!important;}
+tr.gridrow-manual > td { background-color: #fcfcca!important; }
+tr.gridrow-manual:hover > td {background-color: #f3f330!important;}
+tr.gridrow-paused > td {background-color: silver !important;}
+tr.gridrow-paused:hover > td {background-color: #e7e7e7 !important;}
+tr.gridrow-retry_exceeded > td {background-color: #ffc04d!important;}
+tr.gridrow-retry_exceeded:hover > td {background-color: #ffe4b3!important;}
+tr.gridrow-exception > td {background-color: #ffc04d!important;}
+tr.gridrow-exception:hover > td {background-color: #ffe4b3!important;}
+tr.gridrow-archived > td {background-color: #e0ffe0!important;}
+tr.gridrow-archived:hover > td {background-color: #c0ddc0!important;}
+
+/* general classes...*/
+tr.gridrow-ok > td {background-color: #dff0d8 !important;}
+tr.gridrow-ok:hover > td {background-color: #c9e2b3 !important;}
+tr.gridrow-warning > td {background-color: #fbeed5 !important;}
+tr.gridrow-warning:hover > td {background-color: #faf2cc !important;}
+tr.gridrow-danger > td {background-color: #ebcccc !important;}
+tr.gridrow-danger:hover > td {background-color: #e6c1c7 !important;}
+
+/******************************************************************************
+ * Key-Value lists
+ */
+
+/* above "md" = 768px */
+@media (min-width: 768px) {
+  .oxi-keyvalue-label {
+    flex: 0 0 auto;
+    width: auto;
+    max-width: 35%; /* must be less than "col-5" = 41.6%, see app/components/oxi-section/keyvalue/index.hbs */
+  }
+
+  .oxi-keyvalue-label-infobox {
+    flex: 0 0 auto;
+    width: auto;
+    max-width: 42%;
+  }
+}
+
+/* above "lg" = 992px */
+@media (min-width: 992px) {
+  .oxi-keyvalue-label {
+    max-width: 27%; /* must be less than "col-4" = 33.3%, see app/components/oxi-section/keyvalue/index.hbs */
+  }
+}
+
+/* above "xl" = 1140px */
+@media (min-width: 1140px) {
+  .oxi-keyvalue-label {
+    max-width: 19%; /* must be less than "col-3" = 25.0% */
+  }
+}
+
+.oxi-keyvalue-dots {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.oxi-keyvalue-dots::after {
+  content:
+    ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "
+    ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "
+    ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "
+    ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "
+    ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "
+    ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "
+    ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "
+    ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "
+    ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "
+    ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
+  color: #9cA5Ad;
+}
+
+.oxi-truncate {
+  /* like Bootstraps "text-truncate" class */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Status labels */
+.styled-valid,
+.dns-valid,
+.certstatus-issued {
+  color: green;
+}
+
+.styled-failed,
+.dns-failed,
+.certstatus-revoked {
+  color: red;
+}
+
+.dns-skipped,
+.styled-attention,
+.certstatus-crl_issuance_pending {
+  color: orange;
+}
+
+.certstatus-expired {
+  color: #444;
+}
+
+.dns-timeout,
+.certstatus-unknown {
+  color: #79d1f3;
+}
+
+.styled-attention,
+.styled-failed {
+  font-weight: bold;
+}
+
+.styled-encrypted {
+  color: #721c24;
+}
+.styled-encrypted:before {
+  content: '\1F510 ';
+}
+
+/* same colors as Bootstrap's "alert-danger" */
+.oxi-status-danger {
+  background-color:#f8d7da;
+  color: #721c24;
+}
+
+/* same colors as Bootstrap's "alert-warning" */
+.oxi-status-warning {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+/* <code> - keep line wraps */
+code { white-space: pre; }
+
+/* certificate serial number in details popup */
+.certserial ul li:first-child div::after { /* first child is the hex number */
+  content: "hex";
+  font-size: .7em;
+  vertical-align: sub;
+  line-height: 1.8em;
+}
+.certserial ul li:last-child div::after { /* last child is the decimal number */
+  content: "dec";
+  font-size: .7em;
+  vertical-align: sub;
+}
+
+.oxi-formatted-unilist,
+.oxi-formatted-deflist,
+.oxi-formatted-ullist,
+.oxi-formatted-rawlist,
+.oxi-formatted-linklist {
+  margin-bottom: 0;
+}
+
+.oxi-compact .oxi-keyvalue .oxi-keyvalue-items:not(:first-child):before {
+  content: " \2027 ";
+}
+
+.refreshing {
+  background-image: url("data:image/svg+xml,%3Csvg width='15' height='15' viewBox='0 0 15 15' fill='none' xmlns='http%3A//www.w3.org/2000/svg'%3E%3Cpath d='M9.875 7.5C9.875 8.81168 8.81168 9.875 7.5 9.875C6.18832 9.875 5.125 8.81168 5.125 7.5C5.125 6.18832 6.18832 5.125 7.5 5.125C8.81168 5.125 9.875 6.18832 9.875 7.5Z' fill='%23b1d0d6' /%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: top right;
+/*
+  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+*/
+}
+
+/******************************************************************************
+ * Form fields
+ */
+
+.oxi-no-input {
+  padding-top: 0.4rem;
+}
+
+/* Labels */
+form label.col-form-label {
+  font-weight: normal;
+}
+
+form div.required label.col-form-label {
+  font-weight: bold;
+}
+
+/* Input fields */
+div.required input,
+div.required select,
+div.required textarea {
+  background-color:#fff3c2 !important;
+  border:1px solid #444;
+}
+
+div.required input.form-control[disabled] ,
+div.required select.form-control[disabled],
+div.required textarea.form-control[disabled] {
+  border:1px solid #ccc;
+}
+
+div.optional input,
+div.optional select,
+div.optional textarea {
+  border:1px #888 dashed;
+}
+
+.oxi-checkbox {
+  position: relative;
+  top: 4px;
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid;
+  border-radius: 2px;
+  border-color: rgba(0, 0, 0, 0.54);
+}
+
+.oxi-checkbox.checked:after {
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  opacity: 0.54;
+  background-color: #000;
+  content: ' ';
+}
+
+/* oxifield-uploadarea */
+div.oxifield-upload {
+  position: relative;
+  padding-bottom: 34px;
+}
+
+/* Clonable fields - column holding the clonable buttons */
+.clonable-btn-group {
+  white-space: nowrap;
+}
+
+/* Autocomplete */
+.oxi-autocomplete {
+  padding-top: 6pt;
+  color: #777;
+}
+
+/* Datetime */
+div.optional input.flatpickr-input {
+  background-color: transparent;
+}
+div.required input.flatpickr-input {
+  background-color: #fff3c2;
+}
+
+/******************************************************************************
+ * Buttons
+ */
+.oxi-btn-loading {
+  color: #fff;
+  background-color: #428bca;
+  border-color: #357ebd;
+}
+
+.oxi-btn-loading:hover, .oxi-btn-loading:focus, .oxi-btn-loading:active, .oxi-btn-loading.active {
+  color: #fff;
+  background-color: #3276b1;
+  border-color: #285e8e;
+}
+
+.oxi-button-container a.btn::before {
+  font-family: "Glyphicons Halflings";
+  content: "\e144";
+  font-size: 80%;
+  padding-right: 0.5rem;
+}
+
+/* Button format from workflow defs */
+
+.oxi-btn-expected,
+.oxi-btn-expected:focus,
+.oxi-btn-submit,
+.oxi-btn-submit:focus {
+  color: #333; border-color: #ccc;
+  background-color: #c9e2b3;
+}
+
+.oxi-btn-optional,
+.oxi-btn-optional:focus {
+  color: #333; border-color: #ccc;
+  background-color: #e4e4da;
+}
+
+.oxi-btn-failure,
+.oxi-btn-failure:focus,
+.oxi-btn-cancel,
+.oxi-btn-cancel:focus {
+  color: #333; border-color: #ccc;
+  background-color: #e39f9f;
+}
+
+.oxi-btn-reset,
+.oxi-btn-reset:focus,
+.oxi-btn-alternative,
+.oxi-btn-alternative:focus {
+  color: #333; border-color: #ccc;
+  background-color: #ffd78c;
+}
+
+.oxi-btn-exceptional,
+.oxi-btn-exceptional:focus {
+  color: #333; border-color: #ccc;
+  background-color: #79d1f3;
+}
+
+.oxi-btn-terminate,
+.oxi-btn-terminate:focus {
+  color: #333; border-color: #ccc;
+  background-color: #ad7fa8;
+}
+
+.oxi-btn-tile {
+  background: transparent;
+  border: 1px solid transparent;
+}
+
+/******************************************************************************
+ * Tooltips
+ */
+
+/* Fix strange ember-tooltip CSS bug that show darker inner background */
+.ember-tooltip .tooltip-inner {
+  background-color: revert;
+  max-width: 40em;
+}
+
+.ember-tooltip {
+  max-width: 40em;
+}
+
+.ember-popover {
+  background-color: #eee;
+  border-color: #aaa;
+  max-width: 40em;
+}
+
+.ember-popover .tooltip-inner {
+  color: revert;
+  background-color: revert;
+  border-radius: revert;
+  max-width: 40em;
+}
+
+.oxi-has-tooltip {
+  cursor: help;
+}
+
+.oxi-tooltip-icon {
+  font-size: 0.75rem;
+}
+
+/******************************************************************************
+ * Others
+ */
+.hover-element {
+  flex-direction: column;
+}
+
+.hover-element .content {
+  margin: 0 auto;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.hover-element .menu {
+  display: none;
+  background-color: #dff0d8;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 10;
+  width: 100%;
+  padding: 6pt;
+}
+
+/* Show the dropdown menu on hover */
+.hover-element:hover .menu { display: block }
+
+/* Change the background color of the dropdown button when the dropdown content is shown */
+.hover-element:hover .content { border-color: #bfe0a8 }

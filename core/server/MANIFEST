@@ -607,19 +607,21 @@ cgi-bin/healthcheck.fcgi
 # NOTE:
 #   core/htdocs_source/update-manifest.pl will update the list below.
 #   UPDATE_MANIFEST_UI_LIST - do not remove this comment
-htdocs/assets/autoimport-110-69af12e58bc92ad73b0266f4c5070cb2.js
-htdocs/assets/autoimport-110.js.LICENSE.txt
-htdocs/assets/autoimport-348-d869c1d65dab6dc23c4bee1f18f402ec.js
-htdocs/assets/autoimport-348.js.LICENSE.txt
-htdocs/assets/autoimport-app-44a53b841248ae85ad2ffb537b9c882f.css
-htdocs/assets/autoimport-app-cc251a0fbc7ca55be68b6714826b38e6.js
-htdocs/assets/autoimport-tests-5a02a5713c7a165ce0d0c76461b523c9.js
-htdocs/assets/bootstrap-v5-tweaks-eceba2603661927924740a0a5e1f57b3.css
-htdocs/assets/glyphicons-8dfa4dd41b8ab62e14cf32e7dd3756bc.css
-htdocs/assets/openxpki-5cae7b7016554c079b207deb988e3e73.css
-htdocs/assets/openxpki-7b162c2c420da39a52a5bf13507b8951.js
-htdocs/assets/vendor-b9198b1b39aa98fb3a32184f90a6814d.js
-htdocs/assets/vendor-baedf2f3e6c4a679fd40741c0e0eb8b9.css
+htdocs/assets/bootstrap-v5-tweaks.css
+htdocs/assets/bootstrap-v5-tweaks.f43fa53cad50bbdca4e86db401918d21.css
+htdocs/assets/bootstrap.css.map
+htdocs/assets/chunk.21730a9dd384340095c8.js
+htdocs/assets/chunk.21730a9dd384340095c8.js.LICENSE.txt
+htdocs/assets/chunk.fa1243764c54560229a9.css
+htdocs/assets/chunk.fa1243764c54560229a9.js
+htdocs/assets/glyphicons.9f77083ee0aa923723c31e57276de831.css
+htdocs/assets/glyphicons.css
+htdocs/assets/openxpki.css
+htdocs/assets/openxpki.d4857a0e0f24f5fd1fd4a79172349152.css
+htdocs/assets/vendor.12ccaeb34db767fd20853eef3ece86d1.js
+htdocs/assets/vendor.c9cfe38112db04758c9a864ae9d2b5f5.css
+htdocs/assets/vendor.css.map
+htdocs/assets/vendor.map
 htdocs/default.html
 htdocs/favicon.png
 htdocs/fonts/glyphicons-halflings-regular.eot
