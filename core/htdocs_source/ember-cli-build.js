@@ -14,7 +14,7 @@ module.exports = function(defaults) {
       ...on_production,
       // https://github.com/ember-cli/ember-cli/blob/v3.18.0/lib/broccoli/ember-app.js#L319-L327
       'trees': {
-        'app': new Funnel('app', { exclude: ['pods/test/**'] }),
+        'app': new Funnel('app', { exclude: ['route-pods/test/**'] }),
       },
     };
 

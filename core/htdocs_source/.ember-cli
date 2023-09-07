@@ -15,5 +15,5 @@
   /*
    * Use the pods structure as the default without using the --pod option
    */
-  "usePods": true
+  "usePods": false
 }

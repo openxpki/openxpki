@@ -3,19 +3,19 @@
 The web UI uses AJAX to retrieve structured data from the server and render
 the pages using the Ember.js framework with the handlebars templating system.
 
-This directory contains the developer code of the UI, this MUST NOT go onto
-your webserver.
+This directory contains the UI source code, it cannot be used directly on your
+webserver.
 
 ## Ember.js
 
-Ember.js applications are compiled into single JavaScript files ("bundles").
-After making modifications the source code has to be recompiled by `ember-cli`.
+Ember.js applications are compiled into JavaScript files ("bundles"). After
+making modifications the source code has to be recompiled via `ember-cli`.
 
-The easiest way to do that if you just updated some code is via the supplied
-`Makefile` which uses Docker to compile the whole UI code:
+The easiest way to do that after some code updates is to use the supplied
+`Makefile` (which in turn uses Docker to compile the whole UI):
 
 ```bash
-make
+make ember
 ```
 
 For a full development stack on your machine please use the following
@@ -167,7 +167,22 @@ After this a [rebuild](#build-production) needs to be done.
 
 3. Now in your browser open http://localhost:4200/openxpki/tests
 
-## Hints
+## Notes
+
+### Directory layout
+
+Ember.js as of 2023-09-07 knows three different layouts which can (and are) used
+in parallel:
+
+1. Deprecated pre-Octane layout with separated component template and controller
+2. Classic layout with co-location (of component controller and template)
+3. POD layout
+
+For better code grouping we use a mixture:
+
+* Classic layout for **components** (to separate them from the routes. Also, as of 2023-09-07 `@embroider` does not seem to support POD layout components)
+* Classic layout for **services** (to separate them from the routes)
+* POD layout for **routes** incl. their controllers and templates (to have all related files in one directory per route)
 
 ### Inheriting template from parent component
 

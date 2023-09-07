@@ -1,0 +1,72 @@
+<!-- components/oxi-section/form/field -->
+<div class="row {{if @field.is_optional "optional" "required"}} {{@field.class}} py-1">
+    <label class="col-md-3 col-form-label text-md-end text-break-hyphens">
+        <div class="row">
+            <div class="col-auto col-md pe-1">
+                {{#unless this.isBool}}
+                    {{@field.label}}
+                {{/unless}}
+            </div>
+            {{#if @field.tooltip}}
+                <div class="col-auto p-0">
+                    <span class="glyphicon glyphicon-info-sign text-primary oxi-tooltip-icon {{unless @field.tooltip "d-none"}}">
+                        {{! Show a tooltip on tab focus or mouseover }}
+                        <Tippy
+                            @popperOptions={{this.popperOptions}}
+                            @placement="top-start"
+                        >
+                            {{@field.tooltip}}
+                        </Tippy>
+                        {{!--
+
+                        NOTE:
+                          ember-tippy is better configurable and the display seems more stable.
+                          (BsTooltip tooltips sometimes flicker)
+
+                        <BsTooltip
+                            @popperConfig={{this.getPopperOptions}}
+                            @placement="top"
+                        >
+                            {{@field.tooltip}}
+                        </BsTooltip>
+                        --}}
+                    </span>
+                </div>
+            {{/if}}
+        </div>
+    </label>
+
+    {{#if @field.keys}}
+        <div class="col-md-2">
+            <OxiBase::Select @list={{@field.keys}} @selected={{@field.name}} @onChange={{this.selectFieldType}} />
+        </div>
+    {{/if}}
+
+    {{!-- template-lint-disable no-invalid-interactive --}}
+    <div class={{if this.isLarge "col" (if this.isSmall "col-md-3" "col-md-6")}} {{on "keydown" this.onKeydown}}>
+        {{defuse (concat '<!-- field: ' @field.name ' -->')}}
+        <this.fieldComponent
+            @content={{this.field}}
+            @onChange={{this.onChange}}
+            @onError={{this.onError}}
+            @setFocusInfo={{@setFocusInfo}}
+            @encodeFields={{@encodeFields}}
+            @error={{@field._error}}
+        />
+    </div>
+
+    {{#if @field.clonable}}
+        <div class="col-md-1 clonable-btn-group">
+            {{#if @field._canDelete}}
+                <BsButton @type="danger" @onClick={{this.delClone}} tabindex="-1">
+                    <span class="glyphicon glyphicon-minus"></span>
+                </BsButton>
+            {{/if}}
+            {{#if @field._canAdd}}
+                <BsButton @type="primary" @onClick={{this.addClone}} tabindex="-1">
+                    <span class="glyphicon glyphicon-plus"></span>
+                </BsButton>
+            {{/if}}
+        </div>
+    {{/if}}
+</div>

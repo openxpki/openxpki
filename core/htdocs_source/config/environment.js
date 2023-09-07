@@ -3,7 +3,7 @@
 module.exports = function (environment) {
   const ENV = {
     modulePrefix: 'openxpki',
-    podModulePrefix: 'openxpki/pods',   // namespaced directory where resolver will look for resource files
+    podModulePrefix: 'openxpki/route-pods', // where resolver will look for resource files (we only use /route-pods/ for routes)
     environment,
     locationType: 'hash',   // https://guides.emberjs.com/release/configuring-ember/specifying-url-type/
     EmberENV: {

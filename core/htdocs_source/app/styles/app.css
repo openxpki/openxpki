@@ -315,7 +315,7 @@ tr.gridrow-danger:hover > td {background-color: #e6c1c7 !important;}
   .oxi-keyvalue-label {
     flex: 0 0 auto;
     width: auto;
-    max-width: 35%; /* must be less than "col-5" = 41.6%, see app/pods/components/oxi-section/keyvalue/template.hbs */
+    max-width: 35%; /* must be less than "col-5" = 41.6%, see app/components/oxi-section/keyvalue/index.hbs */
   }
 
   .oxi-keyvalue-label-infobox {
@@ -328,7 +328,7 @@ tr.gridrow-danger:hover > td {background-color: #e6c1c7 !important;}
 /* above "lg" = 992px */
 @media (min-width: 992px) {
   .oxi-keyvalue-label {
-    max-width: 27%; /* must be less than "col-4" = 33.3%, see app/pods/components/oxi-section/keyvalue/template.hbs */
+    max-width: 27%; /* must be less than "col-4" = 33.3%, see app/components/oxi-section/keyvalue/index.hbs */
   }
 }
 

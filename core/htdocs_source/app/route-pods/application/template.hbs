@@ -1,0 +1,28 @@
+{{!-- <HeadLayout/> is required by ember-cli-head --}}
+<HeadLayout/>
+
+<div class="container-fluid oxi-page">
+    <div class="row">
+        <div class="col p-0 oxi-the-void">
+        </div>
+        <div
+            class="col-12 p-0 oxi-content {{if this.restricted_width 'oxi-width-restricted' 'oxi-width-full'}}"
+            {{on-init this.removeLoader}}
+        >
+            <div class="oxi-push-footer">
+                <OxiHeader/>
+
+                {{!-- Contents of sub-routes (i.e. the main Ember route /openxpki).
+                      "Each template will be rendered into the {{outlet}} of its parent route's template." --}}
+                {{outlet}}
+
+            </div>
+            <OxiFooter/>
+        </div>
+        <div class="col p-0 oxi-resize-overlay" {{on 'click' this.toggleWidth}} role="button">
+            <span></span>
+        </div>
+        <div class="col p-0 oxi-the-void">
+        </div>
+    </div>
+</div>

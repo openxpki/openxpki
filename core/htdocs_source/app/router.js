@@ -8,8 +8,8 @@ export default class Router extends EmberRouter {
 
 Router.map(function() {
     /* Routes:
-     *      /                       app/pods/index/route.js
-     *      /openxpki/:page         app/pods/openxpki/route.js
+     *      /                       app/route-pods/index/route.js
+     *      /openxpki/:page         app/route-pods/openxpki/route.js
      */
     this.route("openxpki", { path: "/openxpki/:page" }, function() {
          this.route("popup", { path: "/popup/:popup_page" })

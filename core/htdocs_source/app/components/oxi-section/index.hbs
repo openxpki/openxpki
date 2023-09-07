@@ -1,0 +1,45 @@
+<!-- components/oxi-section -->
+{{#if @meta.renderAsCard}}
+
+    <div class="card bg-light mb-3 ms-md-3">
+
+        {{#if (or @content.content.label @content.content.description)}}
+            <div class="card-header {{unless @content.compact "py-2"}}">
+                {{#if @content.content.label}}
+                    <h4>{{@content.content.label}}</h4>
+                {{/if}}
+                {{#if @content.content.description}}
+                    {{defuse @content.content.description}}
+                {{/if}}
+            </div>
+        {{/if}}
+
+        <div class="card-body px-2 {{unless @content.compact "py-2"}}" {{on-init this.initialized}}>
+            <this.sectionComponent
+                @def={{this.sectionData}}
+                @isCompact={{@content.compact}}
+                @meta={{@meta}}
+            />
+        </div>
+    </div>
+
+{{else}}
+
+    <div class="mt-1 {{if @content.compact "oxi-compact" "mb-3"}}">
+        {{#if @content.content.label}}
+            <h4>{{@content.content.label}}</h4>
+        {{/if}}
+        {{#if @content.content.description}}
+            <div class={{unless @content.compact "mb-3"}}>{{defuse @content.content.description}}</div>
+        {{/if}}
+
+        <div {{on-init this.initialized}} class={{unless (or @meta.isInfoBox @content.compact) "ms-md-3"}}>
+            <this.sectionComponent
+                @def={{this.sectionData}}
+                @isCompact={{@content.compact}}
+                @meta={{@meta}}
+            />
+        </div>
+    </div>
+
+{{/if}}
