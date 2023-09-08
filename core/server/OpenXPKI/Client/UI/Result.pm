@@ -539,10 +539,14 @@ sub __param {
     return;
 }
 
-# return a list/hash (tenant => $tenant)_from_env to be directly included
-# in any api call. Returns an empty list if tenant is not set
-sub __tenant {
+# Reads the query parameter "_tenant" and returns a list (tenant => $tenant) to
+# be directly included in any API call that supports the parameter "tenant".
+# Returns an empty list if no tenant is set.
+sub __tenant_param {
     my $self = shift;
+
+    confess '__tenant_param() must be called in list context' unless wantarray; # die
+
     my $tenant = $self->param('_tenant');
     return (tenant => $tenant) if ($tenant);
     return ();

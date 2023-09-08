@@ -27,13 +27,13 @@ B<Parameters>
 
 =over
 
-=item * C<tenant> I<Str>
+=item * C<tenant> L<Tenant|OpenXPKI::Server::API2::Types/Tenant> - tenant
 
 =back
 
 =cut
 command "can_access_tenant" => {
-    tenant => { isa => 'Str', required => 1, },
+    tenant => { isa => 'Tenant', required => 1, },
 } => sub {
     my ($self, $params) = @_;
 

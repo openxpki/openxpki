@@ -11,6 +11,7 @@ use Type::Params qw( signature_for );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
+use OpenXPKI::Server::API2::Types;
 
 use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
 
@@ -51,7 +52,7 @@ my %ATTR_TYPES = (
     user                 => { isa => 'Str', },
     role                 => { isa => 'Str', trigger => sub { my $self = shift; $self->_attr_change; $self->clear_primary_tenant() } },
     tenants              => { isa => 'ArrayRef', trigger => sub { my $self = shift; $self->_attr_change; $self->clear_primary_tenant() } },
-    primary_tenant       => { isa => 'Str|Undef' },
+    primary_tenant       => { isa => 'Tenant|Undef' },
     userinfo             => { isa => 'HashRef|Undef' },
     authinfo             => { isa => 'HashRef|Undef' },  # login / refresh links for SSO
     pki_realm            => { isa => 'Str', },

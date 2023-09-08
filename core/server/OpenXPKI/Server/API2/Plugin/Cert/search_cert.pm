@@ -88,7 +88,7 @@ All parameters are optional and can be used to filter the result list:
 =item * C<pki_realm> L<AlphaPunct|OpenXPKI::Server::API2::Types/AlphaPunct> - certificate realm. Specify "_any"
 for a global search. Default: current session's realm
 
-=item * C<tenant> I<Str>
+=item * C<tenant> L<Tenant|OpenXPKI::Server::API2::Types/Tenant> - tenant
 
 Search for workflows of the given tenant, fallback to the primary
 tenant if not given, unfiltered search if set to the emtpy string.

@@ -77,7 +77,7 @@ sub init_start {
         workflow => $wf_type,
         params => $self->secure_param('wf_params') // {},
         ui_info => 1,
-        $self->__tenant(),
+        $self->__tenant_param(),
     });
 
     if (!$wf_info) {
@@ -996,7 +996,7 @@ sub __render_task_list {
     my $query = $item->{query};
     my $limit = 25;
 
-    $query = { $self->__tenant(), %$query } unless($query->{tenant});
+    $query = { $self->__tenant_param(), %$query } unless($query->{tenant});
 
     if ($query->{limit}) {
         $limit = $query->{limit};

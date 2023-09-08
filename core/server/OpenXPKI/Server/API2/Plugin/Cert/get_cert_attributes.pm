@@ -40,7 +40,7 @@ SQL search string(s) to filter the list of returned attributes. Will
 be applied with SQL LIKE operator, so "%" wildcards are allowed.
 Optional.
 
-=item * C<tenant> I<Str>
+=item * C<tenant> L<Tenant|OpenXPKI::Server::API2::Types/Tenant> - tenant
 
 =back
 
@@ -48,7 +48,7 @@ Optional.
 command "get_cert_attributes" => {
     identifier => { isa => 'Base64', required => 1, },
     attribute  => { isa => 'ArrayRefOrStr', coerce => 1 },
-    tenant  => { isa => 'Str', },
+    tenant  => { isa => 'Tenant', },
 } => sub {
     my ($self, $params) = @_;
 

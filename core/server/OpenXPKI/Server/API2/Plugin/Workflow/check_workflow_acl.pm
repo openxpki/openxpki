@@ -27,7 +27,7 @@ B<Parameters>
 
 =item * C<id> I<Int> - workflow ID
 
-=item * C<tenant> I<Str> - tenant
+=item * C<tenant> L<Tenant|OpenXPKI::Server::API2::Types/Tenant> - tenant
 
 If set to a tenant name the workflow must be owned by this tenant.
 Otherwise, the workflows tenant must be accessible by the current user.
@@ -37,7 +37,7 @@ Otherwise, the workflows tenant must be accessible by the current user.
 =cut
 command "check_workflow_acl" => {
     id => { isa => 'Int', required => 1, },
-    tenant => { isa => 'Str' },
+    tenant => { isa => 'Tenant' },
 } => sub {
     my ($self, $params) = @_;
 

@@ -512,7 +512,7 @@ sub init_mine {
         },
         order => 'notbefore',
         reverse => 1,
-        $self->__tenant(),
+        $self->__tenant_param(),
     };
 
     $self->log->trace( "search query: " . Dumper $query) if $self->log->is_trace;
@@ -751,7 +751,7 @@ sub init_detail {
         my $cert_attrs = $self->send_command_v2( get_cert_attributes => {
                 identifier => $cert_identifier,
                 attribute => 'meta_%',
-                $self->__tenant() }, 1);
+                $self->__tenant_param() }, 1);
         return unless $cert_attrs;
         my @metadata_lines;
 
@@ -836,7 +836,7 @@ sub init_detail {
         ($self->send_command_v2 ( "get_cert_attributes", {
             identifier => $cert_identifier,
             attribute => "system_workflow%",
-            $self->__tenant()
+            $self->__tenant_param()
         }))) {
         push @fields, {
             label => 'I18N_OPENXPKI_UI_CERT_RELATED_LABEL',
@@ -990,7 +990,7 @@ sub init_related {
     my @result;
     if (scalar @wfid) {
         my $cert_workflows = $self->send_command_v2( 'search_workflow_instances', {
-            id => \@wfid, check_acl => 1, $self->__tenant() });
+            id => \@wfid, check_acl => 1, $self->__tenant_param() });
         $self->log->trace("workflow results" . Dumper $cert_workflows) if ($self->log->is_trace());;
 
         my $workflow_labels = $self->send_command_v2( 'get_workflow_instance_types');
@@ -1200,7 +1200,7 @@ sub action_autocomplete {
             status => 'ISSUED',
             entity_only => 1,
             %$params,
-            $self->__tenant(),
+            $self->__tenant_param(),
         });
 
         foreach my $item (@{$search_result}) {
@@ -1255,7 +1255,7 @@ sub action_find {
             return_columns => 'identifier',
             cert_serial => $serial,
             entity_only => 1,
-            $self->__tenant(),
+            $self->__tenant_param(),
         });
         if (!$search_result || @{$search_result} == 0) {
             $self->status->error('I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_NO_SUCH_SERIAL');
@@ -1271,7 +1271,7 @@ sub action_find {
             my $queryid = $self->__save_query({
                 pagename => 'certificate',
                 count => scalar @{$search_result},
-                query => { cert_serial => $serial, entity_only => 1, $self->__tenant() },
+                query => { cert_serial => $serial, entity_only => 1, $self->__tenant_param() },
                 input => { cert_serial => scalar $self->param('cert_serial') },
                 header => $self->__default_grid_head,
                 column => $self->__default_grid_row,
@@ -1302,7 +1302,7 @@ sub action_search {
 
     $self->log->trace("input params: " . Dumper $self->cgi()->param()) if $self->log->is_trace;
 
-    my $query = { entity_only => 1, $self->__tenant() };
+    my $query = { entity_only => 1, $self->__tenant_param() };
     my $input = {}; # store the input data the reopen the form later
     my $verbose = {};
     foreach my $key (qw(subject issuer_dn)) {

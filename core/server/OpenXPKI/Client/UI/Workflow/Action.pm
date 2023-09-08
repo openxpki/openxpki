@@ -131,7 +131,7 @@ sub action_index {
 
         $wf_info = $self->send_command_v2( 'create_workflow_instance', {
             workflow => $wf_args->{wf_type}, params => \%wf_param, ui_info => 1,
-            $self->__tenant(),
+            $self->__tenant_param(),
         });
         if (!$wf_info) {
 
@@ -375,7 +375,7 @@ sub action_search {
     my $self = shift;
     my $args = shift;
 
-    my $query = { $self->__tenant() };
+    my $query = { $self->__tenant_param() };
     my $verbose = {};
     my $input;
 
@@ -567,7 +567,7 @@ sub action_bulk {
         $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_HAS_FAILED_ITEMS_STATUS');
 
         my @failed_id = keys %{$errors};
-        my $failed_result = $self->send_command_v2( 'search_workflow_instances', { id => \@failed_id, $self->__tenant() } );
+        my $failed_result = $self->send_command_v2( 'search_workflow_instances', { id => \@failed_id, $self->__tenant_param() } );
 
         my @result_failed = $self->__render_result_list( $failed_result, $self->__default_grid_row );
 

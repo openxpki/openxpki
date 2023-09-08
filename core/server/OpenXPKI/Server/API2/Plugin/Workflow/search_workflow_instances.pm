@@ -69,7 +69,7 @@ B<Parameters>
 
 =item * C<pki_realm> I<Str> - PKI realm
 
-=item * C<tenant> I<Str>
+=item * C<tenant> L<Tenant|OpenXPKI::Server::API2::Types/Tenant> - tenant
 
 Search for workflows of the given tenant, fallback to the primary
 tenant if not given, unfiltered search if set to the emtpy string.
