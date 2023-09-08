@@ -138,7 +138,7 @@ prune: ## remove Docker image
 npm-cache: ## run local NPM cache "verdaccio" (will be used by containers)
 	$(MANAGER) run $(MANAGER_OPTS_RUN) -ti --rm \
 	  --name verdaccio \
-	  -p $(call port,$(NPM_CUSTOM_REGISTRY)):4873 \
+	  -e "VERDACCIO_PORT=$(call port,$(NPM_CUSTOM_REGISTRY))" \
 	  verdaccio/verdaccio
 
 add/%: ## add modules to package.json as devDependencies
