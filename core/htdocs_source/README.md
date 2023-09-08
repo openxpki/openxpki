@@ -1,121 +1,157 @@
 # OpenXPKI UI - An Ember.js application
 
-The web UI uses AJAX to retrieve structured data from the server and render
-the pages using the Ember.js framework with the handlebars templating system.
+The web frontend uses AJAX to retrieve structured data from the server and render pages using the Ember.js framework with the handlebars templating system.
 
-This directory contains the UI source code, it cannot be used directly on your
-webserver.
+This directory contains the UI source code, it cannot be used directly on your webserver.
 
-## Ember.js
+## Container based development
 
-Ember.js applications are compiled into JavaScript files ("bundles"). After
-making modifications the source code has to be recompiled via `ember-cli`.
+#### Compilation
 
-The easiest way to do that after some code updates is to use the supplied
-`Makefile` (which in turn uses Docker to compile the whole UI):
+The OpenXPKI UI as an Ember.js application has to be compiled into plain JavaScript files ("bundles") after source code updates. This is done via  `ember-cli` but the easiest way is to use the supplied `Makefile` which in turn uses Docker/Podman.
 
 ```bash
 make ember
 ```
 
-For a full development stack on your machine please use the following
-instructions.
+#### Local npmjs.org cache
 
-## Development stack
+If the container repeatedly gets rebuilt it may need to reinstall the Node.js modules (e.g. if you do changes to the Docker build phase). In this case you may want to use the local npmjs.org cache server [verdaccio](https://verdaccio.org/). If it runs on your host on default port 4873 the Makefile detects it and configures `npm` to use the local cache.
 
-You will need the following things properly installed on your computer.
+To use _verdaccio_ run this in another terminal:
+
+```bash
+make npm-cache
+```
+
+#### Running the frontend
+
+To run the UI you have to:
+
+1. Start an OpenXPKI backend via Docker or Vagrant. It's expected to listen on https://localhost:8443
+
+   > The Vagrant machine "develop" can be started as follows:
+   >
+   > ```bash
+   > cd vagrant/develop
+   > vagrant up && vagrant ssh
+   > ```
+   >
+   > Then in the Vagrant machine:
+   >
+   > ```bash
+   > sudo su
+   > docker start mariadb && oxi-refresh
+   > ```
+
+2. Run the Ember.js based web UI incl. live reload (on code changes) via:
+
+   ```bash
+   make serve
+   ```
+
+3. Visit the web UI:
+
+   - http://localhost:4200/webui/democa/
+
+   - http://localhost:4200/webui/democa/#/test (component test page)
+
+   - http://localhost:4200/webui/democa/tests (automated tests)
+
+
+#### Help
+
+There are several other targets in the Makefile which can be queried by running
+
+```bash
+make
+```
+
+## Host development stack
+
+### Setup
+
+If you prefer to have a full development stack on your machine you will need the following tools installed on your computer:
 
 * [Git](https://git-scm.com/)
-* [Node.js](https://nodejs.org/) (with npm)
+* [Node.js](https://nodejs.org/) via nvm (Node Version Manager)
 * [Ember CLI](https://cli.emberjs.com/release/)
-* [Google Chrome](https://google.com/chrome/) for unit tests
+* other Node packages
 
-### Node.js
+**Node.js and pnpm**
 
 ```bash
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh | bash
 cd core/htdocs_source
 nvm install
+npm install -g pnpm
+pnpm config set auto-install-peers true
 ```
 
-### Ember CLI and other global Tools
+To continue developing later on the Node.js version has to be set:
+
+```bash 
+cd core/htdocs_source
+nvm use
+```
+
+**Ember CLI and other global Tools**
 
 ```bash
-nvm use
 pnpm install -g ember-cli ember-cli-update npm-check-updates
 ```
 
-## Installation of required Node.js modules
+**Required Node.js modules**
 
 ```bash
-nvm use
 pnpm install
 ```
 
-## Running / Development
+### Development
 
-To run the web UI locally you have to:
-
-1. Start an OpenXPKI backend via Docker or Vagrant. It's expected to listen on localhost:8443
-2. Now run the Ember based web UI with live reload (on code changes) via:
-   `pnpm run serve` (this calls "ember serve ..." and proxies AJAX requests to localhost:8443)
-3. Visit the web UI at [http://localhost:4200/openxpki/#/](http://localhost:4200/openxpki/#/).
-4. Visit tests at [http://localhost:4200/openxpki/#/test](http://localhost:4200/openxpki/#/test).
-
-### Linting
+**Compilation**
 
 ```bash
-nvm use
-# Handlebars templates and JavaScript
-pnpm run lint
-pnpm run lint:fix
-# only Handlebars templates
-pnpm run lint:hbs
-pnpm run lint:hbs:fix
-# only JavaScript
-pnpm run lint:js
-pnpm run lint:js:fix
-```
-
-### Build Ember app
-
-####  Using Docker
-
-```bash
-make ember
-```
-
-#### Verdaccio (local npmjs.org cache)
-
-If the container repeatedly gets rebuilt it may need to reinstall the NPM modules (e.g. if you do changes to the Docker build phase). In this case you may want to use the local npmjs.org cache server [verdaccio](https://verdaccio.org/). If it runs on your host on default port 4873 the Makefile should detect it and configures `npm` during container building to use the local cache.
-
-To use _verdaccio_ run these steps:
-
-```bash
-nvm use
-pnpm install -g verdaccio
-nvm exec verdaccio -l 0.0.0.0:4873
-```
-
-#### On your host machine
-
-```bash
-nvm use
 pnpm run build
 ```
 
-### Update ember-cli
+**Running the frontend**
+
+To run the Ember.js based web UI locally incl. live reload (on code changes) you have to start an OpenXPKI backend via Docker or Vagrant and then run:
+
+```bash
+pnpm run serve
+```
+
+(this calls `ember serve` and proxies AJAX requests to `$DEV_SERVER_FORWARD_TO`)
+
+**Source code checks (aka. "linting")**
+
+```bash
+# Handlebars templates
+pnpm run lint:hbs
+pnpm run lint:hbs:fix
+# JavaScript
+pnpm run lint:js
+pnpm run lint:js:fix
+# CSS
+pnpm run lint:css
+pnpm run lint:css:fix
+```
+
+### Updates
+
+**ember-cli**
 
 Also see [the Ember CLI update guide](https://cli.emberjs.com/release/basic-use/upgrading/).
 
 ```bash
-nvm use
 pnpm remove ember-cli ember-cli-update
 pnpm install --save-dev ember-cli ember-cli-update
 ./node_modules/.bin/ember --version
 ```
 
-### Update the Ember app (config, dependencies etc.)
+**Ember app (config, dependencies etc.)**
 
 ```bash
 nvm use
@@ -125,9 +161,9 @@ pnpm audit fix
 pnpm install
 ```
 
-After this a [rebuild](#build-production) needs to be done.
+After this a rebuild needs to be done.
 
-### Update dependencies
+**Dependencies**
 
 ```bash
 nvm use
@@ -137,35 +173,7 @@ ncu -u
 pnpm install
 ```
 
-After this a [rebuild](#build-production) needs to be done.
-
-### Run tests
-
-1. Start the OpenXPKI server on port 8443, e.g. via Vagrant machine "develop"
-
-   > The Vagrant machine can be started as follows:
-   >
-   > ```bash
-   > cd vagrant/develop
-   > vagrant up && vagrant ssh
-   > ```
-   > Then in the Vagrant machine:
-   > ```bash
-   > sudo su
-   > docker start mariadb && openxpkictl start
-   > ```
-
-2. Start the Ember development server:
-
-   ```bash
-   make serve
-
-   ## The following currently fails for unknown reasons:
-   # ember test
-   # ember test --server
-   ```
-
-3. Now in your browser open http://localhost:4200/openxpki/tests
+After this a rebuild needs to be done.
 
 ## Notes
 
@@ -202,7 +210,7 @@ export default class OxiFieldTextComponent extends OxiFieldRawtextComponent {
 }
 ```
 
-## Further Reading / Useful Links
+### Further Reading / Useful Links
 
 * [ember.js](https://emberjs.com/)
 * [ember-cli](https://cli.emberjs.com/release/)
