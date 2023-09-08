@@ -20,7 +20,7 @@ use OpenXPKI::Server::API2::Types;
 
 Check if the given tenant can be accessed by the current session user.
 
-Return a literal 0 or 1 weather the user is allowed. Returns undef if a
+Return a literal 0 or 1 whether the user is allowed. Returns undef if a
 tenant was given but the current user has no tenant handler set.
 
 B<Parameters>
@@ -39,14 +39,15 @@ command "can_access_tenant" => {
 
     my $handler = CTX('authentication')->tenant_handler();
 
-    return $handler->check_access( CTX('session')->data->tenants, $params->tenant ) if ($handler);
+    if ($handler) {
+        return $handler->check_access( CTX('session')->data->tenants, $params->tenant );
+    } else {
+        # if no handler is set, the empty tenant "" (or "0") is allowed
+        return 1 unless $params->tenant;
 
-    # if no handler is set, the empty tenant is allowed
-    return 1 unless($params->tenant);
-
-    # no handler is set, return undef to indicate missing evaluation
-    return unless($handler);
-
+        # return undef to indicate missing evaluation
+        return;
+    }
 };
 
 =head2 get_primary_tenant
