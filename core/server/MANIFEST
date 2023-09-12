@@ -607,19 +607,19 @@ cgi-bin/healthcheck.fcgi
 # NOTE:
 #   core/htdocs_source/update-manifest.pl will update the list below.
 #   UPDATE_MANIFEST_UI_LIST - do not remove this comment
-htdocs/assets/autoimport-110-0091d31ef972982da051de6666a7c70f.js
+htdocs/assets/autoimport-110-69af12e58bc92ad73b0266f4c5070cb2.js
 htdocs/assets/autoimport-110.js.LICENSE.txt
-htdocs/assets/autoimport-97-e42a76ee3fe9d858d888bc94a4374c73.js
-htdocs/assets/autoimport-97.js.LICENSE.txt
+htdocs/assets/autoimport-348-d869c1d65dab6dc23c4bee1f18f402ec.js
+htdocs/assets/autoimport-348.js.LICENSE.txt
 htdocs/assets/autoimport-app-44a53b841248ae85ad2ffb537b9c882f.css
-htdocs/assets/autoimport-app-498f95187b20ab4c6329627e55698a92.js
-htdocs/assets/autoimport-tests-d27b97aecf4d43a8871d676d98927076.js
+htdocs/assets/autoimport-app-cc251a0fbc7ca55be68b6714826b38e6.js
+htdocs/assets/autoimport-tests-5a02a5713c7a165ce0d0c76461b523c9.js
 htdocs/assets/bootstrap-v5-tweaks-eceba2603661927924740a0a5e1f57b3.css
 htdocs/assets/glyphicons-8dfa4dd41b8ab62e14cf32e7dd3756bc.css
-htdocs/assets/openxpki-796328f30f256233e5950d0713b3e476.js
-htdocs/assets/openxpki-f3e9bb82746de275b958782891ce4daa.css
-htdocs/assets/vendor-0f90d4c454690ae78761d4fcd1c1a8f8.js
-htdocs/assets/vendor-af55475d5c644e6686de1e2cc4c1a950.css
+htdocs/assets/openxpki-5cae7b7016554c079b207deb988e3e73.css
+htdocs/assets/openxpki-70e0cf2ca5c1a12f2187a5d21c762ee0.js
+htdocs/assets/vendor-b9198b1b39aa98fb3a32184f90a6814d.js
+htdocs/assets/vendor-baedf2f3e6c4a679fd40741c0e0eb8b9.css
 htdocs/default.html
 htdocs/favicon.png
 htdocs/fonts/glyphicons-halflings-regular.eot

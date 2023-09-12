@@ -17,6 +17,9 @@ img.toplogo{height:40px}
 .oxi-footer{height:60px;padding-top:20px}
 .userinfo{font-size:80%}
 .oxi-infobox .card{overflow-x:scroll}
+.oxi-inline-select.ss-main{color:RGBA(var(--bs-primary-rgb),var(--bs-link-opacity,1))!important;display:inline-flex;width:auto;font-weight:700}
+.oxi-inline-select.ss-main:not(.ss-open-below){border:1px solid transparent}
+.oxi-inline-select.ss-main .ss-values .ss-single{margin:0}
 .oxi-resize-overlay{max-width:1.5rem;padding-top:10%!important;text-align:center;flex-grow:100}
 .oxi-width-restricted+.oxi-resize-overlay:hover{background-color:#007bff}
 .oxi-width-restricted+.oxi-resize-overlay span::after{content:"»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»";white-space:pre;visibility:hidden;color:#fff}
