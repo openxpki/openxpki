@@ -730,19 +730,6 @@ sub render {
     }
 }
 
-=head2 _escape ( string )
-
-Replace html entities in string by their encoding
-
-=cut
-sub _escape {
-
-    my $self = shift;
-    my $arg = shift;
-    return encode_entities($arg);
-
-}
-
 =head2 __register_wf_token( wf_info, token )
 
 Generates a new random id and stores the passed workflow info, expects
