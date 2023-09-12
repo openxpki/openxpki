@@ -190,8 +190,12 @@ while (my $cgi = CGI::Fast->new) {
     );
 
     my $sess_id;
-    eval { $sess_id = $session_cookie->fetch_id };
-    $log->error($EVAL_ERROR) if $EVAL_ERROR;
+    try {
+        $sess_id = $session_cookie->fetch_id;
+    }
+    catch ($err) {
+        $log->error($err);
+    }
 
     Log::Log4perl::MDC->remove();
     Log::Log4perl::MDC->put('sid', $sess_id ? substr($sess_id,0,4) : undef);
@@ -202,17 +206,16 @@ while (my $cgi = CGI::Fast->new) {
         $log->debug("No previous frontend session ID found in cookie (or no cookie)");
     }
 
-    eval {
+    try {
         if (!$backend_client || !$backend_client->is_connected()) {
             $backend_client = OpenXPKI::Client->new({
                 SOCKETFILE => $conf->{global}->{socket}
             });
             $backend_client->send_receive_service_msg('PING');
         }
-    };
-
-    if (my $eval_err = $EVAL_ERROR) {
-       $log->error('Error creating backend client ' . $eval_err);
+    }
+    catch ($err) {
+       $log->error("Error creating backend client: $err");
        __handle_error($cgi, "I18N_OPENXPKI_UI_BACKEND_UNREACHABLE");
        next;
     }
@@ -336,7 +339,7 @@ while (my $cgi = CGI::Fast->new) {
     $log->trace('Init UI using backend ' . ref $backend_client);
 
     my $result;
-    eval {
+    try {
         my %pkey;
         if ($conf->{auth}->{'sign.key'}) {
             my $pk = decode_base64($conf->{auth}->{'sign.key'});
@@ -364,11 +367,9 @@ while (my $cgi = CGI::Fast->new) {
         $result->render; # CGI output
         $log->debug('Finished request handling');
         $log->trace(ref($result).' - '.Dumper({ map { $_ => $result->{$_} } qw( type _page redirect extra _result ) }) ) if $log->is_trace();
-    };
-
-    unless (blessed $result and $result->isa('OpenXPKI::Client::UI::Result')) {
-        __handle_error($cgi, $EVAL_ERROR);
-        $log->trace('Result: ' . Dumper $result) if $log->is_trace();
+    }
+    catch ($err) {
+        __handle_error($cgi, $err);
     }
 
     # write session changes to backend
