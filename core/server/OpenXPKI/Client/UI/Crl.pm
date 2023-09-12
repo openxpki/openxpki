@@ -42,7 +42,7 @@ sub init_index {
             $self->main->add_section({
                 type => 'text',
                 content => {
-                    label => $self->_escape($issuer->{subject}),
+                    label => $issuer->{subject},
                     description => 'I18N_OPENXPKI_UI_CRL_NONE_FOR_CA'
                 }
             });
@@ -54,7 +54,7 @@ sub init_index {
             $self->main->add_section({
                 type => 'keyvalue',
                 content => {
-                    label => $self->_escape($issuer->{subject}),
+                    label => $issuer->{subject},
                     description => '',
                     data => \@fields,
                     buttons => [{
@@ -93,7 +93,7 @@ sub init_list {
 
     $self->set_page(
         label => 'I18N_OPENXPKI_UI_CRL_LIST_FOR_ISSUER ',
-        description => $self->_escape( $issuer_info->{subject} ),
+        description => $issuer_info->{subject},
     );
 
     my @result;

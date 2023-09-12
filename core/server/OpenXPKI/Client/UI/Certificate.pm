@@ -1184,7 +1184,7 @@ sub action_autocomplete {
         } else {
             push @result, {
                 value => $search_result->{identifier},
-                label => $self->_escape($search_result->{subject}),
+                label => $search_result->{subject},
                 notbefore => $search_result->{notbefore},
                 notafter => $search_result->{notafter}
             };
@@ -1206,7 +1206,7 @@ sub action_autocomplete {
         foreach my $item (@{$search_result}) {
             push @result, {
                 value => $item->{identifier},
-                label => $self->_escape($item->{subject}),
+                label => $item->{subject},
                 notbefore => $item->{notbefore},
                 notafter => $item->{notafter}
             };

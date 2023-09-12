@@ -48,7 +48,7 @@ sub init_issuer {
     my @result;
     foreach my $cert (@{$issuers}) {
         push @result, [
-            $self->_escape($cert->{subject}),
+            $cert->{subject},
             $cert->{notbefore},
             $cert->{notafter},
             $cert->{identifier},
