@@ -25,6 +25,7 @@ use JSON;
 use Config::Std;
 use Log::Log4perl::MDC;
 use Crypt::CBC;
+use Feature::Compat::Try;
 
 # Project modules
 use OpenXPKI::Log4perl;
@@ -39,65 +40,61 @@ use OpenXPKI::Client::UI::SessionCookie;
 
 my $conf;
 my $log;
+my @header_tpl;
+# We persist the client in the CGI *per session*
+# Sharing one client with multiple sessions requires some work on detach/
+# switching sessions in backend to prevent users from getting wrong sessions!
+my $backend_client;
 
-eval {
+
+sub __load_config {
+
+    my $cgi = shift;
+
     my $config = OpenXPKI::Client::Config->new('webui');
     $log = $config->logger();
     # do NOT call config here as webui does not
     # use the URI based  endpoint logic yet
     $conf = $config->default();
-    $log->trace(Dumper $conf) if ($log->is_trace());
-};
 
-if (my $err = $EVAL_ERROR) {
-    my $cgi = CGI::Fast->new();
-    print $cgi->header( -type => 'application/json' );
-    print encode_json( { status => { 'level' => 'error', 'message' => i18nGettext('I18N_OPENXPKI_UI_APPLICATION_ERROR') } });
-    die $err;
-}
+    $log->info("Config read, FCGI pid = $$");
+    $log->trace(Dumper $conf) if $log->is_trace;
 
-# set defaults
-$conf->{global}->{socket} ||= '/var/openxpki/openxpki.socket';
-$conf->{global}->{scripturl} ||= '/cgi-bin/webui.fcgi';
+    # set defaults
+    $conf->{global}->{socket} ||= '/var/openxpki/openxpki.socket';
+    $conf->{global}->{scripturl} ||= '/cgi-bin/webui.fcgi';
 
-my @header_tpl;
-foreach my $key (keys %{$conf->{header}}) {
-    my $val = $conf->{header}->{$key};
-    $key =~ s/-/_/g;
-    push @header_tpl, ("-$key", $val);
-}
-
-# legacy config compatibility
-if ($conf->{global}->{session_path} || defined $conf->{global}->{ip_match} || $conf->{global}->{session_timeout}) {
-    if ($conf->{session}) {
-        $log->error('Session parameters found both in [global] and [session] - ignoring [global]');
-    } else {
-        $log->warn('Session parameters in [global] are deprecated, please use [session]');
-        $conf->{session} = {
-            'ip_match' => $conf->{global}->{ip_match} || 0,
-            'timeout' => $conf->{global}->{session_timeout} || undef,
-        };
-        $conf->{session_driver} = { Directory => ( $conf->{global}->{session_path} || '/tmp') };
+    foreach my $key (keys %{$conf->{header}}) {
+        my $val = $conf->{header}->{$key};
+        $key =~ s/-/_/g;
+        push @header_tpl, ("-$key", $val);
     }
+
+    # legacy config compatibility
+    if ($conf->{global}->{session_path} || defined $conf->{global}->{ip_match} || $conf->{global}->{session_timeout}) {
+        if ($conf->{session}) {
+            $log->error('Session parameters found both in [global] and [session] - ignoring [global]');
+        } else {
+            $log->warn('Session parameters in [global] are deprecated, please use [session]');
+            $conf->{session} = {
+                'ip_match' => $conf->{global}->{ip_match} || 0,
+                'timeout' => $conf->{global}->{session_timeout} || undef,
+            };
+            $conf->{session_driver} = { Directory => ( $conf->{global}->{session_path} || '/tmp') };
+        }
+    }
+
+    if ($conf->{session}->{ip_match}) {
+       $CGI::Session::IP_MATCH = 1;
+    }
+
+    if (($conf->{session}->{driver}//'') eq 'openxpki') {
+        warn "Builtin session driver is deprecated and will be removed with next release!";
+        $log->warn("Builtin session driver is deprecated and will be removed with next release!");
+    }
+
+    return 1;
 }
-
-if ($conf->{session}->{ip_match}) {
-   $CGI::Session::IP_MATCH = 1;
-}
-
-if (($conf->{session}->{driver}//'') eq 'openxpki') {
-    warn "Builtin session driver is deprecated and will be removed with next release!";
-    $log->warn("Builtin session driver is deprecated and will be removed with next release!");
-}
-
-
-$log->info('Start fcgi loop ' . $$);
-
-# We persist the client in the CGI *per session*
-# Sharing one client with multiple sessions requires some work on detach/
-# switching sessions in backend to prevent users from getting wrong sessions!
-
-my $backend_client;
 
 sub __handle_error {
 
@@ -106,11 +103,12 @@ sub __handle_error {
 
     # only echo UI error messages to prevent data leakage
     if (!$error || $error !~ /I18N_OPENXPKI_UI/) {
-        $log->error($error || '__handle_error() was called with undef');
+        my $msg = $error || '__handle_error() was called with undef';
+        if ($log) { $log->error($msg) } else { warn "$error\n" }
         $error = i18nGettext('I18N_OPENXPKI_UI_APPLICATION_ERROR');
     } else {
         $error = i18nTokenizer($error);
-        $log->info($error);
+        if ($log) { $log->info($error) } else { warn "$error\n" }
     }
 
     if ( $cgi->http('HTTP_X-OPENXPKI-Client') ) {
@@ -165,7 +163,19 @@ sub __get_cookie_cipher {
 
 }
 
-while (my $cgi = CGI::Fast->new()) {
+while (my $cgi = CGI::Fast->new) {
+    # load config once
+    if (not $conf) {
+        try {
+            __load_config($cgi);
+        }
+        catch ($err) {
+            warn "$err\n";
+            __handle_error($cgi, 'I18N_OPENXPKI_UI_APPLICATION_ERROR');
+             next; # stop current loop upon error
+        }
+    }
+
     $log->debug("Check for CGI session, FCGI pid = $$");
 
     my $insecure_cookie = $cgi->http('X-OpenXPKI-Ember-HTTP-Proxy') ? 1 : 0;
