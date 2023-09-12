@@ -1,7 +1,7 @@
 /* Ember supports plain CSS out of the box. More info: https://cli.emberjs.com/release/advanced-use/stylesheets/ */
 
 /*
-Does not work currently (2023-07-28), so we directly specify them in index.html.
+Imports do not work currently (2023-07-28), so we directly specify them in index.html.
 Possible causes:
 - Ember updates (esp. their refactoring regarding ember-cli-clean-css)
 - removal of {{rootURL}} in index.html
@@ -10,6 +10,9 @@ Possible causes:
 @import url("glyphicons.css");
 */
 
+/*
+inset: 0px 100% auto auto;
+*/
 /******************************************************************************
  * Common helpers
  */
@@ -105,6 +108,20 @@ img.toplogo {
 
 .oxi-infobox .card {
   overflow-x: scroll;
+}
+
+/* oxi-base/select - inline select field */
+.oxi-inline-select.ss-main {
+  color: RGBA(var(--bs-primary-rgb), var(--bs-link-opacity, 1)) !important; /* use link color to indicate that it is clickable */
+  display: inline-flex;
+  width: auto;
+  font-weight: bold;
+}
+.oxi-inline-select.ss-main:not(.ss-open-below) {
+  border: 1px solid transparent;
+}
+.oxi-inline-select.ss-main .ss-values .ss-single {
+  margin: 0;
 }
 
 /******************************************************************************
@@ -504,13 +521,12 @@ div.oxifield-upload {
   padding-bottom: 34px;
 }
 
-/* Clonable fields */
-
-/* column holding the clonable buttons */
+/* Clonable fields - column holding the clonable buttons */
 .clonable-btn-group {
   white-space: nowrap;
 }
 
+/* Autocomplete */
 .oxi-autocomplete {
   padding-top: 6pt;
   color: #777;

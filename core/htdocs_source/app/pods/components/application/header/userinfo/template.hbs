@@ -20,18 +20,12 @@
                 <li class="text-end tenant">
                     {{#if this.hasMultipleTenants}}
                         {{t 'userinfo.tenant'}}
-                        <BsDropdown class="d-inline" as |dd|>
-                            <dd.toggle>
-                                <strong>{{this.currentTenant}}</strong> <span class="caret"></span>
-                            </dd.toggle>
-                            <dd.menu class="dropdown-menu-end" as |ddm|>
-                                {{#each this.content.user.tenants as |t|}}
-                                    <ddm.item>
-                                        <ddm.linkTo {{on 'click' (fn this.setTenant t)}}>{{t.label}}</ddm.linkTo>
-                                    </ddm.item>
-                                {{/each}}
-                            </dd.menu>
-                        </BsDropdown>
+                        <OxiBase::Select
+                            @list={{this.content.user.tenants}}
+                            @selected={{this.content.tenant}}
+                            @onChange={{this.selectTenant}}
+                            @inline={{true}}
+                        />
                     {{else}}
                         {{t 'userinfo.tenant'}} <strong>{{this.currentTenant}}</strong>
                     {{/if}}

@@ -2,7 +2,7 @@ import Modifier from 'ember-modifier';
 
 export default class OnInitModifier extends Modifier {
   /*
-    modify() is called upon every changed of any of its arguments or tracked
+    modify() is called upon every change of any of its arguments or tracked
     values it accesses. So we have to manually prevent the repeated
     execution of its code that would lead to endless re-rendering.
   */

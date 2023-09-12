@@ -33,9 +33,9 @@ export default class ApplicationHeaderUserinfo extends Component {
     }
 
     @action
-    setTenant(tenant) {
-        if (tenant.value == this.content.tenant) return;
-        this.content.setTenant(tenant.value);
+    selectTenant(tenant) {
+        if (tenant == this.content.tenant) return
+        this.content.setTenant(tenant)
         this.content.openPage({ name: 'welcome', target: this.content.TARGET.TOP, force: true })
     }
 }
