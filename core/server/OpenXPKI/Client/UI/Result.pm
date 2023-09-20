@@ -951,7 +951,7 @@ sub __build_attribute_preset {
         my $key = $item->{key};
         my @val = $self->multi_param($key);
         while (my $val = shift @val) {
-            push @attr,  { key => $key, value => $val };
+            push @attr,  { key => $key, value => $val, label => $item->{label}//'' };
         }
     }
 

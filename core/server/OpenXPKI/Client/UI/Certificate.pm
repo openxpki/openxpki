@@ -14,6 +14,7 @@ use Math::BigInt;
 # CPAN modules
 use URI::Escape;
 use DateTime;
+use HTML::Entities;
 
 # Project modules
 use OpenXPKI::DN;
@@ -1383,6 +1384,9 @@ sub action_search {
         if ($val =~ m{\A(\w+):(.*)}) {
             $type = $1;
             $val = $2;
+            $verbose->{'san'} = "$val ($type)";
+        } else {
+            $verbose->{'san'} = $val;
         }
         $val = $self->transate_sql_wildcards($val);
         $attr->{subject_alt_name} = { -like => "$type:$val" };
@@ -1444,14 +1448,26 @@ sub action_search {
 
         my $val = $verbose->{ $item->{name} };
         next unless ($val);
-        $val =~ s/[^\w\s*\,\-\=]//g;
-        push @criteria, sprintf '<nobr><b>%s:</b> <i>%s</i></nobr>', $item->{label}, $val;
+        # encoding html entities should be enough here to get any nasty problems handled
+        push @criteria, sprintf '<nobr><b>%s:</b> <i>%s</i></nobr>', $item->{label}, encode_entities($val);
     }
 
     foreach my $item (@{$self->__validity_options()}) {
         my $val = $verbose->{ $item->{value} };
         next unless ($val);
         push @criteria, sprintf '<nobr><b>%s:</b> <i>%s</i></nobr>', $item->{label}, $val;
+    }
+
+    my $sorted = {};
+    foreach my $item (@{$input->{attributes}}) {
+        next unless $item->{label};
+        my $label = $item->{label};
+        $sorted->{$label} //= [];
+        push @{$sorted->{$label}}, $item->{value};
+    }
+
+    foreach my $key (sort keys %{$sorted}) {
+        push @criteria, sprintf '<nobr><b>%s:</b> <i>%s</i></nobr>', $key, join(", ", @{$sorted->{$key}});
     }
 
     my $queryid = $self->__save_query({
