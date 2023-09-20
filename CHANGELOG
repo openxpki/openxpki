@@ -5,3 +5,4 @@ New Features
 Upgrades, Improvements and Bugfixes
 
 Removals, Deprecations, Breaking Changes
+  - Move placeholders for CAALIAS (ALIAS, GROUP, GENERATION) to the top level for CDP/AIA generation
