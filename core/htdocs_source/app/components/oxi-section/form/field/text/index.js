@@ -25,6 +25,7 @@ export default class OxiFieldTextComponent extends Component {
     searchPrevious = null;
     searchTimer = null;
     acFieldRefParams = new Map(); // mapping: (source field name) => (parameter name for autocomplete query)
+    acOtherFieldsReferenced = false
 
     constructor() {
         super(...arguments);
@@ -46,6 +47,10 @@ export default class OxiFieldTextComponent extends Component {
                     // ref_field - name of another form field whose value to use
                     this.acFieldRefParams.set(ref_field, param_name);
                 }
+
+                let fieldName = content.name
+                let otherFields = Array.from(this.acFieldRefParams.keys()).filter(f => f !== fieldName)
+                this.acOtherFieldsReferenced = otherFields.size > 0;
             }
         }
     }
@@ -200,14 +205,14 @@ export default class OxiFieldTextComponent extends Component {
         if (this.isAutoComplete) {
             // If we also send other form field(s) then better refresh the
             // autocomplete results as the other field(s) might have changed.
-            if (this.acFieldRefParams.size > 0) {
+            if (this.acOtherFieldsReferenced > 0) {
                 // We don't use the current value (maybe chosen from the autocomplete
                 // result list) but the same value as used for the previous query.
-                this.autocompleteQuery(this.searchPrevious);
+                this.autocompleteQuery(this.searchPrevious)
             }
             // Otherwise just show result list again
             else {
-                if (this.searchResults.length) this.isDropdownOpen = true;
+                if (this.searchResults.length) this.isDropdownOpen = true
             }
         }
     }
