@@ -32,7 +32,7 @@ export default class OxiFieldTextComponent extends Component {
         let content = this.args.content;
         this.value = content.value;
 
-        if (this.isAutoComplete) {
+        if (content.autocomplete_query) {
             if (content.autocomplete_query?.action === undefined) {
                 throw new Error(`oxi-section/form/field/text: parameter "autocomplete_query.action" missing`);
             }
@@ -51,7 +51,7 @@ export default class OxiFieldTextComponent extends Component {
     }
 
     get isAutoComplete() {
-        return this.args.content.autocomplete_query;
+        return !!this.args.content.autocomplete_query;
     }
 
     @action
@@ -86,13 +86,14 @@ export default class OxiFieldTextComponent extends Component {
         inputField.setSelectionRange(pos, pos);
     }
 
-    setValue(value, runAutocomplete = true) {
-        this.value = value;
-        this.args.onChange(value); // report changes to parent component
+    setValue(value) {
+        this.value = value
+        let skipValidityChecks = this.isAutoComplete
+        this.args.onChange(value, skipValidityChecks) // report changes to parent component
 
         // fetch autocomplete list (but don't process same input value twice)
-        if (runAutocomplete && this.isAutoComplete && value !== this.searchPrevious) {
-            this.autocompleteQuery(value);
+        if (this.isAutoComplete && value !== this.searchPrevious) {
+            this.autocompleteQuery(value)
         }
     }
 

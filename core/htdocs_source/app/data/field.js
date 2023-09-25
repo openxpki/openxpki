@@ -26,7 +26,8 @@ export default class Field extends Base {
     placeholder
     width
     actionOnChange
-    @tracked _error // client- or server-side error state
+    @tracked _error         // client-side error state
+    @tracked _server_error  // server-side error state
     autofill
     ecma_match
     /*

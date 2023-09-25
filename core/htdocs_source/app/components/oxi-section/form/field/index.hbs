@@ -51,7 +51,7 @@
             @onError={{this.onError}}
             @setFocusInfo={{@setFocusInfo}}
             @encodeFields={{@encodeFields}}
-            @error={{@field._error}}
+            @error={{try @field._server_error @field._error}}
         />
     </div>
 

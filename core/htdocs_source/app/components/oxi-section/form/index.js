@@ -227,33 +227,20 @@ export default class OxiSectionFormComponent extends Component {
     /**
      * @param field { hash } - field definition (gets passed in via this components' template, i.e. is a reference to this components' "model")
      * @param value { string } - the field's new value
+     * @param skipValidityChecks { bool } - set to `true` to skip validity checks
      * @memberOf OxiSection::Form
      */
     @action
-    setFieldValue(field, value) {
-        debug(`oxi-section/form (${this.args.def.action}): setFieldValue (${field.name} = "${value}")`);
+    setFieldValue(field, value, skipValidityChecks = false) {
+        debug(`oxi-section/form (${this.args.def.action}): setFieldValue (${field.name}, value = "${value}", skipValidityChecks = ${skipValidityChecks})`);
         field.value = value;
-        this.setFieldError(field, null);
 
-        // check validation regex
-        // (only for non-empty fields; the check if a required field is empty
-        // is done via HTML <input> attribute required="..." in each component)
-        if (field.ecma_match && value !== "") {
-            try {
-                let re = new RegExp(field.ecma_match);
-                if (! re.test(field.value)) {
-                    this.setFieldError(field, this.intl.t('component.oxisection_form.validation_failed'));
-                    return Promise.resolve();
-                }
-            }
-            catch (err) {
-                /* eslint-disable-next-line no-console */
-                console.debug(`Invalid validation regex for field ${field.name}: ecma_match = ${field.ecma_match}.\n${err}`);
-            }
+        if (!skipValidityChecks) {
+            if (this.#checkFieldValidity(field) == false) return Promise.resolve()
         }
 
         // action on change?
-        if (!field.actionOnChange) { return Promise.resolve() }
+        if (!field.actionOnChange) return Promise.resolve()
 
         debug(`oxi-section/form (${this.args.def.action}): executing actionOnChange ("${field.actionOnChange}")`);
         let request = {
@@ -280,6 +267,27 @@ export default class OxiSectionFormComponent extends Component {
         });
     }
 
+    // check validation regex
+    // (only for non-empty fields; the check if a required field is empty
+    // is done via HTML <input> attribute required="..." in each component)
+    #checkFieldValidity(field) {
+        if (field.ecma_match && field.value !== "") {
+            try {
+                let re = new RegExp(field.ecma_match)
+                if (! re.test(field.value)) {
+                    this.setFieldError(field, this.intl.t('component.oxisection_form.validation_failed'))
+                    return false
+                }
+            }
+            catch (err) {
+                /* eslint-disable-next-line no-console */
+                console.debug(`Invalid validation regex for field ${field.name}: ecma_match = ${field.ecma_match}.\n${err}`)
+            }
+        }
+        this.setFieldError(field, null)
+        return true
+    }
+
     /**
      * @param field { hash } - field definition (gets passed in via this components' template, i.e. is a reference to this components' "model")
      * @memberOf OxiSection::Form
@@ -295,14 +303,22 @@ export default class OxiSectionFormComponent extends Component {
      * @memberOf OxiSection::Form
      */
     @action
-    setFieldError(field, message) {
-        debug(`oxi-section/form (${this.args.def.action}): setFieldError (${field.name} = ${message})`);
+    setFieldError(field, message, isServerError = false) {
+        debug(`oxi-section/form (${this.args.def.action}): setFieldError (${field.name}, message = ${message}, isServerError = ${isServerError})`);
+
+        if (isServerError) {
+            field._server_error = message
+            field._error = null
+        }
+        else {
+            field._server_error = null
+            field._error = message
+        }
 
         let domElement = this.domElementsByFieldId[field._id]
         if (!domElement) return
 
         if (!message) message = '' // setCustomValidity() requires empty string to reset error
-        field._error = message
         if (domElement) domElement.setCustomValidity(message)
     }
 
@@ -364,10 +380,12 @@ export default class OxiSectionFormComponent extends Component {
         for (const field of this.fields) {
             if (!field.is_optional && !field.value) {
                 this.setFieldError(field, this.intl.t('component.oxisection_form.missing_value'));
-                return;
+                return
             } else {
-                // previously detected error (client- or server-side)?
-                if (field._error) return;
+                // previous server-side error (reset if user changes the input value)
+                if (field._server_error) return
+                // client side error
+                if (this.#checkFieldValidity(field) == false) return
             }
         }
 
@@ -393,11 +411,11 @@ export default class OxiSectionFormComponent extends Component {
                 // if no index given: mark all clones as faulty
                 if (typeof faultyField.index === "undefined") {
                     for (const clone of clones) {
-                        this.setFieldError(clone, faultyField.error);
+                        this.setFieldError(clone, faultyField.error, true);
                     }
                 // otherwise just pick the specified clone
                 } else {
-                    this.setFieldError(clones[faultyField.index], faultyField.error);
+                    this.setFieldError(clones[faultyField.index], faultyField.error, true);
                 }
             }
         }
