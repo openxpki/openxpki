@@ -219,7 +219,8 @@ export default class OxiFieldTextComponent extends Component {
 
     @action
     onBlur() {
-        this.isDropdownOpen = false;
+        this.isDropdownOpen = false
+        if (this.searchTimer) clearTimeout(this.searchTimer)
     }
 
     @action
