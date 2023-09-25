@@ -396,8 +396,8 @@ sub notify {
 
         # Look if there is info from previous notifications
         # Persisted information includes:
-        # * to: Receipient address
-        # * cc: CC-Receipient, array of address
+        # * to: Recipient address
+        # * cc: CC-Recipient, array of address
         # * prefix: subject prefix (aka Ticket-Id)
         my $pi = $token->{$handle};
         if (!defined $pi) {
@@ -413,11 +413,11 @@ sub notify {
                 ##! 32: 'Creating new prefix ' . $pi->{prefix}
             }
 
-            # Receipient
+            # Recipient
             $pi->{to} = $self->_render_receipient( $cfg->{to}, \%vars );
             ##! 32: 'Got new rcpt ' . $pi->{to}
 
-            # CC-Receipient
+            # CC-Recipient
             my @cclist;
 
             ##! 32: 'Building new cc list'
@@ -495,14 +495,14 @@ sub _render_receipient {
     $rcpt =~ s/\s+//;
 
     if (!$rcpt) {
-        CTX('log')->system()->warn("Receipient address is empty after render!");
+        CTX('log')->system()->warn("Recipient address is empty after render!");
         CTX('log')->system()->debug("Template was $template");
         return;
     }
 
     if ($rcpt !~ /^[\w\.-]+\@[\w\.-]+$/) {
         ##! 8: 'This is not an address ' . $rcpt
-        CTX('log')->system()->warn("Receipient address is not properly formatted: $rcpt");
+        CTX('log')->system()->warn("Recipient address is not properly formatted: $rcpt");
         CTX('log')->system()->debug("Template was $template");
         return;
     }
