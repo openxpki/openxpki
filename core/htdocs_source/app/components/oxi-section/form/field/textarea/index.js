@@ -48,17 +48,21 @@ export default class OxiFieldTextareaComponent extends Component {
     }
 
     @action
-    fileSelected(evt) {
+    async fileSelected(evt) {
         if (evt.target.type !== "file") { return }
-        this.setFile(evt.target.files[0]);
+        await this.setFile(evt.target.files[0])
+        // Reset file input value as otherwise <input type="file"> will not fire
+        // a "change" event on Chrome browsers if the same file is selected again
+        // (after hitting our "Reset" button which does not affect the input).
+        evt.target.value = null
     }
 
     @action
-    fileDropped(evt) {
-        evt.stopPropagation();
-        evt.preventDefault();
-        if (!this.args.allow_upload) return;
-        this.setFile(evt.dataTransfer.files[0]);
+    async fileDropped(evt) {
+        evt.stopPropagation()
+        evt.preventDefault()
+        if (!this.args.allow_upload) return
+        await this.setFile(evt.dataTransfer.files[0])
     }
 
     @action
@@ -79,12 +83,17 @@ export default class OxiFieldTextareaComponent extends Component {
 
     // expects a File object
     setFile(file) {
-        // convert file to ArrayBuffer
-        let reader = new FileReader();
-        reader.onload = (e) => this.setFileData(e.target.result, file.name);
+        debug(`oxifield-textarea: setFile() - loading contents of ${file.name}`)
 
-        debug(`oxifield-textarea: setFile() - loading contents of ${file.name}`);
-        reader.readAsArrayBuffer(file);
+        return new Promise((resolve) => {
+            // convert file to ArrayBuffer
+            let reader = new FileReader()
+            reader.onload = (e) => {
+                this.setFileData(e.target.result, file.name)
+                resolve()
+            }
+            reader.readAsArrayBuffer(file)
+        })
     }
 
     setFileData(arrayBuffer, sourceLabel) {
