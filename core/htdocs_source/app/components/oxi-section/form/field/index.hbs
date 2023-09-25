@@ -47,7 +47,7 @@
         {{defuse (concat '<!-- field: ' @field.name ' -->')}}
         <this.fieldComponent
             @content={{this.field}}
-            @onChange={{this.onChange}}
+            @onChange={{@setValue}}
             @onError={{this.onError}}
             @setFocusInfo={{@setFocusInfo}}
             @encodeFields={{@encodeFields}}

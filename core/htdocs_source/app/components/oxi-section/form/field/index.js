@@ -67,11 +67,6 @@ export default class OxiFieldMainComponent extends Component {
     }
 
     @action
-    onChange(value) {
-        return this.args.setValue(value);
-    }
-
-    @action
     onError(message) {
         this.args.setError(message);
     }
