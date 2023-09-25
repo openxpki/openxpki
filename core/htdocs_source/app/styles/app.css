@@ -526,12 +526,6 @@ div.oxifield-upload {
   white-space: nowrap;
 }
 
-/* Autocomplete */
-.oxi-autocomplete {
-  padding-top: 6pt;
-  color: #777;
-}
-
 /* Datetime */
 div.optional input.flatpickr-input {
   background-color: transparent;
