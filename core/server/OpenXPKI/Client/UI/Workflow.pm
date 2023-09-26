@@ -1264,15 +1264,15 @@ sub __render_fields {
         $field->{value} //= ($wf_info->{workflow}->{context}->{$name} // '');
 
         my $item = $self->render_output_field( # from OpenXPKI::Client::UI::Role::OutputField
-            $field,
+            field => $field,
             # additional custom field render methods
-            {
+            handlers => {
                 "redirect" => \&__render_field_redirect,
                 "request_info" => \&__render_field_request_info,
                 "cert_info" => \&__render_field_cert_info,
             },
             # additional argument to pass to render methods
-            $wf_info,
+            handler_params => $wf_info,
         );
 
         next unless $item;

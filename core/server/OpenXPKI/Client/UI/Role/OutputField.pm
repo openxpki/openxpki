@@ -9,10 +9,13 @@ use Data::Dumper;
 
 # CPAN modules
 use MIME::Base64;
+use Type::Params qw( signature_for );
 
 # Project modules
 use OpenXPKI::Dumper;
 use OpenXPKI::Serialization::Simple;
+
+use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
 
 
 =head2 render_output_field
@@ -21,22 +24,26 @@ Renders a single profile output field, i.e. translates the field definition
 from the config into the the specification expected by the web UI.
 
 =cut
-sub render_output_field {
-    my $self = shift;
-    my $field = shift;
-    my $custom_handlers = shift // {};
-    my $custom_params = shift // {};
-
-    my $name = $field->{name} || '';
-    my $type = $field->{type} || '';
+signature_for render_output_field => (
+    method => 1,
+    named => [
+        field => 'HashRef',
+        handlers => 'HashRef', { optional => 1, default => {} },
+        handler_params => 'HashRef', { optional => 1, default => {} },
+        template_params => 'HashRef', { optional => 1, default => {} },
+    ],
+);
+sub render_output_field ($self, $arg) {
+    my $name = $arg->field->{name} || '';
+    my $type = $arg->field->{type} || '';
 
     my $item = {
         name => $name,
-        value => $field->{value} // '',
-        format =>  $field->{format} || ''
+        value => $arg->field->{value} // '',
+        format =>  $arg->field->{format} || ''
     };
 
-    $item->{className} = $field->{uiclass} if $field->{uiclass};
+    $item->{className} = $arg->field->{uiclass} if $arg->field->{uiclass};
 
     if ($item->{format} eq 'spacer') {
         return { format => 'head', className => $item->{className} || 'spacer' };
@@ -49,7 +56,7 @@ sub render_output_field {
 
     # Label, Description, Tooltip
     foreach my $prop (qw(label description tooltip preamble)) {
-        $item->{$prop} = $field->{$prop} if $field->{$prop};
+        $item->{$prop} = $arg->field->{$prop} if $arg->field->{$prop};
     }
     $item->{label} ||= $name;
 
@@ -96,20 +103,20 @@ sub render_output_field {
         "deflist" => \&__render_deflist,
         "grid" => \&__render_grid,
         "chart" => \&__render_chart,
-        $custom_handlers->%*,
+        $arg->handlers->%*,
     );
     my $match;
     foreach my $test (keys %handlers) {
         next unless $item->{format} eq $test;
-        my $code = $handlers{$test}->($self, $field, $item, $custom_params);
+        my $code = $handlers{$test}->($self, $arg->field, $item, $arg->handler_params);
         return if ($code || 0) == -1;
         $match = 1;
     }
 
     if (not $match and
-        ($type eq 'select' and !$field->{template} and $field->{option} and ref $field->{option} eq 'ARRAY')
+        ($type eq 'select' and !$arg->field->{template} and $arg->field->{option} and ref $arg->field->{option} eq 'ARRAY')
     ) {
-        foreach my $option (@{$field->{option}}) {
+        foreach my $option (@{$arg->field->{option}}) {
             return unless defined $option->{value};
             if ($item->{value} eq $option->{value}) {
                 $item->{value} = $option->{label};
@@ -118,16 +125,16 @@ sub render_output_field {
         }
     }
 
-    if ($field->{template}) {
+    if ($arg->field->{template}) {
 
-        $self->log->trace("Render output using template on field '$name', template: ".$field->{template}.', value: ' . Dumper $item->{value}) if $self->log->is_trace;
+        $self->log->trace("Render output using template on field '$name', template: ".$arg->field->{template}.', value: ' . Dumper $item->{value}) if $self->log->is_trace;
 
         # Rendering target depends on value format
         # deflist: iterate over each label/value pair and render the value template
         if ($item->{format} eq "deflist") {
             $item->{value} = [
                 map {
-                    my $val = $self->send_command_v2('render_template', { template => $field->{template}, params => $_ });
+                    my $val = $self->send_command_v2('render_template', { template => $arg->field->{template}, params => $_ });
                     {
                         # $_ is a HashRef: { label => STR, key => STR, value => STR } where key is the field name (not needed here)
                         label => $_->{label},
@@ -141,8 +148,11 @@ sub render_output_field {
         # bullet list, put the full list to tt and split at the | as sep (as used in profile)
         } elsif ($item->{format} eq "ullist" || $item->{format} eq "rawlist") {
             my $out = $self->send_command_v2('render_template', {
-                template => $field->{template},
-                params => { value => $item->{value} },
+                template => $arg->field->{template},
+                params => {
+                    $arg->template_params->%*,
+                    value => $item->{value},
+                },
             });
             $self->log->debug('Rendered template: ' . $out);
             if ($out) {
@@ -155,23 +165,32 @@ sub render_output_field {
 
         } elsif (ref $item->{value} eq 'HASH' && $item->{value}->{label}) {
             $item->{value}->{label} = $self->send_command_v2('render_template', {
-                template => $field->{template},
-                params => { value => $item->{value}->{label} },
+                template => $arg->field->{template},
+                params => {
+                    $arg->template_params->%*,
+                    value => $item->{value}->{label},
+                },
             });
 
         } else {
             $item->{value} = $self->send_command_v2('render_template', {
-                template => $field->{template},
-                params => { value => $item->{value} },
+                template => $arg->field->{template},
+                params => {
+                    $arg->template_params->%*,
+                    value => $item->{value},
+                },
             });
         }
 
-    } elsif ($field->{yaml_template}) {
+    } elsif ($arg->field->{yaml_template}) {
         ##! 64: 'Rendering value: ' . $item->{value}
         $self->log->trace('Template value: ' . SDumper $item ) if $self->log->is_trace;
         my $structure = $self->send_command_v2('render_yaml_template', {
-            template => $field->{yaml_template},
-            params => { value => $item->{value} },
+            template => $arg->field->{yaml_template},
+            params => {
+                $arg->template_params->%*,
+                value => $item->{value},
+            },
         });
         $self->log->trace('Rendered YAML template: ' . SDumper $structure) if $self->log->is_trace;
         ##! 64: 'Rendered YAML template: ' . $out
