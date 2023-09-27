@@ -63,6 +63,7 @@ install-stamp: build
 	$(MAKE) install PREFIX=$(CURDIR)/debian/libopenxpki-perl/usr
 	dh_makeshlibs
 	dh_installinit --no-start --noscripts --name=openxpkid
+	dh_installsystemd --no-start --name=openxpkid
 	touch install-stamp
 
 .PHONY: arrange binary binary-arch binary-indep build clean config install
