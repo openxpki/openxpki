@@ -399,6 +399,7 @@ sub __do_init_metrics {
         cache_dir => $cache_dir,
         cache_user => $cache_user,
         cache_group => $cache_group,
+        log => CTX('log')->system,
     );
 
     OpenXPKI::Server::Context::setcontext({

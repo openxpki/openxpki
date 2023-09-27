@@ -10,14 +10,11 @@ use Log::Log4perl::MDC;
 use Time::HiRes qw( gettimeofday tv_interval );
 use Data::UUID;
 
-# Project modules
-use OpenXPKI::Server::Context qw( CTX );
-
 ################################################################################
 # Attributes
 #
 
-=head1 Attributes
+=head1 ATTRIBUTES
 
 =head2 Constructor parameters
 
@@ -59,6 +56,15 @@ has cache_group => (
     required => 1,
 );
 
+=item * B<log> L<Log::Log4perl::Logger> - logger instance
+
+=cut
+has log => (
+    is => 'rw',
+    isa => 'Log::Log4perl::Logger',
+    required => 1,
+);
+
 =back
 
 =head2 Others
@@ -85,11 +91,11 @@ has ready => (
         }
         catch ($err) {
             if ($err =~ m{locate Prometheus/Tiny/Shared\.pm in \@INC}) {
-                CTX('log')->system->info("Disabling 'metrics' - Prometheus::Tiny::Shared not found");
+                $self->log->info("Disabling 'metrics' - Prometheus::Tiny::Shared not found");
                 return 0;
             }
             if ($err =~ m{locate OpenXPKI/Metrics/Prometheus\.pm in \@INC}) {
-                CTX('log')->system->info("Disabling 'metrics' - EE class OpenXPKI::Metrics::Prometheus not found");
+                $self->log->info("Disabling 'metrics' - EE class OpenXPKI::Metrics::Prometheus not found");
                 return 0;
             }
             die $err;
@@ -143,7 +149,7 @@ sub _build_prom {
     require Prometheus::Tiny::Shared;
     my $prom = Prometheus::Tiny::Shared->new(filename => $dir);
 
-    CTX('log')->system->info("Using metrics cache dir $dir");
+    $self->log->info("Using metrics cache dir $dir");
 
     # set directory permissions if we created it
     unless ($dir_exists) {
@@ -156,7 +162,7 @@ sub _build_prom {
             sub { chown $uid, $gid, $_ or die "Could not chown '$_': $!" },
             $dir
         );
-        CTX('log')->system->info("Ownership of metrics cache dir $dir set to $user:$group");
+        $self->log->info("Ownership of metrics cache dir $dir set to $user:$group");
     }
 
     return $prom;
@@ -187,7 +193,7 @@ sub stop {
 
     my $metric = $self->delete_metric($id) or return;
 
-    # CTX('log')->system->warn("Logging " . $metric->{label} . " " . $metric->{time_start}->[0]);
+    # $self->log->warn("Logging " . $metric->{label} . " " . $metric->{time_start}->[0]);
 
     # fetch non-falsy MDC values
     my %context = Log::Log4perl::MDC->get_context->%*; # copy hash
