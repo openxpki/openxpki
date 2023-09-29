@@ -414,7 +414,7 @@ sub notify {
             }
 
             # Recipient
-            $pi->{to} = $self->_render_receipient( $cfg->{to}, \%vars );
+            $pi->{to} = $self->_render_recipient( $cfg->{to}, \%vars );
             ##! 32: 'Got new rcpt ' . $pi->{to}
 
             # CC-Recipient
@@ -433,7 +433,7 @@ sub notify {
             } elsif (ref $cfg->{cc} eq 'ARRAY') {
                 ##! 32: 'CC from array ' . Dumper $cfg->{cc}
                 foreach my $cc (@{$cfg->{cc}}) {
-                    my $rcpt = $self->_render_receipient( $cc, \%vars );
+                    my $rcpt = $self->_render_recipient( $cc, \%vars );
                     ##! 32: 'New cc rcpt: ' . $cc . ' -> ' . $rcpt
                     push @cclist, $rcpt if($rcpt);
                 }
@@ -453,7 +453,7 @@ sub notify {
         }
 
         if (!$vars{to}) {
-            CTX('log')->system()->warn("Failed sending notification $msg - no receipient");
+            CTX('log')->system()->warn("Failed sending notification $msg - no recipient");
 
             push @failed, $handle;
             next MAIL_HANDLE;
@@ -474,7 +474,7 @@ sub notify {
 
 =cut
 
-sub _render_receipient {
+sub _render_recipient {
 
     ##! 1: 'Start'
     my $self = shift;
@@ -485,7 +485,7 @@ sub _render_receipient {
     ##! 64: $vars
 
     if (!$template) {
-        CTX('log')->system()->warn("No receipient adress or template given");
+        CTX('log')->system()->warn("No recipient adress or template given");
         return;
     }
 
@@ -684,7 +684,7 @@ sub _send_message {
     } else {
 
         # Host accepts a Net::SMTP object
-        # @res is the list of receipients processed, empty on error
+        # @res is the list of recipients processed, empty on error
         $res = $msg->smtpsend( Host => $smtp, MailFrom => $cfg->{from} );
     }
 

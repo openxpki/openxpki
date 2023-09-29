@@ -672,17 +672,17 @@ You might have recognized that there are two blocks below ``messages.csr_created
 Those are so called *threads*, which combine messages sent at different times
 to share some common settings. With the first message of a thread the values given
 for to, cc and prefix are persisted so you can ensure that all messages
-that belong to a certain thread go to the same receipients using the same subject
+that belong to a certain thread go to the same recipients using the same subject
 prefix. **Note, that settings to those options in later messages are ignored!**
 
-**receipient information**
+**recipient information**
 
-The primary receipient and a from address are mandatory:
+The primary recipient and a from address are mandatory:
 
-- to: The primary receipient, single value, parsed using TT
+- to: The primary recipient, single value, parsed using TT
 - from: single value, NOT parsed
 
-Additional receipients and a seperate Reply-To header are optional:
+Additional recipients and a seperate Reply-To header are optional:
 
 - cc: comma seperated list, parsed using TT
 - reply: single value, NOT parsed
@@ -835,7 +835,7 @@ The maximum configuration is::
 
 For *comment* the result of the parsed template is added to the ticket history.
 
-For *correspond* the result is also mailed to the ticket receipients (this
+For *correspond* the result is also mailed to the ticket recipients (this
 is a feature of RT, we dont send any mails).
 
 Note: If the template parser returns an empty string, no operation is done on the ticket.

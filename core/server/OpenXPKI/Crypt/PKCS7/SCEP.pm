@@ -693,7 +693,7 @@ sub create_cert_response {
     }) || die $parser->error;
 
     # the inner message is the payload encrypted with a random DES/AES key and the
-    # public key of the receipient - this is stored in the signer attribute
+    # public key of the recipient - this is stored in the signer attribute
 
     my ($cbc, $content_key, $iv) = $self->__get_cbc();
 

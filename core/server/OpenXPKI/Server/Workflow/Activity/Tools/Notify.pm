@@ -84,9 +84,9 @@ Trigger notifications using the configured notification backends.
 
 The workflow context is used to persist information from the handlers
 over mulitple workflow steps. This is required e.g. with  the RT/ServiceNow
-backend to hold the session/ticket reference or to hold the receipient
+backend to hold the session/ticket reference or to hold the recipient
 information for emails. You must turn off this behaviour if you do e.g.
-bulk notifications to multiple receipients from one worklflow!
+bulk notifications to multiple recipients from one worklflow!
 
 =head2 Activity Parameters
 
@@ -101,7 +101,7 @@ The name of the message template to use.
 The context key to use for the persister, default is wfl_notify.
 
 Set this to an empty string to turn of persistance - this is required
-if you want to communicate with different  tickets/receipients during
+if you want to communicate with different tickets/recipients during
 the workflow, as it is the case e.g. when doing bulk notifications.
 
 =back
