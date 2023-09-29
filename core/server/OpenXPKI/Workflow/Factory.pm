@@ -45,6 +45,7 @@ sub _create_wf {
         $context = OpenXPKI::Workflow::Context->new();
     }
 
+    CTX('metrics')->inc(create_workflow => { type => $wf_type }) if CTX('metrics')->ready;
     return $self->SUPER::create_workflow( $wf_type, $context, 'OpenXPKI::Server::Workflow' );
 }
 

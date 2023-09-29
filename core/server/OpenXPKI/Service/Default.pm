@@ -604,8 +604,12 @@ sub __handle_COMMAND : PRIVATE {
     }
 
     my $result;
+    my $metric_id;
     eval {
-        CTX('log')->system->debug("Executing client command '$command'");
+        # create command ID
+        my ($id) = split /-/, $UUID->create_str; # take only first part of UUID
+
+        CTX('log')->system->debug("Executing client command '$command' (call id = $id)");
 
         # execution timeout
         my $sh;
@@ -632,11 +636,8 @@ sub __handle_COMMAND : PRIVATE {
             ) if (@violated);
         }
 
-        # create command ID
-        my ($id) = split /-/, $UUID->create_str; # take only first part of UUID
         Log::Log4perl::MDC->put('command_id', $id);
-
-        my $metric_id = CTX('metrics')->start("service:${command}") if CTX('metrics')->ready;
+        $metric_id = CTX('metrics')->start("service_command_seconds", { command => $command }) if CTX('metrics')->ready;
 
         # execute command enclosed with DBI transaction
         CTX('dbi')->start_txn();
@@ -653,6 +654,8 @@ sub __handle_COMMAND : PRIVATE {
     Log::Log4perl::MDC->put('rid', undef);
 
     if (my $error = $EVAL_ERROR) {
+        CTX('metrics')->stop($metric_id) if ($metric_id and CTX('metrics')->ready);
+
         # rollback DBI (should not matter as we throw exception anyway)
         CTX('dbi')->rollback();
 
