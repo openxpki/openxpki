@@ -23,7 +23,6 @@ use File::Find qw();
 
 # CPAN modules
 use Feature::Compat::Try;
-use Log::Log4perl::MDC;
 use Time::HiRes qw( gettimeofday tv_interval );
 use Data::UUID;
 
@@ -204,17 +203,18 @@ to L</stop>).
 =cut
 sub start {
     my $self = shift;
-    my $label = shift;
+    my $name = shift;
+    my $labels = shift // {};
 
     my $id = $self->_uuid->create;
     my $time_start = [gettimeofday];
 
-    if (not $label) {
-        $label = (caller(1))[3];
-        $label =~ s/^OpenXPKI::/O:/;
+    if (not $name) {
+        $name = (caller(1))[3];
+        $name =~ s/^OpenXPKI::/O:/;
     }
 
-    $self->add_metric($id => { label => $label, time_start => $time_start });
+    $self->add_metric($id => { name => $name, time_start => $time_start, labels => $labels });
 
     # TODO Add a check to detect and delete old "running" metrics (most likely abandoned due to exceptions)
 
@@ -240,16 +240,11 @@ sub stop {
 
     my $metric = $self->delete_metric($id) or return;
 
-    # $self->log->warn("Logging " . $metric->{label} . " " . $metric->{time_start}->[0]);
-
-    # fetch non-falsy MDC values
-    my %context = Log::Log4perl::MDC->get_context->%*; # copy hash
-    delete $context{$_} for grep { not $context{$_} } keys %context;
-
-    $self->set(
-        $metric->{label} => tv_interval($metric->{time_start}),
-        \%context,
-        int(sprintf('%i.%i', $metric->{time_start}->@*) * 1000)
+    $self->histogram_observe(
+        $metric->{name}, # metric name
+        tv_interval($metric->{time_start}), # value
+        $metric->{labels}, # labels
+        int(sprintf('%i.%i', $metric->{time_start}->@*) * 1000), # timestamp
     );
 }
 
