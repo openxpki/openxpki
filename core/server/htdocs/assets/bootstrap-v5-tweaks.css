@@ -2,12 +2,6 @@
  * Bootstrap v5 fixes
  */
 
-/* Re-add .pre-scrollable which was removed in Bootstrap v5 */
-.pre-scrollable {
-  max-height: 20rem;
-  overflow-y: scroll;
-}
-
 /* Links: only underline on hover (except navbar items) */
 a, .navbar a:hover {
   text-decoration: none;

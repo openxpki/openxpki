@@ -455,6 +455,11 @@ code { white-space: pre; }
 */
 }
 
+.oxi-formatted-asciidata .content {
+  max-height: 15rem;
+  overflow-y: hidden;
+}
+
 /******************************************************************************
  * Form fields
  */

@@ -82,12 +82,10 @@
         >{{this.valueStr}}</code>
 
     {{else if (eq "asciidata" this.format)}}
-        <div class="hover-element oxi-formatted-asciidata {{@class}}">
-            <pre class="content pre-scrollable">{{this.valueStr}}</pre>
-            <div class="menu">
-                <OxiBase::Download @data={{this.valueStr}} />
-            </div>
-        </div>
+        <OxiBase::Formatted::Asciidata
+            @value={{v}}
+            @class="oxi-formatted-asciidata {{@class}}"
+        />
 
     {{else if (eq "download" this.format)}}
         <OxiBase::Download
