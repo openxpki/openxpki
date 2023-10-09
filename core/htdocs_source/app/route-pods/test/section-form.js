@@ -143,6 +143,69 @@ export default [
                     ],
                     value: "",
                 },
+                {
+                    type: "select",
+                    name: "select_dependants",
+                    label: "Select with dependants",
+                    editable: 1, // must be ignored in this case
+                    value: 2,
+                    options: [
+                        {
+                            value: 1,
+                            label: "Tusen",
+                        },
+                        {
+                            value: 2,
+                            label: "Takk",
+                            dependants: [
+                                {
+                                    type: "bool",
+                                    name: "select_dep_ready_or_not",
+                                    label: "Bool, selected",
+                                    value: 1,
+                                },
+                                {
+                                    type: "datetime",
+                                    name: "select_dep_dt_now",
+                                    label: "Date, now",
+                                    placeholder: "Please select a date...",
+                                    tooltip: "It's now or never!",
+                                },
+                                {
+                                    type: "text",
+                                    name: "select_dep_plaintext",
+                                    label: "Text, cloneable, 2 presets",
+                                    value: ["sheep #1", "sheep #2"],
+                                    clonable: 1,
+                                },
+                                {
+                                    type: "select",
+                                    name: "select_dep_dependants",
+                                    label: "Sub-select with dependants",
+                                    value: 2,
+                                    options: [
+                                        {
+                                            value: 1,
+                                            label: "Vær så god",
+                                        },
+                                        {
+                                            value: 2,
+                                            label: "Ingen problemer",
+                                            dependants: [
+                                                {
+                                                    type: "text",
+                                                    name: "select_dep_dep_plaintext",
+                                                    label: "Text",
+                                                },
+                                            ],
+                                        },
+                                    ],
+                                },
+
+                            ],
+                        },
+                    ],
+                },
             ],
             buttons: [
                 ContainerButton.fromHash({

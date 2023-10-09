@@ -52,9 +52,10 @@ export default class Field extends Base {
     /*
      * oxisection/form/field/select
      */
-    options
+    options = []
     placeholder
     editable
+    _dependants = [] // references to Field objects of currently visible dependent fields
     /*
      * oxisection/form/field/static
      */
@@ -69,6 +70,19 @@ export default class Field extends Base {
     rows
     allow_upload
 
+
+    /**
+     * `true` if this field contains any definition of dependent fields.
+     * Currently only supported for `type == "select"`.
+     * @memberOf Field
+     */
+    get hasDependants() {
+        if (this.type != 'select') return false
+        for (const opt of this.options) {
+            if (opt.dependants) return true
+        }
+        return false
+    }
 
     /**
      * Clones the object and returns a new instance with the same properties

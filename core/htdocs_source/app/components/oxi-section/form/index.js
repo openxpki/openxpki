@@ -1,11 +1,12 @@
-import Component from '@glimmer/component';
-import { action } from "@ember/object";
-import { tracked } from '@glimmer/tracking';
-import { isArray } from '@ember/array';
-import { service } from '@ember/service';
-import { debug } from '@ember/debug';
-import Field from 'openxpki/data/field';
-import ContainerButton from 'openxpki/data/container-button';
+import Component from '@glimmer/component'
+import { action } from "@ember/object"
+import { tracked } from '@glimmer/tracking'
+import { isArray } from '@ember/array'
+import { service } from '@ember/service'
+import { debug } from '@ember/debug'
+import { scheduleOnce } from '@ember/runloop'
+import Field from 'openxpki/data/field'
+import ContainerButton from 'openxpki/data/container-button'
 
 /**
  * Draws a form.
@@ -29,6 +30,7 @@ export default class OxiSectionFormComponent extends Component {
 
     clonableRefNames = [];
     domElementsByFieldId = {};
+    dependants = {} // dependent fields by parent field name
 
     get buttons() {
         let buttons = []
@@ -128,6 +130,27 @@ export default class OxiSectionFormComponent extends Component {
         return result;
     }
 
+    #extractDependentFields(field) {
+        let dependants = []
+        for (const opt of field.options) {
+            // only add dependent fields for currently selected option (if any)
+            if (opt.dependants && (field.value == opt.value)) {
+                dependants = this.#prepareFields(opt.dependants) // recursive call
+                field._dependants = dependants
+                break
+            }
+        }
+        return dependants
+    }
+
+    #removeDependentFields(field) {
+        for (const depField of field._dependants) {
+            if (depField.hasDependants) this.#removeDependentFields(depField)
+        }
+        this.#removeFields(...field._dependants)
+        field._dependants = []
+    }
+
     #updateCloneFields() {
         for (const name of this.clonableRefNames) {
             let clones = this.fields.filter(f => f._refName === name);
@@ -158,22 +181,37 @@ export default class OxiSectionFormComponent extends Component {
     @action
     addClone(field) {
         if (field._canAdd === false) return
-        let index = this.fields.indexOf(field)
         let fieldCopy = field.clone()
         fieldCopy.value = ""
         fieldCopy._focusClone = true
-        this.fields.splice(index + 1, 0, fieldCopy)
-        this.fields = this.fields // trigger Ember refresh
+        this.#insertFields(field, fieldCopy)
         this.#updateCloneFields()
     }
 
     @action
     delClone(field) {
         if (field._canDelete === false) return
-        let index = this.fields.indexOf(field)
-        this.fields.splice(index, 1)
-        this.fields = this.fields // trigger Ember refresh
+        this.#removeFields(field)
         this.#updateCloneFields()
+    }
+
+    // insert the given field(s) after the anchor field
+    #insertFields(anchor, ...fields) {
+        if (fields.length == 0) return
+        let anchorPos = this.fields.indexOf(anchor)
+        this.fields.splice(anchorPos + 1, 0, ...fields)
+        this.fields = this.fields // trigger Ember refresh
+    }
+
+    // remove given field(s) from field list
+    #removeFields(...fields) {
+        if (fields.length == 0) return
+        for (let field of fields) {
+            let pos = this.fields.indexOf(field)
+            if (pos == -1) continue
+            this.fields.splice(pos, 1)
+        }
+        this.fields = this.fields // trigger Ember refresh
     }
 
     // Turns all (non-empty) fields into request parameters (returns an Object)
@@ -237,6 +275,16 @@ export default class OxiSectionFormComponent extends Component {
 
         if (!skipValidityChecks) {
             if (this.#checkFieldValidity(field) == false) return Promise.resolve()
+        }
+
+        // process <select> with dependant fields
+        if (field.hasDependants) {
+            scheduleOnce('afterRender', () => {
+                this.#removeDependentFields(field)
+                let dependants = this.#extractDependentFields(field)
+                this.#insertFields(field, ...dependants)
+                this.#updateCloneFields()
+            })
         }
 
         // action on change?
