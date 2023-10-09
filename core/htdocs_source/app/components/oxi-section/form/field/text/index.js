@@ -61,7 +61,8 @@ export default class OxiFieldTextComponent extends Component {
 
     @action
     onInput(evt) {
-        this.setValue(this.cleanup(evt.target.value));
+        let inputField = event.target
+        this.setValue(inputField.value) // do NOT clean up manually typed text ("the 's-Gravenhage bug")
     }
 
     // Own "paste" implementation to allow for text cleanup
