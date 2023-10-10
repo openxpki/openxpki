@@ -91,7 +91,7 @@ export default class Base {
      */
     clone() {
         let obj = new this.constructor()
-        for (const k of this.getPropertyNames().values()) { obj[k] = this[k] }
+        for (const k of this.getPropertyNames(true).values()) { obj[k] = this[k] }
         return obj
     }
 
@@ -110,14 +110,18 @@ export default class Base {
     /**
      * Returns a Set of all (inherited) instance properties up to (but excl.)
      * this Base class. Also includes @tracked properties.
+     * Pass in `true` as first argument to only return writable properties
+     * (i.e. exclude getters).
      * @memberOf Base
      */
-    getPropertyNames() {
+    getPropertyNames(writableOnly = false) {
         let obj = this
         const props = new Set()
         do {
             if (obj.constructor.name === 'Base') { break }
-            Object.getOwnPropertyNames(obj).forEach(p => props.add(p))
+            Object.getOwnPropertyNames(obj)
+                .filter(p => writableOnly ? Object.getOwnPropertyDescriptor(obj, p).writable : true)
+                .forEach(p => props.add(p))
             obj = Object.getPrototypeOf(obj)
         } while (obj)
         return props
