@@ -57,9 +57,12 @@
         </a>
 
     {{else if (eq "email" this.format)}}
-        <a href="mailto:{{v}}" class="oxi-formatted-email {{@class}}">
-            <OxiBase::Label @text={{v}} />
-        </a>
+        {{#each this.valueArray as |val|}}
+            <a href="mailto:{{val}}" class="oxi-formatted-email {{@class}}">
+                <OxiBase::Label @text={{val}} />
+            </a>
+            <br/>
+        {{/each}}
 
     {{else if (eq "tooltip" this.format)}}
         {{! "d-inline-flex" prevents labels from taking the whole width and

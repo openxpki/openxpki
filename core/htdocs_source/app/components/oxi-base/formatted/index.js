@@ -44,6 +44,23 @@ export default class OxiFormattedComponent extends Component {
         return (new String(this.args.value || "")).replace(/\r/gm, "");
     }
 
+    get valueArray() {
+        let strOrArray = this.args.value
+        let result
+
+        if (strOrArray === null) {
+            result = []
+        } else if (Array.isArray(strOrArray)) {
+            result = strOrArray
+        } else if (typeof strOrArray === 'undefined') {
+            result = []
+        } else {
+            result = [strOrArray]
+        }
+
+        return result.map(e => (new String (e||"")).replace(/\r/gm, ""))
+    }
+
     get valueSplitByNewline() {
         return this.valueStr.split(/\n/);
     }

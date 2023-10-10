@@ -76,6 +76,11 @@ export default {
                 value: "office@whiterabbitsecurity.com",
             },
             {
+                format: "email",
+                label: "email (list)",
+                value: [ "office@whiterabbitsecurity.com", "coffee@whiterabbitsecurity.com", "tap@whiterabbitsecurity.com" ],
+            },
+            {
                 format: "tooltip",
                 label: "tooltip (short)",
                 value: {
