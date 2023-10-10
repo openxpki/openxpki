@@ -1,17 +1,18 @@
-import Controller from '@ember/controller';
-import { action } from "@ember/object";
-import { tracked } from '@glimmer/tracking';
-import { service } from '@ember/service';
-import Pretender from 'pretender';
-import section_chart from './section-chart';
-import section_form from './section-form';
-import section_grid from './section-grid';
-import section_keyvalue from './section-keyvalue';
-import section_tiles from './section-tiles';
-import section_cards from './section-cards';
-import section_cards_vertical from './section-cards-vertical';
-import ContainerButton from 'openxpki/data/container-button';
-import fetch from 'fetch';
+import Controller from '@ember/controller'
+import { action } from "@ember/object"
+import { tracked } from '@glimmer/tracking'
+import { service } from '@ember/service'
+import Pretender from 'pretender'
+import section_chart from './section-chart'
+import section_form from './section-form'
+import section_grid from './section-grid'
+import section_keyvalue from './section-keyvalue'
+import section_tiles from './section-tiles'
+import section_cards from './section-cards'
+import section_cards_vertical from './section-cards-vertical'
+import ContainerButton from 'openxpki/data/container-button'
+import fetch from 'fetch'
+import ENV from 'openxpki/config/environment'
 
 export default class TestController extends Controller {
     @service('oxi-locale') oxiLocale;
@@ -123,7 +124,7 @@ header:
         const server = new Pretender();
 
         // simulate localconfig.yaml
-        server.get('/openxpki/localconfig.yaml', request => [ // eslint-disable-line ember/classic-decorator-no-classic-methods
+        server.get(`${ENV.rootURL}localconfig.yaml`, request => [ // eslint-disable-line ember/classic-decorator-no-classic-methods
                 200, { "Content-type": "application/yaml" }, this.localconfig
         ]);
         let emptyResponse = () => new Promise(resolve => {
@@ -138,7 +139,7 @@ header:
         /* ************************
          * GET requests
          */
-        server.get('/openxpki/cgi-bin/webui.fcgi', req => { // eslint-disable-line ember/classic-decorator-no-classic-methods
+        server.get(`${ENV.rootURL}cgi-bin/webui.fcgi`, req => { // eslint-disable-line ember/classic-decorator-no-classic-methods
             console.info(`MOCKUP SERVER> GET request: ${req.url}`);
             console.info(Object.entries(req.queryParams).map(e => `MOCKUP SERVER> ${e[0]} = ${e[1]}`).join("\n"));
             console.debug(req);
@@ -195,7 +196,7 @@ header:
         /* ************************
          * POST requests
          */
-        server.post('/openxpki/cgi-bin/webui.fcgi', req => {
+        server.post(`${ENV.rootURL}cgi-bin/webui.fcgi`, req => {
             let headers = req.requestHeaders
             let contentType = headers[Object.keys(headers).find(el => el.toLowerCase() == 'content-type')]
             console.info(`MOCKUP SERVER> POST request: ${req.url}`);
@@ -244,11 +245,14 @@ header:
 
         server.unhandledRequest = (verb, path, req) => {
             // pass through a request to a locally running server
-            if (path.includes(this.localRequestPath)) return req.passthrough();
+            if (path.includes(this.localRequestPath)) {
+                console.debug("MOCKUP SERVER> Passing through request to backend")
+                return req.passthrough()
+            }
 
             // otherwise show request
-            console.info("AJAX REQUEST", verb, path, req);
-        };
+            console.info("MOCKUP SERVER> Unhandled request", verb, path, req)
+        }
 
         server.handledRequest = function(verb, path, req) {};
     }
