@@ -56,7 +56,7 @@ export default class Field extends Base {
     options = []
     placeholder
     editable
-    _dependants = [] // references to Field objects of currently visible dependent fields
+    _guardian        // reference to the parent Field object (if current field is a dependant)
     /*
      * oxisection/form/field/static
      */
