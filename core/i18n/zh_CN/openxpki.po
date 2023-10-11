@@ -616,6 +616,10 @@ msgstr "下载文本（TXT）格式"
 msgid "I18N_OPENXPKI_UI_ELIGIBILITY_CHECK_UNEXPECTED_ERROR"
 msgstr "资格检查未正确返回（后端错误）"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ENDPOINT_REQUIRES_TLS_CLIENT_AUTHENTICATION"
+msgstr "请求未通过身份验证"
+
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_CLEANUP"
 msgstr "工作流程已自动清理"
 
@@ -2621,6 +2625,14 @@ msgstr "请更新/完成以下信息。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "更新请求"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_DESC"
+msgstr "安排此证书吊销"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_LABEL"
+msgstr "吊销证书"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_APPROVE_BUTTON"

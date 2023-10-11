@@ -50,6 +50,8 @@ my $error_msg = {
     40011 => 'Unsupported JWS algorithm',
     40012 => 'Content type pkcs7 not enabled',
 
+    40101 => 'Authentication credentials missing or incorrect',
+
     40401 => 'Invalid method / setup incomplete',
     40402 => 'Resume requested but no workflow found',
     40403 => 'Resume requested but workflow is not in manual state',
@@ -531,8 +533,14 @@ while (my $cgi = CGI::Fast->new()) {
             #
             # OpenXPKI::Exception - convert into special internal error hash
             #
-            if ( blessed $err and $err->isa('OpenXPKI::Exception') ) {
-                die failure( 50002, $err->message );
+
+            if ( blessed $err ) {
+
+                die failure( 40101, $err->message )
+                    if ($err->isa('OpenXPKI::Exception::Authentication'));
+
+                die failure( 50002, $err->message )
+                    if ($err->isa('OpenXPKI::Exception'));
             }
 
             #

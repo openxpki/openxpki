@@ -577,6 +577,9 @@ msgstr "Download text (TXT) format"
 msgid "I18N_OPENXPKI_UI_ELIGIBILITY_CHECK_UNEXPECTED_ERROR"
 msgstr "Eligibility check did not return properly (backend error)"
 
+msgid "I18N_OPENXPKI_UI_ENDPOINT_REQUIRES_TLS_CLIENT_AUTHENTICATION"
+msgstr "Endpoint requires mTLS for authentication"
+
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_CLEANUP"
 msgstr "Workflow was automatically cleaned up"
 
@@ -2326,10 +2329,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_CHECK_FOR_REVOCATION_LABEL"
 msgstr "Revocation Pending"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_FETCH_CERTIFICATE_DESC"
-msgstr "Revoke the certificate"
+msgstr "Retry to fetch the certificate from the external issuer."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_FETCH_CERTIFICATE_LABEL"
-msgstr "Revoke the certificate"
+msgstr "Fetch the certificate"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_ISSUE_CERTIFICATE_DESC"
 msgstr "Issue certificate"
@@ -2444,6 +2447,12 @@ msgstr "Please update / complete the information below."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Update Request"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_DESC"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_LABEL"
+msgstr "Upload Certificate"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_APPROVE_BUTTON"
 msgstr "Approve Request"

@@ -1,5 +1,5 @@
 package OpenXPKI::Client::Simple;
-use Moose;
+
 
 =head1 NAME
 
@@ -62,6 +62,7 @@ arguments the settings in the file are ignored.
 =cut
 
 use English;
+use Moose;
 use POSIX qw( strftime );
 use Getopt::Long;
 use Pod::Usage;
@@ -69,6 +70,7 @@ use Data::Dumper;
 use Config::Std;
 use File::Spec;
 use OpenXPKI::Client;
+use OpenXPKI::Exception::Authentication;
 use OpenXPKI::Serialization::Simple;
 use Log::Log4perl qw(:easy :levels);
 use Log::Log4perl::Level;
@@ -354,6 +356,9 @@ sub _build_client {
         my $data;
         # no configuration defined yet
         if ($login_type eq 'X509') {
+            OpenXPKI::Exception::Authentication->throw(
+                message => 'I18N_OPENXPKI_UI_ENDPOINT_REQUIRES_TLS_CLIENT_AUTHENTICATION'
+            ) unless ($ENV{SSL_CLIENT_CERT});
             $data->{certificate} = $ENV{SSL_CLIENT_CERT};
             my @chain;
             # larger chains are very unlikely and we dont support stupid clients
