@@ -193,8 +193,6 @@ while (my $cgi = CGI::Fast->new()) {
 
         my $rpc = OpenXPKI::Client::Service::RPC->new( config => $config, error_messages => $error_msg );
 
-        Log::Log4perl::MDC->put('endpoint', $config->endpoint());
-
         $use_status_codes = $conf->{output} && $conf->{output}->{use_http_status_codes};
 
         # check for request parameters in JSON data (HTTP body)

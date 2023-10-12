@@ -5,6 +5,7 @@ use File::Spec;
 use Cache::LRU;
 use Config::Std;
 use Data::Dumper;
+use Log::Log4perl::MDC;
 use OpenXPKI::Client;
 use OpenXPKI::Log4perl;
 use OpenXPKI::i18n qw( set_language set_locale_prefix);
@@ -376,6 +377,9 @@ sub parse_uri {
         $self->route($rt) if ($rt);
         $self->logger()->debug("Parsed URI: $ep => ".($rt||''));
     }
+
+    # Populate the endpoint to the MDC
+    Log::Log4perl::MDC->put('endpoint', $self->endpoint());
 
     return $self;
 

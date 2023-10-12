@@ -31,7 +31,6 @@ while (my $cgi = CGI::Fast->new()) {
     }
 
     my $log = $config->logger();
-    Log::Log4perl::MDC->put('endpoint', $config->endpoint());
     Log::Log4perl::MDC->put('server', $server);
 
     my $operation = $cgi->url_param('operation') || '';
