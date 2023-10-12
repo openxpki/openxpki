@@ -59,7 +59,7 @@ sub _init_backend {
 sub build_params {
 
     my $self = shift;
-    my $operation = shift;
+    my $operation = shift || $self->operation();
 
     my $conf = $self->config()->config();
 
@@ -331,23 +331,37 @@ sub handle_property_request {
         return OpenXPKI::Client::Service::Response->new( 50010 );
     }
 
-    # create the client object
-    my $client = $self->backend();
-    if ( !$client ) {
-        return OpenXPKI::Client::Service::Response->new( 50001 );
-    }
-
     # TODO - we need to consolidate the workflows for the different protocols
     my $workflow_type = $conf->{$operation}->{workflow} ||
         $self->config()->service().'_'.lc($operation);
     $log->debug( 'Start workflow type ' . $workflow_type );
     $log->trace( 'Workflow Paramters '  . Dumper $param );
 
+    my $response = $self->run_workflow($workflow_type, $param);
+
+    return $self->_handle_property_response($response);
+
+}
+
+sub run_workflow {
+
+    my $self = shift;
+    my $workflow_type = shift;
+    my $param = shift || {};
+
+    # create the client object
+    my $client = $self->backend();
+    if ( !$client ) {
+        return OpenXPKI::Client::Service::Response->new( 50001 );
+    }
 
     my $workflow = $client->handle_workflow({
         type => $workflow_type,
         params => $param
     });
+
+    my $log = $self->logger();
+    $log->trace( 'Workflow info '  . Dumper $workflow );
 
     if (!$workflow || ( $workflow->{'proc_state'} ne 'finished' )) {
         if (my $err = $client->last_reply()->{ERROR}) {
@@ -360,23 +374,26 @@ sub handle_property_request {
         return OpenXPKI::Client::Service::Response->new( 50003 );
     }
 
-    $log->trace( 'Workflow info '  . Dumper $workflow );
-
-    my $out = $workflow->{context}->{output};
-
-    return OpenXPKI::Client::Service::Response->new( 50003 ) unless($out);
-
-    # the workflows should return base64 encoded raw data
-    # but the old EST GetCA workflow returned PKCS7 with PEM headers
-    if ($workflow_type eq 'est_cacerts') {
-        $out =~ s{-----(BEGIN|END) PKCS7-----}{}g;
-        $out =~ s{\s}{}gxms;
-    }
-
     return OpenXPKI::Client::Service::Response->new({
-        result => $out,
         workflow => $workflow,
     });
+
+}
+
+sub _handle_property_response {
+
+    my $self = shift;
+    my $response = shift;
+
+    return $response if ($response->has_error());
+
+    if ($response->workflow()->{context}->{output}) {
+        $response->result( $response->workflow()->{context}->{output} );
+    } else {
+        $response->error( 50003 );
+    }
+
+    return $response;
 
 }
 

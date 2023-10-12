@@ -57,6 +57,14 @@ while (my $cgi = CGI::Fast->new()) {
     my $mime = "application/pkcs7-mime; smime-type=certs-only";
     if ($operation eq 'cacerts') {
         $response = $client->handle_property_request($cgi);
+
+        # the workflows should return base64 encoded raw data
+        # but the old EST GetCA workflow returned PKCS7 with PEM headers
+        my $out = $response->result || '';
+        $out =~ s{-----(BEGIN|END) PKCS7-----}{}g;
+        $out =~ s{\s}{}gxms;
+        $response->result($out);
+
     } elsif($operation eq 'csrattrs') {
         $mime = "application/csrattrs";
         $response = $client->handle_property_request($cgi);

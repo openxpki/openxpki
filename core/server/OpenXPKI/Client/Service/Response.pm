@@ -1,6 +1,7 @@
 package OpenXPKI::Client::Service::Response;
 use Moose;
 
+use HTTP::Status qw(status_message);
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::i18n qw(i18nGettext);
@@ -15,6 +16,20 @@ has error => (
     clearer => 'clear_error',
     lazy => 1,
     default => 0,
+);
+
+has http_status_code => (
+    is => 'rw',
+    isa => 'Int',
+    lazy => 1,
+    builder => '__build_status_code',
+);
+
+has http_status_line => (
+    is => 'rw',
+    isa => 'Str',
+    lazy => 1,
+    builder => '__build_status_line',
 );
 
 has __error_message => (
@@ -52,6 +67,7 @@ has result => (
     isa => 'Str',
     lazy => 1,
     default => '',
+    predicate => 'has_result',
 );
 
 has transaction_id => (
@@ -83,7 +99,7 @@ around BUILDARGS => sub {
     my $class = shift;
 
     my $args = shift;
-    if (!ref $args) {
+    if (defined $args && !ref $args) {
         $args = { error => $args };
     }
 
@@ -119,31 +135,31 @@ sub __build_extra_headers {
 }
 
 
-sub http_status_code {
+sub __build_status_code {
     my $self = shift;
     return '202' if ($self->is_pending());
     return '200' unless ($self->has_error());
     return substr($self->error(),0,3) || '500';
 }
 
-sub http_status_line {
+sub __build_status_line {
 
     my $self = shift;
     if ($self->is_pending()) {
         return sprintf('202 Request Pending - Retry Later (%s)', $self->transaction_id());
     }
 
+    my $rc = $self->http_status_code();
     if ($self->has_error()) {
-        my $err = $self->http_status_code();
         if (my $msg = $OpenXPKI::Client::Service::Response::named_messages{$self->error()}) {
-            $err .= ' '.$msg;
+            $rc .= ' '.$msg;
         } else {
-            $err .= ' Other Error ' . $self->error();
+            $rc .= ' Other Error ' . $self->error();
         }
-        return $err;
+        return $rc;
     }
 
-    return '200 OK';
+    return sprintf('%03d %s', $rc, status_message($rc));
 }
 
 sub error_message {

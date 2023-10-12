@@ -11,6 +11,8 @@ sub pickup_workflow {
     my $config = shift;
     my $pickup_value = shift;
 
+    return unless ($pickup_value);
+
     my $workflow_type = $config->{workflow};
     my $client = $self->backend();
     my $wf_id;
