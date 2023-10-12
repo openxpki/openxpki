@@ -27,7 +27,7 @@ sub BUILD {
     my $self = shift;
     my $config = CTX('config');
 
-    foreach my $key (qw(use_revocation_id)) {
+    foreach my $key (qw(use_revocation_id no_pending_state)) {
         my $val = $config->get(['nice', 'api', $key]);
         $self->$key( $val ) if (defined $val);
     }
