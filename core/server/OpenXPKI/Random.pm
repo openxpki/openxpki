@@ -56,7 +56,7 @@ The call expects three positional parameters:
 The number of random bytes, this is NOT the length of the string received.
 This argument is mandatory.
 
-=item I<base64|hex|bin>
+=item I<base64|hex|bin|base64url>
 
 The encoding of the returned data.
 The default is I<base64>.
@@ -110,6 +110,8 @@ sub get_random {
 
     if ($format eq 'base64') {
         $rand = encode_base64($rand, '');
+    } elsif ($format eq 'base64url') {
+        $rand = MIME::Base64::encode_base64url($rand, '');
     } elsif ($format eq 'hex') {
         $rand = unpack('H*', $rand);
     }

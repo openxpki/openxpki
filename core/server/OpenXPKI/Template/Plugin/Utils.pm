@@ -4,11 +4,14 @@ use Moose;
 use MooseX::NonMoose;
 extends 'Template::Plugin';
 
+use JSON;
 use Template::Plugin;
 use MIME::Base64;
-use Digest::SHA qw(sha256_hex hmac_sha256_hex);
+use Digest::SHA;
 use Data::Dumper;
 use OpenXPKI::DN;
+use Crypt::PK::RSA;
+use Crypt::PK::ECC;
 
 =head1 OpenXPKI::Template::Plugin::Utils
 
@@ -91,6 +94,20 @@ sub to_base64 {
     return MIME::Base64::encode_base64($string, '');
 }
 
+=head3 to_base64url ( text )
+
+Encode the given (binary) data using Base64 urlsafe encoding, output is
+without linebreaks or spaces.
+
+=cut
+
+sub to_base64url {
+
+    my $self = shift;
+    my $string = shift;
+    return MIME::Base64::encode_base64url($string, '');
+}
+
 
 =head3 sha256 ( text, secret )
 
@@ -106,12 +123,72 @@ sub sha256 {
     my $string = shift;
     my $secret = shift;
 
-    return sha256_hex($string) unless($secret);
+    return Digest::SHA::sha256_hex($string) unless($secret);
 
-    return hmac_sha256_hex($string);
+    return Digest::SHA::hmac_sha256_hex($string);
 }
 
-=head2 dn
+=head3 digest ( text, encoding, digest )
+
+Return the digest of the given input data in the choosen encoding.
+The I<digest> parameter is passed to C<Digest::SHA>, default is sha1.
+
+Supported encodings are I<base64url> (default), I<base64> and I<hex>
+or I<binary>.
+
+=cut
+
+sub digest {
+
+    my $self = shift;
+    my $string = shift;
+    my $encoding = shift || 'base64url';
+    my $alg = shift || 'sha1';
+
+    my $digest = Digest::SHA->new($alg);
+    $digest->add($string);
+
+    if ($encoding eq 'hex') {
+        return $digest->hexdigest;
+    } elsif ($encoding eq 'base64') {
+        return $digest->b64digest;
+    } elsif ($encoding eq 'base64url') {
+        return MIME::Base64::encode_base64url($digest->digest,'');
+    } elsif ($encoding eq 'binary') {
+        return $digest->digest;
+    } else {
+        die "Invalid value given for encoding"
+    }
+
+}
+
+=head3 jwt_thumbprint ( key hash )
+
+Expects a JWT key hash (as json string or hash structure) and returns
+its thumbprint.
+
+=cut
+
+sub jwt_thumbprint {
+
+    my $self = shift;
+    my $key_hash = shift;
+
+    $key_hash = decode_json($key_hash) unless (ref $key_hash);
+
+    if ($key_hash->{kty} eq 'RSA') {
+        return Crypt::PK::RSA->new($key_hash)->export_key_jwk_thumbprint();
+    }
+
+    if ($key_hash->{kty} eq 'EC') {
+        return Crypt::PK::ECC->new($key_hash)->export_key_jwk_thumbprint();
+    }
+
+    return;
+
+}
+
+=head2 dn ( subject, component )
 
 Provides the same functionality as Certificate.dn but expects the
 subject DN to parse as string in the first argument.
