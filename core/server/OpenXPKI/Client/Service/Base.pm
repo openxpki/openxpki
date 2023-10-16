@@ -81,9 +81,6 @@ sub build_params {
     if ($conf->{$operation}->{env}) {
         %envkeys = map {$_ => 1} (split /\s*,\s*/, $conf->{$operation}->{env});
         $self->logger->trace("Found env keys " . $conf->{$operation}->{env});
-    } elsif ($operation =~ /enroll/) {
-        %envkeys = ( signer_cert => 1 );
-        $envkeys{'server'} = 1 unless ($servername);
     }
 
     # IP Transport

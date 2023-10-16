@@ -43,6 +43,7 @@ OpenXPKI/Client/Simple.pm
 
 # Wrappers for EST, RPC...
 OpenXPKI/Client/Service/Base.pm
+OpenXPKI/Client/Service/EST.pm
 OpenXPKI/Client/Service/RPC.pm
 OpenXPKI/Client/Service/Response.pm
 OpenXPKI/Client/Service/SCEP.pm

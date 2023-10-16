@@ -9,7 +9,7 @@ use Data::Dumper;
 use English;
 
 use OpenXPKI::Client::Config;
-use OpenXPKI::Client::Service::Base;
+use OpenXPKI::Client::Service::EST;
 
 my $config = OpenXPKI::Client::Config->new('est');
 my $log = $config->logger();
@@ -25,7 +25,7 @@ while (my $cgi = CGI::Fast->new()) {
     # serverkeygen and fullcmc is not supported
     $config->parse_uri();
     my $operation = $config->route();
-    if ($operation !~ m{(cacerts|simpleenroll|simplereenroll|csrattrs)}) {
+    if ($operation !~ m{(cacerts|simpleenroll|simplereenroll|csrattrs|simplerevoke)}) {
         print $cgi->header( -status => '501 Not implemented', -type => 'text/plain');
         print "Method not implemented\n";
         $log->error('Method not implemented');
@@ -47,7 +47,7 @@ while (my $cgi = CGI::Fast->new()) {
         next;
     }
 
-    my $client = OpenXPKI::Client::Service::Base->new(
+    my $client = OpenXPKI::Client::Service::EST->new(
         config => $config,
         logger => $log,
         operation => $operation,
@@ -68,6 +68,10 @@ while (my $cgi = CGI::Fast->new()) {
     } elsif($operation eq 'csrattrs') {
         $mime = "application/csrattrs";
         $response = $client->handle_property_request($cgi);
+    } elsif($operation eq 'simplerevoke') {
+
+        $response = $client->handle_revocation_request($cgi);
+
     } else {
         $response = $client->handle_enrollment_request($cgi);
     }
@@ -102,6 +106,14 @@ while (my $cgi = CGI::Fast->new()) {
             @extra_header
         );
         print "202 Request Pending - Retry Later ($transaction_id)\n";
+
+    # revoke returns a 204 no content on success
+    } elsif (!$response->has_result) {
+
+        print $cgi->header(
+            -status => $response->http_status_line(),
+            @extra_header
+        );
 
     } else {
 
