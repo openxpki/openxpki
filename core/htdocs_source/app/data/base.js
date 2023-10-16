@@ -80,9 +80,13 @@ export default class Base {
         }
 
         if (unknownProps.length > 0) {
-            debug(`Attempt to set unknown properties in ${this.constructor.name} instance "${sourceHash[this.constructor._idField] ?? '<unknown>'}": ${unknownProps.join(', ')}`)
-            debug(`If you need to process these backend properties, please add them to ${this.constructor._type}.js or one of its ancestors.`)
+            debug(
+                `Attempt to set unknown properties in ${this.constructor.name} instance "${sourceHash[this.constructor._idField] ?? '<unknown>'}": ${unknownProps.join(', ')}. `
+                +`If you need to process these backend properties, please add them to ${this.constructor._type}.js or one of its ancestors.`
+            )
         }
+
+        this.validate()
     }
 
     /**
@@ -126,4 +130,10 @@ export default class Base {
         } while (obj)
         return props
     }
+
+    /**
+     * To be overwritten by inheriting classes to check attributes.
+     * @memberOf Base
+     */
+    validate() {}
 }

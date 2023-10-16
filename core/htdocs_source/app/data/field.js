@@ -1,5 +1,6 @@
 import { tracked } from '@glimmer/tracking'
-import Base from './base';
+import { debug } from '@ember/debug'
+import Base from './base'
 
 /*
  * Form field data:
@@ -82,6 +83,13 @@ export default class Field extends Base {
             if (opt.dependants) return true
         }
         return false
+    }
+
+    validate() {
+        if (this.editable && this.hasDependants) {
+            debug(`${this.constructor.name} instance "${this[this.constructor._idField] ?? '<unknown>'}": attribute "enabled" cannot be set while field has dependants.`)
+            this.editable = false
+        }
     }
 
     /**
