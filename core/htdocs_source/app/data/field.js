@@ -1,5 +1,6 @@
 import { tracked } from '@glimmer/tracking'
-import Base from './base';
+import { debug } from '@ember/debug'
+import Base from './base'
 
 /*
  * Form field data:
@@ -52,9 +53,10 @@ export default class Field extends Base {
     /*
      * oxisection/form/field/select
      */
-    options
+    options = []
     placeholder
     editable
+    _guardian        // reference to the parent Field object (if current field is a dependant)
     /*
      * oxisection/form/field/static
      */
@@ -69,6 +71,26 @@ export default class Field extends Base {
     rows
     allow_upload
 
+
+    /**
+     * `true` if this field contains any definition of dependent fields.
+     * Currently only supported for `type == "select"`.
+     * @memberOf Field
+     */
+    get hasDependants() {
+        if (this.type != 'select') return false
+        for (const opt of this.options) {
+            if (opt.dependants) return true
+        }
+        return false
+    }
+
+    validate() {
+        if (this.editable && this.hasDependants) {
+            debug(`${this.constructor.name} instance "${this[this.constructor._idField] ?? '<unknown>'}": attribute "enabled" cannot be set while field has dependants.`)
+            this.editable = false
+        }
+    }
 
     /**
      * Clones the object and returns a new instance with the same properties

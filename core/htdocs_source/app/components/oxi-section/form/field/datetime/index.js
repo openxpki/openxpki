@@ -38,8 +38,9 @@ export default class OxiFieldDatetimeComponent extends Component {
 
     @action
     onReady(dates, dateStr, flatpickr) {
-        this.flatpickr = flatpickr;
-        this.datePicked(dates, dateStr, flatpickr);
+        this.flatpickr = flatpickr
+        this.datePicked(dates, dateStr, flatpickr)
+        this.args.setFocusInfo(flatpickr.element, true)
     }
 
     @action

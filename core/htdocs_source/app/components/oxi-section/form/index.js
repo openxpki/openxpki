@@ -1,11 +1,12 @@
-import Component from '@glimmer/component';
-import { action } from "@ember/object";
-import { tracked } from '@glimmer/tracking';
-import { isArray } from '@ember/array';
-import { service } from '@ember/service';
-import { debug } from '@ember/debug';
-import Field from 'openxpki/data/field';
-import ContainerButton from 'openxpki/data/container-button';
+import Component from '@glimmer/component'
+import { action } from "@ember/object"
+import { tracked } from '@glimmer/tracking'
+import { isArray } from '@ember/array'
+import { service } from '@ember/service'
+import { debug } from '@ember/debug'
+import { scheduleOnce } from '@ember/runloop'
+import Field from 'openxpki/data/field'
+import ContainerButton from 'openxpki/data/container-button'
 
 /**
  * Draws a form.
@@ -27,8 +28,9 @@ export default class OxiSectionFormComponent extends Component {
     @tracked loading = false;
     @tracked fields = [];
 
-    clonableRefNames = [];
+    clonableRefNames = new Set()
     domElementsByFieldId = {};
+    dependants = {} // dependent fields by parent field name
 
     get buttons() {
         let buttons = []
@@ -90,8 +92,8 @@ export default class OxiSectionFormComponent extends Component {
             }
             // clonable field
             else {
-                if (this.clonableRefNames.indexOf(field._refName) < 0) {
-                    this.clonableRefNames.push(field._refName);
+                if (! this.clonableRefNames.has(field._refName)) {
+                    this.clonableRefNames.add(field._refName)
                 }
                 // process presets (array of key/value pairs): insert clones
                 // NOTE: this does NOT support dynamic input fields
@@ -128,18 +130,55 @@ export default class OxiSectionFormComponent extends Component {
         return result;
     }
 
+    // Create an array of Field objects for the currently active dependent fields.
+    // It is not neccessary to do this recursively as this method is triggered
+    // by setFieldValue() also on the very first rendering loop.
+    #createActiveDependants(field) {
+        let dependants = []
+        for (const opt of field.options) {
+            // only add dependent fields for currently selected option (if any)
+            if (opt.dependants && (field.value == opt.value)) {
+                dependants = this.#prepareFields(opt.dependants)
+                for (const dep of dependants) dep._guardian = field
+                break
+            }
+        }
+        return dependants
+    }
+
+    #removeDependentFields(field) {
+        let dependants = this.#getActiveDependants(field)
+        for (const depField of dependants) {
+            if (depField.hasDependants) this.#removeDependentFields(depField)
+        }
+        this.#removeFields(...dependants)
+    }
+
+    #getActiveDependants(field) {
+        return this.fields.filter(f => f._guardian === field)
+    }
+
     #updateCloneFields() {
-        for (const name of this.clonableRefNames) {
-            let clones = this.fields.filter(f => f._refName === name);
+        let deleteRefNames = []
+        for (const name of Array.from(this.clonableRefNames)) { // use a copy so we can delete items in the loop
+            let clones = this.fields.filter(f => f._refName === name)
+
+            // forget the clone master in case the whole clone group vanished,
+            // e.g. if dependent fields were deleted
+            if (clones.length == 0) {
+                this.clonableRefNames.delete(name)
+                continue
+            }
+            // update the clones
             for (const clone of clones) {
-                clone._canDelete = true;
-                clone._canAdd = clones[0].max ? clones.length < clones[0].max : true;
-                clone._lastCloneInGroup = false;
+                clone._canDelete = true
+                clone._canAdd = clones[0].max ? clones.length < clones[0].max : true
+                clone._lastCloneInGroup = false
             }
             if (clones.length === 1) {
-                clones[0]._canDelete = false;
+                clones[0]._canDelete = false
             }
-            clones[clones.length-1]._lastCloneInGroup = true;
+            clones[clones.length-1]._lastCloneInGroup = true
         }
     }
 
@@ -158,22 +197,37 @@ export default class OxiSectionFormComponent extends Component {
     @action
     addClone(field) {
         if (field._canAdd === false) return
-        let index = this.fields.indexOf(field)
         let fieldCopy = field.clone()
         fieldCopy.value = ""
         fieldCopy._focusClone = true
-        this.fields.splice(index + 1, 0, fieldCopy)
-        this.fields = this.fields // trigger Ember refresh
+        this.#insertFields(field, fieldCopy)
         this.#updateCloneFields()
     }
 
     @action
     delClone(field) {
         if (field._canDelete === false) return
-        let index = this.fields.indexOf(field)
-        this.fields.splice(index, 1)
-        this.fields = this.fields // trigger Ember refresh
+        this.#removeFields(field)
         this.#updateCloneFields()
+    }
+
+    // insert the given field(s) after the anchor field
+    #insertFields(anchor, ...fields) {
+        if (fields.length == 0) return
+        let anchorPos = this.fields.indexOf(anchor)
+        this.fields.splice(anchorPos + 1, 0, ...fields)
+        this.fields = this.fields // trigger Ember refresh
+    }
+
+    // remove given field(s) from field list
+    #removeFields(...fields) {
+        if (fields.length == 0) return
+        for (let field of fields) {
+            let pos = this.fields.indexOf(field)
+            if (pos == -1) continue
+            this.fields.splice(pos, 1)
+        }
+        this.fields = this.fields // trigger Ember refresh
     }
 
     // Turns all (non-empty) fields into request parameters (returns an Object)
@@ -237,6 +291,16 @@ export default class OxiSectionFormComponent extends Component {
 
         if (!skipValidityChecks) {
             if (this.#checkFieldValidity(field) == false) return Promise.resolve()
+        }
+
+        // process <select> with dependant fields
+        if (field.hasDependants) {
+            scheduleOnce('afterRender', () => {
+                this.#removeDependentFields(field)
+                let dependants = this.#createActiveDependants(field)
+                this.#insertFields(field, ...dependants)
+                this.#updateCloneFields()
+            })
         }
 
         // action on change?

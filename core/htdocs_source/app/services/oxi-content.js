@@ -561,7 +561,7 @@ export default class OxiContentService extends Service {
         let bc = page?.breadcrumb || {}
         let ignoreBreadcrumbs = trigger === 'breadcrumb'
         let navAction = trigger === 'nav'
-        let pageName = requestedPageName ?? this.top.name
+        let pageName = requestedPageName ?? this.top.name ?? ''
         let breadcrumb
 
         if (ignoreBreadcrumbs) {
