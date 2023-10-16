@@ -38,7 +38,7 @@ export default class OxiSelectComponent extends Component {
         super(...arguments)
         this.cssClasses = (this.args.inline)
             ? 'oxi-inline-select'
-            : 'form-control form-select text-truncate'
+            : 'form-select text-truncate'
     }
 
     @action
