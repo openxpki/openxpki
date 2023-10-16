@@ -33,6 +33,7 @@ sub execute
     my $cutoff_notafter = $self->param('cutoff_notafter');
     my $entity_only = $self->param('entity_only');
     my $cert_serial = $self->param('cert_serial');
+    my $identifier = $self->param('cert_identifier');
 
     my @param = $self->param();
 
@@ -116,6 +117,11 @@ sub execute
     # catch include_expired "_any"
     } elsif (!$include_expired) {
         $query->{expires_after} = $epoch - 1;
+    }
+
+    if ($identifier) {
+        ##! 16: 'Adding identifier ' . $identifier
+        $query->{identifier} = $identifier;
     }
 
     if ($cert_subject) {
@@ -282,6 +288,11 @@ The certificate subject_key_identifier (hex notation with colon)
 
 The certificate serial number (as hex with 0x prefix or integer, separator
 and casing is handled internally)
+
+=item cert_identifier
+
+Returns the certificate for this cert_identifier. Allows you to easily check
+if a given identifier exists or matches other attributes queries.
 
 =item meta_*, system_*
 
