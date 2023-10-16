@@ -52,7 +52,8 @@ has workflow => (
     is => 'rw',
     isa => 'HashRef',
     predicate => 'has_workflow',
-    default => sub { return {}; }
+    default => sub { return {}; },
+    trigger => \&__process_workflow,
 );
 
 has extra_headers => (
@@ -78,6 +79,22 @@ has transaction_id => (
         my $self = shift;
         return $self->workflow->{context}->{transaction_id} // '';
     },
+);
+
+has state => (
+    is => 'rw',
+    isa => 'Str|Undef',
+    lazy => 1,
+    predicate => 'has_state',
+    default => undef,
+);
+
+has proc_state => (
+    is => 'rw',
+    isa => 'Str|Undef',
+    lazy => 1,
+    predicate => 'has_proc_state',
+    default => undef,
 );
 
 # Use predefined numeric codes for dedicated problems
@@ -160,6 +177,21 @@ sub __build_status_line {
     }
 
     return sprintf('%03d %s', $rc, status_message($rc));
+}
+
+sub __process_workflow {
+
+    my $self = shift;
+    my $workflow = shift;
+    $self->state($workflow->{state});
+    $self->proc_state($workflow->{proc_state});
+    $self->error_message($workflow->{context}->{error_code})
+        if ($workflow->{context}->{error_code});
+
+    if ($workflow->{'proc_state'} eq 'exception') {
+        $self->error( 50003 );
+    }
+
 }
 
 sub error_message {
