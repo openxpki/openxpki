@@ -1,6 +1,6 @@
 package OpenXPKI::Server::Database::Driver::MariaDB;
-
 use Moose;
+
 with qw(
     OpenXPKI::Server::Database::Role::SequenceSupport
     OpenXPKI::Server::Database::Role::MergeSupport
@@ -11,10 +11,17 @@ with qw(
 =head1 Name
 
 OpenXPKI::Server::Database::Driver::MariaDB
+
 =cut
 
+# Core modules
+use version;
+
+# CPAN modules
 use DBI qw(:sql_types);
 use DBI::Const::GetInfoType; # provides %GetInfoType hash
+
+# Project modules
 use OpenXPKI::Exception;
 
 ################################################################################
@@ -54,8 +61,9 @@ sub perform_checks {
     # check version
     my $ver = $dbh->get_info($GetInfoType{SQL_DBMS_VER}); # e.g. 5.5.5-10.1.44-MariaDB-1~bionic
     my ($mysql, $major, $minor, $patch) = $ver =~ m/^([\d\.]+-)?(\d+)\.(\d+)\.(\d+)(?:-\w*)?/;
-    die "MariaDB server too old: $major.$minor.$patch - OpenXPKI 'MariaDB' driver requires version 10.3, please use 'MySQL' instead."
-        unless ($major >= 10 and $minor >= 3);
+    # only MariaDB >= 10.3 has SEQUENCE support
+    die "MariaDB server too old: $major.$minor.$patch - OpenXPKI 'MariaDB' driver requires version 10.03, please use 'MySQL' instead."
+        unless (version->parse(sprintf('%d.%03d',$major,$minor)) >= version->parse('10.003'));
 }
 
 # Commands to execute after connecting
