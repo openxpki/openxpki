@@ -67,7 +67,7 @@ my %known_proc_states = (
         hook => 'none',
         enforceable => [ 'fail', 'reset' ],
     },
-    # action stops regulary
+    # action stops regularly
     manual => {
         hook => 'none',
         enforceable => [ 'fail' ],
