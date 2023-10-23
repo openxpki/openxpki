@@ -1,17 +1,18 @@
-## OpenXPKI::Workflow::Config
-##
 package OpenXPKI::Workflow::Config;
+use Moose;
 
-use strict;
-use warnings;
+# Core modules
+use Data::Dumper;
+use List::Util qw( any );
 
+# CPAN modules
 use Workflow 1.39;
+
+# Project modules
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
-use Data::Dumper;
 
-use Moose;
 
 has '_workflow_config' => (
     is => 'rw',
@@ -408,7 +409,9 @@ sub __process_conditions {
     my @result = ();
     my $conn = $self->_config();
 
-    for my $condition_name (sort $conn->get_keys($root_path)) {
+    my @local_cond_names = sort $conn->get_keys($root_path);
+
+    for my $condition_name (@local_cond_names) {
         my @path = (@{$root_path}, $condition_name);
         $self->logger()->debug("Adding condition " . join(".", @path));
         ##! 16: 'Processing condition ' . join (".", @path)
@@ -436,9 +439,48 @@ sub __process_conditions {
         push @result, $condition;
     }
 
+    #
+    # Auto-prepend workflow prefix to nested condition names
+    #
+    my $normalize_array = sub { # from Workflow::Base
+        my ( $ref_or_item ) = @_;
+        return () unless ($ref_or_item);
+        return ( ref $ref_or_item eq 'ARRAY' ) ? @{$ref_or_item} : ($ref_or_item);
+    };
+
+    # Add workflow prefix to referenced conditions' name unless it
+    # starts with "global_" or already has the prefix prepended.
+    my $auto_prepend_prefix = sub {
+        my ( $cond_name, $ref_name ) = @_;
+        my $not = ($ref_name =~ s/^!//) ? '!' : '';
+        # don't touch "global_" or already prefixed names
+        return $not.$ref_name if $ref_name =~ /^(global_|$prefix)/;
+        # prepend workflow prefix if the given condition is a known local name
+        return $not.$prefix.$ref_name if any { $ref_name eq $_ } @local_cond_names;
+        # otherwise it must be a fault or a condition from another workflow
+        OpenXPKI::Exception->throw(
+            message => "Nested condition in '$cond_name' references unkown condition '$ref_name'",
+        );
+    };
+
+    for my $cond (@result) {
+        # process "condition" parameter (may be scalar or array)
+        if (any { $cond->{class} eq "Workflow::Condition::$_" } qw( CheckReturn GreedyOR LazyAND LazyOR )) {
+            for my $param (grep { $_->{name} eq 'condition' } $cond->{param}->@*) {
+                my @refs = $normalize_array->($param->{value});
+                $param->{value} = [ map { $auto_prepend_prefix->($cond->{name}, $_ ) } @refs ];
+            }
+        }
+        # process "condition1", "condition2" etc. (scalar)
+        if (any { $cond->{class} eq "Workflow::Condition::$_" } qw( GreedyOR LazyAND LazyOR )) {
+            for my $param (grep { $_->{name} =~ /^condition\d/ } $cond->{param}->@*) {
+                $param->{value} = $auto_prepend_prefix->($cond->{name}, $param->{value});
+            }
+        }
+    }
+
     return @result;
 }
-
 
 =head2 __process_validators
 
