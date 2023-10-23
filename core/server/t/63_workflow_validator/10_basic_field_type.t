@@ -106,14 +106,14 @@ sub validation_fails {
 }
 
 #
-# Tests - FIXME legacy
+# Tests
 #
 
 sub test_field_with($$) {
     my ($cfg, $test_cb) = @_;
 
     # default
-    my $oxitest = create_test($cfg);
+    my $oxitest = create_test($cfg); # sets $WF_TYPE
     $oxitest->session->data->role('User');
 
     my $cfg_str = YAML::Tiny->new(values %$cfg)->write_string();
