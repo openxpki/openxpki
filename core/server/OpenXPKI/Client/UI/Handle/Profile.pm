@@ -1,9 +1,13 @@
 package OpenXPKI::Client::UI::Handle::Profile;
-
 use Moose;
-use Data::Dumper;
+
 use English;
-use List::Util qw( any );
+
+# Core modules
+use Data::Dumper;
+use List::Util qw( any first );
+
+# Project modules
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::i18n qw( i18nGettext );
 
@@ -15,63 +19,69 @@ sub render_profile_select {
     my $wf_action = shift;
     my $param = shift || '';
 
-    my %extra = split /!/, $param;
-
-    $self->logger()->trace( 'render_profile_select with args: ' . Dumper $args ) if $self->logger->is_trace;
+    $self->logger->trace('render_profile_select with args: ' . Dumper $args) if $self->logger->is_trace;
 
     my $wf_info = $args->{wf_info};
-
-    # Get the list of profiles from the backend - return is a hash with id => hash
-    my $profiles = $self->send_command_v2( 'get_cert_profiles', \%extra );
-    # Transform hash into value/label list and sort it
-    # Apply translation to sort on translated strings
-    map { $profiles->{$_}->{label} = i18nGettext($profiles->{$_}->{label}) } keys %{$profiles};
-    # Sort
-    my @profiles = sort { lc($a->{label}) cmp lc($b->{label}) } values %{$profiles};
-
-    my @profiledesc = map { $_->{description} ? { value => $_->{description}, label => $_->{label} } : () } @profiles;
-
     my $context = $wf_info->{workflow}->{context};
+    my @profiledesc;
 
-    my $cert_profile = $context->{cert_profile} || '';
+    # fetch field definition for subject styles (used for all sub selects aka. dependants)
+    my $style_field = first { $_->{name} eq 'cert_subject_style' } $wf_info->{activity}->{$wf_action}->{field}->@*;
+    my ($style_item, @more_style_items) = $self->__render_input_field($style_field) if $style_field;
 
-    # If the profile is preselected, we need to fetch the options
-    my @styles;
-    if ($cert_profile) {
-        my $styles = $self->send_command_v2( 'get_cert_subject_profiles', { profile => $cert_profile });
-        @styles = sort { lc($a->{value}) cmp lc($b->{value}) } values %{$styles};
-    } else {
-        @styles = ({ value => '', label => 'I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST'});
-    }
-
+    # loop through action input fields
     my @fields;
-    foreach my $field (@{$wf_info->{activity}->{$wf_action}->{field}}) {
+    foreach my $field ($wf_info->{activity}->{$wf_action}->{field}->@*) {
         my $name = $field->{name};
-        my ($item, @more_items) = $self->__render_input_field( $field, $context->{$name} );
+
+        # subject styles are already processed outside this loop
+        next if 'cert_subject_style' eq $name;
+
+        # get field definition
+        my ($item, @more_items) = $self->__render_input_field($field, $context->{$name});
         next unless ($item);
 
-        if ($name eq 'cert_profile') {
-            $item = {
-                %{$item},
-                options => \@profiles,
-                actionOnChange => 'profile!get_styles_for_profile',
-            };
-        } elsif ($name eq 'cert_subject_style') {
-            $item = {
-                %{$item},
-                options => \@styles,
-                prompt => $item->{placeholder}, # TODO - rename in UI
-            };
+        if ('cert_profile' eq $name) {
+            # Get profiles from backend: { id => { ... }, id => { ... } }
+            my $profiles = $self->send_command_v2(get_cert_profiles => { with_subject_styles => 1 });
+
+            # Transform hash into list and sort it
+            # Apply translation to sort on translated strings
+            my @profiles = ();
+            for my $p (values $profiles->%*) {
+                $p->{label} = i18nGettext($p->{label}); # to be able to sort it
+                if ($style_field and my $subject_styles = delete $p->{subject_styles}) {
+                    # sort subject style and add them as options to dependent select field
+                    my @styles = sort { lc($a->{value}) cmp lc($b->{value}) } values $subject_styles->%*;
+                    $p->{dependants} = [
+                        # dependent style select field
+                        {
+                            $style_item->%*, # copy item config
+                            options => \@styles,
+                        },
+                        # maybe more (hidden) fields
+                        @more_style_items,
+                    ];
+                }
+                push @profiles, $p;
+            }
+            @profiles = sort { lc($a->{label}) cmp lc($b->{label}) } @profiles;
+
+            @profiledesc =
+                map { { value => $_->{description}, label => $_->{label} } }
+                grep { $_->{description} }
+                @profiles;
+
+            $item->{options} = \@profiles;
         }
 
         push @fields, $item, @more_items;
     }
 
-
     # record the workflow info in the session
     push @fields, $self->__register_wf_token($wf_info, {
         wf_action => $wf_action,
-        wf_fields => \@fields,
+        wf_fields => [ @fields, $style_field ? ($style_item, @more_style_items) : () ],
     });
 
     my $form = $self->main->add_form(
@@ -80,7 +90,10 @@ sub render_profile_select {
     );
     $form->add_field(%{ $_ }) for @fields;
 
-    if (@profiledesc > 0) {
+    #
+    # Show description section if there are any profile descriptions
+    #
+    if (scalar @profiledesc > 0) {
         $self->main->add_section({
             type => 'keyvalue',
             content => {
@@ -93,7 +106,6 @@ sub render_profile_select {
     return $self;
 
 }
-
 
 sub render_subject_form {
 
@@ -262,54 +274,86 @@ sub render_key_select {
     my $wf_info = $args->{wf_info};
     my $context = $wf_info->{workflow}->{context};
 
-    # Get the list of allowed algorithms
-    my $key_alg = $self->send_command_v2( 'get_key_algs', { profile => $context->{cert_profile} });
-    my @key_type;
-    foreach my $alg (@{$key_alg}) {
-       push @key_type, { label => 'I18N_OPENXPKI_UI_KEY_ALG_'.uc($alg) , value => $alg };
-    }
-
-    my $key_gen_param_names = $self->send_command_v2( 'get_key_params', { profile => $context->{cert_profile} });
-
-    # current values from context when changing values!
-    my $key_gen_param_values = $context->{key_gen_params} ? $self->serializer()->deserialize( $context->{key_gen_params} ) : {};
-
-    # Encryption
-    my $key_enc = $self->send_command_v2( 'get_key_enc', { profile => $context->{cert_profile} });
-    my @enc = map { { value => $_, label => 'I18N_OPENXPKI_UI_KEY_ENC_'.uc($_)  }  } @{$key_enc};
+    my $key_gen_params_field = first { $_->{name} eq 'key_gen_params' } $wf_info->{activity}->{$wf_action}->{field}->@*;
 
     my @fields;
-    FIELDS:
+    my @all_param_fields; # whitelist them so the UI class accepts input from them
+
     foreach my $field (@{$wf_info->{activity}->{$wf_action}->{field}}) {
         my $name = $field->{name};
 
-        if ($name eq 'key_gen_params') {
-            foreach my $pn (@{$key_gen_param_names}) {
-                $pn = uc($pn);
-                # We create the label as I18 string from the param name
-                my $label = 'I18N_OPENXPKI_UI_KEY_'.$pn;
-                push @fields, {
-                    name => "key_gen_params{$pn}", # search tag: #wf_fields_with_sub_items
-                    label => $label,
-                    value => $key_gen_param_values->{ $pn },
-                    type => 'select',
-                    options => []
-                };
-            }
-            next FIELDS;
-        }
+        # key_gen_params is processed as part of key_alg
+        next if 'key_gen_params' eq $name;
 
-        my ($item, @more_items) = $self->__render_input_field( $field );
-        next FIELDS unless ($item);
+        # get field definition
+        my ($item, @more_items) = $self->__render_input_field($field);
+        next unless $item;
 
         if ($name eq 'key_alg') {
-            $item = {
-                %{$item},
-                options => \@key_type,
-                actionOnChange => 'profile!get_key_param'
-            };
+            # Get the list of allowed algorithms
+            my $key_algs = $self->send_command_v2('get_key_algs', { profile => $context->{cert_profile} });
+
+            my @key_alg_options = ();
+            for my $alg_name ($key_algs->@*) {
+                my $alg = {
+                    label => 'I18N_OPENXPKI_UI_KEY_ALG_'.uc($alg_name),
+                    value => $alg_name,
+                };
+
+                #
+                # add dependent select fields for parameters
+                #
+                if ($key_gen_params_field) {
+                    # NOTE that we do not call __render_input_field() for "key_gen_params", i.e.
+                    # we do not read the field spec from the configuration.
+                    # This is because the single "virtual" field "key_gen_params" is expanded
+                    # into multiple <select> fields for each parameter.
+                    my $params = $self->send_command_v2('get_key_params', { profile => $context->{cert_profile}, alg => $alg_name });
+                    my $param_presets = $self->param('key_gen_params');
+
+                    my @param_fields;
+                    for my $param_name (keys $params->%*) {
+                        my @options = $params->{$param_name}->@*;
+                        $param_name = uc($param_name);
+
+                        # preset from context (default to first item if context value is unknown)
+                        my $preset = $param_presets->{$param_name} // '';
+                        if (not any { $_ eq $preset } @options) {
+                            $preset = $options[0];
+                        }
+
+                        my @option_items =
+                            map { {
+                                value => $_,
+                                label => "I18N_OPENXPKI_UI_KEY_${param_name}_".uc($_),
+                            } }
+                            @options;
+
+                        my $param_field = {
+                            name => "key_gen_params{${param_name}}",
+                            label => "I18N_OPENXPKI_UI_KEY_${param_name}",
+                            value => $preset,
+                            type => 'select',
+                            options => \@option_items,
+                        };
+
+                        push @param_fields, $param_field;
+                        push @all_param_fields, $param_field;
+                    }
+
+                    $alg->{dependants} = \@param_fields;
+                }
+
+                push @key_alg_options, $alg;
+            }
+
+            $item->{options} = \@key_alg_options
+
         } elsif ($name eq 'enc_alg') {
+            my $key_enc = $self->send_command_v2('get_key_enc', { profile => $context->{cert_profile} });
+            my @enc = map { { value => $_, label => 'I18N_OPENXPKI_UI_KEY_ENC_'.uc($_)  }  } @{$key_enc};
             $item->{options} = \@enc;
+
         } elsif ($name eq 'csr_type') {
              $item->{value} = 'pkcs10';
         }
@@ -320,8 +364,7 @@ sub render_key_select {
     # record the workflow info in the session
     push @fields, $self->__register_wf_token($wf_info, {
         wf_action => $wf_action,
-        wf_fields => \@fields, # search tag: #wf_fields_with_sub_items
-        cert_profile => $context->{cert_profile}
+        wf_fields => [ @fields, @all_param_fields ], # search tag: #wf_fields_with_sub_items
     });
 
     my $form = $self->main->add_form(
