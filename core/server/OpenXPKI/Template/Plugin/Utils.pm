@@ -174,6 +174,7 @@ sub jwt_thumbprint {
     my $self = shift;
     my $key_hash = shift;
 
+    return unless($key_hash);
     $key_hash = decode_json($key_hash) unless (ref $key_hash);
 
     if ($key_hash->{kty} eq 'RSA') {
