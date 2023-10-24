@@ -67,16 +67,46 @@ sub get_command
             params => { ENC_ALG => $self->{ENC_ALG} });
     }
 
-    ## build the command
-    my $command  = "smime -encrypt -nosmimecap -binary";
-    $command .= " -engine $engine" if ($engine);
-    $command .= " -in ". $self->write_temp_file( $self->{CONTENT} );
-    $command .= " -out ".$self->get_outfile();
-    $command .= " -outform " . $self->{OUTFORM};
-    $command .= " -".$self->{ENC_ALG};
-    $command .= " ".$self->{CERTFILE};
 
-    return [ $command ];
+    ## build the command
+    my @command = qw( cms -encrypt -nosmimecap -binary );
+    push @command, ('-engine', $engine) if ($engine);
+    push @command, ('-in', $self->write_temp_file( $self->{CONTENT} ));
+    push @command, ('-out', $self->get_outfile());
+    push @command, ('-outform', $self->{OUTFORM}) if ($self->{OUTFORM});
+    push @command, ('-'.$self->{ENC_ALG});
+    push @command, ('-recip', $self->{CERTFILE});
+
+    # OAEP Padding
+    if (my $padding = $self->{PADDING}) {
+        if ($padding eq 'oaep') {
+            push @command, ('-keyopt','rsa_padding_mode:oaep');
+            my $opts = $self->{PADDING_OPTIONS};
+            if (my $val = $opts->{oaep_digest}) {
+                OpenXPKI::Exception->throw (
+                    message => "Unknown value for oaep_digest in pkcs7_encrypt",
+                    params => { value => $val }
+                ) if ($val !~ m{\A(sha1|sha256)\z});
+                push @command, ('-keyopt', 'rsa_oaep_md:'.$val);
+            }
+            if (my $val = $opts->{mgf1_digest}) {
+                OpenXPKI::Exception->throw (
+                    message => "Unknown value for mgf1_digest in pkcs7_encrypt",
+                    params => { value => $val }
+                ) if ($val !~ m{\A(sha1|sha256)\z});
+                push @command, ('-keyopt', 'rsa_mgf1_md:'.$val);
+            }
+        } elsif ($padding eq 'pkcs1') {
+            push @command, ('-keyopt','rsa_padding_mode:pkcs1');
+        } else {
+            OpenXPKI::Exception->throw (
+                message => "Unsupported padding mode in pkcs7_encrypt",
+                params => { padding => $padding }
+            );
+        }
+    }
+
+    return [ \@command ];
 }
 
 sub hide_output
@@ -91,7 +121,15 @@ sub key_usage
     return 1;
 }
 
-#get_result moved to base class
+sub get_result
+{
+    my $self = shift;
+    my $result = $self->SUPER::get_result();
+
+    $result =~ s/ (-----BEGIN\ [\w\s]*) CMS (----- [^-]+ -----END\ [\w\s]*) CMS (-----) /${1}PKCS7${2}PKCS7${3}/gmsx;
+
+    return $result;
+}
 
 1;
 __END__

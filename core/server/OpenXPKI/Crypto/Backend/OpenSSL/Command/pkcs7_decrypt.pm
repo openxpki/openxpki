@@ -93,23 +93,20 @@ sub get_command
     }
 
     ## build the command
+    my @command = qw( cms -decrypt -inform PEM );
+    push @command, ('-engine', $engine) if ($engine);
+    push @command, ('-keyform', $keyform) if ($keyform);
+    push @command, ('-inkey', $self->{KEYFILE}) if ( $self->{KEYFILE} );
+    push @command, ('-recip',$self->{CERTFILE}) if ( $self->{CERTFILE} );
+    push @command, ('-in', $self->write_temp_file( $self->{PKCS7} ));
+    push @command, ('-out', $self->get_outfile());
 
-    my $command  = "smime -decrypt";
-    $command .= " -engine $engine" if ($engine);
-    $command .= " -keyform $keyform" if ($keyform);
-    $command .= " -inkey ".$self->{KEYFILE} if ($self->{KEYFILE});
-    $command .= " -recip ".$self->{CERTFILE} if ($self->{CERTFILE});
-    $command .= " -inform PEM";
-    $command .= " -in ". $self->write_temp_file( $self->{PKCS7} );
-    $command .= " -out ".$self->get_outfile();
-
-    if (defined $passwd)
-    {
-        $command .= " -passin env:pwd";
-        $self->set_env ("pwd" => $passwd);
+    if ( defined $passwd ) {
+        push @command, ('-passin','env:pwd');
+        $self->set_env( 'pwd' => $passwd );
     }
 
-    return [ $command ];
+    return [ \@command ];
 }
 
 sub __get_used_engine
@@ -122,7 +119,7 @@ sub __get_used_engine
         return $self->{ENGINE}->get_engine();
     }
     else {
-        return "";
+        return '';
     }
 }
 

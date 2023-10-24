@@ -124,6 +124,8 @@ sub __init_command_params : PRIVATE {
     "pkcs7_encrypt"   => {"CERT"    => 0,
                           "OUTFORM"    => 0,
                           "ENC_ALG" => ["__undef", "aes256","aes192","aes128","idea","des3","des"],
+                          'PADDING' => ["__undef","oaep","pkcs1"],
+                          'PADDING_OPTIONS' => 0,
                           "CONTENT" => 1},
     "pkcs7_get_chain" => {"NOCHAIN" => 0,
                           "NOSORT" => 0,

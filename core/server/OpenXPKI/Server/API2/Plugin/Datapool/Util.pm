@@ -397,11 +397,33 @@ sub encrypt_passwordsafe ($self, $safe_id, $value) {
         unless $cert && $cert->{data};
     ##! 16: "retrieved cert: id = " . $cert->{identifier}
 
+
+    # support OAEP padding mode - IMHO superfluous but required by some HSM vendors
+    # and regulatory bodies to meet formal requirements
+    my %PADDING;
+    my $padding_config = CTX('config')->get_hash(["system","datavault","padding"]);
+    if ($padding_config && $padding_config->{mode}) {
+        my $mode = $padding_config->{mode};
+        delete $padding_config->{mode};
+        if ($mode eq 'oaep') {
+            $PADDING{PADDING} = 'oaep';
+            if (keys %{$padding_config}) {
+                $PADDING{PADDING_OPTIONS} = $padding_config
+            }
+        } elsif ($mode ne 'pkcs1') {
+            OpenXPKI::Exception->throw(
+                message => 'Unsupported padding mode for DataVault',
+                params => { mode => $mode }
+            );
+        }
+    }
+
     ##! 16: 'asymmetric encryption via passwordsafe ' . $safe_id
     return $self->api->get_default_token->command({
         COMMAND => 'pkcs7_encrypt',
         CERT    => $cert->{data},
         CONTENT => $value,
+        %PADDING
     });
 }
 
