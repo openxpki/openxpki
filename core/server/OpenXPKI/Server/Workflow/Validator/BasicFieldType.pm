@@ -29,8 +29,8 @@ sub _validate {
         my ($field, $type, $is_array, $is_required, $regex) = split /:/, $key, 5;
         my $val = $context->param($field);
 
-        if (!defined $val) {
-            ##! 32: "$field - undefined"
+        if (!defined $val or $val eq '') {
+            ##! 32: "$field - undefined or empty string"
             push @no_value, { name => $field, error => "I18N_OPENXPKI_UI_VALIDATOR_EMPTY_BUT_REQUIRED" } if $is_required;
             next;
         }
@@ -62,13 +62,6 @@ sub _validate {
         # ignore deep checks on refs for now
         if (ref $val) {
             ##! 32: "$field - value is a reference, skipping 'required' and UTF-8 checks"
-            next;
-        }
-
-        # check for empty string
-        if ($is_required and $val eq '') {
-            ##! 32: "$field - empty string"
-            push @no_value, { name => $field, error => "I18N_OPENXPKI_UI_VALIDATOR_EMPTY_BUT_REQUIRED" };
             next;
         }
     }
