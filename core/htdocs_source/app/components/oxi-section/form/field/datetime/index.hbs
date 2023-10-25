@@ -33,7 +33,7 @@
                 @icon="glyphicon glyphicon-calendar"
             >
             </BsButton>
-            <div class="invalid-feedback">{{@error}}</div>
+            {{#if @error}}<div class="invalid-feedback">{{@error}}</div>{{/if}}
         </div>
     </div>
     <div class="col-lg-4">

@@ -18,7 +18,7 @@
         {{on "paste" this.onPaste}}
         {{on-init @setFocusInfo true}}
     />
-    <div class="invalid-feedback">{{@error}}</div>
+    {{#if @error}}<div class="invalid-feedback">{{@error}}</div>{{/if}}
 
     <div class="dropdown-menu {{if this.isDropdownOpen "show"}}" role="menu">
         {{#each this.searchResults as |result|}}

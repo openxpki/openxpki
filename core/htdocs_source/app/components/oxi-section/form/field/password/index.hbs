@@ -8,4 +8,4 @@
     {{on "input" this.onInput}}
     {{on-init @setFocusInfo true}}
 />
-<div class="invalid-feedback">{{@error}}</div>
+{{#if @error}}<div class="invalid-feedback">{{@error}}</div>{{/if}}
