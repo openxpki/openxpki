@@ -81,7 +81,7 @@ sub render_profile_select {
     # record the workflow info in the session
     push @fields, $self->__register_wf_token($wf_info, {
         wf_action => $wf_action,
-        wf_fields => [ @fields, $style_field ? ($style_item, @more_style_items) : () ],
+        wf_fields => \@fields,
     });
 
     my $form = $self->main->add_form(
@@ -277,7 +277,6 @@ sub render_key_select {
     my $key_gen_params_field = first { $_->{name} eq 'key_gen_params' } $wf_info->{activity}->{$wf_action}->{field}->@*;
 
     my @fields;
-    my @all_param_fields; # whitelist them so the UI class accepts input from them
 
     foreach my $field (@{$wf_info->{activity}->{$wf_action}->{field}}) {
         my $name = $field->{name};
@@ -338,7 +337,6 @@ sub render_key_select {
                         };
 
                         push @param_fields, $param_field;
-                        push @all_param_fields, $param_field;
                     }
 
                     $alg->{dependants} = \@param_fields;
@@ -364,7 +362,7 @@ sub render_key_select {
     # record the workflow info in the session
     push @fields, $self->__register_wf_token($wf_info, {
         wf_action => $wf_action,
-        wf_fields => [ @fields, @all_param_fields ], # search tag: #wf_fields_with_sub_items
+        wf_fields => \@fields, # search tag: #wf_fields_with_sub_items
     });
 
     my $form = $self->main->add_form(

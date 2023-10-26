@@ -6,6 +6,7 @@ with 'OpenXPKI::Client::UI::Role::QueryCache';
 
 # Core modules
 use Data::Dumper;
+use List::Util qw( any none );
 
 # CPAN modules
 use Log::Log4perl::MDC;
@@ -687,6 +688,10 @@ Returns a I<HashRef> with field names and their values.
 The given list determines the accepted input fields, values originate from
 the request and are queried via L<OpenXPKI::Client::UI::Result/multi_param>.
 
+There is a special treatment for dependent fields: they are not part of the
+$fields list but extracted from C<$field-E<gt>{options}-E<gt>[x]-E<gt>{dependants}>
+and added to the processing queue.
+
 B<Positional parameters>
 
 =over
@@ -700,19 +705,24 @@ L<OpenXPKI::Client::UI::Workflow/__render_input_field>
 sub __request_values_for_fields {
     my $self = shift;
     my $fields = shift;
+    my $result = {};
 
-    my $param = {};
-    foreach my $item (@{$fields}) {
-        my $name = $item->{name};
+    my @fields = $fields->@*; # clone
+    while (my $field = shift @fields) {
+        my $name = $field->{name};
+
         if ($name =~ m{ \[\] \z }xms) {
-            $self->log->warn("Got field name with square brackets $name");
+            $self->log->warn("Received field name '$name' with deprecated square brackets");
             $name = substr($name,0,-2);
         }
         next if $name =~ m{ \A wf_ }xms;
 
+        #
+        # Fetch field value(s)
+        #
         my @v_list = $self->multi_param($name);
         my $vv;
-        if ($item->{clonable}) {
+        if ($field->{clonable}) {
             $vv = \@v_list;
         } else {
             if ((my $amount = scalar @v_list) > 1) {
@@ -721,17 +731,80 @@ sub __request_values_for_fields {
             $vv = $v_list[0];
         }
 
+        #
+        # Validate values of special "fixed" fields types
+        #
+        if ('select' eq $field->{type} and not $field->{editable}) {
+            my @options = map { $_->{value} } ($field->{options}//[])->@*;
+            if (not any { $vv eq $_ } @options) {
+                $self->log->warn(sprintf "Ignoring %s field '%s': value '%s' does not match any known option", $field->{type}, $name, $vv);
+                next; # ignore value
+            }
+        }
+
+        if ('static' eq $field->{type} or 'hidden' eq $field->{type}) {
+            if ($vv//'' ne $field->{value}//'') {
+                $self->log->warn(sprintf "Ignoring %s field '%s': value was altered by frontend", $field->{type}, $name);
+                next; # ignore value
+            }
+        }
+
+        # add dependent fields of currently selected option to the queue
+        push @fields, $self->__get_dependants($field, $vv);
+
         # build nested HashRef for cert profile field name including sub item
         # (e.g. "cert_info{requestor_email}") - search tag: #wf_fields_with_sub_items
         if ($name =~ m{ \A (\w+)\{(\w+)\} \z }xs) {
-            $param->{$1} ||= ();
-            $param->{$1}->{$2} = $vv;
+            $result->{$1} ||= ();
+            $result->{$1}->{$2} = $vv;
         # plain field name
         } else {
-            $param->{$name} = $vv;
+            $result->{$name} = $vv;
+        }
+
+    }
+
+    return $result;
+}
+
+=head2 __get_dependants
+
+Returns a list with field definitions of all dependent fields of the given
+E<lt>selectE<gt> field.
+
+If C<$option> is specified then only the dependent fields of the option with
+that value are returned (if any). Otherwise all dependent fields of all options
+are returned.
+
+B<Positional parameters>
+
+=over
+
+=item * C<$field> I<HashRef> - field specification as returned by
+L<OpenXPKI::Client::UI::Workflow/__render_input_field>.
+
+=item * C<$option> I<Str> - value of the the option whose dependants shall be
+returned. Optional.
+
+=back
+
+=cut
+sub __get_dependants {
+    my $self = shift;
+    my $field = shift;
+    my $option = shift;
+
+    my @dependants;
+    if ('select' eq $field->{type}) {
+        for my $opt (($field->{options}//[])->@*) {
+            next if ($option and $option ne $opt->{value});
+            if (my $deps = $opt->{dependants}) {
+                push @dependants, $deps->@*;
+            }
         }
     }
-    return $param;
+
+    return @dependants;
 }
 
 __PACKAGE__->meta->make_immutable;
