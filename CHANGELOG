@@ -1,8 +1,10 @@
 Please list items to be added to the final release comment here
 
 New Features
+  - OAEP padding for datavault token
 
 Upgrades, Improvements and Bugfixes
 
 Removals, Deprecations, Breaking Changes
   - Move placeholders for CAALIAS (ALIAS, GROUP, GENERATION) to the top level for CDP/AIA generation
+  - Changen openssl call from smime to cms for pkcs7_encrypt/pkcs_decrypt
