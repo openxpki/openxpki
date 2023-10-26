@@ -684,14 +684,14 @@ sub __check_for_validation_error {
 
 Returns a I<HashRef> with field names and their values.
 
-The list of fields to query is taken from the given specification I<HashRef>,
-values originate from the request (see L<OpenXPKI::Client::UI::Result/multi_param>).
+The given list determines the accepted input fields, values originate from
+the request and are queried via L<OpenXPKI::Client::UI::Result/multi_param>.
 
 B<Positional parameters>
 
 =over
 
-=item * C<$fields> I<HashRef> - field specifications as returned by
+=item * C<$fields> I<ArrayRef> - list of field specifications as returned by
 L<OpenXPKI::Client::UI::Workflow/__render_input_field>
 
 =back
@@ -716,12 +716,13 @@ sub __request_values_for_fields {
             $vv = \@v_list;
         } else {
             if ((my $amount = scalar @v_list) > 1) {
-                $self->log->warn(sprintf "Received %s values for non-clonable field '%s'", scalar @v_list, $name);
+                $self->log->warn(sprintf "Received %s values for non-clonable field '%s', expected only one value", scalar @v_list, $name);
             }
             $vv = $v_list[0];
         }
 
-        # cert profile field name including sub item (e.g. "cert_info{requestor_email}") - search tag: #wf_fields_with_sub_items
+        # build nested HashRef for cert profile field name including sub item
+        # (e.g. "cert_info{requestor_email}") - search tag: #wf_fields_with_sub_items
         if ($name =~ m{ \A (\w+)\{(\w+)\} \z }xs) {
             $param->{$1} ||= ();
             $param->{$1}->{$2} = $vv;
