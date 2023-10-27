@@ -466,7 +466,9 @@ sub param {
 
 =head2 secure_param
 
-Returns a single input parameter that was passed inside an encrypted JWT.
+Returns an input parameter that was encrypted via JWT and can thus be trusted.
+
+C<undef> is returned if the parameter does not exist or if it was not encrypted.
 
 B<Parameters>
 
@@ -479,14 +481,33 @@ B<Parameters>
 =cut
 
 sub secure_param {
-
     my ($self, $key) = @_;
 
-    my $val = $self->extra_secure->{$key};
-    return $val if defined $val;
+    #
+    # Check parameters given to special page "encrypted": encrypted!<JWT_TOKEN>
+    #
+    if (my $val = $self->extra_secure->{$key}) {
+        return $val;
+    }
+    #
+    # Check encrypted form parameters: { type => "encrypted", value => "<JWT_TOKEN>" }
+    #
+    else {
+        my $item = $self->param($key);
+        if (not $item) {
+            $self->log->trace("Requested secure parameter '$key' was not found") if $self->log->is_trace;
+            return;
+        }
 
-    $self->log->trace("Requested secure parameter '$key' was not found") if $self->log->is_trace;
-    return;
+        # is set by OpenXPKI::Client::UI::Request->_decrypt_jwt() to flag secure parameters
+        if ($item->{__jwt_key} ne $self->session_param('jwt_encryption_key')) {
+            $self->log->warn("Expected parameter '$key' to be JWT encrypted, but it was not");
+            return;
+        }
+        delete $item->{__jwt_key};
+
+        return $item;
+    }
 }
 
 =head2 multi_param
@@ -980,37 +1001,6 @@ sub transate_sql_wildcards  {
     return $val;
 }
 
-=head2 decrypted_param
-
-Return a decrypted JWT input parameter (whose only allowed type is I<HashRef>).
-
-C<undef> is returned if the parameter does not exist or if it was not encrypted.
-
-B<Parameters>
-
-=over
-
-=item * I<Str> C<$key> - parameter name to retrieve.
-
-=back
-
-=cut
-
-sub decrypted_param {
-    my $self = shift;
-    my $param_name = shift;
-
-    my $item = $self->param($param_name) or return;
-
-    if ($item->{__jwt_key} ne $self->session_param('jwt_encryption_key')) {
-        $self->log->debug("Parameter '".$param_name."'' was not JWT encrypted");
-        return;
-    }
-    delete $item->{__jwt_key};
-
-    return $item;
-}
-
 # encrypt given data
 sub _encrypt_jwt {
     my ($self, $value) = @_;
@@ -1180,7 +1170,7 @@ B<Returns> a I<HashRef> of query parameters
 sub fetch_autocomplete_params {
     my $self = shift;
 
-    my $data = $self->decrypted_param('__encrypted') or return {};
+    my $data = $self->secure_param('__encrypted') or return {};
 
     # add secure parameters
     my %params = %{ $data->{data} };
