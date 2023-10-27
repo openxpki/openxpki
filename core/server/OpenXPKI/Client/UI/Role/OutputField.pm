@@ -78,7 +78,7 @@ sub render_output_field ($self, $arg) {
         # Code format any PEM blocks
         if (( $name =~ m{ \A (pkcs10|pkcs7) \z }x ) ||
             ( ref $item->{value} eq '' and
-                $item->{value}//'' =~ m{ \A \s* -----BEGIN([A-Z ]+)-----.*-----END([A-Z ]+)---- }xms)) {
+                ($item->{value}//'') =~ m{ \A \s* -----BEGIN([A-Z ]+)-----.*-----END([A-Z ]+)---- }xms)) {
             $item->{format} = 'code';
             $item->{value} =~ s{(\A\s*|\s*\z)}{}sg;
         } elsif ($type eq 'textarea') {
