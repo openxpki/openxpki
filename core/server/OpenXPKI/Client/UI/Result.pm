@@ -29,32 +29,85 @@ use experimental 'signatures'; # should be done after imports to safely disable 
 
 # Attributes set via constructor
 
-has req => (
-    is => 'ro',
-    isa => 'OpenXPKI::Client::UI::Request',
-    predicate => 'has_req',
-    required => 1,
-);
-
-# extra parameters appended to a call via xxx!param!value
-has extra => (
-    is => 'rw',
-    isa => 'HashRef',
-    default => sub { {} },
-);
-
-# extra parameters from a secure JWT
-has extra_secure => (
-    is => 'rw',
-    isa => 'HashRef',
-    default => sub { {} },
-);
-
 has _client => (
     is => 'ro',
     isa => 'OpenXPKI::Client::UI',
     init_arg => 'client',
     required => 1,
+);
+
+=head1 REQUEST RELATED METHODS
+
+=head2 param
+
+Returns a single input parameter value, i.e.
+
+=over
+
+=item * secure parameters passed in a (server-side) JWT encoded hash,
+
+=item * those appended to the action name using C<!> and
+
+=item * real CGI parameters.
+
+=back
+
+A parameter name will be looked up in the listed order.
+
+If the input parameter is a list (multiple values) then only the first value is
+returned.
+
+B<Parameters>
+
+=over
+
+=item * I<Str> C<$key> - parameter name to retrieve.
+
+=back
+
+=head2 secure_param
+
+Returns an input parameter that was encrypted via JWT and can thus be trusted.
+
+Encryption might happen either by calling the special virtual page
+C<encrypted!JWT_TOKEN> or with a form field of C<type: encrypted>.
+
+C<undef> is returned if the parameter does not exist or it was not an encrypted
+parameter.
+
+B<Parameters>
+
+=over
+
+=item * I<Str> C<$key> - parameter name to retrieve.
+
+=back
+
+=head2 multi_param
+
+Returns a list with an input parameters' values (multi-value field, most
+likely a clonable field).
+
+B<Parameters>
+
+=over
+
+=item * I<Str> C<$key> - parameter name to retrieve.
+
+=back
+
+=cut
+
+has req => (
+    is => 'ro',
+    isa => 'OpenXPKI::Client::UI::Request',
+    predicate => 'has_req',
+    required => 1,
+    handles => [ qw(
+        param
+        multi_param
+        secure_param
+    ) ],
 );
 
 =head1 RESPONSE RELATED ATTRIBUTES AND METHODS
@@ -347,7 +400,6 @@ B<Parameters>
 =back
 
 =cut
-
 sub send_command_v2 {
 
     my $self = shift;
@@ -419,145 +471,6 @@ sub set_status_from_error_reply {
     $self->status->error($message);
 
     return $self;
-}
-
-=head2 param
-
-Returns a single input parameter value, i.e.
-
-=over
-
-=item * secure parameters passed in a (serverside) JWT encoded hash,
-
-=item * those appended to the action name using C<!> and
-
-=item * real CGI parameters.
-
-=back
-
-A parameter name will be looked up in the listed order.
-
-If the input parameter is a list (multiple values) then only the first value is
-returned.
-
-B<Parameters>
-
-=over
-
-=item * I<Str> C<$key> - parameter name to retrieve: a plain parameter name or
-a stringified hash (e.g. C<key_param{curve_name}>).
-
-Please note that passing an I<ArrayRef> is no longer supported - please use
-L</param_from_fields> instead. Passing C<undef>is also no longer supported.
-
-=back
-
-=cut
-
-sub param {
-
-    my ($self, $key) = @_;
-
-    confess 'param() must be called in scalar context' if wantarray; # die
-
-    my @val = $self->__param($key);
-    return $val[0];
-}
-
-=head2 secure_param
-
-Returns an input parameter that was encrypted via JWT and can thus be trusted.
-
-C<undef> is returned if the parameter does not exist or if it was not encrypted.
-
-B<Parameters>
-
-=over
-
-=item * I<Str> C<$key> - parameter name to retrieve.
-
-=back
-
-=cut
-
-sub secure_param {
-    my ($self, $key) = @_;
-
-    #
-    # Check parameters given to special page "encrypted": encrypted!<JWT_TOKEN>
-    #
-    if (my $val = $self->extra_secure->{$key}) {
-        return $val;
-    }
-    #
-    # Check encrypted form parameters: { type => "encrypted", value => "<JWT_TOKEN>" }
-    #
-    else {
-        my $item = $self->param($key);
-        if (not $item) {
-            $self->log->trace("Requested secure parameter '$key' was not found") if $self->log->is_trace;
-            return;
-        }
-
-        # is set by OpenXPKI::Client::UI::Request->_decrypt_jwt() to flag secure parameters
-        if ($item->{__jwt_key} ne $self->session_param('jwt_encryption_key')) {
-            $self->log->warn("Expected parameter '$key' to be JWT encrypted, but it was not");
-            return;
-        }
-        delete $item->{__jwt_key};
-
-        return $item;
-    }
-}
-
-=head2 multi_param
-
-Returns a list with an input parameters' values (multi-value field, most
-likely a clonable field).
-
-B<Parameters>
-
-=over
-
-=item * I<Str> C<$key> - parameter name to retrieve: a plain parameter name or
-a stringified hash (e.g. C<key_param{curve_name}>).
-
-=back
-
-=cut
-
-sub multi_param {
-
-    my ($self, $key) = @_;
-
-    confess 'multi_param() must be called in list context' unless wantarray; # die
-
-    my @val = $self->__param($key);
-    return @val;
-}
-
-sub __param {
-
-    my ($self, $key) = @_;
-
-    confess "param() / multi_param() expect a single key (string) as argument\n" if (not $key or ref $key); # die
-
-    my @queries = (
-        # Try extra parameters from a secure JWT
-        sub { return $self->extra_secure->{$key} },
-        # Try extra parameters appended to a call via xxx!param!value
-        sub { return $self->extra->{$key} },
-        # Try parameter via request object
-        sub { return $self->req->multi_param($key) },
-    );
-
-    for my $q (@queries) {
-        my @val = $q->();
-        return @val if defined $val[0];
-    }
-
-    $self->log->trace("Requested parameter '$key' was not found") if $self->log->is_trace;
-    return;
 }
 
 # Reads the query parameter "_tenant" and returns a list (tenant => $tenant) to
@@ -775,10 +688,14 @@ sub __register_wf_token {
         $token->{wf_last_update} = $wf_info->{workflow}->{last_update};
     }
     my $id = $self->__generate_uid();
-    $self->log->debug('wf token id ' . $id);
-    $self->log->trace('token info ' . Dumper  $token) if $self->log->is_trace;
+    $self->log->debug("save wf_token: $id");
+    $self->log->trace('token content = ' . Dumper $token) if $self->log->is_trace;
     $self->session_param($id, $token);
-    return { name => 'wf_token', type => 'hidden', value => $id };
+    return {
+        name => 'wf_token',
+        type => 'hidden',
+        value => $id,
+    };
 }
 
 =head2 __fetch_wf_token( wf_token, purge )
@@ -796,12 +713,12 @@ sub __fetch_wf_token {
 
     return {} unless $id;
 
-    $self->log->debug( "load wf_token " . $id );
-
+    $self->log->debug("load wf_token: $id");
     my $token = $self->session_param($id);
     $self->_session->clear($id) if($purge);
-    return $token;
 
+    $self->log->trace('token content = ' . Dumper $token) if $self->log->is_trace;
+    return $token;
 }
 
 =head2 __purge_wf_token( wf_token )
@@ -814,11 +731,10 @@ sub __purge_wf_token {
     my $self = shift;
     my $id = shift;
 
-    $self->log->debug( "purge wf_token " . $id );
+    $self->log->debug("purge wf_token $id");
     $self->_session->clear($id);
 
     return $self;
-
 }
 
 =head2 __persist_response
@@ -1004,9 +920,6 @@ sub transate_sql_wildcards  {
 # encrypt given data
 sub _encrypt_jwt {
     my ($self, $value) = @_;
-
-    die "Only values of type HashRef are supported for encrypted input fields\n"
-      unless ref $value eq 'HASH';
 
     my $key = $self->session_param('jwt_encryption_key');
     if (not $key) {

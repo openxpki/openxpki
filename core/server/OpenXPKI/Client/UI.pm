@@ -334,8 +334,6 @@ sub __load_class ($self, $arg) {
         return;
     }
 
-    my $params = {};
-    my $secure_params = {};
     # the request is encoded in an encrypted jwt structure
     if ($class eq 'encrypted') {
         # as the token has non-word characters the above regex does not contain the full payload
@@ -348,19 +346,22 @@ sub __load_class ($self, $arg) {
             $class = $decrypted->{class};
             $method = $decrypted->{method};
         }
-        $secure_params = $decrypted->{secure_param} // {};
+        my $secure_params = $decrypted->{secure_param} // {};
         $self->log->debug("Encrypted request to $class / $method");
         $self->log->trace("Secure params: " . Dumper $secure_params) if ($self->log->is_trace and keys $secure_params->%*);
+        $arg->req->add_secure_params($secure_params->%*);
     }
     else {
         ($method, $param_raw) = ($remainder =~ /\A (\w+)? \!?(.*) \z/xms);
         if ($param_raw) {
+            my $params = {};
             my @parts = split /!/, $param_raw;
             while (my $key = shift @parts) {
                 my $val = shift @parts // '';
                 $params->{$key} = Encode::decode("UTF-8", uri_unescape($val));
             }
             $self->log->trace("Found extra params: " . Dumper $params) if $self->log->is_trace;
+            $arg->req->add_params($params->%*);
         }
     }
 
@@ -405,8 +406,6 @@ sub __load_class ($self, $arg) {
         my $obj = $pkg->new(
             client => $self,
             req => $arg->req,
-            extra => $params,
-            extra_secure => $secure_params,
             resp => $self->resp,
         );
 
