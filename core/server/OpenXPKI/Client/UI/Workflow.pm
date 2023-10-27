@@ -934,6 +934,7 @@ sub __render_input_field {
     $item->{is_optional} = 1 unless $field->{required};
     $item->{ecma_match} = $field->{ecma_match} if $field->{ecma_match};
     $item->{keys} = $field->{keys} if $field->{keys};
+    $item->{autocomplete} = $field->{autocomplete} if $field->{autocomplete};
 
     # includes dynamically generated additional fields
     my @all_items = ($item);
@@ -951,10 +952,15 @@ sub __render_input_field {
         }
         else {
             $item->{type} = 'text';
-            $item->{autocomplete_query} = {
+            $item->{autocomplete} = {
                 action => "certificate!autocomplete",
                 params => {
-                    cert_identifier => $item->{name},
+                    user => {
+                        cert_identifier => $item->{name},
+                    },
+                    # secure => {
+                    #     anything_that_should_be_encrypted => {},
+                    # }
                 },
             };
         }
@@ -967,15 +973,11 @@ sub __render_input_field {
     }
 
     # option 'autocomplete'
-    if ($field->{autocomplete}) {
-        my ($ac_query_params, $enc_field) = $self->make_autocomplete_query($field);
-        # "autocomplete_query" to distinguish it from the wf config param
-        $item->{autocomplete_query} = {
-            action => $field->{autocomplete}->{action},
-            params => $ac_query_params,
-        };
-        # additional field definition
-        push @all_items, $enc_field;
+    if (my $ac = $item->{autocomplete}) {
+        delete $item->{autocomplete};
+        my ($ac_query, $enc_field) = $self->make_autocomplete_query($ac);
+        $item->{autocomplete_query} = $ac_query; # "autocomplete_query" to distinguish it from the config param
+        push @all_items, $enc_field if $enc_field; # additional field definitio
     }
 
     # set (default) value and handle clonable fields

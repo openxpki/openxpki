@@ -997,20 +997,18 @@ B<Parameters>
 =cut
 
 sub decrypted_param {
-
     my $self = shift;
     my $param_name = shift;
 
-    my $item = $self->param($param_name)
-        or return;
+    my $item = $self->param($param_name) or return;
 
     if ($item->{__jwt_key} ne $self->session_param('jwt_encryption_key')) {
         $self->log->debug("Parameter '".$param_name."'' was not JWT encrypted");
         return;
     }
     delete $item->{__jwt_key};
-    return $item;
 
+    return $item;
 }
 
 # encrypt given data
@@ -1037,7 +1035,7 @@ sub _encrypt_jwt {
         },
     );
 
-    return $token
+    return $token;
 }
 
 =head2 secure_call
@@ -1078,8 +1076,8 @@ sub secure_call ($self, $arg) {
 
 =head2 make_autocomplete_query
 
-Create the autocomplete config for a UI text field from the given workflow
-field configuration C<$wf_field>.
+Create the autocomplete config for a UI text field from the given autocomplete
+workflow field configuration C<$ac_config>.
 
 Also returns an additional hidden, to-be-encrypted UI field definition.
 
@@ -1092,13 +1090,13 @@ Text input fields with autocompletion are configured as follows:
             user:
                 param_1: field_name_1
                 param_2: field_name_1
-            persist:
+            secure:
                 query:
                     status: { "-like": "%done" }
 
 Parameters below C<user> are filled from the referenced form fields.
 
-Parameters below C<persist> may contain data structures (I<HashRefs>, I<ArrayRefs>)
+Parameters below C<secure> may contain data structures (I<HashRefs>, I<ArrayRefs>)
 as they are backend-encrypted and sent to the client as a JWT token. They can
 be considered safe from user manipulation.
 
@@ -1106,7 +1104,7 @@ B<Parameters>
 
 =over
 
-=item * I<HashRef> C<$wf_field> - workflow field config
+=item * I<HashRef> C<$ac_config> - autocomplete workflow field config
 
 =back
 
@@ -1115,49 +1113,51 @@ B<Parameters>
 sub make_autocomplete_query {
 
     my $self = shift;
-    my $wf_field = shift;
+    my $ac_config = shift;
 
-    return unless $wf_field->{autocomplete};
-
-    # $wf_field = {
-    #     type: "text",
-    #     autocomplete: {
-    #         action: "text!autocomplete",
-    #         params: {
-    #             user: {
-    #                 reference_1: "comment",
-    #             },
-    #             persist: {
-    #                 static_a: "deep",
-    #                 sql_query: { "-like": "$key_id:%" },
-    #             },
+    # $ac_config = {
+    #     action => "text!autocomplete",
+    #     params => {
+    #         user => {
+    #             reference_1 => "comment",
+    #         },
+    #         secure => {
+    #             static_a => "deep",
+    #             sql_query => { "-like" => "$key_id:%" },
     #         },
     #     },
     # }
 
-    my $p = $wf_field->{autocomplete}->{params} // {};
+    my $p = $ac_config->{params} // {};
     my $p_user = $p->{user} // {};
-    my $p_persist = $p->{persist} // {};
+    my $p_secure = $p->{secure} // {};
+    my $needs_encryption = scalar keys $p_secure->%*;
+    die 'Autocomplete option "persist" was renamed to "secure"' if $p->{persist};
 
     my $enc_field_name = Data::UUID->new->create_str; # name for additional input field
 
-    my $ac_query_params = {  # the wf config param from the UI param
-        %$p_user,
-        __encrypted => $enc_field_name,
-    };
-
     # additional input field with encrypted data (protected from frontend modification)
-    my $enc_field = {
-        name => $enc_field_name,
-        type => 'encrypted',
-        value => {
-            persistent_params => $p_persist,
-            user_param_whitelist => [ sort keys %$p_user ], # allowed in subsequent request from frontend
+    my $enc_field = $needs_encryption
+        ? {
+            type => 'encrypted',
+            name => $enc_field_name,
+            value => {
+                data => $p_secure,
+                param_whitelist => [ sort keys %$p_user ], # allowed in subsequent request from frontend
+            },
+        }
+        : ();
+
+    return (
+        {
+            action => $ac_config->{action},
+            params => { # list of field names whose values the UI will append to the query
+                %$p_user,
+                $needs_encryption ? (__encrypted => $enc_field_name) : (),
+            },
         },
-    };
-
-    return ($ac_query_params, $enc_field)
-
+        $enc_field
+    );
 }
 
 =head2 fetch_autocomplete_params
@@ -1178,19 +1178,17 @@ B<Returns> a I<HashRef> of query parameters
 =cut
 
 sub fetch_autocomplete_params {
-
     my $self = shift;
 
-    my $data = $self->decrypted_param('__encrypted')
-        or return {};
+    my $data = $self->decrypted_param('__encrypted') or return {};
 
-    my %params = %{ $data->{persistent_params} };
-    $params{$_} = $self->param($_) for @{ $data->{user_param_whitelist} };
+    # add secure parameters
+    my %params = %{ $data->{data} };
+    # add whitelisted user input parameters
+    $params{$_} = $self->param($_) for @{ $data->{param_whitelist} };
 
-    $self->log->trace("Autocomplete params: " . Dumper \%params) if $self->log->is_trace;
-
+    $self->log->debug("Autocomplete params: " . Dumper \%params) if $self->log->is_debug;
     return \%params;
-
 }
 
 __PACKAGE__->meta->make_immutable;
