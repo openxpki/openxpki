@@ -147,8 +147,8 @@ sub action_result {
 
         # convert action link into a token to prevent injection of data
         my $action;
-        if (substr($btn{action},0,23) eq 'workflow!bulk!wf_action') {
-            $action = substr($btn{action},24);
+        if (my ($a) = $btn{action} =~ /^workflow!bulk!wf_action!(.*)/) {
+            $action = $a;
         } else {
             $action = $btn{action};
         }
