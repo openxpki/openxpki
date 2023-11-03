@@ -58,7 +58,6 @@ sub __load_config {
     $conf = $config->default();
 
     $log->info("Config read, FCGI pid = $$");
-    $log->trace(Dumper $conf) if $log->is_trace;
 
     # set defaults
     $conf->{global}->{socket} ||= '/var/openxpki/openxpki.socket';
