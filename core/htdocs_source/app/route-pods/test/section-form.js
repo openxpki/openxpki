@@ -94,6 +94,12 @@ export default [
                     value: 1,
                 },
                 {
+                    type: "bool",
+                    name: "ready_or_not_optional",
+                    label: "Bool, optional",
+                    is_optional: 1,
+                },
+                {
                     type: "select",
                     name: "select_no_preset",
                     label: "Select, no preset",

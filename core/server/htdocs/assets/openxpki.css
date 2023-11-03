@@ -478,7 +478,7 @@ form div.required label.col-form-label {
 }
 
 /* Input fields */
-div.required input:not([type="checkbox"]),
+div.required input:not(:checked),
 div.required select,
 div.required textarea {
   background-color:#fff3c2 !important;

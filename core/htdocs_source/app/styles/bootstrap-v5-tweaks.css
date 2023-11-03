@@ -31,6 +31,12 @@ a:hover {
   color: inherit;
 }
 
+/* Forms: set default blue, not green background color for "valid" checkboxes */
+.form-check-input.is-valid:checked, .was-validated .form-check-input:valid:checked {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
 /* Forms: more discreet colors for border and check mark in valid input fields */
 .was-validated .form-control:valid:not([multiple]):not([size]), .was-validated .form-control:valid:not([multiple])[size="1"], .form-control.is-valid:not([multiple]):not([size]), .form-control.is-valid:not([multiple])[size="1"] {
   border-color: #5c8866;
