@@ -10,6 +10,7 @@ import section_keyvalue from './section-keyvalue'
 import section_tiles from './section-tiles'
 import section_cards from './section-cards'
 import section_cards_vertical from './section-cards-vertical'
+import TestButtons from './buttons'
 import ContainerButton from 'openxpki/data/container-button'
 import fetch from 'fetch'
 import ENV from 'openxpki/config/environment'
@@ -31,6 +32,7 @@ export default class TestController extends Controller {
         section_cards,
         section_cards_vertical,
     ]
+    test_buttons = TestButtons
 
     localconfig = `
 header:

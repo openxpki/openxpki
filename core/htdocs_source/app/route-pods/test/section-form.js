@@ -13,7 +13,7 @@ export default [
         action: "login!text",
         reset: "login!text",
         content: {
-            label: "oxi-section/form #0",
+            label: "Text",
             title: "Text",
             fields: [
                 {
@@ -76,7 +76,23 @@ export default [
                     },
                 },
             ],
-        }
+            buttons: [
+                ContainerButton.fromHash(_testButton),
+                ContainerButton.fromHash({
+                    ..._testButton,
+                    label: "With confirmation",
+                    confirm: {
+                        label: "Really sure?",
+                        description: "Think about it one more time.",
+                    },
+                }),
+                ContainerButton.fromHash({
+                    ..._testButton,
+                    label: "Disabled",
+                    disabled: true,
+                }),
+            ],
+        },
     },
 
     {
@@ -84,7 +100,7 @@ export default [
         action: "login!password",
         reset: "login!password",
         content: {
-            label: "oxi-section/form #1",
+            label: "Bool + Select",
             title: "Bool + Select",
             fields: [
                 {
@@ -149,10 +165,22 @@ export default [
                     ],
                     value: "",
                 },
+            ],
+        }
+    },
+
+    {
+        type: "form",
+        action: "login!password",
+        reset: "login!password",
+        content: {
+            label: "Select with dependants",
+            title: "Select with dependants",
+            fields: [
                 {
                     type: "select",
                     name: "select_dependants",
-                    label: "Select with dependants",
+                    label: "Level 1",
                     editable: 1, // must be ignored in this case
                     value: 2,
                     options: [
@@ -167,27 +195,27 @@ export default [
                                 {
                                     type: "bool",
                                     name: "select_dep_ready_or_not",
-                                    label: "Bool, selected",
+                                    label: "Level 2 - Bool, selected",
                                     value: 1,
                                 },
                                 {
                                     type: "datetime",
                                     name: "select_dep_dt_now",
-                                    label: "Date, now",
+                                    label: "Level 2 - Date, now",
                                     placeholder: "Please select a date...",
                                     tooltip: "It's now or never!",
                                 },
                                 {
                                     type: "text",
                                     name: "select_dep_plaintext",
-                                    label: "Text, cloneable, 2 presets",
+                                    label: "Level 2 - Text, cloneable, 2 presets",
                                     value: ["sheep #1", "sheep #2"],
                                     clonable: 1,
                                 },
                                 {
                                     type: "select",
                                     name: "select_dep_dependants",
-                                    label: "Sub-select with dependants",
+                                    label: "Level 2 - Sub-select with dependants",
                                     value: 2,
                                     options: [
                                         {
@@ -201,7 +229,7 @@ export default [
                                                 {
                                                     type: "text",
                                                     name: "select_dep_dep_plaintext",
-                                                    label: "Text",
+                                                    label: "Level 3 - Text",
                                                 },
                                             ],
                                         },
@@ -212,41 +240,31 @@ export default [
                         },
                     ],
                 },
-            ],
-            buttons: [
-                ContainerButton.fromHash({
-                    label: "External link",
-                    format: "failure",
-                    tooltip: "Just fyi",
-                    href: "https://www.openxpki.org",
-                    target: "_blank",
-                }),
-                ContainerButton.fromHash({
-                    label: "External link (with confirmation)",
-                    format: "exceptional",
-                    tooltip: "Just fyi",
-                    href: "https://www.openxpki.org",
-                    target: "_blank",
-                    confirm: {
-                        label: "Really sure?",
-                        description: "This opens an external page.",
-                    },
-                }),
-                ContainerButton.fromHash(_testButton),
-                ContainerButton.fromHash({
-                    ..._testButton,
-                    label: "With confirmation",
-                    confirm: {
-                        label: "Really sure?",
-                        description: "Think about it one more time.",
-                    },
-                    break_before: 1,
-                }),
-                ContainerButton.fromHash({
-                    ..._testButton,
-                    label: "Disabled",
-                    disabled: true,
-                }),
+                {
+                    type: "select",
+                    name: "select_dependants2",
+                    label: "Level 1",
+                    options: [
+                        {
+                            value: 1,
+                            label: "Only option",
+                            dependants: [
+                                {
+                                    type: "select",
+                                    name: "select_dep_dependants",
+                                    label: "Level 2 - Sub-select",
+                                    options: [
+                                        {
+                                            value: 3,
+                                            label: "Only Option",
+                                        },
+                                    ],
+                                },
+
+                            ],
+                        },
+                    ],
+                },
             ],
         }
     },
@@ -256,7 +274,7 @@ export default [
         action: "login!password",
         reset: "login!password",
         content: {
-            label: "oxi-section/form #2",
+            label: "Password",
             title: "Password",
             fields: [
                 {
@@ -334,7 +352,7 @@ export default [
         action: "login!password",
         reset: "login!password",
         content: {
-            label: "oxi-section/form #4",
+            label: "Cloneable fields",
             title: "Cloneable fields",
             fields: [
                 {
@@ -378,7 +396,7 @@ export default [
         action: "login!password",
         reset: "login!password",
         content: {
-            label: "oxi-section/form #5",
+            label: "Various",
             title: "Various",
             fields: [
                 {
