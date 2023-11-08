@@ -79,7 +79,7 @@ sub render_profile_select {
     }
 
     # record the workflow info in the session
-    push @fields, $self->__register_wf_token($wf_info, {
+    push @fields, $self->__wf_token_field($wf_info, {
         wf_action => $wf_action,
         wf_fields => \@fields,
     });
@@ -236,7 +236,7 @@ sub render_subject_form {
     }
 
     # record the workflow info in the session
-    push @fields, $self->__register_wf_token($wf_info, {
+    push @fields, $self->__wf_token_field($wf_info, {
         wf_action => $wf_action,
         wf_fields => \@fields, # search tag: #wf_fields_with_sub_items
     });
@@ -360,7 +360,7 @@ sub render_key_select {
     }
 
     # record the workflow info in the session
-    push @fields, $self->__register_wf_token($wf_info, {
+    push @fields, $self->__wf_token_field($wf_info, {
         wf_action => $wf_action,
         wf_fields => \@fields, # search tag: #wf_fields_with_sub_items
     });
@@ -429,7 +429,7 @@ sub render_server_password {
     }
 
     # record the workflow info in the session
-    push @fields, $self->__register_wf_token($wf_info, {
+    push @fields, $self->__wf_token_field($wf_info, {
         wf_action =>  $wf_action,
         wf_fields => \@fields,
         cert_profile => $context->{cert_profile}

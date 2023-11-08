@@ -30,7 +30,8 @@ The generic action is the default when sending a workflow generated form back
 to the server. You need to setup the handler from the rendering step, direct
 posting is not allowed. The cgi environment must present the key I<wf_token>
 which is a reference to a session based config hash. The config can be created
-using __register_wf_token, recognized keys are:
+using L<OpenXPKI::Client::UI::Result/__wf_token_id> or
+L<OpenXPKI::Client::UI::Result/__wf_token_field>, recognized keys are:
 
 =over
 

@@ -252,28 +252,28 @@ sub __render_from_workflow {
         $self->log->debug('Adding global actions ' . join('/', @handles));
 
         if (grep /\A wakeup \Z/x, @handles) {
-            my $token = $self->__register_wf_token( $wf_info, { wf_handle => 'wakeup' } );
+            my $id = $self->__wf_token_id( $wf_info, { wf_handle => 'wakeup' } );
             push @buttons_handle, {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_WAKEUP_BUTTON',
-                action => 'workflow!handle!wf_token!'.$token->{value},
+                action => 'workflow!handle!wf_token!'.$id,
                 format => 'exceptional'
             }
         }
 
         if (grep /\A resume \Z/x, @handles) {
-            my $token = $self->__register_wf_token( $wf_info, { wf_handle => 'resume' } );
+            my $id = $self->__wf_token_id( $wf_info, { wf_handle => 'resume' } );
             push @buttons_handle, {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESUME_BUTTON',
-                action => 'workflow!handle!wf_token!'.$token->{value},
+                action => 'workflow!handle!wf_token!'.$id,
                 format => 'exceptional'
             };
         }
 
         if (grep /\A reset \Z/x, @handles) {
-            my $token = $self->__register_wf_token( $wf_info, { wf_handle => 'reset' } );
+            my $id = $self->__wf_token_id( $wf_info, { wf_handle => 'reset' } );
             push @buttons_handle, {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESET_BUTTON',
-                action => 'workflow!handle!wf_token!'.$token->{value},
+                action => 'workflow!handle!wf_token!'.$id,
                 format => 'reset',
                 confirm => {
                     label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESET_DIALOG_LABEL',
@@ -285,10 +285,10 @@ sub __render_from_workflow {
         }
 
         if (grep /\A fail \Z/x, @handles) {
-            my $token = $self->__register_wf_token( $wf_info, { wf_handle => 'fail' } );
+            my $id = $self->__wf_token_id( $wf_info, { wf_handle => 'fail' } );
             push @buttons_handle, {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON',
-                action => 'workflow!handle!wf_token!'.$token->{value},
+                action => 'workflow!handle!wf_token!'.$id,
                 format => 'failure',
                 confirm => {
                     label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_LABEL',
@@ -300,10 +300,10 @@ sub __render_from_workflow {
         }
 
         if (grep /\A archive \Z/x, @handles) {
-            my $token = $self->__register_wf_token( $wf_info, { wf_handle => 'archive' } );
+            my $id = $self->__wf_token_id( $wf_info, { wf_handle => 'archive' } );
             push @buttons_handle, {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_BUTTON',
-                action => 'workflow!handle!wf_token!'.$token->{value},
+                action => 'workflow!handle!wf_token!'.$id,
                 format => 'exceptional',
                 confirm => {
                     label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_LABEL',
@@ -829,10 +829,10 @@ sub __get_form_buttons {
     }
 
     if ($wf_info->{handles} && ref $wf_info->{handles} eq 'ARRAY' && (grep /fail/, @{$wf_info->{handles}})) {
-        my $token = $self->__register_wf_token( $wf_info, { wf_handle => 'fail' } );
+        my $id = $self->__wf_token_id( $wf_info, { wf_handle => 'fail' } );
         push @buttons, {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON',
-            action => 'workflow!handle!wf_token!'.$token->{value},
+            action => 'workflow!handle!wf_token!'.$id,
             format => 'terminate',
             confirm => {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_LABEL',
@@ -1752,7 +1752,7 @@ sub __render_workflow_action_body {
             buttons => $self->__get_form_buttons( $wf_info ),
         );
         # record the workflow info in the session
-        push @fields, $self->__register_wf_token( $wf_info, {
+        push @fields, $self->__wf_token_field( $wf_info, {
             wf_action => $wf_action,
             wf_fields => \@fields,
         });

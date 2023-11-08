@@ -152,15 +152,15 @@ sub action_result {
         } else {
             $action = $btn{action};
         }
-        my $token = $self->__register_wf_token( undef, {
+        my $id = $self->__wf_token_id( undef, {
             wf_action => $action,
             ($btn{params} ? (params => $btn{params}) :()),
             ($btn{async} ? (async => 1) :()),
         });
         delete $btn{params};
         # also use the id of the token as name for the input field
-        $btn{action} = 'workflow!bulk!wf_token!'.$token->{value};
-        $btn{selection} = $token->{value};
+        $btn{action} = 'workflow!bulk!wf_token!'.$id;
+        $btn{selection} = $id;
         push @buttons, \%btn;
     }
 

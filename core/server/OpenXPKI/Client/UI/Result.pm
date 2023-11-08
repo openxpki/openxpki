@@ -668,15 +668,17 @@ sub render {
     }
 }
 
-=head2 __register_wf_token( wf_info, token )
+=head2 __wf_token_id( wf_info, token )
 
-Generates a new random id and stores the passed workflow info, expects
-a wf_info and the token info to store as parameter, returns a hashref
-with the definiton of a hidden field which can be directly
-pushed onto the field list. wf_info can be undef / empty string.
+Generates a new random ID and stores the passed workflow info, expects
+a C<$wf_info> I<HashRef> and the token info to store as parameter.
+
+C<$wf_info> may be undef or an empty string.
+
+Returns the ID.
 
 =cut
-sub __register_wf_token {
+sub __wf_token_id {
 
     my $self = shift;
     my $wf_info = shift;
@@ -691,18 +693,39 @@ sub __register_wf_token {
     $self->log->debug("save wf_token: $id");
     $self->log->trace('token content = ' . Dumper $token) if $self->log->is_trace;
     $self->session_param($id, $token);
+
+    return $id;
+}
+
+=head2 __wf_token_field( wf_info, token )
+
+Generates a new random ID and stores the passed workflow info, expects
+a C<$wf_info> I<HashRef> and the token info to store as parameter.
+
+C<$wf_info> may be undef or an empty string.
+
+Returns a I<HashRef> with the definiton of a hidden field which can be directly
+pushed onto the field list.
+
+=cut
+sub __wf_token_field {
+
+    my $self = shift;
+    my $wf_info = shift;
+    my $token = shift;
+
     return {
         name => 'wf_token',
         type => 'hidden',
-        value => $id,
+        value => $self->__wf_token_id($wf_info, $token),
     };
 }
 
 =head2 __fetch_wf_token( wf_token, purge )
 
-Return the hashref stored by __register_wf_token for the given
-token id. If purge is set to a true value, the info is purged
-from the session context.
+Return the hashref stored by L<__wf_token_id> or L<__wf_token_field> for the
+given token id. If purge is set to a true value, the info is purged from the
+session context.
 
 =cut
 sub __fetch_wf_token {
