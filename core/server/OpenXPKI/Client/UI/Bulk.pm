@@ -152,15 +152,20 @@ sub action_result {
         } else {
             $action = $btn{action};
         }
-        my $id = $self->__wf_token_id( undef, {
+
+        my $selection_field = $self->__generate_uid(); # name of input field that will hold IDs of selected rows
+        $btn{selection} = $selection_field;
+
+        my $token = $self->__wf_token_extra_param( undef, {
             wf_action => $action,
             ($btn{params} ? (params => $btn{params}) :()),
             ($btn{async} ? (async => 1) :()),
+            selection_field => $selection_field,
         });
+
+        $btn{action} = "workflow!bulk!${token}";
+
         delete $btn{params};
-        # also use the id of the token as name for the input field
-        $btn{action} = 'workflow!bulk!wf_token!'.$id;
-        $btn{selection} = $id;
         push @buttons, \%btn;
     }
 

@@ -30,7 +30,7 @@ The generic action is the default when sending a workflow generated form back
 to the server. You need to setup the handler from the rendering step, direct
 posting is not allowed. The cgi environment must present the key I<wf_token>
 which is a reference to a session based config hash. The config can be created
-using L<OpenXPKI::Client::UI::Result/__wf_token_id> or
+using L<OpenXPKI::Client::UI::Result/__wf_token_extra_param> or
 L<OpenXPKI::Client::UI::Result/__wf_token_field>, recognized keys are:
 
 =over
@@ -72,16 +72,8 @@ sub action_index {
     my $self = shift;
     my $args = shift;
 
-    my $wf_token = $self->param('wf_token') || '';
-
     my $wf_info;
-    # wf_token found, so its a real action
-    if (!$wf_token) {
-        $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_ACTION_WITHOUT_TOKEN!');
-        return $self;
-    }
-
-    my $wf_args = $self->__fetch_wf_token( $wf_token );
+    my $wf_args = $self->__resolve_wf_token() or return $self;
 
     $self->log->trace("wf args from token: " . Dumper $wf_args) if $self->log->is_trace;
 
@@ -126,7 +118,7 @@ sub action_index {
 
         $self->log->trace("wf info after execute: " . Dumper $wf_info ) if $self->log->is_trace;
         # purge the workflow token
-        $self->__purge_wf_token( $wf_token );
+        $self->__purge_wf_token;
 
     } elsif ($wf_args->{wf_type}) {
 
@@ -152,7 +144,7 @@ sub action_index {
         $self->log->info(sprintf "Create new workflow %s, got id %01d",  $wf_args->{wf_type}, $wf_info->{workflow}->{id} );
 
         # purge the workflow token
-        $self->__purge_wf_token( $wf_token );
+        $self->__purge_wf_token;
 
         # always redirect after create to have the url pointing to the created workflow
         # do not redirect for "one shot workflows" or workflows already in a final state
@@ -214,16 +206,8 @@ sub action_handle {
     my $self = shift;
     my $args = shift;
 
-    my $wf_token = $self->param('wf_token') || '';
-
     my $wf_info;
-    # wf_token found, so its a real action
-    if (!$wf_token) {
-        $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_ACTION_WITHOUT_TOKEN!');
-        return $self;
-    }
-
-    my $wf_args = $self->__fetch_wf_token( $wf_token );
+    my $wf_args = $self->__resolve_wf_token() or return $self;
 
     if (!$wf_args->{wf_id}) {
         $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_HANDLE_WITHOUT_ID!');
@@ -313,8 +297,7 @@ sub action_select {
     # can be either token or id
     my $wf_id = $self->param('wf_id');
     if (!$wf_id) {
-        my $wf_token = $self->param('wf_token');
-        my $wf_args = $self->__fetch_wf_token( $wf_token );
+        my $wf_args = $self->__resolve_wf_token() or return $self;
         $wf_id = $wf_args->{wf_id};
         if (!$wf_id) {
             $self->log->error('No workflow id given');
@@ -499,13 +482,9 @@ sub action_bulk {
     my $self = shift;
 
     my $wf_token = $self->param('wf_token') || '';
-    if (!$wf_token) {
-        $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_ACTION_WITHOUT_TOKEN!');
-        return $self;
-    }
 
     # token contains the name of the action to do and extra params
-    my $wf_args = $self->__fetch_wf_token( $wf_token );
+    my $wf_args = $self->__resolve_wf_token() or return $self;
     if (!$wf_args->{wf_action}) {
         $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_HANDLE_WITHOUT_ACTION!');
         return $self;
@@ -514,7 +493,7 @@ sub action_bulk {
     $self->log->trace('Doing bulk with arguments: '. Dumper $wf_args) if $self->log->is_trace;
 
     # wf_token is also used as name of the form field
-    my @serials = $self->multi_param($wf_token);
+    my @serials = $self->multi_param($wf_args->{selection_field});
 
     my @success; # list of wf_info results
     my $errors; # hash with wf_id => error
@@ -537,8 +516,7 @@ sub action_bulk {
         return $self;
     }
 
-    $self->log->debug("Run command $command on workflows " . join(", ", @serials));
-
+    $self->log->debug("Run command '$command' on workflows " . join(", ", @serials));
     $self->log->trace('Execute parameters ' . Dumper \%params) if ($self->log->is_trace);
 
     foreach my $id (@serials) {

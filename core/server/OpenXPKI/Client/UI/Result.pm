@@ -668,93 +668,125 @@ sub render {
     }
 }
 
-=head2 __wf_token_id( wf_info, token )
-
-Generates a new random ID and stores the passed workflow info, expects
-a C<$wf_info> I<HashRef> and the token info to store as parameter.
-
-C<$wf_info> may be undef or an empty string.
-
-Returns the ID.
-
-=cut
 sub __wf_token_id {
 
     my $self = shift;
     my $wf_info = shift;
-    my $token = shift;
+    my $wf_args = shift // {};
 
     if (ref $wf_info) {
-        $token->{wf_id} = $wf_info->{workflow}->{id};
-        $token->{wf_type} = $wf_info->{workflow}->{type};
-        $token->{wf_last_update} = $wf_info->{workflow}->{last_update};
+        $wf_args->{wf_id} = $wf_info->{workflow}->{id};
+        $wf_args->{wf_type} = $wf_info->{workflow}->{type};
+        $wf_args->{wf_last_update} = $wf_info->{workflow}->{last_update};
     }
     my $id = $self->__generate_uid();
     $self->log->debug("save wf_token: $id");
-    $self->log->trace('token content = ' . Dumper $token) if $self->log->is_trace;
-    $self->session_param($id, $token);
+    $self->log->trace('token content = ' . Dumper $wf_args) if $self->log->is_trace;
+    $self->session_param($id, $wf_args);
 
     return $id;
 }
 
-=head2 __wf_token_field( wf_info, token )
+=head2 __wf_token_field( wf_info, more_args )
 
-Generates a new random ID and stores the passed workflow info, expects
-a C<$wf_info> I<HashRef> and the token info to store as parameter.
+Create a workflow token that represents a C<HashRef> with data from the given
+workflow info and additional arguments.
 
-C<$wf_info> may be undef or an empty string.
+The generated C<HashRef> will be stored in the session.
 
-Returns a I<HashRef> with the definiton of a hidden field which can be directly
-pushed onto the field list.
+B<Parameters>
+
+=over
+
+=item * C<$wf_info> I<HashRef> - workflow info as returned by API command
+L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info>. Optional
+
+=item * C<$more_args> I<HashRef> - additional parameters to store. Optional
+
+=back
+
+Returns a I<HashRef> with the definiton of a hidden field named C<"wf_info">
+which can be directly pushed onto the field list.
 
 =cut
 sub __wf_token_field {
 
     my $self = shift;
     my $wf_info = shift;
-    my $token = shift;
+    my $more_args = shift;
 
+    my $id = $self->__wf_token_id($wf_info, $more_args);
     return {
         name => 'wf_token',
         type => 'hidden',
-        value => $self->__wf_token_id($wf_info, $token),
+        value => $id,
     };
 }
 
-=head2 __fetch_wf_token( wf_token, purge )
+=head2 __wf_token_extra_param( wf_info, more_args )
 
-Return the hashref stored by L<__wf_token_id> or L<__wf_token_field> for the
-given token id. If purge is set to a true value, the info is purged from the
-session context.
+Create a workflow token that represents a C<HashRef> with data from the given
+workflow info and additional arguments.
+
+The generated C<HashRef> will be stored in the session.
+
+B<Parameters>
+
+=over
+
+=item * C<$wf_info> I<HashRef> - workflow info as returned by API command
+L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info>. Optional
+
+=item * C<$more_args> I<HashRef> - additional parameters to store. Optional
+
+=back
+
+Returns a string C<"wf_token!$token"> which can be added to e.g. a button action.
 
 =cut
-sub __fetch_wf_token {
+sub __wf_token_extra_param {
 
     my $self = shift;
-    my $id = shift;
-    my $purge = shift || 0;
+    my $wf_info = shift;
+    my $more_args = shift;
 
-    return {} unless $id;
-
-    $self->log->debug("load wf_token: $id");
-    my $token = $self->session_param($id);
-    $self->_session->clear($id) if($purge);
-
-    $self->log->trace('token content = ' . Dumper $token) if $self->log->is_trace;
-    return $token;
+    my $id = $self->__wf_token_id($wf_info, $more_args);
+    return "wf_token!${id}";
 }
 
-=head2 __purge_wf_token( wf_token )
+=head2 __resolve_wf_token( wf_token )
 
-Purge the token info from the session.
+Return the C<HashRef> that was associated with the given token via
+L<__wf_token_extra_param> or L<__wf_token_field>.
+
+=cut
+sub __resolve_wf_token {
+    my $self = shift;
+
+    my $id = $self->param('wf_token');
+    if (not $id) {
+        $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_ACTION_WITHOUT_TOKEN!');
+        return;
+    }
+
+    $self->log->debug("load wf_token: $id");
+    my $wf_args = $self->session_param($id);
+    $self->log->trace('token content = ' . Dumper $wf_args) if $self->log->is_trace;
+
+    return $wf_args;
+}
+
+=head2 __purge_wf_token
+
+Purge the C<HashRef> associated with the current token from the session.
 
 =cut
 sub __purge_wf_token {
-
     my $self = shift;
-    my $id = shift;
 
-    $self->log->debug("purge wf_token $id");
+    my $id = $self->param('wf_token');
+
+    $self->log->debug("purge wf_token: $id");
     $self->_session->clear($id);
 
     return $self;
