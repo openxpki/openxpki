@@ -17,7 +17,8 @@ import Clickable from 'openxpki/data/clickable'
  *              footer: 'Auto-Login',
  *              image: 'data:image/webp;base64,UklGRsIdAAB...',
  *              href: '/demo-ca/',
- *              color: '#BEB'
+ *              color: '#BEB',
+ *              css_class: '',
  *          },
  *          {
  *              ...
@@ -34,7 +35,10 @@ export default class OxiSectionCardsComponent extends Component {
     get cards() {
         let cards = this.args.def.cards || []
         // inject _clickable property
-        cards.forEach(c => c._clickable = Clickable.fromHash(c))
+        cards.forEach(c => c._clickable = Clickable.fromHash({
+            format: 'card', // will be ignored by OxiButton if c.css_class is set
+            ...c,
+        }))
         return cards
     }
 }

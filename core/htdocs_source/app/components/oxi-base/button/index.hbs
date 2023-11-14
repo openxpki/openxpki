@@ -4,7 +4,7 @@
     {{#if this.clickable.href}}
         <a
             ...attributes
-            class="btn {{this.cssClass}}"
+            class="btn {{this.formatCSSClass}}"
             href={{this.clickable.href}}
             target={{this.clickable.target}}
             {{on "click" clickHandler}}
@@ -20,7 +20,7 @@
         <BsButton
             ...attributes
             @type=""
-            class={{this.cssClass}}
+            class={{this.formatCSSClass}}
             disabled={{or this.clickable.disabled isLoading}}
             @onClick={{clickHandler}}
         >

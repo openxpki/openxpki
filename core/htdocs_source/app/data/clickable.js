@@ -6,7 +6,7 @@ import Base from './base'
  * @class Clickable
  * @extends Base
  *
- * @property {string} format `@tracked`: Format keyword
+ * @property {string} format `@tracked`: Format (defines the applied CSS classes)
  * @property {bool} disabled `@tracked`
  * @property {hash} confirm Hash to configure a confirmation popup:
  * ```javascript

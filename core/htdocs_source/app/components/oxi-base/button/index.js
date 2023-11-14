@@ -81,6 +81,7 @@ let format2css = {
     exceptional:    "btn-light oxi-btn-exceptional",
     terminate:      "btn-light oxi-btn-terminate",
     tile:           "btn-light oxi-btn-tile",
+    card:           "bg-light",
 }
 
 export default class OxiClickableComponent extends Component {
@@ -89,7 +90,7 @@ export default class OxiClickableComponent extends Component {
 
     @tracked showConfirmDialog = false
 
-    get cssClass() {
+    get formatCSSClass() {
         if (this.args.button.loading) { return "oxi-btn-loading" }
 
         let format = this.args.button.format || 'optional'

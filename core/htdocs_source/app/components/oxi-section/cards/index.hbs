@@ -4,7 +4,12 @@
 
         <div class="col-md-10">
         {{#each this.cards as |card|}}
-            <OxiBase::Button @button={{card._clickable}} class="card w-100 mx-0 my-4 p-0 text-start {{unless card.color "bg-light"}}" style={{if card.color (concat "background-color: " card.color)}}>
+            <OxiBase::Button
+                @button={{card._clickable}}
+                class={{card.css_class}}
+                class="card w-100 mx-0 my-4 p-0 text-start"
+                style={{if card.color (concat "background-color: " card.color " !important")}}
+            >
                 {{#if card.label}}
                     <div class="card-header w-100 text-body-secondary text-center bg-secondary text-light">
                         <h5 class="card-title">
@@ -40,7 +45,12 @@
         <div class="row row-cols-1 row-cols-md-3 g-4">
         {{#each this.cards as |card|}}
             <div class="col">
-                <OxiBase::Button @button={{card._clickable}} class="card h-100 w-100 m-0 p-0 text-start align-items-center {{unless card.color "bg-light"}}" style={{if card.color (concat "background-color: " card.color)}}>
+                <OxiBase::Button
+                    @button={{card._clickable}}
+                    class={{card.css_class}}
+                    class="card h-100 w-100 m-0 p-0 text-start align-items-center"
+                    style={{if card.color (concat "background-color: " card.color " !important")}}
+                >
                     {{#if card.label}}
                         <div class="card-header w-100 text-body-secondary text-center bg-secondary text-light">
                             <h5 class="card-title">
