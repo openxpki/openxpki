@@ -459,6 +459,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/Pause.pm
 OpenXPKI/Server/Workflow/Activity/Tools/PersistCertificateMetadata.pm
 OpenXPKI/Server/Workflow/Activity/Tools/PrepareRenewal.pm
 OpenXPKI/Server/Workflow/Activity/Tools/PresetProfileFields.pm
+OpenXPKI/Server/Workflow/Activity/Tools/PublishAny.pm
 OpenXPKI/Server/Workflow/Activity/Tools/PublishCA.pm
 OpenXPKI/Server/Workflow/Activity/Tools/PublishCertificate.pm
 OpenXPKI/Server/Workflow/Activity/Tools/PublishCRL.pm
