@@ -225,6 +225,8 @@ sub __render_from_workflow {
         return $self;
     }
 
+    my $wf_id = $wf_info->{workflow}->{id};
+
     # delegate handling to custom class
     if ($wf_info->{state}->{uihandle}) {
         return $self->__delegate_call($wf_info->{state}->{uihandle}, $args);
@@ -338,7 +340,7 @@ sub __render_from_workflow {
             breadcrumb => $self->__get_breadcrumb($wf_info, $wf_info->{state}->{label}),
             description => $desc,
             css_class => 'workflow workflow-proc-state workflow-proc-'.$wf_proc_state,
-            ($wf_info->{workflow}->{id} ? (canonical_uri => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id}) : ()),
+            ($wf_id ? (canonical_uri => "workflow!load!wf_id!${wf_id}") : ()),
         );
 
         my @buttons;
@@ -368,17 +370,17 @@ sub __render_from_workflow {
                 # automated reload of the page
                 my $to_sleep = $wf_info->{workflow}->{wake_up_at} - time();
                 if ($to_sleep < 30) {
-                    $self->set_refresh(uri => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id}, timeout => 30);
+                    $self->set_refresh(uri => "workflow!load!wf_id!${wf_id}", timeout => 30);
                     $self->status->info('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_30SEC');
                 } elsif ($to_sleep < 300) {
-                    $self->set_refresh(uri => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id}, timeout => $to_sleep + 30);
+                    $self->set_refresh(uri => "workflow!load!wf_id!${wf_id}", timeout => $to_sleep + 30);
                     $self->status->info('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_5MIN');
                 } else {
                     $self->status->info('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED');
                 }
 
                 @buttons = ({
-                    page => 'redirect!workflow!load!wf_id!'.$wf_info->{workflow}->{id},
+                    page => "redirect!workflow!load!wf_id!${wf_id}",
                     label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_RECHECK_BUTTON',
                     format => 'alternative'
                 });
@@ -414,7 +416,7 @@ sub __render_from_workflow {
             });
 
             @buttons = ({
-                page => 'redirect!workflow!load!wf_id!'.$wf_info->{workflow}->{id},
+                page => "redirect!workflow!load!wf_id!${wf_id}",
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RECHECK_BUTTON',
                 format => 'alternative'
             });
@@ -433,7 +435,7 @@ sub __render_from_workflow {
                 $self->log->debug('Auto Refresh when running' . $elapsed .' / ' . $timeout );
             }
 
-            $self->set_refresh(uri => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id}, timeout => $timeout);
+            $self->set_refresh(uri => "workflow!load!wf_id!${wf_id}", timeout => $timeout);
 
         # workflow halted by exception
         } elsif ( $wf_proc_state eq 'exception') {
@@ -491,7 +493,7 @@ sub __render_from_workflow {
             breadcrumb => $self->__get_breadcrumb($wf_info),
             description => $self->__get_templated_description($wf_info, $wf_info->{state}),
             css_class => 'workflow workflow-page ' . ($wf_info->{state}->{uiclass} || ''),
-            ($wf_info->{workflow}->{id} ? (canonical_uri => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id}) : ()),
+            ($wf_id ? (canonical_uri => "workflow!load!wf_id!${wf_id}") : ()),
         );
 
         # Set status decorator on final states (uses proc_state).
@@ -553,7 +555,7 @@ sub __render_from_workflow {
             # to continue the workflow and might want to reload the page
             if ($wf_proc_state eq 'manual' && @{$buttons} == 0) {
                 $buttons = [{
-                    page => 'redirect!workflow!load!wf_id!'.$wf_info->{workflow}->{id},
+                    page => "redirect!workflow!load!wf_id!${wf_id}",
                     label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_MANUAL_RECHECK_BUTTON',
                     format => 'alternative'
                 }];
@@ -640,9 +642,9 @@ sub __render_from_workflow {
     $self->page->add_button(
         label => 'Info',
         format => 'info',
-        page => 'workflow!info!wf_id!'.$wf_info->{workflow}->{id},
+        page => "workflow!info!wf_id!${wf_id}",
         target => 'popup',
-    );
+    ) if $wf_id;
 
     return $self;
 }
