@@ -25,6 +25,11 @@ sub init_structure {
     $self->rtoken($session->param('rtoken'));
     $self->language(get_language());
 
+    # add PKI realm if CGI session contains one
+    if (my $realm = $self->session_param('pki_realm')) {
+        $self->pki_realm($realm);
+    }
+
     # To issue redirects to the UI, we store the referrer
     # default is mainly relevant for test scripts
     my $baseurl = $self->param('baseurl') || '/openxpki';

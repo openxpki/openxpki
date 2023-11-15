@@ -253,6 +253,12 @@ Set user related information.
     # set several attributes at once
     $self->set_user(%{ $user });
 
+=head2 pki_realm
+
+Set the current PKI realm.
+
+    $self->pki_realm($realm);
+
 =head2 add_header
 
 Add one or more HTTP response headers.
@@ -300,6 +306,7 @@ has resp => (
         status
         tenant
         user set_user
+        pki_realm
         add_header
         get_header_str
         raw_bytes has_raw_bytes raw_bytes_callback has_raw_bytes_callback

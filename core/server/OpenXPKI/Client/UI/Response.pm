@@ -128,6 +128,11 @@ has_dto 'user' => (
     class => 'OpenXPKI::Client::UI::Response::User',
 );
 
+has 'pki_realm' => (
+    is => 'rw',
+    isa => 'Str',
+);
+
 sub set_page { shift->page(OpenXPKI::Client::UI::Response::PageInfo->new(@_)) }
 sub set_refresh { shift->refresh(OpenXPKI::Client::UI::Response::Refresh->new(@_)) }
 sub set_user { shift->user(OpenXPKI::Client::UI::Response::User->new(@_)) }

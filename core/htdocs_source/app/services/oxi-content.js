@@ -28,6 +28,7 @@ export default class OxiContentService extends Service {
     @tracked structure = null
     #rtoken = null
     @tracked tenant = null
+    @tracked realm = null
     @tracked status = null
     @tracked popupStatus = null
 
@@ -61,10 +62,18 @@ export default class OxiContentService extends Service {
 
     LOGIN_PAGES = ['login', 'login!logout', 'logout']
 
+    get realmCssClass() {
+        if (!this.realm) return ''
+        return 'oxi-realm-' + this.safeCssLabel(this.realm)
+    }
+
     get tenantCssClass() {
         if (!this.tenant) return ''
-        return 'tenant-'
-          + this.tenant
+        return 'tenant-' + this.safeCssLabel(this.tenant)
+    }
+
+    safeCssLabel(label) {
+        return label
           .toLowerCase()
           .replace(/[_\s]/g, '-')
           .replace(/[^a-z0-9-]/g, '')
@@ -316,6 +325,7 @@ export default class OxiContentService extends Service {
 
         if (doc.rtoken) this.#rtoken = doc.rtoken // CSRF token
         if (doc.language) this.oxiLocale.locale = doc.language
+        if (doc.pki_realm) this.realm = doc.pki_realm
         this.user = doc.user // this also unsets the user on logout!
 
         // do not overwrite current tenant on repeated bootstrapping

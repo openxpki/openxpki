@@ -1,6 +1,7 @@
 import Controller from '@ember/controller'
 import { action } from '@ember/object'
 import { tracked } from '@glimmer/tracking'
+import { service } from '@ember/service'
 
 /*
  * The application route is entered when the app first boots up.
@@ -15,6 +16,8 @@ import { tracked } from '@glimmer/tracking'
  */
 
 export default class ApplicationController extends Controller {
+    @service('oxi-content') content
+
     @tracked restricted_width = true
 
     @action toggleWidth() {
