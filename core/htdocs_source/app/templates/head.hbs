@@ -5,3 +5,7 @@
 --}}
 <title>{{this.model.config.pageTitle}}</title>
 <meta property="og:title" content={{this.model.config.pageTitle}} />
+
+{{#if this.model.config.customCSSUrl}}
+  <link integrity="" rel="stylesheet" href="{{this.model.config.customCSSUrl}}">
+{{/if}}
