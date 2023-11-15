@@ -1,6 +1,8 @@
 package OpenXPKI::Client::UI::Response::PageInfo;
 use OpenXPKI::Client::UI::Response::DTO;
 
+use OpenXPKI::Client::UI::Response::Button;
+
 has 'label' => (
     is => 'rw',
     isa => 'Str|Undef',
@@ -27,6 +29,13 @@ has 'css_class' => (
     documentation => 'className',
 );
 
+has 'buttons' => (
+    is => 'rw',
+    isa => 'ArrayRef[OpenXPKI::Client::UI::Response::Button]',
+    default => sub { [] },
+    lazy => 1,
+);
+
 # only for popups
 has 'large' => (
     is => 'rw',
@@ -44,6 +53,14 @@ sub suppress_breadcrumb {
     my $self = shift;
 
     $self->breadcrumb({ suppress => 1 });
+}
+
+sub add_button {
+    my $self = shift;
+
+    push $self->buttons->@*, OpenXPKI::Client::UI::Response::Button->new(@_);
+
+    return $self; # allows for method chaining
 }
 
 __PACKAGE__->meta->make_immutable;

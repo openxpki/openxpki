@@ -119,13 +119,23 @@
                 <OxiBase::Status @def={{this.model.status}}/>
             </div>
 
-            {{!
-              *************************************
-              Page title
-            }}
+        </div>
+    </div>
+
+    {{!
+      *************************************
+      Page title and page wide buttons
+    }}
+    <div class="row row-cols-1 row-cols-md-2 justify-content-between">
+        <div class="col col-md-auto oxi-pagehead">
             {{#if this.model.top.page.label}}
                 <h3>{{this.model.top.page.label}}</h3>
             {{/if}}
+        </div>
+        <div class="col col-md-auto oxi-pagehead">
+            {{#each this.model.top.page.buttons as |btn|}}
+                <OxiBase::Button @button={{btn}} class="btn-sm" />
+            {{/each}}
         </div>
     </div>
 
