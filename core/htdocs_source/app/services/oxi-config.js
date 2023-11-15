@@ -79,9 +79,10 @@ export default class OxiConfigService extends Service {
         return this.#rel2absUrl(path)
     }
 
-    get customCssUrl() {
-        if (! this.localConfig.customCssPath) return null
-        let absUrl = this.#rel2absUrl(this.localConfig.customCssPath)
+    get customCSSUrl() {
+        let url = this.localConfig.customCSSPath ?? this.localConfig.customCssPath
+        if (!url) return null
+        let absUrl = this.#rel2absUrl(url)
         /* eslint-disable-next-line no-console */
         console.log(`Custom CSS file configured: ${absUrl}`)
         return absUrl

@@ -21,7 +21,7 @@ backendPath: cgi-bin/webui.fcgi
 #   #application { margin: 0 auto -30px; }
 #   #footer { height: 30px; padding-top: 5px; background-color: #000000; }
 #
-customCssPath: custom.css
+customCSSPath: custom.css
 
 #
 # Page title (browser title bar)
