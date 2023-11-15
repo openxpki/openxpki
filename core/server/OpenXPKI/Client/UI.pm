@@ -665,6 +665,14 @@ sub handle_login {
         } else {
             my $realms = $reply->{PARAMS}->{PKI_REALMS};
 
+            my $safe_realm_str = sub {
+                my $r = lc(shift);
+                $r =~ s/[_\s]/-/g;
+                $r =~ s/[^a-z0-9-]//g;
+                $r =~ s/-+/-/g;
+                "oxi-realm-card-$r"
+            };
+
             my @cards;
             # "path" mode: realm selection that links to defined sub paths
             if ('path' eq $self->realm_mode) {
@@ -690,6 +698,7 @@ sub handle_login {
                             footer => $footer,
                             image => $realms->{$realm}->{IMAGE},
                             color => $realms->{$realm}->{COLOR},
+                            css_class => $safe_realm_str->($realm),
                             href => $def->{url},
                         };
                     }
@@ -703,6 +712,7 @@ sub handle_login {
                         description => $realms->{$_}->{DESCRIPTION},
                         image => $realms->{$_}->{IMAGE},
                         color => $realms->{$_}->{COLOR},
+                        css_class => $safe_realm_str->($_),
                         action => 'login!realm',
                         action_params => {
                             pki_realm => $realms->{$_}->{NAME},
