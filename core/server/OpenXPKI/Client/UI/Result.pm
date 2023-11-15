@@ -595,7 +595,7 @@ sub _render_body_to_str {
     #
     # C) regular response
     #
-    my $result = $self->resp->resolve;
+    my $result = $self->resp->resolve; # resolve response DTOs into nested HashRef
 
     # show message of the day if we have a page section (may overwrite status)
     if ($self->page->is_set && (my $motd = $self->session_param('motd'))) {
