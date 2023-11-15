@@ -8,8 +8,6 @@ use Type::Params qw( signature_for );
 
 use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
 
-my $meta = __PACKAGE__->meta;
-
 =head2 init_realm_cards
 
 For path based realm selection: show links to all realms incl. image and description.
