@@ -10,7 +10,7 @@ import { htmlSafe } from '@ember/template'
  *
  * Example:
  * ```html
- * <span>{{{defuse this.label}}}</span>
+ * <span>{{defuse this.label}}</span>
  * ```
  * @module helper/defuse
  */
