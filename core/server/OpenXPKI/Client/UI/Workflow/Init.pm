@@ -259,9 +259,7 @@ sub init_info {
     }, { nostatus  => 1 });
 
     if (!$wf_info) {
-         $self->set_page(
-            shortlabel => '',
-        );
+        $self->set_page(label => '');
         $self->main->add_section({
             type => 'text',
             content => {
@@ -322,7 +320,7 @@ sub init_info {
     }
 
     $self->set_page(
-        shortlabel => $self->__page_label($wf_info),
+        label => $self->__page_label($wf_info),
         large => 1,
     );
 

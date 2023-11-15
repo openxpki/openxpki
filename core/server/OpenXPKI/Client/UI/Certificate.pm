@@ -920,7 +920,6 @@ sub init_chain {
 
     $self->set_page(
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_CHAIN_LABEL',
-        shortlabel => 'I18N_OPENXPKI_UI_CERTIFICATE_CHAIN_LABEL',
     );
 
     # Download links

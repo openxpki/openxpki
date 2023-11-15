@@ -336,7 +336,6 @@ sub __render_from_workflow {
         $self->set_page(
             label => $label,
             breadcrumb => $self->__get_breadcrumb($wf_info, $wf_info->{state}->{label}),
-            shortlabel => $wf_info->{workflow}->{id},
             description => $desc,
             css_class => 'workflow workflow-proc-state workflow-proc-'.$wf_proc_state,
             ($wf_info->{workflow}->{id} ? (canonical_uri => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id}) : ()),
@@ -490,7 +489,6 @@ sub __render_from_workflow {
         $self->set_page(
             label => $wf_info->{state}->{label} || $wf_info->{workflow}->{title} || $wf_info->{workflow}->{label},
             breadcrumb => $self->__get_breadcrumb($wf_info),
-            shortlabel => $wf_info->{workflow}->{id},
             description => $self->__get_templated_description($wf_info, $wf_info->{state}),
             css_class => 'workflow workflow-page ' . ($wf_info->{state}->{uiclass} || ''),
             ($wf_info->{workflow}->{id} ? (canonical_uri => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id}) : ()),
@@ -1606,7 +1604,6 @@ sub __render_workflow_action_head {
     $self->set_page(
         label => $label,
         breadcrumb => $breadcrumb,
-        shortlabel => $wf_info->{workflow}->{id},
         description => $self->__get_templated_description($wf_info, $wf_action_info),
         css_class => 'workflow workflow-action ' . ($wf_action_info->{uiclass} || ''),
         canonical_uri => sprintf('workflow!load!wf_id!%01d!wf_action!%s', $wf_info->{workflow}->{id}, $wf_action),

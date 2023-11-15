@@ -59,7 +59,7 @@ sub init_manage {
     my $secret = $self->param('id');
 
     if (not $secret) {
-        $self->page->shortlabel('I18N_OPENXPKI_UI_SECRET_LITERAL_NOT_SETABLE_LABEL');
+        $self->page->label('I18N_OPENXPKI_UI_SECRET_LITERAL_NOT_SETABLE_LABEL');
         $self->main->add_section({
             type => 'text',
             content => {
@@ -73,7 +73,7 @@ sub init_manage {
     return unless defined $status;
 
     if ($status) {
-        $self->page->shortlabel('I18N_OPENXPKI_UI_SECRET_CLEAR_SECRET_LABEL');
+        $self->page->label('I18N_OPENXPKI_UI_SECRET_CLEAR_SECRET_LABEL');
         $self->main->add_section({
             type => 'text',
             content => {
