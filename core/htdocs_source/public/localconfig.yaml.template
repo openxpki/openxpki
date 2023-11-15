@@ -24,6 +24,19 @@ backendPath: cgi-bin/webui.fcgi
 customCSSPath: custom.css
 
 #
+# Custom CSS declarations that will be directly included into the HTML header.
+#
+customCSS: |-
+    .oxi-realm-card-democa,
+    .oxi-realm-democa .oxi-header-bar {
+        background-color: #DDFFFF;
+    }
+    .oxi-realm-card-rootca,
+    .oxi-realm-rootca .oxi-header-bar {
+        background-color: #FFDDDD;
+    }
+
+#
 # Page title (browser title bar)
 #
 pageTitle: "OpenXPKI - Open Source Trustcenter"

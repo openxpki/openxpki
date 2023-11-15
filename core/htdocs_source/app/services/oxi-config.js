@@ -84,8 +84,15 @@ export default class OxiConfigService extends Service {
         if (!url) return null
         let absUrl = this.#rel2absUrl(url)
         /* eslint-disable-next-line no-console */
-        console.log(`Custom CSS file configured: ${absUrl}`)
+        console.log(`Loading custom CSS file: ${absUrl}`)
         return absUrl
+    }
+
+    get customCSS() {
+        let css = this.localConfig.customCSS
+        if (! css) return null
+        console.log(`Injecting custom CSS:`, css)
+        return css
     }
 
     get copyrightYear() {

@@ -9,3 +9,9 @@
 {{#if this.model.config.customCSSUrl}}
   <link integrity="" rel="stylesheet" href="{{this.model.config.customCSSUrl}}">
 {{/if}}
+
+{{#if this.model.config.customCSS}}
+  <style type="text/css">
+    {{defuse this.model.config.customCSS}}
+  </style>
+{{/if}}
