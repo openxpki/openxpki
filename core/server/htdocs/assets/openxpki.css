@@ -106,10 +106,6 @@ img.toplogo {
   font-size: 80%;
 }
 
-.oxi-infobox .card {
-  overflow-x: scroll;
-}
-
 /* oxi-base/select - inline select field */
 .oxi-inline-select.ss-main {
   color: RGBA(var(--bs-primary-rgb), var(--bs-link-opacity, 1)) !important; /* use link color to indicate that it is clickable */
@@ -127,6 +123,11 @@ img.toplogo {
 /******************************************************************************
  * Vertical resize "button" bar
  */
+
+/* only show on large displays: "min-width" must be the same as
+   in the first @media query for .oxi-width-restricted above */
+.oxi-resize-overlay { display: none }
+@media (min-width: 1600px) { .oxi-resize-overlay { display: unset } }
 
 .oxi-resize-overlay {
   max-width: 1.5rem;
@@ -608,6 +609,19 @@ div.required input.flatpickr-input {
 .oxi-btn-tile {
   background: transparent;
   border: 1px solid transparent;
+}
+
+.oxi-btn-card {
+  /* same as bg-light but without "!important" so it is
+    easier to overwrite with another style declaration. */
+  background-color: rgba(var(--bs-light-rgb));
+}
+
+.oxi-btn-info::before {
+  font-family: "Glyphicons Halflings";
+  content: "\e086";
+  font-size: 80%;
+  padding-right: 0.3rem;
 }
 
 /******************************************************************************
