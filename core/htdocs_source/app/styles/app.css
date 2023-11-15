@@ -615,6 +615,12 @@ div.required input.flatpickr-input {
   border: 1px solid transparent;
 }
 
+.oxi-btn-card {
+  /* same as bg-light but without "!important" so it is
+    easier to overwrite with another style declaration. */
+  background-color: rgba(var(--bs-light-rgb));
+}
+
 /******************************************************************************
  * Tooltips
  */
