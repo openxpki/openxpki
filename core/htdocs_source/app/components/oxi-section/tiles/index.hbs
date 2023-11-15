@@ -6,9 +6,6 @@
                 {{#each this.tiles as |tile|}}
                     {{#if (eq tile.type "button")}}
                         <OxiBase::Button @button={{tile.content}}>
-                            {{#if tile.content.tooltip}}
-                                <Tippy>{{tile.content.tooltip}}</Tippy>
-                            {{/if}}
                             {{#if tile.content.image}}
                                 <img src={{tile.content.image}} alt="" role="presentation"/>
                                 <br/>
