@@ -165,8 +165,6 @@ sub init_context {
 
     # re-instance existing workflow
     my $id = $self->param('wf_id');
-    my $view = $self->param('view') || '';
-
 
     my $wf_info = $self->send_command_v2( 'get_workflow_info',  {
         id => $id,
@@ -179,7 +177,7 @@ sub init_context {
     }
 
     $self->set_page(
-        label => 'I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL #' . $wf_info->{workflow}->{id},
+        label => $self->__page_label($wf_info, 'I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL'),
         large => 1,
     );
 
@@ -209,7 +207,6 @@ sub init_attribute {
 
     # re-instance existing workflow
     my $id = $self->param('wf_id');
-    my $view = $self->param('view') || '';
 
     my $wf_info = $self->send_command_v2( 'get_workflow_info',  {
         id => $id,
@@ -223,7 +220,7 @@ sub init_attribute {
     }
 
     $self->set_page(
-        label => 'I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL #' . $wf_info->{workflow}->{id},
+        label => $self->__page_label($wf_info, 'I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL'),
         large => 1,
     );
 
@@ -324,9 +321,8 @@ sub init_info {
         }
     }
 
-    my $label = sprintf("%s (#%01d)", ($wf_info->{workflow}->{title} || $wf_info->{workflow}->{label} || $wf_info->{workflow}->{type}), $wf_info->{workflow}->{id});
     $self->set_page(
-        shortlabel => $label,
+        shortlabel => $self->__page_label($wf_info),
         large => 1,
     );
 
@@ -346,6 +342,20 @@ sub init_info {
 
 }
 
+sub __page_label {
+
+    my $self = shift;
+    my $wf_info = shift;
+    my $additional = shift;
+
+    return sprintf(
+        "#%01d - %s%s",
+        $wf_info->{workflow}->{id},
+        ($wf_info->{workflow}->{title} || $wf_info->{workflow}->{label} || $wf_info->{workflow}->{type}),
+        $additional ? ": $additional" : "",
+    );
+
+}
 
 =head2
 
@@ -814,8 +824,12 @@ sub init_history {
     my $id = $self->param('wf_id');
     my $view = $self->param('view') || '';
 
+    my $wf_info = $self->send_command_v2( 'get_workflow_info',  {
+        id => $id,
+    }, { nostatus  => 1 });
+
     $self->set_page(
-        label => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_TITLE',
+        label => $self->__page_label($wf_info, 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_TITLE'),
         description => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_DESCRIPTION',
         large => 1,
     );
@@ -954,8 +968,12 @@ sub init_log {
     my $id = $self->param('wf_id');
     my $view = $self->param('view') || '';
 
+    my $wf_info = $self->send_command_v2( 'get_workflow_info',  {
+        id => $id,
+    }, { nostatus  => 1 });
+
     $self->set_page(
-        label => 'I18N_OPENXPKI_UI_WORKFLOW_LOG',
+        label => $self->__page_label($wf_info, 'I18N_OPENXPKI_UI_WORKFLOW_LOG'),
         large => 1,
     );
 
