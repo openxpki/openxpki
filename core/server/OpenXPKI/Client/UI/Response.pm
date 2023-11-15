@@ -74,11 +74,6 @@ has 'headers' => (
 #   documentation => '...' tells OpenXPKI::Client::UI::Response::DTORole->resolve
 #   to use the given name (not the attribute name) as hash key for this value.
 #
-has_dto 'infobox' => (
-    documentation => 'right',
-    class => 'OpenXPKI::Client::UI::Response::Sections',
-);
-
 has 'language' => (
     is => 'rw',
     isa => 'Str',

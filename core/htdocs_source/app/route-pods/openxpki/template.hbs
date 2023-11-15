@@ -140,7 +140,7 @@
     </div>
 
     <div class="row">
-        <div class="col-12 {{if this.model.top.right (if this.showInfo "col-lg-7" "col-lg-11")}} oxi-main order-0">
+        <div class="col oxi-main">
             {{!
               *************************************
               Page description
@@ -159,10 +159,9 @@
             }}
             {{#each this.model.top.main as |entry index|}}
                 <!-- this.model.top.main item -->
-                {{! extra row/col level to restrict form width if info block
-                     is hidden (as overly long input fields look ugly) }}
+                {{! extra row/col level to restrict form width as overly long input fields look ugly }}
                 <div class="row">
-                    <div class="col {{if (and (not this.showInfo) (eq entry.type "form")) "col-xl-10"}}">
+                    <div class="col {{if (eq entry.type "form") "col-xl-10"}}">
                         <OxiSection
                             @content={{entry}}
                             @meta={{hash sectionNo=index renderAsCard=(and (not entry.compact) (eq entry.type "keyvalue") (not entry.content.buttons))}}
@@ -171,36 +170,6 @@
                 </div>
             {{/each}}
         </div>
-        {{!
-          *************************************
-          Infobox - right hand info column
-        }}
-        {{#if this.model.top.right}}
-            {{#if this.showInfo}}
-                <div class="col-12 col-lg-4 order-2 order-lg-1 pe-lg-0 oxi-infobox">
-                    {{#each this.model.top.right as |rightEntry|}}
-                        <div class="card bg-light border-secondary">
-                            <div class="card-body p-1">
-                                <OxiSection
-                                    @content={{rightEntry}}
-                                    @meta={{hash isInfoBox=true}}
-                                />
-                            </div>
-                        </div>
-                    {{/each}}
-                </div>
-            {{/if}}
-            <div class="col-6 col-lg-1 order-1 order-lg-2 pt-3 ps-lg-0">
-                <BsButton
-                    @type="light"
-                    class="btn-sm"
-                    @onClick={{this.toggleInfoBlock}}
-                    @icon="glyphicon glyphicon-{{if this.showInfo "remove-sign" "info-sign"}}"
-                >
-                    {{t 'site.workflow_info'}}
-                </BsButton>
-            </div>
-        {{/if}}
     </div>
 </div>
 

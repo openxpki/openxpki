@@ -106,10 +106,6 @@ img.toplogo {
   font-size: 80%;
 }
 
-.oxi-infobox .card {
-  overflow-x: scroll;
-}
-
 /* oxi-base/select - inline select field */
 .oxi-inline-select.ss-main {
   color: RGBA(var(--bs-primary-rgb), var(--bs-link-opacity, 1)) !important; /* use link color to indicate that it is clickable */
@@ -619,6 +615,13 @@ div.required input.flatpickr-input {
   /* same as bg-light but without "!important" so it is
     easier to overwrite with another style declaration. */
   background-color: rgba(var(--bs-light-rgb));
+}
+
+.oxi-btn-info::before {
+  font-family: "Glyphicons Halflings";
+  content: "\e086";
+  font-size: 80%;
+  padding-right: 0.3rem;
 }
 
 /******************************************************************************

@@ -82,6 +82,7 @@ let format2css = {
     terminate:      "btn-light oxi-btn-terminate",
     tile:           "btn-light oxi-btn-tile",
     card:           "oxi-btn-card",
+    info:           "btn-light oxi-btn-info",
 }
 
 export default class OxiClickableComponent extends Component {

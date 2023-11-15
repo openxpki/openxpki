@@ -11,6 +11,5 @@ export default class Page extends Base {
     @tracked name
     @tracked page
     @tracked main
-    @tracked right
     @tracked status
 }

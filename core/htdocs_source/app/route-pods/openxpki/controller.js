@@ -30,15 +30,10 @@ export default class OpenXpkiController extends Controller {
     // @tracked trigger = null
 
     @tracked loading = false;
-    @tracked showInfoBlock = false;
 
     get breadcrumbs() {
         let bc = (this.model.breadcrumbs || []).filter(el => el.label)
         return A(bc) // Ember Array allows to query .lastObject
-    }
-
-    get showInfo() {
-        return this.model?.top?.right && this.showInfoBlock
     }
 
     get oldBrowser() {
@@ -111,10 +106,5 @@ export default class OpenXpkiController extends Controller {
     @action
     reload() {
         return window.location.reload();
-    }
-
-    @action
-    toggleInfoBlock() {
-        this.showInfoBlock = !this.showInfoBlock;
     }
 }

@@ -146,12 +146,6 @@ Set the structure of the main contents.
 
 C<add_form> receives constructor parameters for L<OpenXPKI::Client::UI::Response::Section::Form>.
 
-=head2 infobox
-
-Set the structure of the right hand side info box.
-
-Usage equivalent to L</main>.
-
 =head2 language
 
 Set the language.
@@ -294,7 +288,6 @@ has resp => (
     handles => [ qw(
         redirect
         confined_response has_confined_response
-        infobox
         language
         main
         menu

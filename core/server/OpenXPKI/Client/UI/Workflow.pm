@@ -634,86 +634,19 @@ sub __render_from_workflow {
                     description => '',
                     data => \@section_fields,
                     buttons => $buttons,
-            }}) if (@section_fields);
+                }
+            }) if (@section_fields);
         }
     }
 
-    #
-    # Right block
-    #
-    if ($wf_info->{workflow}->{id}) {
-
-        my $wfdetails_config = $self->session_param('wfdetails');
-        # undef = no right box
-        if (defined $wfdetails_config) {
-
-            if ($view eq 'result' && $wf_info->{workflow}->{proc_state} !~ /(finished|failed|archived)/) {
-                push @buttons_handle, {
-                    href => '#/openxpki/redirect!workflow!load!wf_id!'.$wf_info->{workflow}->{id},
-                    label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
-                    format => "primary",
-                };
-            }
-
-            # assemble infos
-            my $data = $self->__render_workflow_info( $wf_info, $wfdetails_config );
-
-            # The workflow info contains info about all control actions that
-            # can done on the workflow -> render appropriate buttons.
-            my $extra_handles;
-            if (@handles) {
-
-                my @extra_links;
-                if (grep /context/, @handles) {
-                    push @extra_links, {
-                        'page' => 'workflow!context!wf_id!'.$wf_info->{workflow}->{id},
-                        'label' => 'I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL',
-                    };
-                }
-
-                if (grep /attribute/, @handles) {
-                    push @extra_links, {
-                        'page' => 'workflow!attribute!wf_id!'.$wf_info->{workflow}->{id},
-                        'label' => 'I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL',
-                    };
-                }
-
-                if (grep /history/, @handles) {
-                    push @extra_links, {
-                        'page' => 'workflow!history!wf_id!'.$wf_info->{workflow}->{id},
-                        'label' => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_LABEL',
-                    };
-                }
-
-                if (grep /techlog/, @handles) {
-                    push @extra_links, {
-                        'page' => 'workflow!log!wf_id!'.$wf_info->{workflow}->{id},
-                        'label' => 'I18N_OPENXPKI_UI_WORKFLOW_LOG_LABEL',
-                    };
-                }
-
-                push @{$data}, {
-                    label => 'I18N_OPENXPKI_UI_WORKFLOW_EXTRA_INFO_LABEL',
-                    format => 'linklist',
-                    value => \@extra_links
-                } if (scalar @extra_links);
-
-            }
-
-            $self->infobox->add_section({
-                type => 'keyvalue',
-                content => {
-                    label => '',
-                    description => '',
-                    data => $data,
-                    buttons => \@buttons_handle,
-                },
-            });
-        }
-    }
+    $self->page->add_button(
+        label => 'Info',
+        format => 'info',
+        page => 'workflow!info!wf_id!'.$wf_info->{workflow}->{id},
+        target => 'popup',
+    );
 
     return $self;
-
 }
 
 =head2 __get_action_buttons
@@ -1601,8 +1534,7 @@ sub __get_proc_state_desc {
     return $proc_state ? $self->__proc_state_i18n->{$proc_state}->{desc} : '-';
 }
 
-# methods extracted from __render_workflow_info
-# this should be moved to a seperate file/class
+# FIXME this should be moved to a seperate file/class
 sub __get_breadcrumb {
 
     my $self = shift;
@@ -1635,7 +1567,7 @@ sub __get_breadcrumb {
     return {};
 }
 
-  # helper sub to render the pages description text from state/action using a template
+# render page description text from state/action using a template
 sub __get_templated_description {
 
     my $self = shift;

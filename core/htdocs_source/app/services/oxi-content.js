@@ -227,7 +227,7 @@ export default class OxiContentService extends Service {
             }
 
             // Set page contents (must be done before setting breadcrumbs)
-            if (!doc.goto) this.#setPageContent(realTarget, request.page, doc.page, doc.main, doc.right, partial, trigger)
+            if (!doc.goto) this.#setPageContent(realTarget, request.page, doc.page, doc.main, partial, trigger)
 
             // Popup
             if (realTarget === this.TARGET.POPUP) {
@@ -545,7 +545,7 @@ export default class OxiContentService extends Service {
         this.error = this.intl.t('error_popup.message.server', { code: status_code })
     }
 
-    #setPageContent(target, requestedPageName, page, main, right, partial, trigger) {
+    #setPageContent(target, requestedPageName, page, main, partial, trigger) {
         let obj
         // Popup
         if (target === this.TARGET.POPUP) {
@@ -563,7 +563,6 @@ export default class OxiContentService extends Service {
             ...(requestedPageName && { name: requestedPageName }),
             ...(page && { page }),
             ...(main && { main }),
-            ...(right && { right }),
         })
     }
 
