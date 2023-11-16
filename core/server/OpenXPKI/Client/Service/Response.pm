@@ -99,11 +99,15 @@ has proc_state => (
 
 # Use predefined numeric codes for dedicated problems
 our %named_messages = (
+    '40000' => 'Bad Request',
     '40001' => 'Signature invalid',
     '40002' => 'Unable to parse request',
     '40003' => 'Incoming enrollment with empty body',
     '40004' => 'Missing or invalid parameters',
     '40006' => 'Request was rejected',
+    '40100' => 'Unauthorized',
+    '40400' => 'Not Found',
+    '50000' => 'Server Error',
     '50001' => 'Unable to initialize client',
     '50003' => 'Unexpected response from backend',
     '50011' => 'Unable to initialize endpoint parameters',

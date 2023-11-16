@@ -360,7 +360,7 @@ sub run_workflow {
     my $log = $self->logger();
     $log->trace( 'Workflow info '  . Dumper $workflow );
 
-    if (!$workflow || ( $workflow->{'proc_state'} ne 'finished' )) {
+    if (!$workflow || ( $workflow->{'proc_state'} !~ m{finished|manual} )) {
         if (my $err = $client->last_reply()->{ERROR}) {
             if ($err->{CLASS} eq 'OpenXPKI::Exception::InputValidator') {
                 $log->info( 'Input validation failed' );
