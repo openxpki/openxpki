@@ -483,6 +483,8 @@ sub __init_logger {
     if ($conf->{'layout.ConversionPattern'} && $conf->{'layout.ConversionPattern'} =~ m{\[\]}) {
         if ($self->service() eq 'webui') {
             $conf->{'layout.ConversionPattern'} =~ s{\[\]}{[pid=%P|sid=%X{sid}]};
+        } elsif($loglevel =~ m{DEBUG|TRACE}) {
+            $conf->{'layout.ConversionPattern'} =~ s{\[\]}{[pid=%P|%i]};
         } else {
             $conf->{'layout.ConversionPattern'} =~ s{\[\]}{[pid=%P|ep=%X{endpoint}]};
         }
