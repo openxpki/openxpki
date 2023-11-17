@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2023-08-17 13:41+0200\n"
+"PO-Revision-Date: 2023-11-14 17:37+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -13,6 +13,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.0.1\n"
 "X-Poedit-Bookmarks: -1,-1,77,-1,-1,-1,-1,-1,-1,-1\n"
+
+msgid "I18N_OPENXPKI_UI_ACCOUNT_CONTACT_INFORMATION_LABEL"
+msgstr "Kontaktinformationen"
 
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "Die ausgewählte Aktion ist nicht verfügbar"
@@ -67,6 +70,12 @@ msgstr "Pausierte Workflows aufwecken oder abbrechen"
 
 msgid "I18N_OPENXPKI_UI_BULK_PAUSED_WORKFLOW_LABEL"
 msgstr "Pausierte Workflows"
+
+msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_DESCRIPTION"
+msgstr "Ausstehende Enrollments gesammelt bestätigen oder ablehnen."
+
+msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_LABEL"
+msgstr "Automatische Enrollments"
 
 msgid "I18N_OPENXPKI_UI_BULK_PENDING_REQUEST_DESCRIPTION"
 msgstr "Ausstehende Zertifikatsanträge gesammelt bestätigen oder ablehnen."
@@ -440,7 +449,7 @@ msgid "I18N_OPENXPKI_UI_CSR_KEY_GENERATION_FAILED"
 msgstr "Schlüsselerzeugung fehlgeschlagen"
 
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION"
-msgstr ""
+msgstr "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_LABELI18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_LABEL"
 
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT"
 msgstr ""
@@ -2610,6 +2619,9 @@ msgstr "Trotz Policy-Verletzung absenden"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_RECHECK_LABEL"
 msgstr "Policy-Prüfung wiederholen"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_REMOVE_TOKEN_LABEL"
+msgstr "Registrierung löschen"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_SET_VALIDITY_LABEL"
 msgstr "Laufzeit ändern"
 
@@ -4407,6 +4419,17 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_LABEL"
 msgstr "Policyverletzung"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PREREG_DUPLICATE_TOKEN_DESC"
+msgstr ""
+"Der gewählte Name wurde bereits vorregistriert. Falls bisher kein aktives "
+"Registrierungsprofil existiert, können Sie über \"Registrierung löschen\" "
+"den bestehenden Eintrag löschen. Falls die Registrierung bereits "
+"abgeschlossen wurde, müssen Sie diese über den vorgesehenen Prozess löschen "
+"bevor sie fortfahren können."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PREREG_DUPLICATE_TOKEN_LABEL"
+msgstr "Name bereits registriert"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PROVIDE_SECRET_DESC"
 msgstr ""
 "Bitte geben Sie das API-Token/Passwort ein, welches ihnen während der "
@@ -4610,6 +4633,12 @@ msgstr "Dieser Workflow wurde erfolgreich beendet."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON"
 msgstr "Weiter"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_DOMAIN_VALIDATAION_DESC"
+msgstr ""
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_DOMAIN_VALIDATAION_LABEL"
+msgstr "ACME Domain Validierung"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ADDUSER_DESC"

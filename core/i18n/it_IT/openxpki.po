@@ -20,6 +20,10 @@ msgstr ""
 "X-Poedit-Bookmarks: -1,-1,77,-1,-1,-1,-1,-1,-1,-1\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ACCOUNT_CONTACT_INFORMATION_LABEL"
+msgstr "Azione"
+
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "Azione richiesta non trovata"
 
@@ -88,6 +92,14 @@ msgstr "Questa pagina mostra una lista di tutti i workflow iniziati da te."
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_BULK_PAUSED_WORKFLOW_LABEL"
 msgstr "Workflow Aperto"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_DESCRIPTION"
+msgstr "Workflow Adesione SCEP in attesa di approvazione."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_LABEL"
+msgstr "Registrazione"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_BULK_PENDING_REQUEST_DESCRIPTION"
@@ -3091,6 +3103,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_RECHECK_LABEL"
 msgstr "Ri-Valuta la Policy"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_REMOVE_TOKEN_LABEL"
+msgstr "Id Transazione SCEP"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_SET_VALIDITY_LABEL"
 msgstr "Modifica Validità"
 
@@ -5045,6 +5061,16 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_LABEL"
 msgstr "Violazione Policy Pendente"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PREREG_DUPLICATE_TOKEN_DESC"
+msgstr ""
+"La Richiesta di revoca è stata definitivamente rifiutata e non può essere "
+"riavviata."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PREREG_DUPLICATE_TOKEN_LABEL"
+msgstr "Revoca Rifiutata"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PROVIDE_SECRET_DESC"
 msgstr ""
 "La Richiesta di revoca è stata definitivamente rifiutata e non può essere "
@@ -5242,6 +5268,14 @@ msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON"
 msgstr "Forza Ripristino"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_DOMAIN_VALIDATAION_DESC"
+msgstr "Modifica i Metadati di un certificato."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_DOMAIN_VALIDATAION_LABEL"
+msgstr "Modifica Metadati"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ADDUSER_DESC"

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2023-08-17 13:48+0200\n"
+"PO-Revision-Date: 2023-11-14 17:38+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -13,6 +13,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.0.1\n"
 "X-Poedit-Bookmarks: -1,-1,77,-1,-1,-1,-1,-1,-1,-1\n"
+
+msgid "I18N_OPENXPKI_UI_ACCOUNT_CONTACT_INFORMATION_LABEL"
+msgstr "Contact Information"
 
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "Requested action not found"
@@ -67,6 +70,12 @@ msgstr "Wakeup or discard workflows in paused state."
 
 msgid "I18N_OPENXPKI_UI_BULK_PAUSED_WORKFLOW_LABEL"
 msgstr "Paused Workflows"
+
+msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_DESCRIPTION"
+msgstr "Bulk approve or reject outstanding enrollment requests."
+
+msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_LABEL"
+msgstr "Enrollments"
 
 msgid "I18N_OPENXPKI_UI_BULK_PENDING_REQUEST_DESCRIPTION"
 msgstr "Bulk approve or reject outstanding certificate signing requests."
@@ -2514,6 +2523,9 @@ msgstr "Submit with Policy Exception"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_RECHECK_LABEL"
 msgstr "Re-Evaluate Policy"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_REMOVE_TOKEN_LABEL"
+msgstr "Remove Token"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_SET_VALIDITY_LABEL"
 msgstr "Change Validity"
 
@@ -4219,6 +4231,17 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_LABEL"
 msgstr "Policy Violation Pending"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PREREG_DUPLICATE_TOKEN_DESC"
+msgstr ""
+"A preregistration token for the given subject already exists. In case there "
+"is no active registration profile assigned, you can use the \"remove token\" "
+"button below to delete the existing entry. In case there is an active "
+"registration, you need to use the provided removal workflow to delete the "
+"registration before you can continue."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PREREG_DUPLICATE_TOKEN_LABEL"
+msgstr "Subject already assigned"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PROVIDE_SECRET_DESC"
 msgstr ""
 "Please provide the API-Token/Secret that was assigned for this entity to "
@@ -4391,6 +4414,12 @@ msgstr "This workflow has finished with success and can not be restarted"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON"
 msgstr "Continue"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_DOMAIN_VALIDATAION_DESC"
+msgstr ""
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_DOMAIN_VALIDATAION_LABEL"
+msgstr "ACME Domain Validation"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ADDUSER_DESC"
 msgstr "Add a new user"

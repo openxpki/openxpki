@@ -14,6 +14,10 @@ msgstr ""
 "X-Generator: Poedit 1.8.7.1\n"
 "X-Poedit-Bookmarks: -1,-1,77,-1,-1,-1,-1,-1,-1,-1\n"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ACCOUNT_CONTACT_INFORMATION_LABEL"
+msgstr "実行"
+
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "リクエストされたアクションが見つかりません"
 
@@ -72,6 +76,14 @@ msgstr "あなたが開始したワークフローが一覧で表示されます
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_BULK_PAUSED_WORKFLOW_LABEL"
 msgstr "ワークフローを開く"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_DESCRIPTION"
+msgstr "SCEP登録ワークフローは承認待ちです。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_LABEL"
+msgstr "登録"
 
 msgid "I18N_OPENXPKI_UI_BULK_PENDING_REQUEST_DESCRIPTION"
 msgstr "証明書発行リクエストは一括での承認/否認をします。"
@@ -2611,6 +2623,10 @@ msgstr "例外のポリシーで送信"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_RECHECK_LABEL"
 msgstr "ポリシーの再評価"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_REMOVE_TOKEN_LABEL"
+msgstr "RAトークンの更新"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_SET_VALIDITY_LABEL"
 msgstr "有効性の変更"
 
@@ -4301,6 +4317,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_LABEL"
 msgstr "保留中のポリシー違反"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PREREG_DUPLICATE_TOKEN_DESC"
+msgstr "リクエストは拒否され、再実効はできません。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PREREG_DUPLICATE_TOKEN_LABEL"
+msgstr "リクエスト拒否"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PROVIDE_SECRET_DESC"
 msgstr "リクエストは拒否され、再実効はできません。"
 
@@ -4469,6 +4493,14 @@ msgstr "ワークフローは正常終了しました。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON"
 msgstr "続ける"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_DOMAIN_VALIDATAION_DESC"
+msgstr "証明書のメタデータを変更します。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_DOMAIN_VALIDATAION_LABEL"
+msgstr "メタデータの変更"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ADDUSER_DESC"
 msgstr "新しいユーザを追加する"
