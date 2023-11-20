@@ -27,7 +27,10 @@ sub render_profile_select {
 
     # fetch field definition for subject styles (used for all sub selects aka. dependants)
     my $style_field = first { $_->{name} eq 'cert_subject_style' } $wf_info->{activity}->{$wf_action}->{field}->@*;
-    my ($style_item, @more_style_items) = $self->__render_input_field($style_field) if $style_field;
+    my ($style_item, @more_style_items) = $self->__render_input_field({
+        $style_field->%*,
+        required => 1, # backward compatibility: overwrite legacy config "required: 0"
+    }) if $style_field;
 
     # loop through action input fields
     my @fields;
