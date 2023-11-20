@@ -276,6 +276,7 @@ command "convert_private_key" => {
         } elsif ($format eq 'PKCS12_LEGACY') {
             $command_hashref->{KEY_PBE} = 'PBE-SHA1-3DES';
             $command_hashref->{CERT_PBE} = 'PBE-SHA1-RC2-40';
+            $command_hashref->{LEGACY} = 1;
         } # anything else is JavaKS and we use the system defaults
 
         if ($nopassword) {
