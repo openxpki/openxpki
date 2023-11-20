@@ -81,11 +81,6 @@ export default class OxiSectionFormComponent extends Component {
             // selected option, so we need an internal reference to the original name ("_refName")
             field._refName = field.name;
 
-            // set placeholder
-            if (typeof field.placeholder === "undefined") {
-                field.placeholder = "";
-            }
-
             // standard fields
             if (! field.clonable) {
                 result.push(field);
