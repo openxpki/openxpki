@@ -29,7 +29,8 @@ sub render_profile_select {
     my $style_field = first { $_->{name} eq 'cert_subject_style' } $wf_info->{activity}->{$wf_action}->{field}->@*;
     my ($style_item, @more_style_items) = $self->__render_input_field({
         $style_field->%*,
-        required => 1, # backward compatibility: overwrite legacy config "required: 0"
+        required => 1,          # backward compatibility: overwrite legacy config "required: 0"
+        placeholder => undef,   # backward compatibility: overwrite legacy empty " " placeholder now that we preselect the first (default) style
     }) if $style_field;
 
     # loop through action input fields
@@ -61,6 +62,7 @@ sub render_profile_select {
                         {
                             $style_item->%*, # copy item config
                             options => \@styles,
+                            value => $styles[0]->{value}, # preselect first (default) style
                         },
                         # maybe more (hidden) fields
                         @more_style_items,
