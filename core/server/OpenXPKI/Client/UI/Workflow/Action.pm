@@ -722,7 +722,7 @@ sub __request_values_for_fields {
         }
 
         if ('static' eq $field->{type} or 'hidden' eq $field->{type}) {
-            if ($vv//'' ne $field->{value}//'') {
+            if (($vv//'') ne ($field->{value}//'')) {
                 $self->log->warn(sprintf "Ignoring %s field '%s': value was altered by frontend", $field->{type}, $name);
                 next; # ignore value
             }
