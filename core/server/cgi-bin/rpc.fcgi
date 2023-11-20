@@ -324,7 +324,7 @@ while (my $cgi = CGI::Fast->new()) {
         # method should be set now
         die failure( 40001 ) unless $method;
 
-        # special handling for requests for OpenAPI (Swagger) spec?
+        # special handling for requests for OpenAPI (Swagger) spec
         if ($method eq 'openapi-spec') {
             my $baseurl = sprintf "%s://%s:%s%s", ($cgi->https ? 'https' : 'http'), $cgi->virtual_host, $cgi->virtual_port, $cgi->request_uri;
             my $spec = $rpc->openapi_spec($baseurl) or die failure( 50004 );
@@ -337,6 +337,9 @@ while (my $cgi = CGI::Fast->new()) {
 
         my $error = '';
 
+        # "workflow" is required even though with "execute_action" we don't need it.
+        # But the check here serves as a config validator so that a correct OpenAPI
+        # Spec will be generated upon request.
         my $workflow_type = $conf->{$method}->{workflow};
         die failure( 40401, "RPC method $method not found or no workflow_type set" )
           unless defined $workflow_type;
@@ -490,6 +493,9 @@ while (my $cgi = CGI::Fast->new()) {
             }
 
             # Endpoint has a "resume and execute" definition so run action if possible
+            #
+            # If "execute_action" is defined it enforces "pickup_workflow" and we never
+            # start a new workflow, even if no "pickup" parameters were given.
             if (my $execute_action = $conf->{$method}->{execute_action}) {
                 if (!$workflow) {
                     die failure( 40402 );
