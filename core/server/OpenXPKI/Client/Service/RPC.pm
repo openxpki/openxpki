@@ -10,6 +10,7 @@ use Data::Dumper;
 
 # CPAN modules
 use JSON;
+use Feature::Compat::Try;
 
 # Project modules
 use OpenXPKI::Client::Simple;
@@ -60,51 +61,78 @@ sub openapi_spec {
     my $openapi_server_url = shift;
     my $conf = $self->config()->config();
 
-    my $info = { title => "OpenXPKI RPC API" };
-    if (my $api_info = $conf->{openapi}) {
-        $info = { %$info, %$api_info };
-    }
+    my $paths = {};
+
+    # global OpenAPI component definitions for reusable things
+    my $components = {
+        schemas => {},
+        parameters => {},
+        securitySchemes => {},
+        requestBodies => {},
+        responses => {},
+        headers => {},
+        examples => {},
+        links => {},
+        callbacks => {},
+    };
 
     my $openapi_spec = {
         openapi => "3.0.0",
-        info => $info,
+        info => {
+            title => "OpenXPKI RPC API",
+            $conf->{openapi} ? ($conf->{openapi}->%*) : (),
+        },
         servers => [ { url => $openapi_server_url, description => "OpenXPKI server" } ],
-        components => {
-            schemas => {
-                Error => {
+        paths => $paths,
+        components => $components,
+    };
+
+    my $add_path = sub {
+        my ($url, $spec) = @_;
+        $paths->{$url} = $spec;
+    };
+
+    my $add_component = sub {
+        my ($section, $spec) = @_;
+        die "Unknown OpenAPI component sub-section '$section'" unless exists $components->{$section};
+        # append new specs or overwrite existing ones (e.g. same pickup workflow
+        # payload might be returned by get_rpc_openapi_spec multiple times)
+        $components->{$section} = { $components->{$section}->%*, $spec->%* };
+    };
+
+    $add_component->(schemas => {
+        Error => {
+            type => 'object',
+            properties => {
+                'error' => {
                     type => 'object',
+                    description => 'Only set if an error occured while executing the command',
+                    required => [qw( code message data )],
                     properties => {
-                        'error' => {
+                        'code' => {
+                            type => 'integer',
+                            description => "Code indicating the type of error:\n"
+                                . join("\n", map { " * $_ - ".$self->error_messages->{$_} } sort keys %{ $self->error_messages }),
+                            enum => [ map { $_+0 } sort keys %{ $self->error_messages } ],
+                        },
+                        'message' => {
+                            type => 'string',
+                        },
+                        'data' => {
                             type => 'object',
-                            description => 'Only set if an error occured while executing the command',
-                            required => [qw( code message data )],
                             properties => {
-                                'code' => {
-                                    type => 'integer',
-                                    description => "Code indicating the type of error:\n"
-                                        . join("\n", map { " * $_ - ".$self->error_messages->{$_} } sort keys %{ $self->error_messages }),
-                                    enum => [ map { $_+0 } sort keys %{ $self->error_messages } ],
-                                },
-                                'message' => {
-                                    type => 'string',
-                                },
-                                'data' => {
-                                    type => 'object',
-                                    properties => {
-                                        'pid' => { type => 'integer', },
-                                    },
-                                },
+                                'pid' => { type => 'integer', },
                             },
                         },
                     },
                 },
             },
         },
-    };
+    });
 
-    my $paths = {};
-    eval {
-        my $client = $self->backend() or die "Could not create OpenXPKI client";
+    try {
+        my $client = $self->backend()
+          or die "Could not create OpenXPKI client\n";
 
         if (!$openapi_spec->{info}->{version}) {
             my $server_version = $client->run_command('version');
@@ -112,18 +140,27 @@ sub openapi_spec {
         }
 
         for my $method (sort keys %$conf) {
-            next unless ($conf->{$method}->{workflow});
+            next if $method =~ /^[a-z]/; # small letters means: no RPC method but a config group
+            my $wf_type = $conf->{$method}->{workflow}
+              or die "Missing parameter 'workflow' in RPC method '$method'\n";
             my $in = $conf->{$method}->{param} || '';
             my $out = $conf->{$method}->{output} || '';
             my $action = $conf->{$method}->{execute_action};
+
+            my $pickup_workflow = $conf->{$method}->{pickup_workflow};
+            my $pickup_input = $conf->{$method}->{pickup};
+
             my $method_spec = $client->run_command('get_rpc_openapi_spec', {
-                workflow => $conf->{$method}->{workflow},
+                rpc_method => $method,
+                workflow => $wf_type,
                 ($action ? (action => $action) : ()),
                 input => [ split /\s*,\s*/, $in ],
-                output => [ split /\s*,\s*/, $out ]
+                output => [ split /\s*,\s*/, $out ],
+                $pickup_workflow ? (pickup_workflow => $pickup_workflow) : (),
+                $pickup_input ? (pickup_input => [ split /\s*,\s*/, $pickup_input ]) : (),
             });
 
-            $paths->{"/$method"} = {
+            $add_path->("/$method" => {
                 post => {
                     description => $method_spec->{description},
                     requestBody => {
@@ -168,17 +205,18 @@ sub openapi_spec {
                         },
                     },
                 },
-            };
+            });
+
+            $add_component->($_, $method_spec->{components}->{$_}) for keys $method_spec->{components}->%*;
         }
 
         $client->disconnect();
-    };
-    if (my $eval_err = $EVAL_ERROR) {
-        $self->logger()->error("Unable to query OpenAPI specification from OpenXPKI server: $eval_err");
+    }
+    catch ($err) {
+        $self->logger->error("Unable to query OpenAPI specification from OpenXPKI server: $err");
         return;
     }
 
-    $openapi_spec->{paths} = $paths;
     return $openapi_spec;
 
 }

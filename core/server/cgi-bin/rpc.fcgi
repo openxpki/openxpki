@@ -473,7 +473,7 @@ while (my $cgi = CGI::Fast->new()) {
             # check for pickup parameter
             if (my $pickup_key = $conf->{$method}->{pickup}) {
                 my $pickup_value;
-                # namespace needs a single value
+                # "pickup_workflow" needs a parameter HashRef
                 if ($conf->{$method}->{pickup_workflow}) {
                     my @keys = split /\s*,\s*/, $pickup_key;
                     foreach my $key (@keys) {
@@ -482,6 +482,7 @@ while (my $cgi = CGI::Fast->new()) {
                         my $val = $param->{$key} // $get_param->($key);
                         $pickup_value->{$key} = $val if (defined $val);
                     }
+                # "pickup_namespace" and "pickup_attribute" need a single value - see pickup_workflow()
                 } else {
                     $pickup_value = $get_param->($pickup_key);
                 }

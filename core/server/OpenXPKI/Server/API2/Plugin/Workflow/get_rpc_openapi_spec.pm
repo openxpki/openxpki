@@ -12,12 +12,15 @@ use List::Util;
 
 # CPAN modules
 use JSON;
+use Type::Params qw( signature_for );
 
 # Project modules
 use OpenXPKI::i18n qw( i18nGettext );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 use OpenXPKI::Server::API2::Plugin::Workflow::Util;
+
+use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
 
 # Sources for "type" and "format" (subtype):
 #   OpenXPKI::Client::UI::Workflow->__render_fields()
@@ -66,20 +69,11 @@ has factory => (
 
 Returns the OpenAPI specification for the given workflow.
 
-Restrictions:
-
-=over
-
-=item *
-
-=back
-
-
-
-
 B<Parameters>
 
 =over
+
+=item * C<rpc_method> I<Str> - name of the RPC method
 
 =item * C<workflow> I<Str> - workflow type
 
@@ -87,80 +81,168 @@ B<Parameters>
 
 =item * C<output> I<ArrayRef> - filter for output parameters (list of allowed parameters)
 
+=item * C<pickup_workflow> I<Str> - workflow type of the pickup workflow
+
+=item * C<pickup_input> I<ArrayRef> - filter for input parameters for the pickup workflow (list of allowed parameters)
+
 =back
 
 =cut
 command "get_rpc_openapi_spec" => {
+    rpc_method => { isa => 'Str', required => 1, },
     workflow => { isa => 'Str', required => 1, },
-    action   => { isa => 'Str', required => 0, },
+    action => { isa => 'Str', required => 0, },
     input => { isa => 'ArrayRef[Str]', required => 0, default => sub { [] } },
     output => { isa => 'ArrayRef[Str]', required => 0, default => sub { [] } },
+    pickup_workflow => { isa => 'Str', required => 0, },
+    pickup_input => { isa => 'ArrayRef[Str]', required => 0, default => sub { [] } },
 } => sub {
     my ($self, $params) = @_;
 
     my $workflow = $params->workflow;
 
-    if (not $self->factory->can_create_workflow( $workflow )) {
-        OpenXPKI::Exception->throw(
-            message => 'User is not authorized to fetch workflow info',
-            params => { workflow => $workflow }
-        );
-    }
+    # details for "workflow" and "input"
+    my ($descr, $input_schema) = $self->_get_workflow_info(
+        workflow => $params->workflow,
+        input_params => $params->input,
+        $params->has_action ? (custom_action => $params->action) : (),
+    );
 
-    my $head = CTX('config')->get_hash([ 'workflow', 'def', $workflow, 'head' ]);
+    # details for "pickup_workflow" and "pickup_input"
+    my (undef, $pickup_input_schema) = $self->_get_workflow_info(
+        workflow => $params->pickup_workflow,
+        input_params => $params->pickup_input,
+        is_pickup_workflow => 1,
+    ) if $params->has_pickup_workflow;
 
     # get field info for all output fields
     # (note that currently there is no way to statically check if the output fields
     # specified in the RPC config will actually exist in the workflow context)
     my $output = {
         map { $_->{name} => $_ }                                # field name => info hash
-        map { $self->factory->get_field_info($_, $workflow) }   # info hash about field
+        map { $self->factory->get_field_info($_, $params->workflow) }   # info hash about field
         @{ $params->output }                                    # output field names
     };
 
+    my $result = {
+        description => $descr,
+        output_schema => $self->_openapi_field_schema(
+            workflow => $params->workflow,
+            wf_fields => $output,
+            rpc_spec_field_names => $params->output,
+        ),
+        components => {},
+    };
+
+    if ($params->has_pickup_workflow) {
+        my $method = $params->rpc_method;
+        $result->{input_schema} = {
+            oneOf => [
+                { '$ref' => "#/components/schemas/${method}Body" },
+                {
+                    allOf => [
+                        $pickup_input_schema,
+                        { '$ref' => "#/components/schemas/${method}Body" },
+                    ],
+                    title => "Workflow pickup",
+                },
+            ],
+        };
+        $result->{components}->{schemas} = {
+            "${method}Body" => {
+                $input_schema->%*,
+                title => "New workflow",
+            },
+        };
+    } else {
+        $result->{input_schema} = {
+            $input_schema->%*,
+            title => "New workflow",
+        };
+    }
+
+    return $result;
+};
+
+signature_for _get_workflow_info => (
+    method => 1,
+    named => [
+        workflow => 'Str',
+        input_params => 'ArrayRef',
+        custom_action => 'Str', { optional => 1 },
+        is_pickup_workflow => 'Bool', { optional => 1, default => 0 },
+    ],
+);
+sub _get_workflow_info ($self, $arg) {
+    if (not $self->factory->can_create_workflow( $arg->workflow )) {
+        OpenXPKI::Exception->throw(
+            message => 'User is not authorized to fetch workflow info',
+            params => { workflow => $arg->workflow }
+        );
+    }
+
+    my $head = CTX('config')->get_hash([ 'workflow', 'def', $arg->workflow, 'head' ]);
+
     my $action;
-    if ($params->has_action) {
-        $action = $params->action;
+    if ($arg->custom_action) {
+        $action = $arg->custom_action;
         my $prefix = $head->{prefix};
         if ($action !~ qr/\A(global|$prefix)_/) {
-            $action =  $prefix.'_'.$action;
+            $action = $prefix.'_'.$action;
         }
     } else {
         # fetch actions in state INITIAL from the config
-        my $wf_config = $self->factory->_get_workflow_config($params->workflow);
+        my $wf_config = $self->factory->_get_workflow_config($arg->workflow);
         for my $state (@{$wf_config->{state}}) {
             next unless $state->{name} eq 'INITIAL';
             ($action) = map { $_->{name} } @{$state->{action}};
             last;
         }
         OpenXPKI::Exception->throw(
-            message => 'No INIITAL action found in workflow',
-            params => { workflow_type => $workflow }
+            message => 'No INITIAL action found in workflow',
+            params => { workflow_type => $arg->workflow }
         ) unless $action;
     }
 
-    return {
-        description => $head->{description} ? i18nGettext($head->{description}) : $workflow,
-        input_schema => $self->_openapi_field_schema($workflow, $self->_get_input_fields($workflow, $action), $params->input),
-        output_schema => $self->_openapi_field_schema($workflow, $output, $params->output),
-    };
-};
+    my $descr = $head->{description} ? i18nGettext($head->{description}) : $arg->workflow;
+
+    return (
+        # description
+        $descr,
+        # input schema
+        $self->_openapi_field_schema(
+            workflow => $arg->workflow,
+            wf_fields => $self->_get_input_fields($arg->workflow, $action),
+            rpc_spec_field_names => $arg->input_params,
+            $arg->is_pickup_workflow ? (prefix => 'Workflow pickup: ') : (),
+        ),
+    );
+}
 
 # ... this also filters out fields that are requested but do not exist in the workflow
-sub _openapi_field_schema {
-    my ($self, $workflow, $wf_fields, $rpc_spec_field_names) = @_;
+signature_for _openapi_field_schema => (
+    method => 1,
+    named => [
+        workflow => 'Str',
+        wf_fields => 'HashRef',
+        rpc_spec_field_names => 'ArrayRef',
+        prefix => 'Str', { optional => 1, default => '' },
+    ],
+);
+sub _openapi_field_schema ($self, $arg) {
+    my $workflow = $arg->workflow;
 
     my $field_specs = {}; # HashRef { fieldname => { type => ... }, fieldname => ... }
     my @required_fields;
     my @missing_fields;
 
     # skip fields defined in RPC spec but not available in workflow
-    for my $fieldname ( @$rpc_spec_field_names ) {
-        if (not $wf_fields->{$fieldname}) {
+    for my $fieldname ($arg->rpc_spec_field_names->@*) {
+        if (not $arg->wf_fields->{$fieldname}) {
             CTX('log')->system->warn("Parameter '$fieldname' as requested for OpenAPI spec is not defined in workflow '$workflow'");
             next;
         }
-        my $wf_field = $wf_fields->{$fieldname};
+        my $wf_field = $arg->wf_fields->{$fieldname};
 
         # remember required fields as they have to be listed outside the field specification
         push @required_fields, $fieldname if $wf_field->{required};
@@ -169,7 +251,7 @@ sub _openapi_field_schema {
         my @hints = ();
 
         #
-        # 1) try to detect OpenXPKI's "format" and/or "type" to set (any or all of)
+        # 1) try to detect OpenXPKI's "format" and/or "type" to set (any or all of):
         #  - type
         #  - description
         #  - format
@@ -234,7 +316,7 @@ sub _openapi_field_schema {
         }
 
         #
-        # 2) use OpenAPI type spec if provided to set/overwrite
+        # 2) use OpenAPI type spec if provided to set/overwrite:
         #  - type
         #  - properties
         #  - decription
@@ -253,6 +335,9 @@ sub _openapi_field_schema {
 
         # add hints to description
         $field->{description} .= ' ('.join(' ', @hints).')' if scalar @hints;
+
+        # prefix description
+        $field->{description} = $arg->prefix . $field->{description};
 
         # Consistency checks - should be a critical problem
         if ($field->{pattern} and $field->{enum}) {
