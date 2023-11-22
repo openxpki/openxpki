@@ -630,8 +630,6 @@ sub handle_login {
             $self->log->debug("Redirect to external login page " . $loginurl );
             $uilogin->redirect->external($loginurl);
             return $uilogin;
-            # Do a real exit to skip the error handling of the script body
-            exit;
 
         } elsif ( $cgi->http('HTTP_X-OPENXPKI-Client') ) {
 
