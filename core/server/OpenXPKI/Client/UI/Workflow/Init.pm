@@ -317,6 +317,12 @@ sub init_info {
                 'label' => 'I18N_OPENXPKI_UI_WORKFLOW_LOG_LABEL',
             };
         }
+
+        if (@buttons_handle) {
+            $buttons_handle[-1]->{break_after} = 1;
+        }
+        push @buttons_handle, @{$self->__get_global_action_handles($wf_info)};
+
     }
 
     $self->set_page(

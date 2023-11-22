@@ -243,82 +243,6 @@ sub __render_from_workflow {
 
     my $wf_proc_state = $wf_info->{workflow}->{proc_state} || 'init';
 
-    # add buttons for manipulative handles (wakeup, fail, reset, resume)
-    # to be added to the default button list
-
-    my @handles;
-    my @buttons_handle;
-    if ($wf_info->{handles} && ref $wf_info->{handles} eq 'ARRAY') {
-        @handles = @{$wf_info->{handles}};
-
-        $self->log->debug('Adding global actions ' . join('/', @handles));
-
-        if (grep /\A wakeup \Z/x, @handles) {
-            my $token = $self->__wf_token_extra_param( $wf_info, { wf_handle => 'wakeup' } );
-            push @buttons_handle, {
-                label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_WAKEUP_BUTTON',
-                action => "workflow!handle!${token}",
-                format => 'exceptional'
-            }
-        }
-
-        if (grep /\A resume \Z/x, @handles) {
-            my $token = $self->__wf_token_extra_param( $wf_info, { wf_handle => 'resume' } );
-            push @buttons_handle, {
-                label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESUME_BUTTON',
-                action => "workflow!handle!${token}",
-                format => 'exceptional'
-            };
-        }
-
-        if (grep /\A reset \Z/x, @handles) {
-            my $token = $self->__wf_token_extra_param( $wf_info, { wf_handle => 'reset' } );
-            push @buttons_handle, {
-                label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESET_BUTTON',
-                action => "workflow!handle!${token}",
-                format => 'reset',
-                confirm => {
-                    label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESET_DIALOG_LABEL',
-                    description => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESET_DIALOG_TEXT',
-                    confirm_label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESET_DIALOG_CONFIRM_BUTTON',
-                    cancel_label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESET_DIALOG_CANCEL_BUTTON',
-                }
-            };
-        }
-
-        if (grep /\A fail \Z/x, @handles) {
-            my $token = $self->__wf_token_extra_param( $wf_info, { wf_handle => 'fail' } );
-            push @buttons_handle, {
-                label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON',
-                action => "workflow!handle!${token}",
-                format => 'failure',
-                confirm => {
-                    label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_LABEL',
-                    description => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_TEXT',
-                    confirm_label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_CONFIRM_BUTTON',
-                    cancel_label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_CANCEL_BUTTON',
-                }
-            };
-        }
-
-        if (grep /\A archive \Z/x, @handles) {
-            my $token = $self->__wf_token_extra_param( $wf_info, { wf_handle => 'archive' } );
-            push @buttons_handle, {
-                label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_BUTTON',
-                action => "workflow!handle!${token}",
-                format => 'exceptional',
-                confirm => {
-                    label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_LABEL',
-                    description => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_TEXT',
-                    confirm_label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_CONFIRM_BUTTON',
-                    cancel_label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_CANCEL_BUTTON',
-                }
-            };
-        }
-    }
-
-
-
     # show buttons to proceed with workflow if it's in "non-regular" state
     my %irregular = (
         running => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_DESC',
@@ -327,6 +251,17 @@ sub __render_from_workflow {
         retry_exceeded => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_RETRY_EXCEEDED_DESC',
     );
     if ($irregular{$wf_proc_state}) {
+
+        # add buttons for manipulative handles (wakeup, fail, reset, resume)
+        # to be added to the default button list
+        my @handles;
+        my @buttons_handle;
+        if ($wf_info->{handles} && ref $wf_info->{handles} eq 'ARRAY') {
+            # this is evaluated to show the context in the exception case below
+            @handles = @{$wf_info->{handles}};
+            # this is added to the button list at the end of the page
+            @buttons_handle = @{$self->__get_global_action_handles($wf_info)};
+        }
 
         # same page head for all proc states
         my $wf_action = $wf_info->{workflow}->{context}->{wf_current_action};
@@ -779,6 +714,83 @@ sub __get_form_buttons {
     return \@buttons;
 }
 
+
+sub __get_global_action_handles {
+
+    my $self = shift;
+    my $wf_info = shift;
+
+    return [] unless ($wf_info->{handles});
+
+    my @handles = @{$wf_info->{handles}};
+    my @buttons;
+
+    $self->log->debug('Adding global actions ' . join('/', @handles));
+
+    if (grep /\A wakeup \Z/x, @handles) {
+        my $token = $self->__wf_token_extra_param( $wf_info, { wf_handle => 'wakeup' } );
+        push @buttons, {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_WAKEUP_BUTTON',
+            action => "workflow!handle!${token}",
+            format => 'exceptional'
+        }
+    }
+
+    if (grep /\A resume \Z/x, @handles) {
+        my $token = $self->__wf_token_extra_param( $wf_info, { wf_handle => 'resume' } );
+        push @buttons, {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESUME_BUTTON',
+            action => "workflow!handle!${token}",
+            format => 'exceptional'
+        };
+    }
+
+    if (grep /\A reset \Z/x, @handles) {
+        my $token = $self->__wf_token_extra_param( $wf_info, { wf_handle => 'reset' } );
+        push @buttons, {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESET_BUTTON',
+            action => "workflow!handle!${token}",
+            format => 'reset',
+            confirm => {
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESET_DIALOG_LABEL',
+                description => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESET_DIALOG_TEXT',
+                confirm_label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESET_DIALOG_CONFIRM_BUTTON',
+                cancel_label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESET_DIALOG_CANCEL_BUTTON',
+            }
+        };
+    }
+
+    if (grep /\A fail \Z/x, @handles) {
+        my $token = $self->__wf_token_extra_param( $wf_info, { wf_handle => 'fail' } );
+        push @buttons, {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON',
+            action => "workflow!handle!${token}",
+            format => 'failure',
+            confirm => {
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_LABEL',
+                description => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_TEXT',
+                confirm_label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_CONFIRM_BUTTON',
+                cancel_label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_CANCEL_BUTTON',
+            }
+        };
+    }
+
+    if (grep /\A archive \Z/x, @handles) {
+        my $token = $self->__wf_token_extra_param( $wf_info, { wf_handle => 'archive' } );
+        push @buttons, {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_BUTTON',
+            action => "workflow!handle!${token}",
+            format => 'exceptional',
+            confirm => {
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_LABEL',
+                description => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_TEXT',
+                confirm_label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_CONFIRM_BUTTON',
+                cancel_label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_CANCEL_BUTTON',
+            }
+        };
+    }
+    return \@buttons;
+}
 
 sub __get_next_auto_action {
 
