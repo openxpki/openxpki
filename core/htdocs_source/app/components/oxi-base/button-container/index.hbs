@@ -3,9 +3,6 @@
         {{#if this.hasDescription}}
 
             {{#each this.buttons as |btn index|}}
-                {{#if (and (has-block) (eq index 0))}}
-                    {{yield}}
-                {{/if}}
                 <div class="row align-items-center my-2">
                     {{#if btn.section}}
                         <div class="col-12">
@@ -25,25 +22,20 @@
             {{/each}}
 
         {{else}}
-
-            {{#each this.buttonGroups as |btnGroup index|}}
-                <div class="mb-1"> {{!-- vertical spacing between button group rows --}}
-                    {{#if (and (has-block) (eq index 0))}}
-                        {{yield}}
-                    {{/if}}
-                    <div class="row align-items-start my-2">
-                    {{#each btnGroup as |btn|}}
-                        <div class="col-12 col-sm-auto pb-1">
-                        {{#if btn.section}}
-                            <!-- Section are not supported yet -->
-                        {{else}}
-                            <OxiBase::Button @button={{btn}} class="d-block d-sm-flex w-100" />
-                        {{/if}}
+            <div class="row row-cols-1 row-cols-sm-{{this.maxButtonsPerRow}} align-items-stretch my-2 g-2">
+                {{#each this.buttons as |btn|}}
+                    {{#if btn.empty}}
+                        <!-- Force next columns to break to new line at md breakpoint and up -->
+                        <div class="w-100 d-none d-md-block"></div>
+                    {{else if btn.section}}
+                        <!-- Sections are not supported yet -->
+                    {{else}}
+                        <div class="col">
+                            <OxiBase::Button @button={{btn}} class="d-block d-sm-flex w-100 h-100 align-items-center justify-content-center" />
                         </div>
-                    {{/each}}
-                    </div>
-                </div>
-            {{/each}}
+                    {{/if}}
+                {{/each}}
+            </div>
 
         {{/if}}
     </div>

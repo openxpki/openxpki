@@ -80,11 +80,7 @@
                 <div class="card-header bg-info"></div>
                 <div class="card-body">
                     <form>
-                        <OxiBase::ButtonContainer @buttons={{this.test_buttons}}>
-                            {{!-- template-lint-disable no-bare-strings --}}
-                            <BsButton @type="" class="oxi-btn-submit"> Submit </BsButton>
-                            <BsButton @type="" class="oxi-btn-reset"> Reset </BsButton>
-                        </OxiBase::ButtonContainer>
+                        <OxiBase::ButtonContainer @buttons={{this.test_buttons}} />
                     </form>
                 </div>
             </div>

@@ -17,25 +17,26 @@ import ContainerButton from 'openxpki/data/container-button'
  * @extends Component
  */
 export default class OxiButtonContainerComponent extends Component {
-    buttons
-    buttonGroups
+    buttons = []
+    maxButtonsPerRow = 4
 
     constructor() {
         super(...arguments)
 
-        // buttons
-        let btns = this.args.buttons || []
-        this.buttons = btns.map(def => ContainerButton.fromHash(def))
+        let addEmptyButton = () => this.buttons.push(ContainerButton.fromHash({ empty: true }))
+
+        let buttons = (this.args.buttons || []).map(def => ContainerButton.fromHash(def))
+        let buttonsPerRow = 0
 
         // button groups
-        this.buttonGroups = []
-        let currentGroup = []
-        for (const btn of this.buttons) {
-            if (btn.break_before) { this.buttonGroups.push(currentGroup); currentGroup = [] }
-            currentGroup.push(btn)
-            if (btn.break_after)  { this.buttonGroups.push(currentGroup); currentGroup = [] }
+        for (const btn of buttons) {
+            if (btn.break_before) { addEmptyButton(); buttonsPerRow = 0 }
+            this.buttons.push(btn)
+            if (++buttonsPerRow > this.maxButtonsPerRow) this.maxButtonsPerRow = buttonsPerRow
+            if (btn.break_after) { addEmptyButton(); buttonsPerRow = 0 }
         }
-        this.buttonGroups.push(currentGroup)
+
+        if (this.maxButtonsPerRow > 6) this.maxButtonsPerRow = 6
     }
 
     get hasDescription() {

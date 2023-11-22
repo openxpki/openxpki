@@ -18,4 +18,5 @@ export default class ContainerButton extends Link {
     description
     break_before
     break_after
+    empty = false // this "button" is only an empty placeholder that fills the grid to simulate a line break
 }
