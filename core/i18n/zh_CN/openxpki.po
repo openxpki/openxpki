@@ -85,14 +85,6 @@ msgstr "此页面显示您启动的所有工作流程的列表。"
 msgid "I18N_OPENXPKI_UI_BULK_PAUSED_WORKFLOW_LABEL"
 msgstr "打开工作流程"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_DESCRIPTION"
-msgstr "SCEP注册工作流程正在等待批准。"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_LABEL"
-msgstr "注册"
-
 msgid "I18N_OPENXPKI_UI_BULK_PENDING_REQUEST_DESCRIPTION"
 msgstr "批量批准或拒绝待定的证书签署请求。"
 
@@ -1425,9 +1417,6 @@ msgstr "如果您没有任何特殊需求，则默认样式通常是最佳选择
 msgid "I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_LABEL"
 msgstr "默认配置文件样式"
 
-msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
-msgstr "请先选择配置文件"
-
 msgid "I18N_OPENXPKI_UI_PROFILE_CN_DESC"
 msgstr "通用名称"
 
@@ -2639,14 +2628,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "更新请求"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_DESC"
-msgstr "安排此证书吊销"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_LABEL"
-msgstr "吊销证书"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_APPROVE_BUTTON"
 msgstr "返回"
 
@@ -2772,9 +2753,6 @@ msgstr "异常消息"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_EXPORT_PRIVATEKEY_RETRY_PASSWORD_BUTTON_LABEL"
 msgstr "重新输入密码"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_EXTRA_INFO_LABEL"
-msgstr "技术信息"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ADDUSER_EMAIL_DESC"
@@ -4914,6 +4892,14 @@ msgstr "唤醒"
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "是"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_DESCRIPTION"
+#~ msgstr "SCEP注册工作流程正在等待批准。"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_LABEL"
+#~ msgstr "注册"
+
 # Remove?
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CERT_SUBJECT_PARTS"
@@ -4939,6 +4925,20 @@ msgstr "是"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_MENU_USERS"
 #~ msgstr "请求"
+
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
+#~ msgstr "请先选择配置文件"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_DESC"
+#~ msgstr "安排此证书吊销"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_LABEL"
+#~ msgstr "吊销证书"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_EXTRA_INFO_LABEL"
+#~ msgstr "技术信息"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_PENDING_DESC"

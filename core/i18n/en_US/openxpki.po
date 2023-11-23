@@ -71,12 +71,6 @@ msgstr "Wakeup or discard workflows in paused state."
 msgid "I18N_OPENXPKI_UI_BULK_PAUSED_WORKFLOW_LABEL"
 msgstr "Paused Workflows"
 
-msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_DESCRIPTION"
-msgstr "Bulk approve or reject outstanding enrollment requests."
-
-msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_LABEL"
-msgstr "Enrollments"
-
 msgid "I18N_OPENXPKI_UI_BULK_PENDING_REQUEST_DESCRIPTION"
 msgstr "Bulk approve or reject outstanding certificate signing requests."
 
@@ -1301,9 +1295,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_LABEL"
 msgstr "Default profile style"
 
-msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
-msgstr "Please select profile first"
-
 msgid "I18N_OPENXPKI_UI_PROFILE_CN_DESC"
 msgstr "Common Name"
 
@@ -2457,12 +2448,6 @@ msgstr "Please update / complete the information below."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Update Request"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_DESC"
-msgstr " "
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_LABEL"
-msgstr "Upload Certificate"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_APPROVE_BUTTON"
 msgstr "Approve Request"
 
@@ -2588,9 +2573,6 @@ msgstr "Exception Message"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_EXPORT_PRIVATEKEY_RETRY_PASSWORD_BUTTON_LABEL"
 msgstr "Re-Enter Password"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_EXTRA_INFO_LABEL"
-msgstr "Technical Information"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ADDUSER_EMAIL_DESC"
 msgstr "Email of user"
@@ -4674,6 +4656,12 @@ msgstr "Wake Up"
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "Yes"
 
+#~ msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_DESCRIPTION"
+#~ msgstr "Bulk approve or reject outstanding enrollment requests."
+
+#~ msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_LABEL"
+#~ msgstr "Enrollments"
+
 #~ msgid "I18N_OPENXPKI_UI_CERT_SUBJECT_PARTS"
 #~ msgstr "Subject Parts"
 
@@ -4693,6 +4681,18 @@ msgstr "Yes"
 
 #~ msgid "I18N_OPENXPKI_UI_MENU_USERS"
 #~ msgstr "Manage Users"
+
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
+#~ msgstr "Please select profile first"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_DESC"
+#~ msgstr " "
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_LABEL"
+#~ msgstr "Upload Certificate"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_EXTRA_INFO_LABEL"
+#~ msgstr "Technical Information"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_PENDING_DESC"
 #~ msgstr "This request requires approval."

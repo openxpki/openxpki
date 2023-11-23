@@ -94,14 +94,6 @@ msgid "I18N_OPENXPKI_UI_BULK_PAUSED_WORKFLOW_LABEL"
 msgstr "Workflow Aperto"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_DESCRIPTION"
-msgstr "Workflow Adesione SCEP in attesa di approvazione."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_LABEL"
-msgstr "Registrazione"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_BULK_PENDING_REQUEST_DESCRIPTION"
 msgstr "Richiesta Certificato in attesa di approvazione."
 
@@ -1652,9 +1644,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_LABEL"
 msgstr "Stile profilo di default"
 
-msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
-msgstr "Seleziona prima un profilo nel campo soprastante"
-
 msgid "I18N_OPENXPKI_UI_PROFILE_CN_DESC"
 msgstr "Common Name"
 
@@ -3026,14 +3015,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Richiesta Aggiornamento"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_DESC"
-msgstr "Programma questo certificato per la revoca"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_LABEL"
-msgstr "Revoca Certificato"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_APPROVE_BUTTON"
 msgstr "Forza Ripristino"
 
@@ -3180,10 +3161,6 @@ msgstr "Link"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_EXPORT_PRIVATEKEY_RETRY_PASSWORD_BUTTON_LABEL"
 msgstr "Password"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_EXTRA_INFO_LABEL"
-msgstr "Ulteriori Informazioni"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ADDUSER_EMAIL_DESC"
@@ -5586,6 +5563,14 @@ msgstr "Riavvia"
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "Sì"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_DESCRIPTION"
+#~ msgstr "Workflow Adesione SCEP in attesa di approvazione."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_LABEL"
+#~ msgstr "Registrazione"
+
 # Remove?
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CERT_SUBJECT_PARTS"
@@ -5612,6 +5597,21 @@ msgstr "Sì"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_MENU_USERS"
 #~ msgstr "Richiesta"
+
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
+#~ msgstr "Seleziona prima un profilo nel campo soprastante"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_DESC"
+#~ msgstr "Programma questo certificato per la revoca"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_LABEL"
+#~ msgstr "Revoca Certificato"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_EXTRA_INFO_LABEL"
+#~ msgstr "Ulteriori Informazioni"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_PENDING_DESC"

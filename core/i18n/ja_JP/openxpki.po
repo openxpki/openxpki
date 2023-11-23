@@ -77,14 +77,6 @@ msgstr "あなたが開始したワークフローが一覧で表示されます
 msgid "I18N_OPENXPKI_UI_BULK_PAUSED_WORKFLOW_LABEL"
 msgstr "ワークフローを開く"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_DESCRIPTION"
-msgstr "SCEP登録ワークフローは承認待ちです。"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_LABEL"
-msgstr "登録"
-
 msgid "I18N_OPENXPKI_UI_BULK_PENDING_REQUEST_DESCRIPTION"
 msgstr "証明書発行リクエストは一括での承認/否認をします。"
 
@@ -1357,9 +1349,6 @@ msgstr "特別な要件がない場合は、通常はデフォルトスタイル
 msgid "I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_LABEL"
 msgstr "デフォルトのプロファイルスタイル"
 
-msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
-msgstr "最初にプロファイルを選択してください"
-
 msgid "I18N_OPENXPKI_UI_PROFILE_CN_DESC"
 msgstr "一般名称(CN)"
 
@@ -2555,14 +2544,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "リクエストの更新"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_DESC"
-msgstr "証明書の失効スケジュール"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_LABEL"
-msgstr "証明書の失効"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_APPROVE_BUTTON"
 msgstr "戻る"
 
@@ -2689,9 +2670,6 @@ msgstr "例外メッセージ"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_EXPORT_PRIVATEKEY_RETRY_PASSWORD_BUTTON_LABEL"
 msgstr "パスワード再入力"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_EXTRA_INFO_LABEL"
-msgstr "追加情報"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ADDUSER_EMAIL_DESC"
 msgstr "ユーザのEメール"
@@ -4762,6 +4740,14 @@ msgstr "はい"
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_RETRIES_EXEEDED"
 #~ msgstr "リトライ制限値に達しました"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_DESCRIPTION"
+#~ msgstr "SCEP登録ワークフローは承認待ちです。"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_LABEL"
+#~ msgstr "登録"
+
 #~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_DESC"
 #~ msgstr "証明書リクエスト中に設定した鍵のパスフレーズを入力してください。"
 
@@ -4846,6 +4832,9 @@ msgstr "はい"
 
 #~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_LABEL"
 #~ msgstr "パスワード"
+
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
+#~ msgstr "最初にプロファイルを選択してください"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_NODEID"
 #~ msgstr "ノードID"
@@ -5445,6 +5434,14 @@ msgstr "はい"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPU_GENERATE_ACT_CODE"
 #~ msgstr "コードを作成する"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_DESC"
+#~ msgstr "証明書の失効スケジュール"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_LABEL"
+#~ msgstr "証明書の失効"
+
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL"
 #~ msgstr "戻る"
 
@@ -5471,6 +5468,9 @@ msgstr "はい"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_LABEL"
 #~ msgstr "SCEPの登録"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_EXTRA_INFO_LABEL"
+#~ msgstr "追加情報"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ACTIVE_CERT_COUNT_LABEL"
 #~ msgstr "有効な証明書の数"

@@ -94,14 +94,6 @@ msgid "I18N_OPENXPKI_UI_BULK_PAUSED_WORKFLOW_LABEL"
 msgstr "Последнее обновление"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_DESCRIPTION"
-msgstr "Прием заявок на сертификаты по протоколу SCEP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_LABEL"
-msgstr "Родительский технологический процесс"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_BULK_PENDING_REQUEST_DESCRIPTION"
 msgstr "Описания пока нет"
 
@@ -1725,10 +1717,6 @@ msgid "I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_LABEL"
 msgstr "Профиль TLS сервера "
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
-msgstr "Профиль пользователя"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_CN_DESC"
 msgstr ""
 "Используйте данный профиль сертификата только если Вы отчетливо "
@@ -3212,14 +3200,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_DESC"
-msgstr "Отозвать сертификат"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_LABEL"
-msgstr "Отозвать сертификат"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_APPROVE_BUTTON"
 msgstr "Дочерние технологические процессы"
 
@@ -3375,10 +3355,6 @@ msgstr ""
 "знаете компоненты этой структуры и соглашения об использовании имен в Вашей "
 "части инфраструктуры открытых ключей. Данный профиль позволяет использовать "
 "также произвольный набор альтернативных имен."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_EXTRA_INFO_LABEL"
-msgstr "Родительский технологический процесс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ADDUSER_EMAIL_DESC"
@@ -6036,6 +6012,14 @@ msgid "I18N_OPENXPKI_UI_YES"
 msgstr "Имя учетной записи"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_DESCRIPTION"
+#~ msgstr "Прием заявок на сертификаты по протоколу SCEP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_LABEL"
+#~ msgstr "Родительский технологический процесс"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CERT_SUBJECT_PARTS"
 #~ msgstr "Субъект"
 
@@ -6063,6 +6047,22 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_MENU_USERS"
 #~ msgstr "Комментарий"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
+#~ msgstr "Профиль пользователя"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_DESC"
+#~ msgstr "Отозвать сертификат"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_LABEL"
+#~ msgstr "Отозвать сертификат"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_EXTRA_INFO_LABEL"
+#~ msgstr "Родительский технологический процесс"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_PENDING_DESC"

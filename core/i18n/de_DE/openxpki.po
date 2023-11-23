@@ -71,12 +71,6 @@ msgstr "Pausierte Workflows aufwecken oder abbrechen"
 msgid "I18N_OPENXPKI_UI_BULK_PAUSED_WORKFLOW_LABEL"
 msgstr "Pausierte Workflows"
 
-msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_DESCRIPTION"
-msgstr "Ausstehende Enrollments gesammelt bestätigen oder ablehnen."
-
-msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_LABEL"
-msgstr "Automatische Enrollments"
-
 msgid "I18N_OPENXPKI_UI_BULK_PENDING_REQUEST_DESCRIPTION"
 msgstr "Ausstehende Zertifikatsanträge gesammelt bestätigen oder ablehnen."
 
@@ -1306,9 +1300,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_LABEL"
 msgstr "Standardmodus"
-
-msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
-msgstr "Bitte zuerst Profil wählen"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_CN_DESC"
 msgstr "Bezeichner (CN)"
@@ -2548,12 +2539,6 @@ msgstr "Bitte aktualisieren/komplettieren Sie die nachfolgenden Informationen."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Antrag aktualisieren"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_DESC"
-msgstr " "
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_LABEL"
-msgstr "Zertifikat hochladen"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_APPROVE_BUTTON"
 msgstr "Antrag Freigeben"
 
@@ -2682,9 +2667,6 @@ msgstr "Fehlermeldung"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_EXPORT_PRIVATEKEY_RETRY_PASSWORD_BUTTON_LABEL"
 msgstr "Passwort wiederholen"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_EXTRA_INFO_LABEL"
-msgstr "Technische Informationen"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ADDUSER_EMAIL_DESC"
@@ -4899,6 +4881,12 @@ msgstr "aufwecken"
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "ja"
 
+#~ msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_DESCRIPTION"
+#~ msgstr "Ausstehende Enrollments gesammelt bestätigen oder ablehnen."
+
+#~ msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_LABEL"
+#~ msgstr "Automatische Enrollments"
+
 #~ msgid "I18N_OPENXPKI_UI_CERT_SUBJECT_PARTS"
 #~ msgstr "Subjectkomponenten"
 
@@ -4917,6 +4905,18 @@ msgstr "ja"
 
 #~ msgid "I18N_OPENXPKI_UI_MENU_USERS"
 #~ msgstr "Benutzer"
+
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
+#~ msgstr "Bitte zuerst Profil wählen"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_DESC"
+#~ msgstr " "
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_LABEL"
+#~ msgstr "Zertifikat hochladen"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_EXTRA_INFO_LABEL"
+#~ msgstr "Technische Informationen"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_PENDING_DESC"
