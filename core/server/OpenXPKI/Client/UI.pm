@@ -147,8 +147,7 @@ sub _init_backend {
     }
 
     my $client_id = $client->get_session_id();
-    my $session = $self->session();
-    my $backend_id =  $session->param('backend_session_id') || undef;
+    my $backend_id =  $self->session->param('backend_session_id') || undef;
 
     if ($backend_id and $client_id and $backend_id eq $client_id) {
         $self->log->debug('Backend session already loaded');
@@ -183,7 +182,7 @@ sub _init_backend {
     } else {
         $self->log->info('New backend session with id ' . $client_id);
     }
-    $session->param('backend_session_id', $client_id);
+    $self->session->param('backend_session_id', $client_id);
 
     Log::Log4perl::MDC->put('ssid', substr($client_id,0,4));
 
@@ -194,12 +193,11 @@ sub _init_backend {
 sub BUILD {
     my $self = shift;
 
-    if (!$self->session()->param('initialized')) {
-        my $session = $self->session();
-        $session->param('initialized', 1);
-        $session->param('is_logged_in', 0);
-        $session->param('user', undef);
-    } elsif (my $user = $self->session()->param('user')) {
+    if (not $self->session->param('initialized')) {
+        $self->session->param('initialized', 1);
+        $self->session->param('is_logged_in', 0);
+        $self->session->param('user', undef);
+    } elsif (my $user = $self->session->param('user')) {
         Log::Log4perl::MDC->put('name', $user->{name});
         Log::Log4perl::MDC->put('role', $user->{role});
     } else {
@@ -244,7 +242,7 @@ sub handle_request {
 
         # For SSO Logins the session might hold an external link
         # to logout from the SSO provider
-        my $authinfo = $self->session()->param('authinfo') || {};
+        my $authinfo = $self->session->param('authinfo') || {};
         my $redirectTo = $authinfo->{logout};
 
         # clear the session before redirecting to make sure we are safe
@@ -306,7 +304,7 @@ sub handle_request {
 
     # if the backend session logged out but did not terminate
     # we get the problem that ui is logged in but backend is not
-    $self->logout_session( $cgi ) if ($self->session()->param('is_logged_in'));
+    $self->logout_session( $cgi ) if ($self->session->param('is_logged_in'));
 
     # try to log in
     return $self->handle_login( { req => $req, reply => $reply } );
@@ -444,7 +442,7 @@ sub __get_action {
     my $self = shift;
     my $req = shift;
 
-    my $rtoken_session = $self->session()->param('rtoken') || '';
+    my $rtoken_session = $self->session->param('rtoken') || '';
     my $rtoken_request = $req->param('_rtoken') || '';
     # check XSRF token
     if ($req->param('action')) {
@@ -598,26 +596,26 @@ sub handle_login {
 
     # Special handling for pki_realm and stack params
     if ($action eq 'login!realm' && $req->param('pki_realm')) {
-        $session->param('pki_realm', scalar $req->param('pki_realm'));
-        $session->param('auth_stack', undef);
+        $self->session->param('pki_realm', scalar $req->param('pki_realm'));
+        $self->session->param('auth_stack', undef);
         $self->log->debug('set realm in session: ' . $req->param('pki_realm') );
     }
     if($action eq 'login!stack' && $req->param('auth_stack')) {
-        $session->param('auth_stack', scalar $req->param('auth_stack'));
+        $self->session->param('auth_stack', scalar $req->param('auth_stack'));
         $self->log->debug('set auth_stack in session: ' . $req->param('auth_stack') );
     }
 
     # ENV always overrides session, keep this after the above block to prevent
     # people from hacking into the session parameters
     if ($ENV{OPENXPKI_PKI_REALM}) {
-        $session->param('pki_realm', $ENV{OPENXPKI_PKI_REALM});
+        $self->session->param('pki_realm', $ENV{OPENXPKI_PKI_REALM});
     }
     if ($ENV{OPENXPKI_AUTH_STACK}) {
-        $session->param('auth_stack', $ENV{OPENXPKI_AUTH_STACK});
+        $self->session->param('auth_stack', $ENV{OPENXPKI_AUTH_STACK});
     }
 
-    my $pki_realm = $session->param('pki_realm') || '';
-    my $auth_stack =  $session->param('auth_stack') || '';
+    my $pki_realm = $self->session->param('pki_realm') || '';
+    my $auth_stack =  $self->session->param('auth_stack') || '';
 
     # if this is an initial request, force redirect to the login page
     # will do an external redirect in case loginurl is set in config
@@ -625,7 +623,7 @@ sub handle_login {
         # Requests to pages can be redirected after login, store page in session
         if ($page && $page ne 'logout' && $page ne 'welcome') {
             $self->log->debug("Store page request for later redirect " . $page);
-            $self->session()->param('redirect', $page);
+            $self->session->param('redirect', $page);
         }
 
         # Link to an internal method using the class!method
@@ -649,7 +647,7 @@ sub handle_login {
 
             # This is not an ember request so we need to redirect
             # back to the ember page - try if the session has a baseurl
-            my $url = $self->session()->param('baseurl');
+            my $url = $self->session->param('baseurl');
             # if not, get the path from the referer
             if (!$url && (($ENV{HTTP_REFERER}//'') =~ m{https?://[^/]+(/[\w/]*[\w])/?}i)) {
                 $url = $1;
@@ -758,7 +756,7 @@ sub handle_login {
             # Directly load stack if there is only one
             if (scalar @stack_list == 1)  {
                 $auth_stack = $stack_list[0]->{value};
-                $session->param('auth_stack', $auth_stack);
+                $self->session->param('auth_stack', $auth_stack);
                 $self->log->debug("Only one stack avail ($auth_stack) - autoselect");
                 $reply = $self->backend()->send_receive_service_msg( 'GET_AUTHENTICATION_STACK', {
                     AUTHENTICATION_STACK => $auth_stack
@@ -817,7 +815,7 @@ sub handle_login {
 
                 # the login url might contain a backlink to the running instance
                 $loginurl = OpenXPKI::Template->new->render( $loginurl,
-                    { baseurl => $session->param('baseurl') } );
+                    { baseurl => $self->session->param('baseurl') } );
 
                 $self->log->debug("No auth data in environment - redirect found $loginurl");
                 $uilogin->redirect->external($loginurl);
@@ -908,7 +906,7 @@ sub handle_login {
             # merge baseurl to authinfo links
             # (we need to get the baseurl before recreating the session below)
             my $auth_info = {};
-            my $baseurl = $session->param('baseurl');
+            my $baseurl = $self->session->param('baseurl');
             if (my $ai = $session_info->{authinfo}) {
                 my $tt = OpenXPKI::Template->new;
                 for my $key (keys %{$ai}) {
@@ -924,11 +922,7 @@ sub handle_login {
             # The backend session remains the same but can not be used by an
             # adversary as the id is never exposed and we destroy the old frontend
             # session so access to the old session is not possible
-            $self->_recreate_frontend_session($session, $session_info, $auth_info);
-
-            Log::Log4perl::MDC->put('sid', substr($session->id,0,4));
-
-            $self->resp->session_cookie->id($session->id);
+            $self->_recreate_frontend_session($session_info, $auth_info);
 
             if ($auth_info->{login}) {
                 $uilogin->redirect->to($auth_info->{login});
@@ -958,59 +952,70 @@ sub handle_login {
 
 }
 
+sub _new_frontend_session {
+
+    my $self = shift;
+
+    # delete the old instance data
+    $self->session->delete;
+    $self->session->flush;
+    # call new on the existing session object to reuse settings
+    $self->session($self->session->new);
+
+    Log::Log4perl::MDC->put('sid', substr($self->session->id,0,4));
+    $self->log->debug('New frontend session id : '. $self->session->id);
+
+    # update the session cookie
+    $self->resp->session_cookie->id($self->session->id);
+
+}
+
 sub _recreate_frontend_session {
 
     my $self = shift;
-    my $session = shift;
     my $data = shift;
     my $auth_info = shift;
 
     $self->log->trace('Got session info: '. Dumper $data) if $self->log->is_trace;
 
     # fetch redirect from old session before deleting it!
-    my $redirect = $session->param('redirect');
+    my $redirect = $self->session->param('redirect');
 
-    # delete the old instance data
-    $session->delete;
-    $session->flush;
-    # call new on the existing session object to reuse settings
-    $session = $session->new;
-
-    $self->log->debug('New frontend session id : '. $session->id );
+    # create a new session
+    $self->_new_frontend_session;
 
     if ($redirect) {
         $self->log->trace('Carry over redirect target ' . $redirect);
-        $session->param('redirect', $redirect);
+        $self->session->param('redirect', $redirect);
     }
 
     # set some data
-    $session->param('backend_session_id', $self->backend->get_session_id );
+    $self->session->param('backend_session_id', $self->backend->get_session_id );
 
     # move userinfo to own node
-    $session->param('userinfo', $data->{userinfo} || {});
+    $self->session->param('userinfo', $data->{userinfo} || {});
     delete $data->{userinfo};
 
-    $session->param('authinfo', $auth_info);
+    $self->session->param('authinfo', $auth_info);
 
-    $session->param('user', $data);
-    $session->param('pki_realm', $data->{pki_realm});
-    $session->param('is_logged_in', 1);
-    $session->param('initialized', 1);
-
-    $self->session($session);
+    $self->session->param('user', $data);
+    $self->session->param('pki_realm', $data->{pki_realm});
+    $self->session->param('is_logged_in', 1);
+    $self->session->param('initialized', 1);
+    $self->session->param('login_timestamp', time);
 
     # Check for MOTD
     my $motd = $self->backend->send_receive_command_msg( 'get_motd' );
     if (ref $motd->{PARAMS} eq 'HASH') {
         $self->log->trace('Got MOTD: '. Dumper $motd->{PARAMS} ) if $self->log->is_trace;
-        $session->param('motd', $motd->{PARAMS} );
+        $self->session->param('motd', $motd->{PARAMS} );
     }
 
     # menu
     my $reply = $self->backend->send_receive_command_msg( 'get_menu' );
-    $self->_set_menu($session, $reply->{PARAMS}) if $reply->{PARAMS};
+    $self->_set_menu($self->session, $reply->{PARAMS}) if $reply->{PARAMS};
 
-    $session->flush;
+    $self->session->flush;
 
 }
 
@@ -1150,17 +1155,10 @@ sub logout_session {
     my $cgi = shift;
 
     $self->log->info("session logout");
-
-    my $session = $self->session;
     $self->backend->logout;
-    $self->session->delete;
-    $self->session->flush;
-    $self->session($self->session->new);
 
-    Log::Log4perl::MDC->put('sid', substr($self->session->id,0,4));
-
-    # flush the session cookie
-    $self->resp->session_cookie->id($self->session->id);
+    # create a new session
+    $self->_new_frontend_session;
 
 }
 
