@@ -32,7 +32,7 @@ signature_for is_token_usable => (
     positional => [
         'OpenXPKI::Crypto::API',
         'Str', { default => 'sign' },
-        'Optional[ HashRef ]',
+        'HashRef|Undef', { default => undef },
     ],
 );
 sub is_token_usable ($self, $token, $check, $padding_config) {
