@@ -11,6 +11,7 @@ site:
   back: "Back"
   workflow_info: "Workflow"
   old_browser: "You are using an old browser version: {browser}. This may result in problems when using OpenXPKI."
+  session_renewed: "You have logged in again in another browser window.\nThe login session has been renewed, please repeat the action you just performed."
 
 userinfo:
   name: "Signed in as"

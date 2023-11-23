@@ -39,6 +39,8 @@ export default class OxiContentService extends Service {
     @tracked error = null
     @tracked loadingBanner = null
     last_session_id = null // to track server-side logouts with session id changes
+    #loginTimestamp = null // to track logouts in another browser window via Cookie comparison
+
     /*
     Custom handlers for exceptions returned by the server (HTTP status codes):
         [
@@ -207,7 +209,7 @@ export default class OxiContentService extends Service {
         try {
             let doc = await this.#request(request)
 
-            // Errors occured and handlers above returned null
+            // Errors occured and #request() returned null
             if (!doc) {
                 this.#setLoadingBanner(null)
                 return {}
@@ -317,13 +319,21 @@ export default class OxiContentService extends Service {
     // "Bootstrapping" - menu, user info, locale, ...
     async #bootstrap() {
         debug("#bootstrap()")
+
         let doc = await this.#request({
             page: "bootstrap!structure",
             baseurl: window.location.pathname,
-        }, true)
+        })
 
+        // Errors occured and #request() returned null
+        if (!doc) {
+            this.#setLoadingBanner(null)
+            return {}
+        }
 
         if (doc.rtoken) this.#rtoken = doc.rtoken // CSRF token
+        this.#loginTimestamp = this.#getLoginTimestampCookie()
+
         if (doc.language) this.oxiLocale.locale = doc.language
         if (doc.pki_realm) this.realm = doc.pki_realm
         this.user = doc.user // this also unsets the user on logout!
@@ -361,6 +371,45 @@ export default class OxiContentService extends Service {
         // POST
         let method
         if (request.action) {
+            /* Check the known login timestamp against the current timestamp in
+             * the cookie. A re-login in another browser windows may have
+             * updated the cookie (= new session/rtoken).
+             * In this case we interrupt the POST request and silently try to
+             * fetch the new rtoken by calling the bootstrap page.
+             * Upon success a message is shown.
+             */
+            let timestampCookie = this.#getLoginTimestampCookie()
+            if (this.#loginTimestamp !== null) {
+                if (this.#loginTimestamp != timestampCookie) {
+                    // Login
+                    if (this.#loginTimestamp == 0) {
+                        debug('Cookie "oxi-login-timestamp" changed - Login')
+                    }
+                    // Logout (somewhere else)
+                    else if (timestampCookie == 0) {
+                        // the server will send a redirect to the login page in this case
+                        debug('Cookie "oxi-login-timestamp" changed - Logout')
+                    }
+                    // Old session/rtoken in our window, new rtoken should be available
+                    else {
+                        console.error('Cookie "oxi-login-timestamp" changed - Session was renewed in other window', this.#loginTimestamp, timestampCookie)
+                        // intermediate request just to get the new rtoken
+                        let doc = await this.#request({ page: "bootstrap!structure" })
+                        if (doc.rtoken) {
+                            this.#rtoken = doc.rtoken // CSRF token
+                            this.#loginTimestamp = this.#getLoginTimestampCookie()
+                            this.status = {
+                                message: this.intl.t('site.session_renewed'),
+                                level: "warn",
+                            }
+                            return null // cancel current request
+                        }
+                        // if no rtoken was returned something went wrong and
+                        // we just render the contents from the server.
+                    }
+                }
+            }
+
             method = 'POST'
             data._rtoken = this.#rtoken
         }
@@ -653,5 +702,12 @@ export default class OxiContentService extends Service {
             }
         }
         this.navEntries = this.navEntries // eslint-disable-line no-self-assign -- trigger Ember update
+    }
+
+    #getLoginTimestampCookie() {
+        return new Map(
+            // create an array of arrays [name,value] to feed the Map constructor
+            document.cookie.split(/;\s*/).map(c => c.match(/^([^=]+)=(.*)/).slice(1,3))
+        ).get('oxi-login-timestamp')
     }
 }
