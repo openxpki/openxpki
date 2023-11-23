@@ -960,7 +960,7 @@ sub _new_frontend_session {
     $self->session->delete;
     $self->session->flush;
     # call new on the existing session object to reuse settings
-    $self->session($self->session->new);
+    $self->session->new;
 
     Log::Log4perl::MDC->put('sid', substr($self->session->id,0,4));
     $self->log->debug('New frontend session id : '. $self->session->id);
