@@ -147,7 +147,7 @@ sub get_header_str {
 
     return $cgi->header(
         @{ $self->headers },
-        -cookie => $self->session_cookie->build,
+        -cookie => $self->session_cookie->render,
     )
 }
 

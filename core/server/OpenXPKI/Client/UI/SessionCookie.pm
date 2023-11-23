@@ -27,15 +27,15 @@ OpenXPKI::Client::UI::SessionCookie - manage the (optionally encrypted) session 
     # decrypt cookie and fetch session ID
     my $sess_id = $cookie->fetch_id; # this might throw a decryption error
 
-    # set session ID and create encrypted cookie
-    $cookie->id($sess_id);
+    # set session and create encrypted cookie
+    $cookie->session($cgi_session);
     $cookie->path(...); # optionally
     print $cgi->header(
         ...
-        -cookie => $cookie->build,
+        -cookie => $cookie->render,
     );
 
-=head1 METHODS
+=head1 CONSTRUCTOR
 
 =head2 new
 
@@ -49,9 +49,9 @@ B<Parameters>
 
 =cut
 has 'cgi' => (
+    required => 1,
     is => 'ro',
     isa => duck_type( [qw( cookie )] ), # not "isa => 'CGI'" as we use CGIMock in tests
-    required => 1,
 );
 
 =item * C<cipher> I<Crypt::CBC> - encryption cipher for the session ID (optional, default: unencrypted session ID)
@@ -65,27 +65,28 @@ has 'cipher' => (
 
 =back
 
-=head1 METHODS
+=head1 ATTRIBUTES
+
+=head2 session
+
+I<CGI::Session> instance.
+
+=cut
+has 'session' => (
+    is => 'rw',
+    isa => 'CGI::Session',
+    predicate => 'has_session',
+);
 
 =head2 path
 
-Set the cookie path (only relevant for L</build>).
+Cookie path (only relevant for L</build>).
 
 =cut
 has 'path' => (
     is => 'rw',
     isa => 'Str',
     predicate => 'has_path',
-);
-
-=head2 id
-
-Set the session ID (only relevant for L</build>).
-
-=cut
-has 'id' => (
-    is => 'rw',
-    isa => 'Str',
 );
 
 =head2 insecure
@@ -101,28 +102,53 @@ has 'insecure' => (
     default => 0,
 );
 
-=head2 build
+=head1 METHODS
 
-Build the HTTP cookie string containing the encrypted session ID previously set
-via L</id> and the path set via L</path>.
+=head2 render
+
+Render the strings for the HTTP cookies:
+
+=over
+
+=item * the encrypted session ID previously set via L</id> and the path set
+via L</path>.
 
 If no L<cipher> has been set the session ID will be stored unencrypted.
 
+=item * the "last login"
+
+=back
+
 =cut
-sub build {
+sub render {
     my $self = shift;
 
-    # assemble cookie
-    my $cookie = {
-        -name => 'oxisess-webui',
-        -value => $self->_encrypt($self->id),
+    die "Cannot create session cookie - session() must be set first\n"
+      unless $self->has_session;
+
+    my %common = (
         $self->has_path ? (-path => $self->path) : (),
         -SameSite => 'Strict',
         -Secure => (($ENV{'HTTPS'} and not $self->insecure) ? 1 : 0),
+    );
+    # session ID
+    my $cookie_id = {
+        %common,
+        -name => 'oxisess-webui',
+        -value => $self->_encrypt($self->session->id),
         -HttpOnly => 1,
     };
-
-    return $self->cgi->cookie($cookie);
+    # last login
+    my $cookie_last_login = {
+        %common,
+        -name => 'oxi-login-timestamp',
+        -value => ($self->session->param('login_timestamp') // 0),
+    };
+    # The result of this method is fed into $cgi->header(-cookie => $cookie->render)
+    return [
+        $self->cgi->cookie($cookie_id),
+        $self->cgi->cookie($cookie_last_login),
+    ];
 }
 
 =head2 fetch_id

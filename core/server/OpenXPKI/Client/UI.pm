@@ -266,7 +266,7 @@ sub handle_request {
     my $reply = $self->backend()->send_receive_service_msg('PING');
     my $status = $reply->{SERVICE_MSG};
     $self->log->trace('Ping replied ' . Dumper $reply) if $self->log->is_trace;
-    $self->log->debug('current session status ' . $status);
+    $self->log->debug('Current session status ' . $status);
 
     if ( $reply->{SERVICE_MSG} eq 'START_SESSION' ) {
         $reply = $self->backend()->init_session();
@@ -959,14 +959,12 @@ sub _new_frontend_session {
     # delete the old instance data
     $self->session->delete;
     $self->session->flush;
-    # call new on the existing session object to reuse settings
+
+    # call new() on the existing session object to reuse settings
     $self->session->new;
 
     Log::Log4perl::MDC->put('sid', substr($self->session->id,0,4));
-    $self->log->debug('New frontend session id : '. $self->session->id);
-
-    # update the session cookie
-    $self->resp->session_cookie->id($self->session->id);
+    $self->log->debug('New frontend session: ID = '. $self->session->id);
 
 }
 

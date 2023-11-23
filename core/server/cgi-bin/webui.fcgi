@@ -220,18 +220,23 @@ while (my $cgi = CGI::Fast->new) {
     }
 
     # create CGI session
-    my $driver_args = $conf->{session_driver} ? $conf->{session_driver} : { Directory => '/tmp' };
-    my $session_front = CGI::Session->new($conf->{session}->{driver}, $sess_id, $driver_args );
+    my $session_front = CGI::Session->new(
+        $conf->{session}->{driver},
+        $sess_id, # may be undef
+        $conf->{session_driver} ? $conf->{session_driver} : { Directory => '/tmp' },
+    );
     $session_front->expire($conf->{session}->{timeout}) if defined $conf->{session}->{timeout};
 
-    $session_cookie->id($session_front->id);
     Log::Log4perl::MDC->put('sid', substr($session_front->id,0,4));
-
     $log->debug(
         'Frontend session: ID = ' . $session_front->id .
         ($session_front->expire ? ', expiration = ' . $session_front->expire : '')
     );
 
+    # update the session cookie
+    $session_cookie->session($session_front);
+
+    # HTTP response wrapper
     my $response = OpenXPKI::Client::UI::Response->new(session_cookie => $session_cookie);
     $response->add_header(@header_tpl);
 
