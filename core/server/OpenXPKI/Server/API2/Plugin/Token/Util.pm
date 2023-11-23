@@ -32,9 +32,10 @@ signature_for is_token_usable => (
     positional => [
         'OpenXPKI::Crypto::API',
         'Str', { default => 'sign' },
+        'Optional[ HashRef ]',
     ],
 );
-sub is_token_usable ($self, $token, $check) {
+sub is_token_usable ($self, $token, $check, $padding_config) {
     ##! 1: 'start'
     try {
         CTX('log')->application()->debug("Check if token is usable using $check operation");
@@ -56,7 +57,14 @@ sub is_token_usable ($self, $token, $check) {
 
         } elsif ($check eq 'encrypt') {
 
-            my $encrypted = $token->command({ COMMAND => 'pkcs7_encrypt', CONTENT => $base });
+            # Padding is only supported for pkcs7_encrypt for now
+            my %PADDING;
+            if ($padding_config && ($padding_config->{mode}//'') eq 'oaep') {
+                $PADDING{PADDING} = 'oaep';
+                $PADDING{PADDING_OPTIONS} = $padding_config // {};
+            }
+
+            my $encrypted = $token->command({ COMMAND => 'pkcs7_encrypt', CONTENT => $base, %PADDING });
             my $decrypted = $token->command({ COMMAND => 'pkcs7_decrypt', PKCS7 => $encrypted });
 
             ##! 16: "pkcs7 roundtrip done"

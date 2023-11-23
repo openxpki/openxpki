@@ -400,6 +400,7 @@ sub encrypt_passwordsafe ($self, $safe_id, $value) {
 
     # support OAEP padding mode - IMHO superfluous but required by some HSM vendors
     # and regulatory bodies to meet formal requirements
+    # #TODO this code is currently duplicated in is_token_usable - needs cleanup
     my %PADDING;
     my $padding_config = CTX('config')->get_hash(["system","datavault","padding"]);
     if ($padding_config && $padding_config->{mode}) {

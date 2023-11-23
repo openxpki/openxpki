@@ -84,12 +84,14 @@ command "is_token_usable" => {
     }
 
     my $operation;
+    my $padding_config = {};
     if ($params->engine) {
         $operation = 'engine';
     } elsif ($params->operation) {
         $operation = $params->operation;
     } elsif ($token_type eq 'datasafe') {
         $operation = 'encrypt';
+        $padding_config = CTX('config')->get_hash(["system","datavault","padding"]) // {};
     } else {
         $operation = 'sign';
     }
@@ -104,7 +106,7 @@ command "is_token_usable" => {
         return $usable;
     }
 
-    return OpenXPKI::Server::API2::Plugin::Token::Util->is_token_usable($token, $operation);
+    return OpenXPKI::Server::API2::Plugin::Token::Util->is_token_usable($token, $operation, $padding_config);
 };
 
 __PACKAGE__->meta->make_immutable;
