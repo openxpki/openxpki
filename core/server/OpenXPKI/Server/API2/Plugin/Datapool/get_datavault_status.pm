@@ -100,7 +100,7 @@ command "get_datavault_status" => {
             };
             $ret->{online} = ($EVAL_ERROR || !$decrypted) ? 0 : 1;
         } else {
-            $ret->{online} = $self->api->is_token_usable($safe_id) ? 1 : 0;
+            $ret->{online} = $self->api->is_token_usable(alias => $safe_id) ? 1 : 0;
         }
     }
 
