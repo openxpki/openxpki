@@ -109,11 +109,23 @@ command "get_rpc_openapi_spec" => {
     );
 
     # details for "pickup_workflow" and "pickup_input"
-    my (undef, $pickup_input_schema) = $self->_get_workflow_info(
-        workflow => $params->pickup_workflow,
-        input_params => $params->pickup_input,
-        is_pickup_workflow => 1,
-    ) if $params->has_pickup_workflow;
+    my $pickup_input_schema;
+    if ($params->has_pickup_workflow) {
+        (undef, $pickup_input_schema) = $self->_get_workflow_info(
+            workflow => $params->pickup_workflow,
+            input_params => $params->pickup_input,
+            is_pickup_workflow => 1,
+        );
+    # input without workflow -> single parameter of type string
+    } elsif ($params->pickup_input->@*) {
+        $pickup_input_schema = {
+            properties => {
+                $params->pickup_input->[0] => {
+                    type => 'string'
+                }
+            }
+        };
+    }
 
     # get field info for all output fields
     # (note that currently there is no way to statically check if the output fields
@@ -134,7 +146,37 @@ command "get_rpc_openapi_spec" => {
         components => {},
     };
 
-    if ($params->has_pickup_workflow) {
+
+    # Pickup and resume case - parameters for BOTH workflows are required
+    if ($params->has_action) {
+        my $method = $params->rpc_method;
+        # The resume action has parameters so we need to provide two schemata
+        if (keys $input_schema->{properties}->%*) {
+            $result->{input_schema} = {
+                allOf => [
+                    $pickup_input_schema,
+                    { '$ref' => "#/components/schemas/${method}Body" },
+                ],
+                # we should have a verbose title here for the action
+                title => "Pickup and Resume Workflow",
+            };
+            $result->{components}->{schemas} = {
+                "${method}Body" => {
+                    $input_schema->%*,
+                    title => "New workflow",
+                },
+            }
+        # The resume action has no params so we need only the pickup params
+        } else {
+            $result->{input_schema} = {
+                $pickup_input_schema->%*,
+                title => "Pickup and Resume Workflow",
+            };
+        }
+
+    # Pickup or create - we expect that both need parameters
+    # (there might be edge cases) where this is not true
+    } elsif ($pickup_input_schema) {
         my $method = $params->rpc_method;
         $result->{input_schema} = {
             oneOf => [
@@ -144,20 +186,21 @@ command "get_rpc_openapi_spec" => {
                         $pickup_input_schema,
                         { '$ref' => "#/components/schemas/${method}Body" },
                     ],
-                    title => "Workflow pickup",
+                    title => "Pickup Workflow",
                 },
             ],
         };
         $result->{components}->{schemas} = {
             "${method}Body" => {
                 $input_schema->%*,
-                title => "New workflow",
+                title => "Create workflow",
             },
         };
-    } else {
+    # omit request body definitons if workflow has no params
+    } elsif (keys $input_schema->{properties}->%*) {
         $result->{input_schema} = {
             $input_schema->%*,
-            title => "New workflow",
+            title => "Create workflow",
         };
     }
 

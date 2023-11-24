@@ -160,52 +160,64 @@ sub openapi_spec {
                 $pickup_input ? (pickup_input => [ split /\s*,\s*/, $pickup_input ]) : (),
             });
 
-            $add_path->("/$method" => {
-                post => {
-                    description => $method_spec->{description},
-                    requestBody => {
-                        required => JSON::true,
-                        content => {
-                            'application/json' => {
-                                schema => $method_spec->{input_schema},
-                            },
-                        },
-                    },
-                    responses => {
-                        '200' => {
-                            description => "JSON object with details either about the command result or the error",
-                            content => {
-                                'application/json' => {
-                                    schema => {
-                                        oneOf => [
-                                            {
+            my $responses = {
+                '200' => {
+                    description => "JSON object with details either about the command result or the error",
+                    content => {
+                        'application/json' => {
+                            schema => {
+                                oneOf => [
+                                    {
+                                        type => 'object',
+                                        properties => {
+                                            'result' => {
                                                 type => 'object',
+                                                description => 'Only set if command was successfully executed',
+                                                required => [qw( data state pid id )],
                                                 properties => {
-                                                    'result' => {
-                                                        type => 'object',
-                                                        description => 'Only set if command was successfully executed',
-                                                        required => [qw( data state pid id )],
-                                                        properties => {
-                                                            'data' => $method_spec->{output_schema},
-                                                            'state' => { type => 'string' },
-                                                            'proc_state' => { type => 'string' },
-                                                            'pid' => { type => 'integer', },
-                                                            'id' => { type => 'integer', },
-                                                        },
-                                                    },
+                                                    'data' => $method_spec->{output_schema},
+                                                    'state' => { type => 'string' },
+                                                    'proc_state' => { type => 'string' },
+                                                    'pid' => { type => 'integer', },
+                                                    'id' => { type => 'integer', },
                                                 },
                                             },
-                                            {
-                                                '$ref' => '#/components/schemas/Error',
-                                            },
-                                        ],
+                                        },
                                     },
-                                },
+                                    {
+                                        '$ref' => '#/components/schemas/Error',
+                                    },
+                                ],
                             },
                         },
                     },
                 },
-            });
+            };
+
+
+            if ($method_spec->{input_schema}) {
+                $add_path->("/$method" => {
+                    post => {
+                        description => $method_spec->{description},
+                        requestBody => {
+                            required => JSON::true,
+                            content => {
+                                'application/json' => {
+                                    schema => $method_spec->{input_schema},
+                                },
+                            },
+                        },
+                        responses => $responses,
+                    },
+                });
+            } else {
+                $add_path->("/$method" => {
+                    get => {
+                        description => $method_spec->{description},
+                        responses => $responses,
+                    },
+                });
+            }
 
             $add_component->($_, $method_spec->{components}->{$_}) for keys $method_spec->{components}->%*;
         }
