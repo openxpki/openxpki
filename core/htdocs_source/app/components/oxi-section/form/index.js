@@ -330,7 +330,8 @@ export default class OxiSectionFormComponent extends Component {
     // (only for non-empty fields; the check if a required field is empty
     // is done via HTML <input> attribute required="..." in each component)
     #checkFieldValidity(field) {
-        if (field.ecma_match && field.value !== "") {
+        // do RegEx check unless field is undefined/null/empty
+        if (field.ecma_match && (field.value ?? "") !== "") {
             try {
                 let re = new RegExp(field.ecma_match)
                 if (! re.test(field.value)) {

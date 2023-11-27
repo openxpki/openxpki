@@ -33,6 +33,13 @@ export default [
                 },
                 {
                     type: "text",
+                    name: "text_optional_regex",
+                    label: "Text (optional, only digits)",
+                    is_optional: 1,
+                    ecma_match: "^[0-9]+$",
+                },
+                {
+                    type: "text",
                     name: "comment",
                     label: "Comment (will be used in autocomplete below)",
                     value: "rain",
