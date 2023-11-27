@@ -165,7 +165,7 @@ command "get_rpc_openapi_spec" => {
                     $input_schema->%*,
                     title => "New workflow",
                 },
-            }
+            };
         # The resume action has no params so we need only the pickup params
         } else {
             $result->{input_schema} = {
