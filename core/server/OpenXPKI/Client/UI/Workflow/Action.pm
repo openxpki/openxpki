@@ -700,46 +700,45 @@ sub __request_values_for_fields {
         # Fetch field value(s)
         #
         my @v_list = $self->multi_param($name);
-        my $vv;
-        if ($field->{clonable}) {
-            $vv = \@v_list;
-        } else {
-            if ((my $amount = scalar @v_list) > 1) {
-                $self->log->warn(sprintf "Received %s values for non-clonable field '%s', expected only one value", scalar @v_list, $name);
-            }
-            $vv = $v_list[0];
+        if (not $field->{clonable} and (my $amount = scalar @v_list) > 1) {
+            $self->log->warn(sprintf "Received %s values for non-clonable field '%s': using first value and ignoring the rest", scalar @v_list, $name);
+            splice @v_list, 1;
         }
 
-        #
-        # Validate values of special "fixed" fields types
-        #
+        # validate values of non-editable select fields
         if ('select' eq $field->{type} and not $field->{editable}) {
             my @options = map { $_->{value} } ($field->{options}//[])->@*;
-            if (not any { $vv eq $_ } @options) {
-                $self->log->warn(sprintf "Ignoring %s field '%s': value '%s' does not match any known option", $field->{type}, $name, $vv);
-                next; # ignore value
+            for my $val (@v_list) {
+                if (not any { $val eq $_ } @options) {
+                    $self->log->warn(sprintf "Ignoring %s field '%s': value '%s' does not match any known option", $field->{type}, $name, $val);
+                    next; # ignore value
+                }
             }
         }
 
+        # validate values of static fields
         if ('static' eq $field->{type} or 'hidden' eq $field->{type}) {
-            if (($vv//'') ne ($field->{value}//'')) {
-                $self->log->warn(sprintf "Ignoring %s field '%s': value was altered by frontend", $field->{type}, $name);
-                next; # ignore value
+            for my $val (@v_list) {
+                if (($val//'') ne ($field->{value}//'')) {
+                    $self->log->warn(sprintf "Ignoring %s field '%s': value was altered by frontend", $field->{type}, $name);
+                    next; # ignore value
+                }
             }
         }
 
         # add dependent fields of currently selected option to the queue
-        my @dependants = $self->__get_dependants($field, $vv);
+        my @dependants = $self->__get_dependants($field, $v_list[0]);
         push @fields, @dependants;
 
         if (scalar @dependants and 'select' eq $field->{type} and $field->{clonable}) {
             $self->log->warn(sprintf "Field '%s': clonable fields of type 'select' with dependants are not supported", $name);
         }
 
+        my $vv = $field->{clonable} ? \@v_list : $v_list[0];
+
         # build nested HashRef for cert profile field name including sub item
         # (e.g. "cert_info{requestor_email}") - search tag: #wf_fields_with_sub_items
         if ($name =~ m{ \A (\w+)\{(\w+)\} \z }xs) {
-            $result->{$1} ||= ();
             $result->{$1}->{$2} = $vv;
         # plain field name
         } else {
