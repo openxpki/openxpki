@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2023-11-14 17:37+0100\n"
+"PO-Revision-Date: 2023-11-27 14:54+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -2026,16 +2026,13 @@ msgstr "Sperrung genehmigen"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_DESC"
 msgstr "~"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_DESC"
 msgstr ""
-"Bitte überprüfen Sie die Informationen des Sperrantrages und bestätigen Sie "
-"die Sperrung nur, wenn Sie sicher sind, dass diese Informationen korrekt "
-"sind."
+"Bitte überprüfen Sie die Informationen des Antrages und bestätigen Sie "
+"diesen, wenn Sie sicher sind, dass alle Informationen korrekt sind."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_LABEL"
-msgstr "Sperrung genehmigen"
+msgstr "Antrag genehmigen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_DESC"
 msgstr "Initialize"
@@ -2488,9 +2485,8 @@ msgstr "wartend"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RESETPASS_PERSIST_DESC"
 msgstr "Speichert die Änderungen in der Datenbank."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RESETPASS_PERSIST_LABEL"
-msgstr "Persist Data"
+msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REVOKE_CERTIFICATE_DESC"
 msgstr "Dieses Zertifikat zur Sperrung vormerken"
@@ -2538,6 +2534,15 @@ msgstr "Bitte aktualisieren/komplettieren Sie die nachfolgenden Informationen."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Antrag aktualisieren"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_ENDPOINT_AUTH_DESC"
+msgstr ""
+"Berechtigen Sie das gewählte Zertifikat als \"autorisierter Antragsteller\" "
+"für die angegebenen Endpunkte. Sie können die Berechtigung widerrufen indem "
+"Sie die Einträge entfernen."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_ENDPOINT_AUTH_LABEL"
+msgstr "Antragsteller Autorisierung"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_APPROVE_BUTTON"
 msgstr "Antrag Freigeben"
@@ -2609,6 +2614,9 @@ msgstr "Registrierung löschen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_SET_VALIDITY_LABEL"
 msgstr "Laufzeit ändern"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_UPDATE_ENDPOINT_AUTH_LABEL"
+msgstr "Aktualisiere Autorisierung"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CANCEL_BUTTON"
 msgstr "Antrag abbrechen"
@@ -4914,6 +4922,9 @@ msgstr "ja"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_LABEL"
 #~ msgstr "Zertifikat hochladen"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_ENDPOINT_AUTH_LABEL"
+#~ msgstr "Berechtigte(r) Endpunkt(e)"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_EXTRA_INFO_LABEL"
 #~ msgstr "Technische Informationen"
