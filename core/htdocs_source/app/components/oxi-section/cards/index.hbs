@@ -62,7 +62,9 @@
                             </h5>
                         </div>
                     {{/if}}
-                    <img src={{card.image}} class="m-3" />
+                    {{#if card.image}}
+                        <img src={{card.image}} class="m-3" />
+                    {{/if}}
                     {{#if card.description}}
                         <div class="card-body">
                             <p class="card-text">
