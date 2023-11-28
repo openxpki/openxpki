@@ -44,7 +44,7 @@ sub init_realm_cards ($self, $realms, $as_list) {
         type => 'cards',
         content => {
             cards => $realms,
-            vertical => $as_list,
+            $as_list ? (vertical => 1) : (),
         },
     });
 
