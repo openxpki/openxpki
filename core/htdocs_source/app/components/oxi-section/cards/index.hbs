@@ -2,7 +2,7 @@
 {{#if this.cards}}
     {{#if @def.vertical}}
 
-        <div class="col-md-10">
+        <div class="oxi-realm-cards-vertical col-md-10">
         {{#each this.cards as |card|}}
             <OxiBase::Button
                 @button={{card._clickable}}
@@ -11,26 +11,30 @@
                 style={{if card.color (concat "background-color: " card.color)}}
             >
                 {{#if card.label}}
-                    <div class="card-header w-100 text-body-secondary text-center bg-dark-subtle text-light">
+                    <div class="card-header w-100 text-body-secondary bg-dark-subtle text-light">
                         <h5 class="card-title">
                             {{defuse card.label}}
                         </h5>
                     </div>
                 {{/if}}
-                <div class="row gx-2 py-2">
-                    <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
-                        <img src={{card.image}}/>
-                    </div>
-                    <div class="col-md-10">
-                        <div class="card-body">
-                            {{#if card.description}}
-                                <p class="card-text">
-                                    {{defuse card.description}}
-                                </p>
-                            {{/if}}
+                {{#if (or card.description card.image)}}
+                    <div class="row gx-2 py-2">
+                        {{#if card.image}}
+                            <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
+                                <img src={{card.image}}/>
+                            </div>
+                        {{/if}}
+                        <div class={{if card.image "col-md-10" "col-md-12"}}>
+                            <div class="card-body">
+                                {{#if card.description}}
+                                    <p class="card-text">
+                                        {{defuse card.description}}
+                                    </p>
+                                {{/if}}
+                            </div>
                         </div>
                     </div>
-                </div>
+                {{/if}}
                 {{#if card.footer}}
                     <div class="card-footer w-100 text-body-secondary text-center">
                         {{defuse card.footer}}
@@ -42,7 +46,7 @@
 
     {{else}}
 
-        <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div class="oxi-realm-cards-grid row row-cols-1 row-cols-md-3 g-4">
         {{#each this.cards as |card|}}
             <div class="col">
                 <OxiBase::Button
