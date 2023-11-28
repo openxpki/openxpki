@@ -729,7 +729,12 @@ sub __request_values_for_fields {
         }
 
         # add dependent fields of currently selected option to the queue
-        push @fields, $self->__get_dependants($field, $vv);
+        my @dependants = $self->__get_dependants($field, $vv);
+        push @fields, @dependants;
+
+        if (scalar @dependants and 'select' eq $field->{type} and $field->{clonable}) {
+            $self->log->warn(sprintf "Field '%s': clonable fields of type 'select' with dependants are not supported", $name);
+        }
 
         # build nested HashRef for cert profile field name including sub item
         # (e.g. "cert_info{requestor_email}") - search tag: #wf_fields_with_sub_items
