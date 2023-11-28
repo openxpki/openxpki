@@ -356,6 +356,7 @@ while (my $cgi = CGI::Fast->new) {
             $conf->{global}->{loginurl} ? (login_url => $conf->{global}->{loginurl}) : (),
             resp => $response,
             realm_mode => $realm_mode,
+            realm_layout => $conf->{global}->{realm_layout} || 'card',
             $realm_path_map ? (realm_path_map => $realm_path_map) : (),
             %pkey,
         });

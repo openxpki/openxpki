@@ -23,14 +23,19 @@ B<Parameters:>
         ...
     ]
 
+=item * I<Bool> C<$as_list> - set to C<1> to show realm selection cards as a list. Optional, default: C<0>
+
 =back
 
 =cut
 signature_for init_realm_cards => (
     method => 1,
-    positional => [ 'ArrayRef[HashRef]' ],
+    positional => [
+        'ArrayRef[HashRef]',
+        'Bool', { default => 1 },
+    ],
 );
-sub init_realm_cards ($self, $realms) {
+sub init_realm_cards ($self, $realms, $as_list) {
     $self->set_page(
         label => 'I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN',
         description => 'I18N_OPENXPKI_UI_LOGIN_REALM_SELECTION_DESC'
@@ -39,7 +44,8 @@ sub init_realm_cards ($self, $realms) {
         type => 'cards',
         content => {
             cards => $realms,
-        }
+            vertical => $as_list,
+        },
     });
 
     return $self;

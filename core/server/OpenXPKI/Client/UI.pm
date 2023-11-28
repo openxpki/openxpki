@@ -51,6 +51,15 @@ has 'realm_mode' => (
     )]),
 );
 
+has 'realm_layout' => (
+    required => 1,
+    is => 'rw',
+    isa => enum([qw(
+        card
+        list
+    )]),
+);
+
 has 'socket_path' => (
     required => 1,
     is => 'ro',
@@ -672,7 +681,7 @@ sub handle_login {
             };
 
             my @cards;
-            # "path" mode: realm selection that links to defined sub paths
+            # "path" mode: realm cards are links to defined sub paths
             if ('path' eq $self->realm_mode) {
                 # use webui config but only take realms known to the server:
                 my @realm_list =
@@ -702,7 +711,7 @@ sub handle_login {
                     }
                 }
 
-            # other modes: realm selection drop-down that sets "pki_realm" parameter
+            # other modes: realm cards are actions that set the "pki_realm" parameter
             } else {
                 @cards =
                     map { {
@@ -720,7 +729,7 @@ sub handle_login {
                     keys %{$realms};
             }
 
-            $uilogin->init_realm_cards(\@cards);
+            $uilogin->init_realm_cards(\@cards, $self->realm_layout eq 'list' ? 1 : 0);
             return $uilogin;
         }
     }
