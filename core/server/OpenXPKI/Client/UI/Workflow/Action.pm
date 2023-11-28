@@ -10,9 +10,12 @@ use List::Util qw( any none );
 
 # CPAN modules
 use Log::Log4perl::MDC;
+use Type::Params qw( signature_for );
 
 # Project modules
 use OpenXPKI::Util;
+
+use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
 
 =head1 UI Methods
 
@@ -772,12 +775,16 @@ returned. Optional.
 =back
 
 =cut
-sub __get_dependants {
-    my $self = shift;
-    my $field = shift;
-    my $option = shift;
-
+signature_for __get_dependants => (
+    method => 1,
+    positional => [
+        'HashRef',
+        'Str|Undef',
+    ],
+);
+sub __get_dependants ($self, $field, $option) {
     my @dependants;
+
     if ('select' eq $field->{type}) {
         for my $opt (($field->{options}//[])->@*) {
             next unless ($option//'') eq $opt->{value};
