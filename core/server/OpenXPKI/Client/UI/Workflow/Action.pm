@@ -780,7 +780,7 @@ sub __get_dependants {
     my @dependants;
     if ('select' eq $field->{type}) {
         for my $opt (($field->{options}//[])->@*) {
-            next if ($option and $option ne $opt->{value});
+            next unless ($option//'') eq $opt->{value};
             if (my $deps = $opt->{dependants}) {
                 push @dependants, $deps->@*;
             }
