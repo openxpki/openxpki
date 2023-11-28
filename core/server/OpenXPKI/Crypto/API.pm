@@ -280,6 +280,16 @@ sub get_key_info
     return $self->get_instance()->get_engine()->get_key_info();
 }
 
+sub get_key_object
+{
+    ##! 1: 'start'
+    my $self  = shift;
+    my $ident = ident $self;
+    ##! 16: 'engine: ' . $self->get_instance()->get_engine()
+    return if (!defined $self->get_instance()->get_engine());
+    return $self->get_instance()->get_engine()->get_key_object();
+}
+
 sub get_certfile
 {
     my $self = shift;

@@ -145,6 +145,7 @@ OpenXPKI/Crypto/Backend/OpenSSL/Config.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Engine.pm
 
 OpenXPKI/Crypto/Backend/OpenSSL/Engine/AWSCloudHSM.pm
+OpenXPKI/Crypto/Backend/OpenSSL/Engine/Inline.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Engine/LunaGem.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Engine/nCipher.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Engine/OpenSSL.pm

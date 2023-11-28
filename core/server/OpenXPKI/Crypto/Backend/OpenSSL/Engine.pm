@@ -238,6 +238,13 @@ sub get_keyfile
     return $self->{KEY};
 }
 
+# New method to get internal key object for token layer migration
+# to keep it easy we just return undef here if this is not supported
+sub get_key_object
+{
+    return;
+}
+
 sub get_passwd
 {
     ##! 16: 'start'
