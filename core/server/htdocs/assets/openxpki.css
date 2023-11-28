@@ -617,6 +617,10 @@ div.required input.flatpickr-input {
   background-color: rgba(var(--bs-light-rgb));
 }
 
+.oxi-btn-card:hover {
+  border-color: unset;
+}
+
 .oxi-btn-info::before {
   font-family: "Glyphicons Halflings";
   content: "\e086";
