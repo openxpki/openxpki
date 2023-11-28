@@ -54,7 +54,11 @@ sub process {
 
     # set "clonable" attribute
     # ("min:0" is legacy syntax for "optional" and does NOT indicate a clonable field)
-    $self->field->{clonable} = ($self->field->{min} || $self->field->{max}) ? 1 : 0;
+    $self->field->{clonable} = (
+        $self->field->{clonable} or
+        $self->field->{min} or
+        $self->field->{max}
+    ) ? 1 : 0;
 
     # process select options
     if ($self->field->{type} eq 'select') {
