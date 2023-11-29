@@ -112,6 +112,11 @@ sub generate_pkcs7_response {
 
         my $failInfo = ($response->error == 40001) ? 'badMessageCheck' : 'badRequest';
 
+        # Special handling of invalid certid with GetCertInitial request
+        if ($self->message_type() eq 'GetCertInitial' && $response->error == 40003) {
+            $failInfo = 'badCertId';
+        }
+
         $self->logger->warn('Client error / malformed request ' . $failInfo);
 
         return $self->backend()->run_command('scep_generate_failure_response',
@@ -173,7 +178,7 @@ around 'build_params' => sub {
             $params->{_url_params} = $extra;
         }
     } elsif ($self->message_type() eq 'GetCertInitial') {
-        $params->{pkcs10} = '';
+        $params->{pkcs10} = undef;
         $params->{transaction_id} = $self->transaction_id();
         $params->{signer_cert} = $self->signer();
     } elsif ($self->message_type() =~ m{\AGet(Cert|CRL)\z}) {
