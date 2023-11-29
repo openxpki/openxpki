@@ -162,6 +162,38 @@ sub digest {
 
 }
 
+=head3 pem_tidy ( text block with pem data )
+
+Cleanup a string holding one or many PEM blocks by stripping any
+surrounding text and reformatting the Base64 encoded payloads
+into 64 characters per line.
+
+Multiple PEM blocks are concatenated with a single newline character.
+
+=cut
+
+sub pem_tidy {
+
+    my $self = shift;
+    my $input = shift;
+
+    my @blocks = $input =~ m{(-----BEGIN\ ([^-]+)-----)\s*([\w\/\+\=\s]+)\s*(-----END\ \2-----)}gxms;
+    my @output;
+    do {
+        shift @blocks; # the BEGIN block
+        my $separator = shift @blocks; # the separator word without the BEGIN word
+        my $payload = decode_base64(shift @blocks) || die "Unable to decode PEM payload";
+        shift @blocks; # END block
+
+        my $pem = encode_base64($payload, '');
+        $pem =~ s{ (.{64}) }{$1\n}xmsg;
+        chomp $pem;
+        push @output, "-----BEGIN $separator-----\n$pem\n-----END $separator-----";
+    } while (@blocks);
+
+    return join("\n", @output);
+}
+
 =head3 jwt_thumbprint ( key hash )
 
 Expects a JWT key hash (as json string or hash structure) and returns
