@@ -2552,6 +2552,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_ENDPOINT_AUTH_LABEL"
 msgstr "リクエストの更新"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_DESC"
+msgstr "証明書の失効スケジュール"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_LABEL"
+msgstr "証明書の失効"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_APPROVE_BUTTON"
 msgstr "戻る"
 
@@ -5445,14 +5453,6 @@ msgstr "はい"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPU_GENERATE_ACT_CODE"
 #~ msgstr "コードを作成する"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_DESC"
-#~ msgstr "証明書の失効スケジュール"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_LABEL"
-#~ msgstr "証明書の失効"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL"
 #~ msgstr "戻る"

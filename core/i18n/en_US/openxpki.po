@@ -1919,6 +1919,9 @@ msgstr "Authority Key IDs do not match"
 msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_CHAIN_VALIDATION_FAILED"
 msgstr "Chain could not be validated"
 
+msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_INVALID_INPUT"
+msgstr "The input must not contain anything else than PEM formated certificates"
+
 msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_PARSE_ERROR"
 msgstr "Certificate can not be read"
 
@@ -2455,6 +2458,16 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_ENDPOINT_AUTH_LABEL"
 msgstr "Authorized Registrar"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_DESC"
+msgstr ""
+"Please paste (or use the upload handle) the PEM encoded certificate you have "
+"received from the external ca to be uploaded. Upload is only possible if the "
+"certificate issuer is known and the certificate key matches the one "
+"requested from this workflow!"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_LABEL"
+msgstr "Upload Certificate"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_APPROVE_BUTTON"
 msgstr "Approve Request"
@@ -4695,12 +4708,6 @@ msgstr "Yes"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
 #~ msgstr "Please select profile first"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_DESC"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_LABEL"
-#~ msgstr "Upload Certificate"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_ENDPOINT_AUTH_LABEL"
 #~ msgstr "Authorized Endpoint(s)"

@@ -20,8 +20,8 @@ sub _validate {
         return 1;
     }
 
-    if ($pem !~ m{(-----BEGIN[^-]*CERTIFICATE-----(.+?)-----END[^-]*CERTIFICATE-----)}xms ) {
-        validation_error("I18N_OPENXPKI_UI_VALIDATOR_X509_PARSE_ERROR");
+    if ($pem !~ m{\A\s*(-----BEGIN\ ([^-]+)-----\s*([\w\/\+\=\s]+)\s*(-----END\ \2-----)\s*)+\z}xms ) {
+        validation_error("I18N_OPENXPKI_UI_VALIDATOR_X509_INVALID_INPUT");
     }
 
     ##! 64: 'Input ' . $pem

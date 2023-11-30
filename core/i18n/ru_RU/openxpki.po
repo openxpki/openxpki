@@ -3208,6 +3208,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_ENDPOINT_AUTH_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_DESC"
+msgstr "Отозвать сертификат"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_LABEL"
+msgstr "Отозвать сертификат"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_APPROVE_BUTTON"
 msgstr "Дочерние технологические процессы"
 
@@ -6063,14 +6071,6 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
 #~ msgstr "Профиль пользователя"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_DESC"
-#~ msgstr "Отозвать сертификат"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_LABEL"
-#~ msgstr "Отозвать сертификат"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_ENDPOINT_AUTH_LABEL"

@@ -1955,6 +1955,9 @@ msgstr "Die Authority Key Identifier passen nicht zusammen!"
 msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_CHAIN_VALIDATION_FAILED"
 msgstr "Die Prüfung der Zertifikatskette ist fehlgeschlagen"
 
+msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_INVALID_INPUT"
+msgstr "Bitte laden Sie ausschliesslich PEM formatierte Zertifikate hoch"
+
 msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_PARSE_ERROR"
 msgstr "Das Zertifikat kann nicht gelesen werden"
 
@@ -2543,6 +2546,15 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_ENDPOINT_AUTH_LABEL"
 msgstr "Antragsteller Autorisierung"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_DESC"
+msgstr ""
+"Bitte fügen Sie das PEM formatierte Zertifikat, welches Sie von der externen "
+"CA erhalten haben, in das Feld ein. Das Zertifikat wird nur akzeptiert wenn "
+"der Aussteller bekannt ist und der Schlüssel zu ihren Antrag passt!"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_LABEL"
+msgstr "Zertifikat hochladen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_APPROVE_BUTTON"
 msgstr "Antrag Freigeben"
@@ -4916,12 +4928,6 @@ msgstr "ja"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
 #~ msgstr "Bitte zuerst Profil wählen"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_DESC"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_LABEL"
-#~ msgstr "Zertifikat hochladen"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_ENDPOINT_AUTH_LABEL"
 #~ msgstr "Berechtigte(r) Endpunkt(e)"

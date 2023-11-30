@@ -3023,6 +3023,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_ENDPOINT_AUTH_LABEL"
 msgstr "Richiesta Aggiornamento"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_DESC"
+msgstr "Programma questo certificato per la revoca"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_LABEL"
+msgstr "Revoca Certificato"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_APPROVE_BUTTON"
 msgstr "Forza Ripristino"
 
@@ -5612,14 +5620,6 @@ msgstr "Sì"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
 #~ msgstr "Seleziona prima un profilo nel campo soprastante"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_DESC"
-#~ msgstr "Programma questo certificato per la revoca"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_LABEL"
-#~ msgstr "Revoca Certificato"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_ENDPOINT_AUTH_LABEL"
