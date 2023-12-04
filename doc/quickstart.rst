@@ -12,9 +12,11 @@ public demo at https://demo.openxpki.org.
 Support
 -------
 
-If you need help, please use the mailing list and do **NOT** open items
-in the issue tracker on GitHub. For details and additional support options
-have a look at http://www.openxpki.org/support.html.
+If you need help, please use
+`the mailing list <https://lists.sourceforge.net/lists/listinfo/openxpki-users>`_
+and do **NOT** open items in the issue tracker on GitHub. Personal support,
+consulting and operational services are available from the founders of the project,
+see the `project webpage for additional information <https://www.openxpki.org/#resources>`_.
 
 
 Docker
@@ -28,12 +30,15 @@ docker-compose file, see https://github.com/openxpki/openxpki-docker.
 Configuration
 -------------
 
-The debian package come with a sample configuration, for a production setup
-we recommend to remove the `/etc/openxpki` folder created by the package and
-replace it with a checkout of the `community` branch of the configuration
-repository available at https://github.com/openxpki/openxpki-config. Please
-also have a look at the `QUICKSTART.md document <https://github.com/openxpki/openxpki-config/blob/community/QUICKSTART.md>`_
-which has some more detailed instructions how to setup the system.
+The debian package come with a sample configuration which is identical
+to the configuration repository at the time of package build. For a production
+setup we recommend to remove the `/etc/openxpki` folder created by the package
+and replace it with a checkout of the `community` branch of the configuration
+repository available at https://github.com/openxpki/openxpki-config.
+Please also have a look at
+`README.md <https://github.com/openxpki/openxpki-config/blob/community/README.md>`_ and
+`QUICKSTART.md <https://github.com/openxpki/openxpki-config/blob/community/QUICKSTART.md>`_
+which have some more detailed instructions how to setup the system.
 
 **Note**: The configuration is (usually) backward compatible but most releases
 introduce new components and new configuration that can not be used with
@@ -46,18 +51,22 @@ in your config!
 Debian Builds
 -------------
 
-**Packages are for Debian 12 (Bookworm) / 64bit (arch amd64). The en_US.utf8 locale must be
-installed as the translation system will crash otherwise! The packages do NOT work
-on Ubuntu or 32bit systems. Packages for SLES/CentOS/RHEL/Ubuntu are available
-via an enterprise subscription**
+**Packages are for Debian 12 (Bookworm) / 64bit (arch amd64). The en_US.utf8
+locale must be installed as the translation system will crash otherwise! The
+packages do NOT work on Ubuntu or 32bit systems. Packages for
+SLES/CentOS/RHEL/Ubuntu are available via an enterprise subscription**
 
-Start with a debian minimal install, we recommend to add "SSH Server" and "Web Server" in the package selection menu, as this will speed up the install later.
+Start with a debian minimal install, we recommend to add "SSH Server" and "Web Server"
+in the package selection menu, as this will speed up the installation later.
 
-To avoid an "untrusted package" warning, you should add our package signing key (you might need to install gpg before)::
+To avoid an "untrusted package" warning, you should add our package signing key
+(you might need to install gpg before)::
 
-    wget https://packages.openxpki.org/v3/debian/Release.key -O - 2>/dev/null | tee Release.key | gpg -o /usr/share/keyrings/openxpki.pgp --dearmor
+    wget https://packages.openxpki.org/v3/debian/Release.key -O - 2>/dev/null | \
+    tee Release.key | gpg -o /usr/share/keyrings/openxpki.pgp --dearmor
 
-The https connection is protected by a Let's Encrypt certificate but if you want to validate the key on your own, the fingerprint is::
+The https connection is protected by a Let's Encrypt certificate but
+if you want to validate the key on your own, the fingerprint is::
 
     gpg --print-md sha256 Release.key (Updated 2023-06-21)
     F88C6BFC 07ACE167 9399CDE5 21BD9148 4F9DA3EB B38E1BFC DA670B1C C96EB501
@@ -69,17 +78,23 @@ Add the repository to your source list (bookworm)::
     echo -e "Types: deb\nURIs: https://packages.openxpki.org/v3/bookworm/\nSuites: bookworm\nComponents: release\nSigned-By: /usr/share/keyrings/openxpki.pgp" > /etc/apt/sources.list.d/openxpki.sources
     apt update
 
-Please do not disable the installation of "recommend" packages as this will very likely leave you with an unusable system.
+Please do not disable the installation of "recommend" packages as this will very
+likely leave you with an unusable system.
 
-As OpenXPKI can run with different RDBMS, the package does not list any of them as dependency. You therefore need to install the required perl bindings and server software yourself::
+As OpenXPKI can run with different RDBMS, the package does not list any of them as
+dependency. You therefore need to install the required perl bindings and server
+software yourself::
 
-    apt install mariadb-server libdbd-mariadb-perl
+    apt install mariadb-server libdbd-mysql-perl
 
-We strongly recommend to use a fastcgi module as it speeds up the UI, we recommend mod_fcgid as it is in the official main repository (mod_fastcgi will also work but is only available in the non-free repo)::
+We strongly recommend to use a fastcgi module as it speeds up the UI, we recommend
+mod_fcgid as it is in the official main repository (mod_fastcgi will also work but
+is only available in the non-free repo)::
 
     apt install apache2 libapache2-mod-fcgid
 
-Note, fastcgi module should be enabled explicitly, otherwise, .fcgi file will be treated as plain text (this is usually done by the installer already)::
+Note, fastcgi module should be enabled explicitly, otherwise, .fcgi file will be
+treated as plain text (this is usually done by the installer already)::
 
     a2enmod fcgid
 
@@ -90,7 +105,7 @@ Now install the OpenXPKI core package, session driver and the translation packag
 use the openxpkiadm command to verify if the system was installed correctly::
 
     openxpkiadm version
-    Version (core): 3.26.0
+    Version (core): 3.28.0
 
 Now, create an empty database and assign a database user::
 
@@ -155,199 +170,10 @@ Production Configuration
 For a production setup we recommend to remove the `/etc/openxpki` folder that was installed
 by the package and use a checkout of the `openxpki-config repository at <https://github.com/openxpki/openxpki-config>`_.
 
-You need to create the following keys/certificates yourself if you *dont* use the sampleconfig script.
-
-#. Issuing CA certificate (recommend with a Root CA on top of it)
-#. Internal DataVault Certificate
-#. Certificate for the SCEP RA
-
-OpenXPKI supports NIST and Brainpool ECC curves (as supported by openssl) for the CA certificates, as the Datavault
-certificate is used for data encryption it **MUST** use an RSA key! You should also remove the `democa` realm and
-create a realm with a proper name (see `<reference/configuration/introduction.html#main-configuration>`_).
-
-**Starting with release 3.6 the default config uses the database to store the issuing ca and SCEP tokens -
-if you upgrade from an older config version check the new settings in systems/crypto.yaml.**
-
-As of v3.10 the openxpiadm alias command can be used to manage the keys
-directly but this requires that the server is started and the directory
-for the keys exists, the default location is `/etc/openxpki/local/keys`
-so we need to create the directory before we proceed::
-
-    $ mkdir -p /etc/openxpki/local/keys
-
-We also need to start the server now (there is also an init-script and systemd unit available)::
-
-    $ openxpkictl start
-
-    Starting OpenXPKI...
-    OpenXPKI Server is running and accepting requests.
-    DONE.
-
-In the process list, you should see two process running::
-
-    14302 ?        S      0:00 openxpki watchdog ( main )
-    14303 ?        S      0:00 openxpki server ( main )
-
-If this is not the case, check */var/log/openxpki/stderr.log*.
-
-Import Root CA
-##############
-
-The Root CA is outside the scope of OpenXPKI, we recommend to use `clca <https://github.com/openxpki/clca>`_.
-
-As OpenXPKI needs to be able to build the full chain for any certificate,
-we need to import the Root CA(s) first::
-
-    $ openxpkiadm certificate import --file root.crt
-
-
-DataVault Token
-###############
-
-Create an RSA key with at least 3072 bits, either chose no password or
-the password configured for the token in your `crypto.yaml`. Create a
-self-signed certificate with this key with subject "/CN=DataVault". You
-can find a usable sample config file to create an **unencrypted** key
-in the contrib folder::
-
-    $ openssl req -new -x509 -keyout vault.key -out vault.crt -days 1100 \
-        -config /etc/openxpki/contrib/vault.openssl.cnf
-
-Now import the certificate and its key::
-
-    $ openxpkiadm certificate import --file vault.crt
-
-    Starting import
-    Successfully imported certificate into database:
-      Subject:    CN=Internal DataVault
-      Issuer:     CN=Internal DataVault
-      Identifier: YsyZ4eCgzHQN607WBIcLTxMjYLI
-      Realm:      none
-
-Register it as datasafe token for the `democa` realm and provide the
-matching key file to get it loaded into the right place::
-
-    $ openxpkiadm alias --realm democa --token datasafe \
-        --file vault.crt --key vault.key
-
-    Successfully created alias in realm democa:
-      Alias     : vault-1
-      Identifier: YsyZ4eCgzHQN607WBIcLTxMjYLI
-      NotBefore : 2020-07-06 18:54:43
-      NotAfter  : 2030-07-09 18:54:43
-
-In case you have multiple realms, you need to run this command for each
-realm but should omit the key file for any additional realms.
-
-You should check now if your DataVault token is working::
-
-    $ openxpkicli  get_token_info --arg alias=vault-1
-    {
-        "key_name" : "/etc/openxpki/local/keys/vault-1.pem",
-        "key_secret" : 1,
-        "key_store" : "OPENXPKI",
-        "key_usable" : 1
-    }
-
-If you do not see `"key_usable": 1` your token is not working! Check the
-permissions of the file (and the folders) and if the key is password
-protected if you have the right secret set in your crypto.yaml!
-
-Issuing CA Token
-################
-
-The creation and management of the Issuing CA keys and certificates themselves
-is **not** part of OpenXPKI, you need to have the keys and certificates at hand
-before you proceed. The keys must either be unprotected or use the secret
-referenced in the realms `crypto.yaml`.
-
-The `openxpkiadm alias` command offers a shortcut to import the certificate,
-register the token and store the private key. Repeat this step for all issuer
-tokens in all realms. The system will assign the next available generation
-number and create all required internal links. In case you choose the filesystem
-as key storage the command will write the key files to the intended location but
-requires that the folder exist (`/etc/openxpki/local/keys/<realm>`)::
-
-    openxpkiadm alias --realm democa --token certsign \
-        --file democa-signer.crt --key democa-signer.pem
-
-If the import went smooth, you should see something like this (ids and times will vary)::
-
-    $ openxpkiadm alias --realm democa
-
-    === functional token ===
-    vault (datasafe):
-    Alias     : vault-1
-    Identifier: lZILS1l6Km5aIGS6pA7P7azAJic
-    NotBefore : 2015-01-30 20:44:40
-    NotAfter  : 2016-01-30 20:44:40
-
-    ca-signer (certsign):
-    Alias     : ca-signer-1
-    Identifier: Sw_IY7AdoGUp28F_cFEdhbtI9pE
-    NotBefore : 2015-01-30 20:44:40
-    NotAfter  : 2018-01-29 20:44:40
-
-    === root ca ===
-    current root ca:
-    Alias     : root-1
-    Identifier: fVrqJAlpotPaisOAsnxa9cglXCc
-    NotBefore : 2015-01-30 20:44:39
-    NotAfter  : 2020-01-30 20:44:39
-
-    upcoming root ca:
-      not set
-
-An easy check to see if the signer token is working is to create a CRL::
-
-    $ openxpkicmd  --realm democa crl_issuance
-    Workflow created (ID: 511), State: SUCCESS
-
-Adding the Webclient
---------------------
-
-The package installs a default configuration for apache but requires that you
-configure a tls certificate and setup the configuration for the webui session
-storage.
-
-TLS Setup
-^^^^^^^^^
-
-Create a TLS certificate (self-signed or from an external PKI) and copy the
-key to `/etc/openxpki/tls/private/openxpki.pem`
-and the certificate to `/etc/openxpki/tls/endentity/openxpki.crt`.
-
-The default configuration also offers TLS client authentication. You need to
-place a copy of your root certificate in `/etc/openxpki/tls/chain/` and run
-`c_rehash /etc/openxpki/tls/chain/` to make it available for chain construction
-in apache. If you don't want to use client authentication you must remove the
-`SSLCACertificatePath` and `SSLVerify*` options as the webserver will not start
-if this path is empty.
-
-Session Storage
-^^^^^^^^^^^^^^^
-
-The default configuration now uses a database backend to store the webui
-session information. Please review the section `[session]` and
-`[session_driver]` in the file `/etc/openxpki/webui/default.conf`. It is
-strongly advised to use a dedicated user here with access only to the
-`frontend_session` table for security reasons. You can even put this on
-a different database as the information is not used by the backend.
-
-If you have a single node setup, you can switch to the filesystem based
-driver.
-
-Module Setup
-^^^^^^^^^^^^
-
-Ensure that fcgid is enabled (``a2enmod fcgid``).
+Follow the steps in the README and QUICKSTART document to setup your production realms.
 
 Testdrive
 ^^^^^^^^^
-
-You should now be able to (re)start the apache server::
-
-    $ service apache2 restart
 
 Navigate your browser to *https://yourhost/openxpki/*. If your browser asks you to present a certificate
 for authentication, skip it. You should now see the main authentication page.
@@ -401,25 +227,19 @@ certificate and register it as SCEP RA token::
 any realm that provides an SCEP service. It is possible to use the same SCEP
 token in multiple realms.
 
-Install SCEP Wrapper
-^^^^^^^^^^^^^^^^^^^^
+Setup SCEP Endpoint
+^^^^^^^^^^^^^^^^^^^
 
-Starting with v3.18, the default configuration uses a pure perl implementation
-for the SCEP server so there is no need to install any additional tools anymore.
-As of v3.26 the two old implementations are no longer provided so you **MUST**
-upgrade to the new implementation!
-
-The remaining SCEP logic is already included in the core distribution. The package
-installs a wrapper script into */usr/lib/cgi-bin/* and creates a suitable alias in
-the apache config redirecting all requests to ``http://host/scep/<any value>`` to
-the wrapper.
+The SCEP setup is already included in the core distribution and example
+configuration. The package installs a wrapper script and creates a suitable alias
+redirecting all requests to ``http://host/scep/<any value>`` to the wrapper.
 A default config is placed at /etc/openxpki/scep/default.conf. For a testdrive,
 there is no need for any configuration, just call ``http://host/scep/scep``.
 
 The system supports getcacert, getcert, getcacaps, getnextca and enroll/renew - the
 shipped workflow is configured to allow enrollment with password or signer on behalf.
 The password has to be set in ``scep.yaml``, the default is 'SecretChallenge'.
-For signing on behalf, use the UI to create a certificate with the 'SCEP Client'
+For signing on behalf, use the UI to create a certificate with the 'TLS Client'
 profile - there is no password necessary. Advanced configuration is described in the
 scep workflow section.
 
