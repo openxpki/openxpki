@@ -24,6 +24,16 @@ catch ($err) {
     plan skip_all => "OpenXPKI::Server::ProcTerminal (EE code) not available. Message was: $err";
 };
 
+my $tempdir = File::Temp::tempdir(CLEANUP => 1);
+my $testfile = "$tempdir/testfile";
+
+my %config = (
+    server_pidfile => "$tempdir/terminal.pid",
+    socket_file => "$tempdir/terminal.sock",
+    command => ['/bin/bash', '-c', "$Bin/bash-proc.sh $testfile" ],
+    umask_octal => '0077',
+);
+
 sub wait_for {
     my ($term, $expected) = @_;
 
@@ -39,7 +49,7 @@ sub wait_for {
 }
 
 sub run_tests {
-    my ($term, $control, $internal) = @_;
+    my ($term, $control, $testfile, $internal) = @_;
 
     lives_and { ok !$control->check_server } "no server";
 
@@ -77,18 +87,14 @@ sub run_tests {
 
     lives_ok { $term->stop_server } "stop server";
     lives_and { ok !$control->check_server } "no server";
+
+    ok -e $testfile, "testfile was created";
+    my $mode = (stat($testfile))[2] & 07777; # & 07777 filters out file type
+    is sprintf('%o', $mode), sprintf('%o', 0666 &~ oct($config{umask_octal})), "testfile has correct permissions";
+    ok unlink($testfile), "testfile was deleted";
 }
 
-my $tempdir = File::Temp::tempdir(CLEANUP => 1);
-my $config = {
-    'test' => {
-        server_pidfile => "$tempdir/terminal.pid",
-        socket_file => "$tempdir/terminal.sock",
-        command => ['/bin/bash', '-c', "$Bin/bash-proc.sh" ],
-        internal => 1,
-    },
-};
-my $ctx = OpenXPKI::Server::ProcTerminal->new(config => $config);
+my $ctx = OpenXPKI::Server::ProcTerminal->new(config => { test => { %config, internal => 1 } });
 
 my $term;
 my $control;
@@ -103,19 +109,17 @@ for my $internal (1, 0) {
     else {
         $control = OpenXPKI::Server::ProcTerminal::Control->new(
             name => 'test-external',
-            server_pidfile => $config->{test}->{server_pidfile},
-            socket_file => $config->{test}->{socket_file},
-            command => $config->{test}->{command},
+            %config,
         );
 
         $term = OpenXPKI::Server::ProcTerminal::Client->new(
             name => 'test-external',
-            socket_file => $config->{test}->{socket_file},
+            socket_file => $config{socket_file},
         );
     }
 
     subtest sprintf("Launch daemon %s", $internal ? 'automatically via OpenXPKI' : 'externally') => sub {
-        run_tests($term, $control, $internal);
+        run_tests($term, $control, $testfile, $internal);
     };
 }
 

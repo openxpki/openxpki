@@ -1,9 +1,10 @@
 #!/bin/bash
 
-# if [ "$1" != "trace" ]; then exec strace $0 trace 2>&1; fi
+test_file="$1"
 
 echo "Welcome to the terminal!"
 sleep 1
+
 num=0
 while /bin/true; do
     num=$((num+1))
@@ -21,4 +22,7 @@ done
 
 sleep 2
 echo "Exiting"
+
+echo "test" > $test_file
+
 exit 33
