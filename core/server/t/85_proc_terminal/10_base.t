@@ -28,10 +28,10 @@ my $tempdir = File::Temp::tempdir(CLEANUP => 1);
 my $testfile = "$tempdir/testfile";
 
 my %config = (
-    server_pidfile => "$tempdir/terminal.pid",
+    pid_file => "$tempdir/terminal.pid",
     socket_file => "$tempdir/terminal.sock",
     command => ['/bin/bash', '-c', "$Bin/bash-proc.sh $testfile" ],
-    umask_octal => '0077',
+    umask => '0077',
 );
 
 sub wait_for {
@@ -65,7 +65,7 @@ sub run_tests {
 
     lives_ok { $term->run } "ignore attempt to start another external process";
 
-    lives_and { ok $control->check_server } "server is running";
+    lives_and { ok $control->check_server(check_socket => 1) } "server is running";
 
     lives_ok {
         wait_for($term, 'password #1');
@@ -90,7 +90,7 @@ sub run_tests {
 
     ok -e $testfile, "testfile was created";
     my $mode = (stat($testfile))[2] & 07777; # & 07777 filters out file type
-    is sprintf('%o', $mode), sprintf('%o', 0666 &~ oct($config{umask_octal})), "testfile has correct permissions";
+    is sprintf('%o', $mode), sprintf('%o', 0666 &~ oct($config{umask})), "testfile has correct permissions";
     ok unlink($testfile), "testfile was deleted";
 }
 

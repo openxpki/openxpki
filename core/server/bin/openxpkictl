@@ -171,7 +171,7 @@ if ($cmd eq 'version') {
 
         for my $proc_name (@{ $manager->list }) {
             my $ctrl = $manager->controller($proc_name);
-            my $pid = $ctrl->check_server(1);
+            my $pid = $ctrl->check_server(silent => 1);
             printf "%-${maxlen}s - %s\n", $proc_name, $pid ? "running ($pid)" : "stopped";
         }
 
@@ -193,7 +193,7 @@ if ($cmd eq 'version') {
     my $stop = sub {
         my $name = shift;
         my $ctrl = $manager->controller($name);
-        my $pid = $ctrl->check_server(1); # needed to initialize internal is_running flag
+        my $pid = $ctrl->check_server(silent => 1); # needed to initialize internal is_running flag
         if ($pid) {
             my $client = $manager->proc($name);
             $client->stop_server();
