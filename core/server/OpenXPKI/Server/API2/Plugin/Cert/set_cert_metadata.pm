@@ -227,6 +227,7 @@ command "set_cert_metadata" => {
             $dbi->delete(
                 from => 'certificate_attributes',
                 where => {
+                    identifier           => $cert_identifier,
                     attribute_contentkey => 'meta_'.$key,
                     attribute_value      => \@delete,
                 }
