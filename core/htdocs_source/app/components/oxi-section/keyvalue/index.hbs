@@ -16,8 +16,12 @@
                             @format={{item.format}}
                             @value={{item.value}}
                             @truncate={{@meta.isInfoBox}}
-                            @class={{if item._refreshing "refreshing"}}
                         />
+                        {{#if item._refreshing}}
+                            <span class="position-absolute top-0 end-0 badge bg-primary-subtle">
+                                <span class="glyphicon glyphicon-refresh"></span>
+                            </span>
+                        {{/if}}
                 </span>
             {{/each}}
         </span>
@@ -45,8 +49,12 @@
                             @format={{item.format}}
                             @value={{item.value}}
                             @truncate={{@meta.isInfoBox}}
-                            @class={{if item._refreshing "refreshing"}}
                         />
+                        {{#if item._refreshing}}
+                            <span class="position-absolute top-0 end-0 badge bg-primary-subtle">
+                                <span class="glyphicon glyphicon-refresh"></span>
+                            </span>
+                        {{/if}}
                     </div>
                 {{/if}}
                 </div>
