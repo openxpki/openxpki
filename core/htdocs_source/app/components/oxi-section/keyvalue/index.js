@@ -18,8 +18,15 @@ export default class OxiSectionKeyvalueComponent extends Component {
     @service('oxi-content') content
 
     refreshTimers = new Map()
+    items = []
 
-    get items() {
+    get hasLabels() {
+        return this.items.filter(i => typeof i.label !== 'undefined' && i.label !== 0 && i.label !== null).length > 0
+    }
+
+    constructor() {
+        super(...arguments);
+
         let items = this.args.def.data ? [ ...this.args.def.data ] : []
         let idx = 0
         for (const i of items) {
@@ -29,11 +36,7 @@ export default class OxiSectionKeyvalueComponent extends Component {
         }
         // hide items where value (after formatting) is empty
         // (this could only happen with format 'raw' and empty values)
-        return items.filter(item => item.format !== 'raw' || item.value !== '')
-    }
-
-    get hasLabels() {
-        return this.items.filter(i => typeof i.label !== 'undefined' && i.label !== 0 && i.label !== null).length > 0
+        this.items = items.filter(item => item.format !== 'raw' || item.value !== '')
     }
 
     // lifecycle hook of @glimmer/component
@@ -46,6 +49,11 @@ export default class OxiSectionKeyvalueComponent extends Component {
     }
 
     startRefresh(item) {
+        if (this.content?.status?.level == 'error') {
+            console.info('Suppressing content refresh because of page status level "error"')
+            return
+        }
+
         let timeout = item.refresh.timeout
         let uri = item.refresh.uri
         if (! timeout) throw new Error("Key 'timeout' is missing in 'refresh' property.")
