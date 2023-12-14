@@ -51,7 +51,7 @@ sub wait_for {
 sub run_tests {
     my ($term, $control, $testfile, $internal) = @_;
 
-    lives_and { ok !$control->check_server } "no server";
+    lives_and { ok !$control->check_server(verbose => 1) } "no server";
 
     if (not $internal) {
         dies_ok { $term->run } qr/Cannot create socket/;
@@ -65,7 +65,7 @@ sub run_tests {
 
     lives_ok { $term->run } "ignore attempt to start another external process";
 
-    lives_and { ok $control->check_server(check_socket => 1) } "server is running";
+    lives_and { ok $control->check_server(verbose => 1, check_socket => 1) } "server is running";
 
     lives_ok {
         wait_for($term, 'password #1');
@@ -86,7 +86,15 @@ sub run_tests {
     lives_and { is $term->exit_code, 33 } "correct exit code";
 
     lives_ok { $term->stop_server } "stop server";
-    lives_and { ok !$control->check_server } "no server";
+    lives_and {
+        my ($runs, $i);
+        while ($i++ < 3) {
+            $runs = $control->check_server;
+            last if not $runs;
+            sleep 1;
+        }
+        ok not $runs;
+    } "no server";
 
     ok -e $testfile, "testfile was created";
     my $mode = (stat($testfile))[2] & 07777; # & 07777 filters out file type
