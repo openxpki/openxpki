@@ -81,7 +81,7 @@ export default class OxiSectionKeyvalueComponent extends Component {
         // cancel old search query timer on new input
         let oldTimer = this.refreshTimers.get(item._id)
         if (oldTimer) clearTimeout(oldTimer)
-        // set refresh timer
-        this.refreshTimers.set(item._id, setTimeout(refreshRequest, timeout * 1000))
+        // immediately run first refresh
+        refreshRequest()
     }
 }
