@@ -164,6 +164,11 @@ if ($cmd eq 'version') {
         config => $config->get_hash('system.terminal') // {},
     );
 
+    if (not scalar $manager->list->@*) {
+        print "No internally managed terminals found in configuration node system.terminal\n";
+        exit 0;
+    }
+
     my $subcmd = shift // '';
 
     if ($subcmd eq 'status') {
