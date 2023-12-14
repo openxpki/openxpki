@@ -1,6 +1,7 @@
 import Component from '@glimmer/component'
 import { service } from '@ember/service'
 import { set as emSet } from '@ember/object'
+import { later, cancel } from '@ember/runloop'
 
 /**
  * Draws a list of key/value pairs.
@@ -45,7 +46,7 @@ export default class OxiSectionKeyvalueComponent extends Component {
         // Remove all refresh timers to prevent that an OpenXPKI page refresh
         // (!= browser reload) leads to multiple parallel request timers.
         // Or that the requests continue if another OpenXPKI page is opened.
-        for (const timer of this.refreshTimers.values()) clearTimeout(timer)
+        for (const timer of this.refreshTimers.values()) cancel(timer)
     }
 
     startRefresh(item) {
@@ -70,7 +71,7 @@ export default class OxiSectionKeyvalueComponent extends Component {
                 emSet(item, "value", doc.value)
                 // item.value = doc.value
                 if (!this.isDestroying && !this.isDestroyed) {
-                    this.refreshTimers.set(item._id, setTimeout(refreshRequest, timeout * 1000))
+                    this.refreshTimers.set(item._id, later(this, refreshRequest, timeout * 1000))
                 }
             })
             .finally(() => {
@@ -80,7 +81,7 @@ export default class OxiSectionKeyvalueComponent extends Component {
 
         // cancel old search query timer on new input
         let oldTimer = this.refreshTimers.get(item._id)
-        if (oldTimer) clearTimeout(oldTimer)
+        if (oldTimer) cancel(oldTimer)
         // immediately run first refresh
         refreshRequest()
     }
