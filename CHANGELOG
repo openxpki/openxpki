@@ -1,23 +1,8 @@
 Please list items to be added to the final release comment here
 
 New Features
-  - OAEP padding for datavault token
-  - New engine "Inline" for pure perl based crypto operations (SCEP only)
-  - Add EST method "simplerevoke" (non RFC)
-  - Implement dependant select boxes
-  - Implement input validation for select boxes
 
 Upgrades, Improvements and Bugfixes
-  - Handle x509 login errors on RPC interface
-  - Fix PKCS12 legacy export when using OpenSSL 3.0
-  - Improve layout of button lists
-  - Add new list layout for realm selection page
-  - Autogenerate workflow prefix for nested conditions
-  - Fix unwanted escape on intended apostrophes / quote charaters
-  - Handle session resume across multiple browser windows
-  - Improve OpenAPI spec to include parameters for pickup actions
-  - Cleanup HTML structure, add decorator classes for CSS customization
+- SELECT fields in workflows now support dependent fields (fields only shown if a specific option is selected)
 
 Removals, Deprecations, Breaking Changes
-  - Move placeholders for CAALIAS (ALIAS, GROUP, GENERATION) to the top level for CDP/AIA generation
-  - Changen openssl call from smime to cms for pkcs7_encrypt/pkcs_decrypt
