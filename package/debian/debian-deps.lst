@@ -4,7 +4,6 @@ libauthen-sasl-perl
 libcache-lru-perl
 libcgi-fast-perl
 libcgi-session-perl
-libcgi-session-perl
 libclass-accessor-perl
 libclass-factory-perl
 libclass-isa-perl
