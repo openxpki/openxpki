@@ -250,6 +250,11 @@ while (my $cgi = CGI::Fast->new()) {
                 $client = $rpc->backend();
                 try {
                     # this will die if the certificate was not found
+                    # TOOD - this call fails if no backend connection can be made which gives a misleading
+                    # error code to the customer - this can also happen on a misconfigured auth stack :)
+                    # might also be useful to have a validated "certificate" used for the session login
+                    # so the likely best option would be some kind on "anonymous" client here
+                    # See #903 and #904 on github
                     $cert = $client->run_command('get_cert', { identifier => $cert_identifier, format => 'PEM' });
 
                     # use our json parser object to decode to limit parsing depth
