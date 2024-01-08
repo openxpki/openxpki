@@ -139,6 +139,17 @@ command "set_cert_metadata" => {
         OpenXPKI::Exception->throw( message => "Attribute value for key $key is not scalar or array" )
             unless (ref $value eq '' || ref $value eq 'ARRAY');
 
+        # deduplicate input list
+        if (ref $value) {
+            my $oldsize = scalar @$value;
+            my %tmp = map { $_ => 1 } @$value;
+            $value = [ keys %tmp ];
+            if ($oldsize != scalar @$value) {
+                $log->info(sprintf("Removed %01d duplicate items for key $key",
+                    (scalar @$value) - $oldsize));
+            }
+        }
+
         # Load existings items
         my $attr = CTX('api2')->get_cert_attributes(
             identifier => $cert_identifier,
@@ -231,7 +242,7 @@ command "set_cert_metadata" => {
                     attribute_contentkey => 'meta_'.$key,
                     attribute_value      => \@delete,
                 }
-            );
+            ) if (@delete);
         }
 
         # create new entries for all items in @add
