@@ -31,7 +31,7 @@ sub handle_revocation_request {
         return OpenXPKI::Client::Service::Response->new( 50010 );
     }
 
-    # preset reason code if not already from from wrapper config
+    # preset reason code if not already done from wrapper config
     $param->{reason_code} = 'unspecified' unless(defined $param->{reason_code});
 
     my $payload = $cgi->param( 'POSTDATA' );
@@ -53,6 +53,8 @@ sub handle_revocation_request {
         # noop
     } elsif ($response->state eq 'SUCCESS') {
         $response->http_status_code(204);
+    } elsif ($response->state eq 'CANCELED') {
+        $response->http_status_code(409);
     } else {
         $response->http_status_code(400);
     }
