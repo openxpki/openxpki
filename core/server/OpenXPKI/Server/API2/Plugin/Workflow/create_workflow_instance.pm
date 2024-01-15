@@ -141,7 +141,7 @@ command "create_workflow_instance" => {
         $tenant = $self->get_validated_tenant( $params->tenant );
         $workflow = CTX('workflow_factory')->get_factory->create_workflow($type);
     }
-    ##! 32: "Tenant $tenant"
+    ##! 32: 'Tenant ' . $tenant//'<undef>'
 
     OpenXPKI::Exception->throw (
         message => "Could not initialize workflow",
