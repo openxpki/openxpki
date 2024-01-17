@@ -85,7 +85,9 @@ serve: docker-build ## run Ember.js development server
 #
 # Update Ember
 #
+update-ember: DIRTY_FILES = $(shell bash -c "git status --porcelain -uno | grep -v '...config$$' | wc -l")
 update-ember: docker-build ## update ember-cli and ember-cli-update
+	@if [ "$(DIRTY_FILES)" -ne 0 ]; then echo "\nERROR: this command must be run in a clean Git checkout (i.e. no modified files)\n"; false; fi
 	$(MANAGER) run $(MANAGER_OPTS_RUN) -ti --rm \
 	  -v $(abspath ./):/source:ro \
 	  -v $(abspath ./):/output \
