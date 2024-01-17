@@ -61,9 +61,12 @@ if [ "update-ember" == "$1" ]; then
   echo -e "\nDone.\nEmber source files were updated on your host."
 
 elif [ "update-deps" == "$1" ]; then
-  echo -e "\n[Update Javascript dependencies]"
+  echo -e "\n[Install npm-check-updates]"
   npm install -g npm-check-updates
+  echo -e "\n[Update Javascript dependencies]"
   ncu -u
+  echo -e "\n[Update pnpm-lock.yaml]"
+  pnpm install
   cp package.json pnpm-lock.yaml /output
   echo -e "\nDone.\npackage.json and pnpm-lock.yaml were updated on your host."
 
