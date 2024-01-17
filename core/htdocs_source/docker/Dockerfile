@@ -1,4 +1,4 @@
-FROM docker.io/library/node:gallium-buster-slim
+FROM docker.io/library/node:iron-bookworm-slim
 
 # Note: npm needs Git to fetch some modules directly from Github
 RUN apt-get update && \
@@ -12,6 +12,9 @@ WORKDIR /
 
 RUN mkdir /build && chmod 0777 /build
 
+# accept Github's SSH keys to avoid prompt "Are you sure you want to continue connecting (yes/no)?"
+RUN mkdir -p /root/.ssh && ssh-keyscan github.com >> /root/.ssh/known_hosts
+
 # use alternative (local) npm registry if available
 ARG NPM_CUSTOM_REGISTRY
 RUN test -n "$NPM_CUSTOM_REGISTRY" \
@@ -21,7 +24,7 @@ RUN test -n "$NPM_CUSTOM_REGISTRY" \
 
 # update npm and install pnpm
 RUN npm install -g npm@9.8.1 \
-  && npm install -g pnpm@8.6.10 \
+  && npm install -g pnpm@8.14.1 \
   && pnpm config set auto-install-peers true
 
 # Copy depency lists separately to allow for Docker caching

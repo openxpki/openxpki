@@ -36,10 +36,6 @@ mv /node_modules /build/node_modules
 
 cd /build
 
-# accept Github's SSH keys to avoid prompt "Are you sure you want to continue connecting (yes/no)?"
-echo -e "\n[Fetch and auto-accept Github's SSH key fingerprints]"
-mkdir -p ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
-
 if [ "update-ember" == "$1" ]; then
   echo -e "\n[Update ember-cli and ember-cli-update]"
   pnpm remove ember-cli ember-cli-update
