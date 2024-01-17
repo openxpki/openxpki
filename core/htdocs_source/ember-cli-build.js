@@ -48,7 +48,7 @@ module.exports = function(defaults) {
       importBootstrapCSS: true,
       importBootstrapFont: false,
       // only include used components into compiled JS
-      whitelist: ['bs-button', 'bs-modal', 'bs-dropdown', 'bs-navbar', 'bs-collapse'],
+      include: ['bs-button', 'bs-modal', 'bs-dropdown', 'bs-navbar', 'bs-collapse'],
     },
 
     // fetch() polyfill (does not exist in core-js via ember-cli-babel, so we need to add it)
