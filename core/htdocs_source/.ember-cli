@@ -1,19 +1,19 @@
 {
-  /*
-   * Ember CLI sends analytics information by default. The data is completely
-   * anonymous, but there are times when you might want to disable this behavior.
-   * Setting `disableAnalytics` to true will prevent any data from being sent.
-   */
-  "disableAnalytics": true,
-
-  /*
-   * Setting `isTypeScriptProject` to true will force the blueprint generators to generate TypeScript
-   * rather than JavaScript by default, when a TypeScript version of a given blueprint is available.
-   */
+  /**
+    Setting `isTypeScriptProject` to true will force the blueprint generators to generate TypeScript
+    rather than JavaScript by default, when a TypeScript version of a given blueprint is available.
+  */
   "isTypeScriptProject": false,
 
-  /*
-   * Use the pods structure as the default without using the --pod option
-   */
+  /**
+    Ember CLI sends analytics information by default. The data is completely
+    anonymous, but there are times when you might want to disable this behavior.
+    Setting `disableAnalytics` to true will prevent any data from being sent.
+  */
+  "disableAnalytics": true,
+
+  /**
+    Use the pods structure as the default without using the --pod option
+  */
   "usePods": false
 }
