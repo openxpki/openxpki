@@ -25,14 +25,15 @@ if command -v dmidecode >/dev/null; then
             install_vbox=1
         fi
         if [ $install_vbox -eq 1 ]; then
+            echo "VBoxGuestAdditions - install libx11-6"
             install_packages libx11-6
             echo "VBoxGuestAdditions - remove old version"
             apt-get -q=2 remove virtualbox-guest-utils >$LOG 2>&1 || echo
             echo "VBoxGuestAdditions - install new version ${VBOX_VERSION}"
             cd /tmp
             wget -q http://download.virtualbox.org/virtualbox/${VBOX_VERSION}/VBoxGuestAdditions_${VBOX_VERSION}.iso >$LOG 2>&1
-            mount VBoxGuestAdditions_${VBOX_VERSION}.iso -o loop /mnt                   >$LOG 2>&1
-            sh /mnt/VBoxLinuxAdditions.run --nox11 -- --force                 >$LOG 2>&1
+            mount VBoxGuestAdditions_${VBOX_VERSION}.iso -o loop /mnt >$LOG 2>&1
+            sh /mnt/VBoxLinuxAdditions.run --nox11 -- --force >$LOG 2>&1
             umount /mnt
             rm VBoxGuestAdditions_${VBOX_VERSION}.iso
         fi

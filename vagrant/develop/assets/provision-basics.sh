@@ -23,6 +23,9 @@ while read def; do export $def; done < /etc/environment
 echo "Apt - update package list"
 apt-get update >$LOG 2>&1
 
+kernel=$(uname -r)
+kernel_base=$(printf '%s\n' "${kernel%%-amd64}")
+
 # libzip-dev - for Net::SSLeay
 # libexpat1-dev - for XML::Parser
 # linux-headers-amd64 - required to compile guest addons using "vagrant vbguest" (on the host)
@@ -30,7 +33,7 @@ install_packages mc rsync gettext \
   apache2 libapache2-mod-fcgid \
   libssl-dev libzip-dev libexpat1-dev \
   libtest-deep-perl libtest-exception-perl \
-  linux-headers-amd64 \
+  linux-headers-${kernel} linux-headers-${kernel_base}-common \
   build-essential curl
 
 echo "Apt - upgrade"
