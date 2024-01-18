@@ -137,10 +137,14 @@ docker-build:
 prune: ## remove Docker image
 	$(MANAGER) rmi $(IMAGE)
 
+npm-cache: NPM_CACHE_DIR := $(abspath ./verdaccio-npm-cache)
+npm-cache: MOUNT_OPT := $(shell if [ -d $(NPM_CACHE_DIR) ]; then a="y"; else read -r -p "Store cache on host [y/N]? " a; fi; if [ "$$a" = "y" -o "$$a" = "j" ]; then echo "-v \"$(NPM_CACHE_DIR):/verdaccio/storage\""; else echo ""; fi)
 npm-cache: ## run local NPM cache "verdaccio" (will be used by containers)
+	@if [ -n "$(MOUNT_OPT)" ]; then mkdir -p "$(NPM_CACHE_DIR)"; fi
 	$(MANAGER) run $(MANAGER_OPTS_RUN) -ti --rm \
 	  --name verdaccio \
 	  -e "VERDACCIO_PORT=$(call port,$(NPM_CUSTOM_REGISTRY))" \
+	  $(MOUNT_OPT) \
 	  verdaccio/verdaccio
 
 add/%: ## add modules to package.json as devDependencies
