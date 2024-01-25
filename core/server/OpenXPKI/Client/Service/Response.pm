@@ -104,6 +104,7 @@ our %named_messages = (
     '40002' => 'Unable to parse request',
     '40003' => 'Incoming enrollment with empty body',
     '40004' => 'Missing or invalid parameters',
+    '40005' => 'No result for given pickup parameters',
     '40006' => 'Request was rejected',
     '40100' => 'Unauthorized',
     '40400' => 'Not Found',

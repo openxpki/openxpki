@@ -47,6 +47,14 @@ while (my $cgi = CGI::Fast->new()) {
         next;
     }
 
+    # TODO - this should be removed
+    if ($operation eq 'simplereenroll' &&
+        !$config->config()->{'simplereenroll'} &&
+        $config->config()->{'simpleenroll'}) {
+        $operation eq 'simpleenroll';
+        $log->warn('Fall back to simpleenroll configuration on simplereenroll');
+    }
+
     my $client = OpenXPKI::Client::Service::EST->new(
         config => $config,
         logger => $log,
@@ -68,12 +76,23 @@ while (my $cgi = CGI::Fast->new()) {
     } elsif($operation eq 'csrattrs') {
         $mime = "application/csrattrs";
         $response = $client->handle_property_request($cgi);
+
     } elsif($operation eq 'simplerevoke') {
 
-        $response = $client->handle_revocation_request($cgi);
+        if (!$cgi->param( 'POSTDATA' )) {
+            $log->debug( 'Incoming revocation request with empty body' );
+            $response = OpenXPKI::Client::Service::Response->new( 40003 );
+        } else {
+            $response = $client->handle_revocation_request($cgi);
+        }
 
     } else {
-        $response = $client->handle_enrollment_request($cgi);
+        if (!$cgi->param( 'POSTDATA' )) {
+            $log->debug( 'Incoming enrollment with empty body' );
+            $response = OpenXPKI::Client::Service::Response->new( 40003 );
+        } else {
+            $response = $client->handle_enrollment_request($cgi);
+        }
     }
 
     $log->debug('Status: ' . $response->http_status_line());

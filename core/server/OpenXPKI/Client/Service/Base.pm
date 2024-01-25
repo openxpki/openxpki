@@ -9,6 +9,7 @@ use Crypt::PKCS10;
 use Log::Log4perl qw(:easy);
 use MIME::Base64;
 use Digest::SHA qw(sha1_hex);
+use Feature::Compat::Try;
 use OpenXPKI::Exception;
 use OpenXPKI::Client::Simple;
 use OpenXPKI::Client::Service::Response;
@@ -59,8 +60,11 @@ sub _init_backend {
 sub build_params {
 
     my $self = shift;
-    my $operation = shift || $self->operation();
 
+    # not used here
+    #my $cgi = shift;
+
+    my $operation = $self->operation();
     my $conf = $self->config()->config();
 
     my $param = {};
@@ -137,11 +141,52 @@ sub build_params {
 
 }
 
+sub build_pickup_config {
+
+    my $self = shift;
+    my $param = shift;
+    my $cgi = shift;
+
+    my $conf = $self->config()->config();
+    my $pickup_config = {(
+        workflow => 'certificate_enroll',
+        pickup => 'pkcs10',
+        pickup_attribute => 'transaction_id',
+        ),
+        %{$conf->{$self->operation()} || {}},
+    };
+
+    Log::Log4perl::MDC->put('tid', $param->{transaction_id});
+
+    # check for pickup parameter
+    my $pickup_value;
+    # namespace needs a single value
+    if ($pickup_config->{pickup_workflow}) {
+        # explicit pickup paramters are set
+        my @keys = split /\s*,\s*/, $pickup_config->{pickup};
+        foreach my $key (@keys) {
+            # take value from param hash if defined, this makes data
+            # from the environment avail to the pickup workflow
+            my $val = $param->{$key} // $cgi->param($key);
+            $pickup_value->{$key} = $val if (defined $val);
+        }
+    } else {
+        # pickup via transaction_id
+        $pickup_value = $param->{transaction_id};
+    }
+
+    return ($pickup_config, $pickup_value);
+}
+
+
 sub handle_enrollment_request {
 
     my $self = shift;
     my $cgi = shift;
-    my $operation = shift || $self->operation();
+
+    die "Passing operation to handle_enrollment_request is no longer supported." if (@_);
+
+    my $operation = $self->operation();
 
     my $config = $self->config();
     my $log = $self->logger();
@@ -150,7 +195,7 @@ sub handle_enrollment_request {
 
     # Build configuration parameters, can be overloaded by protocols
     # e.g. SCEP to inject data from the input
-    my $param = $self->build_params( $operation, $cgi );
+    my $param = $self->build_params( $cgi );
 
     if (!defined $param) {
         return OpenXPKI::Client::Service::Response->new( 50010 );
@@ -193,49 +238,26 @@ sub handle_enrollment_request {
         $param->{transaction_id} = sha1_hex($decoded->csrRequest) unless($param->{transaction_id});
     }
 
-    # fall back to simpleneroll config for simplereenroll if not set
-    if ($operation eq 'simplereenroll' && !$conf->{simplereenroll}) {
-        $operation = "simpleenroll";
-    }
-
-    my $pickup_config = {(
-        workflow => 'certificate_enroll',
-        pickup => 'pkcs10',
-        pickup_attribute => 'transaction_id',
-        ),
-        %{$conf->{$operation} || {}},
-    };
+    my ($pickup_config, $pickup_value) = $self->build_pickup_config( $param, $cgi );
     $log->trace(Dumper $pickup_config) if $log->is_trace;
 
     my $workflow;
-    eval {
 
-        Log::Log4perl::MDC->put('tid', $param->{transaction_id});
-
-        # check for pickup parameter
-        my $pickup_value;
-        # namespace needs a single value
-        if ($pickup_config->{pickup_workflow}) {
-            # explicit pickup paramters are set
-            my @keys = split /\s*,\s*/, $pickup_config->{pickup};
-            foreach my $key (@keys) {
-                # take value from param hash if defined, this makes data
-                # from the environment avail to the pickup workflow
-                my $val = $param->{$key} // $cgi->param($key);
-                $pickup_value->{$key} = $val if (defined $val);
-            }
-        } else {
-            # pickup via transaction_id
-            $pickup_value = $param->{transaction_id};
-        }
-
+    try {
         # try pickup
         $workflow = $self->pickup_workflow($pickup_config, $pickup_value);
+
+        # it was a pickup, it was not successful, we do not have a PKCS10
+        if ($pickup_value && !$workflow && !$param->{pkcs10}) {
+            $log->debug("Pickup failed and no PKCS10 given");
+            return OpenXPKI::Client::Service::Response->new( 40005 );
+        }
 
         # pickup return undef if no workflow was found - start new one
         if (!$workflow) {
             $log->debug(sprintf("Initialize %s with params %s",
                 $pickup_config->{workflow}, join(", ", keys %{$param})));
+
             $workflow = $client->handle_workflow({
                 type => $pickup_config->{workflow},
                 params => $param,
@@ -243,7 +265,10 @@ sub handle_enrollment_request {
         }
 
         $log->trace( 'Workflow info '  . Dumper $workflow ) if ($log->is_trace());
-    };
+    } catch ($error) {
+        $log->error( $error );
+        return OpenXPKI::Client::Service::Response->new( 50003 );
+    }
 
     if (!$workflow || ( $workflow->{'proc_state'} ne 'finished' && !$workflow->{id} ) || $workflow->{'proc_state'} eq 'exception') {
         my $reply = $client->last_reply() || {};
@@ -253,7 +278,7 @@ sub handle_enrollment_request {
                 return OpenXPKI::Client::Service::Response->new( 40004 );
             }
         }
-        $log->error( $EVAL_ERROR ? $EVAL_ERROR : 'Internal Server Error');
+        $log->error( 'Internal server error');
         return OpenXPKI::Client::Service::Response->new( 50003 );
     }
 
@@ -322,7 +347,7 @@ sub handle_property_request {
 
     my $conf = $config->config();
 
-    my $param = $self->build_params( $operation, $cgi );
+    my $param = $self->build_params( $cgi );
 
     if (!defined $param) {
         return OpenXPKI::Client::Service::Response->new( 50010 );

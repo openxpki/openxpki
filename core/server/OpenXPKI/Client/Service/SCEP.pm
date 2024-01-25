@@ -110,15 +110,16 @@ sub generate_pkcs7_response {
         # but we must remove the undef value from the parameters list
         delete $params{alias} unless ($params{alias});
 
-        my $failInfo = ($response->error == 40001) ? 'badMessageCheck' : 'badRequest';
-
-        # Special handling of invalid certid with GetCertInitial request
-        if ($self->message_type() eq 'GetCertInitial' && $response->error == 40003) {
+        my $failInfo;
+        if ($response->error == 40001) {
+            $failInfo = 'badMessageCheck';
+        } elsif ($response->error == 40005) {
             $failInfo = 'badCertId';
+        } else {
+            $failInfo = 'badRequest';
         }
 
         $self->logger->warn('Client error / malformed request ' . $failInfo);
-
         return $self->backend()->run_command('scep_generate_failure_response',
             { %params, failinfo => $failInfo });
     }
@@ -161,7 +162,7 @@ around 'build_params' => sub {
         # Load url paramters if defined by config
         my $conf = $self->config()->config()->{'PKIOperation'};
         if ($conf->{param}) {
-            my $cgi = $args[1];
+            my $cgi = $args[0];
             my $extra;
             my @extra_params;
             # The legacy version - map anything
@@ -178,7 +179,7 @@ around 'build_params' => sub {
             $params->{_url_params} = $extra;
         }
     } elsif ($self->message_type() eq 'GetCertInitial') {
-        $params->{pkcs10} = undef;
+        $params->{pkcs10} = '';
         $params->{transaction_id} = $self->transaction_id();
         $params->{signer_cert} = $self->signer();
     } elsif ($self->message_type() =~ m{\AGet(Cert|CRL)\z}) {

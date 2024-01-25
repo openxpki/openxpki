@@ -18,14 +18,13 @@ sub handle_revocation_request {
 
     my $self = shift;
     my $cgi = shift;
-    my $operation = shift || $self->operation();
 
     my $config = $self->config();
     my $log = $self->logger();
 
     my $conf = $config->config();
 
-    my $param = $self->build_params( $operation, $cgi );
+    my $param = $self->build_params( $cgi );
 
     if (!defined $param) {
         return OpenXPKI::Client::Service::Response->new( 50010 );
@@ -42,7 +41,7 @@ sub handle_revocation_request {
         return OpenXPKI::Client::Service::Response->new( 40002 );
     }
 
-    my $workflow_type = $conf->{$operation}->{workflow} ||
+    my $workflow_type = $conf->{simplerevoke}->{workflow} ||
         'certificate_revoke';
     $log->debug( 'Start workflow type ' . $workflow_type );
     $log->trace( 'Workflow Paramters '  . Dumper $param );
