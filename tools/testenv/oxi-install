@@ -142,12 +142,14 @@ if [ -n "$DATABASE" ]; then
     esac
 fi
 
+rsync_exclude=(--exclude=.git/ --exclude=node_modules/ --exclude=verdaccio-npm-cache/)
+
 #
 # Compile OpenXPKI
 #
 echo -e "\nCompilation and installation"
 echo "- synchronize source code from host to $OXI_CORE_DIR"
-rsync -a --delete --exclude=.git/ --exclude=node_modules/ $OXI_SOURCE_DIR/core/ $OXI_CORE_DIR >$LOG 2>&1
+rsync -a --delete "${rsync_exclude[@]}" $OXI_SOURCE_DIR/core/ $OXI_CORE_DIR >$LOG 2>&1
 
 # Copy EE Perl modules
 if [ -d $OXI_EE_SOURCE_DIR/opt/myperl/site_perl/OpenXPKI ]; then
@@ -157,8 +159,8 @@ fi
 
 # Copy web UI files
 echo "- synchronize UI code"
-rsync -a --delete --exclude=.git/ --exclude=node_modules/ $OXI_SOURCE_DIR/core/server/htdocs/   /var/www/openxpki/ >$LOG 2>&1
-rsync -a --delete --exclude=.git/ $OXI_SOURCE_DIR/core/server/cgi-bin/ /usr/lib/cgi-bin/                           >$LOG 2>&1
+rsync -a --delete "${rsync_exclude[@]}" $OXI_SOURCE_DIR/core/server/htdocs/ /var/www/openxpki/ >$LOG 2>&1
+rsync -a --delete "${rsync_exclude[@]}" $OXI_SOURCE_DIR/core/server/cgi-bin/ /usr/lib/cgi-bin/ >$LOG 2>&1
 
 # Copy EE web UI files
 if [ -d $OXI_EE_SOURCE_DIR/opt/myperl/share/cgi-bin ]; then
