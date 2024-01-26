@@ -168,6 +168,12 @@ if [ -d $OXI_EE_SOURCE_DIR/opt/myperl/share/cgi-bin ]; then
     rsync -a $OXI_EE_SOURCE_DIR/opt/myperl/share/cgi-bin/ /usr/lib/cgi-bin/ >$LOG 2>&1
 fi
 
+# Copy EE /usr files (must be done after copying files with "rsync -a --delete ... /usr/lib/cgi-bin")
+if [ -d $OXI_EE_SOURCE_DIR/usr ]; then
+    echo -e "- synchronize EE /usr files"
+    rsync -a $OXI_EE_SOURCE_DIR/usr/ /usr/ >$LOG 2>&1
+fi
+
 # Copy EE scripts
 if [ -d $OXI_EE_SOURCE_DIR/opt/myperl/bin ]; then
     echo "- synchronize EE scripts and add them to Makefile.PL:"
@@ -175,7 +181,7 @@ if [ -d $OXI_EE_SOURCE_DIR/opt/myperl/bin ]; then
 
     # inject EE scripts into Makefile.PL's EXE_FILES array
     files=$(find $OXI_EE_SOURCE_DIR/opt/myperl/bin/ -type f -printf "bin/%f ")
-    echo "$files" | sed 's/ /\n/g; s/^/  /mg'
+    echo "$files" | sed 's/ /\n/g; s/^/    /mg'
     echo "$files" | $OXI_SOURCE_DIR/tools/scripts/add-exe-to-makefile.pl $OXI_CORE_DIR/server/Makefile.PL \
       > $OXI_CORE_DIR/server/Makefile.PL.new \
       && mv $OXI_CORE_DIR/server/Makefile.PL.new $OXI_CORE_DIR/server/Makefile.PL

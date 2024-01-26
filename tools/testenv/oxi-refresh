@@ -107,11 +107,13 @@ echo
 # fully overwrite existing config
 if [[ $IS_FULLCONFIG -eq 1 ]]; then
     echo "Write complete OpenXPKI config into /etc/openxpki"
-    rsync -a --delete $OXI_TEST_SAMPLECONFIG_DIR/* /etc/openxpki/ >>$LOG 2>&1
-    rsync -a --delete $OXI_TEST_SAMPLECONFIG_DIR/contrib/local/* /etc/openxpki/local/ >>$LOG 2>&1
-
+    pushd $OXI_TEST_SAMPLECONFIG_DIR > /dev/null
+        DESTDIR= make install >>$LOG 2>&1
+    popd > /dev/null
     chmod 750              /etc/openxpki/config.d
     chown -R root:openxpki /etc/openxpki/config.d
+
+    rsync -a --delete $OXI_TEST_SAMPLECONFIG_DIR/contrib/local/* /etc/openxpki/local/ >>$LOG 2>&1
     chmod 750              /etc/openxpki/local
     chown -R root:openxpki /etc/openxpki/local
 
