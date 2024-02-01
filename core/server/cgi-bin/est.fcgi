@@ -8,6 +8,8 @@ use CGI::Fast;
 use Data::Dumper;
 use English;
 
+use Mojo::Message::Request;
+
 use OpenXPKI::Client::Config;
 use OpenXPKI::Client::Service::EST;
 
@@ -15,7 +17,9 @@ my $config = OpenXPKI::Client::Config->new('est');
 my $log = $config->logger();
 $log->info("EST handler initialized");
 
-while (my $cgi = CGI::Fast->new()) {
+while (my $cgi = CGI::Fast->new("")) {
+
+    my $req = OpenXPKI::Client::Service::EST->mojo_req_from_cgi;
 
     # EST urls look like
     # /.well-known/est/cacerts
@@ -23,8 +27,9 @@ while (my $cgi = CGI::Fast->new()) {
     # Supported operations are
     # cacerts, simpleenroll, simplereenroll, , csrattrs
     # serverkeygen and fullcmc is not supported
-    $config->parse_uri();
-    my $operation = $config->route();
+    my ($endpoint, $operation) = $config->parse_uri;
+    my $ep_config = $config->endpoint_config($endpoint);
+
     if ($operation !~ m{(cacerts|simpleenroll|simplereenroll|csrattrs|simplerevoke)}) {
         print $cgi->header( -status => '501 Not implemented', -type => 'text/plain');
         print "Method not implemented\n";
@@ -32,11 +37,11 @@ while (my $cgi = CGI::Fast->new()) {
         next;
     }
 
-    $log->trace(sprintf("Incoming EST request %s on endpoint %s", $operation, $config->endpoint()));
+    $log->trace(sprintf("Incoming EST request '%s' on endpoint '%s'", $operation, $endpoint));
 
     if ( lc( $ENV{HTTPS} // '' ) eq 'on') {
         # what we expect -> noop
-    } elsif ($config->config()->{global}->{insecure}) {
+    } elsif ($ep_config->{global}->{insecure}) {
         # RFC demands TLS for EST but we might have a SSL proxy in front
         $log->debug("unauthenticated (plain http)");
 
@@ -48,23 +53,27 @@ while (my $cgi = CGI::Fast->new()) {
     }
 
     # TODO - this should be removed
-    if ($operation eq 'simplereenroll' &&
-        !$config->config()->{'simplereenroll'} &&
-        $config->config()->{'simpleenroll'}) {
-        $operation eq 'simpleenroll';
-        $log->warn('Fall back to simpleenroll configuration on simplereenroll');
+    if ($operation eq 'simplereenroll'
+        and not $ep_config->{'simplereenroll'}
+        and $ep_config->{'simpleenroll'}
+    ) {
+        $operation = 'simpleenroll';
+        $log->warn("Fall back to 'simpleenroll' configuration on 'simplereenroll'");
     }
 
     my $client = OpenXPKI::Client::Service::EST->new(
-        config => $config,
-        logger => $log,
+        config_obj => $config,
+        apache_env => \%ENV,
+        remote_address => $ENV{REMOTE_ADDR},
+        request => $req,
+        endpoint => $endpoint,
         operation => $operation,
     );
 
     my $response;
     my $mime = "application/pkcs7-mime; smime-type=certs-only";
     if ($operation eq 'cacerts') {
-        $response = $client->handle_property_request($cgi);
+        $response = $client->handle_property_request;
 
         # the workflows should return base64 encoded raw data
         # but the old EST GetCA workflow returned PKCS7 with PEM headers
@@ -75,24 +84,13 @@ while (my $cgi = CGI::Fast->new()) {
 
     } elsif($operation eq 'csrattrs') {
         $mime = "application/csrattrs";
-        $response = $client->handle_property_request($cgi);
+        $response = $client->handle_property_request;
 
     } elsif($operation eq 'simplerevoke') {
-
-        if (!$cgi->param( 'POSTDATA' )) {
-            $log->debug( 'Incoming revocation request with empty body' );
-            $response = OpenXPKI::Client::Service::Response->new( 40003 );
-        } else {
-            $response = $client->handle_revocation_request($cgi);
-        }
+        $response = $client->handle_revocation_request;
 
     } else {
-        if (!$cgi->param( 'POSTDATA' )) {
-            $log->debug( 'Incoming enrollment with empty body' );
-            $response = OpenXPKI::Client::Service::Response->new( 40003 );
-        } else {
-            $response = $client->handle_enrollment_request($cgi);
-        }
+        $response = $client->handle_enrollment_request;
     }
 
     $log->debug('Status: ' . $response->http_status_line());
@@ -101,9 +99,8 @@ while (my $cgi = CGI::Fast->new()) {
     # close backend connection
     $client->terminate();
 
-    my $conf = $config->config();
     my @extra_header;
-    @extra_header = %{ $response->extra_headers() } if ($conf->{output}->{headers});
+    @extra_header = %{ $response->extra_headers() } if ($ep_config->{output}->{headers});
     if ($response->has_error()) {
 
         print $cgi->header(
@@ -137,7 +134,7 @@ while (my $cgi = CGI::Fast->new()) {
     } else {
 
         # Default is base64 encoding, but we can turn on binary
-        my $encoding = $conf->{output}->{encoding} || 'base64';
+        my $encoding = $ep_config->{output}->{encoding} || 'base64';
         my $out = $response->result;
         if ($encoding eq 'binary') {
             $out = decode_base64($out);

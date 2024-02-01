@@ -185,15 +185,23 @@ while (my $cgi = CGI::Fast->new()) {
     my $client;
 
     try {
-        my $conf;
-        eval { $conf = $config->parse_uri()->config(); };
+        my $ep_config;
+        my ($endpoint, $route);
+        eval {
+            ($endpoint, $route) = $config->parse_uri;
+            $ep_config = $config->endpoint_config($endpoint);
+        };
         my $eval_err = $EVAL_ERROR;
 
-        die failure( 50007, [undef, $eval_err] ) unless $conf;
+        die failure( 50007, [undef, $eval_err] ) unless $ep_config;
 
-        my $rpc = OpenXPKI::Client::Service::RPC->new( config => $config, error_messages => $error_msg );
+        my $rpc = OpenXPKI::Client::Service::RPC->new(
+            config_obj => $config,
+            endpoint => $endpoint,
+            error_messages => $error_msg,
+        );
 
-        $use_status_codes = $conf->{output} && $conf->{output}->{use_http_status_codes};
+        $use_status_codes = $ep_config->{output} && $ep_config->{output}->{use_http_status_codes};
 
         # check for request parameters in JSON data (HTTP body)
         my $method = $cgi->param('method');
@@ -203,7 +211,7 @@ while (my $cgi = CGI::Fast->new()) {
         my $jwt_header;
         if (my $raw = $cgi->param('POSTDATA')) {
 
-            die failure( 40004 ) unless $conf->{input}->{allow_raw_post};
+            die failure( 40004 ) unless $ep_config->{input}->{allow_raw_post};
 
             my $content_type = $ENV{'CONTENT_TYPE'} || '';
             if (!$content_type) {
@@ -215,11 +223,11 @@ while (my $cgi = CGI::Fast->new()) {
 
             # TODO - evaluate security implications regarding blessed objects
             # and consider to filter out serialized objects for security reasons
-            $json->max_depth(  $conf->{input}->{parse_depth} || 5 );
+            $json->max_depth(  $ep_config->{input}->{parse_depth} || 5 );
 
             if ($content_type =~ m{\Aapplication/jose}) {
 
-                die failure( 40008 ) unless $conf->{jose};
+                die failure( 40008 ) unless $ep_config->{jose};
 
                 # The cert_identifier used to sign the token must be set as kid
                 # First run - set ignore_signature to just get the header with the kid
@@ -272,7 +280,7 @@ while (my $cgi = CGI::Fast->new()) {
 
             } elsif ($content_type =~ m{\Aapplication/pkcs7}) {
 
-                die failure( 40012 ) unless $conf->{pkcs7};
+                die failure( 40012 ) unless $ep_config->{pkcs7};
 
                 $pkcs7 = $raw;
                 eval {
@@ -324,7 +332,7 @@ while (my $cgi = CGI::Fast->new()) {
             }
         };
 
-        $method = $config->route() unless $method;
+        $method ||= $route;
 
         # method should be set now
         die failure( 40001 ) unless $method;
@@ -337,7 +345,7 @@ while (my $cgi = CGI::Fast->new()) {
             next CGI_LOOP;
         }
 
-        my $servername = $conf->{$method}->{servername} || '';
+        my $servername = $ep_config->{$method}->{servername} || '';
         Log::Log4perl::MDC->put('server', $servername);
 
         my $error = '';
@@ -345,24 +353,24 @@ while (my $cgi = CGI::Fast->new()) {
         # "workflow" is required even though with "execute_action" we don't need it.
         # But the check here serves as a config validator so that a correct OpenAPI
         # Spec will be generated upon request.
-        my $workflow_type = $conf->{$method}->{workflow};
+        my $workflow_type = $ep_config->{$method}->{workflow};
         die failure( 40401, "RPC method $method not found or no workflow_type set" )
           unless defined $workflow_type;
 
         my $param;
         # look for preset params
-        foreach my $key (keys %{$conf->{$method}}) {
+        foreach my $key (keys %{$ep_config->{$method}}) {
             next unless ($key =~ m{preset_(\w+)});
-            $param->{$1} = $conf->{$method}->{$key};
+            $param->{$1} = $ep_config->{$method}->{$key};
         }
 
         # Only parameters which are whitelisted in the config are mapped!
         # This is crucial to prevent injection of server-only parameters
         # like the autoapprove flag...
 
-        if ($conf->{$method}->{param}) {
+        if ($ep_config->{$method}->{param}) {
             my @keys;
-            @keys = split /\s*,\s*/, $conf->{$method}->{param};
+            @keys = split /\s*,\s*/, $ep_config->{$method}->{param};
             foreach my $key (@keys) {
                 my $val = $get_param->($key);
                 next unless (defined $val);
@@ -382,8 +390,8 @@ while (my $cgi = CGI::Fast->new()) {
         }
 
         my %envkeys;
-        if ($conf->{$method}->{env}) {
-            %envkeys = map {$_ => 1} (split /\s*,\s*/, $conf->{$method}->{env});
+        if ($ep_config->{$method}->{env}) {
+            %envkeys = map {$_ => 1} (split /\s*,\s*/, $ep_config->{$method}->{env});
         }
 
         # IP Transport
@@ -400,17 +408,17 @@ while (my $cgi = CGI::Fast->new()) {
         if ($envkeys{'server'}) {
             if ($servername) {
                 die failure( 50005 );
-            } elsif (!$config->endpoint()) {
+            } elsif (!$endpoint) {
                 die failure( 50006 );
             } else {
-                $param->{'server'} = $config->endpoint();
+                $param->{'server'} = $endpoint;
                 $param->{'interface'} = 'rpc';
                 Log::Log4perl::MDC->put('server', $param->{'server'} );
             }
         }
 
         if ($envkeys{'endpoint'}) {
-            $param->{'endpoint'} = $config->endpoint();
+            $param->{'endpoint'} = $endpoint;
         }
 
         # Gather data from TLS session
@@ -466,7 +474,7 @@ while (my $cgi = CGI::Fast->new()) {
             $param->{'signer_cert'} = $jwt_header->{signer_cert};
         }
 
-        $log->trace( "Calling $method on ".$config->endpoint()." with parameters: " . Dumper $param ) if $log->is_trace;
+        $log->trace( "Calling '$method' on '$endpoint' with parameters: " . Dumper $param ) if $log->is_trace;
 
         my $res;
         my $workflow;
@@ -476,10 +484,10 @@ while (my $cgi = CGI::Fast->new()) {
             $client = $rpc->backend() or die failure( 50001, "Unable to create client" );
 
             # check for pickup parameter
-            if (my $pickup_key = $conf->{$method}->{pickup}) {
+            if (my $pickup_key = $ep_config->{$method}->{pickup}) {
                 my $pickup_value;
                 # "pickup_workflow" needs a parameter HashRef
-                if ($conf->{$method}->{pickup_workflow}) {
+                if ($ep_config->{$method}->{pickup_workflow}) {
                     my @keys = split /\s*,\s*/, $pickup_key;
                     foreach my $key (@keys) {
                         # take value from param hash if defined, this makes data
@@ -492,7 +500,7 @@ while (my $cgi = CGI::Fast->new()) {
                     $pickup_value = $get_param->($pickup_key);
                 }
                 if ($pickup_value) {
-                    $workflow = $rpc->pickup_workflow($conf->{$method}, $pickup_value);
+                    $workflow = $rpc->pickup_workflow($ep_config->{$method}, $pickup_value);
                 } else {
                     $log->trace( "No pickup because $pickup_key has no value" ) if $log->is_trace;
                 }
@@ -502,7 +510,7 @@ while (my $cgi = CGI::Fast->new()) {
             #
             # If "execute_action" is defined it enforces "pickup_workflow" and we never
             # start a new workflow, even if no "pickup" parameters were given.
-            if (my $execute_action = $conf->{$method}->{execute_action}) {
+            if (my $execute_action = $ep_config->{$method}->{execute_action}) {
                 if (!$workflow) {
                     die failure( 40402 );
                 } elsif ($workflow->{'proc_state'} ne 'manual') {
@@ -599,7 +607,7 @@ while (my $cgi = CGI::Fast->new()) {
                 $res = { result => { id => int($workflow->{id}), 'state' => $workflow->{'state'}, 'proc_state' => $workflow->{'proc_state'}, pid => $$ }};
 
                 # if pickup is set and workflow is not in a final state we send a 202
-                if ($conf->{$method}->{pickup}) {
+                if ($ep_config->{$method}->{pickup}) {
                     if ($workflow->{'proc_state'} eq 'pause') {
                         my $delay = $workflow->{'wake_up_at'} - time();
                         $res->{result}->{retry_after} = ($delay > 30) ? $delay : 30;
@@ -611,10 +619,10 @@ while (my $cgi = CGI::Fast->new()) {
                 }
 
                 # Map context parameters to the response if requested
-                if ($conf->{$method}->{output}) {
+                if ($ep_config->{$method}->{output}) {
                     $res->{result}->{data} = {};
                     my @keys;
-                    @keys = split /\s*,\s*/, $conf->{$method}->{output};
+                    @keys = split /\s*,\s*/, $ep_config->{$method}->{output};
                     $log->debug("Keys " . join(", ", @keys));
                     $log->trace("Raw context: ". Dumper $workflow->{context}) if ($log->is_trace());
                     foreach my $key (@keys) {

@@ -15,16 +15,39 @@ use Feature::Compat::Try;
 # Project modules
 use OpenXPKI::Client::Simple;
 
-has config => (
-    is      => 'rw',
-    isa     => 'Object',
+has config_obj => (
+    is => 'rw',
+    isa => 'OpenXPKI::Client::Config',
     required => 1,
+);
+
+has endpoint => (
+    is => 'ro',
+    isa => 'Str',
+    required => 1,
+);
+
+# the endpoint config
+has config => (
+    is => 'rw',
+    isa => 'HashRef',
+    lazy => 1,
+    init_arg => undef,
+    default => sub { $_[0]->config_obj->endpoint_config($_[0]->endpoint) },
 );
 
 has error_messages => (
     is      => 'rw',
     isa     => 'HashRef',
     required => 1,
+);
+
+has logger => (
+    is => 'rw',
+    isa => 'Object',
+    lazy => 1,
+    init_arg => undef,
+    default => sub { $_[0]->config_obj->logger },
 );
 
 has backend => (
@@ -34,21 +57,13 @@ has backend => (
     builder => '_init_backend',
 );
 
-has logger => (
-    is => 'rw',
-    isa => 'Object',
-    lazy => 1,
-    default  => sub { my $self = shift; return $self->config()->logger() },
-);
-
 sub _init_backend {
 
     my $self = shift;
-    my $config = $self->config();
-    my $conf = $config->config();
+    my $conf = $self->config;
 
     return OpenXPKI::Client::Simple->new({
-        logger => $self->logger(),
+        logger => $self->logger,
         config => $conf->{global}, # realm and locale
         auth => $conf->{auth} || {}, # auth config
     });
@@ -59,7 +74,7 @@ sub openapi_spec {
 
     my $self = shift;
     my $openapi_server_url = shift;
-    my $conf = $self->config()->config();
+    my $conf = $self->config;
 
     my $paths = {};
 

@@ -1,6 +1,10 @@
 package OpenXPKI::Client::Service::SCEP;
 use Moose;
 
+with 'OpenXPKI::Client::Service::Base';
+
+sub service_name { 'scep' }
+
 use Carp;
 use English;
 use Data::Dumper;
@@ -8,8 +12,6 @@ use Log::Log4perl qw(:easy);
 use MIME::Base64;
 use OpenXPKI::Exception;
 use OpenXPKI::Client::Service::Response;
-
-extends 'OpenXPKI::Client::Service::Base';
 
 has transaction_id => (
     is => 'ro',
@@ -124,9 +126,8 @@ sub generate_pkcs7_response {
             { %params, failinfo => $failInfo });
     }
 
-    if (!$response->is_server_error()) {
-        my $conf = $self->config()->config();
-        $params{chain} = $conf->{output}->{chain} || 'chain';
+    if (not $response->is_server_error) {
+        $params{chain} = $self->config->{output}->{chain} || 'chain';
         return $self->backend()->run_command('scep_generate_cert_response',
         { %params, (
             identifier  => $response->result,
@@ -137,60 +138,49 @@ sub generate_pkcs7_response {
 
 }
 
-around 'build_params' => sub {
-
-    my $orig = shift;
+sub custom_wf_params {
     my $self = shift;
-    my @args = @_;
-
-    my $params = $self->$orig(@args);
-
-    return unless($params); # something is wrong
+    my $params = shift;
 
     # nothing special if we are NOT in PKIOperation mode
-    return $params unless ($self->operation() eq 'PKIOperation');
+    return unless $self->operation eq 'PKIOperation';
 
-    $self->logger->debug('Adding extra params for message type ' . $self->message_type());
+    $self->logger->debug("Adding extra parameters for message type '".$self->message_type."'");
 
-    if ($self->message_type() eq 'PKCSReq') {
+    if ($self->message_type eq 'PKCSReq') {
         # This triggers the build of attr which triggers the unwrap call
         # against the server API and populates the class attributes
-        $params->{pkcs10} = $self->attr()->{pkcs10};
-        $params->{transaction_id} = $self->transaction_id();
-        $params->{signer_cert} = $self->signer();
+        $params->{pkcs10} = $self->attr->{pkcs10};
+        $params->{transaction_id} = $self->transaction_id;
+        $params->{signer_cert} = $self->signer;
 
         # Load url paramters if defined by config
-        my $conf = $self->config()->config()->{'PKIOperation'};
+        my $conf = $self->config->{'PKIOperation'};
         if ($conf->{param}) {
-            my $cgi = $args[0];
             my $extra;
             my @extra_params;
             # The legacy version - map anything
             if ($conf->{param} eq '*') {
-                @extra_params = $cgi->url_param();
+                @extra_params = $self->request->params->names->@*;
             } else {
                 @extra_params = split /\s*,\s*/, $conf->{param};
             }
             foreach my $param (@extra_params) {
                 next if ($param eq "operation");
                 next if ($param eq "message");
-                $extra->{$param} = $cgi->url_param($param);
+                $extra->{$param} = $self->request->param($param);
             }
             $params->{_url_params} = $extra;
         }
-    } elsif ($self->message_type() eq 'GetCertInitial') {
+    } elsif ($self->message_type eq 'GetCertInitial') {
         $params->{pkcs10} = '';
-        $params->{transaction_id} = $self->transaction_id();
-        $params->{signer_cert} = $self->signer();
-    } elsif ($self->message_type() =~ m{\AGet(Cert|CRL)\z}) {
-        $params->{issuer} = $self->attr()->{issuer_serial}->{issuer};
-        $params->{serial} = $self->attr()->{issuer_serial}->{serial};
+        $params->{transaction_id} = $self->transaction_id;
+        $params->{signer_cert} = $self->signer;
+    } elsif ($self->message_type =~ m{\AGet(Cert|CRL)\z}) {
+        $params->{issuer} = $self->attr->{issuer_serial}->{issuer};
+        $params->{serial} = $self->attr->{issuer_serial}->{serial};
     }
-
-    $self->logger->trace(Dumper $params);
-
-    return $params;
-};
+}
 
 __PACKAGE__->meta->make_immutable;
 

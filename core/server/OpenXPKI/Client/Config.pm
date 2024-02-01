@@ -155,35 +155,6 @@ has 'default' => (
     builder => '__init_default',
 );
 
-=head3 endpoint
-
-Name of the endpoint that is used for config discovery, set from the
-script name when C<parse_uri> is called. Can also be set explicit.
-
-=cut
-
-has 'endpoint' => (
-    required => 0,
-    is => 'rw',
-    isa => 'Str|Undef',
-    lazy => 1,
-    default => '',
-);
-
-=head3 route
-
-The name of the route extracted from the script name by C<parse_uri>.
-
-=cut
-
-has 'route' => (
-    required => 0,
-    is => 'rw',
-    isa => 'Str',
-    lazy => 1,
-    default => '',
-);
-
 =head3 language
 
 The name of the current language, set whenever a config is loaded that has
@@ -268,7 +239,7 @@ sub BUILD {
         $self->language($config->{global}->{default_language});
     }
 
-    $self->logger()->debug(sprintf('Config for service %s loaded', $self->service()));
+    $self->logger()->debug(sprintf("Config for service '%s' loaded", $self->service));
     $self->logger()->trace('Global config: ' . Dumper $config ) if $self->logger->is_trace;
 
 }
@@ -308,9 +279,9 @@ sub __init_basepath {
 sub __init_default {
 
     my $self = shift;
+
     # in case an explicit script name is set, we do NOT use the default.conf
-    my $service = $self->service();
-    my $env_file = 'OPENXPKI_'.uc($service).'_CLIENT_CONF_FILE';
+    my $env_file = 'OPENXPKI_'.uc($self->service).'_CLIENT_CONF_FILE';
 
     my $configfile;
     if ($ENV{$env_file}) {
@@ -339,7 +310,7 @@ sub __init_default {
 =head3 parse_uri
 
 Try to parse endpoint and route based on the script url in the
-environment. Always returns $self, endpoint is set to the empty
+environment. Returns ($endpoint, $route), but $endpoint is set to the empty
 string if parsing fails.
 
 =cut
@@ -347,60 +318,57 @@ string if parsing fails.
 sub parse_uri {
 
     my $self = shift;
+    my $service = $self->service;
 
-    # generate name of the environemnt values from the service name
-    my $service = $self->service();
-
-    $self->endpoint('');
-    $self->route('');
+    my $ep = '';
+    my $rt = '';
 
     # Test for specific config file based on script name
     # SCRIPT_URL is only available with mod_rewrite
     # expected pattern is servicename/endpoint/route,
     # route can contain a suffix like .exe which is used by some scep clients
-    my ($ep, $rt);
     if (defined $ENV{SCRIPT_URL}) {
         ($ep, $rt) = $ENV{SCRIPT_URL} =~ qr@ ${service} / ([^/]+) (?: / ([\w\-\/]+ (?:\.\w{3})? )? )?\z@x;
     } elsif (defined $ENV{REQUEST_URI}) {
-        ($ep,$rt) = $ENV{REQUEST_URI} =~ qr@ ${service} / ([^/\?]+) (?: / ([\w\-\/]+ (?:\.\w{3})? )? )? (\?.*)? \z@x;
+        ($ep, $rt) = $ENV{REQUEST_URI} =~ qr@ ${service} / ([^/\?]+) (?: / ([\w\-\/]+ (?:\.\w{3})? )? )? (\?.*)? \z@x;
     }
 
     if (!$ep) {
-        $self->logger()->warn("Unable to detect script name - please check the docs");
-        $self->logger()->trace(Dumper \%ENV) if $self->logger->is_debug;
+        $self->logger->warn("Unable to detect script name - please check the docs");
+        $self->logger->trace(Dumper \%ENV) if $self->logger->is_trace;
+        return ('', '');
     } elsif (($service =~ m{(est|cmc)}) && !$rt) {
-        $self->logger()->debug("URI without endpoint, setting route: $ep");
-        $self->endpoint('default');
-        $self->route($ep);
+        $self->logger->debug("URI without endpoint, setting route: $ep");
+        $rt = $ep;
+        $ep = 'default';
     } else {
-        $self->endpoint($ep);
-        $self->route($rt) if ($rt);
-        $self->logger()->debug("Parsed URI: $ep => ".($rt||''));
+        $self->logger->debug("Parsed URI: $ep => ".($rt // '<undef>'));
     }
 
     # Populate the endpoint to the MDC
-    Log::Log4perl::MDC->put('endpoint', $self->endpoint());
+    Log::Log4perl::MDC->put('endpoint', $ep);
 
-    return $self;
+    return ($ep, $rt // '');
 
 }
 
-=head3 config
+=head3 endpoint_config
 
-Returns the config hashref for the current endpoint.
+Returns the config hashref for the given endpoint.
 
 =cut
 
-sub config {
+sub endpoint_config {
 
     my $self = shift;
+    my $endpoint = shift;
+
     my $config;
-    my $cacheid = $self->endpoint() || 'default';
-    if (!($config = $self->_cache()->get( $cacheid ))) {
+    if (!($config = $self->_cache()->get( $endpoint ))) {
         # non existing files and other errors are handled inside loader
-        $config = $self->__load_config();
-        $self->_cache()->set( $cacheid  => $config );
-        $self->logger()->debug('added config to cache ' . $cacheid);
+        $config = $self->__load_config($endpoint);
+        $self->_cache()->set( $endpoint  => $config );
+        $self->logger()->debug('added config to cache ' . $endpoint);
     }
 
     $self->language($config->{global}->{default_language} || $self->default()->{global}->{default_language} || '');
@@ -412,24 +380,26 @@ sub config {
 sub __load_config {
 
     my $self = shift;
+    my $endpoint = shift;
 
     my $file;
     my $config;
-    if ($self->endpoint()) {
+    if ($endpoint) {
         # config via socket
         if ($self->has_client()) {
-            $self->logger()->debug('Autodetect config for service ' . $self->service() . ' via socket ');
-            my $reply = $self->client()->send_receive_service_msg('GET_ENDPOINT_CONFIG',
-                { 'interface' => $self->service(), endpoint => $self->endpoint() });
+            $self->logger()->debug("Autodetect config for service '".$self->service."' via socket");
+            my $reply = $self->client()->send_receive_service_msg(
+                GET_ENDPOINT_CONFIG => { interface => $self->service, endpoint => $endpoint }
+            );
             die "Unable to fetch endpoint default configuration from backend" unless (ref $reply->{PARAMS});
             return $reply->{PARAMS}->{CONFIG};
         }
-        $file = $self->endpoint().'.conf';
+        $file = "$endpoint.conf";
     }
 
     if ($file) {
-        $self->logger()->debug('Autodetect config file for service ' . $self->service() . ': ' . $file );
-        $file = File::Spec->catfile( ($self->basepath() ), $file );
+        $self->logger()->debug("Autodetect config file for service '".$self->service."': $file");
+        $file = File::Spec->catfile( $self->basepath, $file );
         if (! -f $file ) {
             $self->logger()->debug('No config file found, falling back to default');
             $file = undef;
@@ -474,14 +444,14 @@ sub __init_logger {
     delete $conf->{log_level};
 
     # facility is constructed from service
-    my $log_facility = 'client.'.$self->service();
+    my $log_facility = 'client.'.$self->service;
 
     # fill in the service name into the filename pattern
-    $conf->{filename} = sprintf($conf->{filename}, $self->service());
+    $conf->{filename} = sprintf($conf->{filename}, $self->service);
 
     # add the MDC part to the conversion pattern in case it is not set (empty [] in string)
     if ($conf->{'layout.ConversionPattern'} && $conf->{'layout.ConversionPattern'} =~ m{\[\]}) {
-        if ($self->service() eq 'webui') {
+        if ($self->service eq 'webui') {
             $conf->{'layout.ConversionPattern'} =~ s{\[\]}{[pid=%P|sid=%X{sid}]};
         } elsif($loglevel =~ m{DEBUG|TRACE}) {
             $conf->{'layout.ConversionPattern'} =~ s{\[\]}{[pid=%P|%i]};

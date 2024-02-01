@@ -1,7 +1,7 @@
 package OpenXPKI::Client::Service::Response;
 use Moose;
 
-use HTTP::Status qw(status_message);
+use Mojo::Message::Response;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::i18n qw(i18nGettext);
@@ -22,14 +22,24 @@ has http_status_code => (
     is => 'rw',
     isa => 'Int',
     lazy => 1,
-    builder => '__build_status_code',
+    builder => '__build_http_status_code',
 );
 
 has http_status_line => (
-    is => 'rw',
+    is => 'ro',
     isa => 'Str',
+    init_arg => 'undef',
     lazy => 1,
-    builder => '__build_status_line',
+    builder => '__build_http_status_line',
+);
+
+# will be "undef" for default HTTP codes
+has http_status_message => (
+    is => 'ro',
+    isa => 'Str|Undef',
+    init_arg => 'undef',
+    lazy => 1,
+    builder => '__build_http_status_message',
 );
 
 has __error_message => (
@@ -157,31 +167,28 @@ sub __build_extra_headers {
 }
 
 
-sub __build_status_code {
+sub __build_http_status_code {
     my $self = shift;
-    return '202' if ($self->is_pending());
-    return '200' unless ($self->has_error());
-    return substr($self->error(),0,3) || '500';
+    return '202' if $self->is_pending;
+    return '200' unless $self->has_error;
+    return substr($self->error,0,3) || '500';
 }
 
-sub __build_status_line {
-
+sub __build_http_status_line {
     my $self = shift;
-    if ($self->is_pending()) {
-        return sprintf('202 Request Pending - Retry Later (%s)', $self->transaction_id());
-    }
+    return sprintf(
+        "%03d %s",
+        $self->http_status_code,
+        $self->http_status_message // Mojo::Message::Response->default_message($self->http_status_code)
+    );
+}
 
-    my $rc = $self->http_status_code();
-    if ($self->has_error()) {
-        if (my $msg = $OpenXPKI::Client::Service::Response::named_messages{$self->error()}) {
-            $rc .= ' '.$msg;
-        } else {
-            $rc .= ' Other Error ' . $self->error();
-        }
-        return $rc;
-    }
+sub __build_http_status_message {
+    my $self = shift;
 
-    return sprintf('%03d %s', $rc, status_message($rc));
+    return sprintf('Request Pending - Retry Later (%s)', $self->transaction_id) if $self->is_pending;
+    return unless $self->has_error;
+    return ($named_messages{$self->error} // 'Other Error '.$self->error);
 }
 
 sub __process_workflow {

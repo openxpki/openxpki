@@ -15,11 +15,13 @@ my $config = OpenXPKI::Client::Config->new('scep');
 my $log = $config->logger();
 $log->info("SCEP handler initialized");
 
-while (my $cgi = CGI::Fast->new()) {
+while (my $cgi = CGI::Fast->new("")) {
+    my $req = OpenXPKI::Client::Service::SCEP->mojo_req_from_cgi;
 
-    my $conf = $config->parse_uri()->config();
+    my ($endpoint, $route) = $config->parse_uri;
+    my $ep_config = $config->endpoint_config($endpoint);
 
-    my $server = $conf->{global}->{servername} || $config->endpoint();
+    my $server = $ep_config->{global}->{servername} || $endpoint;
     if (!$server) {
         print $cgi->header(
            -type => 'text/plain',
@@ -30,10 +32,9 @@ while (my $cgi = CGI::Fast->new()) {
         next;
     }
 
-    my $log = $config->logger();
     Log::Log4perl::MDC->put('server', $server);
 
-    my $operation = $cgi->url_param('operation') || '';
+    my $operation = $req->url->query->param('operation') || '';
 
     if ($operation !~ m{\A(PKIOperation|GetCert(Initial)?|GetCRL|Get(Next)?CACert|GetCACaps)\z}) {
         print $cgi->header( -status => '400 Bad Request', -type => 'text/plain');
@@ -42,15 +43,15 @@ while (my $cgi = CGI::Fast->new()) {
         next;
     }
 
-    $log->debug(sprintf("Incoming SCEP operation %s on endpoint %s", $operation, $config->endpoint()));
+    $log->debug(sprintf("Incoming SCEP operation '%s' on endpoint '%s'", $operation, $endpoint));
     my $message;
     if ($operation eq 'PKIOperation') {
         # get the message from the GET string and decode base64
-        if ($cgi->request_method() eq 'GET') {
-            $message = $cgi->url_param('message');
+        if ($req->method eq 'GET') {
+            $message = $req->url->query->param('message');
             $log->debug("Got PKIOperation via GET");
         } else {
-            $message = encode_base64($cgi->param('POSTDATA'),'');
+            $message = encode_base64($req->body, '');
             if (!$message) {
                 $log->error("POSTDATA is empty - check documentation on required setup for Content-Type headers!");
                 $log->debug("Content-Type is " . ($ENV{'CONTENT_TYPE'} || 'undefined'));
@@ -67,9 +68,11 @@ while (my $cgi = CGI::Fast->new()) {
     }
 
     my $client = OpenXPKI::Client::Service::SCEP->new(
-        config => $config,
-        logger => $log,
-        operation => $operation
+        config_obj => $config,
+        apache_env => \%ENV,
+        remote_address => $ENV{REMOTE_ADDR},
+        request => $req,
+        endpoint => $endpoint,
     );
 
     $log->debug("Config created");
@@ -97,13 +100,15 @@ while (my $cgi = CGI::Fast->new()) {
         } elsif ($client->message_type =~ m{(PKCSReq|RenewalReq|GetCertInitial)}) {
             # TODO - improve handling of GetCertInitial and RenewalReq
             $log->debug("Handle enrollment");
-            $response = $client->handle_enrollment_request($cgi);
+            $client->operation($operation);
+            $response = $client->handle_enrollment_request;
         # Request for CRL or GetCert with IssuerSerial in Payload
         } else {
-            $response = $client->handle_property_request($cgi, $client->message_type);
+            $client->operation($client->message_type);
+            $response = $client->handle_property_request;
         }
 
-        @extra_header = %{ $response->extra_headers() } if ($conf->{output}->{headers});
+        @extra_header = %{ $response->extra_headers() } if ($ep_config->{output}->{headers});
         $log->debug('Status: ' . $response->http_status_line());
         $log->trace(Dumper $response) if ($log->is_trace);
 
@@ -126,23 +131,25 @@ while (my $cgi = CGI::Fast->new()) {
         next;
     }
 
+    $client->operation($operation);
+
     my $mime;
     if ($operation eq 'GetCACaps') {
         $mime = 'text/plain';
-        $response = $client->handle_property_request($cgi);
+        $response = $client->handle_property_request;
     }
 
     if ($operation eq 'GetCACert') {
         $mime = 'application/x-x509-ca-ra-cert';
-        $response = $client->handle_property_request($cgi);
+        $response = $client->handle_property_request;
     }
 
     if ($operation eq 'GetNextCACert') {
         $mime = 'application/x-x509-next-ca-cert';
-        $response = $client->handle_property_request($cgi);
+        $response = $client->handle_property_request;
     }
 
-    @extra_header = %{ $response->extra_headers() } if ($conf->{output}->{headers});
+    @extra_header = %{ $response->extra_headers() } if ($ep_config->{output}->{headers});
     if ($response->is_server_error()) {
         print $cgi->header(
             -status => $response->http_status_line(),
