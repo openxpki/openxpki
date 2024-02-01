@@ -44,6 +44,7 @@ libjson-perl
 libjson-pp-perl
 liblog-log4perl-perl
 libmail-rfc822-address-perl
+libmojolicious-perl
 libmoose-perl
 libmoosex-insideout-perl
 libmoosex-nonmoose-perl
