@@ -1,0 +1,48 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+# CPAN modules
+use Log::Log4perl qw(:easy);
+use Mojo::Server::Prefork;
+use Mojo::Util qw( extract_usage getopt url_escape );
+use Mojo::File;
+
+# Project modules
+use OpenXPKI::Util;
+
+my ($help, $development);
+
+getopt
+    'h|help' => \$help,
+    'd|dev'  => \$development;
+
+die extract_usage if $help;
+
+# Log::Log4perl->easy_init($FATAL);
+
+# FATAL("Socket: " . $ENV{LISTEN_FDS});
+# FATAL("Socket: " . $ENV{LISTEN_FDNAMES});
+
+my $enc_path = url_escape(Mojo::File->new('/run/openxpki-client.sock'));
+
+$ENV{MOJO_MODE} = 'production' unless $development;
+
+my $daemon = Mojo::Server::Prefork->new(
+    listen => ["http+unix://$enc_path"],
+    reverse_proxy => 1,
+);
+
+$daemon->build_app('OpenXPKI::Client::Web');
+#$daemon->load_app("$Bin/healthcheck.pl");
+
+$daemon->start; # socketfile will be created only after this
+
+# modify socket ownership and permissions
+my ($u,$uid,$g,$gid) = OpenXPKI::Util->resolve_user_group('root', 'www-data');
+my $socket_path = $daemon->ioloop->acceptor($daemon->acceptors->[0])->handle->hostpath;
+chmod 0660, $socket_path;
+chown $uid, $gid, $socket_path;
+
+# Run, Forest, run!
+$daemon->run;

@@ -1,0 +1,9 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+# CPAN modules
+use Mojolicious::Commands;
+
+# Start command line interface for application
+Mojolicious::Commands->start_app('OpenXPKI::Client::Web');

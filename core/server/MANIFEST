@@ -48,6 +48,9 @@ OpenXPKI/Client/Service/RPC.pm
 OpenXPKI/Client/Service/Response.pm
 OpenXPKI/Client/Service/SCEP.pm
 OpenXPKI/Client/Service/Role/PickupWorkflow.pm
+OpenXPKI/Client/Web.pm
+OpenXPKI/Client/Web/EST.pm
+OpenXPKI/Client/Web/Healthcheck.pm
 
 # New UI Client
 OpenXPKI/Client/UI.pm
@@ -596,6 +599,8 @@ bin/openxpkiadm
 bin/openxpkictl
 bin/openxpkicli
 bin/openxpkicmd
+bin/openxpkictl-client
+bin/openxpkictl-client-debug
 
 # cgi stuff
 cgi-bin/scepv3.fcgi
