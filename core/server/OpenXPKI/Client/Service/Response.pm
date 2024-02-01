@@ -184,7 +184,7 @@ sub __build_http_status_message {
 
     return sprintf('Request Pending - Retry Later (%s)', $self->transaction_id) if $self->is_pending;
     return unless $self->has_error;
-    return ($named_messages{$self->error} // 'Other Error '.$self->error);
+    return $self->error_message;
 }
 
 sub __process_workflow {
@@ -209,8 +209,8 @@ sub error_message {
 
     return i18nGettext($self->__error_message()) if ($self->has_error_message());
 
-    return $OpenXPKI::Client::Service::Response::named_messages{$self->error()}
-        || 'Unknown error';
+    return $named_messages{$self->error()}
+        || sprintf('Unknown error (%s)', $self->error);
 
 }
 
