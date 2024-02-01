@@ -130,12 +130,8 @@ around BUILDARGS => sub {
     my $orig = shift;
     my $class = shift;
 
-    my $args = shift;
-    if (defined $args && !ref $args) {
-        $args = { error => $args };
-    }
-
-    return $class->$orig( $args );
+    return $class->$orig( error => $_[0] ) if (@_ == 1 and not ref $_[0]);
+    return $class->$orig( @_ );
 
 };
 

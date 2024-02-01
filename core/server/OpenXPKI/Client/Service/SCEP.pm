@@ -79,10 +79,10 @@ sub _prepare_result {
     my $self = shift;
     my $workflow = shift;
 
-    return OpenXPKI::Client::Service::Response->new({
+    return OpenXPKI::Client::Service::Response->new(
         workflow => $workflow,
         result => $workflow->{context}->{cert_identifier},
-    });
+    );
 
 }
 

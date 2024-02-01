@@ -334,10 +334,10 @@ sub handle_enrollment_request {
         }
 
         $log->info('Request Pending - ' . $workflow->{'state'});
-        return OpenXPKI::Client::Service::Response->new({
+        return OpenXPKI::Client::Service::Response->new(
             retry_after => $retry_after,
             workflow => $workflow,
-        });
+        );
     }
 
     $log->trace(Dumper $workflow->{context}) if $log->is_trace;
@@ -345,11 +345,11 @@ sub handle_enrollment_request {
     my $cert_identifier = $workflow->{context}->{cert_identifier};
 
     if (!$cert_identifier) {
-        return OpenXPKI::Client::Service::Response->new({
+        return OpenXPKI::Client::Service::Response->new(
             error => 40006,
             ($workflow->{context}->{error_code} ? (error_message => $workflow->{context}->{error_code}) : ()),
             workflow => $workflow,
-        });
+        );
     }
 
     $log->debug( 'Sending output for ' . $cert_identifier);
@@ -373,10 +373,10 @@ sub _prepare_result {
     $result =~ s{-----(BEGIN|END) PKCS7-----}{}g;
     $result =~ s{\s}{}gxms;
 
-    return OpenXPKI::Client::Service::Response->new({
+    return OpenXPKI::Client::Service::Response->new(
         result => $result,
         workflow => $workflow,
-    });
+    );
 
 }
 
@@ -433,9 +433,9 @@ sub run_workflow {
         return OpenXPKI::Client::Service::Response->new( 50003 );
     }
 
-    return OpenXPKI::Client::Service::Response->new({
+    return OpenXPKI::Client::Service::Response->new(
         workflow => $workflow,
-    });
+    );
 
 }
 
