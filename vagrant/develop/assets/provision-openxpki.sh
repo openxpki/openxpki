@@ -74,10 +74,10 @@ mkdir -p /var/www/openxpki
 chown $apache_user:$apache_user /var/www/openxpki
 
 # LOG FILES
-for f in scep.log soap.log webui.log rpc.log est.log; do
-    touch /var/log/openxpki/$f
-    chown $apache_user:openxpki /var/log/openxpki/$f
-    chmod 640 /var/log/openxpki/$f
+for f in webui acme certep cmc est rpc scep soap; do
+    touch /var/log/openxpki/${f}.log
+    chown $apache_user:openxpki /var/log/openxpki/${f}.log
+    chmod 660 /var/log/openxpki/${f}.log
 done
 
 # logrotate
