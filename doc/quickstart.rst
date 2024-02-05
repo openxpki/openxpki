@@ -233,12 +233,15 @@ Setup SCEP Endpoint
 The SCEP setup is already included in the core distribution and example
 configuration. The package installs a wrapper script and creates a suitable alias
 redirecting all requests to ``http://host/scep/<any value>`` to the wrapper.
-A default config is placed at /etc/openxpki/scep/default.conf. For a testdrive,
-there is no need for any configuration, just call ``http://host/scep/scep``.
+While the default config found at ``/etc/openxpki/scep/default.conf`` maps all
+requests, you need make sure the used URL path maps to an endpoint policy file
+in the backend. The demo configuration contains one with the name ``generic``
+so for a testdrive call ``http://host/scep/generic``.
 
 The system supports getcacert, getcert, getcacaps, getnextca and enroll/renew - the
 shipped workflow is configured to allow enrollment with password or signer on behalf.
-The password has to be set in ``scep.yaml``, the default is 'SecretChallenge'.
+The password (and all other policy settings) can be found in the file
+``config.d/realm/democa/scep/generic.yaml``, the default is 'SecretChallenge'.
 For signing on behalf, use the UI to create a certificate with the 'TLS Client'
 profile - there is no password necessary. Advanced configuration is described in the
 scep workflow section.
@@ -249,14 +252,14 @@ e.g. https://github.com/certnanny/sscep).
 Check if the service is working properly at all::
 
     mkdir tmp
-    ./sscep getca -c tmp/cacert -u http://yourhost/scep/scep
+    ./sscep getca -c tmp/cacert -u http://yourhost/scep/generic
 
 Should show and download a list of the root certificates to the tmp folder.
 
 To test an enrollment::
 
     openssl req -new -keyout tmp/scep-test.key -out tmp/scep-test.csr -newkey rsa:2048 -nodes
-    ./sscep enroll -u http://yourhost/scep/scep \
+    ./sscep enroll -u http://yourhost/scep/generic \
         -k tmp/scep-test.key -r tmp/scep-test.csr \
         -c tmp/cacert-0 \
         -l tmp/scep-test.crt \

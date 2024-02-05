@@ -392,7 +392,7 @@ based on the mac address of your client::
             attrs: macaddress
 
 To have the mac in the workflow, you need to pass it with the request as an url
-parameter to the wrapper: `http://host/scep/scep?mac=001122334455`.
+parameter to the wrapper: `http://host/scep/generic?mac=001122334455`.
 
 For more options and samples, see the perldoc of
 OpenXPKI::Server::Workflow::Activity::Tools::EvaluateEligibility
