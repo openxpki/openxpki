@@ -9,6 +9,7 @@ use Crypt::PKCS10;
 use Log::Log4perl qw(:easy);
 use MIME::Base64;
 use Digest::SHA qw(sha1_hex);
+use Feature::Compat::Try;
 use OpenXPKI::Exception;
 use OpenXPKI::Client::Simple;
 use OpenXPKI::Client::Service::Response;
@@ -208,7 +209,7 @@ sub handle_enrollment_request {
     $log->trace(Dumper $pickup_config) if $log->is_trace;
 
     my $workflow;
-    eval {
+    try {
 
         Log::Log4perl::MDC->put('tid', $param->{transaction_id});
 
@@ -232,6 +233,12 @@ sub handle_enrollment_request {
         # try pickup
         $workflow = $self->pickup_workflow($pickup_config, $pickup_value);
 
+        # it was a pickup, it was not successful, we do not have a PKCS10
+        if ($pickup_value && !$workflow && !$param->{pkcs10}) {
+            $log->debug("Pickup failed and no PKCS10 given");
+            return OpenXPKI::Client::Service::Response->new( 40005 );
+        }
+
         # pickup return undef if no workflow was found - start new one
         if (!$workflow) {
             $log->debug(sprintf("Initialize %s with params %s",
@@ -243,7 +250,10 @@ sub handle_enrollment_request {
         }
 
         $log->trace( 'Workflow info '  . Dumper $workflow ) if ($log->is_trace());
-    };
+    } catch ($error) {
+        $log->error( $error );
+        return OpenXPKI::Client::Service::Response->new( 50003 );
+    }
 
     if (!$workflow || ( $workflow->{'proc_state'} ne 'finished' && !$workflow->{id} ) || $workflow->{'proc_state'} eq 'exception') {
         my $reply = $client->last_reply() || {};
@@ -253,7 +263,7 @@ sub handle_enrollment_request {
                 return OpenXPKI::Client::Service::Response->new( 40004 );
             }
         }
-        $log->error( $EVAL_ERROR ? $EVAL_ERROR : 'Internal Server Error');
+        $log->error( 'Internal server error');
         return OpenXPKI::Client::Service::Response->new( 50003 );
     }
 
