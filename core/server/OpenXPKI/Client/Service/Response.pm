@@ -50,6 +50,13 @@ has __error_message => (
     init_arg  => 'error_message',
 );
 
+has use_standard_http_message => (
+    is => 'rw',
+    isa => 'Bool',
+    lazy => 1,
+    default => 0,
+);
+
 has retry_after => (
     is => 'ro',
     isa => 'Int',
@@ -175,16 +182,19 @@ sub __build_http_status_line {
     return sprintf(
         "%03d %s",
         $self->http_status_code,
-        $self->http_status_message // Mojo::Message::Response->default_message($self->http_status_code)
+        $self->http_status_message,
     );
 }
 
 sub __build_http_status_message {
     my $self = shift;
 
+    my $default = Mojo::Message::Response->default_message($self->http_status_code);
+
+    return $default if $self->use_standard_http_message;
     return sprintf('Request Pending - Retry Later (%s)', $self->transaction_id) if $self->is_pending;
-    return unless $self->has_error;
-    return $self->error_message;
+    return $self->error_message if $self->has_error;
+    return $default;
 }
 
 sub __process_workflow {
@@ -205,12 +215,15 @@ sub __process_workflow {
 sub error_message {
 
     my $self = shift;
-    return '' unless ($self->has_error());
 
-    return i18nGettext($self->__error_message()) if ($self->has_error_message());
+    return ''
+      unless $self->has_error;
 
-    return $named_messages{$self->error()}
-        || sprintf('Unknown error (%s)', $self->error);
+    return i18nGettext($self->__error_message)
+      if $self->has_error_message;
+
+    return ($named_messages{$self->error}
+      || sprintf('Unknown error (%s)', $self->error));
 
 }
 
