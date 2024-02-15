@@ -80,6 +80,29 @@ sub handle_revocation_request {
     return $response;
 }
 
+# required by OpenXPKI::Client::Service::Base
+sub prepare_enrollment_result {
+
+    my $self = shift;
+    my $workflow = shift;
+    # not used for the default case
+    # my $operation = shift;
+
+    my $result = $self->backend()->run_command('get_cert',{
+        format => 'PKCS7',
+        identifier => $workflow->{context}->{cert_identifier},
+    });
+
+    $result =~ s{-----(BEGIN|END) PKCS7-----}{}g;
+    $result =~ s{\s}{}gxms;
+
+    return OpenXPKI::Client::Service::Response->new(
+        result => $result,
+        workflow => $workflow,
+    );
+
+}
+
 __PACKAGE__->meta->make_immutable;
 
  __END__;

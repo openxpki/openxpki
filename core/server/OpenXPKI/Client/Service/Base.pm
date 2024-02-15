@@ -5,6 +5,7 @@ with 'OpenXPKI::Client::Service::Role::PickupWorkflow';
 
 requires 'service_name';
 requires 'custom_wf_params';
+requires 'prepare_enrollment_result';
 
 # Core modules
 use Carp;
@@ -354,29 +355,7 @@ sub handle_enrollment_request {
 
     $log->debug( 'Sending output for ' . $cert_identifier);
 
-    return $self->_prepare_result($workflow, $operation);
-
-}
-
-sub _prepare_result {
-
-    my $self = shift;
-    my $workflow = shift;
-    # not used for the default case
-    # my $operation = shift;
-
-    my $result = $self->backend()->run_command('get_cert',{
-        format => 'PKCS7',
-        identifier => $workflow->{context}->{cert_identifier},
-    });
-
-    $result =~ s{-----(BEGIN|END) PKCS7-----}{}g;
-    $result =~ s{\s}{}gxms;
-
-    return OpenXPKI::Client::Service::Response->new(
-        result => $result,
-        workflow => $workflow,
-    );
+    return $self->prepare_enrollment_result($workflow, $operation);
 
 }
 
@@ -384,7 +363,7 @@ sub handle_property_request {
 
     my $self = shift;
 
-    die "Passing operation to handle_enrollment_request is no longer supported." if (@_);
+    die "Passing operation to handle_property_request is no longer supported." if (@_);
 
     my $operation = $self->operation;
     my $log = $self->logger;
