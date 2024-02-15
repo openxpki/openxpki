@@ -3,7 +3,7 @@ use Moose;
 
 with 'OpenXPKI::Client::Service::Base';
 
-sub service_name { 'est' }
+sub service_name { 'est' } # required by OpenXPKI::Client::Service::Base
 
 # Core modules
 use Carp;
@@ -20,7 +20,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Crypt::X509;
 use OpenXPKI::Client::Service::Response;
 
-
+# required by OpenXPKI::Client::Service::Base
 sub custom_wf_params {
     my $self = shift;
     my $params = shift;
@@ -36,6 +36,29 @@ sub custom_wf_params {
     }
 
     return 1;
+}
+
+# required by OpenXPKI::Client::Service::Base
+sub prepare_enrollment_result {
+
+    my $self = shift;
+    my $workflow = shift;
+    # not used for the default case
+    # my $operation = shift;
+
+    my $result = $self->backend()->run_command('get_cert',{
+        format => 'PKCS7',
+        identifier => $workflow->{context}->{cert_identifier},
+    });
+
+    $result =~ s{-----(BEGIN|END) PKCS7-----}{}g;
+    $result =~ s{\s}{}gxms;
+
+    return OpenXPKI::Client::Service::Response->new(
+        result => $result,
+        workflow => $workflow,
+    );
+
 }
 
 sub handle_revocation_request {
@@ -78,29 +101,6 @@ sub handle_revocation_request {
         $response->http_status_code(400);
     }
     return $response;
-}
-
-# required by OpenXPKI::Client::Service::Base
-sub prepare_enrollment_result {
-
-    my $self = shift;
-    my $workflow = shift;
-    # not used for the default case
-    # my $operation = shift;
-
-    my $result = $self->backend()->run_command('get_cert',{
-        format => 'PKCS7',
-        identifier => $workflow->{context}->{cert_identifier},
-    });
-
-    $result =~ s{-----(BEGIN|END) PKCS7-----}{}g;
-    $result =~ s{\s}{}gxms;
-
-    return OpenXPKI::Client::Service::Response->new(
-        result => $result,
-        workflow => $workflow,
-    );
-
 }
 
 __PACKAGE__->meta->make_immutable;

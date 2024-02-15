@@ -3,7 +3,7 @@ use Moose;
 
 with 'OpenXPKI::Client::Service::Base';
 
-sub service_name { 'scep' }
+sub service_name { 'scep' } # required by OpenXPKI::Client::Service::Base
 
 use Carp;
 use English;
@@ -75,18 +75,6 @@ sub __parse_message {
 }
 
 # required by OpenXPKI::Client::Service::Base
-sub prepare_enrollment_result {
-
-    my $self = shift;
-    my $workflow = shift;
-
-    return OpenXPKI::Client::Service::Response->new(
-        workflow => $workflow,
-        result => $workflow->{context}->{cert_identifier},
-    );
-
-}
-
 sub custom_wf_params {
     my $self = shift;
     my $params = shift;
@@ -129,6 +117,19 @@ sub custom_wf_params {
         $params->{issuer} = $self->attr->{issuer_serial}->{issuer};
         $params->{serial} = $self->attr->{issuer_serial}->{serial};
     }
+}
+
+# required by OpenXPKI::Client::Service::Base
+sub prepare_enrollment_result {
+
+    my $self = shift;
+    my $workflow = shift;
+
+    return OpenXPKI::Client::Service::Response->new(
+        workflow => $workflow,
+        result => $workflow->{context}->{cert_identifier},
+    );
+
 }
 
 sub generate_pkcs7_response {
