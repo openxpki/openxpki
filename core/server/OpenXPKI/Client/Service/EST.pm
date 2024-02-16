@@ -43,8 +43,6 @@ sub prepare_enrollment_result {
 
     my $self = shift;
     my $workflow = shift;
-    # not used for the default case
-    # my $operation = shift;
 
     my $result = $self->backend()->run_command('get_cert',{
         format => 'PKCS7',

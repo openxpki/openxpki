@@ -238,8 +238,6 @@ sub handle_enrollment_request {
 
     die "Passing operation to handle_enrollment_request is no longer supported." if (@_);
 
-    my $operation = $self->operation();
-
     my $log = $self->logger();
 
     # Build configuration parameters, can be overloaded by protocols,
@@ -355,7 +353,7 @@ sub handle_enrollment_request {
 
     $log->debug( 'Sending output for ' . $cert_identifier);
 
-    return $self->prepare_enrollment_result($workflow, $operation);
+    return $self->prepare_enrollment_result($workflow);
 
 }
 
