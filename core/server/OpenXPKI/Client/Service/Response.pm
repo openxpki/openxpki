@@ -123,12 +123,14 @@ our %named_messages = (
     '40004' => 'Missing or invalid parameters',
     '40005' => 'No result for given pickup parameters',
     '40006' => 'Request was rejected',
+    '40007' => 'Unknown operation',
     '40100' => 'Unauthorized',
     '40400' => 'Not Found',
     '50000' => 'Server Error',
     '50001' => 'Unable to initialize client',
     '50003' => 'Unexpected response from backend',
     '50011' => 'Unable to initialize endpoint parameters',
+    '50100' => 'Operation not implemented',
 );
 
 # this allows a constructor with the error code as scalar
