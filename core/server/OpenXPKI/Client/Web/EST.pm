@@ -13,7 +13,6 @@ use OpenXPKI::Client::Service::EST;
 sub index ($self) {
     my $endpoint = $self->stash('endpoint');
     my $operation = $self->stash('operation');
-    $operation =~ s/\.exe$//i;
 
     Log::Log4perl::MDC->put('endpoint', $endpoint);
 
