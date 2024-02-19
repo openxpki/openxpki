@@ -236,8 +236,6 @@ sub handle_enrollment_request {
 
     my $self = shift;
 
-    die "Passing operation to handle_enrollment_request is no longer supported." if (@_);
-
     my $log = $self->logger();
 
     # Build configuration parameters, can be overloaded by protocols,
@@ -360,8 +358,6 @@ sub handle_enrollment_request {
 sub handle_property_request {
 
     my $self = shift;
-
-    die "Passing operation to handle_property_request is no longer supported." if (@_);
 
     my $operation = $self->operation;
     my $log = $self->logger;
