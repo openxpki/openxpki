@@ -201,12 +201,11 @@ sub build_pickup_config {
     my $param = shift;
 
     my $conf = $self->config;
-    my $pickup_config = {(
+    my $pickup_config = {
         workflow => 'certificate_enroll',
         pickup => 'pkcs10',
         pickup_attribute => 'transaction_id',
-        ),
-        %{$conf->{$self->operation()} || {}},
+        %{$conf->{$self->operation} || {}},
     };
 
     Log::Log4perl::MDC->put('tid', $param->{transaction_id});
