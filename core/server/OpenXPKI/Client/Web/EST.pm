@@ -3,12 +3,11 @@ use Mojo::Base 'Mojolicious::Controller', -signatures;
 
 # Core modules
 use Data::Dumper;
-use List::Util qw( none );
 
 # Project modules
 use OpenXPKI::Client::Config;
 use OpenXPKI::Client::Service::EST;
-
+use OpenXPKI::Client::Service::Response;
 
 sub index ($self) {
     my $endpoint = $self->stash('endpoint');
@@ -18,12 +17,6 @@ sub index ($self) {
 
     my $config = $self->oxi_config('est');
     my $ep_config = $config->endpoint_config($endpoint);
-
-    # "serverkeygen" and "fullcmc" are not supported
-    if (none { $operation eq $_ } qw( cacerts simpleenroll simplereenroll csrattrs simplerevoke )) {
-        $self->log->error("Method not '$operation' implemented");
-        return $self->render(text => "Method not implemented\n", status => 501);
-    }
 
     $self->log->trace(sprintf("Incoming EST request '%s' on endpoint '%s'", $operation, $endpoint));
 
@@ -49,6 +42,7 @@ sub index ($self) {
     $self->res->headers->content_type("application/pkcs7-mime; smime-type=certs-only"); # default
 
     my $response;
+
     if ('cacerts' eq $operation) {
         $response = $client->handle_property_request;
 
@@ -66,8 +60,17 @@ sub index ($self) {
     } elsif ('simplerevoke' eq $operation) {
         $response = $client->handle_revocation_request;
 
-    } else {
+    } elsif ('simpleenroll' eq $operation or 'simplereenroll' eq $operation ) {
         $response = $client->handle_enrollment_request;
+
+    # "serverkeygen" and "fullcmc" are not supported
+    } elsif ('serverkeygen' eq $operation or 'fullcmc' eq $operation ) {
+        $self->log->error("Operation '$operation' not implemented");
+        $response = OpenXPKI::Client::Service::Response->new( 50100 );
+
+    } else {
+        $self->log->error("Unknown operation '$operation'");
+        $response = OpenXPKI::Client::Service::Response->new( 40007 );
     }
 
     $self->log->debug('Status: ' . $response->http_status_line);
