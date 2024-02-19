@@ -385,7 +385,7 @@ sub run_workflow {
 
     my $self = shift;
     my $workflow_type = shift;
-    my $param = shift || {};
+    my $param = shift;
 
     # create the client object
     my $client = $self->backend
