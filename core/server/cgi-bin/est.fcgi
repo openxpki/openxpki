@@ -96,8 +96,7 @@ while (my $cgi = CGI::Fast->new("")) {
     $log->debug('Status: ' . $response->http_status_line());
     $log->trace(Dumper $response) if ($log->is_trace);
 
-    # close backend connection
-    $client->terminate();
+    $client->disconnect_backend;
 
     my @extra_header;
     @extra_header = %{ $response->extra_headers() } if ($ep_config->{output}->{headers});

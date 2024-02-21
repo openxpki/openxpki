@@ -125,8 +125,8 @@ while (my $cgi = CGI::Fast->new("")) {
             );
             print $out;
         }
-        # close backend connection
-        $client->terminate();
+
+        $client->disconnect_backend;
 
         next;
     }

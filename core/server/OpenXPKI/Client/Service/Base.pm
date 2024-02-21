@@ -428,14 +428,12 @@ sub _handle_property_response {
 
 }
 
-sub terminate {
+sub disconnect_backend {
 
     my $self = shift;
-    if ($self->has_backend()) {
-        if (my $client = $self->backend()) {
-            $client->disconnect();
-        }
-    }
+
+    return unless $self->has_backend;
+    eval { $self->backend->disconnect if $self->backend };
 }
 
 sub mojo_req_from_cgi {
