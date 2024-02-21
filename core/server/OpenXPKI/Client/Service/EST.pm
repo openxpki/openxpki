@@ -28,12 +28,14 @@ sub custom_wf_params {
     # TODO this should be merged with the stuff in Base without
     # having protocol specific items in the core code
     if ($self->operation =~ m{simple((re)?enroll|revoke)}) {
-        $params->{'server'} = $self->endpoint;
-        $params->{'interface'} = $self->service_name;
+        $params->{server} = $self->endpoint;
+        $params->{interface} = $self->service_name;
         if (my $signer = $self->apache_env->{SSL_CLIENT_CERT}) {
-            $params->{'signer_cert'} = $signer;
+            $params->{signer_cert} = $signer;
         }
     }
+
+    $self->set_pkcs10_and_tid($params, decode_base64($self->request->body)) if $self->is_enrollment;
 
     return 1;
 }

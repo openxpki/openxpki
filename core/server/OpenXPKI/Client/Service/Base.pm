@@ -12,11 +12,12 @@ use Carp;
 use English;
 use Data::Dumper;
 use MIME::Base64;
-use Digest::SHA qw(sha1_hex);
+use Digest::SHA qw( sha1_hex );
+use List::Util qw( first );
 
 # CPAN modules
 use Crypt::PKCS10;
-use Log::Log4perl qw(:easy);
+use Log::Log4perl qw( :easy );
 use Feature::Compat::Try;
 use Mojo::Message::Request;
 
@@ -98,6 +99,12 @@ has wf_params => (
     builder => '_build_wf_params',
 );
 
+has is_enrollment => (
+    is => 'rw',
+    isa => 'Bool',
+    init_arg => undef,
+    default => 0,
+);
 
 sub _init_backend {
 
@@ -139,19 +146,9 @@ sub _build_wf_params {
         $self->logger->trace("Found env keys: " . $conf->{$operation}->{env});
     }
 
-    # IP Transport
-    if ($envkeys{'client_ip'}) {
-        $param->{'client_ip'} = $self->remote_address;
-    }
-
-    # User Agent
-    if ($envkeys{'user_agent'}) {
-        $param->{'user_agent'} = $self->request->headers->user_agent;
-    }
-
-    if ($envkeys{'endpoint'}) {
-        $param->{'endpoint'} = $self->endpoint;
-    }
+    $param->{'client_ip'} = $self->remote_address if $envkeys{'client_ip'};
+    $param->{'user_agent'} = $self->request->headers->user_agent if $envkeys{'user_agent'};
+    $param->{'endpoint'} = $self->endpoint if $envkeys{'endpoint'};
 
     # be lazy and use endpoint name as servername
     if ($envkeys{'server'}) {
@@ -195,6 +192,34 @@ sub _build_wf_params {
     return $param;
 }
 
+# Returns the request as PEM CSR after conversion rountrip and removal of any
+# data beyond the length of the ASN.1 structure.
+# Sending PEM with headers is not allowed in neither one but will be
+# gracefully accepted and converted by Crypt::PKSC10.
+sub set_pkcs10_and_tid {
+
+    my $self = shift;
+    my $params = shift;
+
+    # Usually PEM encoded but without borders as POSTDATA
+    my $pkcs10_in = shift
+        or do {
+            $self->logger->debug( 'Incoming enrollment with empty body' );
+            die OpenXPKI::Client::Service::Response->new( 40003 );
+        };
+
+    Crypt::PKCS10->setAPIversion(1);
+    my $decoded = Crypt::PKCS10->new($pkcs10_in, ignoreNonBase64 => 1, verifySignature => 1);
+    if (!$decoded) {
+        $self->logger->error('Unable to parse PKCS10: '. Crypt::PKCS10->error);
+        $self->logger->debug($pkcs10_in);
+        die OpenXPKI::Client::Service::Response->new( 40002 );
+    }
+
+    $params->{pkcs10} = $decoded->csrRequest(1);
+    $params->{transaction_id} = sha1_hex($decoded->csrRequest);
+}
+
 sub build_pickup_config {
 
     my $self = shift;
@@ -230,12 +255,13 @@ sub build_pickup_config {
     return ($pickup_config, $pickup_value);
 }
 
-
 sub handle_enrollment_request {
 
     my $self = shift;
 
-    my $log = $self->logger();
+    my $log = $self->logger;
+
+    $self->is_enrollment(1);
 
     # Build configuration parameters, can be overloaded by protocols,
     # e.g. for SCEP to inject data from the input
@@ -245,37 +271,6 @@ sub handle_enrollment_request {
     # create the client object
     my $client = $self->backend
         or return OpenXPKI::Client::Service::Response->new( 50001 );
-
-    # if pkcs10 was not already passed from build params
-    # we assume it is a raw POST
-    if (!defined $param->{pkcs10}) {
-        # Usually PEM encoded but without borders as POSTDATA
-        my $pkcs10 = $self->request->body
-            or do {
-                $log->debug( 'Incoming enrollment with empty body' );
-                return OpenXPKI::Client::Service::Response->new( 40003 );
-            };
-
-        # Crypt::PKCS10 expects binary or PEM with headers
-        # for simplecmc the payload is already binary -> noop
-        # for EST the payload is base64 encoded -> decode
-        # Sending PEM with headers is not allowed in neither one but
-        # will be gracefully accepted and converted by Crypt::PKSC10
-        if ($pkcs10 =~ m{\A [\w/+=\s]+ \z}xm) {
-            $pkcs10 = decode_base64($pkcs10);
-        }
-
-        Crypt::PKCS10->setAPIversion(1);
-        my $decoded = Crypt::PKCS10->new($pkcs10, ignoreNonBase64 => 1, verifySignature => 1);
-        if (!$decoded) {
-            $log->error('Unable to parse PKCS10: '. Crypt::PKCS10->error);
-            $log->debug($pkcs10);
-            return OpenXPKI::Client::Service::Response->new( 40002 );
-        }
-        $param->{pkcs10} = $decoded->csrRequest(1);
-        # we might accept transaction_id via GET with POSTed payload
-        $param->{transaction_id} = sha1_hex($decoded->csrRequest) unless($param->{transaction_id});
-    }
 
     my ($pickup_config, $pickup_value) = $self->build_pickup_config( $param );
     $log->trace(Dumper $pickup_config) if $log->is_trace;
@@ -287,13 +282,13 @@ sub handle_enrollment_request {
         $workflow = $self->pickup_workflow($pickup_config, $pickup_value);
 
         # it was a pickup, it was not successful, we do not have a PKCS10
-        if ($pickup_value && !$workflow && !$param->{pkcs10}) {
+        if ($pickup_value and not $workflow and not $param->{pkcs10}) {
             $log->debug("Pickup failed and no PKCS10 given");
             return OpenXPKI::Client::Service::Response->new( 40005 );
         }
 
         # pickup return undef if no workflow was found - start new one
-        if (!$workflow) {
+        if (not $workflow) {
             $log->debug(sprintf("Initialize %s with params %s",
                 $pickup_config->{workflow}, join(", ", keys %{$param})));
 

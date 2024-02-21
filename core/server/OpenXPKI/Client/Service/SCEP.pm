@@ -110,7 +110,6 @@ sub custom_wf_params {
             $params->{_url_params} = $extra;
         }
     } elsif ($self->message_type eq 'GetCertInitial') {
-        $params->{pkcs10} = '';
         $params->{transaction_id} = $self->transaction_id;
         $params->{signer_cert} = $self->signer;
     } elsif ($self->message_type =~ m{\AGet(Cert|CRL)\z}) {
