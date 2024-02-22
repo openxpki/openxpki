@@ -70,38 +70,41 @@ while (my $cgi = CGI::Fast->new("")) {
         operation => $operation,
     );
 
-    my $response;
     my $mime = "application/pkcs7-mime; smime-type=certs-only";
-    if ($operation eq 'cacerts') {
-        $response = $client->handle_property_request;
 
-        # the workflows should return base64 encoded raw data
-        # but the old EST GetCA workflow returned PKCS7 with PEM headers
-        my $out = $response->result || '';
-        $out =~ s{-----(BEGIN|END) PKCS7-----}{}g;
-        $out =~ s{\s}{}gxms;
-        $response->result($out);
+    my $response = fcgi_safe_sub {
+        if ($operation eq 'cacerts') {
+            my $r = $client->handle_property_request;
 
-    } elsif($operation eq 'csrattrs') {
-        $mime = "application/csrattrs";
-        $response = $client->handle_property_request;
+            # the workflows should return base64 encoded raw data
+            # but the old EST GetCA workflow returned PKCS7 with PEM headers
+            my $out = $r->result || '';
+            $out =~ s{-----(BEGIN|END) PKCS7-----}{}g;
+            $out =~ s{\s}{}gxms;
+            $r->result($out);
+            return $r;
 
-    } elsif($operation eq 'simplerevoke') {
-        $response = $client->handle_revocation_request;
+        } elsif($operation eq 'csrattrs') {
+            $mime = "application/csrattrs";
+            return $client->handle_property_request;
 
-    } else {
-        $response = $client->handle_enrollment_request;
-    }
+        } elsif($operation eq 'simplerevoke') {
+            return $client->handle_revocation_request;
 
-    $log->debug('Status: ' . $response->http_status_line());
-    $log->trace(Dumper $response) if ($log->is_trace);
+        } else {
+            return $client->handle_enrollment_request;
+        }
+    };
+
+    $log->debug('Status: ' . $response->http_status_line);
+    $log->trace(Dumper $response) if $log->is_trace;
+    $log->error($response->error_message) if $response->has_error;
 
     $client->disconnect_backend;
 
     my @extra_header;
     @extra_header = %{ $response->extra_headers() } if ($ep_config->{output}->{headers});
     if ($response->has_error()) {
-
         print $cgi->header(
             -status => $response->http_status_line(),
             -type => 'text/plain',

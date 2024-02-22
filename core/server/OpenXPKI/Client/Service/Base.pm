@@ -20,11 +20,17 @@ use Crypt::PKCS10;
 use Log::Log4perl qw( :easy );
 use Feature::Compat::Try;
 use Mojo::Message::Request;
+use Moose::Exporter;
 
 # Project modules
 use OpenXPKI::Exception;
 use OpenXPKI::Client::Simple;
 use OpenXPKI::Client::Service::Response;
+
+
+Moose::Exporter->setup_import_methods(
+    as_is => [ 'fcgi_safe_sub' ],
+);
 
 
 has config_obj => (
@@ -123,73 +129,82 @@ sub _build_wf_params {
 
     my $self = shift;
 
-    my $operation = $self->operation;
-    my $conf = $self->config;
-    my $param = {};
+    my $p = {};
 
-    # look for preset params
-    foreach my $key (keys %{$conf->{$operation}}) {
-        next unless ($key =~ m{preset_(\w+)});
-        $param->{$1} = $conf->{$operation}->{$key};
-    }
+    try {
+        my $operation = $self->operation;
+        my $conf = $self->config;
 
-    my $servername = $conf->{$operation}->{servername} || $conf->{global}->{servername};
-    # if given, append to the paramter list
-    if ($servername) {
-        $param->{'server'} = $servername;
-        $param->{'interface'} = $self->service_name;
-    }
+        # look for preset params
+        foreach my $key (keys %{$conf->{$operation}}) {
+            next unless ($key =~ m{preset_(\w+)});
+            $p->{$1} = $conf->{$operation}->{$key};
+        }
 
-    my %envkeys;
-    if ($conf->{$operation}->{env}) {
-        %envkeys = map {$_ => 1} (split /\s*,\s*/, $conf->{$operation}->{env});
-        $self->logger->trace("Found env keys: " . $conf->{$operation}->{env});
-    }
-
-    $param->{'client_ip'} = $self->remote_address if $envkeys{'client_ip'};
-    $param->{'user_agent'} = $self->request->headers->user_agent if $envkeys{'user_agent'};
-    $param->{'endpoint'} = $self->endpoint if $envkeys{'endpoint'};
-
-    # be lazy and use endpoint name as servername
-    if ($envkeys{'server'}) {
+        my $servername = $conf->{$operation}->{servername} || $conf->{global}->{servername};
+        # if given, append to the paramter list
         if ($servername) {
-            $self->logger->error("ENV server and servername are both set but are mutually exclusive");
-            return;
+            $p->{'server'} = $servername;
+            $p->{'interface'} = $self->service_name;
         }
-        my $endpoint = $self->endpoint;
-        if (!$endpoint) {
-            $self->logger->error("ENV server requested but endpoint is not set");
-            return;
+
+        my %envkeys;
+        if ($conf->{$operation}->{env}) {
+            %envkeys = map {$_ => 1} (split /\s*,\s*/, $conf->{$operation}->{env});
+            $self->logger->trace("Found env keys: " . $conf->{$operation}->{env});
         }
-        $param->{'server'} = $endpoint;
-        $param->{'interface'} = $self->service_name;
+
+        $p->{'client_ip'} = $self->remote_address if $envkeys{'client_ip'};
+        $p->{'user_agent'} = $self->request->headers->user_agent if $envkeys{'user_agent'};
+        $p->{'endpoint'} = $self->endpoint if $envkeys{'endpoint'};
+
+        # be lazy and use endpoint name as servername
+        if ($envkeys{'server'}) {
+            die "ENV 'server' and 'servername' are both set but are mutually exclusive ('servername' might be set global config)\n"
+              if $servername;
+
+            $p->{'server'} = $self->endpoint
+              or die "ENV 'server' requested but endpoint is not set\n";
+
+            $p->{'interface'} = $self->service_name;
+        }
+
+        # Gather data from TLS session
+        if ( $self->request->is_secure ) {
+
+            $self->logger->debug("calling context is https");
+            my $auth_dn = $self->apache_env->{SSL_CLIENT_S_DN};
+            my $auth_pem = $self->apache_env->{SSL_CLIENT_CERT};
+            if ( defined $auth_dn ) {
+                $self->logger->info("authenticated client DN: $auth_dn");
+                if ($envkeys{'signer_dn'}) {
+                    $p->{'signer_dn'} = $auth_dn;
+                }
+                if ($auth_pem && $envkeys{'signer_cert'}) {
+                    $p->{'signer_cert'} = $auth_pem;
+                }
+            } else {
+                $self->logger->debug("unauthenticated (no cert)");
+            }
+        }
+
+        # hook that allows consuming classes to add own parameters
+        $self->custom_wf_params($p);
     }
-
-    # Gather data from TLS session
-    if ( $self->request->is_secure ) {
-
-        $self->logger->debug("calling context is https");
-        my $auth_dn = $self->apache_env->{SSL_CLIENT_S_DN};
-        my $auth_pem = $self->apache_env->{SSL_CLIENT_CERT};
-        if ( defined $auth_dn ) {
-            $self->logger->info("authenticated client DN: $auth_dn");
-            if ($envkeys{'signer_dn'}) {
-                $param->{'signer_dn'} = $auth_dn;
-            }
-            if ($auth_pem && $envkeys{'signer_cert'}) {
-                $param->{'signer_cert'} = $auth_pem;
-            }
+    catch ($err) {
+        if ($err->isa('OpenXPKI::Client::Service::Response')) {
+            die $err;
         } else {
-            $self->logger->debug("unauthenticated (no cert)");
+            die OpenXPKI::Client::Service::Response->new(
+                error => 50010,
+                error_message => "$err", # stringification
+            );
         }
     }
 
-    # hook that allows consuming classes to add own parameters
-    $self->custom_wf_params($param);
+    $self->logger->trace(sprintf("Extra params for operation '%s': %s", $self->operation, Dumper $p)) if $self->logger->is_trace;
 
-    $self->logger->trace(sprintf("Extra params for operation '%s': %s", $self->operation, Dumper $param)) if $self->logger->is_trace;
-
-    return $param;
+    return $p;
 }
 
 # Returns the request as PEM CSR after conversion rountrip and removal of any
@@ -253,6 +268,29 @@ sub build_pickup_config {
     }
 
     return ($pickup_config, $pickup_value);
+}
+
+# Class method to wrap legacy FCGI request handling in a try-catch block
+sub fcgi_safe_sub :prototype(&) {
+
+    my $handler_sub = shift;
+
+    my $response;
+    try {
+        $response = $handler_sub->();
+    }
+    catch ($err) {
+        if ($err->isa('OpenXPKI::Client::Service::Response')) {
+            $response = $err;
+        } else {
+            $response = OpenXPKI::Client::Service::Response->new(
+                error => 50000,
+                error_message => "$err", # stringification
+            );
+        }
+    }
+
+    return $response;
 }
 
 sub handle_enrollment_request {

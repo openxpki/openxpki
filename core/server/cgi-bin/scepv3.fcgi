@@ -8,6 +8,7 @@ use CGI::Fast;
 use Data::Dumper;
 use English;
 use MIME::Base64;
+use Feature::Compat::Try;
 use OpenXPKI::Client::Config;
 use OpenXPKI::Client::Service::SCEP;
 
@@ -77,40 +78,43 @@ while (my $cgi = CGI::Fast->new("")) {
 
     $log->debug("Config created");
 
-    my $response;
-    my @extra_header;
     if ($operation eq 'PKIOperation') {
+        my $response = fcgi_safe_sub {
+            try {
+                # this internally triggers a call to the backend to unwrap the
+                # scep message and returns the payload and some attributes
+                # will die in case of an error, so an eval is needed here!
+                $client->pkcs7message( $message );
+            }
+            catch ($err) {
+                # something is wrong, TODO we might try to branch request vs. server errors
+                die OpenXPKI::Client::Service::Response->new( 50010 );
+            }
 
-        # this internally triggers a call to the backend to unwrap the
-        # scep message and returns the payload and some attributes
-        # will die in case of an error, so an eval is needed here!
-        eval{ $client->pkcs7message( $message ); };
+            if (!$client->attr()->{alias}) {
+                $log->info('Unable to find RA certficate');
+                die OpenXPKI::Client::Service::Response->new ( 40002 );
+            } elsif (!$client->signer) {
+                $log->info('Unable to extract signer certficate');
+                die OpenXPKI::Client::Service::Response->new ( 40001 );
+            # Enrollment request
+            } elsif ($client->message_type =~ m{(PKCSReq|RenewalReq|GetCertInitial)}) {
+                # TODO - improve handling of GetCertInitial and RenewalReq
+                $log->debug("Handle enrollment");
+                $client->operation($operation);
+                return $client->handle_enrollment_request;
+            # Request for CRL or GetCert with IssuerSerial in Payload
+            } else {
+                $client->operation($client->message_type);
+                return $client->handle_property_request;
+            }
+        };
 
-        # something is wrong, TODO we might try to branch request vs. server errors
-        if ($EVAL_ERROR) {
-            $response = OpenXPKI::Client::Service::Response->new( 50010 );
+        my @extra_header = %{ $response->extra_headers() } if ($ep_config->{output}->{headers});
 
-        } elsif (!$client->attr()->{alias}) {
-            $response = OpenXPKI::Client::Service::Response->new ( 40002 );
-            $log->info('Unable to find RA certficate');
-        } elsif (!$client->signer) {
-            $response = OpenXPKI::Client::Service::Response->new ( 40001 );
-            $log->info('Unable to extract signer certficate');
-        # Enrollment request
-        } elsif ($client->message_type =~ m{(PKCSReq|RenewalReq|GetCertInitial)}) {
-            # TODO - improve handling of GetCertInitial and RenewalReq
-            $log->debug("Handle enrollment");
-            $client->operation($operation);
-            $response = $client->handle_enrollment_request;
-        # Request for CRL or GetCert with IssuerSerial in Payload
-        } else {
-            $client->operation($client->message_type);
-            $response = $client->handle_property_request;
-        }
-
-        @extra_header = %{ $response->extra_headers() } if ($ep_config->{output}->{headers});
-        $log->debug('Status: ' . $response->http_status_line());
-        $log->trace(Dumper $response) if ($log->is_trace);
+        $log->debug('Status: ' . $response->http_status_line);
+        $log->trace(Dumper $response) if $log->is_trace;
+        $log->error($response->error_message) if $response->has_error;
 
         if (!$response->is_server_error()) {
             my $out = $client->generate_pkcs7_response( $response );
@@ -134,22 +138,25 @@ while (my $cgi = CGI::Fast->new("")) {
     $client->operation($operation);
 
     my $mime;
-    if ($operation eq 'GetCACaps') {
-        $mime = 'text/plain';
-        $response = $client->handle_property_request;
-    }
 
-    if ($operation eq 'GetCACert') {
-        $mime = 'application/x-x509-ca-ra-cert';
-        $response = $client->handle_property_request;
-    }
+    my $response = fcgi_safe_sub {
+        if ($operation eq 'GetCACaps') {
+            $mime = 'text/plain';
+            return $client->handle_property_request;
+        }
 
-    if ($operation eq 'GetNextCACert') {
-        $mime = 'application/x-x509-next-ca-cert';
-        $response = $client->handle_property_request;
-    }
+        if ($operation eq 'GetCACert') {
+            $mime = 'application/x-x509-ca-ra-cert';
+            return $client->handle_property_request;
+        }
 
-    @extra_header = %{ $response->extra_headers() } if ($ep_config->{output}->{headers});
+        if ($operation eq 'GetNextCACert') {
+            $mime = 'application/x-x509-next-ca-cert';
+            return $client->handle_property_request;
+        }
+    };
+
+    my @extra_header = %{ $response->extra_headers() } if ($ep_config->{output}->{headers});
     if ($response->is_server_error()) {
         print $cgi->header(
             -status => $response->http_status_line(),
