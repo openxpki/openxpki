@@ -450,7 +450,7 @@ sub decrypt_passwordsafe ($self, $safe_id, $enc_value) {
         $value = $safe_token->command({ COMMAND => 'pkcs7_decrypt', PKCS7 => $enc_value });
     }
     catch ($err) {
-        if (blessed $err and $err->isa('OpenXPKI::Exception')) {
+        if ($err->isa('OpenXPKI::Exception')) {
             if ($err->message eq 'I18N_OPENXPKI_TOOLKIT_COMMAND_FAILED') {
                 OpenXPKI::Exception->throw(
                     message => 'Encryption key needed to decrypt password safe entry is unavailable',

@@ -10,7 +10,6 @@ use File::Spec;
 
 # CPAN modules
 use Log::Log4perl;
-use Scalar::Util qw( blessed );
 
 # Project modules
 use OpenXPKI::Debug;
@@ -109,7 +108,7 @@ sub init {
             $func->($keys);
         }
         catch ($err) {
-            if (blessed $err and $err->isa('OpenXPKI::Exception')) {
+            if ($err->isa('OpenXPKI::Exception')) {
                 my $msg = $err->message || '<no message>';
                 log_wrapper("Error during initialization task '$task': $msg", "fatal");
                 $err->rethrow;
