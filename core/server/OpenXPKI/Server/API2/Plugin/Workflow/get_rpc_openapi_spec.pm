@@ -20,7 +20,8 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 use OpenXPKI::Server::API2::Plugin::Workflow::Util;
 
-use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
+# should be done after imports to safely disable warnings in Perl < 5.36
+use experimental 'signatures';
 
 # Sources for "type" and "format" (subtype):
 #   OpenXPKI::Client::UI::Workflow->__render_fields()

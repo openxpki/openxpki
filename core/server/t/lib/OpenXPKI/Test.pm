@@ -175,7 +175,8 @@ use OpenXPKI::Test::ConfigWriter;
 use OpenXPKI::Test::CertHelper::Database;
 use OpenXPKI::Test::Log4perlCallerFilter;
 
-use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
+# should be done after imports to safely disable warnings in Perl < 5.36
+use experimental 'signatures';
 
 Moose::Exporter->setup_import_methods(
     as_is     => [ \&OpenXPKI::Server::Context::CTX ],

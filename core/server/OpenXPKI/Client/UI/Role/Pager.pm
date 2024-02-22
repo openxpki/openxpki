@@ -7,7 +7,8 @@ use Moose::Role;
 use Type::Params qw( signature_for );
 use Types::Standard;
 
-use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
+# should be done after imports to safely disable warnings in Perl < 5.36
+use experimental 'signatures';
 
 
 =head2 __build_pager

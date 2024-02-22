@@ -6,7 +6,8 @@ extends 'OpenXPKI::Client::UI::Result';
 use Data::Dumper;
 use Type::Params qw( signature_for );
 
-use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
+# should be done after imports to safely disable warnings in Perl < 5.36
+use experimental 'signatures';
 
 =head2 init_realm_cards
 

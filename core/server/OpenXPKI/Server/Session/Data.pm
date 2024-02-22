@@ -13,7 +13,8 @@ use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::API2::Types;
 
-use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
+# should be done after imports to safely disable warnings in Perl < 5.36
+use experimental 'signatures';
 
 =head1 NAME
 

@@ -17,7 +17,8 @@ use OpenXPKI::Workflow::Context;
 use OpenXPKI::Workflow::Field;
 use Workflow::Exception qw( configuration_error workflow_error );
 
-use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
+# should be done after imports to safely disable warnings in Perl < 5.36
+use experimental 'signatures';
 
 sub new {
     my $class = ref $_[0] || $_[0];

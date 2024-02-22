@@ -25,7 +25,8 @@ use OpenXPKI::i18n qw( i18n_walk );
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Client::UI::Response;
 
-use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
+# should be done after imports to safely disable warnings in Perl < 5.36
+use experimental 'signatures';
 
 # Attributes set via constructor
 

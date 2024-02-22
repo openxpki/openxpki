@@ -10,7 +10,8 @@ use Type::Params qw( signature_for );
 use FindBin qw( $Bin );
 require "$Bin/DatabaseTestConnection.pm";
 
-use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
+# should be done after imports to safely disable warnings in Perl < 5.36
+use experimental 'signatures';
 
 has 'columns' => (
     is => 'rw',

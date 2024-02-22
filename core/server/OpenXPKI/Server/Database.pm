@@ -20,7 +20,8 @@ use SQL::Abstract::More;
 use Moose::Exporter;
 use Type::Params qw( signature_for );
 
-use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
+# should be done after imports to safely disable warnings in Perl < 5.36
+use experimental 'signatures';
 
 # Export AUTO_ID
 Moose::Exporter->setup_import_methods(with_meta => [ 'AUTO_ID' ]);

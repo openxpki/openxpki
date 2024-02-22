@@ -18,7 +18,8 @@ use OpenXPKI::Server::API2::Types;
 use OpenXPKI::Crypt::X509;
 use OpenXPKI::Server::Database; # to get AUTO_ID
 
-use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
+# should be done after imports to safely disable warnings in Perl < 5.36
+use experimental 'signatures';
 
 =head1 COMMANDS
 

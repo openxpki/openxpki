@@ -14,7 +14,8 @@ use OpenXPKI::Debug;
 use OpenXPKI::Server::Log;
 use OpenXPKI::Server::Context qw( CTX );
 
-use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
+# should be done after imports to safely disable warnings in Perl < 5.36
+use experimental 'signatures';
 
 =head1 NAME
 

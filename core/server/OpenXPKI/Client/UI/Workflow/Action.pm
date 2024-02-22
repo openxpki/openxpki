@@ -15,7 +15,8 @@ use Type::Params qw( signature_for );
 # Project modules
 use OpenXPKI::Util;
 
-use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
+# should be done after imports to safely disable warnings in Perl < 5.36
+use experimental 'signatures';
 
 =head1 UI Methods
 
