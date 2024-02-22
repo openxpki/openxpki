@@ -129,7 +129,7 @@ our %named_messages = (
     '50000' => 'Server Error',
     '50001' => 'Unable to initialize client',
     '50003' => 'Unexpected response from backend',
-    '50011' => 'Unable to initialize endpoint parameters',
+    '50010' => 'Unable to initialize endpoint parameters',
     '50100' => 'Operation not implemented',
 );
 
