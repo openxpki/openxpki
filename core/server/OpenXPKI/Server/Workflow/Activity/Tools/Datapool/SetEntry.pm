@@ -12,6 +12,7 @@ use DateTime;
 use Template;
 use Workflow::Exception qw( workflow_error configuration_error );
 
+# Feature::Compat::Try should be done last to safely disable warnings
 use Feature::Compat::Try;
 
 sub execute {

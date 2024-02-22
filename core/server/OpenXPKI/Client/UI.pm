@@ -15,7 +15,6 @@ use URI::Escape;
 use Log::Log4perl::MDC;
 use Crypt::JWT qw( encode_jwt decode_jwt );
 use Moose::Util::TypeConstraints qw( enum ); # PLEASE NOTE: this enables all warnings via Moose::Exporter
-use Feature::Compat::Try;
 use Type::Params qw( signature_for );
 
 # Project modules
@@ -24,7 +23,11 @@ use OpenXPKI::Client;
 use OpenXPKI::Client::UI::Bootstrap;
 use OpenXPKI::Client::UI::Login;
 
-use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
+# Feature::Compat::Try should be done last to safely disable warnings
+use Feature::Compat::Try;
+
+# should be done after imports to safely disable warnings in Perl < 5.36
+use experimental 'signatures';
 
 # ref to the cgi frontend session
 has 'session' => (

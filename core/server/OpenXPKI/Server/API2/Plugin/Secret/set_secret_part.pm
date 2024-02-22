@@ -8,12 +8,13 @@ OpenXPKI::Server::API2::Plugin::Secret::set_secret_part
 =cut
 
 # CPAN modules
-use Feature::Compat::Try;
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 
+# Feature::Compat::Try should be done last to safely disable warnings
+use Feature::Compat::Try;
 
 
 =head1 COMMANDS

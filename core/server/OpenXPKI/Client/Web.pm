@@ -2,13 +2,15 @@ package OpenXPKI::Client::Web;
 use Mojo::Base 'Mojolicious', -signatures;
 
 # CPAN modules
-use Feature::Compat::Try;
 use Mojo::Util qw( monkey_patch url_unescape );
 use Mojo::Log;
 use Type::Params qw( signature_for );
 
 # Project modules
 use OpenXPKI::Client;
+
+# Feature::Compat::Try should be done last to safely disable warnings
+use Feature::Compat::Try;
 
 
 my $socketfile = $ENV{OPENXPKI_CLIENT_SOCKETFILE} || '/var/openxpki/openxpki.socket';

@@ -23,7 +23,6 @@ use English;
 
 # CPAN modules
 use Log::Log4perl::MDC;
-use Feature::Compat::Try;
 use Sys::Hostname;
 
 # Project modules
@@ -35,6 +34,10 @@ use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::DateTime;
 use OpenXPKI::Util;
+
+# Feature::Compat::Try should be done last to safely disable warnings
+use Feature::Compat::Try;
+
 
 our $TERMINATE = 0;
 our $RELOAD = 0;

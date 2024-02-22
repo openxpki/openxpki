@@ -37,12 +37,14 @@ use Test::More;
 
 # CPAN modules
 use Proc::Daemon;
-use Feature::Compat::Try;
 
 # Project modules
 use OpenXPKI::Control;
 use OpenXPKI::Server;
 use OpenXPKI::Test::QA::Role::Server::ClientHelper;
+
+# Feature::Compat::Try should be done last to safely disable warnings
+use Feature::Compat::Try;
 
 
 requires "testenv_root";

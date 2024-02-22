@@ -16,7 +16,6 @@ use Scalar::Util qw( blessed );
 
 # CPAN modules
 use Type::Params qw( signature_for );
-use Feature::Compat::Try;
 
 # Project modules
 use OpenXPKI::Server::Log;
@@ -24,7 +23,11 @@ use OpenXPKI::Exception;
 use OpenXPKI::Server::API2::PluginRole;
 use OpenXPKI::Server::API2::Autoloader;
 
-use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
+# Feature::Compat::Try should be done last to safely disable warnings
+use Feature::Compat::Try;
+
+# should be done after imports to safely disable warnings in Perl < 5.36
+use experimental 'signatures';
 
 =head1 SYNOPSIS
 

@@ -16,6 +16,8 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Plugin::Token::Util;
 
 # CPAN modules
+
+# Feature::Compat::Try should be done last to safely disable warnings
 use Feature::Compat::Try;
 
 

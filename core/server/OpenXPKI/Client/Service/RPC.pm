@@ -10,10 +10,13 @@ use Data::Dumper;
 
 # CPAN modules
 use JSON;
-use Feature::Compat::Try;
 
 # Project modules
 use OpenXPKI::Client::Simple;
+
+# Feature::Compat::Try should be done last to safely disable warnings
+use Feature::Compat::Try;
+
 
 has config_obj => (
     is => 'rw',

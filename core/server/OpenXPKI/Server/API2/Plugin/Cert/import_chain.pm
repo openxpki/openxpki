@@ -13,7 +13,7 @@ use OpenXPKI::Crypt::X509;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 
-# CPAN modules
+# Feature::Compat::Try should be done last to safely disable warnings
 use Feature::Compat::Try;
 
 =head1 COMMANDS

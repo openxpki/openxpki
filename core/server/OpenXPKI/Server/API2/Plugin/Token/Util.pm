@@ -15,10 +15,13 @@ use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 
 # CPAN modules
-use Feature::Compat::Try;
 use Type::Params qw( signature_for );
 
-use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
+# Feature::Compat::Try should be done last to safely disable warnings
+use Feature::Compat::Try;
+
+# should be done after imports to safely disable warnings in Perl < 5.36
+use experimental 'signatures';
 
 =head2 is_token_usable
 

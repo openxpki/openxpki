@@ -11,7 +11,6 @@ use MIME::Base64 qw(encode_base64url decode_base64);
 
 # CPAN modules
 use Crypt::JWT qw(decode_jwt);
-use Feature::Compat::Try;
 
 # Project modules
 use OpenXPKI::Debug;
@@ -19,6 +18,9 @@ use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Authentication::Handle;
 use OpenXPKI::Server::Authentication::Base; # preload to get debug working
+
+# Feature::Compat::Try should be done last to safely disable warnings
+use Feature::Compat::Try;
 
 ## constructor and destructor stuff
 

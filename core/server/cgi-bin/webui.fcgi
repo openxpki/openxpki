@@ -25,7 +25,6 @@ use JSON;
 use Config::Std;
 use Log::Log4perl::MDC;
 use Crypt::CBC;
-use Feature::Compat::Try;
 
 # Project modules
 use OpenXPKI::Log4perl;
@@ -36,6 +35,9 @@ use OpenXPKI::Client::UI;
 use OpenXPKI::Client::UI::Request;
 use OpenXPKI::Client::UI::Response;
 use OpenXPKI::Client::UI::SessionCookie;
+
+# Feature::Compat::Try should be done last to safely disable warnings
+use Feature::Compat::Try;
 
 
 my $conf;

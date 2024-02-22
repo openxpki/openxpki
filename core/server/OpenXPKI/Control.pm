@@ -48,14 +48,17 @@ use File::Temp;
 
 # CPAN modules
 use Proc::ProcessTable;
-use Feature::Compat::Try;
 use Type::Params qw( signature_for );
 
 # Project modules
 use OpenXPKI::VERSION;
 use OpenXPKI::Debug;
 
-use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
+# Feature::Compat::Try should be done last to safely disable warnings
+use Feature::Compat::Try;
+
+# should be done after imports to safely disable warnings in Perl < 5.36
+use experimental 'signatures';
 
 =head2 start {CONFIG, SILENT, PID, DEBUG, KEEP_TEMP}
 

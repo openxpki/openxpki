@@ -13,12 +13,15 @@ use MIME::Base64;
 
 # CPAN modules
 use Log::Log4perl qw(:easy);
-use Feature::Compat::Try;
 
 # Project modules
 use OpenXPKI::Exception;
 use OpenXPKI::Crypt::X509;
 use OpenXPKI::Client::Service::Response;
+
+# Feature::Compat::Try should be done last to safely disable warnings
+use Feature::Compat::Try;
+
 
 # required by OpenXPKI::Client::Service::Base
 sub custom_wf_params {

@@ -18,7 +18,6 @@ use List::Util qw( first );
 # CPAN modules
 use Crypt::PKCS10;
 use Log::Log4perl qw( :easy );
-use Feature::Compat::Try;
 use Mojo::Message::Request;
 use Moose::Exporter;
 
@@ -26,6 +25,9 @@ use Moose::Exporter;
 use OpenXPKI::Exception;
 use OpenXPKI::Client::Simple;
 use OpenXPKI::Client::Service::Response;
+
+# Feature::Compat::Try should be done last to safely disable warnings
+use Feature::Compat::Try;
 
 
 Moose::Exporter->setup_import_methods(

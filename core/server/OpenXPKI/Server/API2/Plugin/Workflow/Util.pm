@@ -3,7 +3,6 @@ use Moose;
 
 # Core modules
 use English;
-use Feature::Compat::Try;
 
 # CPAN modules
 use Type::Params qw( signature_for );
@@ -15,7 +14,11 @@ use OpenXPKI::Connector::WorkflowContext;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 
-use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
+# Feature::Compat::Try should be done last to safely disable warnings
+use Feature::Compat::Try;
+
+# should be done after imports to safely disable warnings in Perl < 5.36
+use experimental 'signatures';
 
 
 has factory => (

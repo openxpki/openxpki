@@ -35,10 +35,12 @@ use Test::More;
 use Test::Exception;
 
 # CPAN modules
-use Feature::Compat::Try;
 
 # Project modules
 use OpenXPKI::Client;
+
+# Feature::Compat::Try should be done last to safely disable warnings
+use Feature::Compat::Try;
 
 =head1 METHODS
 

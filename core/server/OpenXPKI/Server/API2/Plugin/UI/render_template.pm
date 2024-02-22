@@ -7,7 +7,6 @@ OpenXPKI::Server::API2::Plugin::UI::render_template
 
 =cut
 
-use Feature::Compat::Try;
 use YAML::Loader;
 use Data::Dumper;
 
@@ -16,6 +15,9 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 use OpenXPKI::Template;
 use OpenXPKI::Debug;
+
+# Feature::Compat::Try should be done last to safely disable warnings
+use Feature::Compat::Try;
 
 =head1 COMMANDS
 

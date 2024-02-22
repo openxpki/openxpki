@@ -12,7 +12,6 @@ use Scalar::Util qw( blessed );
 
 # CPAN modules
 use Workflow::Exception qw( workflow_error );
-use Feature::Compat::Try;
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
@@ -20,6 +19,10 @@ use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::DateTime;
+
+# Feature::Compat::Try should be done last to safely disable warnings
+use Feature::Compat::Try;
+
 
 my @PERSISTENT_FIELDS = qw( proc_state count_try wakeup_at reap_at archive_at );
 my @TRANSIENT_FIELDS = qw( persist_context is_startup );

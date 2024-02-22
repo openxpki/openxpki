@@ -12,13 +12,14 @@ OpenXPKI::Server::API2::Plugin::Datapool::get_data_pool_entry
 # Core modules
 
 # CPAN modules
-use Feature::Compat::Try;
 
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 
+# Feature::Compat::Try should be done last to safely disable warnings
+use Feature::Compat::Try;
 
 =head1 COMMANDS
 

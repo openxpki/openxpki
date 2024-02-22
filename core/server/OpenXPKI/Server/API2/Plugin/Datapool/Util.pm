@@ -13,14 +13,17 @@ related plugins that provides some utility methods
 # Core modules
 
 # CPAN modules
-use Feature::Compat::Try;
 use Type::Params qw( signature_for );
 
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 
-use experimental 'signatures'; # should be done after imports to safely disable warnings in Perl < 5.36
+# Feature::Compat::Try should be done last to safely disable warnings
+use Feature::Compat::Try;
+
+# should be done after imports to safely disable warnings in Perl < 5.36
+use experimental 'signatures';
 
 =head1 DESCRIPTION
 

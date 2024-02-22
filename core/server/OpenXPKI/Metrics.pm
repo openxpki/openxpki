@@ -24,9 +24,11 @@ I<Please note that metrics are a feature of OpenXPKI Enterprise Edition.>
 use File::Find qw();
 
 # CPAN modules
-use Feature::Compat::Try;
 use Time::HiRes qw( gettimeofday tv_interval );
 use Data::UUID;
+
+# Feature::Compat::Try should be done last to safely disable warnings
+use Feature::Compat::Try;
 
 ################################################################################
 # Attributes

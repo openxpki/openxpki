@@ -13,7 +13,6 @@ use Encode;
 
 # CPAN modules
 use Crypt::JWT qw(decode_jwt);
-use Feature::Compat::Try;
 use Log::Log4perl;
 use Log::Log4perl::MDC;
 
@@ -23,6 +22,9 @@ use OpenXPKI::Client::Config;
 use OpenXPKI::Client::Service::RPC;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::i18n qw( i18nGettext i18n_walk );
+
+# Feature::Compat::Try should be done last to safely disable warnings
+use Feature::Compat::Try;
 
 
 our $config;

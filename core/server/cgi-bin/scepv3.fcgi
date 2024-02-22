@@ -8,9 +8,12 @@ use CGI::Fast;
 use Data::Dumper;
 use English;
 use MIME::Base64;
-use Feature::Compat::Try;
 use OpenXPKI::Client::Config;
 use OpenXPKI::Client::Service::SCEP;
+
+# Feature::Compat::Try should be done last to safely disable warnings
+use Feature::Compat::Try;
+
 
 my $config = OpenXPKI::Client::Config->new('scep');
 my $log = $config->logger();
