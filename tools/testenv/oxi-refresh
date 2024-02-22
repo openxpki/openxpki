@@ -101,7 +101,7 @@ echo "[$([ "$IS_RESTART" -eq 1 ] && echo "X" || echo " ")] Restart OpenXPKI & Ap
 echo
 
 #
-# Copy current code and realm CA-ONE config
+# Configuration (copy and modify)
 #
 
 # fully overwrite existing config
@@ -154,7 +154,7 @@ if [ $test_auth_exists -eq 0 ]; then
 fi
 
 # add "tenant: { type: Base }" to "RA Operator"
-sed -zri 's/(RA Operator[^\n]+\n([\t ]+[^\n]+\n)+)/\1    tenant:\n        type: Base\n/' /etc/openxpki/config.d/realm/democa/auth/roles.yaml
+#sed -zri 's/(RA Operator[^\n]+\n([\t ]+[^\n]+\n)+)/\1    tenant:\n        type: Base\n/' /etc/openxpki/config.d/realm/democa/auth/roles.yaml
 
 # remove probably existing TestAccounts
 sed -zri 's/(TestAccounts:\n([\t ]+[^\n]+\n|\n)+)//' /etc/openxpki/config.d/realm.tpl/auth/handler.yaml
