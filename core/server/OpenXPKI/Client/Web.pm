@@ -25,7 +25,12 @@ sub declare_routes ($self, $r) {
     #   /.well-known/est/cacerts or with a label
     #   /.well-known/est/namedservice/cacerts
     # <endpoint> is optional because a default is given.
-    $r->any('/.well-known/est/<endpoint>/<operation>')->to('EST#index', endpoint => 'default');
+    $r->any('/.well-known/est/<endpoint>/<operation>')->to(
+        namespace => '',
+        controller => 'OpenXPKI::Client::Service::EST',
+        action => 'index',
+        endpoint => 'default',
+    );
 }
 
 sub startup ($self) {

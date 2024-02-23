@@ -1,5 +1,8 @@
 package OpenXPKI::Client::Service::EST;
 use Moose;
+use MooseX::NonMoose;
+
+extends 'Mojolicious::Controller';
 
 with 'OpenXPKI::Client::Service::Base';
 
@@ -13,6 +16,7 @@ use MIME::Base64;
 
 # CPAN modules
 use Log::Log4perl qw(:easy);
+use Mojo::Base;
 
 # Project modules
 use OpenXPKI::Exception;
@@ -21,7 +25,53 @@ use OpenXPKI::Client::Service::Response;
 
 # Feature::Compat::Try should be done last to safely disable warnings
 use Feature::Compat::Try;
+# should be done after imports to safely disable warnings in Perl < 5.36
+use experimental 'signatures';
 
+
+# Mojolicious entry point
+sub index ($self) {
+
+    if ($self->req->is_secure) {
+        # what we expect -> noop
+    } elsif ($self->config->{global}->{insecure}) {
+        # RFC demands TLS for EST but we might have a SSL proxy in front
+        $self->log->debug("Unauthenticated (plain http)");
+    } else {
+        $self->log->error('EST request via insecure connection');
+        return $self->render(text => "HTTPS required\n", status => 403);
+    }
+
+    $self->res->headers->content_type("application/pkcs7-mime; smime-type=certs-only"); # default
+
+    my $response = $self->handle_request;
+
+    $self->disconnect_backend;
+
+    # HTTP header
+    if ($self->config->{output}->{headers}) {
+        $self->res->headers->add($_ => $response->extra_headers->{$_}) for keys $response->extra_headers->%*;
+    }
+
+    if ($response->has_error) {
+        return $self->render(text => $response->error_message."\n");
+
+    } elsif ($response->is_pending) {
+        $self->res->headers->add('-retry-after' => $response->retry_after);
+        return $self->render(text => $response->http_status_message."\n");
+
+    } elsif (not $response->has_result) {
+        # revoke returns a 204 no content on success
+        return $self->rendered;
+
+    } else {
+        # Default is base64 encoding, but we can turn on binary
+        my $is_binary = $self->config->{output}->{encoding}//'' eq 'binary';
+        my $data = $is_binary ? decode_base64($response->result) : $response->result;
+        $self->res->headers->add('content-transfer-encoding' => ($is_binary ? 'binary' : 'base64'));
+        return $self->render(data => $data);
+    }
+}
 
 # required by OpenXPKI::Client::Service::Base
 sub custom_wf_params {
@@ -42,6 +92,38 @@ sub custom_wf_params {
 
     return 1;
 }
+
+sub op_handlers {
+    return [
+        'cacerts' => sub {
+            my $self = shift;
+            my $response = $self->handle_property_request;
+
+            # FIXME Legacy: the workflows should return base64 encoded raw data
+            # but the old EST GetCA workflow returned PKCS7 with PEM headers.
+            my $out = $response->result || '';
+            $out =~ s{-----(BEGIN|END) PKCS7-----}{}g;
+            $out =~ s{\s}{}gxms;
+            $response->result($out);
+            return $response;
+        },
+        'csrattrs' => sub {
+            my $self = shift;
+            $self->res->headers->content_type("application/csrattrs"); # default
+            return $self->handle_property_request;
+        },
+        'simplerevoke' => \&handle_revocation_request,
+        ['simpleenroll', 'simplereenroll'] => \&handle_enrollment_request,
+        # "serverkeygen" and "fullcmc" are not supported
+        ['serverkeygen', 'fullcmc'] => sub {
+            my $self = shift;
+            my $operation = shift;
+            $self->log->error("Operation '$operation' not implemented");
+            return OpenXPKI::Client::Service::Response->new( 50100 );
+        },
+    ];
+}
+
 
 # required by OpenXPKI::Client::Service::Base
 sub prepare_enrollment_result {
@@ -107,4 +189,4 @@ sub handle_revocation_request {
 
 __PACKAGE__->meta->make_immutable;
 
- __END__;
+__END__;

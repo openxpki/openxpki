@@ -119,6 +119,11 @@ sub custom_wf_params {
 }
 
 # required by OpenXPKI::Client::Service::Base
+sub op_handlers {
+    die "Not implemented yet";
+}
+
+# required by OpenXPKI::Client::Service::Base
 sub prepare_enrollment_result {
 
     my $self = shift;

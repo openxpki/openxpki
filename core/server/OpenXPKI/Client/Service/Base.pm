@@ -6,6 +6,13 @@ with 'OpenXPKI::Client::Service::Role::PickupWorkflow';
 requires 'service_name';
 requires 'custom_wf_params';
 requires 'prepare_enrollment_result';
+requires 'op_handlers';
+
+# FIXME enable after phasing out fcgi scripts:
+#requires 'tx';
+#requires 'stash';
+#requires 'log';
+#requires 'oxi_config';
 
 # Core modules
 use Carp;
@@ -14,6 +21,7 @@ use Data::Dumper;
 use MIME::Base64;
 use Digest::SHA qw( sha1_hex );
 use List::Util qw( first );
+use mro;
 
 # CPAN modules
 use Crypt::PKCS10;
@@ -28,6 +36,8 @@ use OpenXPKI::Client::Service::Response;
 
 # Feature::Compat::Try should be done last to safely disable warnings
 use Feature::Compat::Try;
+# should be done after imports to safely disable warnings in Perl < 5.36
+use experimental 'signatures';
 
 
 Moose::Exporter->setup_import_methods(
@@ -38,26 +48,34 @@ Moose::Exporter->setup_import_methods(
 has config_obj => (
     is => 'rw',
     isa => 'OpenXPKI::Client::Config',
-    required => 1,
+    lazy => 1,
+    builder => '_build_config_obj',
 );
+sub _build_config_obj ($self) { $self->oxi_config($self->service_name) }
 
 has endpoint => (
     is => 'ro',
     isa => 'Str',
-    required => 1,
+    lazy => 1,
+    builder => '_build_endpoint',
 );
+sub _build_endpoint ($self) { $self->stash('endpoint') }
 
 has apache_env => (
     is => 'ro',
     isa => 'HashRef',
-    required => 1,
+    lazy => 1,
+    builder => '_build_apache_env',
 );
+sub _build_apache_env ($self) { $self->stash('apache_env') }
 
 has remote_address => (
     is => 'ro',
     isa => 'Str',
-    required => 1,
+    lazy => 1,
+    builder => '_build_remote_address',
 );
+sub _build_remote_address ($self) { $self->tx->remote_address }
 
 # the endpoint config
 has config => (
@@ -65,38 +83,54 @@ has config => (
     isa => 'HashRef',
     lazy => 1,
     init_arg => undef,
-    default => sub { $_[0]->config_obj->endpoint_config($_[0]->endpoint) },
+    builder => '_build_config',
 );
+sub _build_config ($self) { $self->config_obj->endpoint_config($self->endpoint) }
 
-has log => (
+has _log => (
     is => 'rw',
     isa => 'Object',
     lazy => 1,
     init_arg => undef,
-    default => sub { $_[0]->config_obj->logger },
+    builder => '_build_log',
 );
+sub _build_log ($self) { $self->config_obj->logger }
+
+# support two use cases of this role:
+# 1) new: log() method exists in parent class (because the consuming class extends Mojolicious::Controller)
+# 2) old: parent class does not have a log() method
+sub log ($self) { $self->next::can ? $self->next::method : $self->_log }
 
 has request => (
     is => 'ro',
     isa => 'Mojo::Message::Request',
-    required => 1,
+    builder => '_build_request',
 );
+sub _build_request ($self) { $self->tx->req }
 
 has backend => (
     is => 'rw',
     isa => 'Object|Undef',
     lazy => 1,
     predicate => 'has_backend',
-    builder => '_init_backend',
+    builder => '_build_backend',
 );
+sub _build_backend ($self) {
+    OpenXPKI::Client::Simple->new({
+        logger => $self->log,
+        config => $self->config->{global}, # realm and locale
+        auth => $self->config->{auth} || {}, # auth config
+    })
+}
 
-# 'operation' might be set late
+# 'operation' may be overwritten later on
 has operation => (
     is => 'rw',
     isa => 'Str',
     lazy => 1,
-    default => sub { die "Attempt to access attribute 'operation' before it was set" },
+    builder => '_build_operation',
 );
+sub _build_operation ($self) { $self->stash('operation') }
 
 # Workflow parameters. A value of "undef" indicates an error.
 has wf_params => (
@@ -113,18 +147,6 @@ has is_enrollment => (
     init_arg => undef,
     default => 0,
 );
-
-sub _init_backend {
-
-    my $self = shift;
-
-    return OpenXPKI::Client::Simple->new({
-        logger => $self->log(),
-        config => $self->config->{global}, # realm and locale
-        auth => $self->config->{auth} || {}, # auth config
-    });
-
-}
 
 # Workflow parameters. A value of "undef" indicates an error.
 sub _build_wf_params {
@@ -209,6 +231,18 @@ sub _build_wf_params {
     return $p;
 }
 
+# Fallback BUILD method: the service classes usually extend "Mojolicious::Controller"
+# which is not a Moose object and thus does not inherit a BUILD method.
+# "it's completely acceptable to apply a method modifier to BUILD in a role;
+# you can even provide an empty BUILD subroutine in a role so the role is applicable
+# even to classes without their own BUILD.
+# https://metacpan.org/dist/Moose/view/lib/Moose/Manual/Construction.pod#BUILD-and-parent-classes
+sub BUILD {}
+after 'BUILD' => sub {
+    my $self = shift;
+    Log::Log4perl::MDC->put('endpoint', $self->endpoint);
+};
+
 # Returns the request as PEM CSR after conversion rountrip and removal of any
 # data beyond the length of the ASN.1 structure.
 # Sending PEM with headers is not allowed in neither one but will be
@@ -291,6 +325,62 @@ sub fcgi_safe_sub :prototype(&) {
             );
         }
     }
+
+    return $response;
+}
+
+sub handle_request {
+
+    my $self = shift;
+
+    $self->log->debug(sprintf("Incoming %s request '%s' on endpoint '%s'", uc($self->service_name), $self->operation, $self->endpoint)) if $self->log->is_debug;
+
+    my $response;
+    try {
+        my $op_handlers = $self->op_handlers;
+
+        die sprintf('%s->op_handlers() did not return an ArrayRef', $self->meta->name)
+          unless ($op_handlers and ref $op_handlers eq 'ARRAY');
+
+        my $i = 0;
+        while (my $ops = $op_handlers->[$i++]) {
+            $ops = ref $ops eq 'ARRAY' ? $ops : [ $ops ];
+            my $handler = $op_handlers->[$i++]
+              or die sprintf('Missing handler for operation [%s] in %s->op_handlers()', join(',', $ops->@*), $self->meta->name);
+
+            if (my $op = first { $_ eq $self->operation } $ops->@*) {
+                $response = $handler->($self, $op);
+
+                # if ($ep_config->{output}->{headers}) {
+                #     $self->res->headers->add($_ => $response->extra_headers->{$_}) for keys $response->extra_headers->%*;
+                # }
+            }
+        }
+
+        # error / fallback
+        $response //= OpenXPKI::Client::Service::Response->new(
+            error => 40007,
+            error_message => sprintf('Unknown operation "%s"', $self->operation),
+        );
+    }
+    catch ($err) {
+        if ($err->isa('OpenXPKI::Client::Service::Response')) {
+            $response = $err;
+        } else {
+            $response = OpenXPKI::Client::Service::Response->new(
+                error => 50000,
+                error_message => "$err", # stringification
+            );
+        }
+    }
+
+    $self->log->debug('Status: ' . $response->http_status_line);
+    $self->log->error($response->error_message) if $response->has_error;
+    $self->log->trace(Dumper $response) if $self->log->is_trace;
+
+    # TODO -- needs to be overwritten in CertEP - it always returns 200
+    $self->res->code($response->http_status_code);
+    $self->res->message($response->http_status_message);
 
     return $response;
 }
