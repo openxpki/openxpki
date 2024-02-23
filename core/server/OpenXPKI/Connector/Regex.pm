@@ -43,30 +43,30 @@ sub get {
         $regex = "(?$modifier)$regex" ;
     }
 
-    $self->log()->debug($regex);
+    $self->log->debug($regex);
 
     my $res = 1;
     if ($self->is_replace()) {
         my $pattern = shift @args;
         my $replace = $self->replace();
 
-        $self->log()->trace("Replace $pattern with $replace");
+        $self->log->trace("Replace $pattern with $replace");
 
         $pattern =~ s{$regex}{$replace};
         $res = $pattern;
 
-        $self->log()->trace("Result after replace $pattern");
+        $self->log->trace("Result after replace $pattern");
 
     } elsif ($self->invert()) {
         foreach my $p (@args) {
             $res = ($res && ($p !~ m{$regex})) ? 1 : 0;
-            $self->log()->trace("Check $p = $res");
+            $self->log->trace("Check $p = $res");
             last unless ($res);
         }
     } else {
         foreach my $p (@args) {
             $res = ($res && ($p =~ m{$regex})) ? 1 : 0;
-            $self->log()->trace("Check $p = $res");
+            $self->log->trace("Check $p = $res");
             last unless ($res);
         }
     }
@@ -94,7 +94,7 @@ sub get_hash {
         $res = ($val =~ m{$regex}) ? 1: 0;
     }
 
-    $self->log()->debug("Result testing $val against $regex: $res");
+    $self->log->debug("Result testing $val against $regex: $res");
 
     return $self->_node_not_exists( $val ) unless ($res);
 

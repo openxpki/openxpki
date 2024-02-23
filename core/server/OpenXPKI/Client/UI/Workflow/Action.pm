@@ -521,7 +521,7 @@ sub action_bulk {
     }
 
     $self->log->debug("Run command '$command' on workflows " . join(", ", @serials));
-    $self->log->trace('Execute parameters ' . Dumper \%params) if ($self->log->is_trace);
+    $self->log->trace('Execute parameters ' . Dumper \%params) if $self->log->is_trace;
 
     foreach my $id (@serials) {
 

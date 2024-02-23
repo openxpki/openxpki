@@ -991,7 +991,7 @@ sub init_related {
     if (scalar @wfid) {
         my $cert_workflows = $self->send_command_v2( 'search_workflow_instances', {
             id => \@wfid, check_acl => 1, $self->__tenant_param() });
-        $self->log->trace("workflow results" . Dumper $cert_workflows) if ($self->log->is_trace());;
+        $self->log->trace("workflow results" . Dumper $cert_workflows) if $self->log->is_trace;
 
         my $workflow_labels = $self->send_command_v2( 'get_workflow_instance_types');
 

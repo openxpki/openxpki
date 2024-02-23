@@ -147,7 +147,7 @@ sub execute {
     # make sure Proc::SafeExec can collect exit status via waitpid()
     local $SIG{'CHLD'} = 'DEFAULT' if (not $SIG{'CHLD'} or $SIG{'CHLD'} eq 'IGNORE');
 
-    $self->log()->debug('OpenSSL command: ' . join(" ", @wrapper_cmd));
+    $self->log->debug('OpenSSL command: ' . join(" ", @wrapper_cmd));
     my $command = Proc::SafeExec->new({
         exec   => [ $shell, @wrapper_cmd ],
         stdin  => 'new',
@@ -163,7 +163,7 @@ sub execute {
         # we ignore that
         my $stderr = $self->get_stderr();
 
-        $self->log()->error('OpenSSL error: ' . $stderr);
+        $self->log->error('OpenSSL error: ' . $stderr);
 
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_WAIT_FAILED',
@@ -178,7 +178,7 @@ sub execute {
     close($STDERR);
     if ($command->exit_status()) {
         my $stderr = $self->get_stderr();
-        $self->log()->error('OpenSSL error: ' . $stderr);
+        $self->log->error('OpenSSL error: ' . $stderr);
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_FAILED',
             params  => {

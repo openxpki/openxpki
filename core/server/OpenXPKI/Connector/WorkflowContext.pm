@@ -24,7 +24,7 @@ sub set_context {
 sub BUILD {
 
     my $self = shift;
-    $self->log()->trace('context is '. Dumper $CONTEXT ) if $self->log->is_trace;
+    $self->log->trace('context is '. Dumper $CONTEXT ) if $self->log->is_trace;
 
 }
 
@@ -46,7 +46,7 @@ sub get {
     }
 
     if (ref $val ne '') {
-        $self->log()->error('requested value is not a scalar');
+        $self->log->error('requested value is not a scalar');
         die "requested value is not a scalar " . Dumper $val;
     }
 
@@ -61,7 +61,7 @@ sub get_hash {
     my $val = $self->_get_node();
 
     if (defined $val && ref $val ne 'HASH') {
-        $self->log()->error('requested value is not a hash');
+        $self->log->error('requested value is not a hash');
         die "requested value is not a HASH " . Dumper $val;
     }
 
@@ -77,7 +77,7 @@ sub get_list {
     my $val = $self->_get_node();
 
     if (defined $val && ref $val ne 'ARRAY') {
-        $self->log()->error('requested value is not a list');
+        $self->log->error('requested value is not a list');
         die "requested value is not a list " . Dumper $val;
     }
 
@@ -91,7 +91,7 @@ sub _get_node {
 
     my $key = $self->LOCATION();
 
-    $self->log()->debug('Get context value for '.$key );
+    $self->log->debug('Get context value for '.$key );
 
     my $val = $CONTEXT->{$key};
 

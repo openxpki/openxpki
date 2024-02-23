@@ -47,7 +47,7 @@ sub execute
                 } elsif ($key =~ /key_length/i) {
                     $params->{key_length} = $value;
                 } else {
-                    $self->log()->warn('Unknown key parameter ' . $key);
+                    $self->log->warn('Unknown key parameter ' . $key);
                 }
             }
         }
