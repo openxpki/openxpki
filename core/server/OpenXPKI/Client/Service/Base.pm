@@ -400,7 +400,7 @@ sub handle_property_request {
     my $workflow_type = $self->config->{$operation}->{workflow} ||
         $self->service_name.'_'.lc($operation);
     $self->log->debug( 'Start workflow type ' . $workflow_type );
-    $self->log->trace( 'Workflow Paramters '  . Dumper $param );
+    $self->log->trace( 'Workflow Paramters '  . Dumper $param ) if $self->log->is_trace;
 
     my $response = $self->run_workflow($workflow_type, $param);
 
@@ -423,7 +423,7 @@ sub run_workflow {
         params => $param
     });
 
-    $self->log->trace( 'Workflow info '  . Dumper $workflow );
+    $self->log->trace( 'Workflow info '  . Dumper $workflow ) if $self->log->is_trace;
 
     if (!$workflow || ( $workflow->{'proc_state'} !~ m{finished|manual} )) {
         if (my $err = $client->last_reply()->{ERROR}) {

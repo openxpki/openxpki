@@ -1529,7 +1529,7 @@ sub __render_creator_tooltip {
     # still no result
     $value->{tooltip} //= 'I18N_OPENXPKI_UI_WORKFLOW_CREATOR_UNABLE_TO_RESOLVE';
 
-    $self->log->trace(Dumper { cacheid => $cacheid, value => $value} );
+    $self->log->trace(Dumper { cacheid => $cacheid, value => $value} ) if $self->log->is_trace;
 
     $template_cache->set($cacheid => $value) if($cacheid);
     return $value;

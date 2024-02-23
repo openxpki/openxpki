@@ -70,7 +70,7 @@ sub __parse_message {
         $self->log->error("Unable to unwrap message ($EVAL_ERROR)");
         die  "Unable to unwrap message";
     }
-    $self->log->trace(Dumper $result);
+    $self->log->trace(Dumper $result) if $self->log->is_trace;
     return $result;
 }
 
