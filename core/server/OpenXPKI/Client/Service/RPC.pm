@@ -45,7 +45,7 @@ has error_messages => (
     required => 1,
 );
 
-has logger => (
+has log => (
     is => 'rw',
     isa => 'Object',
     lazy => 1,
@@ -66,7 +66,7 @@ sub _init_backend {
     my $conf = $self->config;
 
     return OpenXPKI::Client::Simple->new({
-        logger => $self->logger,
+        logger => $self->log,
         config => $conf->{global}, # realm and locale
         auth => $conf->{auth} || {}, # auth config
     });
@@ -243,7 +243,7 @@ sub openapi_spec {
         $client->disconnect();
     }
     catch ($err) {
-        $self->logger->error("Unable to query OpenAPI specification from OpenXPKI server: $err");
+        $self->log->error("Unable to query OpenAPI specification from OpenXPKI server: $err");
         return;
     }
 

@@ -67,10 +67,10 @@ sub __parse_message {
         });
     };
     if ($EVAL_ERROR) {
-        $self->logger->error("Unable to unwrap message ($EVAL_ERROR)");
+        $self->log->error("Unable to unwrap message ($EVAL_ERROR)");
         die  "Unable to unwrap message";
     }
-    $self->logger->trace(Dumper $result);
+    $self->log->trace(Dumper $result);
     return $result;
 }
 
@@ -82,7 +82,7 @@ sub custom_wf_params {
     # nothing special if we are NOT in PKIOperation mode
     return unless $self->operation eq 'PKIOperation';
 
-    $self->logger->debug("Adding extra parameters for message type '".$self->message_type."'");
+    $self->log->debug("Adding extra parameters for message type '".$self->message_type."'");
 
     if ($self->message_type eq 'PKCSReq') {
         # This triggers the build of attr which triggers the unwrap call
@@ -146,7 +146,7 @@ sub generate_pkcs7_response {
     );
 
     if ($response->is_pending()) {
-        $self->logger->info('Send pending response for ' . $self->transaction_id );
+        $self->log->info('Send pending response for ' . $self->transaction_id );
         return $self->backend()->run_command('scep_generate_pending_response', \%params);
     }
 
@@ -166,7 +166,7 @@ sub generate_pkcs7_response {
             $failInfo = 'badRequest';
         }
 
-        $self->logger->warn('Client error / malformed request ' . $failInfo);
+        $self->log->warn('Client error / malformed request ' . $failInfo);
         return $self->backend()->run_command('scep_generate_failure_response',
             { %params, failinfo => $failInfo });
     }

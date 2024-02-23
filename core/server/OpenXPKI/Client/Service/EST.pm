@@ -68,7 +68,6 @@ sub handle_revocation_request {
 
     my $self = shift;
 
-    my $log = $self->logger;
     my $param = $self->wf_params
         or return OpenXPKI::Client::Service::Response->new( 50010 );
 
@@ -77,7 +76,7 @@ sub handle_revocation_request {
 
     my $body = $self->request->body
         or do {
-            $log->debug( 'Incoming revocation request with empty body' );
+            $self->log->debug( 'Incoming revocation request with empty body' );
             return OpenXPKI::Client::Service::Response->new( 40003 );
         };
 
@@ -89,8 +88,8 @@ sub handle_revocation_request {
     }
 
     my $workflow_type = $self->config->{simplerevoke}->{workflow} || 'certificate_revoke';
-    $log->debug( 'Start workflow type ' . $workflow_type );
-    $log->trace( 'Workflow Paramters '  . Dumper $param ) if $self->logger->is_trace;
+    $self->log->debug( 'Start workflow type ' . $workflow_type );
+    $self->log->trace( 'Workflow Paramters '  . Dumper $param ) if $self->log->is_trace;
 
     my $response = $self->run_workflow($workflow_type, $param);
 

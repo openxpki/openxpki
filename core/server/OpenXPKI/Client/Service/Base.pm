@@ -68,7 +68,7 @@ has config => (
     default => sub { $_[0]->config_obj->endpoint_config($_[0]->endpoint) },
 );
 
-has logger => (
+has log => (
     is => 'rw',
     isa => 'Object',
     lazy => 1,
@@ -119,7 +119,7 @@ sub _init_backend {
     my $self = shift;
 
     return OpenXPKI::Client::Simple->new({
-        logger => $self->logger(),
+        logger => $self->log(),
         config => $self->config->{global}, # realm and locale
         auth => $self->config->{auth} || {}, # auth config
     });
@@ -153,7 +153,7 @@ sub _build_wf_params {
         my %envkeys;
         if ($conf->{$operation}->{env}) {
             %envkeys = map {$_ => 1} (split /\s*,\s*/, $conf->{$operation}->{env});
-            $self->logger->trace("Found env keys: " . $conf->{$operation}->{env});
+            $self->log->trace("Found env keys: " . $conf->{$operation}->{env});
         }
 
         $p->{'client_ip'} = $self->remote_address if $envkeys{'client_ip'};
@@ -174,11 +174,11 @@ sub _build_wf_params {
         # Gather data from TLS session
         if ( $self->request->is_secure ) {
 
-            $self->logger->debug("calling context is https");
+            $self->log->debug("calling context is https");
             my $auth_dn = $self->apache_env->{SSL_CLIENT_S_DN};
             my $auth_pem = $self->apache_env->{SSL_CLIENT_CERT};
             if ( defined $auth_dn ) {
-                $self->logger->info("authenticated client DN: $auth_dn");
+                $self->log->info("authenticated client DN: $auth_dn");
                 if ($envkeys{'signer_dn'}) {
                     $p->{'signer_dn'} = $auth_dn;
                 }
@@ -186,7 +186,7 @@ sub _build_wf_params {
                     $p->{'signer_cert'} = $auth_pem;
                 }
             } else {
-                $self->logger->debug("unauthenticated (no cert)");
+                $self->log->debug("unauthenticated (no cert)");
             }
         }
 
@@ -204,7 +204,7 @@ sub _build_wf_params {
         }
     }
 
-    $self->logger->trace(sprintf("Extra params for operation '%s': %s", $self->operation, Dumper $p)) if $self->logger->is_trace;
+    $self->log->trace(sprintf("Extra params for operation '%s': %s", $self->operation, Dumper $p)) if $self->log->is_trace;
 
     return $p;
 }
@@ -221,15 +221,15 @@ sub set_pkcs10_and_tid {
     # Usually PEM encoded but without borders as POSTDATA
     my $pkcs10_in = shift
         or do {
-            $self->logger->debug( 'Incoming enrollment with empty body' );
+            $self->log->debug( 'Incoming enrollment with empty body' );
             die OpenXPKI::Client::Service::Response->new( 40003 );
         };
 
     Crypt::PKCS10->setAPIversion(1);
     my $decoded = Crypt::PKCS10->new($pkcs10_in, ignoreNonBase64 => 1, verifySignature => 1);
     if (!$decoded) {
-        $self->logger->error('Unable to parse PKCS10: '. Crypt::PKCS10->error);
-        $self->logger->debug($pkcs10_in);
+        $self->log->error('Unable to parse PKCS10: '. Crypt::PKCS10->error);
+        $self->log->debug($pkcs10_in);
         die OpenXPKI::Client::Service::Response->new( 40002 );
     }
 
@@ -299,8 +299,6 @@ sub handle_enrollment_request {
 
     my $self = shift;
 
-    my $log = $self->logger;
-
     $self->is_enrollment(1);
 
     # Build configuration parameters, can be overloaded by protocols,
@@ -313,7 +311,7 @@ sub handle_enrollment_request {
         or return OpenXPKI::Client::Service::Response->new( 50001 );
 
     my ($pickup_config, $pickup_value) = $self->build_pickup_config( $param );
-    $log->trace(Dumper $pickup_config) if $log->is_trace;
+    $self->log->trace(Dumper $pickup_config) if $self->log->is_trace;
 
     my $workflow;
 
@@ -323,13 +321,13 @@ sub handle_enrollment_request {
 
         # it was a pickup, it was not successful, we do not have a PKCS10
         if ($pickup_value and not $workflow and not $param->{pkcs10}) {
-            $log->debug("Pickup failed and no PKCS10 given");
+            $self->log->debug("Pickup failed and no PKCS10 given");
             return OpenXPKI::Client::Service::Response->new( 40005 );
         }
 
         # pickup return undef if no workflow was found - start new one
         if (not $workflow) {
-            $log->debug(sprintf("Initialize %s with params %s",
+            $self->log->debug(sprintf("Initialize %s with params %s",
                 $pickup_config->{workflow}, join(", ", keys %{$param})));
 
             $workflow = $client->handle_workflow({
@@ -338,10 +336,10 @@ sub handle_enrollment_request {
             });
         }
 
-        $log->trace( 'Workflow info '  . Dumper $workflow ) if $log->is_trace;
+        $self->log->trace( 'Workflow info '  . Dumper $workflow ) if $self->log->is_trace;
     }
     catch ($error) {
-        $log->error( $error );
+        $self->log->error( $error );
         return OpenXPKI::Client::Service::Response->new( 50003 );
     }
 
@@ -349,11 +347,11 @@ sub handle_enrollment_request {
         my $reply = $client->last_reply() || {};
         if (my $err = $reply->{ERROR}) {
             if ($err->{CLASS} eq 'OpenXPKI::Exception::InputValidator') {
-                $log->info( 'Input validation failed' );
+                $self->log->info( 'Input validation failed' );
                 return OpenXPKI::Client::Service::Response->new( 40004 );
             }
         }
-        $log->error( 'Internal server error');
+        $self->log->error( 'Internal server error');
         return OpenXPKI::Client::Service::Response->new( 50003 );
     }
 
@@ -364,14 +362,14 @@ sub handle_enrollment_request {
             $retry_after = ($delay > 30) ? $delay : 30;
         }
 
-        $log->info('Request Pending - ' . $workflow->{'state'});
+        $self->log->info('Request Pending - ' . $workflow->{'state'});
         return OpenXPKI::Client::Service::Response->new(
             retry_after => $retry_after,
             workflow => $workflow,
         );
     }
 
-    $log->trace(Dumper $workflow->{context}) if $log->is_trace;
+    $self->log->trace(Dumper $workflow->{context}) if $self->log->is_trace;
 
     my $cert_identifier = $workflow->{context}->{cert_identifier};
 
@@ -383,7 +381,7 @@ sub handle_enrollment_request {
         );
     }
 
-    $log->debug( 'Sending output for ' . $cert_identifier);
+    $self->log->debug( 'Sending output for ' . $cert_identifier);
 
     return $self->prepare_enrollment_result($workflow);
 
@@ -394,7 +392,6 @@ sub handle_property_request {
     my $self = shift;
 
     my $operation = $self->operation;
-    my $log = $self->logger;
 
     my $param = $self->wf_params
         or return OpenXPKI::Client::Service::Response->new( 50010 );
@@ -402,8 +399,8 @@ sub handle_property_request {
     # TODO - we need to consolidate the workflows for the different protocols
     my $workflow_type = $self->config->{$operation}->{workflow} ||
         $self->service_name.'_'.lc($operation);
-    $log->debug( 'Start workflow type ' . $workflow_type );
-    $log->trace( 'Workflow Paramters '  . Dumper $param );
+    $self->log->debug( 'Start workflow type ' . $workflow_type );
+    $self->log->trace( 'Workflow Paramters '  . Dumper $param );
 
     my $response = $self->run_workflow($workflow_type, $param);
 
@@ -426,17 +423,16 @@ sub run_workflow {
         params => $param
     });
 
-    my $log = $self->logger();
-    $log->trace( 'Workflow info '  . Dumper $workflow );
+    $self->log->trace( 'Workflow info '  . Dumper $workflow );
 
     if (!$workflow || ( $workflow->{'proc_state'} !~ m{finished|manual} )) {
         if (my $err = $client->last_reply()->{ERROR}) {
             if ($err->{CLASS} eq 'OpenXPKI::Exception::InputValidator') {
-                $log->info( 'Input validation failed' );
+                $self->log->info( 'Input validation failed' );
                 return OpenXPKI::Client::Service::Response->new( 40004 );
             }
         }
-        $log->error( $EVAL_ERROR ? $EVAL_ERROR : 'Internal Server Error' );
+        $self->log->error( $EVAL_ERROR ? $EVAL_ERROR : 'Internal Server Error' );
         return OpenXPKI::Client::Service::Response->new( 50003 );
     }
 
