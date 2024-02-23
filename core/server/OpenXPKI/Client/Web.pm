@@ -8,6 +8,7 @@ use Type::Params qw( signature_for );
 
 # Project modules
 use OpenXPKI::Client;
+use OpenXPKI::Client::Config;
 
 # Feature::Compat::Try should be done last to safely disable warnings
 use Feature::Compat::Try;
