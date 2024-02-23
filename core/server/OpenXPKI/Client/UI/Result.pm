@@ -1146,7 +1146,7 @@ sub fetch_autocomplete_params {
     # add whitelisted user input parameters
     $params{$_} = $self->param($_) for @{ $data->{param_whitelist} };
 
-    $self->log->debug("Autocomplete params: " . Dumper \%params) if $self->log->is_debug;
+    $self->log->trace("Autocomplete params: " . Dumper \%params) if $self->log->is_trace;
     return \%params;
 }
 

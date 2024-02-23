@@ -168,7 +168,7 @@ sub set {
         die "Wrong value type: expected scalar or HASH ref, got: " . ref $valmap;
     }
 
-    $self->log->debug("Namespace key = '$parsed_key', value = " . Dumper $dpval) if $self->log->is_debug;
+    $self->log->trace("Namespace key = '$parsed_key', value = " . Dumper $dpval) if $self->log->is_trace;
 
     CTX('api2')->set_data_pool_entry(
         'namespace' => $self->LOCATION(),
