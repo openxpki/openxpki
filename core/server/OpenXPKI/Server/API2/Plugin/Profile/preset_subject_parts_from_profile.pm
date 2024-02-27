@@ -54,7 +54,7 @@ is not given the first component is used. E.g. to set a field to the
 commonName of a used CSR write I<CN> or I<CN.0>. To use the second
 occurence of "organizational unit" write I<OU.1>.
 
-The list of supported RDNs is I<C|ST|O|OU|CN|DC|L|UID|SN|GN>.
+The list of supported RDNs is I<C|ST|O|OU|CN|DC|L|UID|SN|GN|serialNumber>.
 
 =item additional data word.key
 
@@ -120,7 +120,7 @@ command "preset_subject_parts_from_profile" => {
             }
 
         # Fast path, copy from DN
-        } elsif ($preset =~ m{ \A \s* (C|ST|O|OU|CN|DC|L|UID|SN|GN)(\.(\d+))? \s* \z }xs) {
+        } elsif ($preset =~ m{ \A \s* (C|ST|O|OU|CN|DC|L|UID|SN|GN|serialNumber)(\.(\d+))? \s* \z }xs) {
             my $comp = $1;
             my $pos = $3 || 0;
             my $val = $params->preset->{$comp}->[$pos];

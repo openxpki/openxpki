@@ -1343,6 +1343,14 @@ msgstr "Enter the fully qualified hostname (domain name) of your system."
 msgid "I18N_OPENXPKI_UI_PROFILE_IMPORTED_LABEL"
 msgstr "Imported Certificate"
 
+msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_STYLE_DESC"
+msgstr ""
+"This style uses serialNumber instead of commonName to be used for e.g. IoT "
+"devices"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_STYLE_LABEL"
+msgstr "IoT Device"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_LOCALITY_DESC"
 msgstr "Locality (L)"
 
@@ -1445,6 +1453,9 @@ msgstr "URI"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_URI_DESCRIPTION"
 msgstr "URI"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_SERIALNUMBER"
+msgstr "Serial Number"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_STATE_DESC"
 msgstr "State or Province (ST)"

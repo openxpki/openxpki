@@ -1349,6 +1349,14 @@ msgstr "Geben Sie bitte den FQDN (Hostname) des Systems an."
 msgid "I18N_OPENXPKI_UI_PROFILE_IMPORTED_LABEL"
 msgstr "Importiertes Zertifikat"
 
+msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_STYLE_DESC"
+msgstr ""
+"Dieser Stil verwendet das Attribut serialNumber anstatt des commonName und "
+"kann z.B. für IoT Geräte verwendet werden."
+
+msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_STYLE_LABEL"
+msgstr "IoT Geräte"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_LOCALITY_DESC"
 msgstr "Ort / Lokalität (L)"
 
@@ -1451,6 +1459,9 @@ msgstr "URI"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_URI_DESCRIPTION"
 msgstr "URI"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_SERIALNUMBER"
+msgstr "Seriennummer"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_STATE_DESC"
 msgstr "Region oder Bundesland (ST)"
