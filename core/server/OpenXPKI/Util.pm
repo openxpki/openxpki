@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use English;
+use MIME::Base64;
 
 =head1 NAME
 
@@ -122,6 +123,40 @@ sub filter_hash {
 
     my %filter_hash = map { exists $hash->{$_} ? ($_ => $hash->{$_}) : () } @keys;
     return \%filter_hash;
+}
+
+=head2 pem_to_list
+
+Expects a string with one or many PEM encoded items and splits them
+into clean PEM blocks in a list.
+
+B<Returns>
+
+A I<ArrayRef> containing the noramlized PEM blocks
+
+=cut
+
+sub pem_to_list {
+
+    my $class = shift if ($_[0] // '') eq __PACKAGE__; # support call via -> and ::
+
+    my $input = shift;
+
+    my @blocks = $input =~ m{(-----BEGIN\ ([^-]+)-----)\s*([\w\/\+\=\s]+)\s*(-----END\ \2-----)}gxms;
+    my @output;
+    do {
+        shift @blocks; # the BEGIN block
+        my $separator = shift @blocks; # the separator word without the BEGIN word
+        my $payload = MIME::Base64::decode_base64(shift @blocks) || die "Unable to decode PEM payload";
+        shift @blocks; # END block
+
+        my $pem = MIME::Base64::encode_base64($payload, '');
+        $pem =~ s{ (.{64}) }{$1\n}xmsg;
+        chomp $pem;
+        push @output, "-----BEGIN $separator-----\n$pem\n-----END $separator-----";
+    } while (@blocks);
+
+    return \@output;
 }
 
 1;

@@ -10,6 +10,7 @@ use MIME::Base64;
 use Digest::SHA;
 use Data::Dumper;
 use OpenXPKI::DN;
+use OpenXPKI::Util;
 use Crypt::PK::RSA;
 use Crypt::PK::ECC;
 
@@ -175,22 +176,7 @@ Multiple PEM blocks are concatenated with a single newline character.
 sub pem_tidy {
 
     my $self = shift;
-    my $input = shift;
-
-    my @blocks = $input =~ m{(-----BEGIN\ ([^-]+)-----)\s*([\w\/\+\=\s]+)\s*(-----END\ \2-----)}gxms;
-    my @output;
-    do {
-        shift @blocks; # the BEGIN block
-        my $separator = shift @blocks; # the separator word without the BEGIN word
-        my $payload = decode_base64(shift @blocks) || die "Unable to decode PEM payload";
-        shift @blocks; # END block
-
-        my $pem = encode_base64($payload, '');
-        $pem =~ s{ (.{64}) }{$1\n}xmsg;
-        chomp $pem;
-        push @output, "-----BEGIN $separator-----\n$pem\n-----END $separator-----";
-    } while (@blocks);
-
+    my @output = OpenXPKI::Util::pem_to_list(shift);
     return join("\n", @output);
 }
 
