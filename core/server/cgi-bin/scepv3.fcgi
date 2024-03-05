@@ -153,10 +153,15 @@ while (my $cgi = CGI::Fast->new()) {
         print $response->error_message()."\n";
         $log->debug($response->error_message()) if ($log->is_trace);
     } elsif ($mime eq 'text/plain') {
+        # we MUST NOT set a charset header here as older sscep versions
+        # check on a literal "text/plain" which breaks with a charset.
+        # As this branch applies only to GetCACaps which is 7bit ASCII
+        # no charset header should be required at all - also make sure
+        # to have "AddDefaultCharset off"
         print $cgi->header(
             -status => $response->http_status_line(),
             -type => 'text/plain',
-            'charset' => 'utf8',
+            'charset' => '',
             'content-length' => length $response->result,
             @extra_header
         );
