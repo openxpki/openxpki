@@ -184,8 +184,10 @@ OpenXPKI/Crypto/Backend/OpenSSL/Command/sign_digest.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/verify_cert.pm
 
 # Collection of reusable items as Moose::Role
+OpenXPKI/Role/ACME.pm
 OpenXPKI/Role/DNSValidation.pm
 OpenXPKI/Role/IssuerSerial.pm
+OpenXPKI/Role/Logger.pm
 OpenXPKI/Role/RevocationReasonCode.pm
 OpenXPKI/Role/SubjectOID.pm
 OpenXPKI/Role/SubjectAltNameMaps.pm
