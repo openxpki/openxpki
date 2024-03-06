@@ -107,6 +107,7 @@ sub __is_valid_message : PRIVATE {
             'NEW_SESSION',
             'DETACH_SESSION',
             'GET_ENDPOINT_CONFIG',
+            'GET_REALM_LIST',
         ],
         'SESSION_ID_SENT' => [
             'PING',
@@ -161,6 +162,7 @@ sub __is_valid_message : PRIVATE {
             'CONTINUE_SESSION',
             'DETACH_SESSION',
             'RESET_SESSIONID',
+            'GET_REALM_LIST',
         ],
     };
 
@@ -566,6 +568,14 @@ sub __handle_GET_ENDPOINT_CONFIG : PRIVATE {
     }
     ##! 128: $res
     return { PARAMS => $res };
+}
+
+
+sub __handle_GET_REALM_LIST : PRIVATE {
+    ##! 1: 'start'
+    my $self    = shift;
+    my $ident   = ident $self;
+    return { PARAMS => CTX('api2')->get_realm_list() };
 }
 
 
