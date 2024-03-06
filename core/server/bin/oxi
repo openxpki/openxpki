@@ -1,0 +1,168 @@
+#!/usr/bin/env perl
+
+use v5.32;
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper;
+use JSON::PP;
+use YAML;
+
+use OpenXPKI::Client::API;
+use OpenXPKI::Client::API::Request;
+
+use Log::Log4perl qw(:easy :no_extra_logdie_message);
+pod2usage( -verbose => 1 ) unless (@ARGV);
+
+my %opt;
+Getopt::Long::Configure('pass_through','bundling');
+GetOptions( \%opt, ('verbose|v+','json','json-pretty'));
+Getopt::Long::Configure('no_pass_through');
+
+if ($opt{verbose} > 2) {
+    Log::Log4perl->easy_init({ level => $TRACE, layout => '%m%n' });
+} elsif ($opt{verbose} > 1) {
+    Log::Log4perl->easy_init({ level => $DEBUG, layout => '%m%n' });
+} elsif ($opt{verbose} > 0) {
+    Log::Log4perl->easy_init({ level => $INFO, layout => '%m%n' });
+} else {
+    Log::Log4perl->easy_init({ level => $ERROR, layout => '%m%n' });
+}
+
+
+# TODO - use POD Formatter to get aligned layout
+my $api = OpenXPKI::Client::API->new(
+    log => Log::Log4perl->get_logger()
+);
+
+# Get list of commands
+my $command = shift;
+if ($command eq 'help') {
+
+    if (@ARGV) {
+        say $api->help(@ARGV);
+        exit 0;
+    }
+
+    say "openxpki COMMAND [SUBCOMMAND...] [OPTIONS] PARAMETER";
+    say "";
+    say "Avaiable commands:";
+    my $commands = $api->commands();
+    map {
+        printf "%12s: %s\n\n", $_, $commands->{$_};
+    } sort keys %{$commands};
+    exit 0;
+}
+
+my $subcommand = shift;
+# List subcommands for command
+if (!$subcommand) {
+    say "openxpki $command [SUBCOMMAND...] [OPTIONS] PARAMETER";
+    say "";
+    say "Avaiable subcommands for $command:";
+    my $commands = $api->routes($command);
+    map {
+        printf "%12s: %s\n\n", $_, $commands->{$_};
+    } sort keys %{$commands};
+    exit 0;
+}
+
+# we have command and subcommand so lets handle parameters and dispatch
+
+my @extra_args;
+my %params;
+# Some commands can consume extra positional args, we strip them now
+# afterwards the first argument of ARGV should be something parsed
+# by GetOptions which leaves the extra parameters after "--" on ARGV
+while (@ARGV && substr($ARGV[0],0,1) ne '-') {
+    push @extra_args, shift;
+}
+
+# Create GetOptsion spec from the parameters recorded in the command
+if (my @spec = @{$api->param_spec($command, $subcommand)}) {
+    my @getopts = map {
+        $_->getopt_type ?
+        ($_->name . (defined $_->hint ? ':' : '=') . $_->getopt_type) :
+        $_->name # boolean
+    } @spec;
+    DEBUG(Dumper \@getopts);
+    GetOptions( \%params, @getopts ) || exit 1;
+    DEBUG(Dumper \%params);
+}
+
+
+# assemble request object
+my $req = OpenXPKI::Client::API::Request->new(
+    params => \%params,
+    (@extra_args ? (args => \@extra_args) : ()),
+    (@ARGV ? (payload => \@ARGV) : ()),
+);
+
+TRACE(Dumper $req);
+# Dispatch request - returns O::C::API::Response
+my $res = $api->dispatch($command, $subcommand, $req);
+DEBUG(Dumper $res);
+
+my $json = JSON::PP->new();
+if ($res->state == 200) {
+
+    if ($opt{'json-pretty'}) {
+        print $json->pretty()->encode($res->payload);
+    } elsif ($opt{'json'}) {
+        print $json->encode($res->payload);
+    } else {
+        print YAML::Dump $res->payload;
+    }
+    exit 0;
+
+}
+
+if (ref $res->payload eq 'OpenXPKI::DTO::ValidationException') {
+    ERROR($res->payload->message);
+    exit 10;
+}
+
+DEBUG(Dumper $res);
+
+if (!ref $res->payload) {
+    ERROR($res->payload || 'Looks like we have an unknown problem');
+    exit 255;
+}
+
+ERROR(sprintf "Something went really wrong (%d, %s)", $res->state, ref $res->payload);
+exit 255;
+
+
+=head1 NAME
+
+oxi - tool for managing OpenXPKI instances and artefacts
+
+=head1 USAGE
+
+openxpki COMMAND [SUBCOMMAND...] [OPTIONS] PARAMETER
+
+Type C<help> to get the list of available commands.
+
+Type the name of any command to get available subcommands.
+
+Type C<help> C<<command>> C<[<subcommand>]> for detailed help
+on a command or subcommand.
+
+=head2 Global Options
+
+=over
+
+=item verbose|v
+
+raise loglevel to INFO, DEBUG (-vv) or TRACE (-vvv)
+
+=item json
+
+print output data as compact JSON structure
+
+=item json-pretty
+
+print output data as formated JSON structure
+
+=cut
+
+1;

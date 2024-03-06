@@ -41,6 +41,21 @@ OpenXPKI/Client.pm
 OpenXPKI/Client/Config.pm
 OpenXPKI/Client/Simple.pm
 
+# New CLI / API
+OpenXPKI/Client/API.pm
+OpenXPKI/Client/API/Command.pm
+OpenXPKI/Client/API/Command/acme.pm
+OpenXPKI/Client/API/Command/acme/create.pm
+OpenXPKI/Client/API/Command/acme/list.pm
+OpenXPKI/Client/API/Command/workflow.pm
+OpenXPKI/Client/API/Command/workflow/create.pm
+OpenXPKI/Client/API/Command/workflow/execute.pm
+OpenXPKI/Client/API/Command/workflow/list.pm
+OpenXPKI/Client/API/Command/workflow/show.pm
+OpenXPKI/Client/API/Request.pm
+OpenXPKI/Client/API/Response.pm
+
+
 # Wrappers for EST, RPC...
 OpenXPKI/Client/Service/Base.pm
 OpenXPKI/Client/Service/EST.pm
@@ -182,6 +197,15 @@ OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_sign.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_verify.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/sign_digest.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/verify_cert.pm
+
+
+# Reusable Data Objects for APIs
+OpenXPKI/DTO/Field.pm
+OpenXPKI/DTO/Field/Bool.pm
+OpenXPKI/DTO/Field/Int.pm
+OpenXPKI/DTO/Field/Realm.pm
+OpenXPKI/DTO/Field/String.pm
+OpenXPKI/DTO/ValidationException.pm
 
 # Collection of reusable items as Moose::Role
 OpenXPKI/Role/ACME.pm
@@ -598,6 +622,7 @@ OpenXPKI/Service/Default.pm
 CGI_Session_Driver/openxpki.pm
 
 # Control Scripts
+bin/oxi
 bin/openxpkiadm
 bin/openxpkictl
 bin/openxpkicli
