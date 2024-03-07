@@ -13,6 +13,7 @@ use JSON;
 
 # Project modules
 use OpenXPKI::Client::Simple;
+use OpenXPKI::Log4perl;
 
 # Feature::Compat::Try should be done last to safely disable warnings
 use Feature::Compat::Try;
@@ -50,7 +51,7 @@ has log => (
     isa => 'Object',
     lazy => 1,
     init_arg => undef,
-    default => sub { $_[0]->config_obj->logger },
+    default => sub { OpenXPKI::Log4perl->get_logger('client.rpc') },
 );
 
 has backend => (

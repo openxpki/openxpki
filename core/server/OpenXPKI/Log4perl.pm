@@ -7,6 +7,9 @@ use List::Util qw( none );
 use Log::Log4perl;
 use Log::Log4perl::Level;
 
+# Project modules
+use OpenXPKI::Log4perl::MojoLogger;
+
 =head1 NAME
 
 OpenXPKI::Log4perl - Tiny wrapper around L<Log::Log4perl>'s init methods to
@@ -135,6 +138,17 @@ sub _add_patternlayout_spec {
         # present the result
         return join("|", map { $_.'='.$mdc->{$_} } @keys_ordered);
     });
+}
+
+sub get_logger {
+    my ($class, @args) = @_;
+    # if someone called ::init instead of ->init, $class contains the first
+    # argument instead of the class name
+    unshift (@args, $class) if $class ne __PACKAGE__;
+
+    die "get_logger() is only implemented for client side use for now" unless caller(0) =~ /^OpenXPKI::Client/;
+
+    return OpenXPKI::Log4perl::MojoLogger->get_logger(@args);
 }
 
 1;

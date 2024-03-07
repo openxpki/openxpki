@@ -9,6 +9,7 @@ requires 'prepare_enrollment_result';
 requires 'op_handlers';
 
 # FIXME enable after phasing out fcgi scripts:
+#requires 'app';
 #requires 'tx';
 #requires 'stash';
 #requires 'log';
@@ -227,16 +228,13 @@ sub BUILD {}
 after 'BUILD' => sub {
     my $self = shift;
 
-    $self->config_obj->init_log4perl;
-
     my $log_category = 'client.' . $self->service_name;
     # We support two use cases:
-    # 1) new style: consuming class is instantiated by OpenXPKI::Client::Web (Mojolicious)
-    #    and owns a log() attribute via Mojolicious' DefaultHelpers (which we set to our
-    #    OpenXPKI::Log4perl::MojoLogger in production mode)
+    # 1) new style: consuming class is instantiated by OpenXPKI::Client::Web
+    #    (Mojolicious) and owns an $self->app->log attribute
     try {
-        # in development mode we use the standard Mojo::Log that does not have a "category"
-        $self->log->category($log_category) if $self->log->can('category');
+        $self->app->log(OpenXPKI::Log4perl->get_logger($log_category));
+        $self->stash('mojo.log' => undef); # reset DefaultHelper "log" (i.e. $self->log) which accesses mojo.log
     }
     # 2) legacy: parent class does not have a log() method/attribute, so we add one
     catch ($err) {
@@ -248,7 +246,7 @@ after 'BUILD' => sub {
             )
         );
         $self->meta->make_immutable(inline_constructor => ($self->isa('Mojolicious::Controller') ? 0 : 1));
-        $self->log(OpenXPKI::Log4perl::MojoLogger->new(category => $log_category));
+        $self->log(OpenXPKI::Log4perl->get_logger($log_category));
     }
 
     Log::Log4perl::MDC->put('endpoint', $self->endpoint);

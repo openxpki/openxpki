@@ -6,6 +6,10 @@ use feature 'state';
 extends 'Mojo::EventEmitter';
 
 use Log::Log4perl;
+use Mojo::Util qw( monkey_patch );
+use Mojo::Log;
+
+our $LOGGERS_BY_NAME = {};
 
 has category => (
     is => 'rw',
@@ -59,6 +63,42 @@ has max_history_size => (
 
         *{ __PACKAGE__ . "::$method" } = sub { shift->emit( message => $method => @_ ) };
     }
+}
+
+sub get_logger {
+    my ($class, $category) = @_;
+
+    # Have we created it previously?
+    return $LOGGERS_BY_NAME->{$category} if exists $LOGGERS_BY_NAME->{$category};
+
+    my $logger;
+
+    # Mojolicious "production" mode (or legacy use): use our Mojo::Log compatible logger
+    if (not exists $ENV{MOJO_MODE} or ($ENV{MOJO_MODE}//'') eq 'production') {
+        $logger = $class->new( category => $category );
+
+    # Mojolicious "development" mode: use a modified Mojolicious screen logger until we will have a
+    # unified Log4perl config for all services and a mechanism to output log messages of the root category ('')
+    } else {
+        state $patched = 0;
+        if (not $patched) {
+            # make Mojo::Log compatible to Log::Log4perl::Logger
+            monkey_patch 'Mojo::Log',
+              is_trace => sub { shift->is_level('trace') },
+              is_debug => sub { shift->is_level('debug') },
+              is_info =>  sub { shift->is_level('info') },
+              is_warn =>  sub { shift->is_level('warn') },
+              is_error => sub { shift->is_level('error') },
+              is_fatal => sub { shift->is_level('fatal') };
+            $patched = 1;
+        }
+        $logger = Mojo::Log->new;
+    }
+
+    # Save it in global structure
+    $LOGGERS_BY_NAME->{$category} = $logger;
+
+    return $logger;
 }
 
 sub BUILD {

@@ -228,21 +228,17 @@ sub BUILD {
 
     my $self = shift;
 
-    if ($self->service() !~ /\A[a-zA-Z0-9\-]+\z/) {
-        die "Invalid service name: " . $self->service();
-    }
+    die "Invalid service name: " . $self->service unless $self->service =~ /\A[a-zA-Z0-9\-]+\z/;
 
-    my $config = $self->default();
+    my $config = $self->default;
 
-    if ($config->{global}->{locale_directory}) {
-        set_locale_prefix($config->{global}->{locale_directory});
-    }
-    if ($config->{global}->{default_language}) {
-        $self->language($config->{global}->{default_language});
-    }
+    set_locale_prefix($config->{global}->{locale_directory}) if $config->{global}->{locale_directory};
+    $self->language($config->{global}->{default_language}) if $config->{global}->{default_language};
 
-    $self->logger()->debug(sprintf("Config for service '%s' loaded", $self->service));
-    $self->logger()->trace('Global config: ' . Dumper $config ) if $self->logger->is_trace;
+    $self->__init_log4perl;
+
+    $self->logger->debug(sprintf("Config for service '%s' loaded", $self->service));
+    $self->logger->trace('Global config: ' . Dumper $config ) if $self->logger->is_trace;
 
 }
 
@@ -427,33 +423,25 @@ sub __load_config {
 sub _build_logger {
     my $self = shift;
 
-    my $config = $self->default;
-    $self->init_log4perl;
-
-    return OpenXPKI::Log4perl::MojoLogger->new( category => $config->{global}->{log_facility} || '')
-      unless $config->{logger};
-
-    return OpenXPKI::Log4perl::MojoLogger->new( category => 'client.'.$self->service );
+    return OpenXPKI::Log4perl->get_logger(
+        $self->default->{logger}
+            ? 'client.'.$self->service
+            : ( $self->default->{global}->{log_facility} || '' )
+    );
 }
 
-sub init_log4perl {
+sub __init_log4perl {
     my $self = shift;
-
-    state $initialized = 0;
-    return if $initialized;
-    $initialized = 1;
-
-    my $config = $self->default;
 
     # if no logger section was found we use the log settings from global
     # if those are also missing this falls back to a SCREEN appender
-    return OpenXPKI::Log4perl->init_or_fallback( $config->{global}->{log_config} )
-      unless $config->{logger};
+    return OpenXPKI::Log4perl->init_or_fallback( $self->default->{global}->{log_config} )
+      unless $self->default->{logger};
 
     # logger section is merged with the default config from the class
     my $conf = {
         %{$self->logconf()},
-        %{$config->{logger}}
+        %{$self->default->{logger}}
     };
 
     # extract the loglevel from the config hash
