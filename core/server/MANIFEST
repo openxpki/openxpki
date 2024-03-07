@@ -18,6 +18,7 @@ OpenXPKI/Exception.pm
 OpenXPKI/FileUtils.pm
 OpenXPKI/i18n.pm
 OpenXPKI/Log4perl.pm
+OpenXPKI/Log4perl/MojoLogger.pm
 OpenXPKI/Metrics.pm
 OpenXPKI/MooseParams.pm
 OpenXPKI/Password.pm

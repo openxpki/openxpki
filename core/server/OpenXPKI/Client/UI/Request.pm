@@ -44,6 +44,12 @@ has session => (
     isa => 'CGI::Session',
 );
 
+has log => (
+    required => 1,
+    is => 'ro',
+    isa => 'Object', # Log::Log4perl::Logger or OpenXPKI::Log4perl::MojoLogger
+);
+
 # cache (and secure_cache) work as follows:
 # All CGI parameter keys are inserted as $key => undef. The undefined value
 # indicates that the parameter exists but was not yet queried / decoded.
@@ -67,13 +73,6 @@ has method => (
     is => 'rw',
     isa => 'Str',
     default => 'GET',
-);
-
-has log => (
-    is => 'ro',
-    isa => 'Log::Log4perl::Logger',
-    lazy => 1,
-    default => sub { return Log::Log4perl->get_logger; }
 );
 
 has id => (

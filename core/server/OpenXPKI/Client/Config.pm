@@ -1,6 +1,7 @@
 package OpenXPKI::Client::Config;
 use Moose;
 
+use feature 'state';
 use File::Spec;
 use Cache::LRU;
 use Config::Std;
@@ -8,6 +9,7 @@ use Data::Dumper;
 use Log::Log4perl::MDC;
 use OpenXPKI::Client;
 use OpenXPKI::Log4perl;
+use OpenXPKI::Log4perl::MojoLogger;
 use OpenXPKI::i18n qw( set_language set_locale_prefix);
 
 =head1 OpenXPKI::Client::Config
@@ -110,7 +112,7 @@ has 'logger' => (
     lazy => 1,
     is => 'rw',
     isa => 'Object',
-    builder => '__init_logger',
+    builder => '_build_logger',
 );
 
 =head3 logconf
@@ -422,16 +424,31 @@ sub __load_config {
     return \%config;
 }
 
-sub __init_logger {
+sub _build_logger {
     my $self = shift;
-    my $config = $self->default();
+
+    my $config = $self->default;
+    $self->init_log4perl;
+
+    return OpenXPKI::Log4perl::MojoLogger->new( category => $config->{global}->{log_facility} || '')
+      unless $config->{logger};
+
+    return OpenXPKI::Log4perl::MojoLogger->new( category => 'client.'.$self->service );
+}
+
+sub init_log4perl {
+    my $self = shift;
+
+    state $initialized = 0;
+    return if $initialized;
+    $initialized = 1;
+
+    my $config = $self->default;
 
     # if no logger section was found we use the log settings from global
     # if those are also missing this falls back to a SCREEN appender
-    if (!$config->{logger}) {
-        OpenXPKI::Log4perl->init_or_fallback( $config->{global}->{log_config} );
-        return Log::Log4perl->get_logger($config->{global}->{log_facility} || '');
-    }
+    return OpenXPKI::Log4perl->init_or_fallback( $config->{global}->{log_config} )
+      unless $config->{logger};
 
     # logger section is merged with the default config from the class
     my $conf = {
@@ -469,9 +486,7 @@ sub __init_logger {
         $log_config->{'log4perl.appender.Logfile.'.$_} = $conf->{$_};
     } keys %{$conf};
 
-    OpenXPKI::Log4perl->init_or_fallback( $log_config );
-    return Log::Log4perl->get_logger( $log_facility );
-
+    return OpenXPKI::Log4perl->init_or_fallback( $log_config );
 }
 
 __PACKAGE__->meta->make_immutable;

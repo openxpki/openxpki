@@ -75,6 +75,12 @@ has 'script_url' => (
     isa => 'Str',
 );
 
+has 'log' => (
+    required => 1,
+    is => 'ro',
+    isa => 'Object', # Log::Log4perl::Logger or OpenXPKI::Log4perl::MojoLogger
+);
+
 has 'login_page' => (
     is => 'ro',
     isa => 'Str',
@@ -111,14 +117,6 @@ has 'backend' => (
     lazy => 1,
     builder => '_init_backend',
     trigger => \&_init_backend,
-);
-
-# should be passed by the ui script to be shared, if not we create it
-has 'log' => (
-    is => 'ro',
-    isa => 'Log::Log4perl::Logger',
-    lazy => 1,
-    default => sub{ return Log::Log4perl->get_logger( ); },
 );
 
 # holds key object to sign socket communication

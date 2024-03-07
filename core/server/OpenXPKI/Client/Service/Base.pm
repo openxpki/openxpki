@@ -21,7 +21,6 @@ use Data::Dumper;
 use MIME::Base64;
 use Digest::SHA qw( sha1_hex );
 use List::Util qw( first );
-use mro;
 
 # CPAN modules
 use Crypt::PKCS10;
@@ -33,6 +32,7 @@ use Moose::Exporter;
 use OpenXPKI::Exception;
 use OpenXPKI::Client::Simple;
 use OpenXPKI::Client::Service::Response;
+use OpenXPKI::Log4perl::MojoLogger;
 
 # Feature::Compat::Try should be done last to safely disable warnings
 use Feature::Compat::Try;
@@ -86,20 +86,6 @@ has config => (
     builder => '_build_config',
 );
 sub _build_config ($self) { $self->config_obj->endpoint_config($self->endpoint) }
-
-has _log => (
-    is => 'rw',
-    isa => 'Object',
-    lazy => 1,
-    init_arg => undef,
-    builder => '_build_log',
-);
-sub _build_log ($self) { $self->config_obj->logger }
-
-# support two use cases of this role:
-# 1) new: log() method exists in parent class (because the consuming class extends Mojolicious::Controller)
-# 2) old: parent class does not have a log() method
-sub log ($self) { $self->next::can ? $self->next::method : $self->_log }
 
 has request => (
     is => 'ro',
@@ -240,6 +226,29 @@ sub _build_wf_params {
 sub BUILD {}
 after 'BUILD' => sub {
     my $self = shift;
+
+    $self->config_obj->init_log4perl;
+
+    my $log_category = 'client.' . $self->service_name;
+    # We support two use cases:
+    # 1) new style: consuming class is instantiated by OpenXPKI::Client::Web (Mojolicious)
+    #    and owns a log() method via Mojolicious' DefaultHelpers
+    try {
+        $self->log->category($log_category);
+    }
+    # 2) legacy: parent class does not have a log() method/attribute, so we add one
+    catch ($err) {
+        $self->meta->make_mutable;
+        $self->meta->add_attribute(
+            log => (
+                is => 'rw',
+                isa => 'OpenXPKI::Log4perl::MojoLogger',
+            )
+        );
+        $self->meta->make_immutable(inline_constructor => ($self->isa('Mojolicious::Controller') ? 0 : 1));
+        $self->log(OpenXPKI::Log4perl::MojoLogger->new(category => $log_category));
+    }
+
     Log::Log4perl::MDC->put('endpoint', $self->endpoint);
 };
 

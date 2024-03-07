@@ -2,13 +2,14 @@ package OpenXPKI::Client::Web;
 use Mojo::Base 'Mojolicious', -signatures;
 
 # CPAN modules
-use Mojo::Util qw( monkey_patch url_unescape );
+use Mojo::Util qw( url_unescape );
 use Mojo::Log;
 use Type::Params qw( signature_for );
 
 # Project modules
 use OpenXPKI::Client;
 use OpenXPKI::Client::Config;
+use OpenXPKI::Log4perl::MojoLogger;
 
 # Feature::Compat::Try should be done last to safely disable warnings
 use Feature::Compat::Try;
@@ -35,16 +36,7 @@ sub declare_routes ($self, $r) {
 
 sub startup ($self) {
 
-    # make Mojo::Log compatible to Log::Log4perl::Logger
-    monkey_patch 'Mojo::Log',
-      is_trace => sub { shift->is_level('trace') },
-      is_debug => sub { shift->is_level('debug') },
-      is_info =>  sub { shift->is_level('info') },
-      is_warn =>  sub { shift->is_level('warn') },
-      is_error => sub { shift->is_level('error') },
-      is_fatal => sub { shift->is_level('fatal') };
-
-    $self->log(Mojo::Log->new);
+    $self->log(OpenXPKI::Log4perl::MojoLogger->new(category => ''));
 
     #$self->secrets(['Mojolicious rocks']);
 
