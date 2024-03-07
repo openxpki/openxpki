@@ -232,9 +232,11 @@ after 'BUILD' => sub {
     my $log_category = 'client.' . $self->service_name;
     # We support two use cases:
     # 1) new style: consuming class is instantiated by OpenXPKI::Client::Web (Mojolicious)
-    #    and owns a log() method via Mojolicious' DefaultHelpers
+    #    and owns a log() attribute via Mojolicious' DefaultHelpers (which we set to our
+    #    OpenXPKI::Log4perl::MojoLogger in production mode)
     try {
-        $self->log->category($log_category);
+        # in development mode we use the standard Mojo::Log that does not have a "category"
+        $self->log->category($log_category) if $self->log->can('category');
     }
     # 2) legacy: parent class does not have a log() method/attribute, so we add one
     catch ($err) {

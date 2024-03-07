@@ -2,7 +2,7 @@ package OpenXPKI::Client::Web;
 use Mojo::Base 'Mojolicious', -signatures;
 
 # CPAN modules
-use Mojo::Util qw( url_unescape );
+use Mojo::Util qw( monkey_patch url_unescape );
 use Mojo::Log;
 use Type::Params qw( signature_for );
 
@@ -32,15 +32,42 @@ sub declare_routes ($self, $r) {
         action => 'index',
         endpoint => 'default',
     );
+
+    # SCEP urls look like
+    #   /scep/PKIOperation or with a label
+    #   /scep/server/PKIOperation
+    # <endpoint> is optional because a default (which evaluates to false) is given.
+    # <#operation> is a relaxed placeholder that allows to match the .exe suffix used by some SCEP clients.
+    $r->any('/scep/<endpoint>/<#operation>')->to('SCEP#index', endpoint => '');
 }
 
 sub startup ($self) {
 
-    $self->log(OpenXPKI::Log4perl::MojoLogger->new(category => ''));
+
+    # DEVELOPMENT
+    if ('development' eq $self->mode) {
+        # In "development" mode we use the Mojolicious screen logger until we will have a
+        # unified service Log4perl config that will output log messages of the root category ('')
+
+        # make Mojo::Log compatible to Log::Log4perl::Logger
+        monkey_patch 'Mojo::Log',
+          is_trace => sub { shift->is_level('trace') },
+          is_debug => sub { shift->is_level('debug') },
+          is_info =>  sub { shift->is_level('info') },
+          is_warn =>  sub { shift->is_level('warn') },
+          is_error => sub { shift->is_level('error') },
+          is_fatal => sub { shift->is_level('fatal') };
+
+        $self->log(Mojo::Log->new);
+
+    # PRODUCTION
+    } else {
+        $self->log(OpenXPKI::Log4perl::MojoLogger->new(category => ''));
+
+        $self->exception_format('txt');
+    }
 
     #$self->secrets(['Mojolicious rocks']);
-
-    $self->exception_format('txt') unless $self->mode eq 'development';
 
     # Routes
     my $r = $self->routes;
@@ -112,6 +139,7 @@ sub helper_oxi_config ($self, $service) {
     unless ($configs->{$service}) {
         $self->log->debug("Load configuration for service '$service'");
         my $cfg = OpenXPKI::Client::Config->new($service);
+        $cfg->logger($self->app->log) if $self->app->mode eq 'development';
         $configs->{$service} = $cfg;
     }
 
