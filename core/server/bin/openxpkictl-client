@@ -15,7 +15,7 @@ my ($help, $development);
 
 getopt
     'h|help' => \$help,
-    'd|dev'  => \$development;
+    'd|dev|debug'  => \$development;
 
 die extract_usage if $help;
 
