@@ -46,7 +46,7 @@ if ($command eq 'help') {
         exit 0;
     }
 
-    say "openxpki COMMAND [SUBCOMMAND...] [OPTIONS] PARAMETER";
+    say "oxi COMMAND [SUBCOMMAND...] [OPTIONS] PARAMETER";
     say "";
     say "Avaiable commands:";
     my $commands = $api->commands();
@@ -59,9 +59,9 @@ if ($command eq 'help') {
 my $subcommand = shift;
 # List subcommands for command
 if (!$subcommand) {
-    say "openxpki $command [SUBCOMMAND...] [OPTIONS] PARAMETER";
+    say "oxi $command [SUBCOMMAND...] [OPTIONS] PARAMETER";
     say "";
-    say "Avaiable subcommands for $command:";
+    say "Available subcommands for $command:";
     my $commands = $api->routes($command);
     map {
         printf "%12s: %s\n\n", $_, $commands->{$_};
@@ -141,7 +141,7 @@ oxi - tool for managing OpenXPKI instances and artefacts
 
 =head1 USAGE
 
-openxpki COMMAND [SUBCOMMAND...] [OPTIONS] PARAMETER
+oxi COMMAND [SUBCOMMAND...] [OPTIONS] PARAMETER
 
 Type C<help> to get the list of available commands.
 
