@@ -218,6 +218,7 @@ WriteMakefile(
         'Module::Load'                  => '0.32',      # OpenXPKI::Server::Database
         'Mojolicious'                   => '9.31',      # 9.31 is included in Debian Bookworm
         'Moose'                         => '1',
+        'MooseX::ClassAttribute'        => 0,
         'MooseX::InsideOut'             => '0.106',     # OpenXPKI::Crypto::Secret::Split etc.
         'MooseX::NonMoose'              => 0,           # OpenXPKI::Server::Workflow::Validator::PasswordQuality
         'MooseX::Params::Validate'      => '0.21',      # OpenXPKI::Server::Database
@@ -262,6 +263,7 @@ WriteMakefile(
         'bin/openxpkicmd',
         'bin/openxpkiadm',
         'bin/openxpkicli',
+        'bin/oxi',
     ],
     %flags,
 );
