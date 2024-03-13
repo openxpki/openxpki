@@ -1,11 +1,16 @@
 package OpenXPKI::Client::API::Command;
-
 use Moose;
 use feature 'state';
+
+# Core modules
+use Scalar::Util qw( blessed );
 use Data::Dumper;
+
+# CPAN modules
 use Feature::Compat::Try;
 use Log::Log4perl qw(:easy);
 
+# Project modules
 use OpenXPKI::Client;
 use OpenXPKI::Client::Simple;
 use OpenXPKI::DTO::ValidationException;
@@ -89,7 +94,7 @@ sub _preprocess {
     } catch ($error) {
         # type constraint validation
         DEBUG(Dumper $input_last);
-        if (ref $error =~ m{\AMoose::Exception::ValidationFailed}) {
+        if (blessed $error and $error->isa('Moose::Exception::ValidationFailed')) {
             return OpenXPKI::DTO::ValidationException->new( field => $input_last, reason => 'type' );
         }
         # something else went wrong

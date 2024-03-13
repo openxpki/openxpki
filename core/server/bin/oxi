@@ -6,6 +6,7 @@ use Pod::Usage;
 use Data::Dumper;
 use JSON::PP;
 use YAML;
+use Scalar::Util qw( blessed );
 
 use OpenXPKI::Client::API;
 use OpenXPKI::Client::API::Request;
@@ -116,7 +117,7 @@ if ($res->state == 200) {
 
 }
 
-if (ref $res->payload eq 'OpenXPKI::DTO::ValidationException') {
+if (blessed $res->payload and $res->payload->isa('OpenXPKI::DTO::ValidationException')) {
     ERROR($res->payload->message);
     exit 10;
 }
