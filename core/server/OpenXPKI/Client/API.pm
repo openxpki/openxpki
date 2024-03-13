@@ -243,7 +243,7 @@ details.
 sub dispatch {
 
     my $self = shift;
-    my $command_ref = $self->load_class(shift, shift)->new( log => $self->log() );
+    my $command_ref = $self->load_class(shift, shift)->new();
 
     my $request = shift;
     # Returns a validation error object in case something went wrong

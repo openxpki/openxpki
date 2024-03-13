@@ -39,13 +39,14 @@ class_has 'param_spec' => (
         OpenXPKI::DTO::Field::String->new( name => 'directory', label => 'Directory Url', required => 1 ),
         OpenXPKI::DTO::Field::String->new( name => 'contact', label => 'Contact (email address)', required => 1 ),
         OpenXPKI::DTO::Field::String->new( name => 'label', label => 'Account Label' ),
-        OpenXPKI::DTO::Field::String->new( name => 'keyspec', label => 'RSA bits (rsaXXXX) or curve name', value => 'secp384r1', 'hint' => '' ),
+        OpenXPKI::DTO::Field::String->new( name => 'keyspec', label => 'RSA bits (rsaXXXX) or curve name',
+            value => 'secp384r1', 'hint' => 'hint_keyspec' ),
         OpenXPKI::DTO::Field::String->new( name => 'eab-kid', label => 'Ext. Account ID' ),
         OpenXPKI::DTO::Field::String->new( name => 'eab-mac', label => 'Ext. Account MAC Key' ),
     ]},
 );
 
-sub hint_type {
+sub hint_keyspec {
 
     my $self = shift;
     my $req = shift;

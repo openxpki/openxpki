@@ -32,8 +32,8 @@ class_has 'param_spec' => (
     default => sub {[
         OpenXPKI::DTO::Field::Realm->new(),
         OpenXPKI::DTO::Field::String->new( name => 'state', label => 'Workflow State' ),
-        OpenXPKI::DTO::Field::String->new( name => 'proc_state', label => 'Workflow Proc State', hint => '' ),
-        OpenXPKI::DTO::Field::String->new( name => 'type', label => 'Workflow Type', hint => '' ),
+        OpenXPKI::DTO::Field::String->new( name => 'proc_state', label => 'Workflow Proc State', hint => 'hint_proc_state' ),
+        OpenXPKI::DTO::Field::String->new( name => 'type', label => 'Workflow Type', hint => 'hint_type' ),
         OpenXPKI::DTO::Field::Int->new( name => 'limit', label => 'Result Count', value => 25 ),
     ]},
 );

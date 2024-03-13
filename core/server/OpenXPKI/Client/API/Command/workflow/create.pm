@@ -29,7 +29,7 @@ class_has 'param_spec' => (
     isa => 'ArrayRef[OpenXPKI::DTO::Field]',
     default => sub {[
         OpenXPKI::DTO::Field::Realm->new( required => 1 ),
-        OpenXPKI::DTO::Field::String->new( name => 'type', label => 'Workflow Type', hint => '', required => 1 ),
+        OpenXPKI::DTO::Field::String->new( name => 'type', label => 'Workflow Type', hint => 'hint_type', required => 1 ),
 
     ]},
 );

@@ -31,7 +31,7 @@ class_has 'param_spec' => (
     default => sub {[
         OpenXPKI::DTO::Field::Realm->new( required => 1 ),
         OpenXPKI::DTO::Field::Int->new( name => 'id', label => 'Workflow Id', required => 1 ),
-        OpenXPKI::DTO::Field::String->new( name => 'action', label => 'Action', hint => '', required => 1 ),
+        OpenXPKI::DTO::Field::String->new( name => 'action', label => 'Action', hint => 'hint_action', required => 1 ),
     ]},
 );
 

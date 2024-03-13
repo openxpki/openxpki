@@ -1,5 +1,8 @@
 package OpenXPKI::Client::API::Command;
+
 use Moose;
+with 'OpenXPKI::Role::Logger';
+
 use feature 'state';
 
 # Core modules
@@ -22,23 +25,6 @@ OpenXPKI::Client::API::Command
 =head1 SYNOPSIS
 
 Base class for all implementations handled by C<OpenXPKI::Client::API>.
-
-=cut
-
-=head1 Attributes
-
-=head2 log
-
-A Log4perl logger instance to use as log target.
-
-=cut
-
-has log => (
-    is => 'ro',
-    isa => 'Log::Log4perl::Logger',
-    default => sub { return Log::Log4perl->get_logger(); },
-    lazy => 1,
-);
 
 =head1 Methods
 
@@ -65,15 +51,14 @@ sub _preprocess {
         foreach my $input (@$spec) {
             $input_last = $input;
             my $name = $input->name;
-            DEBUG('Run input validation for ' . $name);
+            $self->log->debug('Run input validation for ' . $name);
             # Read the expected key name and try to get the parameter from req
             my $val = $req->param( $name );
             # throws an exception if the value mismatches the type contraint
             if (defined $val) {
                 # Empty input + hint flag = load choices
-                if ($val eq '' && defined (my $hint = $input->hint())) {
-                    my $choices_call = $hint || 'hint_'.$name;
-                    DEBUG("Call $choices_call to get choices for $name");
+                if ($val eq '' && (my $choices_call = $input->hint())) {
+                    $self->log->debug("Call $choices_call to get choices for $name");
                     my $choices = $self->$choices_call($req, $input);
                     TRACE(Dumper $choices);
                     return OpenXPKI::DTO::ValidationException->new( field => $input, reason => 'choice', choices => $choices )
@@ -89,7 +74,7 @@ sub _preprocess {
         }
     } catch ($error) {
         # type constraint validation
-        DEBUG(Dumper $input_last);
+        $self->log->debug(Dumper $input_last);
         if (blessed $error and $error->isa('Moose::Exception::ValidationFailed')) {
             return OpenXPKI::DTO::ValidationException->new( field => $input_last, reason => 'type' );
         }
@@ -143,7 +128,7 @@ sub client {
 
     return $client if ($client && $client->client->is_connected() && $client->realm eq $realm);
 
-    DEBUG("Bootstrap client for realm $realm");
+    $self->log->debug("Bootstrap client for realm $realm");
     $client = OpenXPKI::Client::Simple->new({
         config => { realm => $realm, socket => '/var/openxpki/openxpki.socket' },
         auth => { stack => '_System' },
