@@ -19,15 +19,17 @@ Getopt::Long::Configure('pass_through','bundling');
 GetOptions( \%opt, ('verbose|v+','json','json-pretty'));
 Getopt::Long::Configure('no_pass_through');
 
+my $l4p_level;
 if ($opt{verbose} > 2) {
-    Log::Log4perl->easy_init({ level => $TRACE, layout => '%m%n' });
-} elsif ($opt{verbose} > 1) {
-    Log::Log4perl->easy_init({ level => $DEBUG, layout => '%m%n' });
-} elsif ($opt{verbose} > 0) {
-    Log::Log4perl->easy_init({ level => $INFO, layout => '%m%n' });
+    $l4p_level = $TRACE;
+} elsif ($opt{verbose} == 2) {
+    $l4p_level = $DEBUG;
+} elsif ($opt{verbose} == 1) {
+    $l4p_level = $INFO;
 } else {
-    Log::Log4perl->easy_init({ level => $ERROR, layout => '%m%n' });
+    $l4p_level = $ERROR;
 }
+Log::Log4perl->easy_init({ level => $l4p_level, layout => '%m%n' });
 
 
 # TODO - use POD Formatter to get aligned layout
