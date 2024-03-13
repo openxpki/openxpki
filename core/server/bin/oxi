@@ -83,9 +83,9 @@ while (@ARGV && substr($ARGV[0],0,1) ne '-') {
 # Create GetOptsion spec from the parameters recorded in the command
 if (my @spec = @{$api->param_spec($command, $subcommand)}) {
     my @getopts = map {
-        $_->getopt_type ?
-        ($_->name . (defined $_->hint ? ':' : '=') . $_->getopt_type) :
-        $_->name # boolean
+        $_->getopt_type
+            ? ($_->name . (defined $_->hint ? ':' : '=') . $_->getopt_type)
+            : $_->name # boolean
     } @spec;
     DEBUG(Dumper \@getopts);
     GetOptions( \%params, @getopts ) || exit 1;
