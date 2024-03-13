@@ -64,7 +64,7 @@ sub _preprocess {
     try {
         foreach my $input (@$spec) {
             $input_last = $input;
-            my $name = $input->{name};
+            my $name = $input->name;
             DEBUG('Run input validation for ' . $name);
             # Read the expected key name and try to get the parameter from req
             my $val = $req->param( $name );
