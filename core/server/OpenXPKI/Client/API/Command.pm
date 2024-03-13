@@ -15,10 +15,6 @@ use OpenXPKI::Client;
 use OpenXPKI::Client::Simple;
 use OpenXPKI::DTO::ValidationException;
 
-package OpenXPKI::Client::API::Command;
-
-use Moose;
-
 =head1 NAME
 
 OpenXPKI::Client::API::Command
