@@ -47,6 +47,7 @@ OpenXPKI/Client/API/Command.pm
 OpenXPKI/Client/API/Command/acme.pm
 OpenXPKI/Client/API/Command/acme/create.pm
 OpenXPKI/Client/API/Command/acme/list.pm
+OpenXPKI/Client/API/Command/acme/show.pm
 OpenXPKI/Client/API/Command/workflow.pm
 OpenXPKI/Client/API/Command/workflow/create.pm
 OpenXPKI/Client/API/Command/workflow/execute.pm
