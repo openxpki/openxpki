@@ -117,7 +117,7 @@ case "$1" in
 
         # Create the sudo file to restart oxi from pkiadm
         if [ ! -e /etc/sudoers.d/pkiadm ] && [ -d /etc/sudoers.d ]; then
-            echo "pkiadm ALL=(ALL) NOPASSWD:service openxpkid" > /etc/sudoers.d/pkiadm
+            echo "pkiadm ALL=(ALL) NOPASSWD:/usr/sbin/service openxpkid" > /etc/sudoers.d/pkiadm
         fi;
 
         if [ -e "/var/openxpki/openxpki.socket" ]; then
