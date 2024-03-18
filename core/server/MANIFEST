@@ -335,6 +335,7 @@ OpenXPKI/Server/API2/Plugin/UI/get_menu.pm
 OpenXPKI/Server/API2/Plugin/UI/get_motd.pm
 OpenXPKI/Server/API2/Plugin/UI/get_ui_system_status.pm
 OpenXPKI/Server/API2/Plugin/UI/get_user_role_realm.pm
+OpenXPKI/Server/API2/Plugin/UI/get_realm_list.pm
 OpenXPKI/Server/API2/Plugin/UI/get_report.pm
 OpenXPKI/Server/API2/Plugin/UI/get_report_list.pm
 OpenXPKI/Server/API2/Plugin/UI/get_session_info.pm
