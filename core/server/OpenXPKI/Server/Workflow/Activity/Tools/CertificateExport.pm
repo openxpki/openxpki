@@ -210,6 +210,8 @@ Only used in plain export mode (no template and no key export), defines
 the format of the certificate to be written into the target_key. The
 default is to export the PEM encoded certificate.
 
+For export modes with key see C<get_private_key_for_cert>.
+
 =over
 
 =item PEM

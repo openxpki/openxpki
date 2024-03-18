@@ -1,5 +1,3 @@
-## OpenXPKI::Workflow::Config
-##
 package OpenXPKI::Workflow::Context;
 
 use strict;

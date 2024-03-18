@@ -37,6 +37,8 @@ has 'logger' => (
 );
 
 sub _build_workflow_config {
+
+    ##! 1: 'start config'
     my $self = shift;
 
     my $conn = $self->_config();
