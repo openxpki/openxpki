@@ -226,6 +226,49 @@ sub render_system_status {
         }
     });
 
+
+    # List of connected worker nodes
+    my $nodes = $self->send_command_v2( 'list_data_pool_entries', {
+        pki_realm => '_global',
+        namespace => 'sys.cluster.nodes',
+        values => 1
+    });
+
+    $self->logger()->trace("result: " . Dumper $nodes ) if $self->logger->is_trace;
+
+    my @nodes;
+#    my $ser = OpenXPKI::Serialization::Simple->new();
+    foreach my $line (@{$nodes}) {
+        my $className = '';
+        my $node = $self->serializer->deserialize($line->{value});
+        push @nodes, [
+            $node->{node},
+            substr($node->{config},0,8),
+            $node->{version},
+            $node->{uptime} + 0,
+            $node->{last_update} + 0,
+            $className
+        ];
+    }
+
+    $self->main->add_section({
+        type => 'grid',
+        className => 'nodes',
+        content => {
+            label => 'I18N_OPENXPKI_UI_NODE_STATUS_LIST',
+            columns => [
+                { sTitle => 'I18N_OPENXPKI_UI_HOSTNAME_STATUS_LABEL' },
+                { sTitle => 'I18N_OPENXPKI_UI_CONFIG_STATUS_LABEL' },
+                { sTitle => 'I18N_OPENXPKI_UI_SYSTEM_VERSION_STATUS_LABEL' },
+                { sTitle => 'I18N_OPENXPKI_UI_UPTIME_LABEL', format => 'timestamp' },
+                { sTitle => 'I18N_OPENXPKI_UI_LAST_UPDATE_LABEL', format => 'timestamp'},
+                { sTitle => '_className'},
+            ],
+            data => \@nodes,
+        }
+    }) if (@nodes);
+
+
     # we fetch the list of tokens to display from the context
     # this allows a user to configure this
     my @token = split /\s*,\s*/, $wf_info->{workflow}->{context}->{token};

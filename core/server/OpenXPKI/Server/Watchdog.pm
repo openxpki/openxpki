@@ -25,6 +25,7 @@ use POSIX;
 # CPAN modules
 use Log::Log4perl::MDC;
 use Feature::Compat::Try;
+use Sys::Hostname;
 
 # Project modules
 use OpenXPKI::Debug;
@@ -168,6 +169,20 @@ has interval_loop_run => (
     is => 'rw',
     isa => 'Int',
     default => 1,
+);
+
+
+=item interval_status_update
+
+Seconds between two updates of the nodes status record in the datapool.
+default: 300, set to 0 to not write any status records.
+
+=cut
+
+has interval_status_update  => (
+    is => 'rw',
+    isa => 'Int',
+    default => 300,
 );
 
 =item interval_session_purge
@@ -508,6 +523,13 @@ sub __main_loop {
     my $self = shift;
 
     my $slots_avail_count = $self->max_worker_count();
+    my $beacon = {
+        version => $OpenXPKI::VERSION::VERSION,
+        config => CTX('config')->checksum,
+        uptime => $BASETIME,
+        node => hostname,
+        last_update => time,
+    };
     while (not $TERMINATE) {
         ##! 64: 'watchdog: do loop'
         try {
@@ -548,6 +570,27 @@ sub __main_loop {
                 OpenXPKI::Server::__set_process_name("watchdog (idle)");
             }
             ##! 64: sprintf('watchdog sleeps %d secs', $sec)
+
+
+            # Update status beacon in datapool if due
+            if ($self->interval_status_update &&
+                ((time - $beacon->{last_update}) > $self->interval_status_update )) {
+                $beacon->{last_update} = time();
+                CTX('dbi')->start_txn;
+                ##! 64: $beacon
+                CTX('api2')->set_data_pool_entry(
+                    namespace => 'sys.cluster.nodes',
+                    key => hostname,
+                    pki_realm => '_global',
+                    value => $beacon,
+                    serialize => 'simple',
+                    force => 1,
+                    # auto expire status after two beacon intervals
+                    expiration_date => (time + 2*$self->interval_status_update),
+                );
+                CTX('dbi')->commit;
+                CTX('log')->system->info('Updated cluster status');
+            }
 
             sleep($sec);
             # Reset the exception counter after every successfull loop
@@ -648,6 +691,7 @@ sub __reload {
         interval_session_purge
         interval_auto_archiving
         interval_crl_purge
+        interval_status_update
     )) {
         if ($new_cfg->{$key}) {
             ##! 16: 'Update key ' . $key
