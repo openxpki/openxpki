@@ -28,7 +28,7 @@ I<cert_identifier> is mandatory.
 
 command "get_private_key_for_cert" => {
     identifier => { isa => 'Base64', required => 1, },
-    format     => { isa => 'Str', matching => qr{ \A ( PKCS8_(PEM|DER) | OPENSSL_(PRIVKEY|RSA) | PKCS12(_LEGACY|_VANILLA)? | JAVA_KEYSTORE ) \z }xms, required => 1, },
+    format     => { isa => 'Str', matching => qr{ \A ( PKCS8_(PEM|DER) | OPENSSL_(PRIVKEY|RSA) | PKCS12(_LEGACY(_NOFLAG)?|_VANILLA)? | JAVA_KEYSTORE ) \z }xms, required => 1, },
     password   => { isa => 'Str', required => 1, },
     passout    => { isa => 'Str', },
     nopassword => { isa => 'Bool', default => 0, },
@@ -87,6 +87,14 @@ default format in OpenSSL 3.0 and should work on most recent systems.
 Enforces PBE-SHA1-3DES (key) and PBE-SHA1-RC2-40 (certificate). Should
 work on most aged systems but does NOT work on modern systems where RC2
 is deprecated / prevented due to security reasons.
+
+Passes the C<legacy> flag to openssl which works only on OpenSSL 3.x.
+
+=item PKCS12_LEGACY_NOFLAG
+
+Same settings above but does NOT set the C<legacy> flag
+
+Works only on OpenSSL 1.x.
 
 =item PKCS12_VANILLA (PKCS#12 in DER format)
 
@@ -157,7 +165,7 @@ If the input password does not decrypt the private key, an exception is thrown.
 command "convert_private_key" => {
 
     private_key => { isa => 'PEMPKey', required => 1 },
-    format     => { isa => 'Str', matching => qr{ \A ( PKCS8_(PEM|DER) | OPENSSL_(PRIVKEY|RSA) | PKCS12(_LEGACY|_VANILLA)? | JAVA_KEYSTORE ) \z }xms, required => 1, },
+    format     => { isa => 'Str', matching => qr{ \A ( PKCS8_(PEM|DER) | OPENSSL_(PRIVKEY|RSA) | PKCS12(_LEGACY|_LEGACY_NOFLAG|_VANILLA)? | JAVA_KEYSTORE ) \z }xms, required => 1, },
     password   => { isa => 'Str', required => 1, },
     passout    => { isa => 'Str', },
     nopassword => { isa => 'Bool', default => 0, },
@@ -273,10 +281,13 @@ command "convert_private_key" => {
         if ($format eq 'PKCS12') {
             $command_hashref->{KEY_PBE} = 'AES-256-CBC';
             $command_hashref->{CERT_PBE} = 'AES-256-CBC';
-        } elsif ($format eq 'PKCS12_LEGACY') {
+
+        # Accept PKCS12_LEGACY and PKCS12_LEGACY_NOFLAG
+        } elsif ( $format =~ m{\APKCS12_LEGACY} ) {
             $command_hashref->{KEY_PBE} = 'PBE-SHA1-3DES';
             $command_hashref->{CERT_PBE} = 'PBE-SHA1-RC2-40';
-            $command_hashref->{LEGACY} = 1;
+            # openssl 1.0 which does not support the -legacy flag
+            $command_hashref->{LEGACY} = 1 unless($format eq 'PKCS12_LEGACY_NOFLAG');
         } # anything else is JavaKS and we use the system defaults
 
         if ($nopassword) {
