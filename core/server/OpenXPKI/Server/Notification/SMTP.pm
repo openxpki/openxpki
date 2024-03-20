@@ -52,6 +52,45 @@ are read from the filesystem.
 Calling the notifier with C<MESSAGE=csr_created> will send out two mails.
 One to the requestor and one to the ra-officer, both are CC'ed to helpdesk.
 
+=head2 Message Composition
+
+=head3 Body
+
+The message body is read from a file. The filename is created from the
+string given to I<template> by adding the suffix I<.txt> and I<.html>
+for the text and html part of the mail. If an html part is found, the
+message is send as multipart message, if a plain part exists it is set
+as alternative text in the multipart document.
+
+If only the plain part exists, a plain text message is send.
+
+You must set I<use_html: 1> in the main configuration section to enable
+html formated mails.
+
+=head3 Subject
+
+The subject can be provided in two ways - the explicit option is by
+adding the key I<subject> to the definition holding the text for the
+subject line. The string can be a template toolkit, it is send as UTF8
+encoded string so it can contain any printable character.
+
+If a I<prefix> is defined, it is prepended to the given string, to
+suppress a global prefix in a particular message, set I<prefix: ''> in
+the local definition.
+
+If the I<subject> key is set an undef or empty value, the first line of
+the plain body (after rendering) is used as subject line, the I<prefix>
+is ignored but you can access it inside the mail body as I<[% prefix %]>.
+
+To avoid any accidential problems, the mail body must have an extra
+newline between the subject and the real body:
+
+   [% prefix %] I am the subject line
+
+   Body starts here
+   ....
+
+
 =head2 Recipients and Headers
 
 =over
@@ -524,9 +563,11 @@ sub _send_message {
     my $cfg = shift;
     my $vars = shift;
 
+    ##! 64: $cfg
+    ##! 32: $vars
+
     # Parse the templates - txt and html
     # it is ok to not have a plain text version
-
     my ($plain, $html);
     if ($self->use_html()) {
         ##! 16: 'Using html template'
@@ -550,21 +591,48 @@ sub _send_message {
         return 0;
     }
 
-    # Go ahead and build the message
-    # Parse the subject
-    my $subject = $self->_render_template($cfg->{subject}, $vars);
-    ##! 16: $subject
+
+    my $subject;
+    # Regular mode - build subject from template
+    if ($cfg->{subject}) {
+        $subject = $self->_render_template($cfg->{subject}, $vars);
+
+        # If a prefix is defined we prepend it to the subject
+        if ($vars->{prefix}) {
+            ##! 32: 'Adding prefix '.$vars->{prefix}
+            $subject = $vars->{prefix}.' '.$subject;
+        }
+
+    # If subject is explicitly set to undef in the config we use the
+    # first line of the plain body text as subject line
+    } elsif (exists $cfg->{subject}) {
+        if (!$plain) {
+            CTX('log')->system()->error("No plain body found to shift of mail subject ($cfg->{template})");
+            return 0;
+        }
+        my $empty;
+        ($subject, $empty, $plain) = split "\n", $plain, 3;
+        # something went wrong if empty is not empty
+        if ($empty || !$plain) {
+            CTX('log')->system()->error("Got invalid body text while trying to shift of mail subject ($cfg->{template})");
+            CTX('log')->system()->debug("Expected seperator line is not empty but '$empty'") if ($empty);
+            CTX('log')->system()->debug("Remaining body is empty") unless ($plain);
+            return 0;
+        }
+
+    # No subject at all - thats not ok
+    } else {
+        CTX('log')->system()->error("Mail subject is not defined ($cfg->{template})");
+        return 0;
+    }
+
+    # Rendering went wrong or something broke in the split/shift operation
     if (!$subject) {
         CTX('log')->system()->error("Mail subject is empty ($cfg->{template})");
         return 0;
     }
 
     ##! 16: $subject
-
-    # If a prefix is defined we prepend it to the subject
-    if ($vars->{prefix}) {
-        $subject = $vars->{prefix}.' '.$subject;
-    }
 
     # Go ahead and build the message
     my @args = (
