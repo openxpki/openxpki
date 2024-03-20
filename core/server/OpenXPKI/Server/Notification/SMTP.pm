@@ -559,10 +559,18 @@ sub _send_message {
         return 0;
     }
 
+    ##! 16: $subject
+
+    # If a prefix is defined we prepend it to the subject
+    if ($vars->{prefix}) {
+        $subject = $vars->{prefix}.' '.$subject;
+    }
+
+    # Go ahead and build the message
     my @args = (
         From    => Encode::encode("UTF-8", $cfg->{from}),
         To      => Encode::encode("UTF-8", $vars->{to}),
-        Subject => Encode::encode("MIME-B", "$vars->{prefix} $subject"),
+        Subject => Encode::encode("MIME-B", $subject),
         Charset => 'UTF-8',
         'X-User-Agent' => 'OpenXPKI Notification Service',
     );
