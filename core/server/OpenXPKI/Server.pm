@@ -269,8 +269,8 @@ sub pre_loop_hook {
     OpenXPKI::Server::Watchdog->start_or_reload(keep_parent_sigchld => $is_forking);
 
     # Start metrics server
-    try {
-        if (CTX('config')->get('system.server.metrics.enabled')) {
+    if (CTX('config')->get('system.server.metrics.enabled')) {
+        try {
             my $agent = CTX('config')->get_hash('system.server.metrics.agent') // {};
             require OpenXPKI::Metrics::Prometheus; # this is EE code
             OpenXPKI::Metrics::Prometheus->start(
@@ -281,13 +281,13 @@ sub pre_loop_hook {
                 keep_parent_sigchld => $is_forking,
             );
         }
-    }
-    catch ($err) {
-        if ($err =~ m{locate OpenXPKI/Prometheus\.pm in \@INC}) {
-            CTX('log')->system->info('Skipping Prometheus agent start - EE code not found');
-        }
-        else {
-            die $err;
+        catch ($err) {
+            if ($err =~ m{locate OpenXPKI/Metrics/Prometheus\.pm in \@INC}) {
+                CTX('log')->system->warn('Cannot start Prometheus agent: EE class OpenXPKI::Metrics::Prometheus not found');
+            }
+            else {
+                die $err;
+            }
         }
     }
 }

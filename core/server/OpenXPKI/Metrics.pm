@@ -112,11 +112,11 @@ has ready => (
         }
         catch ($err) {
             if ($err =~ m{locate Prometheus/Tiny/Shared\.pm in \@INC}) {
-                $self->log->info("Disabling 'metrics' - Prometheus::Tiny::Shared not found");
+                $self->log->error("Cannot enable 'metrics': Prometheus::Tiny::Shared not found");
                 return 0;
             }
             if ($err =~ m{locate OpenXPKI/Metrics/Prometheus\.pm in \@INC}) {
-                $self->log->info("Disabling 'metrics' - EE class OpenXPKI::Metrics::Prometheus not found");
+                $self->log->warn("Cannot enable 'metrics': EE class OpenXPKI::Metrics::Prometheus not found");
                 return 0;
             }
             die $err;
