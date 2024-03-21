@@ -7,14 +7,16 @@ OpenXPKI::Metrics - Context object to create metrics
 
 =head1 DESCRIPTION
 
-This module is meant to be invoked via C<CTX('metrics')>. It uses
-L<Prometheus::Tiny::Shared> to do the actual work of writing metrics to disk.
-It offers some additional higher level functions to create metrics.
+This module is meant to be invoked via C<CTX('metrics')>. It offers some
+additional higher level functions to create metrics.
 
-Please note that metrics are a feature of OpenXPKI Enterprise Edition.
+L<Prometheus::Tiny::Shared> is used to do the actual work of writing metrics to
+disk (shared memory).
 
 The HTTP interface that exposes the metrics to an external server (Prometheus)
 is implemented in L<OpenXPKI::Metrics::Prometheus>.
+
+I<Please note that metrics are a feature of OpenXPKI Enterprise Edition.>
 
 =cut
 
@@ -38,7 +40,7 @@ use Data::UUID;
 
 =item * B<enabled> I<Bool> - whether the metrics are enabled (via config).
 
-If this is set to C<0> then L</ready> will always return C<0>.
+If this returns C<0> then L</ready> will also never return C<1>.
 
 =cut
 has enabled => (
@@ -185,19 +187,23 @@ sub _build_prom {
 
 =head2 start
 
+    my $metric_id = CTX('metrics')->start("service_command_seconds", { command => $command });
+
 Start a timer metric, i.e. measure a duration.
 
-This will only create an ID and internally store the starting time under that ID.
+Creates an ID and associates the start timestamp with that ID.
 
 B<Parameters>
 
 =over
 
-=item * C<$label> - a user readable label for the metric
+=item * C<$name> I<Str> - custom metric name
+
+=item * C<$labels> I<HashRef> - custom labels (key-value pairs) as additional metric data. Optional, default: C<{}>
 
 =back
 
-B<Returns> a UUID used to identify the running metric (this needs to be passed
+B<Returns> a UUID to identify the running metric (this needs to be passed
 to L</stop>).
 
 =cut
@@ -223,7 +229,9 @@ sub start {
 
 =head2 stop
 
-Stop a timer and write the metric to disk using L<Prometheus::Tiny::Shared>.
+    CTX('metrics')->stop($metric_id);
+
+Stop a timer and store the duration under the name that was given to L</start>.
 
 B<Parameters>
 
@@ -247,5 +255,129 @@ sub stop {
         int(sprintf('%i.%i', $metric->{time_start}->@*) * 1000), # timestamp
     );
 }
+
+=head1 METHODS FROM C<Prometheus::Tiny>
+
+=head2 set
+
+    CTX('metric')->set($name, $value, { labels }, [timestamp])
+
+Set the value for the named metric. The labels hashref is optional. The timestamp (milliseconds since epoch) is optional, but requires labels to be provided to use. An empty hashref will work in the case of no labels.
+
+Trying to set a metric to a non-numeric value will emit a warning and the metric will be set to zero.
+
+See L<Prometheus::Tiny/set>.
+
+=head2 add
+
+    CTX('metric')->add($name, $amount, { labels })
+
+Add the given amount to the already-stored value (or 0 if it doesn't exist). The labels hashref is optional.
+
+Trying to add a non-numeric value to a metric will emit a warning and 0 will be added instead (this will still create the metric if it didn't exist, and will update timestamps etc).
+
+See L<Prometheus::Tiny/add>.
+
+=head2 inc
+
+    CTX('metric')->inc($name, { labels })
+
+A shortcut for
+
+    CTX('metric')->add($name, 1, { labels })
+
+See L<Prometheus::Tiny/inc>.
+
+=head2 dec
+
+    CTX('metric')->dec($name, { labels })
+
+A shortcut for
+
+    CTX('metric')->add($name, -1, { labels })
+
+See L<Prometheus::Tiny/dec>.
+
+=head2 clear
+
+    CTX('metric')->clear;
+
+Remove all stored metric values. Metric metadata (set by C<declare>) is preserved.
+
+See L<Prometheus::Tiny/clear>.
+
+=head2 histogram_observe
+
+    CTX('metric')->histogram_observe($name, $value, { labels })
+
+Record a histogram observation. The labels hashref is optional.
+
+You should declare your metric beforehand, using the C<buckets> key to set the
+buckets you want to use. If you don't, the following buckets will be used.
+
+    [ 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1.0, 2.5, 5.0, 7.5, 10 ]
+
+See L<Prometheus::Tiny/histogram_observe>.
+
+=head2 enum_set
+
+    CTX('metric')->enum_set($name, $value, { labels }, [timestamp])
+
+Set an enum value for the named metric. The labels hashref is optiona. The timestamp is optional.
+
+You should declare your metric beforehand, using the C<enum> key to set the
+label to use for the enum value, and the C<enum_values> key to list the
+possible values for the enum.
+
+See L<Prometheus::Tiny/enum_set>.
+
+=head2 declare
+
+    CTX('metric')->declare($name, help => $help, type => $type, buckets => [...])
+
+"Declare" a metric by associating metadata with it. Valid keys are:
+
+=over 4
+
+=item C<help>
+
+Text describing the metric. This will appear in the formatted output sent to Prometheus.
+
+=item C<type>
+
+Type of the metric, typically C<gauge> or C<counter>.
+
+=item C<buckets>
+
+For C<histogram> metrics, an arrayref of the buckets to use. See C<histogram_observe>.
+
+=item C<enum>
+
+For C<enum> metrics, the name of the label to use for the enum value. See C<enum_set>.
+
+=item C<enum_values>
+
+For C<enum> metrics, the possible values the enum can take. See C<enum_set>.
+
+=back
+
+Declaring a already-declared metric will work, but only if the metadata keys
+and values match the previous call. If not, C<declare> will throw an exception.
+
+See L<Prometheus::Tiny/declare>.
+
+=head2 format
+
+    my $metrics = CTX('metric')->format
+
+Output the stored metrics, values, help text and types in the L<Prometheus exposition format|https://github.com/prometheus/docs/blob/master/content/docs/instrumenting/exposition_formats.md>.
+
+See L<Prometheus::Tiny/format>.
+
+=head2 psgi
+
+See L<Prometheus::Tiny/psgi>.
+
+=cut
 
 __PACKAGE__->meta->make_immutable;
