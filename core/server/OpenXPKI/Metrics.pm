@@ -126,11 +126,13 @@ has ready => (
     },
 );
 
+my $passthrough_methods = [ qw( set add inc dec clear histogram_observe enum_set declare format psgi ) ];
+
 has _prom => (
     is => 'rw',
     isa => 'Object', # Prometheus::Tiny::Shared
     lazy => 1,
-    handles => [qw( set add inc dec clear histogram_observe enum_set declare format psgi )],
+    handles => $passthrough_methods,
     builder => '_build_prom',
 );
 
@@ -204,13 +206,15 @@ B<Parameters>
 =back
 
 B<Returns> a UUID to identify the running metric (this needs to be passed
-to L</stop>).
+to L</stop>) or C<undef> if C<ready()> equals to I<false>.
 
 =cut
 sub start {
     my $self = shift;
     my $name = shift;
     my $labels = shift // {};
+
+    return unless $self->ready;
 
     my $id = $self->_uuid->create;
     my $time_start = [gettimeofday];
@@ -233,6 +237,8 @@ sub start {
 
 Stop a timer and store the duration under the name that was given to L</start>.
 
+Passing C<undef> or an unknown ID is a no-op.
+
 B<Parameters>
 
 =over
@@ -246,6 +252,9 @@ sub stop {
     my $self = shift;
     my $id = shift;
 
+    return unless $self->ready;
+    return unless $id;
+
     my $metric = $self->delete_metric($id) or return;
 
     $self->histogram_observe(
@@ -257,6 +266,19 @@ sub stop {
 }
 
 =head1 METHODS FROM C<Prometheus::Tiny>
+
+The following methods are more or less passed through to L<Prometheus::Tiny::Shared>
+except if C<ready()> equals to I<false> (then they do nothing).
+
+=cut
+
+around $passthrough_methods => sub {
+    my $orig = shift;
+    my $self = shift;
+
+    return unless $self->ready;
+    return $self->$orig(@_);
+};
 
 =head2 set
 
