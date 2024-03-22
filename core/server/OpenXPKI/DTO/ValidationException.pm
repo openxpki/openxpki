@@ -50,4 +50,4 @@ sub _build_hint {
     return "The value for parameter *$name* is not accepted."
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
