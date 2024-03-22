@@ -30,7 +30,6 @@ class_has 'param_spec' => (
     is      => 'ro',
     isa => 'ArrayRef[OpenXPKI::DTO::Field]',
     default => sub {[
-        OpenXPKI::DTO::Field::Realm->new(),
         OpenXPKI::DTO::Field::String->new( name => 'state', label => 'Workflow State' ),
         OpenXPKI::DTO::Field::String->new( name => 'proc_state', label => 'Workflow Proc State', hint => 'hint_proc_state' ),
         OpenXPKI::DTO::Field::String->new( name => 'type', label => 'Workflow Type', hint => 'hint_type' ),
@@ -43,8 +42,8 @@ sub hint_type {
     my $req = shift;
     my $input = shift;
 
-    my $client = $self->client($req->param('realm'));
-    my $types = $client->run_command('get_workflow_instance_types');
+
+    my $types = $self->api->run_command('get_workflow_instance_types');
     TRACE(Dumper $types);
     return [ map { sprintf '%s (%s)', $_, $types->{$_}->{label} } sort keys %$types ];
 
@@ -69,8 +68,7 @@ sub execute {
 
     my $client;
     try {
-        $client = $self->client($req->param('realm'));
-        my $res = $client->run_command('search_workflow_instances', \%query );
+        my $res = $self->api->run_command('search_workflow_instances', \%query );
         return OpenXPKI::Client::API::Response->new( payload => $res );
     } catch ($err) {
         return OpenXPKI::Client::API::Response->new( state => 400, payload => $err );

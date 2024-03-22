@@ -29,7 +29,6 @@ class_has 'param_spec' => (
     is      => 'ro',
     isa => 'ArrayRef[OpenXPKI::DTO::Field]',
     default => sub {[
-        OpenXPKI::DTO::Field::Realm->new( required => 1 ),
         OpenXPKI::DTO::Field::Int->new( name => 'id', label => 'Workflow Id', required => 1 ),
         OpenXPKI::DTO::Field::String->new( name => 'action', label => 'Action', hint => 'hint_action', required => 1 ),
     ]},
@@ -39,11 +38,10 @@ sub hint_action {
 
     my $self = shift;
     my $req = shift;
-    my $input = shift;
 
-    my $client = $self->client($req->param('realm'));
-    my $actions = $client->run_command('get_workflow_activities', { id => $req->param('id') });
-    return $actions || [];
+    my $actions = $self->api->run_command('get_workflow_activities', { id => $req->param('id') });
+    $self->log->trace(Dumper $actions->result) if ($self->log->is_trace);
+    return $actions->result || [];
 
 }
 
@@ -54,12 +52,12 @@ sub execute {
 
     my $client;
     try {
-        $client = $self->client($req->param('realm'));
+
         my $wf_parameters = {};
         if ($req->payload()) {
-            $wf_parameters = $self->_build_parameters_from_request($req);
+            $wf_parameters = $self->_build_hash_from_payload($req);
         }
-        my $res = $client->run_command('execute_workflow_activity', {
+        my $res = $self->api->run_command('execute_workflow_activity', {
                 id => $req->param('id'),
                 activity => $req->param('action'),
                 params => $wf_parameters,

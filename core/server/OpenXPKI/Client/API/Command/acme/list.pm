@@ -31,7 +31,6 @@ class_has 'param_spec' => (
     is      => 'ro',
     isa => 'ArrayRef[OpenXPKI::DTO::Field]',
     default => sub {[
-        OpenXPKI::DTO::Field::Realm->new( required => 1 ),
     ]},
 );
 
@@ -42,15 +41,15 @@ sub execute {
 
     my $client;
     try {
-        $client = $self->client($req->param('realm'));
 
-        my $res = $client->run_command('list_data_pool_entries', {
+
+        my $res = $self->api->run_command('list_data_pool_entries', {
             namespace => 'nice.acme.account',
         });
 
         my @result;
         foreach my $account (@$res) {
-            $res = $client->run_command('get_data_pool_entry', {
+            $res = $self->api->run_command('get_data_pool_entry', {
                 namespace => 'nice.acme.account',
                 key => $account->{key},
                 deserialize => 'simple',

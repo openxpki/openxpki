@@ -7,6 +7,7 @@ use feature 'state';
 
 # Core modules
 use Scalar::Util qw( blessed );
+use Crypt::PK::ECC;
 use Data::Dumper;
 
 # CPAN modules
@@ -15,8 +16,11 @@ use Log::Log4perl qw(:easy);
 
 # Project modules
 use OpenXPKI::Client;
+use OpenXPKI::Client::CLI;
 use OpenXPKI::Client::Simple;
 use OpenXPKI::DTO::ValidationException;
+use OpenXPKI::DTO::Message::Command;
+use OpenXPKI::DTO::Message::ProtectedCommand;
 
 =head1 NAME
 
@@ -25,6 +29,16 @@ OpenXPKI::Client::API::Command
 =head1 SYNOPSIS
 
 Base class for all implementations handled by C<OpenXPKI::Client::API>.
+
+=head1 Attributes
+
+=cut
+
+has api => (
+    is => 'ro',
+    isa => 'OpenXPKI::Client::API',
+    required => 1,
+);
 
 =head1 Methods
 
@@ -75,11 +89,16 @@ sub _preprocess {
     } catch ($error) {
         # type constraint validation
         $self->log->debug(Dumper $input_last);
-        if (blessed $error and $error->isa('Moose::Exception::ValidationFailed')) {
-            return OpenXPKI::DTO::ValidationException->new( field => $input_last, reason => 'type' );
+        if (blessed $error) {
+            if ($error->isa('Moose::Exception::ValidationFailed')
+                || $error->isa('Moose::Exception::ValidationFailedForTypeConstraint')) {
+                return OpenXPKI::DTO::ValidationException->new( field => $input_last, reason => 'type' );
+            }
+
+            if ($error->can('rethrow')) {
+                $error->rethrow();
+            }
         }
-        # something else went wrong
-        $error->rethrow() if ref $error;
         die "$error";
     }
     return;
@@ -113,27 +132,14 @@ sub preprocess {
 
 }
 
-=head2 client I<realm>
+=head2 is_protected
 
-Constructs an OpenXPKI::Client object to talk to the given realm
-on the backend system.
+Return true if the command is marked as a protected command
 
 =cut
 
-sub client {
-
-    my $self = shift;
-    my $realm = shift;
-    state $client;
-
-    return $client if ($client && $client->client->is_connected() && $client->realm eq $realm);
-
-    $self->log->debug("Bootstrap client for realm $realm");
-    $client = OpenXPKI::Client::Simple->new({
-        config => { realm => $realm, socket => '/var/openxpki/openxpki.socket' },
-        auth => { stack => '_System' },
-    });
-    return $client;
+sub is_protected {
+    return shift->DOES('OpenXPKI::Client::API::Command::Protected');
 }
 
 =head2 list_realm
@@ -150,8 +156,31 @@ sub list_realm {
         SOCKETFILE => '/var/openxpki/openxpki.socket'
     });
     my $reply = $client->send_receive_service_msg('GET_REALM_LIST');
-    DEBUG(Dumper $reply);
+    $self->log->debug(Dumper $reply);
     return [ map { $_->{name} } @{$reply->{PARAMS}} ];
+
+}
+
+sub _build_hash_from_payload {
+
+    my $self = shift;
+    my $req = shift;
+    return {} unless ($req->payload());
+
+    my %params;
+    foreach my $arg (@{$req->payload()}) {
+        my ($key, $val) = split('=', $arg, 2);
+        if ($params{$key}) {
+            if (!ref $params{$key}) {
+                $params{$key} = [$params{$key}, $val];
+            } else {
+                push @{$params{$key}}, $val;
+            }
+        } else {
+            $params{$key} = $val;
+        }
+    }
+    return \%params;
 
 }
 

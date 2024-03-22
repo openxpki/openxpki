@@ -1,8 +1,7 @@
-package OpenXPKI::Client::API::Command::workflow;
+package OpenXPKI::Client::API::Command::config;
 
 use Moose;
 extends 'OpenXPKI::Client::API::Command';
-with 'OpenXPKI::Client::API::Command::NeedRealm';
 
 # Core modules
 use Data::Dumper;
@@ -11,11 +10,11 @@ use List::Util qw( none );
 
 =head1 NAME
 
-OpenXPKI::CLI::Command::workflow
+OpenXPKI::CLI::Command::config
 
 =head1 SYNOPSIS
 
-Show and interact with workflows in OpenXPKI
+Show and handle OpenXPKI system configuarion
 
 =head1 USAGE
 
@@ -25,17 +24,16 @@ Feed me!
 
 =over
 
-=item list
+=item lint
 
 =item show
 
 =item create
 
-=item execute
-
 =back
 
 =cut
+
 
 __PACKAGE__->meta()->make_immutable();
 

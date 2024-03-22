@@ -36,7 +36,7 @@ sub _build_hint {
 
     my $name = $self->field()->name();
     if ($self->has_choices) {
-        return "Value for *$name* must be one of\n". join("\n", @{$self->choices} );
+        return "Value for *$name* must be one of\n  ". join("\n  ", @{$self->choices} );
     }
 
     if ($self->reason eq 'required') {
@@ -45,6 +45,10 @@ sub _build_hint {
 
     if ($self->reason eq 'type') {
         return "The value for parameter *$name* does not match the expected type/pattern.";
+    }
+
+    if ($self->reason eq 'value') {
+        return "The value for parameter *$name* can not be resolved.";
     }
 
     return "The value for parameter *$name* is not accepted."

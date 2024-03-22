@@ -3,6 +3,7 @@ package OpenXPKI::Client::API::Command::acme;
 use Moose;
 extends 'OpenXPKI::Client::API::Command';
 with 'Connector::Role::SSLUserAgent';
+with 'OpenXPKI::Client::API::Command::NeedRealm';
 
 # Core modules
 use JSON;

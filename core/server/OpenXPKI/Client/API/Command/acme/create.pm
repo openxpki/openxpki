@@ -35,7 +35,6 @@ class_has 'param_spec' => (
     is      => 'ro',
     isa => 'ArrayRef[OpenXPKI::DTO::Field]',
     default => sub {[
-        OpenXPKI::DTO::Field::Realm->new( required => 1 ),
         OpenXPKI::DTO::Field::String->new( name => 'directory', label => 'Directory Url', required => 1 ),
         OpenXPKI::DTO::Field::String->new( name => 'contact', label => 'Contact (email address)', required => 1 ),
         OpenXPKI::DTO::Field::String->new( name => 'label', label => 'Account Label' ),
@@ -62,11 +61,11 @@ sub execute {
 
     my $client;
     try {
-        $client = $self->client($req->param('realm'));
+
 
         my $label = $req->param('label') || encode_base64url(sha256($req->param('directory')));
 
-        my $res = $client->run_command('get_data_pool_entry', {
+        my $res = $self->api->run_command('get_data_pool_entry', {
             namespace => 'nice.acme.account',
             key => $label,
         });
@@ -92,7 +91,7 @@ sub execute {
             $eab
         );
 
-        $res = $client->run_command('set_data_pool_entry', {
+        $res = $self->api->run_command('set_data_pool_entry', {
             namespace => 'nice.acme.account',
             key => $label,
             value => $account,

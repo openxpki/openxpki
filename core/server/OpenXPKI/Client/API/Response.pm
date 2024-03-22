@@ -41,7 +41,8 @@ Problems while talking to the backend server or other internal issues.
 has state => (
     is => 'ro',
     isa => 'Int',
-    default => 200,
+    lazy => 1,
+    builder => '_init_state',
 );
 
 =head2 payload
@@ -56,6 +57,20 @@ has payload => (
     is => 'ro',
     isa => 'Item'
 );
+
+sub _init_state {
+
+    my $self = shift;
+    my $response = $self->payload;
+    return 500 unless (blessed $response);
+
+    return 400 if ($response->isa('OpenXPKI::DTO::Message::ErrorResponse'));
+
+    return 200 if ($response->isa('OpenXPKI::DTO::Message::Response'));
+
+    return 500;
+
+}
 
 __PACKAGE__->meta()->make_immutable();
 

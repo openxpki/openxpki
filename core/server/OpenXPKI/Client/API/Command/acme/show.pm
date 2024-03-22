@@ -30,7 +30,6 @@ class_has 'param_spec' => (
     is      => 'ro',
     isa => 'ArrayRef[OpenXPKI::DTO::Field]',
     default => sub {[
-        OpenXPKI::DTO::Field::Realm->new( required => 1 ),
         OpenXPKI::DTO::Field::String->new( name => 'id', label => 'Account Key Id', required => 1 ),
         OpenXPKI::DTO::Field::Bool->new( name => 'with-privatekey', label => 'Show Private Key'),
     ]},
@@ -43,9 +42,9 @@ sub execute {
 
     my $client;
     try {
-        $client = $self->client($req->param('realm'));
 
-        my $res = $client->run_command('get_data_pool_entry', {
+
+        my $res = $self->api->run_command('get_data_pool_entry', {
             namespace => 'nice.acme.account',
             key => $req->param('id'),
             deserialize => 'simple',

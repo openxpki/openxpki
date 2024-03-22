@@ -49,7 +49,6 @@ has hint => (
     default => undef
 );
 
-
 sub getopt_type {
 
     my $class = shift;

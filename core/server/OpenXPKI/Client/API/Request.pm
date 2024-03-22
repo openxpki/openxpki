@@ -57,7 +57,6 @@ has payload => (
     predicate => 'has_payload',
 );
 
-
 =head1 Methods
 
 =head2 param I<name>

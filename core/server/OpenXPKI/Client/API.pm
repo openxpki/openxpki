@@ -10,7 +10,10 @@ use Pod::POM;
 use Pod::POM::View::Text;
 
 use Log::Log4perl qw(:easy :no_extra_logdie_message);
-Log::Log4perl->easy_init($TRACE);
+
+use OpenXPKI::DTO::Field::Realm;
+use OpenXPKI::DTO::Message::Command;
+use OpenXPKI::DTO::Message::ProtectedCommand;
 
 =head1 NAME
 
@@ -64,6 +67,14 @@ has log => (
     isa => 'Log::Log4perl::Logger',
     default => sub { return Log::Log4perl->get_logger(); },
     lazy => 1,
+);
+
+has client => (
+    is => 'rw',
+    isa => 'Object',
+    lazy => 1,
+    default => sub { shift->log->logdie('Client object was not initialized'); },
+    predicate => 'has_client',
 );
 
 
@@ -216,7 +227,13 @@ sub param_spec {
 
     my $self = shift;
     my $impl_class = $self->load_class(shift, shift);
-    return $impl_class->param_spec();
+
+    my $spec = $impl_class->param_spec();
+    if ($impl_class->DOES('OpenXPKI::Client::API::Command::NeedRealm')) {
+        # If it is NOT a protected command we need the realm for authentication
+        unshift @$spec, OpenXPKI::DTO::Field::Realm->new( required => 1 );
+    }
+    return $spec;
 }
 
 
@@ -243,9 +260,9 @@ details.
 sub dispatch {
 
     my $self = shift;
-    my $command_ref = $self->load_class(shift, shift)->new();
-
+    my $command_ref = $self->load_class(shift, shift)->new( api => $self );
     my $request = shift;
+
     # Returns a validation error object in case something went wrong
     # Preprocess MIGHT change the paramters in the request object!
     if (my $validation = $command_ref->preprocess($request)) {
@@ -254,6 +271,46 @@ sub dispatch {
     # Returns the response data structure
     return $command_ref->execute($request);
 
+}
+
+=head2 run_command I<command>, I<params>
+
+=cut
+
+sub run_command {
+
+    my $self = shift;
+    my $command = shift;
+    my $params = shift;
+
+    $self->log->debug("Running command $command");
+    my $msg = OpenXPKI::DTO::Message::Command->new(
+        command => $command,
+        defined $params ? (params =>  $params) : ()
+    );
+
+    my $res = $self->client()->send_message($msg);
+    return OpenXPKI::DTO::Message::from_hash($res);
+}
+
+=head2 run_protected_command I<command>, I<params>
+
+=cut
+
+sub run_protected_command {
+
+    my $self = shift;
+    my $command = shift;
+    my $params = shift;
+
+    $self->log->debug("Running command $command in protected mode");
+    my $msg = OpenXPKI::DTO::Message::ProtectedCommand->new(
+        command => $command,
+        defined $params ? (params =>  $params) : ()
+    );
+
+    my $res = $self->client()->send_message($msg);
+    return OpenXPKI::DTO::Message::from_hash($res);
 }
 
 __PACKAGE__->meta()->make_immutable();

@@ -28,9 +28,7 @@ class_has 'param_spec' => (
     is      => 'ro',
     isa => 'ArrayRef[OpenXPKI::DTO::Field]',
     default => sub {[
-        OpenXPKI::DTO::Field::Realm->new( required => 1 ),
         OpenXPKI::DTO::Field::String->new( name => 'type', label => 'Workflow Type', hint => 'hint_type', required => 1 ),
-
     ]},
 );
 
@@ -41,10 +39,10 @@ sub hint_type {
     my $input = shift;
 
     # TODO - we need a new API method to get ALL types and not only the used ones!
-    my $client = $self->client($req->param('realm'));
-    my $types = $client->run_command('get_workflow_instance_types');
-    $self->log()->trace(Dumper $types) if ($self->log()->is_trace);
-    return [ map { sprintf '%s (%s)', $_, $types->{$_}->{label} } sort keys %$types ];
+    my $types = $self->api->run_command('get_workflow_instance_types');
+    my %types = %{$types->params};
+    $self->log()->trace(Dumper \%types) if ($self->log()->is_trace);
+    return [ map { sprintf '%s (%s)', $_, $types{$_}->{label} } sort keys %types ];
 
 }
 
@@ -55,12 +53,13 @@ sub execute {
 
     my $client;
     try {
-        $client = $self->client($req->param('realm'));
+
         my $wf_parameters = {};
         if ($req->payload()) {
-            $wf_parameters = $self->_build_parameters_from_request($req);
+            $wf_parameters = $self->_build_hash_from_payload($req);
+            $self->log->info(Dumper $wf_parameters);
         }
-        my $res = $client->run_command('create_workflow_instance', {
+        my $res = $self->api->run_command('create_workflow_instance', {
             workflow => $req->param('type'),
             params => $wf_parameters,
         });

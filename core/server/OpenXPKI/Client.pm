@@ -5,6 +5,7 @@ use English;
 
 use Carp;
 use Socket;
+use Feature::Compat::Try;
 
 use Sys::SigAction qw( sig_alarm set_sig_handler );
 
@@ -206,20 +207,17 @@ sub talk {
 
     my $msg  = shift;
 
-    eval {
+    try {
         $self->_channel()->write(
             $self->_serializer()->serialize($msg)
         );
-    };
-
-    if ($EVAL_ERROR) {
-        OpenXPKI::Exception->throw(
+    } catch ($error) {
+        OpenXPKI::Exception::Socket->throw(
             message => 'Error while writing to socket',
-            params  => {
-                EVAL_ERROR => $EVAL_ERROR,
-            },
+            error  => $error,
         );
     }
+
 
     my $result;
     my $sh = set_sig_handler('ALRM', sub {
@@ -239,6 +237,7 @@ sub talk {
     );
     sig_alarm( 0 );
 
+    # TODO - is this ever fired ?
     if (my $eval_err = $EVAL_ERROR) {
         OpenXPKI::Exception->throw(
             message => 'Error while reading from socket',
