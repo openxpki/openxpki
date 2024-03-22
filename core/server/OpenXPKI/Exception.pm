@@ -12,17 +12,30 @@ use Exception::Class (
     'OpenXPKI::Exception' => {
         fields => [ 'children', 'params' ],
     },
+    # Validation failed on workflow or api input field
     'OpenXPKI::Exception::InputValidator' => {
         isa         => 'OpenXPKI::Exception',
         fields => [ 'errors', 'action' ],
     },
+    # Authentication request was not successful
     'OpenXPKI::Exception::Authentication' => {
         isa         => 'OpenXPKI::Exception',
-        fields => [ 'error', 'authinfo' ],
+        fields => [ 'stack', 'error', 'authinfo' ],
     },
+    # Timeout while waiting for a socket or external process
     'OpenXPKI::Exception::Timeout' => {
         isa         => 'OpenXPKI::Exception',
         fields => [ 'error', 'command', 'timeout' ],
+    },
+    # Error during socket communication
+    'OpenXPKI::Exception::Socket' => {
+        isa         => 'OpenXPKI::Exception',
+        fields => [ 'error' ],
+    },
+    # Error while executing a command
+    'OpenXPKI::Exception::Command' => {
+        isa         => 'OpenXPKI::Exception',
+        fields => [ 'error' ],
     },
 );
 
@@ -111,7 +124,14 @@ sub throw {
 
     $proto->rethrow if ref $proto;
 
+    # lazy mode -  message string given as single argument
     my %args           = (@_);
+    if (scalar @_ == 1) {
+        %args = (message => shift );
+    } else {
+        %args           = (@_);
+    }
+
     my %exception_args = %args;
     delete $exception_args{log};
 

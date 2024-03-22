@@ -39,6 +39,7 @@ OpenXPKI/VERSION.pm
 ## Client
 OpenXPKI/Client.pm
 OpenXPKI/Client/Config.pm
+OpenXPKI/Client/CLI.pm
 OpenXPKI/Client/Simple.pm
 
 # New CLI / API
@@ -201,11 +202,17 @@ OpenXPKI/Crypto/Backend/OpenSSL/Command/verify_cert.pm
 
 
 # Reusable Data Objects for APIs
+OpenXPKI/DTO/Authenticator.pm
 OpenXPKI/DTO/Field.pm
 OpenXPKI/DTO/Field/Bool.pm
 OpenXPKI/DTO/Field/Int.pm
 OpenXPKI/DTO/Field/Realm.pm
 OpenXPKI/DTO/Field/String.pm
+OpenXPKI/DTO/Message.pm
+OpenXPKI/DTO/Message/Command.pm
+OpenXPKI/DTO/Message/ErrorResponse.pm
+OpenXPKI/DTO/Message/ProtectedCommand.pm
+OpenXPKI/DTO/Message/Response.pm
 OpenXPKI/DTO/ValidationException.pm
 
 # Collection of reusable items as Moose::Role
@@ -618,6 +625,8 @@ OpenXPKI/Serialization/Fast.pm
 OpenXPKI/Serialization/JSON.pm
 OpenXPKI/Serialization/Legacy.pm
 OpenXPKI/Service.pm
+OpenXPKI/ServiceRole.pm
+OpenXPKI/Service/CLI.pm
 OpenXPKI/Service/Default.pm
 
 # Outside of namespace

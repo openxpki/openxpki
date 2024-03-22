@@ -8,15 +8,19 @@ use JSON::PP;
 use YAML;
 use Scalar::Util qw( blessed );
 
+use OpenXPKI::i18n qw(set_language);
 use OpenXPKI::Client::API;
 use OpenXPKI::Client::API::Request;
+use OpenXPKI::Client::CLI;
+use OpenXPKI::DTO::Authenticator;
 
+set_language('en_US');
 use Log::Log4perl qw(:easy :no_extra_logdie_message);
 pod2usage( -verbose => 1 ) unless (@ARGV);
 
 my %opt;
 Getopt::Long::Configure('pass_through','bundling');
-GetOptions( \%opt, ('verbose|v+','json','json-pretty'));
+GetOptions( \%opt, ('verbose|v+','json','json-pretty','auth-key|k=s','auth-config|c=s','no-caop','help'));
 Getopt::Long::Configure('no_pass_through');
 
 my $l4p_level;
@@ -31,11 +35,13 @@ if ($opt{verbose} > 2) {
 }
 Log::Log4perl->easy_init({ level => $l4p_level, layout => '%m%n' });
 
+my $api = OpenXPKI::Client::API->new();
 
-# TODO - use POD Formatter to get aligned layout
-my $api = OpenXPKI::Client::API->new(
-    log => Log::Log4perl->get_logger()
-);
+# help is also avail via flag for subcommands
+if ($opt{help} && @ARGV) {
+    say $api->help(@ARGV);
+    exit 0;
+}
 
 # Get list of commands
 my $command = shift;
@@ -80,7 +86,7 @@ while (@ARGV && substr($ARGV[0],0,1) ne '-') {
     push @extra_args, shift;
 }
 
-# Create GetOptsion spec from the parameters recorded in the command
+# Create GetOption spec from the parameters recorded in the command
 if (my @spec = @{$api->param_spec($command, $subcommand)}) {
     my @getopts = map {
         $_->getopt_type
@@ -92,6 +98,47 @@ if (my @spec = @{$api->param_spec($command, $subcommand)}) {
     DEBUG(Dumper \%params);
 }
 
+# TODO - Review if there is a better place for this
+my %auth_args;
+
+# For non-global commands the API injects 'realm' into param_spec
+# So if realm is present and set we put it into auth_args
+# NB: Realm argument for commands is pki_realm
+if ($params{realm}) {
+    DEBUG('Set command realm ' . $params{realm});
+    $auth_args{'pki_realm'} = $params{realm};
+}
+
+# Explicit auth key given
+if (my $keyfile = $opt{'auth-key'}) {
+    if (!-r $keyfile) {
+        LOGDIE('Unable to find/read keyfile at ' . $keyfile);
+    }
+    $auth_args{account_key} = $keyfile;
+
+# Explicit auth config
+} elsif ($opt{'auth-config'}) {
+
+
+} else {
+    my $keyfile = glob("~/.oxi/client.key");
+    # first try to autodetect the admin mode key file...
+    if ((not $opt{'no-caop'}) && -e $keyfile && -r $keyfile) {
+        $auth_args{account_key} = $keyfile;
+
+    # ...and second the user config file.
+    } else {
+
+    }
+}
+
+INFO('Enable operator mode using keyfile '. $auth_args{account_key})
+    if ($auth_args{account_key});
+
+my $client = OpenXPKI::Client::CLI->new(
+    authenticator => OpenXPKI::DTO::Authenticator->new(%auth_args)
+);
+$api->client($client);
 
 # assemble request object
 my $req = OpenXPKI::Client::API::Request->new(
@@ -108,19 +155,21 @@ DEBUG(Dumper $res);
 my $json = JSON::PP->new();
 if ($res->state == 200) {
 
+    my $out = $res->payload->params();
+    $out = OpenXPKI::i18n::i18n_walk($out);
     if ($opt{'json-pretty'}) {
-        print $json->pretty()->encode($res->payload);
+        print $json->pretty()->encode($out);
     } elsif ($opt{'json'}) {
-        print $json->encode($res->payload);
+        print $json->encode($out);
     } else {
-        print YAML::Dump $res->payload;
+        print YAML::Dump $out;
     }
     exit 0;
 
 }
 
-if (blessed $res->payload and $res->payload->isa('OpenXPKI::DTO::ValidationException')) {
-    ERROR($res->payload->message);
+if (blessed $res->payload and $res->payload->can('message')) {
+    ERROR(OpenXPKI::i18n::i18nTokenizer($res->payload->message));
     exit 10;
 }
 
@@ -165,6 +214,28 @@ print output data as compact JSON structure
 =item json-pretty
 
 print output data as formated JSON structure
+
+=item auth-config|c
+
+path to a config file to read the authentication details from
+
+=item auth-key|k
+
+path to the login key to run command as ca operator
+
+the default location is ~/.oxi/client.key
+
+=item no-caop
+
+do not authenticate as ca operator and use the default user binding
+even if a ca operator key was autodetected.
+
+=item realm
+
+realm to run the command against, also used for authentication when
+not in ca operator mode.
+
+This option is not available on global commands.
 
 =cut
 

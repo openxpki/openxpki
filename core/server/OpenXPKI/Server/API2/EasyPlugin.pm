@@ -58,7 +58,7 @@ plugin, but you can instead easily add another role to it:
 =cut
 Moose::Exporter->setup_import_methods(
     also => [ "Moose" ],
-    with_meta => [ "command" ],
+    with_meta => [ "command", "protected_command" ],
     base_class_roles => [ "OpenXPKI::Server::API2::EasyPluginRole" ],
     class_metaroles => {
         class => [ 'OpenXPKI::Server::API2::EasyPluginMetaClassTrait' ],
@@ -162,4 +162,17 @@ sub command {
     $meta->add_param_specs($command_name, $params);
 }
 
+# copy of command that registers the command with the name starting
+# with two underscores - should be reworked to use roles
+sub protected_command {
+
+    my ($meta, $command_name, $params, $code_ref) = @_;
+
+    # Add a method of the given name to the calling class
+    $meta->add_method("__$command_name", $code_ref);
+
+    # Add a parameter class (see OpenXPKI::Server::API2::EasyPluginMetaClassTrait)
+    $meta->add_param_specs("__$command_name", $params);
+
+}
 1;

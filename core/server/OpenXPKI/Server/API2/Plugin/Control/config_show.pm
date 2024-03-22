@@ -1,6 +1,5 @@
 package OpenXPKI::Server::API2::Plugin::Control::config_show;
 use OpenXPKI::Server::API2::EasyPlugin;
-with 'OpenXPKI::Server::API2::ProtectedPluginRole';
 
 =head1 NAME
 
@@ -19,7 +18,7 @@ use OpenXPKI::Server::API2::Types;
 =head2 config_show
 
 =cut
-command "config_show" => {
+protected_command "config_show" => {
     path => { isa => 'Str', required => 0, matching => qr/^ \w+(\.\w+)? $/sxi},
 } => sub {
     my ($self, $params) = @_;

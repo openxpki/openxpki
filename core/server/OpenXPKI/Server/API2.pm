@@ -145,6 +145,21 @@ has enable_acls => (
     default => 1,
 );
 
+=head2 enable_protected
+
+Optional: set to TRUE to enable running protected commands
+
+Default: FALSE
+
+Can only be set via constructor.
+
+=cut
+has enable_protected => (
+    is => 'ro',
+    isa => 'Bool',
+    default => 0,
+);
+
 =head2 acl_rule_accessor
 
 Only if C<enable_acls = 1>: callback that should return the ACL configuration
@@ -286,6 +301,12 @@ sub _load_plugins {
                     params => { now_file => $file, previous_file => $earlier_file }
                 );
             }
+
+            if (substr($cmd,0,2) eq '__' && not $self->enable_protected) {
+                $self->log->trace("API - skipping protected command $pkg: ".join(", ", @{ $pkg->commands })." - $file");
+                next;
+            }
+
             $cmd_package_map->{$cmd} = $pkg;
         }
     }

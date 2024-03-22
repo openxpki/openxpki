@@ -476,6 +476,14 @@ sub do_process_request {
         });
         $transport->write($serializer->serialize('OK'));
     }
+    elsif ($data eq 'CLI') {
+        # Refactoring ongoing - Moose class - expects array not hash
+        $service = OpenXPKI::Service::CLI->new(
+            transport     => $transport,
+            serialization => $serializer,
+        );
+        $transport->write($serializer->serialize('OK'));
+    }
     else {
         $transport->write($serializer->serialize("OpenXPKI::Server: Unsupported service.\n"));
         $log->fatal("Unsupported service.");
