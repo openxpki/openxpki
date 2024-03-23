@@ -77,9 +77,7 @@ sub start {
     $self->run(%{$self->{PARAMS}}); # from Net::Server::MultiType
 }
 
-sub cleanup() {
-    shift if (blessed($_[0]) // $_[0] // '') eq __PACKAGE__; # support object and instance calls via :: and
-
+sub cleanup {
     eval { CTX('config')->cleanup };
     eval { CTX('dbi')->disconnect };
     eval { CTX('dbi_log')->disconnect };
