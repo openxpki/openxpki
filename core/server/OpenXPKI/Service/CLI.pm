@@ -21,28 +21,20 @@ use OpenXPKI::Server::Context qw( CTX );
 use Log::Log4perl::MDC;
 
 has 'kid_list' => (
-    is => 'ro',
+    is => 'rw',
     isa => 'ArrayRef',
-    required => 1,
+    init_arg => undef,
 );
 
 has 'kid2role' => (
-    is => 'ro',
+    is => 'rw',
     isa => 'HashRef',
-    required => 1,
+    init_arg => undef,
 );
 
-around BUILDARGS => sub {
+sub BUILD {
 
-    my $orig = shift;
-    my $class = shift;
-    my %args = @_;
-
-    my $idle_timeout = CTX('config')->get(['system','server','service','CLI','idle_timeout']);
-    $args{idle_timeout} = $idle_timeout if ($idle_timeout);
-
-    my $max_execution_time = CTX('config')->get(['system','server','service','CLI','max_execution_time']);
-    $args{max_execution_time} = $max_execution_time if ($max_execution_time);
+    my $self = shift;
 
     my $kid2role;
     my @keys = CTX('config')->get_list(['system','cli','auth']);
@@ -54,9 +46,8 @@ around BUILDARGS => sub {
         $jwk_hash;
     } @keys;
 
-    $args{kid_list} = \@key_list;
-    $args{kid2role} = $kid2role;
-    return $class->$orig(%args);
+    $self->kid_list(\@key_list);
+    $self->kid2role($kid2role);
 
 };
 
