@@ -12,7 +12,6 @@ use Data::Dumper;
 
 # CPAN modules
 use Feature::Compat::Try;
-use Log::Log4perl qw(:easy);
 
 # Project modules
 use OpenXPKI::Client;
@@ -74,7 +73,7 @@ sub _preprocess {
                 if ($val eq '' && (my $choices_call = $input->hint())) {
                     $self->log->debug("Call $choices_call to get choices for $name");
                     my $choices = $self->$choices_call($req, $input);
-                    TRACE(Dumper $choices);
+                    $self->log->trace(Dumper $choices) if $self->log->is_trace;
                     return OpenXPKI::DTO::ValidationException->new( field => $input, reason => 'choice', choices => $choices )
                 }
                 $input->value($val);
@@ -88,7 +87,7 @@ sub _preprocess {
         }
     } catch ($error) {
         # type constraint validation
-        $self->log->debug(Dumper $input_last);
+        $self->log->trace(Dumper $input_last) if $self->log->is_trace;
         if (blessed $error) {
             if ($error->isa('Moose::Exception::ValidationFailed')
                 || $error->isa('Moose::Exception::ValidationFailedForTypeConstraint')) {
@@ -156,7 +155,7 @@ sub list_realm {
         SOCKETFILE => '/var/openxpki/openxpki.socket'
     });
     my $reply = $client->send_receive_service_msg('GET_REALM_LIST');
-    $self->log->debug(Dumper $reply);
+    $self->log->trace(Dumper $reply) if $self->log->is_trace;
     return [ map { $_->{name} } @{$reply->{PARAMS}} ];
 
 }
