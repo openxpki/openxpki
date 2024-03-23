@@ -45,10 +45,16 @@ OpenXPKI/Client/Simple.pm
 # New CLI / API
 OpenXPKI/Client/API.pm
 OpenXPKI/Client/API/Command.pm
+OpenXPKI/Client/API/Command/NeedRealm.pm
+OpenXPKI/Client/API/Command/Protected.pm
 OpenXPKI/Client/API/Command/acme.pm
 OpenXPKI/Client/API/Command/acme/create.pm
 OpenXPKI/Client/API/Command/acme/list.pm
 OpenXPKI/Client/API/Command/acme/show.pm
+OpenXPKI/Client/API/Command/config.pm
+OpenXPKI/Client/API/Command/config/lint.pm
+OpenXPKI/Client/API/Command/config/show.pm
+OpenXPKI/Client/API/Command/config/smtptest.pm
 OpenXPKI/Client/API/Command/workflow.pm
 OpenXPKI/Client/API/Command/workflow/create.pm
 OpenXPKI/Client/API/Command/workflow/execute.pm
@@ -56,7 +62,6 @@ OpenXPKI/Client/API/Command/workflow/list.pm
 OpenXPKI/Client/API/Command/workflow/show.pm
 OpenXPKI/Client/API/Request.pm
 OpenXPKI/Client/API/Response.pm
-
 
 # Wrappers for EST, RPC...
 OpenXPKI/Client/Service/Base.pm
@@ -205,10 +210,13 @@ OpenXPKI/Crypto/Backend/OpenSSL/Command/verify_cert.pm
 OpenXPKI/DTO/Authenticator.pm
 OpenXPKI/DTO/Field.pm
 OpenXPKI/DTO/Field/Bool.pm
+OpenXPKI/DTO/Field/Directory.pm
+OpenXPKI/DTO/Field/File.pm
 OpenXPKI/DTO/Field/Int.pm
 OpenXPKI/DTO/Field/Realm.pm
 OpenXPKI/DTO/Field/String.pm
 OpenXPKI/DTO/Message.pm
+OpenXPKI/DTO/Message/Authenticate.pm
 OpenXPKI/DTO/Message/Command.pm
 OpenXPKI/DTO/Message/ErrorResponse.pm
 OpenXPKI/DTO/Message/ProtectedCommand.pm
