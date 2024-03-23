@@ -1,29 +1,19 @@
 package OpenXPKI::Service::CLI;
-
-
-use strict;
-use warnings;
-use English;
-use Moose;
+use OpenXPKI -class;
 with 'OpenXPKI::ServiceRole';
 
 use List::Util qw( first );
 
 use Crypt::JWT qw(decode_jwt);
 use Crypt::PK::ECC;
-use Feature::Compat::Try;
 
 use Sys::SigAction qw( sig_alarm set_sig_handler );
-
-use Data::Dumper;
 
 ## used modules
 
 use OpenXPKI::DTO::Message;
 use OpenXPKI::DTO::Message::ErrorResponse;
 use OpenXPKI::DTO::Message::Response;
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Server;
 use OpenXPKI::Server::API2;
 use OpenXPKI::Server::Session;

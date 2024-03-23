@@ -1,29 +1,20 @@
 package OpenXPKI::Server;
-
-use strict;
-use warnings;
-use English;
-use base qw( Net::Server::MultiType );
+use OpenXPKI -base => 'Net::Server::MultiType';
 
 # Core modules
 use Socket;
-use Scalar::Util qw( blessed );
 
 # CPAN modules
 use Net::Server::Daemonize qw( set_uid set_gid );
 use Log::Log4perl qw(:levels);
 
 # Project modules
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Watchdog;
 use OpenXPKI::Server::Notification::Handler;
 use OpenXPKI::Util;
 use OpenXPKI::Control;
-
-use Feature::Compat::Try; # should be done after other imports to safely disable warnings
 
 
 our $stop_soon = 0;
