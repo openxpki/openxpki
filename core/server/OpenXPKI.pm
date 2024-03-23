@@ -15,46 +15,42 @@ OpenXPKI - Base module to reduce boilerlate code in our packages.
 
     use OpenXPKI;
 
-    #
-    # is equivalent to:
-    #
+    # Inheritance
+    use OpenXPKI -base => 'Net::Server::MultiType';
+    use OpenXPKI qw ( -base Net::Server::MultiType );
 
-    use strict;
-    use warnings;
-    use utf8; # allows for UTF-8 characters within the source code
-    use English;
+    # Moose class
+    use OpenXPKI -class;
 
-    # Language features
-    use feature "current_sub";
-    use feature "isa";
-    use feature "say";
-    use feature "signatures";
-    use feature "state";
-    no feature "indirect";
-    no feature "multidimensional";
-    no feature "bareword_filehandles";
-
-    # Core modules
-    use Data::Dumper;
-    use Scalar::Util "blessed";
-
-    # CPAN modules
-    use Type::Params "signature_for";
-    use Feature::Compat::Try;
-
-    # Project modules
-    use OpenXPKI::Exception;
+    # Moose role
+    use OpenXPKI -role;
 
 =cut
 
 sub import {
-    my $self = shift;
+    my $class = shift;
+
+    my %flags;
+    while (my $flag = shift) {
+        $flags{$flag} = $flag eq '-base' ? shift : 1;
+    }
+
+    my $poc_base = $flags{-base};
+    my $moose_class = $flags{-class};
+    my $moose_role = $flags{-role};
 
     # import required modules and pragmas into the calling package
 
-    # pragmas
-    strict->import::into(1);
-    warnings->import::into(1);
+    # Moose and pragmas
+    if ($moose_class) {
+        Moose->import::into(1);
+    } elsif ($moose_role) {
+        Moose::Role->import::into(1);
+    } else {
+        base->import::into(1, $poc_base) if $poc_base;
+        strict->import::into(1);
+        warnings->import::into(1);
+    }
     utf8->import::into(1);
     English->import::into(1);
 
@@ -97,15 +93,67 @@ sub import {
 
 =head1 DESCRIPTION
 
-This class only defines an C<import> method which uses L<Import::Into> to
-import various pragmas and modules into the calling package.
+When using this package various pragmas and modules are imported into the
+calling package via L<Import::Into>.
 
-=head2 use feature "current_sub"
+=head2 Plain Perl package/class
+
+    use OpenXPKI;
+
+This is equivalent to adding the following imports to the calling package:
+
+    use strict;
+    use warnings;
+    use utf8; # allows for UTF-8 characters within the source code
+    use English;
+
+    # Language features
+    use feature "current_sub";
+    use feature "isa";
+    use feature "say";
+    use feature "signatures";
+    use feature "state";
+    no feature "indirect";
+    no feature "multidimensional";
+    no feature "bareword_filehandles";
+
+    # Core modules
+    use Data::Dumper;
+    use Scalar::Util "blessed";
+
+    # CPAN modules
+    use Type::Params "signature_for";
+    use Feature::Compat::Try;
+
+    # Project modules
+    use OpenXPKI::Exception;
+
+=head2 Perl class with inheritance
+
+    use OpenXPKI -base => 'Net::Server::MultiType';
+
+Adds C<use base qw( Net::Server::MultiType )> to the list of imports.
+
+=head2 Moose class
+
+    use OpenXPKI -class;
+
+Adds C<use Moose> to the list of imports.
+
+=head2 Moose role
+
+    use OpenXPKI -role;
+
+Adds C<use Moose::Role> to the list of imports.
+
+=head2 Imports
+
+=head3 use feature "current_sub"
 
 Provides the C<__SUB__> token that returns a reference to the current subroutine
 or undef outside of a subroutine.
 
-=head2 use feature "isa"
+=head3 use feature "isa"
 
 New C<isa> infix operator:
 
@@ -115,7 +163,7 @@ New C<isa> infix operator:
 
 Also see L<https://perldoc.perl.org/feature#The-'isa'-feature>.
 
-=head2 use feature "say"
+=head3 use feature "say"
 
 New function C<say> which behaves like C<print> with a trailing newline:
 
@@ -123,7 +171,7 @@ New function C<say> which behaves like C<print> with a trailing newline:
 
 Also see L<https://perldoc.perl.org/feature#The-'say'-feature>.
 
-=head2 use feature "signatures"
+=head3 use feature "signatures"
 
 Enables subroutine signatures:
 
@@ -133,7 +181,7 @@ Enables subroutine signatures:
 
 Also see L<https://perldoc.perl.org/feature#The-'signatures'-feature>.
 
-=head2 use feature "state"
+=head3 use feature "state"
 
 New C<state> keyword:
 
@@ -145,7 +193,7 @@ New C<state> keyword:
 
 Also see L<https://perldoc.perl.org/feature#The-'state'-feature>.
 
-=head2 no feature "indirect"
+=head3 no feature "indirect"
 
 Disable indirect object syntax:
 
@@ -156,14 +204,14 @@ Disable indirect object syntax:
 
 Also see L<https://perldoc.perl.org/feature#The-'indirect'-feature>.
 
-=head2 no feature "multidimensional"
+=head3 no feature "multidimensional"
 
 Disable auto conversion of e.g. C<$foo{$x, $y}> into C<$foo{join($;, $x, $y)}>
 (this was a Perl 4 feature).
 
 Also see L<https://perldoc.perl.org/feature#The-'multidimensional'-feature>.
 
-=head2 no feature "bareword_filehandles"
+=head3 no feature "bareword_filehandles"
 
 Disable bareword filehandles for builtin functions operations:
 
@@ -172,13 +220,13 @@ Disable bareword filehandles for builtin functions operations:
 
 Also see L<https://perldoc.perl.org/feature#The-'bareword_filehandles'-feature>.
 
-=head2 use Data::Dumper
+=head3 use Data::Dumper
 
 Provides the C<Dumper> function:
 
     $self->log->trace(Dumper $obj) if $self->log->is_trace;
 
-=head2 use Scalar::Util "blessed"
+=head3 use Scalar::Util "blessed"
 
 Provides the C<blessed> function:
 
@@ -186,7 +234,7 @@ Provides the C<blessed> function:
         ...
     }
 
-=head2 use Type::Params "signature_for"
+=head3 use Type::Params "signature_for"
 
 Provides the C<signature_for> function:
 
@@ -205,7 +253,7 @@ Provides the C<signature_for> function:
 
 Also see L<https://metacpan.org/pod/Type::Params#signature_for-$function_name-=%3E-(-%25spec-)>.
 
-=head2 use Feature::Compat::Try
+=head3 use Feature::Compat::Try
 
 Provides syntax support for try/catch control flow:
 
