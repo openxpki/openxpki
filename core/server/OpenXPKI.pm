@@ -42,6 +42,9 @@ OpenXPKI - Base module to reduce boilerlate code in our packages.
     use Type::Params "signature_for";
     use Feature::Compat::Try;
 
+    # Project modules
+    use OpenXPKI::Exception;
+
 =cut
 
 sub import {
@@ -77,6 +80,9 @@ sub import {
 
     # CPAN modules
     Type::Params->import::into(1, qw( signature_for ));
+
+    # Project modules
+    OpenXPKI::Exception->import::into(1);
 
     # Disable "experimental" warnings: should be done after other imports to safely disable warnings in Perl < 5.36
     warnings->unimport::out_of(1, qw(
