@@ -36,7 +36,7 @@ sub BUILD {
 
     my $self = shift;
 
-    my $kid2role;
+    my $kid2role = {};
     my @keys = CTX('config')->get_list(['system','cli','auth']);
     my @key_list = map {
         my $pubkey = Crypt::PK::ECC->new(\$_->{key});
