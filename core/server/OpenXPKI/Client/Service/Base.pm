@@ -342,23 +342,30 @@ sub handle_request {
 
     my $self = shift;
 
-    $self->log->debug(sprintf("Incoming %s request '%s' on endpoint '%s'", uc($self->service_name), $self->operation, $self->endpoint)) if $self->log->is_debug;
+    $self->log->debug(sprintf('Incoming %s request "%s" on endpoint "%s"', uc($self->service_name), $self->operation, $self->endpoint)) if $self->log->is_debug;
 
     my $response;
     try {
         my $op_handlers = $self->op_handlers;
 
         die sprintf('%s->op_handlers() did not return an ArrayRef', $self->meta->name)
-          unless ($op_handlers and ref $op_handlers eq 'ARRAY');
+          unless ref $op_handlers eq 'ARRAY';
 
         my $i = 0;
         while (my $ops = $op_handlers->[$i++]) {
             $ops = ref $ops eq 'ARRAY' ? $ops : [ $ops ];
-            my $handler = $op_handlers->[$i++]
-              or die sprintf('Missing handler for operation [%s] in %s->op_handlers()', join(',', $ops->@*), $self->meta->name);
+            my $handler = $op_handlers->[$i++];
+
+            die sprintf('Handler for "%s" in %s->op_handlers() is missing or not a code reference', join(',', $ops->@*), $self->meta->name)
+              unless ref $handler eq 'CODE';
 
             if (my $op = first { $_ eq $self->operation } $ops->@*) {
                 $response = $handler->($self, $op);
+
+                die sprintf('Return value of operation handler for "%s" specified in %s->op_handlers() is not an instance of "OpenXPKI::Client::Service::Response"', $self->operation, $self->meta->name)
+                  unless blessed $response && $response->isa('OpenXPKI::Client::Service::Response');
+
+                last;
 
                 # if ($ep_config->{output}->{headers}) {
                 #     $self->res->headers->add($_ => $response->extra_headers->{$_}) for keys $response->extra_headers->%*;
