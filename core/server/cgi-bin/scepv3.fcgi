@@ -87,7 +87,7 @@ while (my $cgi = CGI::Fast->new("")) {
                 # this internally triggers a call to the backend to unwrap the
                 # scep message and returns the payload and some attributes
                 # will die in case of an error, so an eval is needed here!
-                $client->pkcs7message( $message );
+                $client->set_pkcs7_message( $message );
             }
             catch ($err) {
                 # something is wrong, TODO we might try to branch request vs. server errors

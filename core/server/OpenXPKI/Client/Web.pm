@@ -38,7 +38,12 @@ sub declare_routes ($self, $r) {
     #   /scep/server/PKIOperation
     # <endpoint> is optional because a default (which evaluates to false) is given.
     # <#operation> is a relaxed placeholder that allows to match the .exe suffix used by some SCEP clients.
-    $r->any('/scep/<endpoint>/<#operation>')->to('SCEP#index', endpoint => '');
+    $r->any('/scep/<endpoint>/<#operation>')->to(
+        namespace => '',
+        controller => 'OpenXPKI::Client::Service::SCEP',
+        action => 'index',
+        endpoint => '',
+    );
 }
 
 sub startup ($self) {
