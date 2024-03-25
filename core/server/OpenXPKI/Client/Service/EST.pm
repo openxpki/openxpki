@@ -1,37 +1,21 @@
 package OpenXPKI::Client::Service::EST;
-use Moose;
-use MooseX::NonMoose;
+use OpenXPKI qw( -class -nonmoose );
 
 extends 'Mojolicious::Controller';
-
 with 'OpenXPKI::Client::Service::Base';
 
 sub service_name { 'est' } # required by OpenXPKI::Client::Service::Base
 
 # Core modules
-use Carp;
-use English;
-use Data::Dumper;
 use MIME::Base64;
 
-# CPAN modules
-use Log::Log4perl qw(:easy);
-use Mojo::Base;
-
 # Project modules
-use OpenXPKI::Exception;
 use OpenXPKI::Crypt::X509;
 use OpenXPKI::Client::Service::Response;
-
-# Feature::Compat::Try should be done last to safely disable warnings
-use Feature::Compat::Try;
-# should be done after imports to safely disable warnings in Perl < 5.36
-use experimental 'signatures';
 
 
 # Mojolicious entry point
 sub index ($self) {
-
     if ($self->req->is_secure) {
         # what we expect -> noop
     } elsif ($self->config->{global}->{insecure}) {
@@ -74,10 +58,7 @@ sub index ($self) {
 }
 
 # required by OpenXPKI::Client::Service::Base
-sub custom_wf_params {
-    my $self = shift;
-    my $params = shift;
-
+sub custom_wf_params ($self, $params) {
     # TODO this should be merged with the stuff in Base without
     # having protocol specific items in the core code
     if ($self->operation =~ m{simple((re)?enroll|revoke)}) {
@@ -126,11 +107,7 @@ sub op_handlers {
 
 
 # required by OpenXPKI::Client::Service::Base
-sub prepare_enrollment_result {
-
-    my $self = shift;
-    my $workflow = shift;
-
+sub prepare_enrollment_result ($self, $workflow) {
     my $result = $self->backend()->run_command('get_cert',{
         format => 'PKCS7',
         identifier => $workflow->{context}->{cert_identifier},
@@ -143,13 +120,9 @@ sub prepare_enrollment_result {
         result => $result,
         workflow => $workflow,
     );
-
 }
 
-sub handle_revocation_request {
-
-    my $self = shift;
-
+sub handle_revocation_request ($self) {
     my $param = $self->wf_params
         or return OpenXPKI::Client::Service::Response->new( 50010 );
 
