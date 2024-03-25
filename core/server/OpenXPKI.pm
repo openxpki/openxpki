@@ -21,6 +21,7 @@ OpenXPKI - Base module to reduce boilerlate code in our packages.
 
     # Moose class
     use OpenXPKI -class;
+    use OpenXPKI qw( -class -nonmoose );
 
     # Moose role
     use OpenXPKI -role;
@@ -37,6 +38,7 @@ sub import {
 
     my $poc_base = $flags{-base};
     my $moose_class = $flags{-class};
+    my $moose_nonmoose = $flags{-nonmoose};
     my $moose_role = $flags{-role};
 
     # import required modules and pragmas into the calling package
@@ -44,6 +46,7 @@ sub import {
     # Moose and pragmas
     if ($moose_class) {
         Moose->import::into(1);
+        MooseX::NonMoose->import::into(1) if $moose_nonmoose;
     } elsif ($moose_role) {
         Moose::Role->import::into(1);
     } else {
@@ -132,19 +135,23 @@ This is equivalent to adding the following imports to the calling package:
 
     use OpenXPKI -base => 'Net::Server::MultiType';
 
-Adds C<use base qw( Net::Server::MultiType )> to the list of imports.
+adds C<use base qw( Net::Server::MultiType )> to the list of imports.
 
 =head2 Moose class
 
     use OpenXPKI -class;
 
-Adds C<use Moose> to the list of imports.
+adds C<use Moose> to the list of imports.
+
+    use OpenXPKI qw( -class -nonmoose );
+
+also adds C<use MooseX::NonMoose> to the list of imports.
 
 =head2 Moose role
 
     use OpenXPKI -role;
 
-Adds C<use Moose::Role> to the list of imports.
+adds C<use Moose::Role> to the list of imports.
 
 =head2 Imports
 
