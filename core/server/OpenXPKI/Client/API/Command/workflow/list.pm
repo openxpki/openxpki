@@ -13,7 +13,6 @@ use OpenXPKI::Client::API::Response;
 use OpenXPKI::DTO::Field;
 use OpenXPKI::DTO::Field::Int;
 use OpenXPKI::DTO::Field::String;
-use OpenXPKI::DTO::Field::Realm;
 use OpenXPKI::DTO::ValidationException;
 
 =head1 NAME

@@ -33,6 +33,16 @@ Feed me!
 
 =item execute
 
+=item wakeup
+
+=item resume
+
+=item reset
+
+=item fail
+
+=item archive
+
 =back
 
 =cut

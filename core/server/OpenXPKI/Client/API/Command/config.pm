@@ -24,16 +24,15 @@ Feed me!
 
 =over
 
-=item lint
-
 =item show
 
-=item create
+=item verify
+
+=item smtptest
 
 =back
 
 =cut
-
 
 __PACKAGE__->meta()->make_immutable();
 

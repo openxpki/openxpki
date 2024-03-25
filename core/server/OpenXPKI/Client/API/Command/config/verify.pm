@@ -1,4 +1,4 @@
-package OpenXPKI::Client::API::Command::config::lint;
+package OpenXPKI::Client::API::Command::config::verify;
 
 use Moose;
 extends 'OpenXPKI::Client::API::Command::config';
@@ -28,7 +28,8 @@ OpenXPKI::Client::API::Command::config::show;
 
 =head1 SYNOPSIS
 
-Show information of the (running) OpenXPKI configuration
+Show information of the (running) OpenXPKI configuration or
+validate a configuration tree.
 
 =cut
 
@@ -38,8 +39,30 @@ class_has 'param_spec' => (
     default => sub {[
         OpenXPKI::DTO::Field::Directory->new( name => 'config', label => 'Path to local config tree', value => '/etc/openxpki/config.d' ),
         OpenXPKI::DTO::Field::String->new( name => 'path', label => 'Path to dump' ),
+        OpenXPKI::DTO::Field::String->new( name => 'module', label => 'Optional linter module' ),
     ]},
 );
+
+sub lint_module {
+    my $self = shift;
+    my $config = shift;
+    my $module = shift;
+    my $params = shift;
+
+    my $uc_module = ucfirst($module);
+    my $class = "OpenXPKI::Config::Lint::$uc_module";
+    if (Mojo::Loader::load_class($class)) {
+        die "Unable to load linter module '$uc_module'";
+    }
+    $self->log->debug("Linting module '$uc_module'");
+    my $linter = $class->new(
+        config => $config,
+        $params->{realm} ? (realm => $params->{realm}) : (),
+        $uc_module eq 'Workflow' && $params->{workflow} ? (workflow => $params->{workflow}) : (),
+    );
+    return $linter->lint;
+}
+
 
 sub execute {
 
@@ -69,6 +92,14 @@ sub execute {
                     value => $hash
                 }
             );
+        } elsif (my $module = $req->param('module')) {
+            my $res_lint = $self->lint_module($conf, $module,
+                $self->_build_hash_from_payload($req));
+
+            $res = OpenXPKI::DTO::Message::Response->new(
+                params => { digest => $conf->checksum(), $module => $res_lint }
+            );
+
         } else {
             $res = OpenXPKI::DTO::Message::Response->new(
                 params => { digest => $conf->checksum() }
@@ -85,5 +116,6 @@ sub execute {
 __PACKAGE__->meta()->make_immutable();
 
 1;
+
 
 

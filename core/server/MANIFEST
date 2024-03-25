@@ -53,14 +53,20 @@ OpenXPKI/Client/API/Command/acme/create.pm
 OpenXPKI/Client/API/Command/acme/list.pm
 OpenXPKI/Client/API/Command/acme/show.pm
 OpenXPKI/Client/API/Command/config.pm
-OpenXPKI/Client/API/Command/config/lint.pm
+OpenXPKI/Client/API/Command/config/verify.pm
 OpenXPKI/Client/API/Command/config/show.pm
 OpenXPKI/Client/API/Command/config/smtptest.pm
 OpenXPKI/Client/API/Command/workflow.pm
+OpenXPKI/Client/API/Command/workflow/archive.pm
 OpenXPKI/Client/API/Command/workflow/create.pm
 OpenXPKI/Client/API/Command/workflow/execute.pm
+OpenXPKI/Client/API/Command/workflow/fail.pm
 OpenXPKI/Client/API/Command/workflow/list.pm
+OpenXPKI/Client/API/Command/workflow/reset.pm
+OpenXPKI/Client/API/Command/workflow/resume.pm
 OpenXPKI/Client/API/Command/workflow/show.pm
+OpenXPKI/Client/API/Command/workflow/wakeup.pm
+
 OpenXPKI/Client/API/Request.pm
 OpenXPKI/Client/API/Response.pm
 
