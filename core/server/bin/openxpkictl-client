@@ -17,7 +17,7 @@ getopt
     'h|help' => \$help,
     'd|dev|debug'  => \$development;
 
-die extract_usage if $help;
+die extract_usage, "\n" if $help;
 
 # Log::Log4perl->easy_init($FATAL);
 
@@ -46,3 +46,41 @@ chown $uid, $gid, $socket_path;
 
 # Run, Forest, run!
 $daemon->run;
+
+=head1 NAME
+
+openxpkictl-client - Experimental startup script for Mojolicious based web services
+
+=head1 USAGE
+
+openxpkictl-client [OPTIONS]
+
+=head1 OPTIONS
+
+=over
+
+=item B<-h>
+
+=item B<--help>
+
+Print a brief help message.
+
+=item B<-d>
+
+=item B<--dev>
+
+=item B<--debug>
+
+Switch Mojolicious into "development" mode:
+
+=over
+
+=item * treat all requests as if transmitted over HTTPS,
+
+=item * output all log messages to the screen (ignores Log4perl configuration),
+
+=item * print detailed Mojolicious exceptions.
+
+=back
+
+=back
