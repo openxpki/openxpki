@@ -71,6 +71,7 @@ sub start {
     # Also see https://github.com/perl5-dbi/DBD-MariaDB/pull/175.
     # This workaround should not cause problems because DBIx::Handler does a
     # reconnect if neccessary.
+    # FIXME Remove workaround when https://github.com/perl5-dbi/DBD-MariaDB/pull/175 is resolved
     eval { CTX('dbi')->disconnect if OpenXPKI::Server::Context::hascontext('dbi') };
     eval { CTX('dbi_log')->disconnect if OpenXPKI::Server::Context::hascontext('dbi_log') };
 
