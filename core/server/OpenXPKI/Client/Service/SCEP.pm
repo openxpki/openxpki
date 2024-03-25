@@ -1,39 +1,35 @@
 package OpenXPKI::Client::Service::SCEP;
-use Moose;
+use OpenXPKI -class;
 
 with 'OpenXPKI::Client::Service::Base';
 
 sub service_name { 'scep' } # required by OpenXPKI::Client::Service::Base
 
-use Carp;
-use English;
-use Data::Dumper;
-use Log::Log4perl qw(:easy);
 use MIME::Base64;
-use OpenXPKI::Exception;
 use OpenXPKI::Client::Service::Response;
 
 has transaction_id => (
     is => 'ro',
     isa => 'Str',
+    init_arg => undef,
     lazy => 1,
-    default => sub { return shift->attr()->{transaction_id}; }
+    default => sub { shift->attr->{transaction_id} },
 );
 
 has message_type => (
     is => 'ro',
     isa => 'Str',
+    init_arg => undef,
     lazy => 1,
-    default => sub {
-        return shift->attr()->{message_type};
-    }
+    default => sub { shift->attr->{message_type} },
 );
 
 has signer => (
     is => 'ro',
     isa => 'Str',
+    init_arg => undef,
     lazy => 1,
-    default => sub { return shift->attr()->{signer} || ''; }
+    default => sub { shift->attr->{signer} || '' },
 );
 
 # this can NOT be set via the constructor as we need other attributes
@@ -43,42 +39,35 @@ has pkcs7message => (
     is => 'rw',
     isa => 'Str',
     init_arg => undef,
-    trigger => sub { shift->attr() }
 );
 
 has attr => (
     is => 'ro',
     isa => 'HashRef',
+    init_arg => undef,
     lazy => 1,
     builder => '__parse_message'
 );
 
-
-sub __parse_message {
-
-    my $self = shift;
-
-    my $pkcs7 = $self->pkcs7message();
-    die "Message is not set or empty" unless($pkcs7);
+sub __parse_message ($self) {
+    my $pkcs7 = $self->pkcs7message or die "PKCS7 message is not set or empty";
     my $result = {};
-    eval {
-        $result = $self->backend()->run_command('scep_unwrap_message',{
+    try {
+        $result = $self->backend->run_command('scep_unwrap_message', {
             message => $pkcs7
         });
-    };
-    if ($EVAL_ERROR) {
-        $self->log->error("Unable to unwrap message ($EVAL_ERROR)");
-        die  "Unable to unwrap message";
     }
-    $self->log->trace(Dumper $result) if $self->log->is_trace;
+    catch ($err) {
+        $self->log->error("Unable to unwrap message: $err");
+        die "Unable to unwrap message";
+    }
+    $self->log->trace("Unwrapped message: " . Dumper $result) if $self->log->is_trace;
     return $result;
 }
 
-# required by OpenXPKI::Client::Service::Base
-sub custom_wf_params {
-    my $self = shift;
-    my $params = shift;
 
+# required by OpenXPKI::Client::Service::Base
+sub custom_wf_params ($self, $params) {
     # nothing special if we are NOT in PKIOperation mode
     return unless $self->operation eq 'PKIOperation';
 
@@ -124,38 +113,29 @@ sub op_handlers {
 }
 
 # required by OpenXPKI::Client::Service::Base
-sub prepare_enrollment_result {
-
-    my $self = shift;
-    my $workflow = shift;
-
+sub prepare_enrollment_result ($self, $workflow) {
     return OpenXPKI::Client::Service::Response->new(
         workflow => $workflow,
         result => $workflow->{context}->{cert_identifier},
     );
-
 }
 
-sub generate_pkcs7_response {
-
-    my $self = shift;
-    my $response = shift;
-
+sub generate_pkcs7_response ($self, $response) {
     my %params = (
-        alias           => $self->attr()->{alias},
+        alias           => $self->attr->{alias},
         transaction_id  => $self->transaction_id,
-        request_nonce   => $self->attr()->{sender_nonce},
-        digest_alg      => $self->attr()->{digest_alg},
-        enc_alg         => $self->attr()->{enc_alg},
-        key_alg         => $self->attr()->{key_alg},
+        request_nonce   => $self->attr->{sender_nonce},
+        digest_alg      => $self->attr->{digest_alg},
+        enc_alg         => $self->attr->{enc_alg},
+        key_alg         => $self->attr->{key_alg},
     );
 
-    if ($response->is_pending()) {
+    if ($response->is_pending) {
         $self->log->info('Send pending response for ' . $self->transaction_id );
-        return $self->backend()->run_command('scep_generate_pending_response', \%params);
+        return $self->backend->run_command('scep_generate_pending_response', \%params);
     }
 
-    if ($response->is_client_error()) {
+    if ($response->is_client_error) {
 
         # if an invalid recipient token was given, the alias is unset
         # the API will take the  default token to generate the reponse
@@ -172,20 +152,22 @@ sub generate_pkcs7_response {
         }
 
         $self->log->warn('Client error / malformed request ' . $failInfo);
-        return $self->backend()->run_command('scep_generate_failure_response',
-            { %params, failinfo => $failInfo });
+        return $self->backend->run_command('scep_generate_failure_response', {
+            %params,
+            failinfo => $failInfo,
+        });
     }
 
     if (not $response->is_server_error) {
         $params{chain} = $self->config->{output}->{chain} || 'chain';
-        return $self->backend()->run_command('scep_generate_cert_response',
-        { %params, (
-            identifier  => $response->result,
-            signer      => $self->signer,
-        )});
+        return $self->backend->run_command('scep_generate_cert_response', {
+            %params,
+            identifier => $response->result,
+            signer => $self->signer,
+        });
     }
-    return;
 
+    return;
 }
 
 __PACKAGE__->meta->make_immutable;
