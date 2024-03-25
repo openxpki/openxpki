@@ -20,7 +20,6 @@ The namespace is I<system.watchdog>. The properties are:
 
 # Core modules
 use English;
-use POSIX;
 
 # CPAN modules
 use Log::Log4perl::MDC;

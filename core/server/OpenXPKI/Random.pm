@@ -6,7 +6,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use MIME::Base64;
 
-use POSIX;
+use Fcntl qw( :DEFAULT ); # import F_* and O_* constants
 
 =head1 OpenXPKI::Random
 
@@ -23,12 +23,6 @@ has token => (
         return CTX('api2')->get_default_token();
     },
 );
-
-sub BUILD {
-    my $self = shift;
-    my $args = shift;
-
-}
 
 =head1 Configuration
 

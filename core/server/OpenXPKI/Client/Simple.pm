@@ -63,7 +63,6 @@ arguments the settings in the file are ignored.
 
 use English;
 use Moose;
-use POSIX qw( strftime );
 use Getopt::Long;
 use Pod::Usage;
 use Data::Dumper;

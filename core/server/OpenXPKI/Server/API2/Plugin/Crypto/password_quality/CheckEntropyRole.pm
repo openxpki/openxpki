@@ -23,7 +23,7 @@ L<OpenXPKI::Server::API2::Plugin::Crypto::password_quality>.
 use Moose::Role;
 
 # Core modules
-use POSIX qw(floor);
+use POSIX ();
 
 # Project modules
 use OpenXPKI::Debug;
@@ -289,7 +289,7 @@ sub _calc_entropy {
 
     if ($pci != 0) {
         my $bits_per_char = log($pci) / log(2.0);
-        $entropy = floor($bits_per_char * $eff_len);
+        $entropy = POSIX::floor($bits_per_char * $eff_len);
     }
     ##! 32: "Password entropy: $entropy"
     return $entropy;

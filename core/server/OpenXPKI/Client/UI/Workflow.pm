@@ -7,7 +7,7 @@ with 'OpenXPKI::Client::UI::Role::OutputField';
 
 # Core modules
 use DateTime;
-use POSIX;
+use POSIX ();
 use Data::Dumper;
 use Cache::LRU;
 

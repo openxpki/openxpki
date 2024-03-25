@@ -13,7 +13,6 @@ use Digest::MD5;
 use Proc::SafeExec;
 use MIME::Base64;
 use Crypt::Argon2;
-use POSIX;
 
 sub hash {
 

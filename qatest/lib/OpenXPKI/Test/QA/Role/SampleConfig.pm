@@ -9,7 +9,7 @@ to include the complete sample configuration from `config/config.d`
 =cut
 
 # Core modules
-use POSIX;
+use English;
 
 # CPAN modules
 use Test::More;
@@ -177,10 +177,10 @@ sub _customize_system_server {
     # $conf->{session}  is set by OpenXPKI::Test->init_base_config later on
 
     # Daemon settings
-    $conf->{user} =  (getpwuid(geteuid))[0]; # run under same user as test scripts
-    $conf->{group} = (getgrgid(getegid))[0];
+    $conf->{user} =  (getpwuid($EUID))[0]; # run under same user as test scripts
+    $conf->{group} = (getgrgid($EGID))[0];
     $conf->{socket_file} = $self->path_socket_file;
-    $conf->{socket_owner} = (getpwuid(geteuid))[0]; # same user as the one who runs the test scripts
+    $conf->{socket_owner} = (getpwuid($EUID))[0]; # same user as the one who runs the test scripts
     $conf->{pid_file} = $self->path_pid_file;
     $conf->{stderr} = $self->path_stderr_file;
     $conf->{tmpdir} = $self->path_temp_dir;
