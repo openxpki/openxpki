@@ -32,39 +32,30 @@ has signer => (
     default => sub { shift->attr->{signer} || '' },
 );
 
-# this can NOT be set via the constructor as we need other attributes
-# to finally parse the message. The trigger "reads" attr which then
-# triggers the actual parsing which allows us to keep attr read-only
-has pkcs7message => (
-    is => 'rw',
-    isa => 'Str',
-    init_arg => undef,
-);
-
 has attr => (
-    is => 'ro',
+    is => 'rw',
     isa => 'HashRef',
     init_arg => undef,
-    lazy => 1,
-    builder => '__parse_message'
+    trigger => sub { die '"attr" can only be set once' if scalar @_ > 2 },
 );
 
-sub __parse_message ($self) {
-    my $pkcs7 = $self->pkcs7message or die "PKCS7 message is not set or empty";
-    my $result = {};
+sub pkcs7message ($self, $pkcs7) {
+    die "PKCS7 message is not set or empty" unless $pkcs7;
+
+    my $attrs = {};
     try {
-        $result = $self->backend->run_command('scep_unwrap_message', {
+        $attrs = $self->backend->run_command('scep_unwrap_message', {
             message => $pkcs7
         });
     }
     catch ($err) {
-        $self->log->error("Unable to unwrap message: $err");
-        die "Unable to unwrap message";
+        $self->log->error("Unable to unwrap PKCS7 message: $err");
+        die "Unable to unwrap PKCS7 message";
     }
-    $self->log->trace("Unwrapped message: " . Dumper $result) if $self->log->is_trace;
-    return $result;
-}
 
+    $self->log->trace("Unwrapped PKCS7 message: " . Dumper $attrs) if $self->log->is_trace;
+    $self->attr($attrs);
+}
 
 # required by OpenXPKI::Client::Service::Base
 sub custom_wf_params ($self, $params) {
