@@ -62,12 +62,18 @@ sub _init_state {
 
     my $self = shift;
     my $response = $self->payload;
-    return 500 unless (blessed $response);
 
+    # if the payload is not a blessed object we assume it is a good response
+    return 200 unless (blessed $response);
+
+    # An encapsualted error response from the execution
+    # we assume this is a client error
     return 400 if ($response->isa('OpenXPKI::DTO::Message::ErrorResponse'));
 
+    # A good response object
     return 200 if ($response->isa('OpenXPKI::DTO::Message::Response'));
 
+    # no idea what happened - server returned an unknown exception
     return 500;
 
 }

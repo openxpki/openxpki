@@ -51,22 +51,16 @@ sub execute {
     my $self = shift;
     my $req = shift;
 
-    my $client;
-    try {
-
-        my $wf_parameters = {};
-        if ($req->payload()) {
-            $wf_parameters = $self->_build_hash_from_payload($req);
-            $self->log->info(Dumper $wf_parameters);
-        }
-        my $res = $self->api->run_command('create_workflow_instance', {
-            workflow => $req->param('type'),
-            params => $wf_parameters,
-        });
-        return OpenXPKI::Client::API::Response->new( payload => $res );
-    } catch ($err) {
-        return OpenXPKI::Client::API::Response->new( state => 400, payload => $err );
+    my $wf_parameters = {};
+    if ($req->payload()) {
+        $wf_parameters = $self->_build_hash_from_payload($req);
+        $self->log->info(Dumper $wf_parameters);
     }
+    my $res = $self->api->run_command('create_workflow_instance', {
+        workflow => $req->param('type'),
+        params => $wf_parameters,
+    });
+    return OpenXPKI::Client::API::Response->new( payload => $res );
 
 }
 

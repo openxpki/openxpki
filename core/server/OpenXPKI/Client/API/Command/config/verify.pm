@@ -68,48 +68,37 @@ sub execute {
 
     my $self = shift;
     my $req = shift;
-    try {
-
-        my $res;
-        # the given path is known to exist as this is checked by the validator already!
-        my $conf = OpenXPKI::Config::Backend->new( LOCATION => $req->param('config') );
-        # YAML was ok but there is no system node
-        if (!$conf->get_hash('system')) {
-            die 'No *system* node was found';
-        } elsif (my $path = $req->param('path')) {
-            my @path = split /\./, $path;
-            my $hash = $conf->get_hash( shift @path );
-            foreach my $item (@path) {
-                if (!defined $hash->{$item}) {
-                    die "No such component ($item)";
-                }
-                $hash = $hash->{$item};
+    my $res;
+    # the given path is known to exist as this is checked by the validator already!
+    my $conf = OpenXPKI::Config::Backend->new( LOCATION => $req->param('config') );
+    # YAML was ok but there is no system node
+    if (!$conf->get_hash('system')) {
+        die 'No *system* node was found';
+    } elsif (my $path = $req->param('path')) {
+        my @path = split /\./, $path;
+        my $hash = $conf->get_hash( shift @path );
+        foreach my $item (@path) {
+            if (!defined $hash->{$item}) {
+                die "No such component ($item)";
             }
-            $res = OpenXPKI::DTO::Message::Response->new(
-                params => {
-                    digest => $conf->checksum(),
-                    path => $path,
-                    value => $hash
-                }
-            );
-        } elsif (my $module = $req->param('module')) {
-            my $res_lint = $self->lint_module($conf, $module,
-                $self->_build_hash_from_payload($req));
-
-            $res = OpenXPKI::DTO::Message::Response->new(
-                params => { digest => $conf->checksum(), $module => $res_lint }
-            );
-
-        } else {
-            $res = OpenXPKI::DTO::Message::Response->new(
-                params => { digest => $conf->checksum() }
-            );
+            $hash = $hash->{$item};
         }
+        $res = {
+            digest => $conf->checksum(),
+            path => $path,
+            value => $hash
+        };
+    } elsif (my $module = $req->param('module')) {
+        my $res_lint = $self->lint_module($conf, $module,
+            $self->_build_hash_from_payload($req));
 
-        return OpenXPKI::Client::API::Response->new( payload => $res );
-    } catch ($err) {
-        return OpenXPKI::Client::API::Response->new( state => 400, payload => $err );
+        $res = { digest => $conf->checksum(), $module => $res_lint };
+
+    } else {
+        $res = { digest => $conf->checksum() };
     }
+
+    return OpenXPKI::Client::API::Response->new( payload => $res );
 
 }
 

@@ -17,6 +17,7 @@ use Feature::Compat::Try;
 use OpenXPKI::Client;
 use OpenXPKI::Client::CLI;
 use OpenXPKI::Client::Simple;
+use OpenXPKI::FileUtils;
 use OpenXPKI::DTO::ValidationException;
 use OpenXPKI::DTO::Message::Command;
 use OpenXPKI::DTO::Message::ProtectedCommand;
@@ -76,7 +77,11 @@ sub _preprocess {
                     $self->log->trace(Dumper $choices) if $self->log->is_trace;
                     return OpenXPKI::DTO::ValidationException->new( field => $input, reason => 'choice', choices => $choices )
                 }
+                # this triggers the validation by appling the Moose type spec
                 $input->value($val);
+                # this writes back the value from the moose attribute which
+                # MIGHT be a change if the value as a coerce method defined
+                $req->params()->{$name} = $input->value();
             } elsif ($input->has_value($name)) {
                 # write back a default value from the field spec into the request
                 $req->params()->{$name} = $input->value();
@@ -84,6 +89,13 @@ sub _preprocess {
                 return OpenXPKI::DTO::ValidationException->new( field => $input, reason => 'required' );
             }
             # Field is set if needed and field matches type contraint
+            # TODO - we need to rework File/Directory type when making
+            # a webservice from this
+            if ($input->isa('OpenXPKI::DTO::Field::File') && $input->has_value($name)) {
+                $self->log->debug("Populate '$name' from file '$input->value'");
+                $req->params()->{$name} =
+                    OpenXPKI::FileUtils->new()->read_file($input->value);
+            }
         }
     } catch ($error) {
         # type constraint validation

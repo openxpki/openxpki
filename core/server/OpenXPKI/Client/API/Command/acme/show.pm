@@ -40,23 +40,16 @@ sub execute {
     my $self = shift;
     my $req = shift;
 
-    my $client;
-    try {
+    my $res = $self->api->run_command('get_data_pool_entry', {
+        namespace => 'nice.acme.account',
+        key => $req->param('id'),
+        deserialize => 'simple',
+    });
 
-
-        my $res = $self->api->run_command('get_data_pool_entry', {
-            namespace => 'nice.acme.account',
-            key => $req->param('id'),
-            deserialize => 'simple',
-        });
-
-        my $out = $res->{value};
-        $out->{key_id} = $req->param('id');
-        delete $out->{jwk} unless($req->param('with-privatekey'));
-        return OpenXPKI::Client::API::Response->new( payload => $out );
-    } catch ($err) {
-        return OpenXPKI::Client::API::Response->new( state => 400, payload => $err );
-    }
+    my $out = $res->{value};
+    $out->{key_id} = $req->param('id');
+    delete $out->{jwk} unless($req->param('with-privatekey'));
+    return OpenXPKI::Client::API::Response->new( payload => $out );
 
 }
 

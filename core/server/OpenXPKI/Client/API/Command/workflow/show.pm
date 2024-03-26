@@ -43,25 +43,16 @@ sub execute {
     my $self = shift;
     my $req = shift;
 
-    try {
-        my %param;
-        if ($req->param('attributes')) {
-            $param{'with_attributes'} = 1;
-        }
-        DEBUG(Dumper \%param);
-        my $res = $self->api->run_command('get_workflow_info', { id => $req->param('id'), %param });
-        if ($req->param('deserialize') && $res->isa('OpenXPKI::DTO::Message::Response')) {
-            my $ctx = $res->params()->{workflow}->{context};
-            my $ser = OpenXPKI::Serialization::Simple->new();
-            foreach my $key (keys (%{$ctx})) {
-                next unless (OpenXPKI::Serialization::Simple::is_serialized($ctx->{$key}));
-                $ctx->{$key} = $ser->deserialize($ctx->{$key});
-            }
-        }
-        return OpenXPKI::Client::API::Response->new( payload => $res );
-    } catch ($err) {
-        return OpenXPKI::Client::API::Response->new( state => 400, payload => $err );
+    my %param;
+    if ($req->param('attributes')) {
+        $param{'with_attributes'} = 1;
     }
+    $self->log->trace(Dumper \%param) if ($self->log->is_trace);
+    my $res = $self->api->run_command('get_workflow_info', { id => $req->param('id'), %param });
+    if ($req->param('deserialize')) {
+       $self->deserialize_context($res);
+    }
+    return OpenXPKI::Client::API::Response->new( payload => $res );
 
 }
 

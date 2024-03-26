@@ -44,16 +44,12 @@ sub execute {
     my $self = shift;
     my $req = shift;
 
-    try {
-        my $res = $self->api->run_command('fail_workflow', {
-            id => $req->param('id'),
-            error => $req->param('error') || '',
-            reason => $req->param('reason') || '',
-        });
-        return OpenXPKI::Client::API::Response->new( payload => $res );
-    } catch ($err) {
-        return OpenXPKI::Client::API::Response->new( state => 400, payload => $err );
-    }
+    my $res = $self->api->run_command('fail_workflow', {
+        id => $req->param('id'),
+        error => $req->param('error') || '',
+        reason => $req->param('reason') || '',
+    });
+    return OpenXPKI::Client::API::Response->new( payload => $res );
 
 }
 

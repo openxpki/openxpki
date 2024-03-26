@@ -43,16 +43,12 @@ sub execute {
 
     my $self = shift;
     my $req = shift;
-    try {
-        my $res = $self->api->run_command('send_notification', {
-            message => $req->param('message'),
-            params => { notify_to => $req->param('mailto') },
-        });
-        return OpenXPKI::Client::API::Response->new( payload => $res );
-    } catch ($err) {
-        return OpenXPKI::Client::API::Response->new( state => 400, payload => $err );
-    }
 
+    my $res = $self->api->run_command('send_notification', {
+        message => $req->param('message'),
+        params => { notify_to => $req->param('mailto') },
+    });
+    return OpenXPKI::Client::API::Response->new( payload => $res );
 }
 
 __PACKAGE__->meta()->make_immutable();

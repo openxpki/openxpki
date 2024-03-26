@@ -8,8 +8,7 @@ use Crypt::JWT qw(encode_jwt);
 use Crypt::PK::ECC;
 use Data::Dumper;
 
-use OpenXPKI::DTO::Message::Command;
-
+use OpenXPKI::DTO::Message;
 
 =head1 NAME
 
@@ -79,7 +78,9 @@ sub send_message {
         );
     }
     $self->log()->debug($msg) if ($self->log()->is_debug);
-    return $self->talk($msg);
+    my $res = $self->talk($msg);
+    $self->log()->trace(Dumper $res) if ($self->log()->is_trace);
+    return OpenXPKI::DTO::Message::from_hash($res);
 }
 
 

@@ -1,8 +1,6 @@
 package OpenXPKI::Client::API;
 
-use Moose;
-
-use Data::Dumper;
+use OpenXPKI -class;
 use Mojo::Loader;
 
 use Pod::Find qw(pod_where);
@@ -252,6 +250,9 @@ with the payload holding the result of the command. If a validation
 error occurs, the result code is 400 and the payload is an instance of
 C<OpenXPKI::DTO::ValidationException>.
 
+The C<execute> method is wrapped by a try/catch and expected to return
+an instance of C<OpenXPKI::Client::API::Response>.
+
 Check the documentation of C<OpenXPKI::Client::API::Command> for more
 details.
 
@@ -268,9 +269,25 @@ sub dispatch {
     if (my $validation = $command_ref->preprocess($request)) {
         return $validation;
     }
-    # Returns the response data structure
-    return $command_ref->execute($request);
 
+    # Must return the response data structure
+    my $ret;
+    try {
+        $ret = $command_ref->execute($request);
+        if (!blessed $ret) {
+            $self->log->debug('Return value of command is not a blessed object');
+            die "$ret";
+        }
+        if (!$ret->isa('OpenXPKI::Client::API::Response')) {
+            $self->log->debug('Return value of command is not a response object');
+            die $ret;
+        }
+    } catch ($err) {
+        $ret = OpenXPKI::Client::API::Response->new(
+            state => 400, payload => $err
+        );
+    }
+    return $ret;
 }
 
 =head2 run_command I<command>, I<params>
@@ -289,8 +306,7 @@ sub run_command {
         defined $params ? (params =>  $params) : ()
     );
 
-    my $res = $self->client()->send_message($msg);
-    return OpenXPKI::DTO::Message::from_hash($res);
+    return $self->send_message($msg);
 }
 
 =head2 run_protected_command I<command>, I<params>
@@ -309,8 +325,28 @@ sub run_protected_command {
         defined $params ? (params =>  $params) : ()
     );
 
-    my $res = $self->client()->send_message($msg);
-    return OpenXPKI::DTO::Message::from_hash($res);
+    return $self->send_message($msg);
+
+}
+
+sub send_message {
+
+    my $self = shift;
+    my $msg = shift;
+
+    my $resp = $self->client()->send_message($msg);
+
+    OpenXPKI::Exception::Command->throw(
+        message => $resp->message,
+    ) if ($resp->isa('OpenXPKI::DTO::Message::ErrorResponse'));
+
+    OpenXPKI::Exception::Command->throw(
+        message => 'Got unknown response on command execution',
+        error => $resp,
+    ) unless ($resp->isa('OpenXPKI::DTO::Message::Response'));
+
+    return $resp;
+
 }
 
 __PACKAGE__->meta()->make_immutable();

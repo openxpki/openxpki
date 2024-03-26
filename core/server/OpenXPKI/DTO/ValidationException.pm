@@ -1,11 +1,13 @@
 package OpenXPKI::DTO::ValidationException;
 
+# TODO - merge with OpenXPKI::Exception
+
 use Moose;
 use OpenXPKI::DTO::Field;
 
 has 'field' => (
     is => 'ro',
-    isa => 'OpenXPKI::DTO::Field',
+    isa => 'OpenXPKI::DTO::Field|Str',
     required => 1,
 );
 

@@ -24,16 +24,19 @@ GetOptions( \%opt, ('verbose|v+','json','json-pretty','auth-key|k=s','auth-confi
 Getopt::Long::Configure('no_pass_through');
 
 my $l4p_level;
+my $l4p_layout = '%m%n';
 if ($opt{verbose} > 2) {
     $l4p_level = $TRACE;
+    $l4p_layout = '%l %F:%L %m%n';
 } elsif ($opt{verbose} == 2) {
     $l4p_level = $DEBUG;
+    $l4p_layout = '%m%n';
 } elsif ($opt{verbose} == 1) {
     $l4p_level = $INFO;
 } else {
     $l4p_level = $ERROR;
 }
-Log::Log4perl->easy_init({ level => $l4p_level, layout => '%m%n' });
+Log::Log4perl->easy_init({ level => $l4p_level, layout => $l4p_layout });
 
 my $api = OpenXPKI::Client::API->new();
 
@@ -150,13 +153,20 @@ my $req = OpenXPKI::Client::API::Request->new(
 TRACE(Dumper $req);
 # Dispatch request - returns O::C::API::Response
 my $res = $api->dispatch($command, $subcommand, $req);
-DEBUG(Dumper $res);
+TRACE(Dumper $res);
 
 my $json = JSON::PP->new();
 if ($res->state == 200) {
 
-    my $out = $res->payload->params();
-    $out = OpenXPKI::i18n::i18n_walk($out);
+    my $out = $res->payload;
+    if (blessed $out) {
+        $out = $out->params();
+    }
+    if (ref $out eq '')  {
+        $out = OpenXPKI::i18n::i18nTokenizer($out);
+    } else {
+        $out = OpenXPKI::i18n::i18n_walk($out);
+    }
     if ($opt{'json-pretty'}) {
         print $json->pretty()->encode($out);
     } elsif ($opt{'json'}) {
@@ -168,19 +178,23 @@ if ($res->state == 200) {
 
 }
 
-if (blessed $res->payload and $res->payload->can('message')) {
+if (blessed $res->payload and $res->payload->isa('OpenXPKI::DTO::ValidationException')) {
     ERROR(OpenXPKI::i18n::i18nTokenizer($res->payload->message));
     exit 10;
 }
 
-DEBUG(Dumper $res);
-
-if (!ref $res->payload) {
-    ERROR($res->payload || 'Looks like we have an unknown problem');
-    exit 255;
+# a simple plain error message
+if (ref $res->payload eq '') {
+    ERROR(OpenXPKI::i18n::i18nTokenizer($res->payload));
+    exit 10;
 }
 
-ERROR(sprintf "Something went really wrong (%d, %s)", $res->state, ref $res->payload);
+if (blessed $res->payload and $res->payload->isa('OpenXPKI::Exception')) {
+    # We assume that all OpenXPKI::Exceptions are already logged
+    exit 10;
+}
+
+ERROR(sprintf "Something went wrong (%d, %s)", $res->state, ref $res->payload);
 exit 255;
 
 

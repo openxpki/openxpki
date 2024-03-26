@@ -8,6 +8,7 @@ with 'OpenXPKI::Client::API::Command::NeedRealm';
 use Data::Dumper;
 use List::Util qw( none );
 
+use OpenXPKI::Serialization::Simple;
 
 =head1 NAME
 
@@ -46,6 +47,20 @@ Feed me!
 =back
 
 =cut
+
+sub deserialize_context {
+    my $self = shift;
+    my $response = shift;
+
+    return unless($response->isa('OpenXPKI::DTO::Message::Response'));
+
+    my $ctx = $response->params()->{workflow}->{context};
+    my $ser = OpenXPKI::Serialization::Simple->new();
+    foreach my $key (keys (%{$ctx})) {
+        next unless (OpenXPKI::Serialization::Simple::is_serialized($ctx->{$key}));
+        $ctx->{$key} = $ser->deserialize($ctx->{$key});
+    }
+}
 
 __PACKAGE__->meta()->make_immutable();
 

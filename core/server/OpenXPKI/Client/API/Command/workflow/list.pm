@@ -65,13 +65,8 @@ sub execute {
         (defined $val) ? ($_ => $val) : ()
     } ('type','proc_state','state','limit');
 
-    my $client;
-    try {
-        my $res = $self->api->run_command('search_workflow_instances', \%query );
-        return OpenXPKI::Client::API::Response->new( payload => $res );
-    } catch ($err) {
-        return OpenXPKI::Client::API::Response->new( state => 400, payload => $err );
-    }
+    my $res = $self->api->run_command('search_workflow_instances', \%query );
+    return OpenXPKI::Client::API::Response->new( payload => $res );
 
 }
 

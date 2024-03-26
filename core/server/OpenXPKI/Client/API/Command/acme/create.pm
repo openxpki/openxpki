@@ -59,54 +59,47 @@ sub execute {
     my $self = shift;
     my $req = shift;
 
-    my $client;
-    try {
+    my $label = $req->param('label') || encode_base64url(sha256($req->param('directory')));
 
+    my $res = $self->api->run_command('get_data_pool_entry', {
+        namespace => 'nice.acme.account',
+        key => $label,
+    });
 
-        my $label = $req->param('label') || encode_base64url(sha256($req->param('directory')));
+    return OpenXPKI::Client::API::Response->new( state => 400,
+        payload => 'ACME account for this label already exists' ) if ($res);
 
-        my $res = $self->api->run_command('get_data_pool_entry', {
-            namespace => 'nice.acme.account',
-            key => $label,
-        });
+    $self->LOCATION($req->param('directory'));
 
-        return OpenXPKI::Client::API::Response->new( state => 400,
-            payload => 'ACME account for this label already exists' ) if ($res);
+    return OpenXPKI::Client::API::Response->new( state => 400,
+        payload => 'You must pass both or no external binding parameters' )
+            if ($req->param('eab-kid') xor $req->param('eab-mac'));
 
-        $self->LOCATION($req->param('directory'));
+    my $eab;
+    $eab = {
+        kid => $req->param('eab-kid'),
+        mac => $req->param('eab-mac')
+    } if ($req->param('eab-kid'));
 
-        return OpenXPKI::Client::API::Response->new( state => 400,
-            payload => 'You must pass both or no external binding parameters' )
-                if ($req->param('eab-kid') xor $req->param('eab-mac'));
+    my $account = $self->_registerAccount(
+        $req->param('keyspec'),
+        $req->param('contact'),
+        $eab
+    );
 
-        my $eab;
-        $eab = {
-            kid => $req->param('eab-kid'),
-            mac => $req->param('eab-mac')
-        } if ($req->param('eab-kid'));
+    $self->api->run_command('set_data_pool_entry', {
+        namespace => 'nice.acme.account',
+        key => $label,
+        value => $account,
+        serialize => 'simple',
+        encrypt => 1,
+    });
 
-        my $account = $self->_registerAccount(
-            $req->param('keyspec'),
-            $req->param('contact'),
-            $eab
-        );
-
-        $res = $self->api->run_command('set_data_pool_entry', {
-            namespace => 'nice.acme.account',
-            key => $label,
-            value => $account,
-            serialize => 'simple',
-            encrypt => 1,
-        });
-
-        return OpenXPKI::Client::API::Response->new( payload => {
-            account_id => $account->{kid},
-            thumbprint => $account->{thumbprint},
-            label => $label }
-        );
-    } catch ($err) {
-        return OpenXPKI::Client::API::Response->new( state => 400, payload => $err );
-    }
+    return OpenXPKI::Client::API::Response->new( payload => {
+        account_id => $account->{kid},
+        thumbprint => $account->{thumbprint},
+        label => $label
+    });
 
 }
 

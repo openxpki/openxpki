@@ -43,16 +43,12 @@ sub execute {
     my $self = shift;
     my $req = shift;
 
-    try {
-        my $res = $self->api->run_command('wakeup_workflow', {
-            id => $req->param('id'),
-            async => $req->param('async') ? 1 : 0,
-            wait => $req->param('wait') ? 1 : 0,
-        });
-        return OpenXPKI::Client::API::Response->new( payload => $res );
-    } catch ($err) {
-        return OpenXPKI::Client::API::Response->new( state => 400, payload => $err );
-    }
+    my $res = $self->api->run_command('wakeup_workflow', {
+        id => $req->param('id'),
+        async => $req->param('async') ? 1 : 0,
+        wait => $req->param('wait') ? 1 : 0,
+    });
+    return OpenXPKI::Client::API::Response->new( payload => $res );
 
 }
 

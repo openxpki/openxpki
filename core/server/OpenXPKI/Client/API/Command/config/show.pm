@@ -39,16 +39,12 @@ sub execute {
 
     my $self = shift;
     my $req = shift;
-    try {
-        my $params;
-        if (my $path = $req->param('path')) {
-            $params->{path} = $path;
-        }
-        my $res = $self->api->run_protected_command('config_show', $params);
-        return OpenXPKI::Client::API::Response->new( payload => $res );
-    } catch ($err) {
-        return OpenXPKI::Client::API::Response->new( state => 400, payload => $err );
+    my $params;
+    if (my $path = $req->param('path')) {
+        $params->{path} = $path;
     }
+    my $res = $self->api->run_protected_command('config_show', $params);
+    return OpenXPKI::Client::API::Response->new( payload => $res );
 
 }
 

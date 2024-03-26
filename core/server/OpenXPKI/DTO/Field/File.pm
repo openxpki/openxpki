@@ -2,8 +2,9 @@ package OpenXPKI::DTO::Field::File;
 
 use Moose;
 use Moose::Util::TypeConstraints;
-
 with 'OpenXPKI::DTO::Field';
+
+use OpenXPKI::FileUtils;
 
 has '+name' => (
     default => 'file',

@@ -39,32 +39,25 @@ sub execute {
     my $self = shift;
     my $req = shift;
 
-    my $client;
-    try {
 
+    my $res = $self->api->run_command('list_data_pool_entries', {
+        namespace => 'nice.acme.account',
+    });
 
-        my $res = $self->api->run_command('list_data_pool_entries', {
+    my @result;
+    foreach my $account (@{$res->result}) {
+        $res = $self->api->run_command('get_data_pool_entry', {
             namespace => 'nice.acme.account',
+            key => $account->{key},
+            deserialize => 'simple',
         });
-
-        my @result;
-        foreach my $account (@$res) {
-            $res = $self->api->run_command('get_data_pool_entry', {
-                namespace => 'nice.acme.account',
-                key => $account->{key},
-                deserialize => 'simple',
-            });
-            push @result, {
-                key_id => $account->{key},
-                kid =>    $res->{value}->{kid},
-                thumbprint => $res->{value}->{thumbprint},
-            };
-        }
-        return OpenXPKI::Client::API::Response->new( payload => \@result );
-    } catch ($err) {
-        return OpenXPKI::Client::API::Response->new( state => 400, payload => $err );
+        push @result, {
+            key_id => $account->{key},
+            kid =>    $res->{value}->{kid},
+            thumbprint => $res->{value}->{thumbprint},
+        };
     }
-
+    return OpenXPKI::Client::API::Response->new( payload =>\@result );
 }
 
 __PACKAGE__->meta()->make_immutable();

@@ -218,6 +218,7 @@ OpenXPKI/DTO/Authenticator.pm
 OpenXPKI/DTO/Field.pm
 OpenXPKI/DTO/Field/Bool.pm
 OpenXPKI/DTO/Field/Directory.pm
+OpenXPKI/DTO/Field/Epoch.pm
 OpenXPKI/DTO/Field/File.pm
 OpenXPKI/DTO/Field/Int.pm
 OpenXPKI/DTO/Field/Realm.pm

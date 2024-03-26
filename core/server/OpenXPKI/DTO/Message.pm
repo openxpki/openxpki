@@ -79,7 +79,37 @@ sub to_hash {
 
 }
 
-# this is a static method !
+=head2 param
+
+Helper to get the value of the named parameter from C<params>.
+
+Returns the value "as is" or undef if the key is not found.
+
+=cut
+
+sub param {
+
+    my $self = shift;
+    return unless ($self->has_params);
+
+    my $name = shift;
+
+    my $p = $self->params();
+
+    return unless exists $p->{$name};
+
+    return $p->{$name};
+
+}
+
+
+=head2 from_hash
+
+Factory method to revive a class instance from a serialized hash.
+
+This method must be called in a static context.
+
+=cut
 sub from_hash {
 
     my $hash = shift;
