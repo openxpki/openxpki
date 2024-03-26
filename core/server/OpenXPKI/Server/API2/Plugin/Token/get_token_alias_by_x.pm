@@ -81,6 +81,18 @@ command "get_token_alias_by_group" => {
     return $self->_token_alias_by_group($params->group, $params->validity);
 };
 
+
+=head2 list_token_groups
+
+Return the map to assign group names to the token types.
+
+=cut
+command "list_token_groups" => {
+} => sub {
+    my ($self, $params) = @_;
+    return CTX('config')->get_hash('crypto.type');
+};
+
 #
 # Look up token alias by group
 #

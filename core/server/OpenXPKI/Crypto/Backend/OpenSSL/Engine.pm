@@ -193,6 +193,8 @@ sub get_key_info
     my $self = shift;
     return {
         'key_name' => $self->{KEY},
+        'key_cert' => $self->{CERT},
+        'key_engine' => $self->get_engine() || 'none',
         'key_store' => $self->{KEY_STORE},
         'key_secret' => ($self->get_passwd() ? 1 : 0),
         'key_usable' => ($self->key_usable()  ? 1 : 0),

@@ -95,7 +95,8 @@ sub is_token_usable ($self, $token, $check, $padding_config) {
 =head2 validity_to_epoch
 
 Converts a I<HashRef> with a validity interval given as L<DateTime> objects into
-a I<HashRef> with Unix epoch timestamps.
+a I<HashRef> with Unix epoch timestamps. Values that are already Integers are
+passed through.
 
 Expects undef or DateTime objects in a HashRef like this:
 
@@ -112,17 +113,24 @@ and converts it to:
     }
 
 =cut
+
 sub validity_to_epoch {
     my ($self, $validity) = @_;
     my $result = {};
 
     for my $key (qw(notbefore notafter) ) {
         my $value = $validity->{$key};
-        OpenXPKI::Exception->throw(
-            message => "Values in 'validity' must be specified as DateTime object (or set to 'undef')",
-            params => { key => uc($key), type => blessed($value) },
-        ) unless (not defined $value or (defined blessed($value) and $value->isa('DateTime')));
-        $result->{$key} = $value ? $value->epoch : time;
+        if (not defined $value) {
+            $value = time
+        } elsif (blessed($value) and $value->isa('DateTime')) {
+            $value = $value->epoch
+        } elsif (ref $value ne '' || $value !~ m{\A\d+\z}) {
+            OpenXPKI::Exception->throw(
+                message => "Values in 'validity' must be specified as DateTime object, Integer or set to 'undef'",
+                params => { key => uc($key), type => ref $value },
+            )
+        }
+        $result->{$key} = $value;
     }
 
     return $result;

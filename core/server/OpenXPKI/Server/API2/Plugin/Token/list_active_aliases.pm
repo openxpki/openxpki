@@ -51,10 +51,9 @@ L<OpenXPKI::Server::API2::Types/TokenType>). Default: none
 =item * C<pki_realm> I<Str> - PK realm, specify this to query another realm.
 Default: current session's realm.
 
-=item * C<validity> I<HashRef> - two datetime objects, given as hash keys
-I<notbefore> and I<notafter>. Hash values of C<undef> will be interpreted as
-"now". Default: current time
-
+=item * C<validity> I<HashRef> - two datetime objects or epoch timestamps, given
+as hash keys I<notbefore> and I<notafter>.
+Hash values of C<undef> will be interpreted as "now". Default: current time
 
 =item * C<check_online> I<Bool> - Set to 1 to get the token online status
 (L<is_token_usable|OpenXPKI::Server::API2::Plugin::Token::is_token_usable/is_token_usable> is
