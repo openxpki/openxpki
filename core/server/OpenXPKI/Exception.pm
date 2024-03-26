@@ -3,6 +3,8 @@ package OpenXPKI::Exception;
 use strict;
 use warnings;
 
+use Scalar::Util qw(blessed);
+
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context;
 use Log::Log4perl;
@@ -30,7 +32,7 @@ use Exception::Class (
     # Error during socket communication
     'OpenXPKI::Exception::Socket' => {
         isa         => 'OpenXPKI::Exception',
-        fields => [ 'error' ],
+        fields => [ 'error', 'socket' ],
     },
     # Error while executing a command
     'OpenXPKI::Exception::Command' => {
@@ -125,11 +127,18 @@ sub throw {
     $proto->rethrow if ref $proto;
 
     # lazy mode -  message string given as single argument
-    my %args           = (@_);
+    my %args = (@_);
     if (scalar @_ == 1) {
         %args = (message => shift );
     } else {
         %args           = (@_);
+    }
+
+    # If an error is given and the error is an OpenXPKI::Exception
+    # we do NOT create a new exeption but rethrow it
+    if ($args{error} && blessed($args{error}) && $args{error}->isa('OpenXPKI::Exception')) {
+        ##! 32: 'rethrow existing exception'
+        $args{error}->rethrow();
     }
 
     my %exception_args = %args;
