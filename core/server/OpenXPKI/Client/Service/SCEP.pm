@@ -6,8 +6,13 @@ with 'OpenXPKI::Client::Service::Base';
 
 sub service_name { 'scep' } # required by OpenXPKI::Client::Service::Base
 
+# Core modules
 use MIME::Base64;
+use List::Util qw( any );
+
+# Project modules
 use OpenXPKI::Client::Service::Response;
+
 
 has transaction_id => (
     is => 'ro',
@@ -38,28 +43,12 @@ has attr => (
     isa => 'HashRef',
     init_arg => undef,
     trigger => sub { die '"attr" can only be set once' if scalar @_ > 2 },
-);
-
-has _binary_type => (
-    is => 'rw',
-    isa => 'Bool',
-    init_arg => undef,
+    predicate => 'has_attr',
 );
 
 
 sub index ($self) {
-    # strip .exe
-    my $op = $self->operation; $op =~ s/\.exe$//i; $self->operation($op);
-
-    # my $server = $ep_config->{global}->{servername} || $endpoint;
-    # if (not $server) {
-    #     $self->log->error('Server not set: empty endpoint and no default server set');
-    #     $self->res->code(404);
-    #     $self->res->message('Not Found (no such server)');
-    #     return $self->render(text => "Server not set");
-    # }
-
-    # Log::Log4perl::MDC->put('server', $server);
+    $self->operation($self->req->url->query->param('operation') // '');
 
     my $response = $self->handle_request;
 
@@ -68,30 +57,43 @@ sub index ($self) {
         $self->res->headers->add($_ => $response->extra_headers->{$_}) for keys $response->extra_headers->%*;
     }
 
-    # Response
+    # Server errors are never encoded with PKCS7
+    if ($response->is_server_error) {
+        $self->disconnect_backend;
+        $self->res->headers->content_type('text/plain');
+        return $self->render(text => $response->error_message);
 
-    --> Order of processing of 'application/x-pki-message' header is wrong.
-        We read it before we set it. Still necessary as a flag?
-
-    if ('application/x-pki-message' eq $self->res->headers->content_type) {
+    # PKCS7 response (incl. client errors) - only after successful decoding of PKCS7 request
+    } elsif ('PKIOperation' eq $self->operation and $self->has_attr) {
         my $out = $self->generate_pkcs7_response( $response );
         $self->disconnect_backend;
-
         $self->log->trace('PKCS7 response: ' . $out) if $self->log->is_trace;
         $out = decode_base64($out);
+
+        $self->res->headers->content_type('application/x-pki-message');
         return $self->render(data => $out);
 
-    } elsif ($response->has_error) {
+    # non-PKCS7 client errors
+    } elsif ($response->is_client_error) {
+        $self->disconnect_backend;
+        $self->res->headers->content_type('text/plain');
         return $self->render(text => $response->error_message);
 
     } else {
+        $self->disconnect_backend;
         $self->log->trace('Response: ' . $response->result) if $self->log->is_trace;
 
-        if (my $type = $self->_binary_type) {
-            $self->res->headers->content_type($type);
-            return $self->render(data => decode_base64($response->result));
-        } else {
+        if ('GetCACaps' eq $self->operation) {
+            $self->res->headers->content_type('text/plain');
             return $self->render(text => $response->result);
+
+        } elsif ('GetCACert' eq $self->operation) {
+            $self->res->headers->content_type('application/x-x509-ca-ra-cert');
+            return $self->render(data => decode_base64($response->result));
+
+        } elsif ('GetNextCACert' eq $self->operation) {
+            $self->res->headers->content_type('application/x-x509-next-ca-cert');
+            return $self->render(data => decode_base64($response->result));
         }
     }
 
@@ -102,68 +104,63 @@ sub op_handlers {
     return [
         'PKIOperation' => sub ($self) {
             my $message;
-            # get the message from the GET string and decode base64
+            # GET: read Base64 encoded message from URL parameter
             if ($self->req->method eq 'GET') {
                 $message = $self->req->url->query->param('message');
                 $self->log->debug("Got PKIOperation via GET");
-
+            # POST: read message from request body
             } else {
                 $message = encode_base64($self->req->body, '');
                 if (not $message) {
                     $self->log->error("POSTDATA is empty - check documentation on required setup for Content-Type headers!");
-                    $self->log->debug("Content-Type is " . ($self->req->headers->content_type || 'undefined'));
+                    $self->log->debug("Content-Type is: " . ($self->req->headers->content_type || 'undefined'));
                     return OpenXPKI::Client::Service::Response->new( 40003 );
                 }
                 $self->log->debug("Got PKIOperation via POST");
-            }
-            $self->log->trace("Decoded SCEP message: " . $message) if $self->log->is_trace;
 
-            # this internally triggers a call to the backend to unwrap the
-            # scep message and returns the payload and some attributes
-            # will die in case of an error, so an eval is needed here!
+            }
+            $self->log->trace("SCEP request: " . $message) if $self->log->is_trace;
+
+            # Does a call to the backend to unwrap the SCEP message and returns
+            # the payload and some attributes
             try {
                 $self->set_pkcs7_message( $message );
             }
             # something is wrong, TODO we might try to branch request vs. server errors
             catch ($err) {
+                $self->log->warn($err);
                 return OpenXPKI::Client::Service::Response->new( 50010 );
             }
 
-            $self->res->headers->content_type('application/x-pki-message'); # only set after successfully decoding the PKCS#7 request
+            $self->log->warn('Error while parsing PKCS7 message: ' . $self->attr->{error}) if $self->attr->{error};
 
             if (not $self->attr->{alias}) {
-                $self->log->info('Unable to find RA certficate');
+                $self->log->warn('Unable to find RA certificate');
                 return OpenXPKI::Client::Service::Response->new ( 40002 );
+            }
 
-            } elsif (not $self->signer) {
-                $self->log->info('Unable to extract signer certficate');
+            if (not $self->signer) {
+                $self->log->warn('Unable to extract signer certficate');
                 return OpenXPKI::Client::Service::Response->new ( 40001 );
+            }
 
             # Enrollment request
-            } elsif ($self->message_type =~ m{(PKCSReq|RenewalReq|GetCertInitial)}) {
+            if (any { $self->message_type eq $_ } qw( PKCSReq RenewalReq GetCertInitial )) {
                 # TODO - improve handling of GetCertInitial and RenewalReq
                 $self->log->debug("Handle enrollment");
                 return $self->handle_enrollment_request;
 
             # Request for CRL or GetCert with IssuerSerial in Payload
+            } elsif (any { $self->message_type eq $_ } qw( GetCert GetCRL )) {
+                return $self->handle_property_request($self->message_type);
+
             } else {
-                $self->operation($self->message_type);
-                return $self->handle_property_request;
+                $self->log->warn(sprintf('Unknown message type "%s"', $self->message_type));
+                return OpenXPKI::Client::Service::Response->new ( 40000 );
             }
 
         },
-        'GetCACaps' => sub ($self) {
-            my $response = $self->handle_property_request;
-            return $response;
-        },
-        'GetCACert' => sub ($self) {
-            $self->binary_type('application/x-x509-ca-ra-cert');
-            return $self->handle_property_request;
-        },
-        'GetNextCACert' => sub ($self) {
-            $self->binary_type('application/x-x509-next-ca-cert');
-            return $self->handle_property_request;
-        },
+        [ 'GetCACaps', 'GetCACert', 'GetNextCACert' ] => \&handle_property_request,
     ];
 }
 
@@ -226,7 +223,7 @@ sub set_pkcs7_message ($self, $pkcs7) {
         $attrs = $self->backend->run_command('scep_unwrap_message' => { message => $pkcs7 });
     }
     catch ($err) {
-        $self->log->error("Unable to unwrap PKCS7 message: $err");
+        $self->log->error("$err"); # stringification
         die "Unable to unwrap PKCS7 message";
     }
 
@@ -244,11 +241,6 @@ sub generate_pkcs7_response ($self, $response) {
         key_alg         => $self->attr->{key_alg},
     );
 
-    if ($response->is_pending) {
-        $self->log->info('Send pending response for ' . $self->transaction_id );
-        return $self->backend->run_command('scep_generate_pending_response', \%params);
-    }
-
     if ($response->is_client_error) {
 
         # if an invalid recipient token was given, the alias is unset
@@ -265,14 +257,20 @@ sub generate_pkcs7_response ($self, $response) {
             $failInfo = 'badRequest';
         }
 
-        $self->log->warn('Client error / malformed request ' . $failInfo);
+        $self->log->warn(sprintf('Client error / malformed request: %s (internal code: %s)', $failInfo, $response->error));
         return $self->backend->run_command('scep_generate_failure_response', {
             %params,
             failinfo => $failInfo,
         });
-    }
+    # server errors must be handled before generate_pkcs7_response() is called
+    } elsif ($response->is_server_error) {
+        die "Unhandled server error";
 
-    if (not $response->is_server_error) {
+    } elsif ($response->is_pending) {
+        $self->log->info('Send pending response for ' . $self->transaction_id );
+        return $self->backend->run_command('scep_generate_pending_response', \%params);
+
+    } else {
         $params{chain} = $self->config->{output}->{chain} || 'chain';
         return $self->backend->run_command('scep_generate_cert_response', {
             %params,
@@ -280,8 +278,6 @@ sub generate_pkcs7_response ($self, $response) {
             signer => $self->signer,
         });
     }
-
-    return;
 }
 
 __PACKAGE__->meta->make_immutable;

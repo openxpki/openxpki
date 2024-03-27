@@ -23,8 +23,8 @@ sub declare_routes ($self, $r) {
     $r->get('/healthcheck/<command>')->to('Healthcheck#index')->name('check');
 
     # EST urls look like
-    #   /.well-known/est/cacerts or with a label
-    #   /.well-known/est/namedservice/cacerts
+    #   /.well-known/est/cacerts
+    #   /.well-known/est/namedservice/cacerts  # incl. endpoint
     # <endpoint> is optional because a default is given.
     $r->any('/.well-known/est/<endpoint>/<operation>')->to(
         namespace => '',
@@ -34,15 +34,14 @@ sub declare_routes ($self, $r) {
     );
 
     # SCEP urls look like
-    #   /scep/PKIOperation or with a label
-    #   /scep/server/PKIOperation
-    # <endpoint> is optional because a default (which evaluates to false) is given.
-    # <#operation> is a relaxed placeholder that allows to match the .exe suffix used by some SCEP clients.
-    $r->any('/scep/<endpoint>/<#operation>')->to(
+    #   /scep/server?operation=PKIOperation                 # incl. endpoint/server
+    #   /scep/server/pkiclient.exe?operation=PKIOperation   # incl. endpoint/server
+    # <*throwaway> is a catchall placeholder which is optional (because a default is given).
+    $r->any('/scep/<endpoint>/<*throwaway>')->to(
         namespace => '',
         controller => 'OpenXPKI::Client::Service::SCEP',
         action => 'index',
-        endpoint => '',
+        throwaway => '',
     );
 }
 
@@ -92,16 +91,30 @@ sub startup ($self) {
         $self->log->error("Missing header X-OpenXPKI-Apache-ENVSET - Apache setup seems to be incomplete")
             unless $c->req->headers->header('X-OpenXPKI-Apache-ENVSET');
 
+        # Inject forwarded Apache ENV into Mojo::Request
         my $headers = $c->req->headers->to_hash;
         my $apache_env = {};
         for my $header (sort keys $headers->%*) {
             if (my ($key) = $header =~ /^X-OpenXPKI-Apache-ENV-(.*)/) {
                 my $val = url_unescape($headers->{$header});
-                $self->log->trace("Apache ENV variable received via header: $key");
                 $apache_env->{$key} = $val;
+                $self->log->trace("Apache ENV variable received via header: $key");
             }
         }
         $c->stash(apache_env => $apache_env);
+
+        # Inject forwarded query parameters into Mojo::Request.
+        # NOTE:
+        # We need this workaround because Apache cannot forward the
+        # QUERY_STRING to the backend server. The "proxy_pass" documentation
+        # which is also valid for "RewriteRule ... url [p]" says: "url is a
+        # partial URL for the remote server and cannot include a query string."
+        # (https://httpd.apache.org/docs/2.4/mod/mod_proxy.html#proxypass)
+        if (my $query_escaped = $c->req->headers->header('X-OpenXPKI-Apache-QueryString')) {
+            my $query = url_unescape($query_escaped);
+            $c->req->url->query($query);
+            $self->log->trace("Apache QUERY_STRING received via header: $query");
+        }
 
         if ($self->mode eq 'development') {
             $self->log->trace('Development mode: enforcing HTTPS');
