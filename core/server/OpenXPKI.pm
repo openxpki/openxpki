@@ -22,6 +22,7 @@ OpenXPKI - Base module to reduce boilerlate code in our packages.
     # Moose class
     use OpenXPKI -class;
     use OpenXPKI qw( -class -nonmoose );
+    use OpenXPKI qw( -class -exporter );
 
     # Moose role
     use OpenXPKI -role;
@@ -38,6 +39,7 @@ sub import {
 
     my $poc_base = $flags{-base};
     my $moose_class = $flags{-class};
+    my $moose_exporter = $flags{-exporter};
     my $moose_nonmoose = $flags{-nonmoose};
     my $moose_role = $flags{-role};
 
@@ -47,8 +49,10 @@ sub import {
     if ($moose_class) {
         Moose->import::into(1);
         MooseX::NonMoose->import::into(1) if $moose_nonmoose;
+        Moose::Exporter->import::into(1) if $moose_exporter;
     } elsif ($moose_role) {
         Moose::Role->import::into(1);
+        Moose::Exporter->import::into(1) if $moose_exporter;
     } else {
         base->import::into(1, $poc_base) if $poc_base;
         strict->import::into(1);
@@ -141,17 +145,31 @@ adds C<use base qw( Net::Server::MultiType )> to the list of imports.
 
     use OpenXPKI -class;
 
-adds C<use Moose> to the list of imports.
+This adds C<use Moose> to the list of imports.
+
+=head2 Moose exporter class
+
+    use OpenXPKI qw( -class -exporter );
+
+This adds C<use Moose> and C<use MooseX::Exporter> to the list of imports.
+
+=head2 Moose class extending a non-Moose class
 
     use OpenXPKI qw( -class -nonmoose );
 
-also adds C<use MooseX::NonMoose> to the list of imports.
+This adds C<use Moose> and C<use MooseX::NonMoose> to the list of imports.
 
 =head2 Moose role
 
     use OpenXPKI -role;
 
-adds C<use Moose::Role> to the list of imports.
+This adds C<use Moose::Role> to the list of imports.
+
+=head2 Moose exporter role
+
+    use OpenXPKI qw( -role -exporter );
+
+This adds C<use Moose::Role> and C<use MooseX::Exporter> to the list of imports.
 
 =head2 Imports
 
