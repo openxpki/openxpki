@@ -81,8 +81,7 @@ sub op_handlers {
         # "serverkeygen" and "fullcmc" are not supported
         ['serverkeygen', 'fullcmc'] => sub {
             my $self = shift;
-            my $operation = shift;
-            $self->log->error("Operation '$operation' not implemented");
+            $self->log->error(sprintf('Operation "%s" not implemented', $self->operation));
             return OpenXPKI::Client::Service::Response->new( 50100 );
         },
     ];
@@ -122,8 +121,7 @@ sub prepare_enrollment_result ($self, $workflow) {
 }
 
 sub handle_revocation_request ($self) {
-    my $param = $self->wf_params
-        or return OpenXPKI::Client::Service::Response->new( 50010 );
+    my $param = $self->wf_params;
 
     # preset reason code if not already done from wrapper config
     $param->{reason_code} = 'unspecified' unless defined $param->{reason_code};

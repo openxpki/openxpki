@@ -1,5 +1,5 @@
 package OpenXPKI::Client::Service::Base;
-use Moose::Role;
+use OpenXPKI qw( -role -exporter );
 
 with 'OpenXPKI::Client::Service::Role::PickupWorkflow';
 
@@ -17,28 +17,20 @@ requires 'op_handlers';
 
 # Core modules
 use Carp;
-use English;
-use Data::Dumper;
 use MIME::Base64;
 use Digest::SHA qw( sha1_hex );
 use List::Util qw( first );
 
 # CPAN modules
 use Crypt::PKCS10;
-use Log::Log4perl qw( :easy );
+use Log::Log4perl qw( :nowarn );
 use Mojo::Message::Request;
-use Moose::Exporter;
 
 # Project modules
 use OpenXPKI::Exception;
 use OpenXPKI::Client::Simple;
 use OpenXPKI::Client::Service::Response;
-use OpenXPKI::Log4perl::MojoLogger;
-
-# Feature::Compat::Try should be done last to safely disable warnings
-use Feature::Compat::Try;
-# should be done after imports to safely disable warnings in Perl < 5.36
-use experimental 'signatures';
+use OpenXPKI::Log4perl;
 
 
 Moose::Exporter->setup_import_methods(
@@ -115,6 +107,7 @@ has operation => (
     is => 'rw',
     isa => 'Str',
     lazy => 1,
+    trigger => sub { die '"operation" can only be set once' if scalar @_ > 2 },
     builder => '_build_operation',
 );
 sub _build_operation ($self) { $self->stash('operation') }
@@ -140,9 +133,8 @@ sub _build_wf_params {
 
     my $self = shift;
 
-    my $p = {};
-
     try {
+        my $p = {};
         my $operation = $self->operation;
         my $conf = $self->config;
 
@@ -201,6 +193,15 @@ sub _build_wf_params {
 
         # hook that allows consuming classes to add own parameters
         $self->custom_wf_params($p);
+
+        if (not $p->{'server'}) {
+            $self->log->error('Server not set: empty endpoint and no default server set');
+            die OpenXPKI::Client::Service::Response->new( 40401 );
+        }
+        Log::Log4perl::MDC->put('server', $p->{'server'});
+
+        $self->log->trace(sprintf("Extra params for operation '%s': %s", $self->operation, Dumper $p)) if $self->log->is_trace;
+        return $p;
     }
     catch ($err) {
         if ($err->isa('OpenXPKI::Client::Service::Response')) {
@@ -212,10 +213,6 @@ sub _build_wf_params {
             );
         }
     }
-
-    $self->log->trace(sprintf("Extra params for operation '%s': %s", $self->operation, Dumper $p)) if $self->log->is_trace;
-
-    return $p;
 }
 
 # Fallback BUILD method: the service classes usually extend "Mojolicious::Controller"
@@ -229,11 +226,13 @@ after 'BUILD' => sub {
     my $self = shift;
 
     my $log_category = 'client.' . $self->service_name;
+    my $logger = OpenXPKI::Log4perl->get_logger($log_category);
+
     # We support two use cases:
     # 1) new style: consuming class is instantiated by OpenXPKI::Client::Web
     #    (Mojolicious) and owns an $self->app->log attribute
     try {
-        $self->app->log(OpenXPKI::Log4perl->get_logger($log_category));
+        $self->app->log($logger);
         $self->stash('mojo.log' => undef); # reset DefaultHelper "log" (i.e. $self->log) which accesses mojo.log
     }
     # 2) legacy: parent class does not have a log() method/attribute, so we add one
@@ -245,8 +244,9 @@ after 'BUILD' => sub {
                 isa => 'OpenXPKI::Log4perl::MojoLogger',
             )
         );
+        # old .fcgi scripts may use new Mojolicious-based classes or old plain Moose classes
         $self->meta->make_immutable(inline_constructor => ($self->isa('Mojolicious::Controller') ? 0 : 1));
-        $self->log(OpenXPKI::Log4perl->get_logger($log_category));
+        $self->log($logger);
     }
 
     Log::Log4perl::MDC->put('endpoint', $self->endpoint);
@@ -346,6 +346,8 @@ sub handle_request {
 
     my $response;
     try {
+        die OpenXPKI::Client::Service::Response->new( 40008 ) unless $self->operation;
+
         my $op_handlers = $self->op_handlers;
 
         die sprintf('%s->op_handlers() did not return an ArrayRef', $self->meta->name)
@@ -360,7 +362,7 @@ sub handle_request {
               unless ref $handler eq 'CODE';
 
             if (my $op = first { $_ eq $self->operation } $ops->@*) {
-                $response = $handler->($self, $op);
+                $response = $handler->($self);
 
                 die sprintf('Return value of operation handler for "%s" specified in %s->op_handlers() is not an instance of "OpenXPKI::Client::Service::Response"', $self->operation, $self->meta->name)
                   unless blessed $response && $response->isa('OpenXPKI::Client::Service::Response');
@@ -409,8 +411,7 @@ sub handle_enrollment_request {
 
     # Build configuration parameters, can be overloaded by protocols,
     # e.g. for SCEP to inject data from the input
-    my $param = $self->wf_params
-        or return OpenXPKI::Client::Service::Response->new( 50010 );
+    my $param = $self->wf_params;
 
     # create the client object
     my $client = $self->backend
@@ -493,14 +494,8 @@ sub handle_enrollment_request {
 
 }
 
-sub handle_property_request {
-
-    my $self = shift;
-
-    my $operation = $self->operation;
-
-    my $param = $self->wf_params
-        or return OpenXPKI::Client::Service::Response->new( 50010 );
+sub handle_property_request ($self, $operation = $self->operation) {
+    my $param = $self->wf_params;
 
     # TODO - we need to consolidate the workflows for the different protocols
     my $workflow_type = $self->config->{$operation}->{workflow} ||
@@ -511,7 +506,6 @@ sub handle_property_request {
     my $response = $self->run_workflow($workflow_type, $param);
 
     return $self->_handle_property_response($response);
-
 }
 
 sub run_workflow {
