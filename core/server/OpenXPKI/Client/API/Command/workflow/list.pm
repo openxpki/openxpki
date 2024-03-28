@@ -6,14 +6,11 @@ extends 'OpenXPKI::Client::API::Command::workflow';
 use MooseX::ClassAttribute;
 
 use Data::Dumper;
-use Feature::Compat::Try;
-use Log::Log4perl qw(:easy);
 
 use OpenXPKI::Client::API::Response;
 use OpenXPKI::DTO::Field;
 use OpenXPKI::DTO::Field::Int;
 use OpenXPKI::DTO::Field::String;
-use OpenXPKI::DTO::ValidationException;
 
 =head1 NAME
 
@@ -41,9 +38,8 @@ sub hint_type {
     my $req = shift;
     my $input = shift;
 
-
     my $types = $self->api->run_command('get_workflow_instance_types');
-    TRACE(Dumper $types);
+    $self->log->trace(Dumper $types) if ($self->log->is_trace);
     return [ map { sprintf '%s (%s)', $_, $types->{$_}->{label} } sort keys %$types ];
 
 }

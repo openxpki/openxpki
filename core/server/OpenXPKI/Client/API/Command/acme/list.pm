@@ -5,10 +5,6 @@ extends 'OpenXPKI::Client::API::Command::acme';
 
 use MooseX::ClassAttribute;
 
-use JSON::PP qw(decode_json);
-use Data::Dumper;
-use Feature::Compat::Try;
-
 use OpenXPKI::Client::API::Response;
 use OpenXPKI::DTO::Field;
 use OpenXPKI::DTO::Field::String;

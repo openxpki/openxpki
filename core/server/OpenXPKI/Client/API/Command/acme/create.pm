@@ -11,8 +11,7 @@ use Crypt::PK::ECC;
 use Crypt::PK::RSA;
 use Data::Dumper;
 use Digest::SHA qw(sha256);
-use Feature::Compat::Try;
-use LWP::UserAgent;
+
 use MIME::Base64 qw(decode_base64url encode_base64url);
 
 use OpenXPKI::Client::API::Response;

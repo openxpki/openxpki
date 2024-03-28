@@ -6,16 +6,9 @@ with 'OpenXPKI::Client::API::Command::Protected';
 
 use MooseX::ClassAttribute;
 
-use Data::Dumper;
-use Feature::Compat::Try;
-use Log::Log4perl qw(:easy);
-
-
 use OpenXPKI::Client::API::Response;
 use OpenXPKI::DTO::Field;
 use OpenXPKI::DTO::Field::String;
-use OpenXPKI::DTO::ValidationException;
-use OpenXPKI::Serialization::Simple;
 
 =head1 NAME
 

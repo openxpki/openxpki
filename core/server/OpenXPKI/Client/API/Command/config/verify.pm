@@ -7,20 +7,11 @@ with 'OpenXPKI::Client::API::Command::Protected';
 
 use MooseX::ClassAttribute;
 
-use Data::Dumper;
-use Feature::Compat::Try;
-use Log::Log4perl qw(:easy);
-
-
 use OpenXPKI::Config::Backend;
 use OpenXPKI::Client::API::Response;
 use OpenXPKI::DTO::Field;
 use OpenXPKI::DTO::Field::String;
 use OpenXPKI::DTO::Field::Directory;
-use OpenXPKI::DTO::Message::ErrorResponse;
-use OpenXPKI::DTO::Message::Response;
-use OpenXPKI::DTO::ValidationException;
-use OpenXPKI::Serialization::Simple;
 
 =head1 NAME
 

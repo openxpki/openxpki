@@ -7,12 +7,10 @@ extends 'OpenXPKI::Client::API::Command::workflow';
 use MooseX::ClassAttribute;
 
 use Data::Dumper;
-use Feature::Compat::Try;
 
 use OpenXPKI::Client::API::Response;
 use OpenXPKI::DTO::Field;
 use OpenXPKI::DTO::Field::String;
-use OpenXPKI::DTO::Field::Realm;
 
 =head1 NAME
 
