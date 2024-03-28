@@ -46,6 +46,11 @@ sub import {
     my $moose_nonmoose = delete $flags{-nonmoose};
     my $moose_role = delete $flags{-role};
 
+    die sprintf(
+        'Unknown options: "use OpenXPKI qw( ... %s )" (called at %s line %s)',
+        join(' ', keys %flags), $caller_file, $caller_line
+    ) if scalar keys %flags;
+
     # import required modules and pragmas into the calling package
 
     # Moose
