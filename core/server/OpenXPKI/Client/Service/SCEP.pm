@@ -49,20 +49,20 @@ has attr => (
 # required by OpenXPKI::Client::Service::Role::Base
 sub prepare ($self) {
     # set operation from request parameter
-    $self->operation($self->request->url->query->param('operation') // '');
+    $self->operation($self->query_params->param('operation') // '');
 }
 
 # required by OpenXPKI::Client::Service::Role::Base
 sub send_response ($self, $response) {
     # HTTP header
     if ($self->config->{output}->{headers}) {
-        $self->response->headers->add($_ => $response->extra_headers->{$_}) for keys $response->extra_headers->%*;
+        $self->headers->add($_ => $response->extra_headers->{$_}) for keys $response->extra_headers->%*;
     }
 
     # Server errors are never encoded with PKCS7
     if ($response->is_server_error) {
         $self->disconnect_backend;
-        $self->response->headers->content_type('text/plain');
+        $self->content_type('text/plain');
         return $self->render(text => $response->error_message);
 
     # PKCS7 response (incl. client errors) - only after successful decoding of PKCS7 request
@@ -72,13 +72,13 @@ sub send_response ($self, $response) {
         $self->log->trace('PKCS7 response: ' . $out) if $self->log->is_trace;
         $out = decode_base64($out);
 
-        $self->response->headers->content_type('application/x-pki-message');
+        $self->content_type('application/x-pki-message');
         return $self->render(data => $out);
 
     # non-PKCS7 client errors
     } elsif ($response->is_client_error) {
         $self->disconnect_backend;
-        $self->response->headers->content_type('text/plain');
+        $self->content_type('text/plain');
         return $self->render(text => $response->error_message);
 
     } else {
@@ -86,15 +86,15 @@ sub send_response ($self, $response) {
         $self->log->trace('Response: ' . $response->result) if $self->log->is_trace;
 
         if ('GetCACaps' eq $self->operation) {
-            $self->response->headers->content_type('text/plain');
+            $self->content_type('text/plain');
             return $self->render(text => $response->result);
 
         } elsif ('GetCACert' eq $self->operation) {
-            $self->response->headers->content_type('application/x-x509-ca-ra-cert');
+            $self->content_type('application/x-x509-ca-ra-cert');
             return $self->render(data => decode_base64($response->result));
 
         } elsif ('GetNextCACert' eq $self->operation) {
-            $self->response->headers->content_type('application/x-x509-next-ca-cert');
+            $self->content_type('application/x-x509-next-ca-cert');
             return $self->render(data => decode_base64($response->result));
         }
     }
@@ -108,7 +108,7 @@ sub op_handlers {
             my $message;
             # GET: read Base64 encoded message from URL parameter
             if ($self->request->method eq 'GET') {
-                $message = $self->request->url->query->param('message');
+                $message = $self->query_params->param('message');
                 $self->log->debug("Got PKIOperation via GET");
             # POST: read message from request body
             } else {

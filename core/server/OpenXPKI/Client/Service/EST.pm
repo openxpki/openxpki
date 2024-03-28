@@ -25,7 +25,7 @@ sub prepare ($self) {
         die OpenXPKI::Client::Service::Response->new_error( 403 => "HTTPS required" );
     }
 
-    $self->response->headers->content_type("application/pkcs7-mime; smime-type=certs-only"); # default
+    $self->content_type("application/pkcs7-mime; smime-type=certs-only"); # default
 }
 
 # required by OpenXPKI::Client::Service::Role::Base
@@ -34,14 +34,14 @@ sub send_response ($self, $response) {
 
     # HTTP header
     if ($self->config->{output}->{headers}) {
-        $self->response->headers->add($_ => $response->extra_headers->{$_}) for keys $response->extra_headers->%*;
+        $self->headers->add($_ => $response->extra_headers->{$_}) for keys $response->extra_headers->%*;
     }
 
     if ($response->has_error) {
         return $self->render(text => $response->error_message."\n");
 
     } elsif ($response->is_pending) {
-        $self->response->headers->add('-retry-after' => $response->retry_after);
+        $self->headers->add('-retry-after' => $response->retry_after);
         return $self->render(text => $response->http_status_message."\n");
 
     } elsif (not $response->has_result) {
@@ -52,7 +52,7 @@ sub send_response ($self, $response) {
         # Default is base64 encoding, but we can turn on binary
         my $is_binary = $self->config->{output}->{encoding}//'' eq 'binary';
         my $data = $is_binary ? decode_base64($response->result) : $response->result;
-        $self->response->headers->add('content-transfer-encoding' => ($is_binary ? 'binary' : 'base64'));
+        $self->headers->add('content-transfer-encoding' => ($is_binary ? 'binary' : 'base64'));
         return $self->render(data => $data);
     }
 }
@@ -74,7 +74,7 @@ sub op_handlers {
         },
         'csrattrs' => sub {
             my $self = shift;
-            $self->response->headers->content_type("application/csrattrs"); # default
+            $self->content_type("application/csrattrs"); # default
             return $self->handle_property_request;
         },
         'simplerevoke' => \&handle_revocation_request,

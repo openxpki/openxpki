@@ -97,16 +97,18 @@ has request => (
     isa => 'Mojo::Message::Request',
     lazy => 1,
     builder => '_build_request',
+    handles => [qw( query_params body_params )],
 );
 sub _build_request ($self) { $self->controller->tx->req }
 
-has response => (
+has headers => (
     is => 'ro',
-    isa => 'Mojo::Message::Response',
+    isa => 'Mojo::Headers',
+    init_arg => undef,
     lazy => 1,
-    builder => '_build_response',
+    default => sub ($self) { $self->controller->tx->res->headers },
+    handles => [qw( content_type )],
 );
-sub _build_response ($self) { $self->controller->tx->res }
 
 has log => (
     is => 'rw',
@@ -361,7 +363,7 @@ sub handle_request {
                 last;
 
                 # if ($ep_config->{output}->{headers}) {
-                #     $self->response->headers->add($_ => $response->extra_headers->{$_}) for keys $response->extra_headers->%*;
+                #     $self->headers->add($_ => $response->extra_headers->{$_}) for keys $response->extra_headers->%*;
                 # }
             }
         }
