@@ -229,7 +229,11 @@ sub __generate_response {
         return encode_base64($req->create_pending_response());
     }
 
-    return encode_base64($req->create_failure_response( $params->failinfo ));
+    if ($mode eq 'failure') {
+        return encode_base64($req->create_failure_response( $params->failinfo ));
+    }
+
+    die "Unknown mode '$mode' given to __generate_response()";
 }
 
 __PACKAGE__->meta->make_immutable;
