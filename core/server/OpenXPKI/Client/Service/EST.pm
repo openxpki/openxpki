@@ -1,7 +1,6 @@
 package OpenXPKI::Client::Service::EST;
-use OpenXPKI qw( -class -nonmoose );
+use OpenXPKI -class;
 
-extends 'Mojolicious::Controller';
 with 'OpenXPKI::Client::Service::Base';
 
 sub service_name { 'est' } # required by OpenXPKI::Client::Service::Base
@@ -14,34 +13,35 @@ use OpenXPKI::Crypt::X509;
 use OpenXPKI::Client::Service::Response;
 
 
-# Mojolicious entry point
-sub index ($self) {
-    if ($self->req->is_secure) {
+# required by OpenXPKI::Client::Service::Base
+sub prepare ($self) {
+    if ($self->request->is_secure) {
         # what we expect -> noop
     } elsif ($self->config->{global}->{insecure}) {
         # RFC demands TLS for EST but we might have a SSL proxy in front
-        $self->log->debug("Unauthenticated (plain http)");
+        $self->log->debug("EST request via insecure connection (plain HTTP) - allowed via configuration");
     } else {
-        $self->log->error('EST request via insecure connection');
-        return $self->render(text => "HTTPS required\n", status => 403);
+        $self->log->error('EST request via insecure connection (plain HTTP)');
+        die OpenXPKI::Client::Service::Response->new_error( 403 => "HTTPS required" );
     }
 
-    $self->res->headers->content_type("application/pkcs7-mime; smime-type=certs-only"); # default
+    $self->response->headers->content_type("application/pkcs7-mime; smime-type=certs-only"); # default
+}
 
-    my $response = $self->handle_request;
-
+# required by OpenXPKI::Client::Service::Base
+sub send_response ($self, $response) {
     $self->disconnect_backend;
 
     # HTTP header
     if ($self->config->{output}->{headers}) {
-        $self->res->headers->add($_ => $response->extra_headers->{$_}) for keys $response->extra_headers->%*;
+        $self->response->headers->add($_ => $response->extra_headers->{$_}) for keys $response->extra_headers->%*;
     }
 
     if ($response->has_error) {
         return $self->render(text => $response->error_message."\n");
 
     } elsif ($response->is_pending) {
-        $self->res->headers->add('-retry-after' => $response->retry_after);
+        $self->response->headers->add('-retry-after' => $response->retry_after);
         return $self->render(text => $response->http_status_message."\n");
 
     } elsif (not $response->has_result) {
@@ -52,11 +52,12 @@ sub index ($self) {
         # Default is base64 encoding, but we can turn on binary
         my $is_binary = $self->config->{output}->{encoding}//'' eq 'binary';
         my $data = $is_binary ? decode_base64($response->result) : $response->result;
-        $self->res->headers->add('content-transfer-encoding' => ($is_binary ? 'binary' : 'base64'));
+        $self->response->headers->add('content-transfer-encoding' => ($is_binary ? 'binary' : 'base64'));
         return $self->render(data => $data);
     }
 }
 
+# required by OpenXPKI::Client::Service::Base
 sub op_handlers {
     return [
         'cacerts' => sub {
@@ -73,7 +74,7 @@ sub op_handlers {
         },
         'csrattrs' => sub {
             my $self = shift;
-            $self->res->headers->content_type("application/csrattrs"); # default
+            $self->response->headers->content_type("application/csrattrs"); # default
             return $self->handle_property_request;
         },
         'simplerevoke' => \&handle_revocation_request,

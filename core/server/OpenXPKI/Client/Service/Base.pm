@@ -1,19 +1,14 @@
 package OpenXPKI::Client::Service::Base;
-use OpenXPKI qw( -role -exporter );
+use OpenXPKI qw( -role -exporter -typeconstraints );
 
 with 'OpenXPKI::Client::Service::Role::PickupWorkflow';
 
 requires 'service_name';
+requires 'prepare';
+requires 'send_response';
+requires 'op_handlers';
 requires 'custom_wf_params';
 requires 'prepare_enrollment_result';
-requires 'op_handlers';
-
-# FIXME enable after phasing out fcgi scripts:
-#requires 'app';
-#requires 'tx';
-#requires 'stash';
-#requires 'log';
-#requires 'oxi_config';
 
 # Core modules
 use Carp;
@@ -44,31 +39,7 @@ has config_obj => (
     lazy => 1,
     builder => '_build_config_obj',
 );
-sub _build_config_obj ($self) { $self->oxi_config($self->service_name) }
-
-has endpoint => (
-    is => 'ro',
-    isa => 'Str',
-    lazy => 1,
-    builder => '_build_endpoint',
-);
-sub _build_endpoint ($self) { $self->stash('endpoint') }
-
-has apache_env => (
-    is => 'ro',
-    isa => 'HashRef',
-    lazy => 1,
-    builder => '_build_apache_env',
-);
-sub _build_apache_env ($self) { $self->stash('apache_env') }
-
-has remote_address => (
-    is => 'ro',
-    isa => 'Str',
-    lazy => 1,
-    builder => '_build_remote_address',
-);
-sub _build_remote_address ($self) { $self->tx->remote_address }
+sub _build_config_obj ($self) { $self->controller->oxi_config($self->service_name) }
 
 # the endpoint config
 has config => (
@@ -80,16 +51,78 @@ has config => (
 );
 sub _build_config ($self) { $self->config_obj->endpoint_config($self->endpoint) }
 
+# Mojolicious controller
+has controller => (
+    is => 'rw',
+    isa => 'Mojolicious::Controller',
+    # required => 1, # FIXME Make this required once we fully migrated to Mojolicious based web services
+    handles => [qw( render rendered )],
+);
+
+has operation => (
+    is => 'rw',
+    isa => 'Str',
+    lazy => 1,
+    trigger => sub { die '"operation" can only be set once' if scalar @_ > 2 },
+    builder => '_build_operation',
+);
+sub _build_operation ($self) { $self->controller->stash('operation') }
+
+has endpoint => (
+    is => 'ro',
+    isa => 'Str',
+    lazy => 1,
+    builder => '_build_endpoint',
+);
+sub _build_endpoint ($self) { $self->controller->stash('endpoint') }
+
+has apache_env => (
+    is => 'ro',
+    isa => 'HashRef',
+    lazy => 1,
+    builder => '_build_apache_env',
+);
+sub _build_apache_env ($self) { $self->controller->stash('apache_env') }
+
+has remote_address => (
+    is => 'ro',
+    isa => 'Str',
+    lazy => 1,
+    builder => '_build_remote_address',
+);
+sub _build_remote_address ($self) { $self->controller->tx->remote_address }
+
 has request => (
     is => 'ro',
     isa => 'Mojo::Message::Request',
+    lazy => 1,
     builder => '_build_request',
 );
-sub _build_request ($self) { $self->tx->req }
+sub _build_request ($self) { $self->controller->tx->req }
+
+has response => (
+    is => 'ro',
+    isa => 'Mojo::Message::Response',
+    lazy => 1,
+    builder => '_build_response',
+);
+sub _build_response ($self) { $self->controller->tx->res }
+
+has log => (
+    is => 'rw',
+    isa => duck_type( [qw(
+           trace    debug    info    warn    error    fatal
+        is_trace is_debug is_info is_warn is_error is_fatal
+    )] ),
+    lazy => 1,
+    builder => '_build_log',
+);
+sub _build_log ($self) { OpenXPKI::Log4perl->get_logger('client.' . $self->service_name) }
 
 has backend => (
     is => 'rw',
     isa => 'Object|Undef',
+    init_arg => undef,
     lazy => 1,
     predicate => 'has_backend',
     builder => '_build_backend',
@@ -102,15 +135,12 @@ sub _build_backend ($self) {
     })
 }
 
-# 'operation' may be overwritten later on
-has operation => (
+has is_enrollment => (
     is => 'rw',
-    isa => 'Str',
-    lazy => 1,
-    trigger => sub { die '"operation" can only be set once' if scalar @_ > 2 },
-    builder => '_build_operation',
+    isa => 'Bool',
+    init_arg => undef,
+    default => 0,
 );
-sub _build_operation ($self) { $self->stash('operation') }
 
 # Workflow parameters. A value of "undef" indicates an error.
 has wf_params => (
@@ -120,15 +150,6 @@ has wf_params => (
     init_arg => undef,
     builder => '_build_wf_params',
 );
-
-has is_enrollment => (
-    is => 'rw',
-    isa => 'Bool',
-    init_arg => undef,
-    default => 0,
-);
-
-# Workflow parameters. A value of "undef" indicates an error.
 sub _build_wf_params {
 
     my $self = shift;
@@ -194,11 +215,11 @@ sub _build_wf_params {
         # hook that allows consuming classes to add own parameters
         $self->custom_wf_params($p);
 
-        if (not $p->{'server'}) {
-            $self->log->error('Server not set: empty endpoint and no default server set');
-            die OpenXPKI::Client::Service::Response->new( 40401 );
-        }
-        Log::Log4perl::MDC->put('server', $p->{'server'});
+        # if (not $p->{'server'}) {
+        #     $self->log->error('Server not set: empty endpoint and no default server set');
+        #     die OpenXPKI::Client::Service::Response->new( 40401 );
+        # }
+        # Log::Log4perl::MDC->put('server', $p->{'server'});
 
         $self->log->trace(sprintf("Extra params for operation '%s': %s", $self->operation, Dumper $p)) if $self->log->is_trace;
         return $p;
@@ -212,40 +233,16 @@ sub _build_wf_params {
     }
 }
 
-# Fallback BUILD method: the service classes usually extend "Mojolicious::Controller"
-# which is not a Moose object and thus does not inherit a BUILD method.
-# "it's completely acceptable to apply a method modifier to BUILD in a role;
-# you can even provide an empty BUILD subroutine in a role so the role is applicable
-# even to classes without their own BUILD.
+# Around modifier with fallback BUILD method:
+# "around 'BUILD'" complains if there is no BUILD method in the inheritance
+# chain of the consuming class. So we define an empty fallback method.
+# If the consuming class defines an own BUILD method it will overwrite ours.
+# The "around" modifier will work in any case.
+# Please note that "around 'build'" is only allowed in roles.
 # https://metacpan.org/dist/Moose/view/lib/Moose/Manual/Construction.pod#BUILD-and-parent-classes
 sub BUILD {}
 after 'BUILD' => sub {
     my $self = shift;
-
-    my $log_category = 'client.' . $self->service_name;
-    my $logger = OpenXPKI::Log4perl->get_logger($log_category);
-
-    # We support two use cases:
-    # 1) new style: consuming class is instantiated by OpenXPKI::Client::Web
-    #    (Mojolicious) and owns an $self->app->log attribute
-    try {
-        $self->app->log($logger);
-        $self->stash('mojo.log' => undef); # reset DefaultHelper "log" (i.e. $self->log) which accesses mojo.log
-    }
-    # 2) legacy: parent class does not have a log() method/attribute, so we add one
-    catch ($err) {
-        $self->meta->make_mutable;
-        $self->meta->add_attribute(
-            log => (
-                is => 'rw',
-                isa => 'OpenXPKI::Log4perl::MojoLogger',
-            )
-        );
-        # old .fcgi scripts may use new Mojolicious-based classes or old plain Moose classes
-        $self->meta->make_immutable(inline_constructor => ($self->isa('Mojolicious::Controller') ? 0 : 1));
-        $self->log($logger);
-    }
-
     Log::Log4perl::MDC->put('endpoint', $self->endpoint);
 };
 
@@ -364,7 +361,7 @@ sub handle_request {
                 last;
 
                 # if ($ep_config->{output}->{headers}) {
-                #     $self->res->headers->add($_ => $response->extra_headers->{$_}) for keys $response->extra_headers->%*;
+                #     $self->response->headers->add($_ => $response->extra_headers->{$_}) for keys $response->extra_headers->%*;
                 # }
             }
         }
@@ -389,10 +386,6 @@ sub handle_request {
     $self->log->debug('Status: ' . $response->http_status_line);
     $self->log->error($response->error_message) if $response->has_error;
     $self->log->trace(Dumper $response) if $self->log->is_trace;
-
-    # TODO -- needs to be overwritten in CertEP - it always returns 200
-    $self->res->code($response->http_status_code);
-    $self->res->message($response->http_status_message);
 
     return $response;
 }
@@ -428,7 +421,7 @@ sub handle_enrollment_request {
 
         # pickup return undef if no workflow was found - start new one
         if (not $workflow) {
-            $self->log->debug(sprintf("Initialize %s with params %s",
+            $self->log->debug(sprintf("Initialize workflow '%s' with parameters: %s",
                 $pickup_config->{workflow}, join(", ", keys %{$param})));
 
             $workflow = $client->handle_workflow({
@@ -437,7 +430,7 @@ sub handle_enrollment_request {
             });
         }
 
-        $self->log->trace( 'Workflow info '  . Dumper $workflow ) if $self->log->is_trace;
+        $self->log->trace( 'Workflow info: '  . Dumper $workflow ) if $self->log->is_trace;
     }
     catch ($error) {
         $self->log->error( $error );
@@ -494,8 +487,8 @@ sub handle_property_request ($self, $operation = $self->operation) {
     # TODO - we need to consolidate the workflows for the different protocols
     my $workflow_type = $self->config->{$operation}->{workflow} ||
         $self->service_name.'_'.lc($operation);
-    $self->log->debug( 'Start workflow type ' . $workflow_type );
-    $self->log->trace( 'Workflow Paramters '  . Dumper $param ) if $self->log->is_trace;
+    $self->log->debug( "Start workflow type '$workflow_type'" );
+    $self->log->trace( 'Workflow parameters: '  . Dumper $param ) if $self->log->is_trace;
 
     my $response = $self->run_workflow($workflow_type, $param);
 
@@ -517,7 +510,7 @@ sub run_workflow {
         params => $param
     });
 
-    $self->log->trace( 'Workflow info '  . Dumper $workflow ) if $self->log->is_trace;
+    $self->log->trace( 'Workflow info: '  . Dumper $workflow ) if $self->log->is_trace;
 
     if (!$workflow || ( $workflow->{'proc_state'} !~ m{finished|manual} )) {
         if (my $err = $client->last_reply()->{ERROR}) {

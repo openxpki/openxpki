@@ -22,14 +22,20 @@ sub declare_routes ($self, $r) {
     $r->get('/healthcheck' => sub { shift->redirect_to('check', command => 'ping') });
     $r->get('/healthcheck/<command>')->to('Healthcheck#index')->name('check');
 
+    # Reserved Mojolicious keywords to load our shared controller
+    my %controller_params = (
+        namespace => '',
+        controller => 'OpenXPKI::Client::Web::Controller',
+        action => 'index',
+    );
+
     # EST urls look like
     #   /.well-known/est/cacerts
     #   /.well-known/est/namedservice/cacerts  # incl. endpoint
     # <endpoint> is optional because a default is given.
     $r->any('/.well-known/est/<endpoint>/<operation>')->to(
-        namespace => '',
-        controller => 'OpenXPKI::Client::Service::EST',
-        action => 'index',
+        %controller_params,
+        service_class => 'OpenXPKI::Client::Service::EST',
         endpoint => 'default',
     );
 
@@ -38,9 +44,8 @@ sub declare_routes ($self, $r) {
     #   /scep/server/pkiclient.exe?operation=PKIOperation   # incl. endpoint/server
     # <*throwaway> is a catchall placeholder which is optional (because a default is given).
     $r->any('/scep/<endpoint>/<*throwaway>')->to(
-        namespace => '',
-        controller => 'OpenXPKI::Client::Service::SCEP',
-        action => 'index',
+        %controller_params,
+        service_class => 'OpenXPKI::Client::Service::SCEP',
         throwaway => '',
     );
 }
@@ -121,14 +126,10 @@ sub startup ($self) {
             $c->req->url->base->scheme('https');
         }
     });
-
-    # Move first part and slash from path to base path in production mode
-    # $self->hook(before_dispatch => sub ($c) {
-    #     push @{$c->req->url->base->path->trailing_slash(1)},
-    #         shift @{$c->req->url->path->leading_slash(0)};
-    # ) if $self->mode eq 'production';
 }
 
+# We implement the config helper to be able to cache configurations across
+# multiple requests.
 sub helper_oxi_config ($self, $service) {
     state $configs = {}; # cache config object accross requests
 

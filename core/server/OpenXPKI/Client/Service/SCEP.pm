@@ -1,7 +1,6 @@
 package OpenXPKI::Client::Service::SCEP;
-use OpenXPKI qw( -class -nonmoose );
+use OpenXPKI -class;
 
-extends 'Mojolicious::Controller';
 with 'OpenXPKI::Client::Service::Base';
 
 sub service_name { 'scep' } # required by OpenXPKI::Client::Service::Base
@@ -47,20 +46,23 @@ has attr => (
 );
 
 
-sub index ($self) {
-    $self->operation($self->req->url->query->param('operation') // '');
+# required by OpenXPKI::Client::Service::Base
+sub prepare ($self) {
+    # set operation from request parameter
+    $self->operation($self->request->url->query->param('operation') // '');
+}
 
-    my $response = $self->handle_request;
-
+# required by OpenXPKI::Client::Service::Base
+sub send_response ($self, $response) {
     # HTTP header
     if ($self->config->{output}->{headers}) {
-        $self->res->headers->add($_ => $response->extra_headers->{$_}) for keys $response->extra_headers->%*;
+        $self->response->headers->add($_ => $response->extra_headers->{$_}) for keys $response->extra_headers->%*;
     }
 
     # Server errors are never encoded with PKCS7
     if ($response->is_server_error) {
         $self->disconnect_backend;
-        $self->res->headers->content_type('text/plain');
+        $self->response->headers->content_type('text/plain');
         return $self->render(text => $response->error_message);
 
     # PKCS7 response (incl. client errors) - only after successful decoding of PKCS7 request
@@ -70,13 +72,13 @@ sub index ($self) {
         $self->log->trace('PKCS7 response: ' . $out) if $self->log->is_trace;
         $out = decode_base64($out);
 
-        $self->res->headers->content_type('application/x-pki-message');
+        $self->response->headers->content_type('application/x-pki-message');
         return $self->render(data => $out);
 
     # non-PKCS7 client errors
     } elsif ($response->is_client_error) {
         $self->disconnect_backend;
-        $self->res->headers->content_type('text/plain');
+        $self->response->headers->content_type('text/plain');
         return $self->render(text => $response->error_message);
 
     } else {
@@ -84,15 +86,15 @@ sub index ($self) {
         $self->log->trace('Response: ' . $response->result) if $self->log->is_trace;
 
         if ('GetCACaps' eq $self->operation) {
-            $self->res->headers->content_type('text/plain');
+            $self->response->headers->content_type('text/plain');
             return $self->render(text => $response->result);
 
         } elsif ('GetCACert' eq $self->operation) {
-            $self->res->headers->content_type('application/x-x509-ca-ra-cert');
+            $self->response->headers->content_type('application/x-x509-ca-ra-cert');
             return $self->render(data => decode_base64($response->result));
 
         } elsif ('GetNextCACert' eq $self->operation) {
-            $self->res->headers->content_type('application/x-x509-next-ca-cert');
+            $self->response->headers->content_type('application/x-x509-next-ca-cert');
             return $self->render(data => decode_base64($response->result));
         }
     }
@@ -105,15 +107,15 @@ sub op_handlers {
         'PKIOperation' => sub ($self) {
             my $message;
             # GET: read Base64 encoded message from URL parameter
-            if ($self->req->method eq 'GET') {
-                $message = $self->req->url->query->param('message');
+            if ($self->request->method eq 'GET') {
+                $message = $self->request->url->query->param('message');
                 $self->log->debug("Got PKIOperation via GET");
             # POST: read message from request body
             } else {
-                $message = encode_base64($self->req->body, '');
+                $message = encode_base64($self->request->body, '');
                 if (not $message) {
                     $self->log->error("POSTDATA is empty - check documentation on required setup for Content-Type headers!");
-                    $self->log->debug("Content-Type is: " . ($self->req->headers->content_type || 'undefined'));
+                    $self->log->debug("Content-Type is: " . ($self->request->headers->content_type || 'undefined'));
                     return OpenXPKI::Client::Service::Response->new( 40003 );
                 }
                 $self->log->debug("Got PKIOperation via POST");

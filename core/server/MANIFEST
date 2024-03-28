@@ -72,6 +72,7 @@ OpenXPKI/Client/Service/Response.pm
 OpenXPKI/Client/Service/SCEP.pm
 OpenXPKI/Client/Service/Role/PickupWorkflow.pm
 OpenXPKI/Client/Web.pm
+OpenXPKI/Client/Web/Controller.pm
 OpenXPKI/Client/Web/Healthcheck.pm
 
 # New UI Client
