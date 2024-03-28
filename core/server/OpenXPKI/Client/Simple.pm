@@ -266,7 +266,7 @@ sub _build_client {
             $log->trace("Realms found:" . Dumper (keys %{$reply->{PARAMS}->{PKI_REALMS}}));
             die "No realm specified";
         }
-        $log->debug("Selecting realm $realm");
+        $log->debug("Selecting realm '$realm'");
         my $auth = $self->auth();
         $reply = $client->send_receive_service_msg('GET_PKI_REALM',{
             PKI_REALM => $realm,
@@ -572,8 +572,8 @@ sub handle_workflow {
             die "No workflow object received!";
         }
 
-        $self->logger()->debug(sprintf('Workflow created (ID: %d), State: %s',
-            $reply->{workflow}->{id}, $reply->{workflow}->{state}));
+        $self->logger()->debug(sprintf("Workflow '%s' created: id = %d, state = %s",
+            $wf_type, $reply->{workflow}->{id}, $reply->{workflow}->{state}));
 
     } else {
         $self->logger()->fatal("Neither workflow id nor type given");
