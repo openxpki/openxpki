@@ -1,9 +1,9 @@
 package OpenXPKI::Client::Service::SCEP;
 use OpenXPKI -class;
 
-with 'OpenXPKI::Client::Service::Base';
+with 'OpenXPKI::Client::Service::Role::Base';
 
-sub service_name { 'scep' } # required by OpenXPKI::Client::Service::Base
+sub service_name { 'scep' } # required by OpenXPKI::Client::Service::Role::Base
 
 # Core modules
 use MIME::Base64;
@@ -46,13 +46,13 @@ has attr => (
 );
 
 
-# required by OpenXPKI::Client::Service::Base
+# required by OpenXPKI::Client::Service::Role::Base
 sub prepare ($self) {
     # set operation from request parameter
     $self->operation($self->request->url->query->param('operation') // '');
 }
 
-# required by OpenXPKI::Client::Service::Base
+# required by OpenXPKI::Client::Service::Role::Base
 sub send_response ($self, $response) {
     # HTTP header
     if ($self->config->{output}->{headers}) {
@@ -101,7 +101,7 @@ sub send_response ($self, $response) {
 
 }
 
-# required by OpenXPKI::Client::Service::Base
+# required by OpenXPKI::Client::Service::Role::Base
 sub op_handlers {
     return [
         'PKIOperation' => sub ($self) {
@@ -166,7 +166,7 @@ sub op_handlers {
     ];
 }
 
-# required by OpenXPKI::Client::Service::Base
+# required by OpenXPKI::Client::Service::Role::Base
 sub custom_wf_params ($self, $params) {
     # nothing special if we are NOT in PKIOperation mode
     return unless $self->operation eq 'PKIOperation';
@@ -209,7 +209,7 @@ sub custom_wf_params ($self, $params) {
     }
 }
 
-# required by OpenXPKI::Client::Service::Base
+# required by OpenXPKI::Client::Service::Role::Base
 sub prepare_enrollment_result ($self, $workflow) {
     return OpenXPKI::Client::Service::Response->new(
         workflow => $workflow,

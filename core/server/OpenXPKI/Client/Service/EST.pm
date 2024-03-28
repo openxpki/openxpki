@@ -1,9 +1,9 @@
 package OpenXPKI::Client::Service::EST;
 use OpenXPKI -class;
 
-with 'OpenXPKI::Client::Service::Base';
+with 'OpenXPKI::Client::Service::Role::Base';
 
-sub service_name { 'est' } # required by OpenXPKI::Client::Service::Base
+sub service_name { 'est' } # required by OpenXPKI::Client::Service::Role::Base
 
 # Core modules
 use MIME::Base64;
@@ -13,7 +13,7 @@ use OpenXPKI::Crypt::X509;
 use OpenXPKI::Client::Service::Response;
 
 
-# required by OpenXPKI::Client::Service::Base
+# required by OpenXPKI::Client::Service::Role::Base
 sub prepare ($self) {
     if ($self->request->is_secure) {
         # what we expect -> noop
@@ -28,7 +28,7 @@ sub prepare ($self) {
     $self->response->headers->content_type("application/pkcs7-mime; smime-type=certs-only"); # default
 }
 
-# required by OpenXPKI::Client::Service::Base
+# required by OpenXPKI::Client::Service::Role::Base
 sub send_response ($self, $response) {
     $self->disconnect_backend;
 
@@ -57,7 +57,7 @@ sub send_response ($self, $response) {
     }
 }
 
-# required by OpenXPKI::Client::Service::Base
+# required by OpenXPKI::Client::Service::Role::Base
 sub op_handlers {
     return [
         'cacerts' => sub {
@@ -88,7 +88,7 @@ sub op_handlers {
     ];
 }
 
-# required by OpenXPKI::Client::Service::Base
+# required by OpenXPKI::Client::Service::Role::Base
 sub custom_wf_params ($self, $params) {
     # TODO this should be merged with the stuff in Base without
     # having protocol specific items in the core code
@@ -105,7 +105,7 @@ sub custom_wf_params ($self, $params) {
     return 1;
 }
 
-# required by OpenXPKI::Client::Service::Base
+# required by OpenXPKI::Client::Service::Role::Base
 sub prepare_enrollment_result ($self, $workflow) {
     my $result = $self->backend()->run_command('get_cert',{
         format => 'PKCS7',

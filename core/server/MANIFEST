@@ -65,11 +65,11 @@ OpenXPKI/Client/API/Request.pm
 OpenXPKI/Client/API/Response.pm
 
 # Wrappers for EST, RPC...
-OpenXPKI/Client/Service/Base.pm
 OpenXPKI/Client/Service/EST.pm
 OpenXPKI/Client/Service/RPC.pm
 OpenXPKI/Client/Service/Response.pm
 OpenXPKI/Client/Service/SCEP.pm
+OpenXPKI/Client/Service/Role/Base.pm
 OpenXPKI/Client/Service/Role/PickupWorkflow.pm
 OpenXPKI/Client/Web.pm
 OpenXPKI/Client/Web/Controller.pm

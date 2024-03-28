@@ -18,8 +18,8 @@ sub index ($self) {
     try {
         Module::Load::load $class;
         $service = $class->new(controller => $self);
-        die "Service class $class does not consume role OpenXPKI::Client::Service::Base"
-          unless $service->DOES('OpenXPKI::Client::Service::Base');
+        die "Service class $class does not consume role OpenXPKI::Client::Service::Role::Base"
+          unless $service->DOES('OpenXPKI::Client::Service::Role::Base');
     }
     catch ($error) {
         die sprintf("Error loading service class '%s': %s", $class, $error);

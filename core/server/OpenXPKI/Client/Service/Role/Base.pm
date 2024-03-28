@@ -1,4 +1,4 @@
-package OpenXPKI::Client::Service::Base;
+package OpenXPKI::Client::Service::Role::Base;
 use OpenXPKI qw( -role -exporter -typeconstraints );
 
 with 'OpenXPKI::Client::Service::Role::PickupWorkflow';
