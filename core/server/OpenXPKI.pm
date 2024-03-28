@@ -22,6 +22,7 @@ OpenXPKI - Base module to reduce boilerlate code in our packages.
     # Moose class
     use OpenXPKI -class;
     use OpenXPKI qw( -class -nonmoose );
+    use OpenXPKI qw( -class -typeconstraints );
     use OpenXPKI qw( -class -exporter );
 
     # Moose role
@@ -31,28 +32,34 @@ OpenXPKI - Base module to reduce boilerlate code in our packages.
 
 sub import {
     my $class = shift;
+    my ($caller_pkg, $caller_file, $caller_line) = caller;
 
     my %flags;
     while (my $flag = shift) {
         $flags{$flag} = $flag eq '-base' ? shift : 1;
     }
 
-    my $poc_base = $flags{-base};
-    my $moose_class = $flags{-class};
-    my $moose_exporter = $flags{-exporter};
-    my $moose_nonmoose = $flags{-nonmoose};
-    my $moose_role = $flags{-role};
+    my $poc_base = delete $flags{-base};
+    my $moose_class = delete $flags{-class};
+    my $moose_exporter = delete $flags{-exporter};
+    my $moose_typeconstraints = delete $flags{-typeconstraints};
+    my $moose_nonmoose = delete $flags{-nonmoose};
+    my $moose_role = delete $flags{-role};
 
     # import required modules and pragmas into the calling package
 
-    # Moose and pragmas
-    if ($moose_class) {
-        Moose->import::into(1);
-        MooseX::NonMoose->import::into(1) if $moose_nonmoose;
+    # Moose
+    if ($moose_class or $moose_role) {
+        if ($moose_class) {
+            Moose->import::into(1);
+            MooseX::NonMoose->import::into(1) if $moose_nonmoose;
+        } else {
+            Moose::Role->import::into(1);
+        }
         Moose::Exporter->import::into(1) if $moose_exporter;
-    } elsif ($moose_role) {
-        Moose::Role->import::into(1);
-        Moose::Exporter->import::into(1) if $moose_exporter;
+        Moose::Util::TypeConstraints->import::into(1) if $moose_typeconstraints;
+
+    # Plain old Perl package / class
     } else {
         base->import::into(1, $poc_base) if $poc_base;
         strict->import::into(1);
@@ -146,6 +153,12 @@ adds C<use base qw( Net::Server::MultiType )> to the list of imports.
     use OpenXPKI -class;
 
 This adds C<use Moose> to the list of imports.
+
+=head2 Moose class with type constraints
+
+    use OpenXPKI qw( -class -typeconstraints );
+
+This adds C<use Moose> and C<Moose::Util::TypeConstraints> to the list of imports.
 
 =head2 Moose exporter class
 
