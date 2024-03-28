@@ -336,11 +336,11 @@ sub parse_uri {
         $self->logger->trace(Dumper \%ENV) if $self->logger->is_trace;
         return ('', '');
     } elsif (($service =~ m{(est|cmc)}) && !$rt) {
-        $self->logger->debug("URI without endpoint, setting route: $ep");
+        $self->logger->trace("URI without endpoint, setting route: $ep");
         $rt = $ep;
         $ep = 'default';
     } else {
-        $self->logger->debug("Parsed URI: $ep => ".($rt // '<undef>'));
+        $self->logger->trace("Parsed URI: $ep => ".($rt // '<undef>'));
     }
 
     # Populate the endpoint to the MDC
