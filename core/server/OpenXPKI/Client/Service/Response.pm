@@ -8,6 +8,26 @@ use Mojo::Message::Response;
 use OpenXPKI::i18n qw(i18nGettext);
 use OpenXPKI::Server::Context qw( CTX );
 
+# Use predefined numeric codes for dedicated problems
+our %named_messages = (
+    '40000' => 'Bad Request',
+    '40001' => 'Signature invalid',
+    '40002' => 'Unable to parse request',
+    '40003' => 'Request body is empty',
+    '40004' => 'Missing or invalid parameters',
+    '40005' => 'No result for given pickup parameters',
+    '40006' => 'Request was rejected',
+    '40007' => 'Unknown operation',
+    '40008' => 'No operation specified',
+    '40100' => 'Unauthorized',
+    '40400' => 'Not Found',
+    '40401' => 'Not Found (Empty request endpoint and no default server set)',
+    '50000' => 'Server Error',
+    '50001' => 'Unable to initialize client',
+    '50003' => 'Unexpected response from backend',
+    '50010' => 'Unable to initialize endpoint parameters',
+    '50100' => 'Operation not implemented',
+);
 
 subtype 'OpenXPKI::Client::Service::Response::error',
     as 'Int',
@@ -58,13 +78,6 @@ has __error_message => (
     predicate => 'has_error_message',
     clearer => 'clear_error_message',
     init_arg  => 'error_message',
-);
-
-has use_standard_http_message => (
-    is => 'rw',
-    isa => 'Bool',
-    lazy => 1,
-    default => 0,
 );
 
 has retry_after => (
@@ -124,26 +137,6 @@ has proc_state => (
     default => undef,
 );
 
-# Use predefined numeric codes for dedicated problems
-our %named_messages = (
-    '40000' => 'Bad Request',
-    '40001' => 'Signature invalid',
-    '40002' => 'Unable to parse request',
-    '40003' => 'Request body is empty',
-    '40004' => 'Missing or invalid parameters',
-    '40005' => 'No result for given pickup parameters',
-    '40006' => 'Request was rejected',
-    '40007' => 'Unknown operation',
-    '40008' => 'No operation specified',
-    '40100' => 'Unauthorized',
-    '40400' => 'Not Found',
-    '40401' => 'Not Found (Empty request endpoint and no default server set)',
-    '50000' => 'Server Error',
-    '50001' => 'Unable to initialize client',
-    '50003' => 'Unexpected response from backend',
-    '50010' => 'Unable to initialize endpoint parameters',
-    '50100' => 'Operation not implemented',
-);
 
 # this allows a constructor with the error code as scalar
 around BUILDARGS => sub {
@@ -212,12 +205,12 @@ sub __build_http_status_line {
 sub __build_http_status_message {
     my $self = shift;
 
-    my $default = Mojo::Message::Response->default_message($self->http_status_code);
-
-    return $default if $self->use_standard_http_message;
+    # Pending request
     return sprintf('Request Pending - Retry Later (%s)', $self->transaction_id) if $self->is_pending;
+    # Error
     return $self->error_message if $self->has_error;
-    return $default;
+    # Default
+    return Mojo::Message::Response->default_message($self->http_status_code);
 }
 
 sub __process_workflow {
