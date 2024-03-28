@@ -207,10 +207,7 @@ sub _build_wf_params {
         if ($err->isa('OpenXPKI::Client::Service::Response')) {
             die $err;
         } else {
-            die OpenXPKI::Client::Service::Response->new(
-                error => 50010,
-                error_message => "$err", # stringification
-            );
+            die OpenXPKI::Client::Service::Response->new_error( 50010 => "$err" ); # stringification
         }
     }
 }
@@ -328,10 +325,7 @@ sub fcgi_safe_sub :prototype(&) {
         if ($err->isa('OpenXPKI::Client::Service::Response')) {
             $response = $err;
         } else {
-            $response = OpenXPKI::Client::Service::Response->new(
-                error => 50000,
-                error_message => "$err", # stringification
-            );
+            $response = OpenXPKI::Client::Service::Response->new_error( 500 => "$err" ); # stringification
         }
     }
 

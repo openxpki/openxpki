@@ -1,17 +1,27 @@
 package OpenXPKI::Client::Service::Response;
-use Moose;
+use OpenXPKI qw( -class -typeconstraints );
 
+# CPAN modules
 use Mojo::Message::Response;
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
+
+# Project modules
 use OpenXPKI::i18n qw(i18nGettext);
 use OpenXPKI::Server::Context qw( CTX );
 
-## constructor and destructor stuff
+
+subtype 'OpenXPKI::Client::Service::Response::error',
+    as 'Int',
+    where { $_ >= 10000 and $_ <= 59999 };
+
+# Fill up short (3-digit) error codes with trailing zeros
+coerce 'OpenXPKI::Client::Service::Response::error',
+    from 'Str',
+    via { 0 + ($_. '0' x (5 - length $_)) };
 
 has error => (
     is => 'rw',
-    isa => 'Int',
+    isa => 'OpenXPKI::Client::Service::Response::error',
+    coerce => 1,
     predicate => 'has_error',
     clearer => 'clear_error',
     lazy => 1,
@@ -145,6 +155,15 @@ around BUILDARGS => sub {
     return $class->$orig( @_ );
 
 };
+
+# Alternate constructor
+sub new_error ($class, @args) {
+    die 'new_error() requires an error code' unless @args > 0;
+    return $class->new(
+        error => $args[0],
+        scalar @args > 1 ? ( error_message => $args[1] ) : (),
+    );
+}
 
 sub __build_extra_headers {
 
