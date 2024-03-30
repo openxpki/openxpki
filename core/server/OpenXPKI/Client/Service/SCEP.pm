@@ -47,13 +47,13 @@ has attr => (
 
 
 # required by OpenXPKI::Client::Service::Role::Base
-sub prepare ($self) {
+sub prepare ($self, $c) {
     # set operation from request parameter
     $self->operation($self->query_params->param('operation') // '');
 }
 
 # required by OpenXPKI::Client::Service::Role::Base
-sub send_response ($self, $response) {
+sub send_response ($self, $c, $response) {
     # HTTP header
     if ($self->config->{output}->{headers}) {
         $self->headers->add($_ => $response->extra_headers->{$_}) for keys $response->extra_headers->%*;
@@ -62,8 +62,8 @@ sub send_response ($self, $response) {
     # Server errors are never encoded with PKCS7
     if ($response->is_server_error) {
         $self->disconnect_backend;
-        $self->content_type('text/plain');
-        return $self->render(text => $response->error_message);
+        $c->res->headers->content_type('text/plain');
+        return $c->render(text => $response->error_message);
 
     # PKCS7 response (incl. client errors) - only after successful decoding of PKCS7 request
     } elsif ('PKIOperation' eq $self->operation and $self->has_attr) {
@@ -72,30 +72,30 @@ sub send_response ($self, $response) {
         $self->log->trace('PKCS7 response: ' . $out) if $self->log->is_trace;
         $out = decode_base64($out);
 
-        $self->content_type('application/x-pki-message');
-        return $self->render(data => $out);
+        $c->res->headers->content_type('application/x-pki-message');
+        return $c->render(data => $out);
 
     # non-PKCS7 client errors
     } elsif ($response->is_client_error) {
         $self->disconnect_backend;
-        $self->content_type('text/plain');
-        return $self->render(text => $response->error_message);
+        $c->res->headers->content_type('text/plain');
+        return $c->render(text => $response->error_message);
 
     } else {
         $self->disconnect_backend;
         $self->log->trace('Response: ' . $response->result) if $self->log->is_trace;
 
         if ('GetCACaps' eq $self->operation) {
-            $self->content_type('text/plain');
-            return $self->render(text => $response->result);
+            $c->res->headers->content_type('text/plain');
+            return $c->render(text => $response->result);
 
         } elsif ('GetCACert' eq $self->operation) {
-            $self->content_type('application/x-x509-ca-ra-cert');
-            return $self->render(data => decode_base64($response->result));
+            $c->res->headers->content_type('application/x-x509-ca-ra-cert');
+            return $c->render(data => decode_base64($response->result));
 
         } elsif ('GetNextCACert' eq $self->operation) {
-            $self->content_type('application/x-x509-next-ca-cert');
-            return $self->render(data => decode_base64($response->result));
+            $c->res->headers->content_type('application/x-x509-next-ca-cert');
+            return $c->render(data => decode_base64($response->result));
         }
     }
 
@@ -192,8 +192,8 @@ sub custom_wf_params ($self, $params) {
                 @extra_params = split /\s*,\s*/, $conf->{param};
             }
             foreach my $param (@extra_params) {
-                next if ($param eq "operation");
-                next if ($param eq "message");
+                next if $param eq "operation";
+                next if $param eq "message";
                 $extra->{$param} = $self->request->param($param);
             }
             $params->{_url_params} = $extra;

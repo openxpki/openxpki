@@ -14,7 +14,9 @@ use OpenXPKI::Client::Service::Response;
 
 
 # required by OpenXPKI::Client::Service::Role::Base
-sub prepare ($self) {
+sub prepare ($self, $c) {
+    $self->operation($c->stash('operation'));
+
     if ($self->request->is_secure) {
         # what we expect -> noop
     } elsif ($self->config->{global}->{insecure}) {
@@ -25,35 +27,35 @@ sub prepare ($self) {
         die OpenXPKI::Client::Service::Response->new_error( 403 => "HTTPS required" );
     }
 
-    $self->content_type("application/pkcs7-mime; smime-type=certs-only"); # default
+    $c->res->headers->content_type("application/pkcs7-mime; smime-type=certs-only"); # default
 }
 
 # required by OpenXPKI::Client::Service::Role::Base
-sub send_response ($self, $response) {
+sub send_response ($self, $c, $response) {
     $self->disconnect_backend;
 
     # HTTP header
     if ($self->config->{output}->{headers}) {
-        $self->headers->add($_ => $response->extra_headers->{$_}) for keys $response->extra_headers->%*;
+        $c->res->headers->add($_ => $response->extra_headers->{$_}) for keys $response->extra_headers->%*;
     }
 
     if ($response->has_error) {
-        return $self->render(text => $response->error_message."\n");
+        return $c->render(text => $response->error_message."\n");
 
     } elsif ($response->is_pending) {
-        $self->headers->add('-retry-after' => $response->retry_after);
-        return $self->render(text => $response->http_status_message."\n");
+        $c->res->headers->add('-retry-after' => $response->retry_after);
+        return $c->render(text => $response->http_status_message."\n");
 
     } elsif (not $response->has_result) {
         # revoke returns a 204 no content on success
-        return $self->rendered;
+        return $c->rendered;
 
     } else {
         # Default is base64 encoding, but we can turn on binary
         my $is_binary = $self->config->{output}->{encoding}//'' eq 'binary';
         my $data = $is_binary ? decode_base64($response->result) : $response->result;
-        $self->headers->add('content-transfer-encoding' => ($is_binary ? 'binary' : 'base64'));
-        return $self->render(data => $data);
+        $c->res->headers->add('content-transfer-encoding' => ($is_binary ? 'binary' : 'base64'));
+        return $c->render(data => $data);
     }
 }
 
@@ -107,7 +109,7 @@ sub custom_wf_params ($self, $params) {
 
 # required by OpenXPKI::Client::Service::Role::Base
 sub prepare_enrollment_result ($self, $workflow) {
-    my $result = $self->backend()->run_command('get_cert',{
+    my $result = $self->backend->run_command('get_cert',{
         format => 'PKCS7',
         identifier => $workflow->{context}->{cert_identifier},
     });

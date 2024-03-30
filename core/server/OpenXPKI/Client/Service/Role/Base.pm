@@ -32,14 +32,37 @@ Moose::Exporter->setup_import_methods(
     as_is => [ 'fcgi_safe_sub' ],
 );
 
-
+# required parameters
 has config_obj => (
-    is => 'rw',
+    is => 'ro',
     isa => 'OpenXPKI::Client::Config',
-    lazy => 1,
-    builder => '_build_config_obj',
+    required => 1,
 );
-sub _build_config_obj ($self) { $self->controller->oxi_config($self->service_name) }
+
+has apache_env => (
+    is => 'ro',
+    isa => 'HashRef',
+    required => 1,
+);
+
+has remote_address => (
+    is => 'ro',
+    isa => 'Str',
+    required => 1,
+);
+
+has request => (
+    is => 'ro',
+    isa => 'Mojo::Message::Request',
+    required => 1,
+    handles => [qw( query_params body_params )],
+);
+
+has endpoint => (
+    is => 'ro',
+    isa => 'Str',
+    required => 1,
+);
 
 # the endpoint config
 has config => (
@@ -51,63 +74,11 @@ has config => (
 );
 sub _build_config ($self) { $self->config_obj->endpoint_config($self->endpoint) }
 
-# Mojolicious controller
-has controller => (
-    is => 'rw',
-    isa => 'Mojolicious::Controller',
-    # required => 1, # FIXME Make this required once we fully migrated to Mojolicious based web services
-    handles => [qw( render rendered )],
-);
-
 has operation => (
     is => 'rw',
     isa => 'Str',
     lazy => 1,
-    trigger => sub { die '"operation" can only be set once' if scalar @_ > 2 },
-    builder => '_build_operation',
-);
-sub _build_operation ($self) { $self->controller->stash('operation') }
-
-has endpoint => (
-    is => 'ro',
-    isa => 'Str',
-    lazy => 1,
-    builder => '_build_endpoint',
-);
-sub _build_endpoint ($self) { $self->controller->stash('endpoint') }
-
-has apache_env => (
-    is => 'ro',
-    isa => 'HashRef',
-    lazy => 1,
-    builder => '_build_apache_env',
-);
-sub _build_apache_env ($self) { $self->controller->stash('apache_env') }
-
-has remote_address => (
-    is => 'ro',
-    isa => 'Str',
-    lazy => 1,
-    builder => '_build_remote_address',
-);
-sub _build_remote_address ($self) { $self->controller->tx->remote_address }
-
-has request => (
-    is => 'ro',
-    isa => 'Mojo::Message::Request',
-    lazy => 1,
-    builder => '_build_request',
-    handles => [qw( query_params body_params )],
-);
-sub _build_request ($self) { $self->controller->tx->req }
-
-has headers => (
-    is => 'ro',
-    isa => 'Mojo::Headers',
-    init_arg => undef,
-    lazy => 1,
-    default => sub ($self) { $self->controller->tx->res->headers },
-    handles => [qw( content_type )],
+    default => sub { die "Attribute 'operation' has not been set" },
 );
 
 has log => (

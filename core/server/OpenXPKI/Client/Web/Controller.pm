@@ -17,7 +17,13 @@ sub index ($self) {
     my $service;
     try {
         Module::Load::load $class;
-        $service = $class->new(controller => $self);
+        $service = $class->new(
+            config_obj => $self->oxi_config($class->service_name),
+            apache_env => $self->stash('apache_env'),
+            remote_address => $self->tx->remote_address,
+            request => $self->req,
+            endpoint => $self->stash('endpoint'),
+        );
         die "Service class $class does not consume role OpenXPKI::Client::Service::Role::Base"
           unless $service->DOES('OpenXPKI::Client::Service::Role::Base');
     }
@@ -31,10 +37,11 @@ sub index ($self) {
 
     $self->log->debug("Service class $class instantiated");
 
-    # process request
+    # preparations and checks
     $self->log->debug("Request handling (1/3): preparations and checks");
-    $service->prepare;
+    $service->prepare($self);
 
+    # request handling
     $self->log->debug("Request handling (2/3): process request");
     my $response = $service->handle_request;
     die "Result of $class->handle_request() is not an instance of OpenXPKI::Client::Service::Response"
@@ -44,8 +51,9 @@ sub index ($self) {
     $self->res->code($response->http_status_code);
     $self->res->message($response->http_status_message);
 
+    # HTTP response
     $self->log->debug("Request handling (3/3): send response");
-    $service->send_response($response);
+    $service->send_response($self, $response);
 }
 
 1;
