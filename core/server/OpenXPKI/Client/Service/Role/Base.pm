@@ -247,12 +247,33 @@ sub set_pkcs10_and_tid {
     $params->{transaction_id} = sha1_hex($decoded->csrRequest);
 }
 
-sub build_pickup_config {
+=head2 _build_pickup_config
 
-    my $self = shift;
-    my $param = shift;
+Build a configuration hash for the pickup workflow from
 
+=over
+
+=item * L</wf_params> and
+
+=item * the protocols' configuration for the current operation.
+
+=back
+
+B<Returns> A list C<($config, $value)>:
+
+=over
+
+=item * C<$config> - Pickup workflow configuration I<HashRef>
+
+=item * C<$value> - Pickup parameter I<HashRef> if C<$config-E<gt>{pickup_workflow}> is given, or transaction ID value I<Str> otherwise
+
+=back
+
+=cut
+sub _build_pickup_config ($self) {
     my $conf = $self->config;
+    my $param = $self->wf_params;
+
     my $pickup_config = {
         workflow => 'certificate_enroll',
         pickup => 'pkcs10',
@@ -270,7 +291,7 @@ sub build_pickup_config {
         my @keys = split /\s*,\s*/, $pickup_config->{pickup};
         foreach my $key (@keys) {
             # take value from param hash if defined, this makes data
-            # from the environment avail to the pickup workflow
+            # from the environment available to the pickup workflow
             my $val = $param->{$key} // $self->request->param($key);
             $pickup_value->{$key} = $val if (defined $val);
         }
@@ -379,7 +400,7 @@ sub handle_enrollment_request ($self) {
     # create the client object
     my $client = $self->backend;
 
-    my ($pickup_config, $pickup_value) = $self->build_pickup_config( $param );
+    my ($pickup_config, $pickup_value) = $self->_build_pickup_config;
     $self->log->trace(Dumper $pickup_config) if $self->log->is_trace;
 
     my $workflow;
