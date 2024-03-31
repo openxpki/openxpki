@@ -15,7 +15,9 @@ requires 'prepare_enrollment_result';
 OpenXPKI::Client::Service::Role::Base - Base role for all service classes (i.e.
 protocol implementations)
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
+
+A consuming class that implements a service generally looks like this:
 
     package OpenXPKI::Client::Service::TheXProtocol;
     use OpenXPKI -class;
@@ -54,8 +56,6 @@ Moose::Exporter->setup_import_methods(
     as_is => [ 'fcgi_safe_sub' ],
 );
 
-=head1 FOR CONSUMING CLASSES
-
 =head2 ATTRIBUTES
 
 =head3 operation
@@ -73,11 +73,11 @@ has operation => (
 
 =head2 REQUIRED METHODS
 
-This role requires the consuming class to implement the following methods:
+The consuming class needs to implement the following methods.
 
 =head3 service_name
 
-The name of the service the class implements. Used e.g.
+Name of the service the class implements. Used e.g.
 
 =over
 
@@ -399,145 +399,21 @@ after 'BUILD' => sub ($self, $args) {
     Log::Log4perl::MDC->put('endpoint', $self->endpoint);
 };
 
-=head2 set_pkcs10_and_tid
-
-Sets the C<pkcs10> workflow parameter to the PEM CSR after conversion rountrip
-and removal of any data beyond the length of the ASN.1 structure.
-
-Also sets the C<transaction_id> workflow parameter to the hexadecimal SHA1 hash
-(L<Digest::SHA/sha1_hex>) of the binary CSR.
-
-B<Parameters>
-
-=over
-
-=item * C<$params> I<HashRef> - Workflow parameter hash (will be modified)
-
-=item * C<$pkcs10> I<Str> - PKCS10 encoded CSR
-
-=back
-
-B<Returns> nothing.
-
-=cut
-sub set_pkcs10_and_tid ($self, $params, $pkcs10 = undef) {
-    $self->log->debug('Parse PKCS10');
-
-    # Usually PEM encoded but without borders as POSTDATA
-    $pkcs10 or do {
-        $self->log->debug( 'Incoming enrollment with empty body' );
-        die OpenXPKI::Client::Service::Response->new( 40003 );
-    };
-
-    Crypt::PKCS10->setAPIversion(1);
-    my $decoded = Crypt::PKCS10->new($pkcs10, ignoreNonBase64 => 1, verifySignature => 1);
-    if (!$decoded) {
-        $self->log->error('Unable to parse PKCS10: '. Crypt::PKCS10->error);
-        $self->log->debug($pkcs10);
-        die OpenXPKI::Client::Service::Response->new( 40002 );
-    }
-
-    $params->{pkcs10} = $decoded->csrRequest(1);
-    $params->{transaction_id} = sha1_hex($decoded->csrRequest);
-}
-
-=head2 _build_pickup_config
-
-Build a configuration hash for the pickup workflow from
-
-=over
-
-=item * L</wf_params> and
-
-=item * the protocols' configuration for the current operation.
-
-=back
-
-B<Returns> A list C<($config, $value)>:
-
-=over
-
-=item * C<$config> - Pickup workflow configuration I<HashRef>
-
-=item * C<$value> - Pickup parameter I<HashRef> if C<$config-E<gt>{pickup_workflow}> is given, or transaction ID value I<Str> otherwise
-
-=back
-
-=cut
-sub _build_pickup_config ($self) {
-    my $conf = $self->config;
-    my $param = $self->wf_params;
-
-    my $pickup_config = {
-        workflow => 'certificate_enroll',
-        pickup => 'pkcs10',
-        pickup_attribute => 'transaction_id',
-        %{$conf->{$self->operation} || {}},
-    };
-
-    Log::Log4perl::MDC->put('tid', $param->{transaction_id});
-
-    # check for pickup parameter
-    my $pickup_value;
-    # namespace needs a single value
-    if ($pickup_config->{pickup_workflow}) {
-        # explicit pickup paramters are set
-        my @keys = split /\s*,\s*/, $pickup_config->{pickup};
-        foreach my $key (@keys) {
-            # take value from param hash if defined, this makes data
-            # from the environment available to the pickup workflow
-            my $val = $param->{$key} // $self->request->param($key);
-            $pickup_value->{$key} = $val if (defined $val);
-        }
-    } else {
-        # pickup via transaction_id
-        $pickup_value = $param->{transaction_id};
-    }
-
-    return ($pickup_config, $pickup_value);
-}
-
-=head2 fcgi_safe_sub
-
-Class method to wrap legacy FCGI request handling in a try-catch block so that
-always a L<OpenXPKI::Client::Service::Response> is returned.
-
-=cut
-sub fcgi_safe_sub :prototype(&) {
-
-    my $handler_sub = shift;
-
-    my $response;
-    try {
-        $response = $handler_sub->();
-    }
-    catch ($err) {
-        if ($err->isa('OpenXPKI::Client::Service::Response')) {
-            $response = $err;
-        } else {
-            $response = OpenXPKI::Client::Service::Response->new_error( 500 => "$err" ); # stringification
-        }
-    }
-
-    return $response;
-}
-
 =head2 handle_request
 
 Main request handling method:
 
 =over
 
-=item * queries the current operation (set by consuming class)
+=item * queries the current operation C<$self-E<gt>operation> (set by consuming class)
 
-=item * calls consuming classes' L<op_handlers>
+=item * calls consuming classes' L</op_handlers>
 
-=item * calls the subroutine returned by L<op_handlers> that matches the operation
+=item * calls the subroutine returned by L</op_handlers> that matches the operation
 
 =back
 
-C<handle_request> catches all exceptions and always returns a
-L<OpenXPKI::Client::Service::Response>.
+B<Returns> an L<OpenXPKI::Client::Service::Response> and does not throw exceptions.
 
 =cut
 sub handle_request ($self) {
@@ -608,11 +484,13 @@ The resulting workflow state is checked. If the workflow context contains
 a C<cert_identifier> then the consuming classes' L</prepare_enrollment_result>
 is called.
 
+B<Returns> an L<OpenXPKI::Client::Service::Response>.
+
 =cut
 sub handle_enrollment_request ($self) {
     $self->is_enrollment(1);
 
-    # Build configuration parameters. May be customized by protocol classes
+    # Build configuration parameters. May be customized by service classes
     # via custom_wf_params(), e.g. for SCEP to inject data from the input.
     my $param = $self->wf_params;
 
@@ -767,9 +645,7 @@ B<Parameters>
 
 =back
 
-B<Returns> a L<OpenXPKI::Client::Service::Response>.
-
-Might throw exceptions.
+B<Returns> an L<OpenXPKI::Client::Service::Response>.
 
 =cut
 sub run_workflow ($self, $workflow_type, $param) {
@@ -811,13 +687,113 @@ sub run_workflow ($self, $workflow_type, $param) {
 
 Disconnect the backend (client) if it was initialized.
 
-Does not throw exceptions.
+B<Returns> nothing and does not throw exceptions.
 
 =cut
 sub disconnect_backend ($self) {
     return unless $self->has_backend;
     eval { $self->backend->disconnect if $self->backend };
 }
+
+=head2 set_pkcs10_and_tid
+
+Sets the C<pkcs10> workflow parameter to the PEM CSR after conversion rountrip
+and removal of any data beyond the length of the ASN.1 structure.
+
+Also sets the C<transaction_id> workflow parameter to the hexadecimal SHA1 hash
+(L<Digest::SHA/sha1_hex>) of the binary CSR.
+
+B<Parameters>
+
+=over
+
+=item * C<$params> I<HashRef> - Workflow parameter hash (will be modified)
+
+=item * C<$pkcs10> I<Str> - PKCS10 encoded CSR
+
+=back
+
+B<Returns> nothing.
+
+=cut
+sub set_pkcs10_and_tid ($self, $params, $pkcs10 = undef) {
+    $self->log->debug('Parse PKCS10');
+
+    # Usually PEM encoded but without borders as POSTDATA
+    $pkcs10 or do {
+        $self->log->debug( 'Incoming enrollment with empty body' );
+        die OpenXPKI::Client::Service::Response->new( 40003 );
+    };
+
+    Crypt::PKCS10->setAPIversion(1);
+    my $decoded = Crypt::PKCS10->new($pkcs10, ignoreNonBase64 => 1, verifySignature => 1);
+    if (!$decoded) {
+        $self->log->error('Unable to parse PKCS10: '. Crypt::PKCS10->error);
+        $self->log->debug($pkcs10);
+        die OpenXPKI::Client::Service::Response->new( 40002 );
+    }
+
+    $params->{pkcs10} = $decoded->csrRequest(1);
+    $params->{transaction_id} = sha1_hex($decoded->csrRequest);
+}
+
+=head2 _build_pickup_config
+
+Build a configuration hash for the pickup workflow from
+
+=over
+
+=item * L</wf_params> and
+
+=item * the services' configuration for the current operation.
+
+=back
+
+B<Returns> A list C<($config, $value)>:
+
+=over
+
+=item * C<$config> - Pickup workflow configuration I<HashRef>
+
+=item * C<$value> - Pickup parameter I<HashRef> if C<$config-E<gt>{pickup_workflow}> is given, or transaction ID value I<Str> otherwise
+
+=back
+
+=cut
+sub _build_pickup_config ($self) {
+    my $conf = $self->config;
+    my $param = $self->wf_params;
+
+    my $pickup_config = {
+        workflow => 'certificate_enroll',
+        pickup => 'pkcs10',
+        pickup_attribute => 'transaction_id',
+        %{$conf->{$self->operation} || {}},
+    };
+
+    Log::Log4perl::MDC->put('tid', $param->{transaction_id});
+
+    # check for pickup parameter
+    my $pickup_value;
+    # namespace needs a single value
+    if ($pickup_config->{pickup_workflow}) {
+        # explicit pickup paramters are set
+        my @keys = split /\s*,\s*/, $pickup_config->{pickup};
+        foreach my $key (@keys) {
+            # take value from param hash if defined, this makes data
+            # from the environment available to the pickup workflow
+            my $val = $param->{$key} // $self->request->param($key);
+            $pickup_value->{$key} = $val if (defined $val);
+        }
+    } else {
+        # pickup via transaction_id
+        $pickup_value = $param->{transaction_id};
+    }
+
+    return ($pickup_config, $pickup_value);
+}
+
+=head1 LEGACY CGI METHODS
 
 =head2 mojo_req_from_cgi
 
@@ -840,6 +816,31 @@ sub mojo_req_from_cgi {
     }
 
     return $req;
+}
+
+=head2 fcgi_safe_sub
+
+Class method to wrap legacy FCGI request handling in a try-catch block so that
+always a L<OpenXPKI::Client::Service::Response> is returned.
+
+=cut
+sub fcgi_safe_sub :prototype(&) {
+
+    my $handler_sub = shift;
+
+    my $response;
+    try {
+        $response = $handler_sub->();
+    }
+    catch ($err) {
+        if ($err->isa('OpenXPKI::Client::Service::Response')) {
+            $response = $err;
+        } else {
+            $response = OpenXPKI::Client::Service::Response->new_error( 500 => "$err" ); # stringification
+        }
+    }
+
+    return $response;
 }
 
 1;
