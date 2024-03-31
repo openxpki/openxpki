@@ -188,12 +188,6 @@ sub _build_wf_params {
         # hook that allows consuming classes to add own parameters
         $self->custom_wf_params($p);
 
-        # if (not $p->{'server'}) {
-        #     $self->log->error('Server not set: empty endpoint and no default server set');
-        #     die OpenXPKI::Client::Service::Response->new( 40401 );
-        # }
-        # Log::Log4perl::MDC->put('server', $p->{'server'});
-
         $self->log->trace(sprintf("Extra params for operation '%s': %s", $self->operation, Dumper $p)) if $self->log->is_trace;
         return $p;
     }
@@ -363,15 +357,18 @@ sub handle_request {
     return $response;
 }
 
-sub handle_enrollment_request {
-
-    my $self = shift;
-
+sub handle_enrollment_request ($self) {
     $self->is_enrollment(1);
 
-    # Build configuration parameters, can be overloaded by protocols,
-    # e.g. for SCEP to inject data from the input
+    # Build configuration parameters. May be customized by protocol classes
+    # via custom_wf_params(), e.g. for SCEP to inject data from the input.
     my $param = $self->wf_params;
+
+    if (not $param->{server}) {
+        $self->log->error("Parameter 'server' missing but required by enrollment workflow");
+        return OpenXPKI::Client::Service::Response->new( 40401 );
+    }
+    Log::Log4perl::MDC->put('server', $param->{server});
 
     # create the client object
     my $client = $self->backend
@@ -450,8 +447,8 @@ sub handle_enrollment_request {
 
     $self->log->debug( 'Sending output for ' . $cert_identifier);
 
+    # implemented by consuming class
     return $self->prepare_enrollment_result($workflow);
-
 }
 
 sub handle_property_request ($self, $operation = $self->operation) {
