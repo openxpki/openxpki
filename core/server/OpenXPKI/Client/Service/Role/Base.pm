@@ -101,11 +101,17 @@ has backend => (
     builder => '_build_backend',
 );
 sub _build_backend ($self) {
-    OpenXPKI::Client::Simple->new({
-        logger => $self->log,
-        config => $self->config->{global}, # realm and locale
-        auth => $self->config->{auth} || {}, # auth config
-    })
+    try {
+        return OpenXPKI::Client::Simple->new({
+            logger => $self->log,
+            config => $self->config->{global}, # realm and locale
+            auth => $self->config->{auth} || {}, # auth config
+        });
+    }
+    catch ($err) {
+        $self->log->error("Could not create client object: $err");
+        die OpenXPKI::Client::Service::Response->new( 50001 );
+    }
 }
 
 has is_enrollment => (
@@ -371,8 +377,7 @@ sub handle_enrollment_request ($self) {
     Log::Log4perl::MDC->put('server', $param->{server});
 
     # create the client object
-    my $client = $self->backend
-        or return OpenXPKI::Client::Service::Response->new( 50001 );
+    my $client = $self->backend;
 
     my ($pickup_config, $pickup_value) = $self->build_pickup_config( $param );
     $self->log->trace(Dumper $pickup_config) if $self->log->is_trace;
@@ -472,13 +477,19 @@ sub run_workflow {
     my $param = shift;
 
     # create the client object
-    my $client = $self->backend
-        or return OpenXPKI::Client::Service::Response->new( 50001 );
+    my $client = $self->backend;
+    my $workflow;
 
-    my $workflow = $client->handle_workflow({
-        type => $workflow_type,
-        params => $param
-    });
+    try {
+        $workflow = $client->handle_workflow({
+            type => $workflow_type,
+            params => $param
+        });
+    }
+    catch ($err) {
+        $self->log->error($err);
+        return OpenXPKI::Client::Service::Response->new( 50003 );
+    }
 
     $self->log->trace( 'Workflow info: '  . Dumper $workflow ) if $self->log->is_trace;
 
@@ -489,8 +500,6 @@ sub run_workflow {
                 return OpenXPKI::Client::Service::Response->new( 40004 );
             }
         }
-        $self->log->error( $EVAL_ERROR ? $EVAL_ERROR : 'Internal Server Error' );
-        return OpenXPKI::Client::Service::Response->new( 50003 );
     }
 
     return OpenXPKI::Client::Service::Response->new(
