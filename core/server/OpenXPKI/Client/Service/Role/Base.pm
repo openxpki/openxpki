@@ -486,7 +486,15 @@ sub handle_property_request ($self, $operation = $self->operation) {
 
     my $response = $self->run_workflow($workflow_type, $param);
 
-    return $self->_handle_property_response($response);
+    return $response if $response->has_error;
+
+    if ($response->workflow->{context}->{output}) {
+        $response->result( $response->workflow()->{context}->{output} );
+    } else {
+        $response->error( 50003 );
+    }
+
+    return $response;
 }
 
 =head2 run_workflow
@@ -542,24 +550,6 @@ sub run_workflow ($self, $workflow_type, $param) {
     return OpenXPKI::Client::Service::Response->new(
         workflow => $workflow,
     );
-
-}
-
-sub _handle_property_response {
-
-    my $self = shift;
-    my $response = shift;
-
-    return $response if ($response->has_error());
-
-    if ($response->workflow()->{context}->{output}) {
-        $response->result( $response->workflow()->{context}->{output} );
-    } else {
-        $response->error( 50003 );
-    }
-
-    return $response;
-
 }
 
 sub disconnect_backend {
