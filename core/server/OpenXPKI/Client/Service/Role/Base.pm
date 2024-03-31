@@ -10,6 +10,28 @@ requires 'op_handlers';
 requires 'custom_wf_params';
 requires 'prepare_enrollment_result';
 
+=head1 NAME
+
+OpenXPKI::Client::Service::Role::Base - Base role for all service classes (i.e.
+protocol implementations)
+
+=head1 SYNOPSIS
+
+    package OpenXPKI::Client::Service::TheXProtocol;
+    use OpenXPKI -class;
+
+    with 'OpenXPKI::Client::Service::Role::Base';
+
+    # The class needs to define all methods required by C<OpenXPKI::Client::Service::Role::Base>:
+    sub service_name { 'xproto' }
+    sub prepare ($self, $c) { ... }
+    sub send_response ($self, $c, $response) { ... }
+    sub op_handlers { ... }
+    sub custom_wf_params ($self, $params) { ... }
+    sub prepare_enrollment_result ($self, $workflow) { ... }
+
+=cut
+
 # Core modules
 use Carp;
 use MIME::Base64;
@@ -32,25 +54,155 @@ Moose::Exporter->setup_import_methods(
     as_is => [ 'fcgi_safe_sub' ],
 );
 
-# required parameters
+=head1 FOR CONSUMING CLASSES
+
+=head2 ATTRIBUTES
+
+=head3 operation
+
+This special attribute needs to be set by the consuming class, most likely in
+its L</prepare> method.
+
+=cut
+has operation => (
+    is => 'rw',
+    isa => 'Str',
+    lazy => 1,
+    default => sub { die "Attribute 'operation' has not been set" },
+);
+
+=head2 REQUIRED METHODS
+
+This role requires the consuming class to implement the following methods:
+
+=head3 service_name
+
+The name of the service the class implements. Used e.g.
+
+=over
+
+=item * for configuration lookups,
+
+=item * to create the C<Log4perl> logger,
+
+=item * to assemble the fallback workflow name in L</handle_property_request>.
+
+=back
+
+    sub service_name { 'xproto' }
+
+=head3 prepare
+
+May be used to do checks and preparations before the real request / operation
+handling.
+
+    sub prepare ($self, $c) {
+        $self->operation($c->stash('operation'));
+        # or:
+        $self->operation($self->query_params->param('operation') // '');
+
+        # some checks ...
+    }
+
+=head3 send_response
+
+Sends the response back to the HTTP client via a passed Mojolicious controller.
+
+    sub send_response ($self, $c, $response) {
+        $self->disconnect_backend;
+
+        if ($response->has_error) {
+            return $c->render(text => $response->error_message."\n");
+
+        } else {
+            $c->res->headers->content_type('application/xprotocol');
+            return $c->render(data => $data);
+        }
+    }
+
+=head3 op_handlers
+
+Defines the mapping between requested operation and the handler methods.
+
+Must return an I<ArrayRef> where the odd items are either an operation name
+(I<Str>) or a list of operation names (I<ArrayRef>) and the even items are
+I<CodeRefs>.
+
+    sub op_handlers {
+        return [
+            'getcrl' => sub ($self) { $self->handle_property_request('crl') },
+            ['enroll', 're-enroll'] => \&handle_enrollment_request, # shortcut
+        ];
+    }
+
+=head3 custom_wf_params
+
+Allows to add service specific workflow parameters.
+
+    sub custom_wf_params ($self, $params) {
+        if ($self->operation eq 'enroll') {
+            $params->{server} = $self->endpoint;
+        }
+    }
+
+=head3 prepare_enrollment_result
+
+Service specific processing of the successful enrollment workflow result.
+
+Must return a L<OpenXPKI::Client::Service::Response>.
+
+    sub prepare_enrollment_result ($self, $workflow) {
+        return OpenXPKI::Client::Service::Response->new(
+            workflow => $workflow,
+            result => $workflow->{context}->{cert_identifier},
+        );
+    }
+
+=head1 ATTRIBUTES
+
+=head2 REQUIRED
+
+These attributes will be set by L<OpenXPKI::Client::Web::Controller> so that
+the consuming service class does not need to care about setting them.
+
+=head3 config_obj
+
+An instance of L<OpenXPKI::Client::Config>.
+
+=cut
 has config_obj => (
     is => 'ro',
     isa => 'OpenXPKI::Client::Config',
     required => 1,
 );
 
+=head3 apache_env
+
+I<HashRef> containing the Apache environment variables (NOT the shell environment).
+
+=cut
 has apache_env => (
     is => 'ro',
     isa => 'HashRef',
     required => 1,
 );
 
+=head3 remote_address
+
+IP address of the client that sent the request.
+
+=cut
 has remote_address => (
     is => 'ro',
     isa => 'Str',
     required => 1,
 );
 
+=head3 remote_address
+
+L<Mojo::Message::Request> object encapsulating the request.
+
+=cut
 has request => (
     is => 'ro',
     isa => 'Mojo::Message::Request',
@@ -58,13 +210,25 @@ has request => (
     handles => [qw( query_params body_params )],
 );
 
+=head3 endpoint
+
+The endpoint I<Str> extracted from the URL.
+
+=cut
 has endpoint => (
     is => 'ro',
     isa => 'Str',
     required => 1,
 );
 
-# the endpoint config
+=head2 OTHER
+
+=head3 config
+
+L<HashRef> containing the endpoint configuration as returned by
+L<OpenXPKI::Client::Config/endpoint_config>.
+
+=cut
 has config => (
     is => 'rw',
     isa => 'HashRef',
@@ -74,13 +238,12 @@ has config => (
 );
 sub _build_config ($self) { $self->config_obj->endpoint_config($self->endpoint) }
 
-has operation => (
-    is => 'rw',
-    isa => 'Str',
-    lazy => 1,
-    default => sub { die "Attribute 'operation' has not been set" },
-);
+=head3 log
 
+A logger object, per default set
+C<OpenXPKI::Log4perl-E<gt>get_logger('client.' . $self-E<gt>service_name)>.
+
+=cut
 has log => (
     is => 'rw',
     isa => duck_type( [qw(
@@ -92,6 +255,12 @@ has log => (
 );
 sub _build_log ($self) { OpenXPKI::Log4perl->get_logger('client.' . $self->service_name) }
 
+=head3 backend
+
+An instance of L<OpenXPKI::Client::Simple> initialized with the current
+endpoint configuration.
+
+=cut
 has backend => (
     is => 'rw',
     isa => 'Object|Undef',
@@ -114,6 +283,13 @@ sub _build_backend ($self) {
     }
 }
 
+=head3 is_enrollment
+
+I<Bool> flag, may be used e.g. in C<custom_wf_params>.
+
+Returns C<1> if L<handle_enrollment_request> was called.
+
+=cut
 has is_enrollment => (
     is => 'rw',
     isa => 'Bool',
@@ -121,18 +297,20 @@ has is_enrollment => (
     default => 0,
 );
 
-# Workflow parameters. A value of "undef" indicates an error.
+=head3 wf_params
+
+I<HashRef> with workflow parameters (calls the consuming classes'
+L<custom_wf_params> as the last step).
+
+=cut
 has wf_params => (
     is => 'ro',
-    isa => 'HashRef|Undef',
+    isa => 'HashRef',
     lazy => 1,
     init_arg => undef,
     builder => '_build_wf_params',
 );
-sub _build_wf_params {
-
-    my $self = shift;
-
+sub _build_wf_params ($self) {
     try {
         my $p = {};
         my $operation = $self->operation;
@@ -206,6 +384,9 @@ sub _build_wf_params {
     }
 }
 
+=head1 METHODS
+
+=cut
 # Around modifier with fallback BUILD method:
 # "around 'BUILD'" complains if there is no BUILD method in the inheritance
 # chain of the consuming class. So we define an empty fallback method.
@@ -214,32 +395,45 @@ sub _build_wf_params {
 # Please note that "around 'build'" is only allowed in roles.
 # https://metacpan.org/dist/Moose/view/lib/Moose/Manual/Construction.pod#BUILD-and-parent-classes
 sub BUILD {}
-after 'BUILD' => sub {
-    my $self = shift;
+after 'BUILD' => sub ($self, $args) {
     Log::Log4perl::MDC->put('endpoint', $self->endpoint);
 };
 
-# Returns the request as PEM CSR after conversion rountrip and removal of any
-# data beyond the length of the ASN.1 structure.
-# Sending PEM with headers is not allowed in neither one but will be
-# gracefully accepted and converted by Crypt::PKSC10.
-sub set_pkcs10_and_tid {
+=head2 set_pkcs10_and_tid
 
-    my $self = shift;
-    my $params = shift;
+Sets the C<pkcs10> workflow parameter to the PEM CSR after conversion rountrip
+and removal of any data beyond the length of the ASN.1 structure.
+
+Also sets the C<transaction_id> workflow parameter to the hexadecimal SHA1 hash
+(L<Digest::SHA/sha1_hex>) of the binary CSR.
+
+B<Parameters>
+
+=over
+
+=item * C<$params> I<HashRef> - Workflow parameter hash (will be modified)
+
+=item * C<$pkcs10> I<Str> - PKCS10 encoded CSR
+
+=back
+
+B<Returns> nothing.
+
+=cut
+sub set_pkcs10_and_tid ($self, $params, $pkcs10 = undef) {
+    $self->log->debug('Parse PKCS10');
 
     # Usually PEM encoded but without borders as POSTDATA
-    my $pkcs10_in = shift
-        or do {
-            $self->log->debug( 'Incoming enrollment with empty body' );
-            die OpenXPKI::Client::Service::Response->new( 40003 );
-        };
+    $pkcs10 or do {
+        $self->log->debug( 'Incoming enrollment with empty body' );
+        die OpenXPKI::Client::Service::Response->new( 40003 );
+    };
 
     Crypt::PKCS10->setAPIversion(1);
-    my $decoded = Crypt::PKCS10->new($pkcs10_in, ignoreNonBase64 => 1, verifySignature => 1);
+    my $decoded = Crypt::PKCS10->new($pkcs10, ignoreNonBase64 => 1, verifySignature => 1);
     if (!$decoded) {
         $self->log->error('Unable to parse PKCS10: '. Crypt::PKCS10->error);
-        $self->log->debug($pkcs10_in);
+        $self->log->debug($pkcs10);
         die OpenXPKI::Client::Service::Response->new( 40002 );
     }
 
@@ -303,7 +497,12 @@ sub _build_pickup_config ($self) {
     return ($pickup_config, $pickup_value);
 }
 
-# Class method to wrap legacy FCGI request handling in a try-catch block
+=head2 fcgi_safe_sub
+
+Class method to wrap legacy FCGI request handling in a try-catch block so that
+always a L<OpenXPKI::Client::Service::Response> is returned.
+
+=cut
 sub fcgi_safe_sub :prototype(&) {
 
     my $handler_sub = shift;
@@ -323,10 +522,25 @@ sub fcgi_safe_sub :prototype(&) {
     return $response;
 }
 
-sub handle_request {
+=head2 handle_request
 
-    my $self = shift;
+Main request handling method:
 
+=over
+
+=item * queries the current operation (set by consuming class)
+
+=item * calls consuming classes' L<op_handlers>
+
+=item * calls the subroutine returned by L<op_handlers> that matches the operation
+
+=back
+
+C<handle_request> catches all exceptions and always returns a
+L<OpenXPKI::Client::Service::Response>.
+
+=cut
+sub handle_request ($self) {
     $self->log->debug(sprintf('Incoming %s request "%s" on endpoint "%s"', uc($self->service_name), $self->operation, $self->endpoint)) if $self->log->is_debug;
 
     my $response;
@@ -384,6 +598,17 @@ sub handle_request {
     return $response;
 }
 
+=head2 handle_enrollment_request
+
+Handler for enrollment requests.
+
+Tries to pick up an existing enrollment workflow or starts a new one.
+
+The resulting workflow state is checked. If the workflow context contains
+a C<cert_identifier> then the consuming classes' L</prepare_enrollment_result>
+is called.
+
+=cut
 sub handle_enrollment_request ($self) {
     $self->is_enrollment(1);
 
@@ -477,6 +702,36 @@ sub handle_enrollment_request ($self) {
     return $self->prepare_enrollment_result($workflow);
 }
 
+=head2 handle_property_request
+
+Handler for property requests.
+
+The workflow type is set to:
+
+=over
+
+=item 1 the configuration value C<E<lt>serviceE<gt>.E<lt>operationE<gt>.E<lt>workflowE<gt>> if
+specified or
+
+=item 2 the lowercase string C<"E<lt>serviceE<gt>_E<lt>operationE<gt>"> otherwise.
+
+=back
+
+If the workflow ends successfully the contents of its C<output> context key
+are returned (wrapped in a L<OpenXPKI::Client::Service::Response>).
+
+B<Parameters>
+
+=over
+
+=item * C<$operation> I<Str> - Optional: operation name (used for querying the
+configuration), defaults to C<$self->operation>
+
+=back
+
+B<Returns> a L<OpenXPKI::Client::Service::Response>.
+
+=cut
 sub handle_property_request ($self, $operation = $self->operation) {
     my $param = $self->wf_params;
 
@@ -536,7 +791,7 @@ sub run_workflow ($self, $workflow_type, $param) {
         return OpenXPKI::Client::Service::Response->new( 50003 );
     }
 
-    $self->log->trace( 'Workflow info: '  . Dumper $workflow ) if $self->log->is_trace;
+    $self->log->trace( 'Workflow result: '  . Dumper $workflow ) if $self->log->is_trace;
 
     if (!$workflow || ( $workflow->{'proc_state'} !~ m{finished|manual} )) {
         if (my $err = $client->last_reply()->{ERROR}) {
@@ -552,14 +807,25 @@ sub run_workflow ($self, $workflow_type, $param) {
     );
 }
 
-sub disconnect_backend {
+=head2 disconnect_backend
 
-    my $self = shift;
+Disconnect the backend (client) if it was initialized.
 
+Does not throw exceptions.
+
+=cut
+sub disconnect_backend ($self) {
     return unless $self->has_backend;
     eval { $self->backend->disconnect if $self->backend };
 }
 
+=head2 mojo_req_from_cgi
+
+Parses a CGI environment into a L<Mojo::Message::Request> object.
+
+B<Returns> A L<Mojo::Message::Request> object.
+
+=cut
 sub mojo_req_from_cgi {
     my $req = Mojo::Message::Request->new->parse(\%ENV);
 
