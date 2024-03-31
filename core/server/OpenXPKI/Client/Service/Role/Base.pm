@@ -462,19 +462,35 @@ sub handle_property_request ($self, $operation = $self->operation) {
     # TODO - we need to consolidate the workflows for the different protocols
     my $workflow_type = $self->config->{$operation}->{workflow} ||
         $self->service_name.'_'.lc($operation);
-    $self->log->debug( "Start workflow type '$workflow_type'" );
-    $self->log->trace( 'Workflow parameters: '  . Dumper $param ) if $self->log->is_trace;
 
     my $response = $self->run_workflow($workflow_type, $param);
 
     return $self->_handle_property_response($response);
 }
 
-sub run_workflow {
+=head2 run_workflow
 
-    my $self = shift;
-    my $workflow_type = shift;
-    my $param = shift;
+Runs the given workflow type with the given parameters via
+L<OpenXPKI::Client::Simple/handle_workflow>.
+
+B<Parameters>
+
+=over
+
+=item * C<$workflow_type> I<Str> - workflow type
+
+=item * C<$param> I<HashRef> - workflow parameters
+
+=back
+
+B<Returns> a L<OpenXPKI::Client::Service::Response>.
+
+Might throw exceptions.
+
+=cut
+sub run_workflow ($self, $workflow_type, $param) {
+    $self->log->debug( "Start workflow type '$workflow_type'" );
+    $self->log->trace( 'Workflow parameters: '  . Dumper $param ) if $self->log->is_trace;
 
     # create the client object
     my $client = $self->backend;

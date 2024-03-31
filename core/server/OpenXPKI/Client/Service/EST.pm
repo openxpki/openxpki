@@ -143,8 +143,6 @@ sub handle_revocation_request ($self) {
     }
 
     my $workflow_type = $self->config->{simplerevoke}->{workflow} || 'certificate_revoke';
-    $self->log->debug( 'Start workflow type ' . $workflow_type );
-    $self->log->trace( 'Workflow Paramters '  . Dumper $param ) if $self->log->is_trace;
 
     my $response = $self->run_workflow($workflow_type, $param);
 
