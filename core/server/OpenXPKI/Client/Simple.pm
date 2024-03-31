@@ -528,59 +528,54 @@ sub handle_workflow {
         $wf_params = $params->{PARAMS};
     }
 
+    my $run_and_check = sub {
+        my $cmd = shift;
+        my $params = shift;
+
+        my $reply = $self->run_command($cmd, $params);
+        die "'$cmd' did not return a workflow object" unless ($reply and $reply->{workflow});
+
+        return $reply;
+    };
+
     if ($wf_action && $wf_id) {
 
-        $self->logger()->info(sprintf('execute workflow action %s on %01d', $wf_action, $wf_id));
-        $self->logger()->trace('workflow params:  '. Dumper $wf_params) if $self->logger->is_trace;
-        $reply = $self->run_command('execute_workflow_activity',{
+        $self->logger->info(sprintf('execute workflow action %s on %01d', $wf_action, $wf_id));
+        $self->logger->trace('Workflow params:  '. Dumper $wf_params) if $self->logger->is_trace;
+        $reply = $run_and_check->('execute_workflow_activity' => {
             id => $wf_id,
             activity => $wf_action,
             params => $wf_params,
         });
 
-        if (!$reply || !$reply->{workflow}) {
-            $self->logger()->fatal("No workflow object received after execute!");
-            die "No workflow object received!";
-        }
-
-        $self->logger()->debug('new Workflow State: ' . $reply->{workflow}->{state});
+        $self->logger->debug('New workflow state: ' . $reply->{workflow}->{state});
 
     } elsif ($wf_id) {
 
-        $self->logger()->debug(sprintf('request for workflow info on %01d', $wf_id));
+        $self->logger->debug(sprintf('request for workflow info on %01d', $wf_id));
 
-        $reply = $self->run_command('get_workflow_info',{
+        $reply = $run_and_check->('get_workflow_info' => {
             id => $wf_id,
         });
 
-        if (!$reply || !$reply->{workflow}) {
-            $self->logger()->fatal("No workflow object received after execute!");
-            die "No workflow object received!";
-        }
-
-        $self->logger()->trace(Dumper $reply->{workflow});
+        $self->logger->trace(Dumper $reply->{workflow});
 
     } elsif ($wf_type) {
-        $reply = $self->run_command('create_workflow_instance',{
+        $reply = $run_and_check->('create_workflow_instance' => {
             workflow => $wf_type,
             params => $wf_params,
             ($params->{use_lock} ? (use_lock => $params->{use_lock}) : ()),
         });
 
-        if (!$reply || !$reply->{workflow}) {
-            $self->logger()->fatal("No workflow object received after create!");
-            die "No workflow object received!";
-        }
-
-        $self->logger()->debug(sprintf("Workflow '%s' created: id = %d, state = %s",
+        $self->logger->debug(sprintf("Workflow '%s' created: id = %d, state = %s",
             $wf_type, $reply->{workflow}->{id}, $reply->{workflow}->{state}));
 
     } else {
-        $self->logger()->fatal("Neither workflow id nor type given");
+        $self->logger->fatal("Neither workflow id nor type given");
         die "Neither workflow id nor type given";
     }
 
-    $self->logger()->trace('Result of workflow action: ' . Dumper $reply) if $self->logger->is_trace;
+    $self->logger->trace('Result of workflow action: ' . Dumper $reply) if $self->logger->is_trace;
 
     my $ret = $reply->{workflow};
     if ($return_uppercase) {
