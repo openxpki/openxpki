@@ -364,8 +364,8 @@ B<Parameters>
 =cut
 
 command "show_alias" => {
-    alias => { isa => 'AlphaPunct', required => 1, },
-    global      => { isa => 'Bool', default => 0 },
+    alias => { isa => 'AlphaPunct', required => 1, documentation => 'the name of the alias to remove' },
+    global      => { isa => 'Bool', default => 0, documentation => 'weather to show a globally defined alias' },
 } => sub {
 
     my ($self, $params) = @_;
