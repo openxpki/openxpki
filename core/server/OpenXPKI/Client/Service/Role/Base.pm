@@ -24,7 +24,7 @@ A consuming class that implements a service generally looks like this:
 
     with 'OpenXPKI::Client::Service::Role::Base';
 
-    # The class needs to define all methods required by C<OpenXPKI::Client::Service::Role::Base>:
+    # The class needs to define all methods required by C<OpenXPKI::Client::Service::Role::Base>
     sub service_name { 'xproto' }
     sub prepare ($self, $c) { ... }
     sub send_response ($self, $c, $response) { ... }
@@ -60,8 +60,20 @@ Moose::Exporter->setup_import_methods(
 
 =head3 operation
 
-This special attribute needs to be set by the consuming class, most likely in
-its L</prepare> method.
+Defines the requested PKI operation (service specific). Used e.g.
+
+=over
+
+=item * for configuration lookups,
+
+=item * as a lookup key in the mappings returned by L<op_handlers>,
+
+=item * and maybe as part of the fallback workflow name in
+L</handle_property_request>.
+
+=back
+
+B<Needs to be set by the consuming class, most likely in its L</prepare> method.>
 
 =cut
 has operation => (
@@ -85,7 +97,7 @@ Name of the service the class implements. Used e.g.
 
 =item * to create the C<Log4perl> logger,
 
-=item * to assemble the fallback workflow name in L</handle_property_request>.
+=item * as part of the fallback workflow name in L</handle_property_request>.
 
 =back
 
@@ -93,16 +105,17 @@ Name of the service the class implements. Used e.g.
 
 =head3 prepare
 
-May be used to do checks and preparations before the real request / operation
-handling.
+Should be used to set the L</operation> attribute.
 
     sub prepare ($self, $c) {
+        # e.g.
         $self->operation($c->stash('operation'));
-        # or:
+        # or
         $self->operation($self->query_params->param('operation') // '');
-
-        # some checks ...
     }
+
+May also be used to checks and preparations before the request / operation
+handling as defined in L</op_handlers>.
 
 =head3 send_response
 
@@ -149,7 +162,7 @@ Allows to add service specific workflow parameters.
 
 Service specific processing of the successful enrollment workflow result.
 
-Must return a L<OpenXPKI::Client::Service::Response>.
+Must return an L<OpenXPKI::Client::Service::Response>.
 
     sub prepare_enrollment_result ($self, $workflow) {
         return OpenXPKI::Client::Service::Response->new(
@@ -596,18 +609,18 @@ specified or
 =back
 
 If the workflow ends successfully the contents of its C<output> context key
-are returned (wrapped in a L<OpenXPKI::Client::Service::Response>).
+are returned (wrapped in an L<OpenXPKI::Client::Service::Response>).
 
 B<Parameters>
 
 =over
 
 =item * C<$operation> I<Str> - Optional: operation name (used for querying the
-configuration), defaults to C<$self->operation>
+configuration), defaults to C<$self-E<gt>operation>
 
 =back
 
-B<Returns> a L<OpenXPKI::Client::Service::Response>.
+B<Returns> an L<OpenXPKI::Client::Service::Response>.
 
 =cut
 sub handle_property_request ($self, $operation = $self->operation) {
@@ -821,7 +834,7 @@ sub mojo_req_from_cgi {
 =head2 fcgi_safe_sub
 
 Class method to wrap legacy FCGI request handling in a try-catch block so that
-always a L<OpenXPKI::Client::Service::Response> is returned.
+always an L<OpenXPKI::Client::Service::Response> is returned.
 
 =cut
 sub fcgi_safe_sub :prototype(&) {
