@@ -168,19 +168,17 @@ sub op_handlers {
 
 # required by OpenXPKI::Client::Service::Role::Base
 sub custom_wf_params ($self, $params) {
-    # nothing special if we are NOT in PKIOperation mode
-    return unless $self->operation eq 'PKIOperation';
+    # Only handle PKIOperation
+    return unless 'PKIOperation' eq $self->operation;
 
     $self->log->debug("Adding extra parameters for message type '".$self->message_type."'");
 
     if ($self->message_type eq 'PKCSReq') {
-        # This triggers the build of attr which triggers the unwrap call
-        # against the server API and populates the class attributes
         $params->{pkcs10} = $self->attr->{pkcs10};
         $params->{transaction_id} = $self->transaction_id;
         $params->{signer_cert} = $self->signer;
 
-        # Load url paramters if defined by config
+        # Load URL paramters if defined by config
         my $conf = $self->config->{'PKIOperation'};
         if ($conf->{param}) {
             my $extra;
