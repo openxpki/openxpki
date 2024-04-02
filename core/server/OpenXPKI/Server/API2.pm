@@ -420,6 +420,40 @@ sub dispatch ($self, $arg) {
     return $result;
 }
 
+# TODO - might be better part of the bootstrap process to have this cached?
+signature_for command_help => (
+    method => 1,
+    positional => [
+        'Str',
+    ],
+);
+sub command_help ($self, $command) {
+
+    my $package = $self->commands->{ $command };
+
+    # command ensures that the packages was loaded before
+    my $meta = $package->meta;
+
+    OpenXPKI::Exception->throw(
+        'Unable to find help for given API command'
+    ) unless (blessed $meta && $meta->isa('Moose::Meta::Class'));
+
+    # This is a 'Moose::Meta::Class' holding attributes and coderef
+    my @attributes = $meta->param_classes->{$command}->get_all_attributes;
+
+    # each item is a 'Moose::Meta::Attribute'
+    my %arguments = map {
+        ( $_->name => {
+                'required' => ($_->is_required? 1 : 0),
+                'type' => ($_->has_type_constraint ? $_->type_constraint->name : 'unknown'),
+                'documentation' => ($_->documentation || ''),
+        })
+    } @attributes;
+
+    return \%arguments;
+
+}
+
 =head2 my_caller
 
 Returns informations about the caller of the code that invokes this method:
