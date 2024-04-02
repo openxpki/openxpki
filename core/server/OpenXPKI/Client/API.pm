@@ -11,6 +11,7 @@ use Log::Log4perl qw(:easy :no_extra_logdie_message);
 
 use OpenXPKI::DTO::Field::Realm;
 use OpenXPKI::DTO::Message::Command;
+use OpenXPKI::DTO::Message::Enquiry;
 use OpenXPKI::DTO::Message::ProtectedCommand;
 
 =head1 NAME
@@ -288,6 +289,25 @@ sub dispatch {
         );
     }
     return $ret;
+}
+
+=head2 run_enquiry I<topic>, I<params>
+
+=cut
+
+sub run_enquiry {
+
+    my $self = shift;
+    my $topic = shift;
+    my $params = shift;
+
+    $self->log->debug("Running service enquiry on topic $topic");
+    my $msg = OpenXPKI::DTO::Message::Enquiry->new(
+        topic => $topic,
+        defined $params ? (params =>  $params) : ()
+    );
+
+    return $self->send_message($msg);
 }
 
 =head2 run_command I<command>, I<params>

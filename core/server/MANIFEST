@@ -238,6 +238,7 @@ OpenXPKI/DTO/Field/String.pm
 OpenXPKI/DTO/Message.pm
 OpenXPKI/DTO/Message/Authenticate.pm
 OpenXPKI/DTO/Message/Command.pm
+OpenXPKI/DTO/Message/Enquiry.pm
 OpenXPKI/DTO/Message/ErrorResponse.pm
 OpenXPKI/DTO/Message/ProtectedCommand.pm
 OpenXPKI/DTO/Message/Response.pm

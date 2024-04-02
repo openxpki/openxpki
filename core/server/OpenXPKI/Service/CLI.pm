@@ -15,6 +15,7 @@ use OpenXPKI::DTO::Message;
 use OpenXPKI::DTO::Message::ErrorResponse;
 use OpenXPKI::DTO::Message::Response;
 use OpenXPKI::Server;
+use OpenXPKI::Debug;
 use OpenXPKI::Server::API2;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
@@ -97,8 +98,9 @@ sub run {
         my $response;
         try {
 
-            my ($header) = decode_jwt( token => $msg, kid_keys => { keys => $self->kid_list },
+            my ($header, $payload) = decode_jwt( token => $msg, kid_keys => { keys => $self->kid_list },
                 decode_header => 1, decode_payload => 0, allow_none => 1 );
+
             if ($header->{alg} eq 'none') {
                 ##! 8: 'Regular command'
                 $response = $self->_process_regular_command($msg);
@@ -140,7 +142,8 @@ sub _process_regular_command {
     $self->_process_login($header);
 
     my $message = OpenXPKI::DTO::Message::from_hash($hash);
-    if (!$message->isa('OpenXPKI::DTO::Message::Command')) {
+    if (!($message->isa('OpenXPKI::DTO::Message::Command') ||
+        $message->isa('OpenXPKI::DTO::Message::Enquiry'))) {
         OpenXPKI::Exception::Command->throw(
             sprintf('Invalid command message (not command but %s)', ref $message)
         );
@@ -309,6 +312,35 @@ sub collect {
     }
     ##! 128: 'collect: ' . Dumper $result
     return $result;
+}
+
+=head2 __handle_enquiry
+
+Incoming service request
+
+=cut
+
+sub __handle_enquiry {
+
+    my $self = shift;
+    my $message = shift;
+
+    my $enquiry = $message->topic;
+
+    my $result;
+    if ($enquiry eq 'command') {
+        if (my $command = $message->param('command')) {
+            ##! 64: $command
+            $result = $self->api()->command_help($command);
+        } else {
+            $result = { result => [ sort keys %{$self->api()->commands} ] }
+        }
+    } elsif ($enquiry eq 'realm') {
+        $result = { result => $self->api->get_realm_list };
+    }
+
+    return OpenXPKI::DTO::Message::Response->new(params => $result);
+
 }
 
 =head2 __handle_command
