@@ -58,6 +58,10 @@ OpenXPKI/Client/API/Command/alias/delete.pm
 OpenXPKI/Client/API/Command/alias/list.pm
 OpenXPKI/Client/API/Command/alias/show.pm
 OpenXPKI/Client/API/Command/alias/update.pm
+OpenXPKI/Client/API/Command/api.pm
+OpenXPKI/Client/API/Command/api/execute.pm
+OpenXPKI/Client/API/Command/api/help.pm
+OpenXPKI/Client/API/Command/api/list.pm
 OpenXPKI/Client/API/Command/config.pm
 OpenXPKI/Client/API/Command/config/verify.pm
 OpenXPKI/Client/API/Command/config/show.pm
