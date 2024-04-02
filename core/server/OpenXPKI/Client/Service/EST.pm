@@ -7,6 +7,7 @@ sub service_name { 'est' } # required by OpenXPKI::Client::Service::Role::Base
 
 # Core modules
 use MIME::Base64;
+use List::Util qw( any );
 
 # Project modules
 use OpenXPKI::Crypt::X509;
@@ -94,7 +95,7 @@ sub op_handlers {
 sub custom_wf_params ($self, $params) {
     # TODO this should be merged with the stuff in Base without
     # having protocol specific items in the core code
-    if ($self->operation =~ m{simple((re)?enroll|revoke)}) {
+    if (any { $self->operation eq $_ } qw( simpleenroll simplereenroll simplerevoke )) {
         $params->{server} = $self->endpoint;
         $params->{interface} = $self->service_name;
         if (my $signer = $self->apache_env->{SSL_CLIENT_CERT}) {

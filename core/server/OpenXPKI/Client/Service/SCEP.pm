@@ -201,7 +201,7 @@ sub custom_wf_params ($self, $params) {
         $params->{transaction_id} = $self->transaction_id;
         $params->{signer_cert} = $self->signer;
 
-    } elsif ($self->message_type =~ m{\AGet(Cert|CRL)\z}) {
+    } elsif (any { $self->message_type eq $_ } qw( GetCert GetCRL )) {
         $params->{issuer} = $self->attr->{issuer_serial}->{issuer};
         $params->{serial} = $self->attr->{issuer_serial}->{serial};
     }
