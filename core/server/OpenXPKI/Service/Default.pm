@@ -971,7 +971,7 @@ sub __send_error
                 }
             }
 
-            if ($class eq 'OpenXPKI::Exception::InputValidator') {
+            if ($class->isa('OpenXPKI::Exception::InputValidator')) {
                 $error->{ERRORS} = $params->{EXCEPTION}->{errors};
             }
         }
