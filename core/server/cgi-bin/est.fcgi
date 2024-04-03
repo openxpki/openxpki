@@ -19,7 +19,7 @@ $log->info("EST handler initialized");
 
 while (my $cgi = CGI::Fast->new("")) {
 
-    my $req = OpenXPKI::Client::Service::EST->mojo_req_from_cgi;
+    my $req = OpenXPKI::Client::Service::EST->cgi_to_mojo_request;
 
     # EST urls look like
     # /.well-known/est/cacerts
@@ -72,7 +72,7 @@ while (my $cgi = CGI::Fast->new("")) {
 
     my $mime = "application/pkcs7-mime; smime-type=certs-only";
 
-    my $response = fcgi_safe_sub {
+    my $response = cgi_safe_sub {
         if ($operation eq 'cacerts') {
             my $r = $client->handle_property_request;
 

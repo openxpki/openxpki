@@ -53,7 +53,7 @@ use OpenXPKI::Log4perl;
 
 
 Moose::Exporter->setup_import_methods(
-    as_is => [ 'fcgi_safe_sub' ],
+    as_is => [ 'cgi_safe_sub' ],
 );
 
 =head2 ATTRIBUTES
@@ -155,7 +155,7 @@ I<CodeRefs>.
 
 =head3 fcgi_set_custom_wf_params
 
-Legacy method for FCGI to add service specific workflow parameters.
+Legacy method for CGI to add service specific workflow parameters.
 
     sub fcgi_set_custom_wf_params ($self) {
         if ($self->operation eq 'enroll') {
@@ -385,7 +385,7 @@ sub _build_wf_params ($self) {
             }
         }
 
-        # legacy FCGI mode
+        # legacy CGI mode
         $self->fcgi_set_custom_wf_params if ($ENV{GATEWAY_INTERFACE} and $ENV{REMOTE_ADDR});
 
         # merge custom parameters set by consuming class
@@ -839,14 +839,14 @@ sub _build_pickup_config ($self) {
 
 =head1 LEGACY CGI METHODS
 
-=head2 mojo_req_from_cgi
+=head2 cgi_to_mojo_request
 
 Parses a CGI environment into a L<Mojo::Message::Request> object.
 
 B<Returns> A L<Mojo::Message::Request> object.
 
 =cut
-sub mojo_req_from_cgi {
+sub cgi_to_mojo_request {
     my $req = Mojo::Message::Request->new->parse(\%ENV);
 
     # Request body (may block if we try to read too much)
@@ -862,13 +862,13 @@ sub mojo_req_from_cgi {
     return $req;
 }
 
-=head2 fcgi_safe_sub
+=head2 cgi_safe_sub
 
-Class method to wrap legacy FCGI request handling in a try-catch block so that
+Class method to wrap legacy CGI request handling in a try-catch block so that
 always an L<OpenXPKI::Client::Service::Response> is returned.
 
 =cut
-sub fcgi_safe_sub :prototype(&) {
+sub cgi_safe_sub :prototype(&) {
 
     my $handler_sub = shift;
 

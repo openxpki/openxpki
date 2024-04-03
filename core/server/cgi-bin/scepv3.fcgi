@@ -20,7 +20,7 @@ my $log = $config->logger();
 $log->info("SCEP handler initialized");
 
 while (my $cgi = CGI::Fast->new("")) {
-    my $req = OpenXPKI::Client::Service::SCEP->mojo_req_from_cgi;
+    my $req = OpenXPKI::Client::Service::SCEP->cgi_to_mojo_request;
 
     my ($endpoint, $route) = $config->parse_uri;
     my $ep_config = $config->endpoint_config($endpoint);
@@ -82,7 +82,7 @@ while (my $cgi = CGI::Fast->new("")) {
     $log->debug("Config created");
 
     if ($operation eq 'PKIOperation') {
-        my $response = fcgi_safe_sub {
+        my $response = cgi_safe_sub {
             try {
                 # this internally triggers a call to the backend to unwrap the
                 # scep message and returns the payload and some attributes
@@ -142,7 +142,7 @@ while (my $cgi = CGI::Fast->new("")) {
 
     my $mime;
 
-    my $response = fcgi_safe_sub {
+    my $response = cgi_safe_sub {
         if ($operation eq 'GetCACaps') {
             $mime = 'text/plain';
             return $client->handle_property_request;
