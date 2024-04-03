@@ -572,25 +572,13 @@ sub handle_enrollment_request ($self) {
                 params => $param,
             });
         }
-
-        $self->log->trace( 'Workflow info: '  . Dumper $workflow ) if $self->log->is_trace;
     }
     catch ($error) {
         $self->log->error( $error );
         return OpenXPKI::Client::Service::Response->new( 50003 );
     }
 
-    if (!$workflow || ( $workflow->{'proc_state'} ne 'finished' && !$workflow->{id} ) || $workflow->{'proc_state'} eq 'exception') {
-        my $reply = $client->last_reply() || {};
-        if (my $err = $reply->{ERROR}) {
-            if ($err->{CLASS} eq 'OpenXPKI::Exception::InputValidator') {
-                $self->log->info( 'Input validation failed' );
-                return OpenXPKI::Client::Service::Response->new( 40004 );
-            }
-        }
-        $self->log->error( 'Internal server error');
-        return OpenXPKI::Client::Service::Response->new( 50003 );
-    }
+    $self->check_workflow_error($workflow);
 
     if ($workflow->{'proc_state'} ne 'finished') {
         my $retry_after = 300;
@@ -711,20 +699,53 @@ sub run_workflow ($self, $workflow_type, $param) {
         return OpenXPKI::Client::Service::Response->new( 50003 );
     }
 
-    $self->log->trace( 'Workflow result: '  . Dumper $workflow ) if $self->log->is_trace;
-
-    if (!$workflow || ( $workflow->{'proc_state'} !~ m{finished|manual} )) {
-        if (my $err = $client->last_reply()->{ERROR}) {
-            if ($err->{CLASS} eq 'OpenXPKI::Exception::InputValidator') {
-                $self->log->info( 'Input validation failed' );
-                return OpenXPKI::Client::Service::Response->new( 40004 );
-            }
-        }
-    }
+    $self->check_workflow_error($workflow);
 
     return OpenXPKI::Client::Service::Response->new(
         workflow => $workflow,
     );
+}
+
+=head2 check_workflow_error
+
+Checks the given workflow result I<HashRef> and dies with a
+L<OpenXPKI::Client::Service::Response> in case of workflow errors.
+
+B<Parameters>
+
+=over
+
+=item * C<$workflow> I<HashRef> - workflow information as returned by
+L<OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info>
+
+=back
+
+B<Returns> nothing if successful.
+
+=cut
+sub check_workflow_error ($self, $workflow) {
+    $self->log->trace( 'Workflow result: '  . Dumper $workflow ) if $self->log->is_trace;
+
+    if (
+        not $workflow
+        or ($workflow->{'proc_state'} ne 'finished' and not $workflow->{id})
+        or ($workflow->{'proc_state'} eq 'exception')
+    ) {
+        my $reply = $self->backend->last_reply || {};
+        # this is assembled in OpenXPKI::Service::Default->__send_error():
+        if (my $err = $reply->{ERROR}) {
+            if (my $class = $err->{CLASS}) {
+                if ($class eq 'OpenXPKI::Exception::InputValidator') {
+                    $self->log->info( 'Input validation failed' );
+                    die OpenXPKI::Client::Service::Response->new( 40004 );
+                }
+            }
+            $self->log->error( 'Internal server error: ' . $err->{LABEL} );
+        } else {
+            $self->log->error( 'Internal server error' );
+        }
+        die OpenXPKI::Client::Service::Response->new( 50003 );
+    }
 }
 
 =head2 disconnect_backend

@@ -185,19 +185,10 @@ sub __build_http_status_message {
     return Mojo::Message::Response->default_message($self->http_status_code);
 }
 
-sub __process_workflow {
-
-    my $self = shift;
-    my $workflow = shift;
+sub __process_workflow ($self, $workflow) {
     $self->state($workflow->{state});
     $self->proc_state($workflow->{proc_state});
-    $self->__error_message($workflow->{context}->{error_code})
-        if ($workflow->{context}->{error_code});
-
-    if ($workflow->{'proc_state'} eq 'exception') {
-        $self->error( 50003 );
-    }
-
+    $self->__error_message($workflow->{context}->{error_code}) if $workflow->{context}->{error_code};
 }
 
 sub error_message {
