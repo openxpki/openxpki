@@ -127,7 +127,7 @@ while (my $cgi = CGI::Fast->new("")) {
                 -status => $response->http_status_line(),
                 -type => 'application/x-pki-message',
                 -charset => '',
-                'content-length' => length $out,
+                -content_length => length $out,
                 @extra_header
             );
             print $out;
@@ -159,12 +159,12 @@ while (my $cgi = CGI::Fast->new("")) {
         }
     };
 
-    my @extra_header = %{ $response->extra_headers() } if ($ep_config->{output}->{headers});
+    my @extra_header = %{ $client->cgi_headers($response->extra_headers) } if ($ep_config->{output}->{headers});
     if ($response->is_server_error()) {
         print $cgi->header(
             -status => $response->http_status_line(),
             -type => 'text/plain',
-            'charset' => 'utf8',
+            -charset => 'utf8',
             @extra_header
         );
         print $response->error_message()."\n";
@@ -178,8 +178,8 @@ while (my $cgi = CGI::Fast->new("")) {
         print $cgi->header(
             -status => $response->http_status_line(),
             -type => 'text/plain',
-            'charset' => '',
-            'content-length' => length $response->result,
+            -charset => '',
+            -content_length => length $response->result,
             @extra_header
         );
         print $response->result;
@@ -190,7 +190,7 @@ while (my $cgi = CGI::Fast->new("")) {
             -status => $response->http_status_line(),
             -type => $mime,
             -charset => '',
-            'content-length' => length $out,
+            -content_length => length $out,
             @extra_header
         );
         print $out;

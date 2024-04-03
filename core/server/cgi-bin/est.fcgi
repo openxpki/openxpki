@@ -108,7 +108,7 @@ while (my $cgi = CGI::Fast->new("")) {
         print $cgi->header(
             -status => $response->http_status_line(),
             -type => 'text/plain',
-            'charset' => 'utf8',
+            -charset => 'utf8',
             @extra_header
         );
         print $response->error_message()."\n";
@@ -119,8 +119,8 @@ while (my $cgi = CGI::Fast->new("")) {
         print $cgi->header(
             -status => $response->http_status_line(),
             -type => 'text/plain',
-            'charset' => 'utf8',
-            '-retry-after' => $response->retry_after(),
+            -charset => 'utf8',
+            -retry_after => $response->retry_after(),
             @extra_header
         );
         print "202 Request Pending - Retry Later ($transaction_id)\n";
@@ -146,9 +146,9 @@ while (my $cgi = CGI::Fast->new("")) {
         print $cgi->header(
             -status => $response->http_status_line(),
             -type => $mime,
-            'content-length' => length $out,
-            'content-transfer-encoding' => $encoding,
-            'charset' => '',
+            -content_length => length $out,
+            -content_transfer_encoding => $encoding,
+            -charset => '',
             @extra_header
         );
         print $out;
