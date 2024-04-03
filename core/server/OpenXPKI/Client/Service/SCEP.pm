@@ -111,7 +111,7 @@ sub op_handlers {
                 if (not $message) {
                     $self->log->error("POSTDATA is empty - check documentation on required setup for Content-Type headers!");
                     $self->log->debug("Content-Type is: " . ($self->request->headers->content_type || 'undefined'));
-                    return OpenXPKI::Client::Service::Response->new( 40003 );
+                    return OpenXPKI::Client::Service::Response->new_error( 40003 );
                 }
                 $self->log->debug("Got PKIOperation via POST");
 
@@ -126,19 +126,19 @@ sub op_handlers {
             # something is wrong, TODO we might try to branch request vs. server errors
             catch ($err) {
                 $self->log->warn($err);
-                return OpenXPKI::Client::Service::Response->new( 50010 );
+                return OpenXPKI::Client::Service::Response->new_error( 50010 );
             }
 
             $self->log->warn('Error while parsing PKCS7 message: ' . $self->attr->{error}) if $self->attr->{error};
 
             if (not $self->attr->{alias}) {
                 $self->log->warn('Unable to find RA certificate');
-                return OpenXPKI::Client::Service::Response->new ( 40002 );
+                return OpenXPKI::Client::Service::Response->new_error ( 40002 );
             }
 
             if (not $self->signer) {
                 $self->log->warn('Unable to extract signer certficate');
-                return OpenXPKI::Client::Service::Response->new ( 40001 );
+                return OpenXPKI::Client::Service::Response->new_error ( 40001 );
             }
 
             # Enrollment request
@@ -187,7 +187,7 @@ sub op_handlers {
 
             } else {
                 $self->log->warn(sprintf('Unknown message type "%s"', $self->message_type));
-                return OpenXPKI::Client::Service::Response->new ( 40000 );
+                return OpenXPKI::Client::Service::Response->new_error ( 40000 );
             }
 
         },

@@ -297,7 +297,7 @@ sub _build_backend ($self) {
     }
     catch ($err) {
         $self->log->error("Could not create client object: $err");
-        die OpenXPKI::Client::Service::Response->new( 50001 );
+        die OpenXPKI::Client::Service::Response->new_error( 50001 );
     }
 }
 
@@ -460,7 +460,7 @@ sub handle_request ($self) {
 
     my $response;
     try {
-        die OpenXPKI::Client::Service::Response->new( 40008 ) unless $self->operation;
+        die OpenXPKI::Client::Service::Response->new_error( 40008 ) unless $self->operation;
 
         my $op_handlers = $self->op_handlers;
 
@@ -488,19 +488,15 @@ sub handle_request ($self) {
         }
 
         # error / fallback
-        $response //= OpenXPKI::Client::Service::Response->new(
-            error => 40007,
-            error_message => sprintf('Unknown operation "%s"', $self->operation),
+        $response //= OpenXPKI::Client::Service::Response->new_error(
+            40007 => sprintf('Unknown operation "%s"', $self->operation)
         );
     }
     catch ($err) {
         if ($err->isa('OpenXPKI::Client::Service::Response')) {
             $response = $err;
         } else {
-            $response = OpenXPKI::Client::Service::Response->new(
-                error => 50000,
-                error_message => "$err", # stringification
-            );
+            $response = OpenXPKI::Client::Service::Response->new_error(500 => "$err"); # stringification
         }
     }
 
@@ -540,7 +536,7 @@ sub handle_enrollment_request ($self) {
 
     if (not $param->{server}) {
         $self->log->error("Parameter 'server' missing but required by enrollment workflow");
-        return OpenXPKI::Client::Service::Response->new( 40401 );
+        return OpenXPKI::Client::Service::Response->new_error( 40401 );
     }
     Log::Log4perl::MDC->put('server', $param->{server});
 
@@ -559,7 +555,7 @@ sub handle_enrollment_request ($self) {
         # it was a pickup, it was not successful, we do not have a PKCS10
         if ($pickup_value and not $workflow and not $param->{pkcs10}) {
             $self->log->debug("Pickup failed and no PKCS10 given");
-            return OpenXPKI::Client::Service::Response->new( 40005 );
+            return OpenXPKI::Client::Service::Response->new_error( 40005 );
         }
 
         # pickup return undef if no workflow was found - start new one
@@ -575,7 +571,7 @@ sub handle_enrollment_request ($self) {
     }
     catch ($error) {
         $self->log->error( $error );
-        return OpenXPKI::Client::Service::Response->new( 50003 );
+        return OpenXPKI::Client::Service::Response->new_error( 50003 );
     }
 
     $self->check_workflow_error($workflow);
@@ -696,7 +692,7 @@ sub run_workflow ($self, $workflow_type, $param) {
     }
     catch ($err) {
         $self->log->error($err);
-        return OpenXPKI::Client::Service::Response->new( 50003 );
+        return OpenXPKI::Client::Service::Response->new_error( 50003 );
     }
 
     $self->check_workflow_error($workflow);
@@ -737,14 +733,14 @@ sub check_workflow_error ($self, $workflow) {
             if (my $class = $err->{CLASS}) {
                 if ($class eq 'OpenXPKI::Exception::InputValidator') {
                     $self->log->info( 'Input validation failed' );
-                    die OpenXPKI::Client::Service::Response->new( 40004 );
+                    die OpenXPKI::Client::Service::Response->new_error( 40004 );
                 }
             }
             $self->log->error( 'Internal server error: ' . $err->{LABEL} );
         } else {
             $self->log->error( 'Internal server error' );
         }
-        die OpenXPKI::Client::Service::Response->new( 50003 );
+        die OpenXPKI::Client::Service::Response->new_error( 50003 );
     }
 }
 
@@ -785,7 +781,7 @@ sub set_pkcs10_and_tid ($self, $pkcs10 = undef) {
     # Usually PEM encoded but without borders as POSTDATA
     $pkcs10 or do {
         $self->log->debug( 'Incoming enrollment with empty body' );
-        die OpenXPKI::Client::Service::Response->new( 40003 );
+        die OpenXPKI::Client::Service::Response->new_error( 40003 );
     };
 
     Crypt::PKCS10->setAPIversion(1);
@@ -793,7 +789,7 @@ sub set_pkcs10_and_tid ($self, $pkcs10 = undef) {
     if (!$decoded) {
         $self->log->error('Unable to parse PKCS10: '. Crypt::PKCS10->error);
         $self->log->debug($pkcs10);
-        die OpenXPKI::Client::Service::Response->new( 40002 );
+        die OpenXPKI::Client::Service::Response->new_error( 40002 );
     }
 
     $self->add_wf_param(pkcs10 =>$decoded->csrRequest(1));

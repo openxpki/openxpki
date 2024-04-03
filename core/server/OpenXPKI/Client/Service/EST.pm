@@ -93,7 +93,7 @@ sub op_handlers {
         # "serverkeygen" and "fullcmc" are not supported
         ['serverkeygen', 'fullcmc'] => sub ($self) {
             $self->log->error(sprintf('Operation "%s" not implemented', $self->operation));
-            return OpenXPKI::Client::Service::Response->new( 50100 );
+            return OpenXPKI::Client::Service::Response->new_error( 50100 );
         },
     ];
 }
@@ -140,14 +140,14 @@ sub handle_revocation_request ($self) {
     my $body = $self->request->body
         or do {
             $self->log->debug( 'Incoming revocation request with empty body' );
-            return OpenXPKI::Client::Service::Response->new( 40003 );
+            return OpenXPKI::Client::Service::Response->new_error( 40003 );
         };
 
     try {
         my $x509 = OpenXPKI::Crypt::X509->new( decode_base64($body) );
         $param->{certificate} = $x509->pem;
     } catch ($error) {
-        return OpenXPKI::Client::Service::Response->new( 40002 );
+        return OpenXPKI::Client::Service::Response->new_error( 40002 );
     }
 
     my $workflow_type = $self->config->{simplerevoke}->{workflow} || 'certificate_revoke';
