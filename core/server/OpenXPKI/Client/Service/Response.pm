@@ -161,8 +161,8 @@ sub new_error ($class, @args) {
 sub __build_http_status_code {
     my $self = shift;
     return '202' if $self->is_pending;
-    return '200' unless $self->has_error;
-    return substr($self->error,0,3) || '500';
+    return substr($self->error,0,3) if $self->has_error;
+    return '200';
 }
 
 sub __build_http_status_line {
