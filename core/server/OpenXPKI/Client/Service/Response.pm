@@ -219,7 +219,7 @@ sub __process_workflow {
     my $workflow = shift;
     $self->state($workflow->{state});
     $self->proc_state($workflow->{proc_state});
-    $self->error_message($workflow->{context}->{error_code})
+    $self->__error_message($workflow->{context}->{error_code})
         if ($workflow->{context}->{error_code});
 
     if ($workflow->{'proc_state'} eq 'exception') {
