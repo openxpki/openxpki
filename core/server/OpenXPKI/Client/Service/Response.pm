@@ -100,7 +100,7 @@ has extra_headers => (
     is => 'rw',
     isa => 'HashRef',
     lazy => 1,
-    builder => '__build_extra_headers',
+    default => sub { {} },
 );
 
 has result => (
@@ -157,34 +157,6 @@ sub new_error ($class, @args) {
         scalar @args > 1 ? ( error_message => $args[1] ) : (),
     );
 }
-
-sub __build_extra_headers {
-
-    my $self = shift;
-    return {} unless($self->has_workflow());
-
-    my $workflow = $self->workflow();
-    my $extra_header = {};
-    if ($workflow->{id}) {
-        $extra_header->{'X-OpenXPKI-Workflow-Id'} = $workflow->{id};
-    }
-    if (my $tid = $self->transaction_id()) {
-        # this should usually be a hexadecimal string but to avoid any surprise
-        # we check this here and encoded if needed.
-        $tid = Encode::encode("MIME-B", $tid) if ($tid =~ m{\W});
-        $extra_header->{'X-OpenXPKI-Transaction-Id'} = $tid;
-    }
-    if (my $error = $workflow->{context}->{error_code}) {
-        # header must not be any longer than 76 chars in total
-        $error = substr(i18nGettext($error),0,64);
-        # use mime encode if header is non-us-ascii, 42 chars plus tags is the
-        # maximum to stay below 76 chars (starts to wrap otherwise)
-        $error = Encode::encode("MIME-B", substr($error,0,42)) if ($error =~ m{\W});
-        $extra_header->{'X-OpenXPKI-Error'} = $error;
-    }
-    return $extra_header;
-}
-
 
 sub __build_http_status_code {
     my $self = shift;
@@ -261,6 +233,28 @@ sub is_client_error {
     return 0 unless ($err >= 40000 && $err < 50000);
     return $err;
 
+}
+
+sub add_debug_headers ($self) {
+    my $workflow = $self->workflow or return;
+
+    if ($workflow->{id}) {
+        $self->extra_headers->{'X-OpenXPKI-Workflow-Id'} = $workflow->{id};
+    }
+    if (my $tid = $self->transaction_id) {
+        # this should usually be a hexadecimal string but to avoid any surprise
+        # we check this here and encoded if needed.
+        $tid = Encode::encode("MIME-B", $tid) if ($tid =~ m{\W});
+        $self->extra_headers->{'X-OpenXPKI-Transaction-Id'} = $tid;
+    }
+    if (my $error = $workflow->{context}->{error_code}) {
+        # header must not be any longer than 76 chars in total
+        $error = substr(i18nGettext($error),0,64);
+        # use mime encode if header is non-us-ascii, 42 chars plus tags is the
+        # maximum to stay below 76 chars (starts to wrap otherwise)
+        $error = Encode::encode("MIME-B", substr($error,0,42)) if ($error =~ m{\W});
+        $self->extra_headers->{'X-OpenXPKI-Error'} = $error;
+    }
 }
 
 __PACKAGE__->meta->make_immutable;

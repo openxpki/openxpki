@@ -113,7 +113,8 @@ while (my $cgi = CGI::Fast->new("")) {
             }
         };
 
-        my @extra_header = %{ $client->cgi_headers($response->extra_headers) } if ($ep_config->{output}->{headers});
+        $response->add_debug_headers if $client->config->{output}->{headers};
+        my @extra_header = %{ $client->cgi_headers($response->extra_headers) };
 
         $log->debug('Status: ' . $response->http_status_line);
         $log->trace(Dumper $response) if $log->is_trace;
@@ -159,7 +160,9 @@ while (my $cgi = CGI::Fast->new("")) {
         }
     };
 
-    my @extra_header = %{ $client->cgi_headers($response->extra_headers) } if ($ep_config->{output}->{headers});
+    $response->add_debug_headers if $client->config->{output}->{headers};
+    my @extra_header = %{ $client->cgi_headers($response->extra_headers) };
+
     if ($response->is_server_error()) {
         print $cgi->header(
             -status => $response->http_status_line(),

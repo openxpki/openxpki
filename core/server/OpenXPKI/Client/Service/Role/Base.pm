@@ -481,11 +481,9 @@ sub handle_request ($self) {
                 die sprintf('Return value of operation handler for "%s" specified in %s->op_handlers() is not an instance of "OpenXPKI::Client::Service::Response"', $self->operation, $self->meta->name)
                   unless blessed $response && $response->isa('OpenXPKI::Client::Service::Response');
 
-                last;
+                $response->add_debug_headers if $self->config->{output}->{headers};
 
-                # if ($ep_config->{output}->{headers}) {
-                #     $self->headers->add($_ => $response->extra_headers->{$_}) for keys $response->extra_headers->%*;
-                # }
+                last;
             }
         }
 

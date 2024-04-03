@@ -102,8 +102,9 @@ while (my $cgi = CGI::Fast->new("")) {
 
     $client->disconnect_backend;
 
-    my @extra_header;
-    @extra_header = %{ $client->cgi_headers($response->extra_headers) } if ($ep_config->{output}->{headers});
+    $response->add_debug_headers if $client->config->{output}->{headers};
+    my @extra_header = %{ $client->cgi_headers($response->extra_headers) };
+
     if ($response->has_error()) {
         print $cgi->header(
             -status => $response->http_status_line(),

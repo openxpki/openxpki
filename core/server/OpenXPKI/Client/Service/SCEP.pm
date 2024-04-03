@@ -54,11 +54,6 @@ sub prepare ($self, $c) {
 
 # required by OpenXPKI::Client::Service::Role::Base
 sub send_response ($self, $c, $response) {
-    # HTTP header
-    if ($self->config->{output}->{headers}) {
-        $self->headers->add($_ => $response->extra_headers->{$_}) for keys $response->extra_headers->%*;
-    }
-
     # Server errors are never encoded with PKCS7
     if ($response->is_server_error) {
         $self->disconnect_backend;

@@ -35,11 +35,6 @@ sub prepare ($self, $c) {
 sub send_response ($self, $c, $response) {
     $self->disconnect_backend;
 
-    # HTTP header
-    if ($self->config->{output}->{headers}) {
-        $c->res->headers->add($_ => $response->extra_headers->{$_}) for keys $response->extra_headers->%*;
-    }
-
     if ($response->has_error) {
         return $c->render(text => $response->error_message."\n");
 
