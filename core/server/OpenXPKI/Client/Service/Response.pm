@@ -29,6 +29,91 @@ our %named_messages = (
     '50100' => 'Operation not implemented',
 );
 
+=head1 NAME
+
+OpenXPKI::Client::Service::Response - Protocol independent service response encapsulation
+
+=head1 SYNOPSIS
+
+    return OpenXPKI::Client::Service::Response->new(
+        result => $res,
+    );
+
+Response incl. workflow details:
+
+    return OpenXPKI::Client::Service::Response->new(
+        result => "...PEM...",
+        workflow => $workflow,
+    );
+
+Error response:
+
+    die OpenXPKI::Client::Service::Response->new_error( 50001 );
+
+Error response with custom error message:
+
+    die OpenXPKI::Client::Service::Response->new_error(
+        400 => 'urn:ietf:params:acme:error:alreadyRevoked'
+    );
+
+    # ...is a shortcut for the longer version:
+    die OpenXPKI::Client::Service::Response->new(
+        error => 400,
+        error_message => 'urn:ietf:params:acme:error:alreadyRevoked',
+    );
+
+=head1 ATTRIBUTES
+
+=head2 result
+
+Service specific result I<Str>.
+
+    OpenXPKI::Client::Service::Response->new(
+        result => json_encode(...),
+    );
+
+=cut
+has result => (
+    is => 'rw',
+    isa => 'Str',
+    lazy => 1,
+    default => '',
+    predicate => 'has_result',
+);
+
+=head2 extra_headers
+
+Extra HTTP headers to be added (I<HashRef>).
+
+    OpenXPKI::Client::Service::Response->new(
+        extra_headers => {
+            'content-type' => 'application/x-pem-file',
+        },
+        result => $pem,
+    );
+
+=cut
+has extra_headers => (
+    is => 'rw',
+    isa => 'HashRef',
+    lazy => 1,
+    default => sub { {} },
+);
+
+=head2 error
+
+Either an internal 5-digit or an official 3-digit HTTP status error code I<Str>.
+
+Internally all codes are represented as 5-digit codes, so 3-digit codes will be
+filled up with trailing zeros:
+
+    my $r = OpenXPKI::Client::Service::Response->new(error => 403);
+    say $r->error;
+    # 40300
+
+There is a shortcut constructor L</new_error> to define error responses.
+
+=cut
 subtype 'OpenXPKI::Client::Service::Response::error',
     as 'Int',
     where { $_ >= 10000 and $_ <= 59999 };
@@ -48,30 +133,14 @@ has error => (
     default => 0,
 );
 
-has http_status_code => (
-    is => 'rw',
-    isa => 'Int',
-    lazy => 1,
-    builder => '__build_http_status_code',
-);
+=head2 error_message
 
-has http_status_line => (
-    is => 'ro',
-    isa => 'Str',
-    init_arg => 'undef',
-    lazy => 1,
-    builder => '__build_http_status_line',
-);
+Error message (only evaluated if L</error> has been set).
 
-# will be "undef" for default HTTP codes
-has http_status_message => (
-    is => 'ro',
-    isa => 'Str|Undef',
-    init_arg => 'undef',
-    lazy => 1,
-    builder => '__build_http_status_message',
-);
+Will be set automatically if L</workflow> was set and its context contains
+the C<error_code> item.
 
+=cut
 has __error_message => (
     is => 'rw',
     isa => 'Str',
@@ -80,6 +149,11 @@ has __error_message => (
     init_arg  => 'error_message',
 );
 
+=head2 retry_after
+
+Timeout indicator for the HTTP client to retry the request (I<Int>, seconds).
+
+=cut
 has retry_after => (
     is => 'ro',
     isa => 'Int',
@@ -88,6 +162,15 @@ has retry_after => (
     default => 0,
 );
 
+=head2 workflow
+
+Workflow info I<HashRef> as returned by
+L<OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info>.
+
+Setting this attribute will also set L</state> and L</proc_state> and maybe
+L</error_message> according to the workflow informations.
+
+=cut
 has workflow => (
     is => 'rw',
     isa => 'HashRef',
@@ -95,32 +178,117 @@ has workflow => (
     default => sub { return {}; },
     trigger => \&__process_workflow,
 );
+sub __process_workflow ($self, $workflow) {
+    $self->state($workflow->{state});
+    $self->proc_state($workflow->{proc_state});
+    $self->__error_message($workflow->{context}->{error_code}) if $workflow->{context}->{error_code};
+}
 
-has extra_headers => (
+=head2 http_status_code
+
+HTTP status code I<Str>.
+
+If not explicitely set it defaults to:
+
+=over
+
+=item * C<202> if L</retry_after> was set,
+
+=item * the first 3 digits if L</error> if set,
+
+=item * C<200> otherwise.
+
+=back
+
+=cut
+has http_status_code => (
     is => 'rw',
-    isa => 'HashRef',
+    isa => 'Int',
     lazy => 1,
-    default => sub { {} },
+    builder => '__build_http_status_code',
 );
+sub __build_http_status_code ($self) {
+    # Pending request
+    return '202' if $self->is_pending;
+    # Error
+    return substr($self->error,0,3) if $self->has_error;
+    # Default
+    return '200';
+}
 
-has result => (
-    is => 'rw',
+=head2 http_status_message
+
+HTTP status message I<Str>.
+
+If not explicitely set it defaults to:
+
+=over
+
+=item * C<"Request Pending - Retry Later (TRANSACTION_ID)"> if L</retry_after> was set,
+
+=item * L</error_message> if L</error> if set,
+
+=item * the default HTTP status message for the current L</http_status_code> otherwise.
+
+=back
+
+=cut
+has http_status_message => (
+    is => 'ro',
+    isa => 'Str|Undef',
+    init_arg => 'undef',
+    lazy => 1,
+    builder => '__build_http_status_message',
+);
+sub __build_http_status_message ($self) {
+    # Pending request
+    return sprintf('Request Pending - Retry Later (%s)', $self->transaction_id) if $self->is_pending;
+    # Error
+    return $self->error_message if $self->has_error;
+    # Default
+    return Mojo::Message::Response->default_message($self->http_status_code);
+}
+
+=head2 http_status_line
+
+Readonly HTTP status line I<Str>: C<"STATUS_CODE STATUS_MESSAGE">.
+
+=cut
+has http_status_line => (
+    is => 'ro',
     isa => 'Str',
+    init_arg => 'undef',
     lazy => 1,
-    default => '',
-    predicate => 'has_result',
+    builder => '__build_http_status_line',
 );
+sub __build_http_status_line ($self) {
+    return sprintf(
+        "%03d %s",
+        $self->http_status_code,
+        $self->http_status_message,
+    );
+}
 
+=head2 transaction_id
+
+Workflow transaction ID I<Str>, set automatically if L</workflow> was set and
+its context contains the C<transaction_id> item.
+
+=cut
 has transaction_id => (
     is => 'rw',
     isa => 'Str',
     lazy => 1,
-    default => sub {
-        my $self = shift;
-        return $self->workflow->{context}->{transaction_id} // '';
-    },
+    default => sub ($self) { $self->workflow->{context}->{transaction_id} // '' },
 );
 
+=head2 state
+
+Workflow C<state> I<Str>, set automatically if L</workflow> was set.
+
+May be I<undef>.
+
+=cut
 has state => (
     is => 'rw',
     isa => 'Str|Undef',
@@ -129,6 +297,13 @@ has state => (
     default => undef,
 );
 
+=head2 state
+
+Workflow C<proc_state> I<Str>, set automatically if L</workflow> was set.
+
+May be I<undef>.
+
+=cut
 has proc_state => (
     is => 'rw',
     isa => 'Str|Undef',
@@ -149,7 +324,26 @@ around BUILDARGS => sub {
 
 };
 
-# Alternate constructor
+=head1 METHODS
+
+=head2 new_error
+
+Alternate constructor to specify HTTP error codes and error messages.
+
+    OpenXPKI::Client::Service::Response->new_error( 500 );
+    # is equal to:
+    OpenXPKI::Client::Service::Response->new(
+        error => 500
+    );
+
+    OpenXPKI::Client::Service::Response->new_error( 500 => 'Something bad happened');
+    # is equal to:
+    OpenXPKI::Client::Service::Response->new(
+        error => 500,
+        error_message => 'Something bad happened',
+    );
+
+=cut
 sub new_error ($class, @args) {
     die 'new_error() requires an error code' unless @args > 0;
     return $class->new(
@@ -158,43 +352,24 @@ sub new_error ($class, @args) {
     );
 }
 
-sub __build_http_status_code {
-    my $self = shift;
-    return '202' if $self->is_pending;
-    return substr($self->error,0,3) if $self->has_error;
-    return '200';
-}
+=head2 error_message
 
-sub __build_http_status_line {
-    my $self = shift;
-    return sprintf(
-        "%03d %s",
-        $self->http_status_code,
-        $self->http_status_message,
-    );
-}
+Returns the custom error message if set:
 
-sub __build_http_status_message {
-    my $self = shift;
+    my $r = OpenXPKI::Client::Service::Response->new_error( 500 => 'Something bad happened');
+    say $r->error_message;
+    # Something bad happened
 
-    # Pending request
-    return sprintf('Request Pending - Retry Later (%s)', $self->transaction_id) if $self->is_pending;
-    # Error
-    return $self->error_message if $self->has_error;
-    # Default
-    return Mojo::Message::Response->default_message($self->http_status_code);
-}
+...or a predefined message if a known internal error code was used:
 
-sub __process_workflow ($self, $workflow) {
-    $self->state($workflow->{state});
-    $self->proc_state($workflow->{proc_state});
-    $self->__error_message($workflow->{context}->{error_code}) if $workflow->{context}->{error_code};
-}
+    my $r = OpenXPKI::Client::Service::Response->new_error( 50001 );
+    say $r->error_message;
+    # Unable to initialize client
 
-sub error_message {
+Returns the empty string if L</error> was not set.
 
-    my $self = shift;
-
+=cut
+sub error_message ($self) {
     return ''
       unless $self->has_error;
 
@@ -203,29 +378,33 @@ sub error_message {
 
     return ($named_messages{$self->error}
       || sprintf('Unknown error (%s)', $self->error));
-
 }
 
-sub is_server_error {
+=head2 is_server_error
 
-    my $self = shift;
-    return 0 unless ($self->has_error());
-    my $err = $self->error();
-    return 0 unless ($err >= 50000);
-    return $err;
+Returns C<1> if L</error> was set to C<5xxxx> or C<5xx> or C<0> othwerwise.
 
+=cut
+sub is_server_error ($self) {
+    return 0 unless $self->has_error;
+    return $self->error >= 50000 ? 1 : 0;
 }
 
-sub is_client_error {
+=head2 is_client_error
 
-    my $self = shift;
-    return 0 unless ($self->has_error());
-    my $err = $self->error();
-    return 0 unless ($err >= 40000 && $err < 50000);
-    return $err;
+Returns C<1> if L</error> was set to C<5xxxx> or C<5xx> or C<0> othwerwise.
 
+=cut
+sub is_client_error ($self) {
+    return 0 unless $self->has_error;
+    return ($self->error >= 40000 and $self->error < 50000) ? 1 : 0;
 }
 
+=head2 add_debug_headers
+
+Adds some debugging HTTP headers if L</workflow> was set.
+
+=cut
 sub add_debug_headers ($self) {
     my $workflow = $self->workflow or return;
 
@@ -251,7 +430,3 @@ sub add_debug_headers ($self) {
 __PACKAGE__->meta->make_immutable;
 
  __END__;
-
-=head1 NAME
-
-OpenXPKI::Client::Service::Response

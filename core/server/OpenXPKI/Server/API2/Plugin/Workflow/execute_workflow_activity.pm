@@ -21,9 +21,11 @@ use OpenXPKI::Debug;
 Executes a given activity on a workflow.
 
 By default, the activity is executed "inline", all actions are handled and the
-method returns a I<HashRef> with the UI control structure of the new workflow state.
-Use parameters C<async> and/or C<wait> for "background" execution using a newly spawned process
-(see below).
+method returns a I<HashRef> with the UI control structure of the new workflow
+state.
+
+Use parameters C<async> and/or C<wait> for "background" execution using a newly
+spawned process (see below).
 
 =over
 
@@ -41,18 +43,23 @@ otherwise only workflow state information is returned. Default: 0
 =item * C<async> I<Bool> - "background" execution (asynchronously): forks a new
 process. Optional.
 
-Return I<HashRef> contains the UI control structure of the OLD workflow
+Return I<HashRef> contains the UI control structure of the B<OLD> workflow
 state.
 
 =item * C<wait> I<Bool> - wait for background execution to start (monitors the
 database, max. 15 seconds). Optional.
 
 Return I<HashRef> contains the UI control structure of the current state of the
-running workflow. Please note that this might be the next step or any
-following step as this depends on random timing, i.e. when the monitoring loop
-happens to check the database again.
+running workflow.
+
+Please note that this might be the next step or any following step as this
+depends on random timing, i.e. when the monitoring loop happens to check the
+database again.
 
 =back
+
+B<Returns> a I<HashRef> with workflow information, see
+L<OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info> for more details.
 
 B<Changes compared to API v1:>
 
