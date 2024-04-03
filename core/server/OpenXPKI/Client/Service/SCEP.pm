@@ -147,13 +147,47 @@ sub op_handlers {
             }
 
             # Enrollment request
-            if (any { $self->message_type eq $_ } qw( PKCSReq RenewalReq GetCertInitial )) {
-                # TODO - improve handling of GetCertInitial and RenewalReq
-                $self->log->debug("Handle enrollment");
+            if ($self->message_type eq 'PKCSReq') {
+                $self->add_wf_param(
+                    pkcs10 => $self->attr->{pkcs10},
+                    transaction_id => $self->transaction_id,
+                    signer_cert => $self->signer,
+                );
+                # Load URL paramters if defined by config
+                my $conf = $self->config->{'PKIOperation'};
+                if ($conf->{param}) {
+                    my @keys =
+                        grep { $_ ne "operation" and $_ ne "message" }
+                        ($conf->{param} eq '*'
+                            ? $self->request->params->names->@* # legacy version - map anything
+                            : split /\s*,\s*/, $conf->{param}   # read list of parameter names from config
+                        );
+
+                    $self->add_wf_param(_url_params => { map { $_ => $self->request->param($_) } @keys });
+                }
+
+                return $self->handle_enrollment_request;
+
+            # Enrollment request
+            # TODO - improve handling of GetCertInitial
+            } elsif ($self->message_type eq 'GetCertInitial') {
+                $self->add_wf_param(
+                    transaction_id => $self->transaction_id,
+                    signer_cert => $self->signer,
+                );
+                return $self->handle_enrollment_request;
+
+            # Enrollment request
+            # TODO - improve handling of RenewalReq
+            } elsif ($self->message_type eq 'RenewalReq') {
                 return $self->handle_enrollment_request;
 
             # Request for CRL or GetCert with IssuerSerial in Payload
             } elsif (any { $self->message_type eq $_ } qw( GetCert GetCRL )) {
+                $self->add_wf_param(
+                    issuer => $self->attr->{issuer_serial}->{issuer},
+                    serial => $self->attr->{issuer_serial}->{serial},
+                );
                 return $self->handle_property_request($self->message_type);
 
             } else {
@@ -167,17 +201,18 @@ sub op_handlers {
 }
 
 # required by OpenXPKI::Client::Service::Role::Base
-sub custom_wf_params ($self, $params) {
+sub fcgi_set_custom_wf_params ($self) {
     # Only handle PKIOperation
     return unless 'PKIOperation' eq $self->operation;
 
     $self->log->debug("Adding extra parameters for message type '".$self->message_type."'");
 
     if ($self->message_type eq 'PKCSReq') {
-        $params->{pkcs10} = $self->attr->{pkcs10};
-        $params->{transaction_id} = $self->transaction_id;
-        $params->{signer_cert} = $self->signer;
-
+        $self->add_wf_param(
+            pkcs10 => $self->attr->{pkcs10},
+            transaction_id => $self->transaction_id,
+            signer_cert => $self->signer,
+        );
         # Load URL paramters if defined by config
         my $conf = $self->config->{'PKIOperation'};
         if ($conf->{param}) {
@@ -194,16 +229,19 @@ sub custom_wf_params ($self, $params) {
                 next if $param eq "message";
                 $extra->{$param} = $self->request->param($param);
             }
-            $params->{_url_params} = $extra;
+            $self->add_wf_param(_url_params => $extra);
         }
 
     } elsif ($self->message_type eq 'GetCertInitial') {
-        $params->{transaction_id} = $self->transaction_id;
-        $params->{signer_cert} = $self->signer;
-
+        $self->add_wf_param(
+            transaction_id => $self->transaction_id,
+            signer_cert => $self->signer,
+        );
     } elsif (any { $self->message_type eq $_ } qw( GetCert GetCRL )) {
-        $params->{issuer} = $self->attr->{issuer_serial}->{issuer};
-        $params->{serial} = $self->attr->{issuer_serial}->{serial};
+        $self->add_wf_param(
+            issuer => $self->attr->{issuer_serial}->{issuer},
+            serial => $self->attr->{issuer_serial}->{serial},
+        );
     }
 }
 

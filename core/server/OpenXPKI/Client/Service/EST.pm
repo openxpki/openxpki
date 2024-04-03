@@ -63,8 +63,7 @@ sub send_response ($self, $c, $response) {
 # required by OpenXPKI::Client::Service::Role::Base
 sub op_handlers {
     return [
-        'cacerts' => sub {
-            my $self = shift;
+        'cacerts' => sub ($self) {
             my $response = $self->handle_property_request;
 
             # FIXME Legacy: the workflows should return base64 encoded raw data
@@ -75,16 +74,29 @@ sub op_handlers {
             $response->result($out);
             return $response;
         },
-        'csrattrs' => sub {
-            my $self = shift;
+        'csrattrs' => sub ($self) {
             $self->content_type("application/csrattrs"); # default
             return $self->handle_property_request;
         },
-        'simplerevoke' => \&handle_revocation_request,
-        ['simpleenroll', 'simplereenroll'] => \&handle_enrollment_request,
+        ['simpleenroll', 'simplereenroll', 'simplerevoke'] => sub ($self) {
+            # TODO this should be merged with the stuff in Base without having protocol specific items in the core code
+            $self->add_wf_param(
+                server => $self->endpoint,
+                interface => $self->service_name,
+            );
+            if (my $signer = $self->apache_env->{SSL_CLIENT_CERT}) {
+                $self->add_wf_param(signer_cert => $signer);
+            }
+
+            if ('simplerevoke' eq $self->operation) {
+                $self->handle_revocation_request;
+            } else {
+                $self->set_pkcs10_and_tid(decode_base64($self->request->body));
+                $self->handle_enrollment_request;
+            }
+        },
         # "serverkeygen" and "fullcmc" are not supported
-        ['serverkeygen', 'fullcmc'] => sub {
-            my $self = shift;
+        ['serverkeygen', 'fullcmc'] => sub ($self) {
             $self->log->error(sprintf('Operation "%s" not implemented', $self->operation));
             return OpenXPKI::Client::Service::Response->new( 50100 );
         },
@@ -92,20 +104,20 @@ sub op_handlers {
 }
 
 # required by OpenXPKI::Client::Service::Role::Base
-sub custom_wf_params ($self, $params) {
+sub fcgi_set_custom_wf_params ($self) {
     # TODO this should be merged with the stuff in Base without
     # having protocol specific items in the core code
     if (any { $self->operation eq $_ } qw( simpleenroll simplereenroll simplerevoke )) {
-        $params->{server} = $self->endpoint;
-        $params->{interface} = $self->service_name;
+        $self->add_wf_param(
+            server => $self->endpoint,
+            interface => $self->service_name,
+        );
         if (my $signer = $self->apache_env->{SSL_CLIENT_CERT}) {
-            $params->{signer_cert} = $signer;
+            $self->add_wf_param(signer_cert => $signer);
         }
     }
 
-    $self->set_pkcs10_and_tid($params, decode_base64($self->request->body)) if $self->is_enrollment;
-
-    return 1;
+    $self->set_pkcs10_and_tid(decode_base64($self->request->body)) if $self->is_enrollment;
 }
 
 # required by OpenXPKI::Client::Service::Role::Base

@@ -7,7 +7,7 @@ requires 'service_name';
 requires 'prepare';
 requires 'send_response';
 requires 'op_handlers';
-requires 'custom_wf_params';
+requires 'fcgi_set_custom_wf_params';
 requires 'prepare_enrollment_result';
 
 =head1 NAME
@@ -29,8 +29,8 @@ A consuming class that implements a service generally looks like this:
     sub prepare ($self, $c) { ... }
     sub send_response ($self, $c, $response) { ... }
     sub op_handlers { ... }
-    sub custom_wf_params ($self, $params) { ... }
     sub prepare_enrollment_result ($self, $workflow) { ... }
+    sub fcgi_set_custom_wf_params ($self) { ... }
 
 =cut
 
@@ -141,20 +141,25 @@ Must return an I<ArrayRef> where the odd items are either an operation name
 (I<Str>) or a list of operation names (I<ArrayRef>) and the even items are
 I<CodeRefs>.
 
-    sub op_handlers {
+    sub op_handlers ($self) {
+        $self->add_wf_param(server => $self->endpoint);
+
         return [
-            'getcrl' => sub ($self) { $self->handle_property_request('crl') },
+            'getcrl' => sub ($self) {
+                $self->add_wf_param(mode => $self->xmode);
+                $self->handle_property_request('crl');
+            },
             ['enroll', 're-enroll'] => \&handle_enrollment_request, # shortcut
         ];
     }
 
-=head3 custom_wf_params
+=head3 fcgi_set_custom_wf_params
 
-Allows to add service specific workflow parameters.
+Legacy method for FCGI to add service specific workflow parameters.
 
-    sub custom_wf_params ($self, $params) {
+    sub fcgi_set_custom_wf_params ($self) {
         if ($self->operation eq 'enroll') {
-            $params->{server} = $self->endpoint;
+            $self->add_wf_param(server => $self->endpoint);
         }
     }
 
@@ -312,8 +317,8 @@ has is_enrollment => (
 
 =head3 wf_params
 
-I<HashRef> with workflow parameters (calls the consuming classes'
-L<custom_wf_params> as the last step).
+Readonly I<HashRef> with workflow parameters, incl. L</custom_wf_params>, that
+is automatically build.
 
 =cut
 has wf_params => (
@@ -336,7 +341,6 @@ sub _build_wf_params ($self) {
         }
 
         my $servername = $conf->{$operation}->{servername} || $conf->{global}->{servername};
-        # if given, append to the paramter list
         if ($servername) {
             $p->{'server'} = $servername;
             $p->{'interface'} = $self->service_name;
@@ -363,9 +367,8 @@ sub _build_wf_params ($self) {
             $p->{'interface'} = $self->service_name;
         }
 
-        # Gather data from TLS session
+        # gather data from TLS session
         if ( $self->request->is_secure ) {
-
             $self->log->debug("calling context is https");
             my $auth_dn = $self->apache_env->{SSL_CLIENT_S_DN};
             my $auth_pem = $self->apache_env->{SSL_CLIENT_CERT};
@@ -382,10 +385,16 @@ sub _build_wf_params ($self) {
             }
         }
 
-        # hook that allows consuming classes to add own parameters
-        $self->custom_wf_params($p);
+        # legacy FCGI mode
+        $self->fcgi_set_custom_wf_params if ($ENV{GATEWAY_INTERFACE} and $ENV{REMOTE_ADDR});
 
-        $self->log->trace(sprintf("Extra params for operation '%s': %s", $self->operation, Dumper $p)) if $self->log->is_trace;
+        # merge custom parameters set by consuming class
+        $p = {
+            $p->%*,
+            $self->custom_wf_params->%*,
+        };
+
+        $self->log->trace(sprintf("Parameters for operation '%s': %s", $self->operation, Dumper $p)) if $self->log->is_trace;
         return $p;
     }
     catch ($err) {
@@ -396,6 +405,23 @@ sub _build_wf_params ($self) {
         }
     }
 }
+
+=head3 custom_wf_params
+
+Custom workflow parameters to be set by the consuming class via L</add_wf_param>.
+
+=cut
+has custom_wf_params => (
+    is => 'rw',
+    isa => 'HashRef',
+    traits => [ 'Hash' ],
+    lazy => 1,
+    init_arg => undef,
+    default => sub { {} },
+    handles => {
+        add_wf_param => 'set',
+    },
+);
 
 =head1 METHODS
 
@@ -414,7 +440,7 @@ after 'BUILD' => sub ($self, $args) {
 
 =head2 handle_request
 
-Main request handling method:
+Main request handling method (called by L<OpenXPKI::Client::Web::Controller>):
 
 =over
 
@@ -487,6 +513,13 @@ sub handle_request ($self) {
     return $response;
 }
 
+=head2 add_wf_param
+
+Allows to add service specific workflow parameters, e.g. in L</op_handlers> or
+L</prepare>.
+
+    $self->add_wf_param(server => $self->endpoint) if $self->operation eq 'enroll';
+
 =head2 handle_enrollment_request
 
 Handler for enrollment requests.
@@ -504,7 +537,7 @@ sub handle_enrollment_request ($self) {
     $self->is_enrollment(1);
 
     # Build configuration parameters. May be customized by service classes
-    # via custom_wf_params(), e.g. for SCEP to inject data from the input.
+    # via add_wf_param(), e.g. for SCEP to inject data from the input.
     my $param = $self->wf_params;
 
     if (not $param->{server}) {
@@ -710,17 +743,15 @@ sub disconnect_backend ($self) {
 
 =head2 set_pkcs10_and_tid
 
-Sets the C<pkcs10> workflow parameter to the PEM CSR after conversion rountrip
-and removal of any data beyond the length of the ASN.1 structure.
+Sets the C<pkcs10> custom workflow parameter to the PEM CSR after conversion
+rountrip and removal of any data beyond the length of the ASN.1 structure.
 
-Also sets the C<transaction_id> workflow parameter to the hexadecimal SHA1 hash
+Also sets the C<transaction_id> parameter to the hexadecimal SHA1 hash
 (L<Digest::SHA/sha1_hex>) of the binary CSR.
 
 B<Parameters>
 
 =over
-
-=item * C<$params> I<HashRef> - Workflow parameter hash (will be modified)
 
 =item * C<$pkcs10> I<Str> - PKCS10 encoded CSR
 
@@ -729,7 +760,7 @@ B<Parameters>
 B<Returns> nothing.
 
 =cut
-sub set_pkcs10_and_tid ($self, $params, $pkcs10 = undef) {
+sub set_pkcs10_and_tid ($self, $pkcs10 = undef) {
     $self->log->debug('Parse PKCS10');
 
     # Usually PEM encoded but without borders as POSTDATA
@@ -746,8 +777,8 @@ sub set_pkcs10_and_tid ($self, $params, $pkcs10 = undef) {
         die OpenXPKI::Client::Service::Response->new( 40002 );
     }
 
-    $params->{pkcs10} = $decoded->csrRequest(1);
-    $params->{transaction_id} = sha1_hex($decoded->csrRequest);
+    $self->add_wf_param(pkcs10 =>$decoded->csrRequest(1));
+    $self->add_wf_param(transaction_id => sha1_hex($decoded->csrRequest));
 }
 
 =head2 _build_pickup_config
