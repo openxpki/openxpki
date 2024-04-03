@@ -887,6 +887,38 @@ sub cgi_safe_sub :prototype(&) {
     return $response;
 }
 
+=head2 cgi_headers
+
+Converts standard HTTP header names to parameters that can be passed to
+L<CGI/header>.
+
+B<Parameters>
+
+=over
+
+=item * C<$headers> I<HashRef> - headers where the keys are HTTP standard names (i.e. C<"content-type">)
+
+=back
+
+B<Returns> a I<HashRef> with headers where the keys are L<CGI> specific names (i.e. C<"-type">)
+
+=cut
+sub cgi_headers ($self, $headers) {
+    my @keys = keys $headers->%*;
+    my @values = values $headers->%*;
+
+    my @cgi_keys =
+        map { ($_ eq '-content_type') ? '-type' : $_ }
+        map { lc }
+        map { "-$_" }
+        map { s/-/_/g; $_ }
+        @keys;
+
+    my %cgi_headers;
+    @cgi_headers{@cgi_keys} = @values;
+    return \%cgi_headers;
+}
+
 1;
 
 __END__;

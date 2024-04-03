@@ -113,7 +113,7 @@ while (my $cgi = CGI::Fast->new("")) {
             }
         };
 
-        my @extra_header = %{ $response->extra_headers() } if ($ep_config->{output}->{headers});
+        my @extra_header = %{ $client->cgi_headers($response->extra_headers) } if ($ep_config->{output}->{headers});
 
         $log->debug('Status: ' . $response->http_status_line);
         $log->trace(Dumper $response) if $log->is_trace;

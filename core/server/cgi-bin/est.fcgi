@@ -103,7 +103,7 @@ while (my $cgi = CGI::Fast->new("")) {
     $client->disconnect_backend;
 
     my @extra_header;
-    @extra_header = %{ $response->extra_headers() } if ($ep_config->{output}->{headers});
+    @extra_header = %{ $client->cgi_headers($response->extra_headers) } if ($ep_config->{output}->{headers});
     if ($response->has_error()) {
         print $cgi->header(
             -status => $response->http_status_line(),
