@@ -779,8 +779,8 @@ sub __flag_for_wakeup {
 
     return unless $wf_id;    #this is real defensive programming ...;-)
 
-    #FIXME: Might add some more entropy or the server id for cluster oepration
-    my $rand_key = sprintf( '%s_%s_%s', $PID, time(), sprintf( '%02.d', rand(100) ) );
+    # As we have PID and node name here we can use this to find zombies
+    my $rand_key = join(':', ($PID, time(), CTX('config')->node_id));
 
     ##! 16: 'set random key '.$rand_key
 

@@ -2,11 +2,14 @@ package OpenXPKI::Config;
 use Moose;
 
 use English;
+use Digest::SHA qw(sha1_hex);
+use Log::Log4perl;
+use Sys::Hostname;
+
 use OpenXPKI::Config::Backend;
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
-use Log::Log4perl;
 
 # Make sure the underlying connector is recent
 use Connector 1.43;
@@ -33,6 +36,25 @@ has backend => (
         return OpenXPKI::Config::Backend->new(LOCATION => $self->config_dir);
     },
 );
+
+has node_id => (
+    is => 'ro',
+    isa => 'Str',
+    lazy => 1,
+    builder => '__init_node_id',
+);
+
+# Node Id is the hostname or the first 16 chars of the hex encoded
+# sha1 hash of the hostname in case its length exceeds 16 chars.
+sub __init_node_id {
+    my $name = shift->get(['system','server','node_id']);
+    return $name if ($name);
+    $name = hostname;
+    if (length($name) > 16) {
+        $name = substr(sha1_hex($name),0,16);
+    }
+    return $name;
+}
 
 has credential_backend => (
     is => 'rw',

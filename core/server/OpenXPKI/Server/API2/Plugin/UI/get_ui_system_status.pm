@@ -73,6 +73,7 @@ command "get_ui_system_status" => {
         workflow        => scalar @{$pids->{workflow}},
         version         => $OpenXPKI::VERSION::VERSION,
         hostname        => hostname,
+        node_id         => CTX('config')->node_id,
         config          => $config
     };
 
