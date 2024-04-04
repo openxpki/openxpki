@@ -12,7 +12,7 @@ use MIME::Base64;
 use OpenXPKI::Debug;
 use OpenXPKI::Crypt::CRL;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
+use OpenXPKI::Types;
 
 
 =head1 COMMANDS

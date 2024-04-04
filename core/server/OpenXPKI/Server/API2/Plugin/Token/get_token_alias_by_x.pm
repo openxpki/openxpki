@@ -25,7 +25,7 @@ B<Parameters>
 
 =over
 
-=item * C<type> I<Str> - Token type (for possible values see L<OpenXPKI::Server::API2::Types/TokenType>). Required.
+=item * C<type> I<Str> - Token type (for possible values see L<OpenXPKI::Types/TokenType>). Required.
 
 =item * C<validity> I<HashRef> - two datetime objects, given as hash keys
 I<notbefore> and I<notafter>. Hash values of C<undef> will be interpreted as

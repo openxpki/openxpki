@@ -11,7 +11,7 @@ OpenXPKI::Server::API2::Plugin::Token::handle_alias
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
+use OpenXPKI::Types;
 
 =head1 COMMANDS
 

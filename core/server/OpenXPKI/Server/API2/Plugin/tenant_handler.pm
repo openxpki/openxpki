@@ -11,7 +11,7 @@ OpenXPKI::Server::API2::Plugin::tenant_handler
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
+use OpenXPKI::Types;
 
 
 =head1 COMMANDS
@@ -27,7 +27,7 @@ B<Parameters>
 
 =over
 
-=item * C<tenant> L<Tenant|OpenXPKI::Server::API2::Types/Tenant> - tenant
+=item * C<tenant> L<Tenant|OpenXPKI::Types/Tenant> - tenant
 
 =back
 

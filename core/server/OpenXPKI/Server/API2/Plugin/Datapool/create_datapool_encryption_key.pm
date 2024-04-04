@@ -12,7 +12,7 @@ OpenXPKI::Server::API2::Plugin::Datapool::create_datapool_encryption_key
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
+use OpenXPKI::Types;
 
 
 

@@ -9,7 +9,7 @@ OpenXPKI::Server::API2::Plugin::Control::purge_application_log
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
+use OpenXPKI::Types;
 
 
 

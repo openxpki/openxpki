@@ -17,7 +17,7 @@ use Type::Params qw( signature_for );
 # Project modules
 use OpenXPKI::i18n qw( i18nGettext );
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
+use OpenXPKI::Types;
 use OpenXPKI::Server::API2::Plugin::Workflow::Util;
 
 # should be done after imports to safely disable warnings in Perl < 5.36
@@ -32,7 +32,7 @@ our %FORMAT_MAP = (
     rawlist => { type => 'array' },
     deflist => { type => 'array' },
     cert_info => { _hint => 'if prefixed with "OXJSF1:" it is a JSON string.', },
-    # FIXME: use enum from OpenXPKI::Server::API2::Types
+    # FIXME: use enum from OpenXPKI::Types
     certstatus => { type => 'string', enum => [ qw( ISSUED REVOKED CRL_ISSUANCE_PENDING EXPIRED ) ] },
 );
 

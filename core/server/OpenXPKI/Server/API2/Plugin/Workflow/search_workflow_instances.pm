@@ -16,7 +16,7 @@ use Moose::Util::TypeConstraints; # PLEASE NOTE: this enables all warnings via M
 use OpenXPKI::Debug;
 use OpenXPKI::DateTime;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
+use OpenXPKI::Types;
 use OpenXPKI::Util;
 
 subtype 'StateName',
@@ -69,7 +69,7 @@ B<Parameters>
 
 =item * C<pki_realm> I<Str> - PKI realm
 
-=item * C<tenant> L<Tenant|OpenXPKI::Server::API2::Types/Tenant> - tenant
+=item * C<tenant> L<Tenant|OpenXPKI::Types/Tenant> - tenant
 
 Search for workflows of the given tenant, fallback to the primary
 tenant if not given, unfiltered search if set to the emtpy string.

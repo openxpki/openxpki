@@ -9,7 +9,7 @@ OpenXPKI::Server::API2::Plugin::Cert::get_profile_for_cert
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
+use OpenXPKI::Types;
 
 
 

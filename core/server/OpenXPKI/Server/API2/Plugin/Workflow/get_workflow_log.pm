@@ -9,7 +9,7 @@ OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_log
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
+use OpenXPKI::Types;
 
 
 

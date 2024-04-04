@@ -10,7 +10,7 @@ OpenXPKI::Server::API2::Plugin::Cert::get_cert_attributes
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
+use OpenXPKI::Types;
 
 with 'OpenXPKI::Server::API2::TenantRole';
 
@@ -40,7 +40,7 @@ SQL search string(s) to filter the list of returned attributes. Will
 be applied with SQL LIKE operator, so "%" wildcards are allowed.
 Optional.
 
-=item * C<tenant> L<Tenant|OpenXPKI::Server::API2::Types/Tenant> - tenant
+=item * C<tenant> L<Tenant|OpenXPKI::Types/Tenant> - tenant
 
 =back
 

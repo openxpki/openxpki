@@ -9,7 +9,7 @@ OpenXPKI::Server::API2::Plugin::UI::send_notification
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
+use OpenXPKI::Types;
 
 
 

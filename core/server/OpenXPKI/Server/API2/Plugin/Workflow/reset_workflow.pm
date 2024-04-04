@@ -9,7 +9,7 @@ OpenXPKI::Server::API2::Plugin::Workflow::reset_workflow
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
+use OpenXPKI::Types;
 use OpenXPKI::Server::API2::Plugin::Workflow::Util;
 
 

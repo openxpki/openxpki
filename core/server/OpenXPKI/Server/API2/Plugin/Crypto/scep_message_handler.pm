@@ -12,7 +12,7 @@ use English;
 use MIME::Base64;
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
+use OpenXPKI::Types;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Crypt::PKCS7::SCEP;

@@ -11,7 +11,7 @@ use JSON;
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
+use OpenXPKI::Types;
 
 =head1 COMMANDS
 

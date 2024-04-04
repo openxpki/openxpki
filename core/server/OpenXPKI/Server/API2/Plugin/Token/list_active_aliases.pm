@@ -46,7 +46,7 @@ B<Parameters>
 
 =item * C<type> I<Str> - Token type, might be specified instead of token group
 to query one of the predefined token types (for possible values see
-L<OpenXPKI::Server::API2::Types/TokenType>). Default: none
+L<OpenXPKI::Types/TokenType>). Default: none
 
 =item * C<pki_realm> I<Str> - PK realm, specify this to query another realm.
 Default: current session's realm.

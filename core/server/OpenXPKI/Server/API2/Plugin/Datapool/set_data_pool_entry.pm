@@ -12,7 +12,7 @@ OpenXPKI::Server::API2::Plugin::Datapool::set_data_pool_entry
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
+use OpenXPKI::Types;
 use OpenXPKI::Serialization::Simple;
 
 
@@ -76,7 +76,7 @@ Optional, default: 0
 
 Requires a properly set up password safe certificate in the target realm.
 
-=item * C<serialize> L<SerializationFormat|OpenXPKI::Server::API2::Types/SerializationFormat> - serialization format for complex values. Optional
+=item * C<serialize> L<SerializationFormat|OpenXPKI::Types/SerializationFormat> - serialization format for complex values. Optional
 
 =back
 

@@ -10,7 +10,7 @@ OpenXPKI::Server::API2::Plugin::Cert::get_cert_actions
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
+use OpenXPKI::Types;
 
 
 

@@ -85,10 +85,10 @@ All parameters are optional and can be used to filter the result list:
 
 =over
 
-=item * C<pki_realm> L<AlphaPunct|OpenXPKI::Server::API2::Types/AlphaPunct> - certificate realm. Specify "_any"
+=item * C<pki_realm> L<AlphaPunct|OpenXPKI::Types/AlphaPunct> - certificate realm. Specify "_any"
 for a global search. Default: current session's realm
 
-=item * C<tenant> L<Tenant|OpenXPKI::Server::API2::Types/Tenant> - tenant
+=item * C<tenant> L<Tenant|OpenXPKI::Types/Tenant> - tenant
 
 Search for workflows of the given tenant, fallback to the primary
 tenant if not given, unfiltered search if set to the emtpy string.
@@ -102,19 +102,19 @@ so you can use asterisk (*) as placeholder)
 =item * C<issuer_dn> I<Str> - issuer pattern (does an SQL LIKE search
 so you can use asterisk (*) as placeholder)
 
-=item * C<cert_serial> L<IntOrHex|OpenXPKI::Server::API2::Types/IntOrHex> - serial number of certificate
+=item * C<cert_serial> L<IntOrHex|OpenXPKI::Types/IntOrHex> - serial number of certificate
 
 =item * C<csr_serial> I<Int> - serial number of certificate request
 
 =item * C<subject_key_identifier> I<Str> - X.509 certificate subject identifier
 
-=item * C<issuer_identifier> L<Base64|OpenXPKI::Server::API2::Types/Base64> - issuer identifier
+=item * C<issuer_identifier> L<Base64|OpenXPKI::Types/Base64> - issuer identifier
 
-=item * C<authority_key_identifier> L<AlphaPunct|OpenXPKI::Server::API2::Types/AlphaPunct> - CA identifier
+=item * C<authority_key_identifier> L<AlphaPunct|OpenXPKI::Types/AlphaPunct> - CA identifier
 
-=item * C<identifier> L<Base64|OpenXPKI::Server::API2::Types/Base64> - internal certificate identifier (hash of PEM)
+=item * C<identifier> L<Base64|OpenXPKI::Types/Base64> - internal certificate identifier (hash of PEM)
 
-=item * C<profile> L<ArrayOrAlphaPunct|OpenXPKI::Server::API2::Types/ArrayOrAlphaPunct> - certificate profile name
+=item * C<profile> L<ArrayOrAlphaPunct|OpenXPKI::Types/ArrayOrAlphaPunct> - certificate profile name
 
 =item * C<valid_before> I<Int> - certificate validity must start before this UNIX epoch timestamp
 
@@ -132,7 +132,7 @@ so you can use asterisk (*) as placeholder)
 
 =item * C<invalid_after> I<Int> - certificate invalidity  date is after this UNIX epoch timestamp
 
-=item * C<status> L<CertStatus|OpenXPKI::Server::API2::Types/CertStatus> - certificate status
+=item * C<status> L<CertStatus|OpenXPKI::Types/CertStatus> - certificate status
 
 =item * C<cert_attributes> I<HashRef> - key is attribute name, value is passed
 "as is" as where statement on value, see documentation of L<SQL::Abstract>.
@@ -154,7 +154,7 @@ Set to the empty string to return the result unsorted.
 
 =item * C<reverse> I<Bool> - order results ascending
 
-=item * C<return_attributes> L<ArrayRefOrStr|OpenXPKI::Server::API2::Types/ArrayRefOrStr> - add the given attributes as
+=item * C<return_attributes> L<ArrayRefOrStr|OpenXPKI::Types/ArrayRefOrStr> - add the given attributes as
 columns to the result set. Each attribute is added as extra column
 using the attribute name as key.
 
@@ -162,7 +162,7 @@ Note: If the attribute is multivalued or you use an attribute query that
 causes multiple result lines for a single certificate you will get more
 than one line for the same certificate!
 
-=item * C<return_columns> L<ArrayRefOrStr|OpenXPKI::Server::API2::Types/ArrayRefOrStr> - set the columns from the base
+=item * C<return_columns> L<ArrayRefOrStr|OpenXPKI::Types/ArrayRefOrStr> - set the columns from the base
 table that should be included in the returned hashref. By default this
 replaces the default columns, if you want the columns to extend the default
 set put the plus sign '+' as first column name.

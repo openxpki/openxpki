@@ -10,7 +10,7 @@ OpenXPKI::Server::API2::Plugin::Cert::set_cert_metadata
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
+use OpenXPKI::Types;
 use OpenXPKI::Server::Database; # to get AUTO_ID
 
 =head1 COMMANDS

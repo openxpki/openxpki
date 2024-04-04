@@ -9,7 +9,7 @@ OpenXPKI::Server::API2::TenantRole - provides helper methods for plugins
 use Moose::Role;
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
+use OpenXPKI::Types;
 
 sub get_validated_tenant {
 

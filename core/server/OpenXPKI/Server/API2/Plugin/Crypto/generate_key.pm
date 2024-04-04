@@ -10,7 +10,7 @@ OpenXPKI::Server::API2::Plugin::Crypto::generate_key
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
+use OpenXPKI::Types;
 
 
 

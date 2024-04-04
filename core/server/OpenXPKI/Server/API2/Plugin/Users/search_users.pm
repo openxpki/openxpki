@@ -8,7 +8,7 @@ OpenXPKI::Server::API2::Plugin::Users::search_users
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
+use OpenXPKI::Types;
 
 # parameters common for search_users and search_users_count
 my %common_params = (

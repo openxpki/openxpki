@@ -11,7 +11,7 @@ OpenXPKI::Server::API2::Plugin::Datapool::modify_data_pool_entry
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
+use OpenXPKI::Types;
 use OpenXPKI::DateTime;
 use OpenXPKI::Debug;
 

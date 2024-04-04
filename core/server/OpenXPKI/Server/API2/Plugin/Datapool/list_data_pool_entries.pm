@@ -11,7 +11,7 @@ OpenXPKI::Server::API2::Plugin::Datapool::list_data_pool_entries
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
+use OpenXPKI::Types;
 use OpenXPKI::Util;
 
 

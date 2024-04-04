@@ -12,7 +12,7 @@ OpenXPKI::Server::API2::Plugin::Datapool::delete_data_pool_entry
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
+use OpenXPKI::Types;
 
 =head1 COMMANDS
 

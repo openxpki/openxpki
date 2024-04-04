@@ -9,7 +9,7 @@ OpenXPKI::Server::API2::Plugin::Workflow::check_workflow_acl
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
+use OpenXPKI::Types;
 
 
 =head1 COMMANDS
@@ -27,7 +27,7 @@ B<Parameters>
 
 =item * C<id> I<Int> - workflow ID
 
-=item * C<tenant> L<Tenant|OpenXPKI::Server::API2::Types/Tenant> - tenant
+=item * C<tenant> L<Tenant|OpenXPKI::Types/Tenant> - tenant
 
 If set to a tenant name the workflow must be owned by this tenant.
 Otherwise, the workflows tenant must be accessible by the current user.

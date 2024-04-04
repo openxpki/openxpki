@@ -14,7 +14,7 @@ use Scalar::Util 'blessed';
 use OpenXPKI::DateTime;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
+use OpenXPKI::Types;
 use OpenXPKI::Server::API2::Plugin::Workflow::Util;
 with 'OpenXPKI::Server::API2::TenantRole';
 
@@ -90,7 +90,7 @@ The namespace has a default of I<workflow.lock>, so if you dont need to
 modify neither namespace or error handling you can directly pass the locks
 key as String instead of using a HashRef.
 
-=item * C<tenant> L<Tenant|OpenXPKI::Server::API2::Types/Tenant> - tenant. Optional
+=item * C<tenant> L<Tenant|OpenXPKI::Types/Tenant> - tenant. Optional
 
 Assign the new workflow to the given tenant. The value must be a valid
 tenant for the current session user, if it is not given and tenant mode

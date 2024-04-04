@@ -16,7 +16,7 @@ OpenXPKI::Server::API2::Plugin::Datapool::get_data_pool_entry
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
+use OpenXPKI::Types;
 
 # Feature::Compat::Try should be done last to safely disable warnings
 use Feature::Compat::Try;
@@ -63,9 +63,9 @@ of the currently active session is accepted.
 
 =item * C<decrypt> I<Bool> - set to 0 to skip decryption of encrypted items
 
-=item * C<deserialize> L<SerializationFormat|OpenXPKI::Server::API2::Types/SerializationFormat> - deserialization format for complex values. Optional
+=item * C<deserialize> L<SerializationFormat|OpenXPKI::Types/SerializationFormat> - deserialization format for complex values. Optional
 
-=item * C<try_deserialize> L<SerializationFormat|OpenXPKI::Server::API2::Types/SerializationFormat> - like C<deserialize> but returns C<undef> instead of throwing an exception if deserialization fails. Optional
+=item * C<try_deserialize> L<SerializationFormat|OpenXPKI::Types/SerializationFormat> - like C<deserialize> but returns C<undef> instead of throwing an exception if deserialization fails. Optional
 
 =back
 

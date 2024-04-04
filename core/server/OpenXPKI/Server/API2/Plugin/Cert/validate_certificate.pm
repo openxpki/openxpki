@@ -12,7 +12,7 @@ OpenXPKI::Server::API2::Plugin::Cert::validate_certificate
 use OpenXPKI::Debug;
 use OpenXPKI::Crypt::X509;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
+use OpenXPKI::Types;
 
 
 

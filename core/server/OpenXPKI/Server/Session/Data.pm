@@ -11,7 +11,7 @@ use Type::Params qw( signature_for );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
-use OpenXPKI::Server::API2::Types;
+use OpenXPKI::Types;
 
 # should be done after imports to safely disable warnings in Perl < 5.36
 use experimental 'signatures';
