@@ -45,6 +45,10 @@ sub log {
     my $self    = shift;
     my $arg_ref = { @_ };
 
+
+    my $wf_id = Log::Log4perl::MDC->get('wfid') || '';
+    return unless($wf_id =~ m{\A\d+\z});
+
     ##! 128: 'arg_ref: ' . Dumper $arg_ref
 
     my $category  = $arg_ref->{'log4p_category'};
@@ -76,7 +80,6 @@ sub log {
     my $loglevel_int = $Log::Log4perl::Level::PRIORITY{$loglevel} // $ALL;
 
     eval {
-        my $wf_id = Log::Log4perl::MDC->get('wfid') || 0;
         CTX($self->{dbi_handle})->insert(
             into => $self->{table},
             values  => {
