@@ -176,11 +176,14 @@ sub _build_hash_from_payload {
 
     my $self = shift;
     my $req = shift;
+    my $allow_bool = shift;
     return {} unless ($req->payload());
 
     my %params;
     foreach my $arg (@{$req->payload()}) {
         my ($key, $val) = split('=', $arg, 2);
+        $val = 1 if (!defined $val && $allow_bool);
+        next unless(defined $val);
         if ($params{$key}) {
             if (!ref $params{$key}) {
                 $params{$key} = [$params{$key}, $val];

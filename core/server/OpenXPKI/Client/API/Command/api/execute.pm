@@ -53,7 +53,7 @@ sub execute {
 
     my $payload = {};
     if ($req->payload()) {
-        $payload = $self->_build_hash_from_payload($req);
+        $payload = $self->_build_hash_from_payload($req, 1);
     }
 
     my $api_params = $self->help_command($command);
