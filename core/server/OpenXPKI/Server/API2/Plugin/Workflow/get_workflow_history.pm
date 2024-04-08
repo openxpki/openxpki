@@ -66,6 +66,8 @@ command "get_workflow_history" => {
         params => { type => $wf_type,  handle => 'history' }
     );
 
+    # TODO - this duplicates code from the Persister and depends on the
+    # actual implementation. Should likely be replaced by persister call
     my $history = CTX('dbi')->select_hashes(
         from => 'workflow_history',
         columns => [ '*' ],

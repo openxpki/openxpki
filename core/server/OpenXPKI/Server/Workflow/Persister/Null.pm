@@ -5,7 +5,7 @@ use base qw( Workflow::Persister );
 use English;
 
 use OpenXPKI::Debug;
-
+use OpenXPKI::Random;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 
@@ -25,8 +25,7 @@ sub create_workflow {
 
     CTX('log')->workflow()->info("Created volatile workflow for type ".$workflow->type());
 
-
-    return 0;
+    return 'V'.OpenXPKI::Random->new()->get_random(15);
 }
 
 sub update_workflow {

@@ -310,7 +310,7 @@ if ($params{wfid}) {
     });
 
     if ($reply->{SERVICE_MSG} eq 'COMMAND') {
-        printf "Workflow created (ID: %d), State: %s\n", $reply->{PARAMS}->{workflow}->{id}, $reply->{PARAMS}->{workflow}->{state}
+        printf "Workflow created (ID: %s), State: %s\n", $reply->{PARAMS}->{workflow}->{id}, $reply->{PARAMS}->{workflow}->{state}
             unless(defined $params{json});
         dump_workflow( $reply );
     }
