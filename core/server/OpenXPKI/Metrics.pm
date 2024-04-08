@@ -237,7 +237,7 @@ sub _build_prom {
     $prom->declare('workflow_state_count', help => 'Number of workflows ending in given proc state' );
     $prom->declare('workflow_runtime_seconds', help => 'Total handling time for each wokflow');
     $prom->declare('process_count', help => 'Number of (currently) running processes');
-    if (self->do_histogram_metrics) {
+    if ($self->do_histogram_metrics) {
         $prom->declare('workflow_action_seconds', help => 'Time used to process the workflow action', buckets => [0.05, 0.25, 0.5, 1, 5, 10, 30 ]);
         $prom->declare('service_command_seconds', help => 'Historgram on comand execution times', buckets => [0.05, 0.25, 0.5, 1, 5, 10, 30 ]);
     }
