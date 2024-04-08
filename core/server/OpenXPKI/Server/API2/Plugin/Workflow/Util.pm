@@ -314,6 +314,9 @@ sub _run_activity {
 
     my $log = CTX('log')->workflow;
 
+    my $metric_id = CTX('metrics')->start('workflow_action_seconds',
+        { type => $wf->type, state => $wf->state, action => $ac }) if CTX('metrics')->do_histogram_metrics;
+
     # This is a hack to handle simple "autorun" actions which we use to
     # create a bypass around optional actions
     do {
@@ -340,6 +343,9 @@ sub _run_activity {
             $ac = $action[0];
         }
     } while($ac);
+
+    CTX('metrics')->stop($metric_id) if CTX('metrics')->do_histogram_metrics;
+
 }
 
 =head2 get_wf_info

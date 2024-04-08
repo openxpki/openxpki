@@ -567,16 +567,24 @@ sub __main_loop {
                 $sec = $self->interval_loop_run;
                 $slots_avail_count--;
                 OpenXPKI::Server::__set_process_name("watchdog (busy)");
+                CTX('metrics')->set('watchdog_slots_avail', $slots_avail_count);
             } else {
                 ##! 32: 'watchdog idle'
                 OpenXPKI::Server::__set_process_name("watchdog (idle)");
             }
             ##! 64: sprintf('watchdog sleeps %d secs', $sec)
 
-
             # Update status beacon in datapool if due
             if ($self->interval_status_update &&
                 ((time - $beacon->{last_update}) > $self->interval_status_update )) {
+
+                my $pids = OpenXPKI::Control::get_pids();
+                my $now = time()*1000;
+                foreach my $key ('watchdog','worker','workflow') {
+                    my $value = scalar @{$pids->{$key}};
+                    CTX('metrics')->set('process_count', $value, { scope => $key }, $now);
+                    $beacon->{'process_count_'.$key} = $value;
+                }
                 $beacon->{last_update} = time();
                 CTX('dbi')->start_txn;
                 ##! 64: $beacon

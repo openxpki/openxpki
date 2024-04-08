@@ -382,19 +382,25 @@ sub __do_init_terminal {
 }
 
 sub __do_init_metrics {
-    my $enabled = CTX('config')->get('system.server.metrics.enabled') ? 1 : 0;
+    my $enabled = CTX('config')->get(['system','metrics','enabled']) ? 1 : 0;
 
-    my $cache_conf = CTX('config')->get_hash('system.server.metrics.cache') // {};
+    my $topics = CTX('config')->get_hash(['system','metrics','topic']) // {};
+
+    my $cache_conf = CTX('config')->get_hash(['system','metrics','cache']) // {};
     my $cache_dir = $cache_conf->{dir}
         // File::Spec->catdir(
-            CTX('config')->get('system.server.tmpdir') // '/var/tmp',
+            CTX('config')->get(['system','server','tmpdir']) // '/var/tmp',
             'openxpki.metrics'
         );
-    my $cache_user  = $cache_conf->{user}  // CTX('config')->get('system.server.user') // $EUID;
-    my $cache_group = $cache_conf->{group} // CTX('config')->get('system.server.group') // (split ' ', $EGID)[0];
+    my $cache_user  = $cache_conf->{user}  // CTX('config')->get(['system','server','user']) // $EUID;
+    my $cache_group = $cache_conf->{group} // CTX('config')->get(['system','server','group']) // (split ' ', $EGID)[0];
+
+    CTX('log')->system->info("Running metrics service: $enabled");
 
     my $metrics = OpenXPKI::Metrics->new(
         enabled => $enabled,
+        histogram_metrics => ($enabled && $topics->{histogram}),
+        workflow_metrics =>  ($enabled && $topics->{workflow}),
         cache_dir => $cache_dir,
         cache_user => $cache_user,
         cache_group => $cache_group,

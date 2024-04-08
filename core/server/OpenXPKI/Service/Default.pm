@@ -647,14 +647,14 @@ sub __handle_COMMAND : PRIVATE {
         }
 
         Log::Log4perl::MDC->put('command_id', $id);
-        $metric_id = CTX('metrics')->start("service_command_seconds", { command => $command }) if CTX('metrics')->ready;
+        $metric_id = CTX('metrics')->start("service_command_seconds", { command => $command }) if CTX('metrics')->do_histogram_metrics;
 
         # execute command enclosed with DBI transaction
         CTX('dbi')->start_txn();
         $result = $api{$ident}->dispatch(command => $command, params => $params);
         CTX('dbi')->commit();
 
-        CTX('metrics')->stop($metric_id) if CTX('metrics')->ready;
+        CTX('metrics')->stop($metric_id) if ($metric_id);
 
         # reset timeout
         sig_alarm(0) if $sh;
@@ -664,7 +664,7 @@ sub __handle_COMMAND : PRIVATE {
     Log::Log4perl::MDC->put('rid', undef);
 
     if (my $error = $EVAL_ERROR) {
-        CTX('metrics')->stop($metric_id) if ($metric_id and CTX('metrics')->ready);
+        CTX('metrics')->stop($metric_id) if ($metric_id);
 
         # rollback DBI (should not matter as we throw exception anyway)
         CTX('dbi')->rollback();

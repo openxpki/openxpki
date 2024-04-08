@@ -259,14 +259,14 @@ sub pre_loop_hook {
     OpenXPKI::Server::Watchdog->start_or_reload(keep_parent_sigchld => $is_forking);
 
     # Start metrics server
-    if (CTX('config')->get('system.server.metrics.enabled')) {
+    if (CTX('config')->get(['system','metrics','enabled'])) {
         try {
-            my $agent = CTX('config')->get_hash('system.server.metrics.agent') // {};
+            my $agent = CTX('config')->get_hash(['system','metrics','agent']) // {};
             require OpenXPKI::Metrics::Prometheus; # this is EE code
             OpenXPKI::Metrics::Prometheus->start(
                 user  => $agent->{user}  // CTX('config')->get('system.server.user'),
                 group => $agent->{group} // CTX('config')->get('system.server.group'),
-                host  => $agent->{host}  // '*',
+                host  => $agent->{host}  // 'localhost',
                 port  => $agent->{port}  // 7070,
                 keep_parent_sigchld => $is_forking,
             );

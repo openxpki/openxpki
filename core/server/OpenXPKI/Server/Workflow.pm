@@ -25,7 +25,7 @@ use Feature::Compat::Try;
 
 
 my @PERSISTENT_FIELDS = qw( proc_state count_try wakeup_at reap_at archive_at );
-my @TRANSIENT_FIELDS = qw( persist_context is_startup );
+my @TRANSIENT_FIELDS = qw( persist_context is_startup created_at );
 __PACKAGE__->mk_accessors( @PERSISTENT_FIELDS, @TRANSIENT_FIELDS );
 
 
@@ -138,6 +138,7 @@ sub init {
         }
     } else {
         $self->is_startup(1);
+        $self->created_at(time);
     }
 
     # The condition cache bug also affects the get_action_fields method
@@ -242,6 +243,8 @@ sub execute_action {
     # so we just ignore any expcetions here
     if ($self->_has_paused()) {
         ##! 16: 'action paused'
+        CTX('metrics')->inc(workflow_state_count =>  { type => $self->type, state => 'paused' });
+
     } elsif ( $EVAL_ERROR ) {
 
         my $error = $EVAL_ERROR;
@@ -273,6 +276,7 @@ sub execute_action {
         # workflow engine makes recursive calls, rethrow the first exception
         # instead of cascading them
 
+        CTX('metrics')->inc(workflow_state_count =>  {  type => $self->type, state => 'exception' });
         $e = OpenXPKI::Exception->caught();
         if ( (ref $e eq 'OpenXPKI::Exception') &&
             ( $e->message_code() eq 'I18N_OPENXPKI_SERVER_WORKFLOW_ERROR_ON_EXECUTE') ) {
@@ -328,6 +332,17 @@ sub execute_action {
             $self->_set_proc_state('manual');
         } else {
             $self->_set_proc_state('finished');
+            # try to calculate the runtime
+            if ($self->id && CTX('metrics')->do_workflow_metrics) {
+                my $startup = $self->get_startup_time();
+                my $runtime = $startup ? (time - $startup) : 0;
+                my $labels = {
+                    type => $self->type,
+                    state => $self->state,
+                    id => $self->id,
+                };
+                CTX('metrics')->set('workflow_runtime_seconds' => $runtime, $labels, time()*1000);
+            }
         }
     }
 
@@ -622,6 +637,40 @@ sub get_global_actions {
 
     ##! 16: 'allowed actions: ' . join(', ', @allowed)
     return \@allowed;
+}
+
+
+=head2 get_startup_time
+
+Try to get the startup time for this workflow, this works only if the
+workflow ran within one step or uses the "History" persister
+
+=cut
+
+sub get_startup_time {
+
+    my $self = shift;
+
+    # if the workflow was "one shot" we have the startup time in the instance
+    my $startup = $self->created_at();
+
+    return $startup if ($startup);
+
+    return unless ($self->id);
+
+    # TODO - this duplicates code from the Persister / API
+    $startup = CTX('dbi')->select_value(
+        from => 'workflow_history',
+        columns => [ 'workflow_history_date' ],
+        where => { workflow_id => $self->id },
+        order_by => [ 'workflow_history_date' ],
+        limit => 1,
+    );
+
+    return unless ($startup);
+    # convert db timestamp to unixtime
+    return OpenXPKI::DateTime::parse_date_utc($startup)->epoch();
+
 }
 
 sub _handle_proc_state {

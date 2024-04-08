@@ -18,6 +18,24 @@ is implemented in L<OpenXPKI::Metrics::Prometheus>.
 
 I<Please note that metrics are a feature of OpenXPKI Enterprise Edition.>
 
+=head2 Configuration
+
+Configuration is done via I<system.metrics> with the following settings:
+
+  metrics:
+    enabled: 1
+    topic:
+      histogram: 1
+      workflow: 1
+
+    cache:
+      dir: /var/tmp/openxpki.metrics
+      user: openxpki
+      group: openxpki
+
+The only argument is required I<enabled>, the other parameters are
+passed to the build arguments described below.
+
 =cut
 
 # Core modules
@@ -49,6 +67,34 @@ has enabled => (
     is => 'ro',
     isa => 'Bool',
     required => 1,
+);
+
+=item * B<histogram_metrics> I<Bool> - whether histogram metrics sould be recorded.
+
+Records execution times of all service commands and all workflow
+actions in a histogram. This might have a significant impact on
+performance if enabled on loaded systems.
+
+=cut
+
+has histogram_metrics => (
+    is => 'ro',
+    isa => 'Bool',
+    reader => 'do_histogram_metrics',
+    default => 0,
+);
+
+=item * B<workflow_metrics> I<Bool> - whether workflow metrics sould be recorded.
+
+Record total execution time of each individual workflow.
+
+=cut
+
+has workflow_metrics => (
+    is => 'ro',
+    isa => 'Bool',
+    reader => 'do_workflow_metrics',
+    default => 0,
 );
 
 =item * B<cache_dir> I<Str> - path to the cache directory for L<Prometheus::Tiny::Shared>
@@ -128,7 +174,7 @@ has ready => (
     },
 );
 
-my $passthrough_methods = [ qw( set add inc dec clear histogram_observe enum_set declare format psgi ) ];
+my $passthrough_methods = [ qw( set add inc dec clear histogram_observe enum_set declare format ) ];
 
 has _prom => (
     is => 'rw',
@@ -184,6 +230,16 @@ sub _build_prom {
             $dir
         );
         $self->log->info("Ownership of metrics cache dir $dir set to $user:$group");
+    }
+
+    # add help texts and initialize histogram buckets
+    $prom->declare('workflow_create', help => 'Number of workflows created' );
+    $prom->declare('workflow_state_count', help => 'Number of workflows ending in given proc state' );
+    $prom->declare('workflow_runtime_seconds', help => 'Total handling time for each wokflow');
+    $prom->declare('process_count', help => 'Number of (currently) running processes');
+    if (self->do_histogram_metrics) {
+        $prom->declare('workflow_action_seconds', help => 'Time used to process the workflow action', buckets => [0.05, 0.25, 0.5, 1, 5, 10, 30 ]);
+        $prom->declare('service_command_seconds', help => 'Historgram on comand execution times', buckets => [0.05, 0.25, 0.5, 1, 5, 10, 30 ]);
     }
 
     return $prom;
@@ -397,10 +453,6 @@ See L<Prometheus::Tiny/declare>.
 Output the stored metrics, values, help text and types in the L<Prometheus exposition format|https://github.com/prometheus/docs/blob/master/content/docs/instrumenting/exposition_formats.md>.
 
 See L<Prometheus::Tiny/format>.
-
-=head2 psgi
-
-See L<Prometheus::Tiny/psgi>.
 
 =cut
 
