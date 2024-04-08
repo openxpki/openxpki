@@ -49,8 +49,10 @@ sub execute
 
     my $target_key = $self->param('target_key') || 'check_policy_key_duplicate';
 
+
+    my $ignore = $self->param('cert_identifier_ignore') || '';
     ##! 16: 'Search returned ' . Dumper $result
-    my @identifier = map {  $_->{identifier} } @{$result};
+    my @identifier = map {  ($_->{identifier} eq $ignore) ? () : $_->{identifier} } @{$result};
 
     if (@identifier) {
 
@@ -102,5 +104,10 @@ Context key to write the result to, default is check_policy_key_duplicate
 =item any_realm
 
 Boolean, search certificates globally, optional.
+
+=item cert_identifier_ignore
+
+Pass a single certificate identifier that is removed from the list in case
+it was found. This is useful to allow a key reuse on renewal.
 
 =back
