@@ -1268,7 +1268,7 @@ sub __render_field_redirect {
             $self->status->message($v->{label});
             $self->status->level($v->{level}) if $v->{level};
         }
-    } else {
+    } elsif ($item->{value}) {
         $self->redirect->to($item->{value});
     }
     return -1; # do not output this field
