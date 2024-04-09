@@ -5,7 +5,6 @@ use English;
 
 use Carp;
 use Socket;
-use Feature::Compat::Try;
 
 use Sys::SigAction qw( sig_alarm set_sig_handler );
 
@@ -211,11 +210,15 @@ sub talk {
 
     my $msg  = shift;
 
-    try {
+    # for whatever reason using try/catch here does NOT behave like the
+    # eval construct and causes the session reinit to end in an endless loop
+    eval {
         $self->_channel()->write(
             $self->_serializer()->serialize($msg)
         );
-    } catch ($error) {
+    };
+
+    if (my $error = $EVAL_ERROR) {
         OpenXPKI::Exception::Socket->throw(
             message => 'Error while writing to socket',
             socket => $self->socketfile(),
