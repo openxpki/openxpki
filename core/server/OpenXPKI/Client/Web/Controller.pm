@@ -47,10 +47,8 @@ sub index ($self) {
     die "Result of $class->handle_request() is not an instance of OpenXPKI::Client::Service::Response"
       unless $response->isa('OpenXPKI::Client::Service::Response');
 
-    # Custom HTTP headers
-    if ($service->config->{output}->{headers}) {
-        $self->res->headers->add($_ => $response->extra_headers->{$_}) for keys $response->extra_headers->%*;
-    }
+    # service specific HTTP headers
+    $self->res->headers->add($_ => $response->extra_headers->{$_}) for keys $response->extra_headers->%*;
 
     # TODO -- needs to be overwritten in CertEP - it always returns 200
     $self->res->code($response->http_status_code);
