@@ -18,6 +18,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_ACCOUNT_CONTACT_INFORMATION_LABEL"
 msgstr "実行"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ACCOUNT_ID_LABEL"
+msgstr "ワンタイムパスワード"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ACCOUNT_KEY_LABEL"
+msgstr "再試行"
+
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "リクエストされたアクションが見つかりません"
 
@@ -97,6 +105,14 @@ msgstr "選択拒否"
 
 msgid "I18N_OPENXPKI_UI_BULK_REJECT_CSR_LABEL"
 msgstr "選択拒否"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BUTTON_ACME_APPROVE_ACCOUNT_LABEL"
+msgstr "失効の承認"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BUTTON_ACME_REVOKE_ACCOUNT_LABEL"
+msgstr "実行"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_BY_IDENTIFIER_OR_SERIAL"
 msgstr ""
@@ -696,9 +712,6 @@ msgstr "指定された証明書識別子の形式が無効です。"
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_IN_FUTURE"
 msgstr "失効日に未来が指定されています。"
 
-msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
-msgstr "入力された日付/時刻を検証できませんでした。"
-
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_INVALID_CONTENT"
 msgstr "入力された失効日に無効なコンテンツがあります。"
 
@@ -785,9 +798,6 @@ msgstr "エクスポートする私有鍵にパスワードを設定します。
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_FILENAME_LABEL"
 msgstr "キーストアのダウンロード"
-
-msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
-msgstr "ダウンロードフォーマット"
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_DESC"
 msgstr ""
@@ -971,6 +981,10 @@ msgstr "4096 bit"
 
 msgid "I18N_OPENXPKI_UI_KEY_XX_YY"
 msgstr "ユーザー名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LAST_UPDATE_LABEL"
+msgstr "最終更新"
 
 msgid "I18N_OPENXPKI_UI_LOGIN_ABORT_BUTTON"
 msgstr "戻る"
@@ -1222,6 +1236,10 @@ msgstr "更新ドメインリスト"
 msgid "I18N_OPENXPKI_UI_NO"
 msgstr "いいえ"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NODE_STATUS_LIST"
+msgstr "オンライン"
+
 msgid "I18N_OPENXPKI_UI_NOTIFY_EXPIRY_NOT_RENEWED"
 msgstr "期限が切れました"
 
@@ -1398,6 +1416,14 @@ msgstr "システムに最も適したホスト名（ドメイン名）を入力
 msgid "I18N_OPENXPKI_UI_PROFILE_IMPORTED_LABEL"
 msgstr "RA/SCEPトークン"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_STYLE_DESC"
+msgstr "高度な入力スタイル"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_STYLE_LABEL"
+msgstr "拡張プロファイル（エキスパート）"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_LOCALITY_DESC"
 msgstr "国(countryName)"
 
@@ -1500,6 +1526,10 @@ msgstr "URI"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_URI_DESCRIPTION"
 msgstr "URI"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_SERIALNUMBER"
+msgstr "本名"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_STATE_DESC"
 msgstr "システムに最も適したホスト名（ドメイン名）を入力します。"
@@ -1783,6 +1813,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_SYSTEM_VERSION_STATUS_LABEL"
 msgstr "システムバージョン"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ACME_ACCOUNT_REQUEST_DESCRIPTION"
+msgstr "承認待ちの証明書リクエストが表示されます。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ACME_ACCOUNT_REQUEST_LABEL"
+msgstr "認証リクエスト"
+
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"
 msgstr "SCEP登録ワークフローは承認待ちです。"
 
@@ -1848,6 +1886,10 @@ msgstr "PKCS10リクエストを解析できません"
 
 msgid "I18N_OPENXPKI_UI_UNKNOWN_ERROR"
 msgstr "不明なエラー"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_UPTIME_LABEL"
+msgstr "CAレルム"
 
 msgid "I18N_OPENXPKI_UI_USER_ADD_USER"
 msgstr "ユーザーの追加"
@@ -2000,6 +2042,10 @@ msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_AUTHORITY_KEY_ID_MISMATCH_ERROR"
 msgstr "権限キーIDが一致しません。"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_CHAIN_VALIDATION_FAILED"
+msgstr "X509チェーンの検証に失敗しました。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_INVALID_INPUT"
 msgstr "X509チェーンの検証に失敗しました。"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_PARSE_ERROR"
@@ -3090,6 +3136,26 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_TOOLTIP"
 msgstr "実際に漏洩した日付が分かっている場合にのみ設定します。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_DESC"
+msgstr ""
+"証明書の識別子を入力するか、証明書の件名を入力すると、証明書を検索できます。"
+"フィールドの下に表示された結果を選択すると証明書が入力されます。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_LABEL"
+msgstr "証明書"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_PLACEHOLDER"
+msgstr "証明書の識別子を入力するか、件名を入力して自動検索を開始してください。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_TOOLTIP"
+msgstr ""
+"自動検索では、件名に特定の単語が含まれている証明書が検索され、下のドロップダ"
+"ウンリストに表示されます。リストから必要な証明書をクリックして選択します。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_REPLACE_LABEL"
 msgstr "更新"
@@ -4500,6 +4566,14 @@ msgstr "証明書のメタデータを変更します。"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_DOMAIN_VALIDATAION_LABEL"
 msgstr "メタデータの変更"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_NEWACCOUNT_DESC"
+msgstr "証明書を認証します。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_NEWACCOUNT_LABEL"
+msgstr "証明書の認証"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ADDUSER_DESC"
 msgstr "新しいユーザを追加する"
 
@@ -4816,6 +4890,12 @@ msgstr "はい"
 
 #~ msgid "I18N_OPENXPKI_UI_ERROR_NOT_CERTIFICATE_OWNER"
 #~ msgstr "証明書所有者のみがこの操作を実行できます"
+
+#~ msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
+#~ msgstr "入力された日付/時刻を検証できませんでした。"
+
+#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
+#~ msgstr "ダウンロードフォーマット"
 
 #~ msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST2001"
 #~ msgstr "GOST 2001"

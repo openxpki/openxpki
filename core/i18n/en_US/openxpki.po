@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2024-03-18 19:04+0100\n"
+"PO-Revision-Date: 2024-04-10 11:16+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -14,17 +14,14 @@ msgstr ""
 "X-Generator: Poedit 3.2.2\n"
 "X-Poedit-Bookmarks: -1,-1,77,-1,-1,-1,-1,-1,-1,-1\n"
 
-msgid "I18N_OPENXPKI_UI_NODE_STATUS_LIST"
-msgstr "Cluster Status"
-
-msgid "I18N_OPENXPKI_UI_UPTIME_LABEL"
-msgstr "Uptime"
-
-msgid "I18N_OPENXPKI_UI_LAST_UPDATE_LABEL"
-msgstr "Last Update"
-
 msgid "I18N_OPENXPKI_UI_ACCOUNT_CONTACT_INFORMATION_LABEL"
 msgstr "Contact Information"
+
+msgid "I18N_OPENXPKI_UI_ACCOUNT_ID_LABEL"
+msgstr "Account ID"
+
+msgid "I18N_OPENXPKI_UI_ACCOUNT_KEY_LABEL"
+msgstr "Account Key"
 
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "Requested action not found"
@@ -100,6 +97,12 @@ msgstr "Reject Selected"
 
 msgid "I18N_OPENXPKI_UI_BULK_REJECT_CSR_LABEL"
 msgstr "Reject Selected"
+
+msgid "I18N_OPENXPKI_UI_BUTTON_ACME_APPROVE_ACCOUNT_LABEL"
+msgstr "Approve Account"
+
+msgid "I18N_OPENXPKI_UI_BUTTON_ACME_REVOKE_ACCOUNT_LABEL"
+msgstr "Revoke Account"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_BY_IDENTIFIER_OR_SERIAL"
 msgstr ""
@@ -680,9 +683,6 @@ msgstr "The given certificate identifier has an invalid format."
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_IN_FUTURE"
 msgstr "The entered invalidity time is in the future."
 
-msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
-msgstr "The entered date/time could not be validated."
-
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_INVALID_CONTENT"
 msgstr "The entered invalidity time has invalid content."
 
@@ -764,9 +764,6 @@ msgstr "Export Password"
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_FILENAME_LABEL"
 msgstr "Keystore Download"
-
-msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
-msgstr "Download Format"
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_DESC"
 msgstr ""
@@ -953,6 +950,9 @@ msgstr "4096 bit"
 
 msgid "I18N_OPENXPKI_UI_KEY_XX_YY"
 msgstr "Username"
+
+msgid "I18N_OPENXPKI_UI_LAST_UPDATE_LABEL"
+msgstr "Last Update"
 
 msgid "I18N_OPENXPKI_UI_LOGIN_ABORT_BUTTON"
 msgstr "Abort"
@@ -1177,6 +1177,9 @@ msgstr "Update Domainlist"
 
 msgid "I18N_OPENXPKI_UI_NO"
 msgstr "No"
+
+msgid "I18N_OPENXPKI_UI_NODE_STATUS_LIST"
+msgstr "Cluster Status"
 
 msgid "I18N_OPENXPKI_UI_NOTIFY_EXPIRY_NOT_RENEWED"
 msgstr "expired"
@@ -1723,6 +1726,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_SYSTEM_VERSION_STATUS_LABEL"
 msgstr "System Version"
 
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ACME_ACCOUNT_REQUEST_DESCRIPTION"
+msgstr "ACME Account requests awaiting approval."
+
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ACME_ACCOUNT_REQUEST_LABEL"
+msgstr "ACME Account Registration"
+
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"
 msgstr "SCEP Enrollment workflows awaiting approval."
 
@@ -1785,6 +1794,9 @@ msgstr "Unable to parse PKCS10 request"
 
 msgid "I18N_OPENXPKI_UI_UNKNOWN_ERROR"
 msgstr "Unknown error"
+
+msgid "I18N_OPENXPKI_UI_UPTIME_LABEL"
+msgstr "Uptime"
 
 msgid "I18N_OPENXPKI_UI_USER_ADD_USER"
 msgstr "Add User"
@@ -3021,6 +3033,26 @@ msgstr "usually not required, use the selector on the right or type a datetime"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_TOOLTIP"
 msgstr "set this only if you know the implication!"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_DESC"
+msgstr ""
+"If known, you can enter the alphanumeric identifier of the certificate or "
+"just type the subject of the certificate to start a search. The results will "
+"be displayed below the field, select the expected one using the left mouse "
+"button. Note that the search function requires a minimum of three letters."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_LABEL"
+msgstr "Issuer"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_PLACEHOLDER"
+msgstr "Enter certificate identifier or type your subject to start autosearch!"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_TOOLTIP"
+msgstr ""
+"The autosearch will search for certificates that contain the given words in "
+"the subject and will show them in a drop down list below. Select the needed "
+"certificate from the list by clicking on it. Note that the search function "
+"requires a minimum of three letters."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_REPLACE_LABEL"
 msgstr "Is Replacement"
@@ -4448,6 +4480,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_DOMAIN_VALIDATAION_LABEL"
 msgstr "ACME Domain Validation"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_NEWACCOUNT_DESC"
+msgstr "Request registration of a new ACME user account"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_NEWACCOUNT_LABEL"
+msgstr "ACME Account Registration"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ADDUSER_DESC"
 msgstr "Add a new user"
 
@@ -4720,6 +4758,12 @@ msgstr "Yes"
 
 #~ msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
 #~ msgstr "Modify"
+
+#~ msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
+#~ msgstr "The entered date/time could not be validated."
+
+#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
+#~ msgstr "Download Format"
 
 #~ msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD"
 #~ msgstr "Encryption Password"

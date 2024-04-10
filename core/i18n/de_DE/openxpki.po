@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2023-11-27 14:54+0100\n"
+"PO-Revision-Date: 2024-04-10 11:15+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -11,11 +11,17 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 3.2.2\n"
 "X-Poedit-Bookmarks: -1,-1,77,-1,-1,-1,-1,-1,-1,-1\n"
 
 msgid "I18N_OPENXPKI_UI_ACCOUNT_CONTACT_INFORMATION_LABEL"
 msgstr "Kontaktinformationen"
+
+msgid "I18N_OPENXPKI_UI_ACCOUNT_ID_LABEL"
+msgstr "Nutzerkonto ID"
+
+msgid "I18N_OPENXPKI_UI_ACCOUNT_KEY_LABEL"
+msgstr "Nutzerkonto Schlüssel"
 
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "Die ausgewählte Aktion ist nicht verfügbar"
@@ -91,6 +97,12 @@ msgstr "Ausgewählte ablehnen"
 
 msgid "I18N_OPENXPKI_UI_BULK_REJECT_CSR_LABEL"
 msgstr "Ausgewählte ablehnen"
+
+msgid "I18N_OPENXPKI_UI_BUTTON_ACME_APPROVE_ACCOUNT_LABEL"
+msgstr "Nutzerkonto genehmigen"
+
+msgid "I18N_OPENXPKI_UI_BUTTON_ACME_REVOKE_ACCOUNT_LABEL"
+msgstr "Nutzerkonto sperren"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_BY_IDENTIFIER_OR_SERIAL"
 msgstr ""
@@ -666,9 +678,6 @@ msgstr "Der Zertifikats-Identifier hat ein ungültiges Format"
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_IN_FUTURE"
 msgstr "Der eingegebene Zeitpunkt liegt in der Zukunft!"
 
-msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
-msgstr "Die eingegebene Zeitangabe ist ungültig/nicht zulässig."
-
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_INVALID_CONTENT"
 msgstr "Die eingegebene Zeitangabe hat einen ungültigen Inhalt."
 
@@ -751,9 +760,6 @@ msgstr "Export-Passwort"
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_FILENAME_LABEL"
 msgstr "Keystore Download"
-
-msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
-msgstr "Download Format"
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_DESC"
 msgstr ""
@@ -941,6 +947,9 @@ msgstr "4096 Bit"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_KEY_XX_YY"
 msgstr "Key"
+
+msgid "I18N_OPENXPKI_UI_LAST_UPDATE_LABEL"
+msgstr "Letzte Änderung"
 
 msgid "I18N_OPENXPKI_UI_LOGIN_ABORT_BUTTON"
 msgstr "Abbrechen"
@@ -1167,6 +1176,9 @@ msgstr "Aktualisiere Domainliste"
 # Remove?
 msgid "I18N_OPENXPKI_UI_NO"
 msgstr "Nein"
+
+msgid "I18N_OPENXPKI_UI_NODE_STATUS_LIST"
+msgstr "Cluster Status"
 
 msgid "I18N_OPENXPKI_UI_NOTIFY_EXPIRY_NOT_RENEWED"
 msgstr "abgelaufen"
@@ -1721,6 +1733,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_SYSTEM_VERSION_STATUS_LABEL"
 msgstr "System Status"
 
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ACME_ACCOUNT_REQUEST_DESCRIPTION"
+msgstr "Nutzerkonten auf Genehmigung wartend"
+
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ACME_ACCOUNT_REQUEST_LABEL"
+msgstr "Anträge für ACME Nutzerkonten"
+
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"
 msgstr "Automatische Enrollments auf Genehmigung wartend"
 
@@ -1783,6 +1801,9 @@ msgstr "PKCS10 Container kann nicht gelesen werden"
 
 msgid "I18N_OPENXPKI_UI_UNKNOWN_ERROR"
 msgstr "Unbekannter Fehler"
+
+msgid "I18N_OPENXPKI_UI_UPTIME_LABEL"
+msgstr "Uptime"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_USER_ADD_USER"
@@ -3137,6 +3158,33 @@ msgstr "in der Regel nicht erforderlich"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_TOOLTIP"
 msgstr ""
 "Verwenden Sie diesen Wert nur, wenn Sie sich über die Folgen im Klaren sind."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_DESC"
+msgstr ""
+"Sie können direkt den alphanumerischen Zertifikatsidentifier eingeben oder "
+"einen Suchbegriff eintippen, um die Liste der Zertifikate zu durchsuchen. "
+"Die Ergebnisse werden unterhalb des Feldes als Liste angezeigt, wählen Sie "
+"das gewünschte per Mausklick aus. Die Suche beginnt nach der Eingabe von "
+"mindestens drei Zeichen."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_LABEL"
+msgstr "Zertifikat"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_PLACEHOLDER"
+msgstr ""
+"Geben Sie den Zertifikatsidentifier an oder tippen Sie für die automatische "
+"Suche."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_TOOLTIP"
+msgstr ""
+"Die automatische Vervollständigung durchsucht das vollständige Subject aller "
+"Zertifikate und zeigt die Treffer in einer Auswahlliste an. Wählen Sie "
+"anschließend den gewünschten Eintrag durch Anklicken. Die Suche beginnt nach "
+"der Eingabe von mindestens drei Zeichen."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_REPLACE_LABEL"
 msgstr "ist Erneuerung"
@@ -4653,6 +4701,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_DOMAIN_VALIDATAION_LABEL"
 msgstr "ACME Domain Validierung"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_NEWACCOUNT_DESC"
+msgstr "Registrierung eines neuen Nutzerkontos für ACME."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_NEWACCOUNT_LABEL"
+msgstr "ACME Antrag für Nutzerkonto"
+
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ADDUSER_DESC"
 msgstr ""
@@ -4930,6 +4984,12 @@ msgstr "ja"
 
 #~ msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
 #~ msgstr "Ändern"
+
+#~ msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
+#~ msgstr "Die eingegebene Zeitangabe ist ungültig/nicht zulässig."
+
+#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
+#~ msgstr "Download Format"
 
 #~ msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD"
 #~ msgstr "Schlüsselpasswort"

@@ -22,6 +22,14 @@ msgid "I18N_OPENXPKI_UI_ACCOUNT_CONTACT_INFORMATION_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_ACCOUNT_ID_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ACCOUNT_KEY_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "Тестировщик"
 
@@ -125,6 +133,14 @@ msgstr "Отклонить заявку на отзыв сертификата"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_BULK_REJECT_CSR_LABEL"
 msgstr "Отклонить заявку на сертификат"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BUTTON_ACME_APPROVE_ACCOUNT_LABEL"
+msgstr "Утвердить заявку на отзыв сертификата (CRR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BUTTON_ACME_REVOKE_ACCOUNT_LABEL"
+msgstr "Родительский технологический процесс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_BY_IDENTIFIER_OR_SERIAL"
@@ -855,10 +871,6 @@ msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_IN_FUTURE"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
-msgstr "SPKAC-строка пуста."
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_INVALID_CONTENT"
 msgstr "SPKAC-строка пуста."
 
@@ -971,10 +983,6 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_FILENAME_LABEL"
 msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
-msgstr "Профиль пользователя"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_DESC"
@@ -1229,6 +1237,10 @@ msgstr "Длина ключа"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_KEY_XX_YY"
 msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LAST_UPDATE_LABEL"
+msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_LOGIN_ABORT_BUTTON"
@@ -1538,6 +1550,10 @@ msgid "I18N_OPENXPKI_UI_NO"
 msgstr "Имя учетной записи"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_NODE_STATUS_LIST"
+msgstr "Недействителен"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_NOTIFY_EXPIRY_NOT_RENEWED"
 msgstr "Отозван"
 
@@ -1796,6 +1812,14 @@ msgid "I18N_OPENXPKI_UI_PROFILE_IMPORTED_LABEL"
 msgstr "Профиль TLS сервера "
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_STYLE_DESC"
+msgstr "Расширенный профиль"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_STYLE_LABEL"
+msgstr "Расширенный профиль"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_LOCALITY_DESC"
 msgstr ""
 "Используйте данный профиль сертификата только если Вы отчетливо "
@@ -1959,6 +1983,10 @@ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_URI_DESCRIPTION"
 msgstr ""
 "Параметр URI (Uniform Resource Identifier) представляет собой адрес или "
 "ссылку на источник информации. Например: www.openxpki.org/~testuser."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_SERIALNUMBER"
+msgstr "Имя"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_STATE_DESC"
@@ -2317,6 +2345,14 @@ msgid "I18N_OPENXPKI_UI_SYSTEM_VERSION_STATUS_LABEL"
 msgstr "Статус"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ACME_ACCOUNT_REQUEST_DESCRIPTION"
+msgstr "Описания пока нет"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ACME_ACCOUNT_REQUEST_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"
 msgstr "Прием заявок на сертификаты по протоколу SCEP"
 
@@ -2404,6 +2440,10 @@ msgstr "SPKAC-строка пуста."
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_UNKNOWN_ERROR"
 msgstr "Пауза"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_UPTIME_LABEL"
+msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_USER_ADD_USER"
@@ -2605,6 +2645,10 @@ msgstr "SPKAC-строка пуста."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_CHAIN_VALIDATION_FAILED"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_INVALID_INPUT"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
@@ -3945,6 +3989,22 @@ msgstr "SPKAC-строка пуста."
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_TOOLTIP"
 msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_DESC"
+msgstr "Отклонить заявку на сертификат"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_LABEL"
+msgstr "Идентификатор сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_PLACEHOLDER"
+msgstr "Отклонить заявку на сертификат"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_TOOLTIP"
+msgstr "Идентификатор сертификата"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_REPLACE_LABEL"
@@ -5724,6 +5784,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_DOMAIN_VALIDATAION_LABEL"
 msgstr "Пауза"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_NEWACCOUNT_DESC"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_NEWACCOUNT_LABEL"
+msgstr "Технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ADDUSER_DESC"
 msgstr "Дочерние технологические процессы"
 
@@ -6053,6 +6121,14 @@ msgstr "Имя учетной записи"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
+#~ msgstr "Профиль пользователя"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
+#~ msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
 #~ msgstr "Профиль пользователя"
 
 #, fuzzy

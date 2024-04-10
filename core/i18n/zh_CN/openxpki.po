@@ -19,6 +19,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_ACCOUNT_CONTACT_INFORMATION_LABEL"
 msgstr "操作"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ACCOUNT_ID_LABEL"
+msgstr "技术日志"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ACCOUNT_KEY_LABEL"
+msgstr "重试次数"
+
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "找不到请求的动作"
 
@@ -106,6 +114,14 @@ msgstr "拒绝选择"
 
 msgid "I18N_OPENXPKI_UI_BULK_REJECT_CSR_LABEL"
 msgstr "拒绝选择"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BUTTON_ACME_APPROVE_ACCOUNT_LABEL"
+msgstr "批准吊销"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BUTTON_ACME_REVOKE_ACCOUNT_LABEL"
+msgstr "操作"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_BY_IDENTIFIER_OR_SERIAL"
 msgstr ""
@@ -714,9 +730,6 @@ msgstr "给定的证书标识符格式无效。"
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_IN_FUTURE"
 msgstr "输入的失效时间在未来。"
 
-msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
-msgstr "输入的日期/时间无法验证。"
-
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_INVALID_CONTENT"
 msgstr "输入的失效时间包含无效内容。"
 
@@ -814,9 +827,6 @@ msgstr "导出密码"
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_FILENAME_LABEL"
 msgstr "密钥库下载"
-
-msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
-msgstr "下载格式"
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_DESC"
 msgstr "密钥库的格式，大多数应用程序使用PKCS12容器。"
@@ -999,6 +1009,10 @@ msgstr "4096 bit"
 
 msgid "I18N_OPENXPKI_UI_KEY_XX_YY"
 msgstr "用户名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LAST_UPDATE_LABEL"
+msgstr "最后更新"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_LOGIN_ABORT_BUTTON"
@@ -1271,6 +1285,10 @@ msgid "I18N_OPENXPKI_UI_NO"
 msgstr "不"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_NODE_STATUS_LIST"
+msgstr "在线"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_NOTIFY_EXPIRY_NOT_RENEWED"
 msgstr "提出一个<b>证书续订请求</b>。"
 
@@ -1468,6 +1486,14 @@ msgid "I18N_OPENXPKI_UI_PROFILE_IMPORTED_LABEL"
 msgstr "人员（安全电子邮件/身份验证）"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_STYLE_DESC"
+msgstr "高级命名方式"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_STYLE_LABEL"
+msgstr "扩展命名（仅限专家使用）"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_LOCALITY_DESC"
 msgstr "国家"
 
@@ -1574,6 +1600,10 @@ msgstr "URI"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_URI_DESCRIPTION"
 msgstr "URI"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_SERIALNUMBER"
+msgstr "真名"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_STATE_DESC"
@@ -1853,6 +1883,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_SYSTEM_VERSION_STATUS_LABEL"
 msgstr "系统版本"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ACME_ACCOUNT_REQUEST_DESCRIPTION"
+msgstr "证书申请正在等待批准。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ACME_ACCOUNT_REQUEST_LABEL"
+msgstr "证书请求"
+
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"
 msgstr "SCEP注册工作流程正在等待批准。"
 
@@ -1918,6 +1956,10 @@ msgstr "无法解析PKCS10请求"
 
 msgid "I18N_OPENXPKI_UI_UNKNOWN_ERROR"
 msgstr "未知错误"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_UPTIME_LABEL"
+msgstr "CA域"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_USER_ADD_USER"
@@ -2085,6 +2127,10 @@ msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_AUTHORITY_KEY_ID_MISMATCH_ERROR"
 msgstr "授权密钥ID不匹配"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_CHAIN_VALIDATION_FAILED"
+msgstr "链无法验证"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_INVALID_INPUT"
 msgstr "链无法验证"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_PARSE_ERROR"
@@ -3211,6 +3257,27 @@ msgstr "通常不需要，请使用右侧的选择器或输入日期时间"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_TOOLTIP"
 msgstr "仅当您知道含义时才设置此值！"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_DESC"
+msgstr ""
+"如果知道，则可以输入证书的字母数字标识符，或者只需键入证书的主题即可开始搜"
+"索。 结果将显示在字段下方，使用鼠标左键选择所需的结果。 请注意，搜索功能至少"
+"需要三个字母。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_LABEL"
+msgstr "证书"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_PLACEHOLDER"
+msgstr "输入证书标识符或键入您的主题以开始自动搜索！"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_TOOLTIP"
+msgstr ""
+"自动搜索将搜索主题中包含给定单词的证书，并将其显示在下面的下拉列表中。 通过单"
+"击从列表中选择所需的证书。 请注意，搜索功能至少需要三个字母。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_REPLACE_LABEL"
 msgstr "是替换"
@@ -4648,6 +4715,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_DOMAIN_VALIDATAION_LABEL"
 msgstr "更改元数据"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_NEWACCOUNT_DESC"
+msgstr "将证书信息发布到已定义的存储库。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_NEWACCOUNT_LABEL"
+msgstr "发布证书"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ADDUSER_DESC"
 msgstr ""
 "该工作流程已暂停，稍后将由系统继续。 您可以在下面找到有关暂停原因和计划的唤醒"
@@ -4938,6 +5013,12 @@ msgstr "是"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
 #~ msgstr "用户名"
+
+#~ msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
+#~ msgstr "输入的日期/时间无法验证。"
+
+#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
+#~ msgstr "下载格式"
 
 #~ msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD"
 #~ msgstr "加密密码"
