@@ -567,7 +567,7 @@ sub handle_workflow {
             ($params->{use_lock} ? (use_lock => $params->{use_lock}) : ()),
         });
 
-        $self->logger->debug(sprintf("Workflow '%s' created: id = %d, state = %s",
+        $self->logger->debug(sprintf("Workflow '%s' created: id = %s, state = %s",
             $wf_type, $reply->{workflow}->{id}, $reply->{workflow}->{state}));
 
     } else {
