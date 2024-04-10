@@ -172,9 +172,9 @@ command "create_workflow_instance" => {
     my $creator = CTX('session')->data->user;
 
     # workflow_id is a virtual key that is added by the Context on init so
-    # it does not exist in the fresh context after creation, fixes #442
-    # we set it directly to prevent triggering any "on update" methods
-    # only set this on non-volatile workflows (numeric ids)
+    # it does not exist in the fresh context after creation, fixes #442.
+    # We set it directly to prevent triggering any "on update" methods.
+    # Only set this on non-volatile workflows (numeric ids).
     $context->{PARAMS}{'workflow_id'} = $id if ($id =~ m{\A\d+\z});
 
     # same for creator
