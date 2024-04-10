@@ -24,6 +24,7 @@ Configuration is done via I<system.metrics> with the following settings:
 
   metrics:
     enabled: 1
+
     topic:
       histogram: 1
       workflow: 1
@@ -33,7 +34,7 @@ Configuration is done via I<system.metrics> with the following settings:
       user: openxpki
       group: openxpki
 
-The only argument is required I<enabled>, the other parameters are
+The only required argument is I<enabled>, the other parameters are
 passed to the build arguments described below.
 
 =cut
@@ -69,7 +70,7 @@ has enabled => (
     required => 1,
 );
 
-=item * B<histogram_metrics> I<Bool> - whether histogram metrics sould be recorded.
+=item * B<histogram_metrics> I<Bool> - whether histogram metrics should be recorded.
 
 Records execution times of all service commands and all workflow
 actions in a histogram. This might have a significant impact on
@@ -84,7 +85,7 @@ has histogram_metrics => (
     default => 0,
 );
 
-=item * B<workflow_metrics> I<Bool> - whether workflow metrics sould be recorded.
+=item * B<workflow_metrics> I<Bool> - whether workflow metrics should be recorded.
 
 Record total execution time of each individual workflow.
 
