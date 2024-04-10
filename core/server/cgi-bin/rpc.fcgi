@@ -147,14 +147,16 @@ sub send_output {
 
     if ($ENV{'HTTP_ACCEPT'} && $ENV{'HTTP_ACCEPT'} eq 'text/plain') {
        print $cgi->header( -type => 'text/plain', charset => 'utf8', -status => $status, %retry_head );
-       if ($result->{error}) {
-           print 'error.code=' . $result->{error}->{code}."\n";
-           print 'error.message=' . $result->{error}->{message}."\n";
-       } elsif ($result->{result}) {
-           print 'id=' . $result->{result}->{id}."\n";
-           print 'state=' . $result->{result}->{state}."\n";
-           print 'retry_after=' . $result->{result}->{retry_after} ."\n" if ($result->{result}->{retry_after});
-           map { printf "data.%s=%s\n", $_, $result->{result}->{data}->{$_} } keys %{$result->{result}->{data}} if ($result->{result}->{data});
+       if (my $e = $result->{error}) {
+           print 'error.code=' . $e->{code}."\n";
+           print 'error.message=' . $e->{message}."\n";
+           map { printf "data.%s=%s\n", $_, $e->{data}->{$_} } keys $e->{data}->%* if $e->{data};
+
+       } elsif (my $s = $result->{result}) {
+           print 'id=' . $s->{id}."\n";
+           print 'state=' . $s->{state}."\n";
+           print 'retry_after=' . $s->{retry_after} ."\n" if $s->{retry_after};
+           map { printf "data.%s=%s\n", $_, $s->{data}->{$_} } keys $s->{data}->%* if $s->{data};
        }
 
     } else {
