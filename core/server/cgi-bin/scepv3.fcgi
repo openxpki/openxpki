@@ -40,7 +40,7 @@ while (my $cgi = CGI::Fast->new("")) {
 
     my $operation = $req->url->query->param('operation') || '';
 
-    if ($operation !~ m{\A(PKIOperation|GetCert(Initial)?|GetCRL|Get(Next)?CACert|GetCACaps)\z}) {
+    if ($operation !~ m{\A(PKIOperation|GetCert(Initial)?|CertPoll|GetCRL|Get(Next)?CACert|GetCACaps)\z}) {
         print $cgi->header( -status => '400 Bad Request', -type => 'text/plain');
         print "Invalid operation\n";
         $log->error('Invalid operation ' . $operation);
@@ -101,8 +101,7 @@ while (my $cgi = CGI::Fast->new("")) {
                 $log->info('Unable to extract signer certficate');
                 die OpenXPKI::Client::Service::Response->new_error ( 40001 );
             # Enrollment request
-            } elsif ($client->message_type =~ m{(PKCSReq|RenewalReq|GetCertInitial)}) {
-                # TODO - improve handling of GetCertInitial and RenewalReq
+            } elsif ($client->message_type =~ m{(PKCSReq|RenewalReq|GetCertInitial|CertPoll)}) {
                 $log->debug("Handle enrollment");
                 $client->operation($operation);
                 return $client->handle_enrollment_request;

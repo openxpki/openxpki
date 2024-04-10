@@ -98,6 +98,19 @@ sub send_response ($self, $c, $response) {
 
 # required by OpenXPKI::Client::Service::Role::Base
 sub op_handlers {
+    # PKIOperation
+    #    Message types:
+    #    - PKCSReq          https://www.rfc-editor.org/rfc/rfc8894.html#section-4.3
+    #    - RenewalReq       https://www.rfc-editor.org/rfc/rfc8894.html#section-4.3
+    #    - CertPoll         https://www.rfc-editor.org/rfc/rfc8894.html#section-4.4
+    #                       https://www.rfc-editor.org/rfc/rfc8894.html#section-3.3.3
+    #                       >> For unknown reasons, it was referred to as "GetCertInitial"
+    #                       >> in earlier draft versions of this specification."
+    #    - GetCert          https://www.rfc-editor.org/rfc/rfc8894.html#section-4.5
+    #    - GetCRL           https://www.rfc-editor.org/rfc/rfc8894.html#section-2.7
+    # GetCACert             https://www.rfc-editor.org/rfc/rfc8894.html#section-4.2
+    # GetCACaps             https://www.rfc-editor.org/rfc/rfc8894.html#section-3.5
+    # GetNextCACert         https://www.rfc-editor.org/rfc/rfc8894.html#section-4.7
     return [
         'PKIOperation' => sub ($self) {
             my $message;
@@ -163,9 +176,9 @@ sub op_handlers {
 
                 return $self->handle_enrollment_request;
 
-            # Enrollment request
-            # TODO - improve handling of GetCertInitial
-            } elsif ($self->message_type eq 'GetCertInitial') {
+            # Enrollment request (CertPoll, formerly known as GetCertInitial)
+            # TODO - improve handling of CertPoll (GetCertInitial)
+            } elsif (any { $self->message_type eq $_ } qw( CertPoll GetCertInitial )) {
                 $self->add_wf_param(
                     transaction_id => $self->transaction_id,
                     signer_cert => $self->signer,
@@ -227,7 +240,7 @@ sub fcgi_set_custom_wf_params ($self) {
             $self->add_wf_param(_url_params => $extra);
         }
 
-    } elsif ($self->message_type eq 'GetCertInitial') {
+    } elsif (any { $self->message_type eq $_ } qw( CertPoll GetCertInitial )) {
         $self->add_wf_param(
             transaction_id => $self->transaction_id,
             signer_cert => $self->signer,
