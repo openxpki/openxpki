@@ -1568,7 +1568,7 @@ sub __get_breadcrumb {
     if ($wf_info->{workflow}->{id}) {
         return {
             class => 'workflow-type' ,
-            label => sprintf("%s (#%01d)", $wf_info->{workflow}->{title}, $wf_info->{workflow}->{id})
+            label => sprintf("%s #%01d", $wf_info->{workflow}->{title}, $wf_info->{workflow}->{id})
         };
     }
     if ($wf_info->{workflow}->{state} eq 'INITIAL') {
