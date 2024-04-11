@@ -28,6 +28,7 @@ port = $(or $(word 2,$(subst :, ,$(call strip_proto,$1))),$(value 2))
 #
 MANAGER_OPTS_BUILD =
 MANAGER_OPTS_RUN =
+MANAGER_OPTS_RUN_VERDACCIO =
 # "shell bash -c ..."" is required to support both:
 # systems where "command" is a binary and those where it's a shell builtin
 ifneq (, $(shell bash -c 'command -v telnet'))
@@ -40,10 +41,11 @@ endif
 ifneq (, $(shell bash -c 'command -v podman'))
 	MANAGER = podman
 	MANAGER_OPTS_RUN += --network host
+	MANAGER_OPTS_RUN_VERDACCIO += --user root
 #	MANAGER_OPTS = --network slirp4netns:allow_host_loopback=true
 else
 	MANAGER = docker
-	MANAGER_OPTS_RUN += --network host --user `id -u`:`id -g`
+	MANAGER_OPTS_RUN += --network host --user $(shell id -u):$(shell id -g)
 #	MANAGER_OPTS = --add-host host.containers.internal:host-gateway
 endif
 
@@ -141,7 +143,7 @@ npm-cache: NPM_CACHE_DIR := $(abspath ./verdaccio-npm-cache)
 npm-cache: MOUNT_OPT := $(shell if [ -d $(NPM_CACHE_DIR) ]; then a="y"; else read -r -p "Store cache on host [y/N]? " a; fi; if [ "$$a" = "y" -o "$$a" = "j" ]; then echo "-v \"$(NPM_CACHE_DIR):/verdaccio/storage\""; else echo ""; fi)
 npm-cache: ## run local NPM cache "verdaccio" (will be used by containers)
 	@if [ -n "$(MOUNT_OPT)" ]; then mkdir -p "$(NPM_CACHE_DIR)"; fi
-	$(MANAGER) run $(MANAGER_OPTS_RUN) -ti --rm \
+	$(MANAGER) run $(MANAGER_OPTS_RUN) $(MANAGER_OPTS_RUN_VERDACCIO) -ti --rm \
 	  --name verdaccio \
 	  -e "VERDACCIO_PORT=$(call port,$(NPM_CUSTOM_REGISTRY))" \
 	  $(MOUNT_OPT) \
