@@ -66,8 +66,8 @@ devDependencies:
     specifier: ^6.1.0
     version: 6.1.0(@babel/core@7.23.7)(@glimmer/component@1.1.2)(@glimmer/tracking@1.1.2)(ember-source@5.5.0)(webpack@5.89.0)
   ember-cli:
-    specifier: ^5.5.0
-    version: 5.5.0(react@18.2.0)
+    specifier: ^5.7.0
+    version: 5.7.0(react@18.2.0)
   ember-cli-babel:
     specifier: ^8.2.0
     version: 8.2.0(@babel/core@7.23.7)
@@ -76,7 +76,7 @@ devDependencies:
     version: 3.0.0
   ember-cli-dependency-checker:
     specifier: ^3.3.2
-    version: 3.3.2(ember-cli@5.5.0)
+    version: 3.3.2(ember-cli@5.7.0)
   ember-cli-head:
     specifier: ^2.0.0
     version: 2.0.0
@@ -4972,7 +4972,7 @@ packages:
       promise-inflight: 1.0.1
       rimraf: 3.0.2
       ssri: 9.0.1
-      tar: 6.2.0
+      tar: 6.2.1
       unique-filename: 2.0.1
     transitivePeerDependencies:
       - bluebird
@@ -6264,14 +6264,14 @@ packages:
       - supports-color
     dev: true
 
-  /ember-cli-dependency-checker@3.3.2(ember-cli@5.5.0):
+  /ember-cli-dependency-checker@3.3.2(ember-cli@5.7.0):
     resolution: {integrity: sha512-PwkrW5oYsdPWwt+0Tojufmv/hxVETTjkrEdK7ANQB2VSnqpA5UcYubwpQM9ONuR2J8wyNDMwEHlqIrk/FYtBsQ==}
     engines: {node: '>= 6'}
     peerDependencies:
       ember-cli: ^3.2.0 || >=4.0.0
     dependencies:
       chalk: 2.4.2
-      ember-cli: 5.5.0(react@18.2.0)
+      ember-cli: 5.7.0(react@18.2.0)
       find-yarn-workspace-root: 1.2.1
       is-git-url: 1.0.0
       resolve: 1.22.4
@@ -6556,8 +6556,8 @@ packages:
       - supports-color
     dev: true
 
-  /ember-cli@5.5.0(react@18.2.0):
-    resolution: {integrity: sha512-D3Q+mq5yOpZB1pJu4aOnVj5+LTwXmd5sJhXqZxc9Y0JFRYinl4h0HHGUMUvtV7obo811gf13ObDAaUmSfVPQbQ==}
+  /ember-cli@5.7.0(react@18.2.0):
+    resolution: {integrity: sha512-MKHVcRpDk1ENUCCRGGqZ8yfkCsszvSUbwO09h14vqcfaqcJkOWI+p0oynmdZQMM8OkZp484oLe3+CZCsXO9LfA==}
     engines: {node: '>= 18'}
     hasBin: true
     dependencies:
@@ -8766,9 +8766,9 @@ packages:
       '@types/glob': 7.2.0
       array-union: 2.1.0
       dir-glob: 3.0.1
-      fast-glob: 3.3.1
+      fast-glob: 3.3.2
       glob: 7.2.3
-      ignore: 5.2.4
+      ignore: 5.3.0
       merge2: 1.4.1
       slash: 3.0.0
     dev: true
@@ -9353,8 +9353,12 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /ip@2.0.0:
-    resolution: {integrity: sha512-WKa+XuLG1A1R0UWhl2+1XQSi+fZWMsYKffMZTTYsiZaUD8k2yDAj5atimTUD2TZkyCkNEeYE5NhFZmupOGtjYQ==}
+  /ip-address@9.0.5:
+    resolution: {integrity: sha512-zHtQzGojZXTwZTHQqra+ETKd4Sn3vgi7uBmlPoXVWZqYvuKmtI0l/VZTjqGmJY9x88GGOaZ9+G9ES8hC4T4X8g==}
+    engines: {node: '>= 12'}
+    dependencies:
+      jsbn: 1.1.0
+      sprintf-js: 1.1.3
     dev: true
 
   /ipaddr.js@1.9.1:
@@ -9799,6 +9803,10 @@ packages:
     resolution: {integrity: sha512-6n4D8gLlLf1n5mNLQPRfViYzu9RATblzPEtm1SthMX1Pjao0r9YI9nw7ZIfRxQMERS87mcswrg+r/OYrPRX6jA==}
     dependencies:
       xmlcreate: 2.0.4
+    dev: true
+
+  /jsbn@1.1.0:
+    resolution: {integrity: sha512-4bYVV3aAMtDTTu4+xsDYa6sy9GyJ69/amsu9sYF2zqjiEoZA5xJi3BrfX3uY+/IekIu7MwdObdbDWpoZdBv3/A==}
     dev: true
 
   /jsdoc@4.0.2:
@@ -10860,7 +10868,7 @@ packages:
       npmlog: 6.0.2
       rimraf: 3.0.2
       semver: 7.5.4
-      tar: 6.2.0
+      tar: 6.2.1
       which: 2.0.2
     transitivePeerDependencies:
       - bluebird
@@ -11396,7 +11404,7 @@ packages:
       read-package-json-fast: 2.0.3
       rimraf: 3.0.2
       ssri: 9.0.1
-      tar: 6.2.0
+      tar: 6.2.1
     transitivePeerDependencies:
       - bluebird
       - supports-color
@@ -12748,16 +12756,16 @@ packages:
     dependencies:
       agent-base: 6.0.2(supports-color@8.1.1)
       debug: 4.3.4(supports-color@8.1.1)
-      socks: 2.7.1
+      socks: 2.8.3
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /socks@2.7.1:
-    resolution: {integrity: sha512-7maUZy1N7uo6+WVEX6psASxtNlKaNVMlGQKkG/63nEDdLOWNbiUMoLK7X4uYoLhQstau72mLgfEWcXcwsaHbYQ==}
-    engines: {node: '>= 10.13.0', npm: '>= 3.0.0'}
+  /socks@2.8.3:
+    resolution: {integrity: sha512-l5x7VUUWbjVFbafGLxPWkYsHIhEvmF85tbIeFZWc8ZPtoMyybuEhL7Jye/ooC4/d48FgOjSJXgsF/AJPYCW8Zw==}
+    engines: {node: '>= 10.0.0', npm: '>= 3.0.0'}
     dependencies:
-      ip: 2.0.0
+      ip-address: 9.0.5
       smart-buffer: 4.2.0
     dev: true
 
@@ -12861,22 +12869,22 @@ packages:
     resolution: {integrity: sha512-kN9dJbvnySHULIluDHy32WHRUu3Og7B9sbY7tsFLctQkIqnMh3hErYgdMjTYuqmcXX+lK5T1lnUt3G7zNswmZA==}
     dependencies:
       spdx-expression-parse: 3.0.1
-      spdx-license-ids: 3.0.13
+      spdx-license-ids: 3.0.17
     dev: true
 
-  /spdx-exceptions@2.3.0:
-    resolution: {integrity: sha512-/tTrYOC7PPI1nUAgx34hUpqXuyJG+DTHJTnIULG4rDygi4xu/tfgmq1e1cIRwRzwZgo4NLySi+ricLkZkw4i5A==}
+  /spdx-exceptions@2.5.0:
+    resolution: {integrity: sha512-PiU42r+xO4UbUS1buo3LPJkjlO7430Xn5SVAhdpzzsPHsjbYVflnnFdATgabnLude+Cqu25p6N+g2lw/PFsa4w==}
     dev: true
 
   /spdx-expression-parse@3.0.1:
     resolution: {integrity: sha512-cbqHunsQWnJNE6KhVSMsMeH5H/L9EpymbzqTQ3uLwNCLZ1Q481oWaofqH7nO6V07xlXwY6PhQdQ2IedWx/ZK4Q==}
     dependencies:
-      spdx-exceptions: 2.3.0
-      spdx-license-ids: 3.0.13
+      spdx-exceptions: 2.5.0
+      spdx-license-ids: 3.0.17
     dev: true
 
-  /spdx-license-ids@3.0.13:
-    resolution: {integrity: sha512-XkD+zwiqXHikFZm4AX/7JSCXA98U5Db4AFd5XUg/+9UNtnH75+Z9KxtpYiJZx36mUDVOwH83pl7yvCer6ewM3w==}
+  /spdx-license-ids@3.0.17:
+    resolution: {integrity: sha512-sh8PWc/ftMqAAdFiBu6Fy6JUOYjqDJBJvIhpfDMyHrr0Rbp5liZqd4TjtQ/RgfLjKFZb+LMx5hpml5qOWy0qvg==}
     dev: true
 
   /split-string@3.1.0:
@@ -12892,6 +12900,10 @@ packages:
 
   /sprintf-js@1.1.2:
     resolution: {integrity: sha512-VE0SOVEHCk7Qc8ulkWw3ntAzXuqf7S2lvwQaDLRnUeIEaKNQJzV6BwmLKhOqT61aGhfUMrXeaBk+oDGCzvhcug==}
+    dev: true
+
+  /sprintf-js@1.1.3:
+    resolution: {integrity: sha512-Oo+0REFV59/rz3gfJNKQiBlwfHaSESl1pcGyABQsnnIfWOFt6JNj5gCog2U6MLZ//IGYD+nA8nI+mTShREReaA==}
     dev: true
 
   /sri-toolbox@0.2.0:
@@ -13285,8 +13297,8 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-  /tar@6.2.0:
-    resolution: {integrity: sha512-/Wo7DcT0u5HUV486xg675HtjNd3BXZ6xDbzsCUZPt5iw8bTQ63bP0Raut3mvro9u+CUyq7YQd8Cx55fsZXxqLQ==}
+  /tar@6.2.1:
+    resolution: {integrity: sha512-DZ4yORTwrbTj/7MZYq2w+/ZFdI6OZ/f9SFHR+71gIVUZhOQPHzVCLpvRnPgyaMpfWxxk/4ONva3GQSyNIKRv6A==}
     engines: {node: '>=10'}
     dependencies:
       chownr: 2.0.0
