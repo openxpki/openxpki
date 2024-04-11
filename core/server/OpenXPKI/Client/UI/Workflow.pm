@@ -268,7 +268,7 @@ sub __render_from_workflow {
         my $wf_action_info = $wf_info->{activity}->{ $wf_action };
 
         $self->set_page(
-            label => sprintf('%s - #%s', $self->__get_proc_state_label($wf_proc_state), $wf_id), # reuse labels from init_info popup
+            label => $self->__get_proc_state_label($wf_proc_state), # reuse labels from init_info popup
             breadcrumb => $self->__get_breadcrumb($wf_info, $wf_info->{state}->{label}),
             description => $irregular{$wf_proc_state},
             css_class => 'workflow workflow-proc-state workflow-proc-'.$wf_proc_state,
@@ -421,11 +421,7 @@ sub __render_from_workflow {
     } else {
 
         $self->set_page(
-            label => sprintf(
-                '%s - #%s',
-                $wf_info->{state}->{label} || $wf_info->{workflow}->{title} || $wf_info->{workflow}->{label},
-                $wf_id,
-            ),
+            label => $wf_info->{state}->{label} || $wf_info->{workflow}->{title} || $wf_info->{workflow}->{label},
             breadcrumb => $self->__get_breadcrumb($wf_info),
             description => $self->__get_templated_description($wf_info, $wf_info->{state}),
             css_class => 'workflow workflow-page ' . ($wf_info->{state}->{uiclass} || ''),
@@ -1617,7 +1613,7 @@ sub __render_workflow_action_head {
     }
 
     $self->set_page(
-        label => sprintf('%s – #%s', $label, $wf_info->{workflow}->{id}),
+        label => $label,
         breadcrumb => $breadcrumb,
         description => $self->__get_templated_description($wf_info, $wf_action_info),
         css_class => 'workflow workflow-action ' . ($wf_action_info->{uiclass} || ''),
