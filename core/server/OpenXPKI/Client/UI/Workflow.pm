@@ -267,13 +267,10 @@ sub __render_from_workflow {
         my $wf_action = $wf_info->{workflow}->{context}->{wf_current_action};
         my $wf_action_info = $wf_info->{activity}->{ $wf_action };
 
-        my $label = $self->__get_proc_state_label($wf_proc_state); # reuse labels from init_info popup
-        my $desc = $irregular{$wf_proc_state};
-
         $self->set_page(
-            label => $label,
+            label => $self->__get_proc_state_label($wf_proc_state), # reuse labels from init_info popup
             breadcrumb => $self->__get_breadcrumb($wf_info, $wf_info->{state}->{label}),
-            description => $desc,
+            description => $irregular{$wf_proc_state},
             css_class => 'workflow workflow-proc-state workflow-proc-'.$wf_proc_state,
             ($wf_id ? (canonical_uri => "workflow!load!wf_id!${wf_id}") : ()),
         );
