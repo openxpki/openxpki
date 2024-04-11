@@ -45,8 +45,8 @@ module.exports = function(defaults) {
     // Bootstrap
     'ember-bootstrap': {
       bootstrapVersion: 5,
-      importBootstrapCSS: true,
-      importBootstrapFont: false,
+      importBootstrapCSS: false,
+      insertEmberWormholeElementToDom: false,
       // only include used components into compiled JS
       include: ['bs-button', 'bs-modal', 'bs-dropdown', 'bs-navbar', 'bs-collapse'],
     },
@@ -95,6 +95,9 @@ module.exports = function(defaults) {
       { transformation: 'amd', as: 'slimselect' }
     ]
   });
+
+  // Bootstrap
+  app.import('node_modules/bootstrap/dist/css/bootstrap.css');
 
   /********************************
    * Compilation
