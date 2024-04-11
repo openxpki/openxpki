@@ -8,27 +8,23 @@ RSYNC_OPTS=(--recursive --links --devices --specials --times --inplace --quiet)
 echo -e "\n[Copy source code without node_modules/]"
 
 # Do not use the bind-mounted node_modules/ from the host...
-if [ "serve" == "$1" ]; then
-  # in "serve" mode continuously sync code to allow Ember to pick up changes
-  # and do recompilation
-  (while true; do \
-    rsync "${RSYNC_OPTS[@]}" --delete \
-      --exclude node_modules \
-      --exclude docs-api \
-      --exclude dist \
-      --exclude dist-dev \
-      --exclude docker \
-      /source/ /build; \
-    sleep 1; \
-  done) &
-else
+rsyncHostToContainer=(
   rsync "${RSYNC_OPTS[@]}" --delete \
     --exclude node_modules \
+    --exclude verdaccio-npm-cache\
     --exclude docs-api \
     --exclude dist \
     --exclude dist-dev \
     --exclude docker \
     /source/ /build
+)
+
+if [ "serve" == "$1" ]; then
+  # in "serve" mode continuously sync code to allow Ember to pick up changes
+  # and do recompilation
+  (while true; do "${rsyncHostToContainer[@]}"; sleep 1; done) &
+else
+  "${rsyncHostToContainer[@]}"
 fi
 
 # ...instead use /node_modules/ from the container
