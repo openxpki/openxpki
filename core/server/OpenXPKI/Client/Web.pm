@@ -43,6 +43,66 @@ sub declare_routes ($self, $r) {
         service_class => 'OpenXPKI::Client::Service::SCEP',
         throwaway => '',
     );
+
+    # ACME urls look like (full pattern)
+    # /acme/<endpoint>/<objectclass>/<resource id>/<sub method>
+    # but we need to handle some special path directly
+
+    # /acme/<endpoint> - directory request
+    $r->get('/acme/<endpoint>')->to(
+        %controller_params,
+        service_class => 'OpenXPKI::Client::Service::ACME',
+        operation => 'directory'
+    );
+
+    # /acme/<endpoint>/newNonce - nonce request
+    $r->any(['GET', 'HEAD'] => '/acme/<endpoint>/newNonce')->to(
+        %controller_params,
+        service_class => 'OpenXPKI::Client::Service::ACME',
+        operation => 'nonce'
+    );
+
+    $r->post('/acme/<endpoint>/order/<resource_id>/finalize')->to(
+        %controller_params,
+        service_class => 'OpenXPKI::Client::Service::ACME::Order',
+        operation => 'finalize',
+    );
+
+    $r->post('/acme/<endpoint>/revokeCert')->to(
+        %controller_params,
+        service_class => 'OpenXPKI::Client::Service::ACME::Cert',
+        operation => 'revokeCert',
+    );
+
+    # not yet implemented in backend
+    $r->post('/acme/<endpoint>/keyChange')->to(
+        %controller_params,
+        service_class => 'OpenXPKI::Client::Service::ACME::Account',
+        operation => 'keyChange',
+    );
+
+    $r->post('/acme/<endpoint>/chall-http/<resource_id>')->to(
+        %controller_params,
+        service_class => 'OpenXPKI::Client::Service::ACME::Authz',
+        operation => 'validate_http',
+    );
+
+    map {
+        $r->post('/acme/<endpoint>/'.$_.'/<resource_id>')->to(
+            %controller_params,
+            service_class => 'OpenXPKI::Client::Service::ACME::'.ucfirst($_),
+            operation => $_
+        );
+    } qw(order orders account authz cert);
+
+    map {
+        $r->post('/acme/<endpoint>/'.$_)->to(
+            %controller_params,
+            service_class => 'OpenXPKI::Client::Service::ACME::'.ucfirst(substr($_,3)),
+            operation => $_,
+        );
+    } qw(newAccount newAuthz newOrder);
+
 }
 
 sub startup ($self) {
