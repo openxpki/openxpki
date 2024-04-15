@@ -99,37 +99,7 @@ sub audit {
     return Log::Log4perl->get_logger("openxpki.audit.$subcat");
 }
 
-=head2 log DEPRECATED
-
-This is the old method used in pre 1.18 and shouldnt be used any longer!
-Each call triggers a deprecation warning with facility "openxpki.deprecated"
-
-This function creates a new log message it accept the following
-parameters:
-
-=over
-
-=item * PRIORITY (debug, info, warn, error, fatal)
-
-=item * FACILITY (auth, audit, monitor, system, workflow)
-
-It is possible to specify more than one facility by passing an array
-reference here.
-
-=item * MESSAGE (normal text string)
-
-=item * MODULE (overwrites the internally determined caller) - optional
-
-=item * FILENAME (overwrites the internally determined caller) - optional
-
-=item * LINE (overwrites the internally determined caller - optional)
-
-=back
-
-Default is C<system.fatal: [OpenXPKI] undefined message>.
-
-=cut
-
+# TODO Remove deprecated CTX('log')->log() method
 sub log {
 
     my $self = shift;
@@ -213,39 +183,8 @@ sub log {
 
 }
 
-=head2 debug
-
-Shortcut method that logs a message with C<< PRIORITY => "debug" >>.
-
-Positional parameters:
-
-=over
-
-=item * B<$message> log message
-
-=item * B<$facility> the logging facility - optional, default: C<system>
-
-=back
-
-=head2 info
-
-Shortcut method that logs a message with C<< PRIORITY => "info" >>. Similar to L</debug>.
-
-=head2 warn
-
-Shortcut method that logs a message with C<< PRIORITY => "warn" >>. Similar to L</debug>.
-
-=head2 error
-
-Shortcut method that logs a message with C<< PRIORITY => "error" >>. Similar to L</debug>.
-
-=head2 fatal
-
-Shortcut method that logs a message with C<< PRIORITY => "fatal" >>. Similar to L</debug>.
-
-=cut
-
 # install wrapper / helper subs - DEPRECATED, use new format
+# TODO Remove deprecated CTX('log')->debug() method etc.
 no strict 'refs';
 for my $prio (qw/ debug info warn error fatal trace /) {
     *{$prio} = sub {
