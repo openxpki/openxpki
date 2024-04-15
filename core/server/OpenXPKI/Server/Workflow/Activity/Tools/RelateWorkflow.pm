@@ -50,7 +50,7 @@ sub execute {
         }
     );
 
-    CTX('log')->application()->info('Register workflow with tag '.$name);
+    CTX('log')->application()->info("Register workflow with tag '$name'");
 
     return 1;
 

@@ -164,26 +164,26 @@ command "set_cert_metadata" => {
             ##! 32: '  -> no item found, plain insert'
             if (!ref $value) {
                 $insert_item->( $key, $value );
-                $log->info("Append (set) certificate metadata $key with $value");
+                $log->info("Certificate metadata '$key': append (set) '$value'");
                 next KEY;
             }
             foreach my $val (@{$value}) {
                 $insert_item->( $key, $val );
-                $log->info("Append (set) certificate metadata $key with $val");
+                $log->info("Certificate metadata '$key': append (set) '$val'");
             }
             next KEY;
         }
 
         if ($mode eq 'skip') {
             ##! 32: '  -> item found in "skip" mode'
-            $log->info("Key $key already exists, skip certificate metadata");
+            $log->info("Certificate metadata '$key': skip (item already exists)");
             next KEY;
         }
 
         if ($mode eq 'error') {
             ##! 64: '  -> error: item found in "error" mode'
             OpenXPKI::Exception->throw(
-                message => "Tried to set values for $key but items already exist"
+                message => "Tried to set values for '$key' but items already exist"
             );
         }
 
@@ -204,11 +204,11 @@ command "set_cert_metadata" => {
             # mark to keep
             if (exists $existing{$val}) {
                 $existing{$val} = 1;
-                $log->info("Value already exists, skip certificate metadata with $key with $val");
+                $log->info("Certificate metadata '$key': skip (value '$val' already exists)");
             # insert
             } else {
                 push @add, $val;
-                $log->info("Append (merge) certificate metadata $key with $val");
+                $log->info("Certificate metadata '$key': append (merge) '$val'");
             }
         }
 

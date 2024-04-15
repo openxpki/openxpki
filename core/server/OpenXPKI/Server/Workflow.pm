@@ -479,7 +479,7 @@ sub pause {
         });
         $self->_set_proc_state('pause');#saves wf data
 
-        CTX('log')->application()->info("Action ".$self->{_CURRENT_ACTION}." paused ($cause_description), wakeup $dt_wakeup_at");
+        CTX('log')->application->info(sprintf("Action '%s' paused (%s), wakeup %s", $self->{_CURRENT_ACTION}, $cause_description, $dt_wakeup_at));
     }
 
 }
