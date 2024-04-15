@@ -260,26 +260,14 @@ sub _init_transport {
 
     if($cfg->{username}) {
         if(!$cfg->{password}) {
-          CTX('log')->log(
-              MESSAGE  => sprintf("Empty password or no password provided (for user %s)", $cfg->{username}),
-              PRIORITY => "error",
-              FACILITY => [ "system", "monitor" ]
-          );
+          CTX('log')->system->error(sprintf("Empty password or no password provided (for user %s)", $cfg->{username}));
           $transport->quit;
           return undef;
         }
-        CTX('log')->log(
-            MESSAGE  => sprintf("Authenticating to server (user %s)", $cfg->{username}),
-            PRIORITY => "debug",
-            FACILITY => [ "system", "monitor" ]
-        );
+        CTX('log')->system->debug(sprintf("Authenticating to server (user %s)", $cfg->{username}));
 
         if(!$transport->auth($cfg->{username}, $cfg->{password})) {
-          CTX('log')->log(
-              MESSAGE  => sprintf("SMTP SASL authentication failed (user: %s, error: %s)", $cfg->{username}, $transport->message),
-              PRIORITY => "error",
-              FACILITY => [ "system", "monitor" ]
-          );
+          CTX('log')->system->error(sprintf("SMTP SASL authentication failed (user: %s, error: %s)", $cfg->{username}, $transport->message));
           $transport->quit;
           return undef;
         }
