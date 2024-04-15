@@ -1,9 +1,7 @@
 package OpenXPKI::Util;
+use OpenXPKI;
 
-use strict;
-use warnings;
-
-use English;
+# Core modules
 use MIME::Base64;
 
 =head1 NAME
@@ -157,6 +155,36 @@ sub pem_to_list {
     } while (@blocks);
 
     return \@output;
+}
+
+=head2 is_regular_workflow
+
+Checks if the given workflow ID indicates a regular workflow, i.e. the ID
+consists of digits only and is not zero.
+
+    if (OpenXPKI::Util->is_regular_workflow($id)) { ... };
+
+B<Parameters>
+
+=over
+
+=item * B<$wf_id> I<Str> - workflow ID to check
+
+=back
+
+B<Returns>
+
+C<1> if the ID indicates a regular workflow, C<0> another type
+
+=cut
+
+sub is_regular_workflow {
+    my $class = shift if ($_[0] // '') eq __PACKAGE__; # support call via -> and ::
+    my $wf_id = shift;
+
+    return 0 unless defined $wf_id;
+    return 0 unless $wf_id =~ m{\A\d+\z};
+    return 1;
 }
 
 1;
