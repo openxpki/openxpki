@@ -40,6 +40,15 @@ for my $name (qw( application auth system workflow deprecated )) {
     );
 }
 
+# alias for "application"
+has app => (
+    is => 'ro',
+    isa => 'Log::Log4perl::Logger',
+    init_arg => undef,
+    lazy => 1,
+    default => sub { shift->application }
+);
+
 =head2 Constructor
 
 The constructor only accepts the named parameter C<CONFIG> which can either be
