@@ -1,39 +1,23 @@
 package OpenXPKI::Server::Log::Appender::Database;
+use OpenXPKI -base => 'Log::Log4perl::Appender';
 
-
-use strict;
-use English;
-use Log::Log4perl;
+# CPAN modules
 use Log::Log4perl::MDC;
 use Log::Log4perl::Level;
+
+# Project modules
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Database; # we must import "auto_id"
-
-our @ISA = qw(Log::Log4perl::Appender);
 
 sub new {
     my($proto, %p) = @_;
     my $class = ref $proto || $proto;
 
-    my $self = bless {}, $class;
-
-    if ($p{table}) {
-        $self->{table} = $p{table};
-    } else {
-        $self->{table} = 'application_log';
-    }
-
-    if (defined $p{microseconds}) {
-        $self->{microseconds} = $p{microseconds};
-    } else {
-        $self->{microseconds} = 1;
-    }
-
-    if ($p{inside_transaction}) {
-        $self->{dbi_handle} = 'dbi';
-    } else {
-        $self->{dbi_handle} = 'dbi_log';
-    }
+    my $self = bless {
+        table => $p{table} || 'application_log',
+        microseconds => $p{microseconds} // 1,
+        dbi_handle => $p{inside_transaction} ? 'dbi' : 'dbi_log',
+    }, $class;
 
     return $self;
 }
@@ -47,7 +31,7 @@ sub log {
 
 
     my $wf_id = Log::Log4perl::MDC->get('wfid') || '';
-    return unless($wf_id =~ m{\A\d+\z});
+    return unless OpenXPKI::Util->is_regular_workflow($wf_id);
 
     ##! 128: 'arg_ref: ' . Dumper $arg_ref
 
@@ -79,21 +63,21 @@ sub log {
 
     my $loglevel_int = $Log::Log4perl::Level::PRIORITY{$loglevel} // $ALL;
 
-    eval {
+    try {
         CTX($self->{dbi_handle})->insert(
             into => $self->{table},
             values  => {
                 $self->{table}.'_id' => AUTO_ID,
-                logtimestamp       => $timestamp,
-                workflow_id        => $wf_id,
-                priority           => $loglevel_int,
-                category           => $category,
-                message            => $message,
+                logtimestamp => $timestamp,
+                workflow_id => $wf_id,
+                priority => $loglevel_int,
+                category => $category,
+                message => $message,
             },
         );
-    };
-    if ($EVAL_ERROR) {
-        warn "Error writing log message to database: $EVAL_ERROR\nLog message was: $timestamp $category.$loglevel $message\n";
+    }
+    catch ($error) {
+        warn "Error writing log message to database: $error\nLog message was: $timestamp $category.$loglevel $message\n";
         $occupied = 0;
         return;
     }
