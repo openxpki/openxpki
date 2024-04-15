@@ -98,6 +98,7 @@ sub import {
 
     # Project modules
     OpenXPKI::Exception->import::into(1);
+    OpenXPKI::Util->import::into(1);
 
     # Disable "experimental" warnings: should be done after other imports to safely disable warnings in Perl < 5.36
     warnings->unimport::out_of(1, qw(
@@ -146,6 +147,7 @@ This is equivalent to adding the following imports to the calling package:
 
     # Project modules
     use OpenXPKI::Exception;
+    use OpenXPKI::Util;
 
 =head2 Perl class with inheritance
 
