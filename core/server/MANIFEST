@@ -67,6 +67,13 @@ OpenXPKI/Client/API/Command/config.pm
 OpenXPKI/Client/API/Command/config/verify.pm
 OpenXPKI/Client/API/Command/config/show.pm
 OpenXPKI/Client/API/Command/config/smtptest.pm
+OpenXPKI/Client/API/Command/datapool.pm
+OpenXPKI/Client/API/Command/datapool/add.pm
+OpenXPKI/Client/API/Command/datapool/delete.pm
+OpenXPKI/Client/API/Command/datapool/list.pm
+OpenXPKI/Client/API/Command/datapool/rename.pm
+OpenXPKI/Client/API/Command/datapool/show.pm
+OpenXPKI/Client/API/Command/datapool/update.pm
 OpenXPKI/Client/API/Command/token.pm
 OpenXPKI/Client/API/Command/token/add.pm
 OpenXPKI/Client/API/Command/token/delete.pm
@@ -343,6 +350,7 @@ OpenXPKI/Server/API2/Plugin/Datapool/delete_data_pool_entry.pm
 OpenXPKI/Server/API2/Plugin/Datapool/get_data_pool_entry.pm
 OpenXPKI/Server/API2/Plugin/Datapool/get_datavault_status.pm
 OpenXPKI/Server/API2/Plugin/Datapool/list_data_pool_entries.pm
+OpenXPKI/Server/API2/Plugin/Datapool/list_data_pool_namespaces.pm
 OpenXPKI/Server/API2/Plugin/Datapool/modify_data_pool_entry.pm
 OpenXPKI/Server/API2/Plugin/Datapool/set_data_pool_entry.pm
 OpenXPKI/Server/API2/Plugin/Datapool/Util.pm
