@@ -9,7 +9,7 @@ functions
 =cut
 
 # Core modules
-use Module::Load;
+use Module::Load ();
 use File::Spec;
 use IO::Dir 1.03;
 use Scalar::Util qw( blessed );
@@ -284,7 +284,7 @@ sub _load_plugins {
     for my $pkg (keys %{ $pkg_map }) {
         my $file = $pkg_map->{$pkg};
 
-        Module::Load::load $pkg;
+        Module::Load::load($pkg);
 
         if (not $pkg->DOES($self->command_role)) {
             $self->log->trace("API - ignore $pkg (does not consume ".$self->command_role.") - $file");

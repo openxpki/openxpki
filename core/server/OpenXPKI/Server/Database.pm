@@ -18,6 +18,7 @@ use DBI::Const::GetInfoType; # provides %GetInfoType hash
 use Math::BigInt;
 use SQL::Abstract::More;
 use Moose::Exporter;
+use Module::Load;
 use Type::Params qw( signature_for );
 
 # should be done after imports to safely disable warnings in Perl < 5.36
@@ -169,7 +170,7 @@ sub _build_driver {
     my $class = "OpenXPKI::Server::Database::Driver::".$driver;
     ##! 32: "Trying to load driver class " . $class;
 
-    eval { use Module::Load 0.32; autoload($class) };
+    eval { Module::Load::load($class) };
     OpenXPKI::Exception->throw (
         message => "Unable to require() database driver package",
         params => { class_name => $class, message => $@ }

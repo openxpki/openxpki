@@ -2,7 +2,7 @@ package OpenXPKI::Client::Web::Controller;
 use OpenXPKI -base => 'Mojolicious::Controller';
 
 # Core modules
-use Module::Load;
+use Module::Load ();
 
 # Project modules
 use OpenXPKI::Log4perl;
@@ -16,7 +16,7 @@ sub index ($self) {
     # load and instantiate service class
     my $service;
     try {
-        Module::Load::load $class;
+        Module::Load::load($class);
         $service = $class->new(
             config_obj => $self->oxi_config($class->service_name),
             apache_env => $self->stash('apache_env'),

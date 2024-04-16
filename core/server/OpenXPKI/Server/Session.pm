@@ -3,6 +3,7 @@ use Moose;
 
 # Core modules
 use Scalar::Util qw( blessed );
+use Module::Load ();
 
 # CPAN modules
 use Type::Params qw( signature_for );
@@ -130,7 +131,7 @@ sub _build_driver {
 
     my $class = "OpenXPKI::Server::Session::Driver::".$self->type;
 
-    eval { use Module::Load 0.32; autoload($class) };
+    eval { Module::Load::load($class) };
     OpenXPKI::Exception->throw (
         message => "Unable to require() session driver package",
         params => { class_name => $class, message => $@ }

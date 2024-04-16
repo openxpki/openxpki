@@ -146,7 +146,7 @@ B<before> you use C<OpenXPKI::Test>:
 use Data::Dumper;
 use File::Path qw( remove_tree );
 use File::Temp qw( tempdir );
-use Module::Load qw( autoload );
+use Module::Load ();
 
 # CPAN modules
 use Moose::Exporter;
@@ -580,7 +580,7 @@ around BUILDARGS => sub {
                 for my $namespace ("", "OpenXPKI::Test::Role::", "OpenXPKI::Test::QA::Role::") {
                     my $p = "${namespace}${shortname}";
                     # if package is not found, autoload() dies and eval() returns
-                    eval { autoload $p };
+                    eval { Module::Load::load($p) };
                     if (not $@) { $role = $p; last }
                 }
                 die "Could not find test class role '$shortname'" unless $role;

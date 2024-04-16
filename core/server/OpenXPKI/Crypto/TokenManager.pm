@@ -172,7 +172,7 @@ sub get_system_token {
     if (not $self->{TOKEN}->{system}->{$type}) {
         my $backend_api_class = CTX('config')->get("system.crypto.token.$type.api");
 
-        eval { Module::Load::autoload($backend_api_class) };
+        eval { Module::Load::load($backend_api_class) };
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_FAILED_LOADING_BACKEND_API_CLASS",
             params => { class_name => $backend_api_class, message => $@ }
@@ -236,7 +236,7 @@ sub __add_token {
         params => { TYPE => $type, NAME => $name, GROUP => $config_name_group}
     ) unless $backend_class;
 
-    eval { Module::Load::autoload($backend_class); Module::Load::autoload($backend_api_class); };
+    eval { Module::Load::load($backend_class); Module::Load::load($backend_api_class); };
     OpenXPKI::Exception->throw (
         message => "Unable to load backend class for token $name",
         params => { class_name => $backend_class, message => $@ }
