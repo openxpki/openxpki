@@ -9,6 +9,7 @@ use warnings;
 use English;
 
 use Class::Std;
+use Module::Load ();
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
@@ -40,8 +41,8 @@ sub START {
     my $class = $arg_ref->{CLASS};
     delete $arg_ref->{CLASS};
 
-    eval "require $class";
-    if ($EVAL_ERROR ne '') {
+    eval { Module::Load::load($class) };
+    if ($EVAL_ERROR) {
         ##! 4: "compilation of driver " . $class . " failed\n$EVAL_ERROR"
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_CRYPTO_API_EVAL_ERROR',

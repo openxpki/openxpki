@@ -10,6 +10,7 @@ use DateTime;
 use POSIX ();
 use Data::Dumper;
 use Cache::LRU;
+use Module::Load ();
 
 # CPAN modules
 use Date::Parse qw( str2time );
@@ -980,7 +981,7 @@ sub __delegate_call {
 
     my ($class, $method, $n, $param) = $call =~ /([\w\:\_]+)::([\w\_]+)(!([!\w]+))?/;
     $self->log->debug("delegate render to $class, $method" );
-    eval "use $class; 1;";
+    Module::Load::load($class);
     if ($param) {
         $class->$method( $self, $args, $wf_action, $param );
     } else {

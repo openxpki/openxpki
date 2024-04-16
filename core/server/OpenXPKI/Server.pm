@@ -3,6 +3,7 @@ use OpenXPKI -base => 'Net::Server::MultiType';
 
 # Core modules
 use Socket;
+use Module::Load ();
 
 # CPAN modules
 use Net::Server::Daemonize qw( set_uid set_gid );
@@ -420,7 +421,11 @@ sub do_process_request {
     my $msg = $transport->read();
 
     if ($msg =~ m{ \A (?:Simple|JSON|Fast) \z }xms) {
-        eval "\$serializer = OpenXPKI::Serialization::$msg->new();";
+        eval {
+            my $class = "OpenXPKI::Serialization::$msg";
+            Module::Load::load($class);
+            $serializer = $class->new;
+        };
 
         if (! defined $serializer) {
             $transport->write("OpenXPKI::Server: Serializer failed to initialize.\n");
@@ -582,7 +587,7 @@ sub __init_user_interfaces {
             next unless ($transport->{$class});
 
             $class = "OpenXPKI::Transport::".$class;
-            eval "use $class;";
+            eval { Module::Load::load($class) };
             if ($EVAL_ERROR) {
                 OpenXPKI::Exception->throw (
                     message => "I18N_OPENXPKI_SERVER_GET_USER_INTERFACE_TRANSPORT_FAILED",
@@ -607,7 +612,7 @@ sub __init_user_interfaces {
 
             ##! 4: "init $class"
             $class = "OpenXPKI::Service::".$class;
-            eval "use $class;";
+            eval { Module::Load::load($class) };
             if ($EVAL_ERROR) {
                 ##! 8: "use $class failed"
                 OpenXPKI::Exception->throw (

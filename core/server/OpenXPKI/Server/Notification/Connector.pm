@@ -9,6 +9,7 @@ use Data::Dumper;
 use JSON;
 use YAML::Loader;
 use DateTime;
+use Module::Load ();
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
@@ -39,12 +40,16 @@ sub _init_backend {
     delete $cfg->{class}; # this is the notify package name
     delete $cfg->{connector}; # this is the connector package name
 
-    eval "use $class;1" or OpenXPKI::Exception->throw(
-        message => 'Unable to load connector backend class',
-        params  => {
-            class => $class,
-            error => $@,
-        });
+    eval { Module::Load::load($class) };
+    if ($EVAL_ERROR) {
+        OpenXPKI::Exception->throw(
+            message => 'Unable to load connector backend class',
+            params  => {
+                class => $class,
+                error => $@,
+            },
+        );
+    }
 
     my $conn;
     eval{ $conn = $class->new(%{$cfg}); };

@@ -5,6 +5,7 @@ use English;
 use Digest::SHA qw(sha1_hex);
 use Log::Log4perl;
 use Sys::Hostname;
+use Module::Load ();
 
 use OpenXPKI::Config::Backend;
 use OpenXPKI::Exception;
@@ -80,7 +81,7 @@ sub BUILD {
             die "Invalid class name $class";
         }
         ##! 16: 'Config bootstrap ' . Dumper $bootstrap
-        eval "use $class;1;" or die "Unable to bootstrap config, can not use $class: $@";
+        eval { Module::Load::load($class) }; die "Unable to bootstrap config, can not use $class: $@" if $@;
 
         delete $bootstrap->{class};
 

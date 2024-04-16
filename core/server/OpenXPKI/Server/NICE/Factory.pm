@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use English;
 
+use Module::Load();
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
@@ -21,22 +22,23 @@ sub getHandler {
 
     $backend = 'Local' unless( $backend );
 
-    my $BackendClass = 'OpenXPKI::Server::NICE::'.$backend;
+    my $backend_class = 'OpenXPKI::Server::NICE::'.$backend;
     ##! 16: 'Load Backend: '.$backend
 
-    if(!eval("require $BackendClass")){
+    eval { Module::Load::load($backend_class) };
+    if ($EVAL_ERROR) {
         OpenXPKI::Exception->throw(
-              message => "I18N_OPENXPKI_UI_NICE_NO_SUCH_BACKEND",
-              params => {
-                  backend => $backend,
-                  class =>  $BackendClass,
-                  error => $EVAL_ERROR
-              }
+            message => "I18N_OPENXPKI_UI_NICE_NO_SUCH_BACKEND",
+            params => {
+                backend => $backend,
+                class => $backend_class,
+                error => $EVAL_ERROR
+            }
         );
     }
     CTX('log')->application()->debug("NICE backend $backend loaded, execute $activity->name");
 
-    return $BackendClass->new( $activity );
+    return $backend_class->new( $activity );
 
 }
 

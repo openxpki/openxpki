@@ -22,6 +22,8 @@ Execute the notifcations for MESSAGE and.
 
 use English;
 
+use Module::Load ();
+
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
@@ -78,7 +80,7 @@ sub _init_backends_for_realm {
             next INIT_BACKEND;
         }
 
-        eval "use $class;1";
+        eval { Module::Load::load($class) };
 
         if ($EVAL_ERROR) {
             CTX('log')->system()->error("Initialization of Notification backend failed: $backend / $EVAL_ERROR");

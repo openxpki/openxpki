@@ -5,6 +5,7 @@ use Test::More;
 use Test::Exception;
 use Log::Log4perl;
 use Moose::Util::TypeConstraints; # PLEASE NOTE: this enables all warnings via Moose::Exporter
+use Module::Load ();
 use Type::Params qw( signature_for );
 
 use FindBin qw( $Bin );
@@ -140,7 +141,7 @@ sub run ($self, $name, $plan, $tests) {
 
         return note "$env_var not set" if ($env_var and not $ENV{$env_var});
         return unless $self->shall_test($dbtype);
-        return note "$dbi_driver is not installed" unless eval "require $dbi_driver";
+        eval { Module::Load::load($dbi_driver) }; return note "$dbi_driver is not installed" if $@;
 
         my $dbi_params = $self->get_dbi_params($dbtype);
 

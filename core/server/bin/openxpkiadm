@@ -16,6 +16,7 @@ use YAML;
 use MIME::Base64;
 use Crypt::X509;
 use JSON; # early use of JSON avoids "Subroutine JSON::PP::Boolean::(++ redefined at /usr/share/perl/5.28/overload.pm line 48"
+use Module::Load ();
 
 # For the password hasher
 use IO::Prompt;
@@ -1711,7 +1712,7 @@ if ($cmd eq 'initdb') {
         foreach my $module (@{$params{module}}) {
             my $uc_module = ucfirst($module);
             my $class = "OpenXPKI::Config::Lint::$uc_module";
-            eval "use $class;1";
+            eval { Module::Load::load($class) };
             if ($EVAL_ERROR) {
                 print "Unable to load lint module $uc_module\n";
                 print STDERR $EVAL_ERROR;

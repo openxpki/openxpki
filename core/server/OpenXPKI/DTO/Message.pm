@@ -2,6 +2,8 @@ package OpenXPKI::DTO::Message;
 
 use Moose::Role;
 
+use Module::Load ();
+
 =head1 Attributes
 
 =head2 session_id
@@ -117,7 +119,7 @@ sub from_hash {
     my $class = $hash->{class};
     my $data = $hash->{data};
     $class = 'OpenXPKI::DTO::Message::'.$class;
-    eval "use $class;1";
+    Module::Load::load($class);
     return $class->new($data);
 
 }

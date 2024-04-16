@@ -15,6 +15,7 @@ use OpenXPKI::FileUtils;
 use English;
 
 use File::Spec;
+use Module::Load ();
 
 # attributes
 my %token_type_of     :ATTR; # the token type
@@ -279,7 +280,7 @@ sub __init_engine
     }
 
     my $engine = $base_class_of{$ident} . '::Engine::' . $params_of{$ident}->{ENGINE};
-    eval "use $engine;";
+    eval { Module::Load::load($engine) };
     if ($EVAL_ERROR)
     {
         OpenXPKI::Exception->throw (
@@ -334,7 +335,7 @@ sub __init_shell
     }
 
     my $cli_class = $base_class_of{$ident} . '::CLI';
-    eval "use $cli_class;";
+    eval { Module::Load::load($cli_class) };
     if ($EVAL_ERROR ne '') {
         OpenXPKI::Exception->throw (
             message => 'I18N_OPENXPKI_TOOLKIT_INIT_SHELL_USE_FAILED',
@@ -405,8 +406,8 @@ sub command {
     my $cmd  = $base_class_of{$ident} . '::Command::' . $arg_ref->{COMMAND};
     delete $arg_ref->{COMMAND};
 
-    eval "require $cmd";
-    if ($EVAL_ERROR ne '') {
+    eval { Module::Load::load($cmd) };
+    if ($EVAL_ERROR) {
         OpenXPKI::Exception->throw(
             message  => 'I18N_OPENXPKI_TOOLKIT_COMMAND_REQUIRE_FAILED',
             params   => {'EVAL_ERROR' => $EVAL_ERROR},

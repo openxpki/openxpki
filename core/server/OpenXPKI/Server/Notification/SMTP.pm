@@ -302,7 +302,7 @@ sub _init_use_html {
     if ($html) {
 
         # Try to load the Mime class
-        eval "use MIME::Entity;1";
+        eval { require MIME::Entity };
         if ($EVAL_ERROR) {
             CTX('log')->system()->error("Initialization of MIME::Entity failed, falling back to plain text");
             return 0;
@@ -323,14 +323,13 @@ sub _init_smime {
         return;
     }
 
-    eval "use Crypt::SMIME;1";
+    eval { require Crypt::SMIME };
     if ($EVAL_ERROR) {
         CTX('log')->system()->fatal("Initialization of Crypt::SMIME failed!");
         OpenXPKI::Exception->throw(
             message => "Initialization of Crypt::SMIME failed!",
         );
     }
-    require Crypt::SMIME;
 
     my $smime;
     if ($cfg->{certificate_p12_file}) {

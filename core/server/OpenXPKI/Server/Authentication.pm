@@ -8,6 +8,7 @@ use English;
 use Data::Dumper;
 use Digest::SHA qw(sha1);
 use MIME::Base64 qw(encode_base64url decode_base64);
+use Module::Load ();
 
 # CPAN modules
 use Crypt::JWT qw(decode_jwt);
@@ -153,7 +154,7 @@ sub __load_handler
     ##! 8: "name ::= $handler"
     ##! 8: "type ::= $type"
     my $class = "OpenXPKI::Server::Authentication::$type";
-    eval "use $class;1";
+    eval { Module::Load::load($class) };
     if ($EVAL_ERROR) {
         OpenXPKI::Exception->throw (
             message => "Unable to load authentication handler class $type",
@@ -219,7 +220,7 @@ sub __load_tenant {
         );
     }
     ##! 32: $class
-    eval "use $class;1";
+    eval { Module::Load::load($class) };
     if ($EVAL_ERROR) {
         OpenXPKI::Exception->throw (
             message => "Unable to load access control handler class $class",
