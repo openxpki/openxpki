@@ -38,6 +38,12 @@ module.exports = function(defaults) {
     // store app config in compiled JS file instead of <meta> tag
     'storeConfigInMeta': false,
 
+    minifyCSS: {
+      options: {
+        processImport: true,
+      },
+    },
+
     /********************************
      * Assets to include
      ********************************/
