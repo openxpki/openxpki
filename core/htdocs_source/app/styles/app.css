@@ -628,6 +628,13 @@ div.required input.flatpickr-input {
   padding-right: 0.3rem;
 }
 
+.oxi-btn-copy-workflow-id::before {
+  font-family: "Glyphicons Halflings";
+  content: "\e224";
+  font-size: 80%;
+  padding-right: 0.3rem;
+}
+
 /******************************************************************************
  * Tooltips
  */
