@@ -692,11 +692,12 @@ cgi-bin/healthcheck.fcgi
 # NOTE:
 #   core/htdocs_source/update-manifest.pl will update the list below.
 #   UPDATE_MANIFEST_UI_LIST - do not remove this comment
-htdocs/assets/bootstrap-v5-tweaks.78cd96d2a9bfcd432a2d869bcda2ef1e.css
 htdocs/assets/bootstrap-v5-tweaks.css
 htdocs/assets/chunk.00676285557719e09103.js
 htdocs/assets/chunk.081820203fecda34f65a.js
 htdocs/assets/chunk.094a59ec1678f2b1803c.js
+htdocs/assets/chunk.09def0dff2fd8d65b05a.css
+htdocs/assets/chunk.09def0dff2fd8d65b05a.js
 htdocs/assets/chunk.0bafadbe7e97b0c53bc5.js
 htdocs/assets/chunk.0d6f1388e93e3905382b.js
 htdocs/assets/chunk.189adf14c10c24ef1c09.js
@@ -707,6 +708,8 @@ htdocs/assets/chunk.32b9e618d9330d7ce276.js
 htdocs/assets/chunk.3780b686df9caae8986f.js
 htdocs/assets/chunk.38c16d145c6ab7bffb54.js
 htdocs/assets/chunk.3ac1f6b0a6d4a822924f.js
+htdocs/assets/chunk.4575235ea1bc9350ecd3.js
+htdocs/assets/chunk.4575235ea1bc9350ecd3.js.LICENSE.txt
 htdocs/assets/chunk.45ad32d3c1c75131dc35.js
 htdocs/assets/chunk.47331fe99536a92c1bdf.js
 htdocs/assets/chunk.4ab88e1298e5ec62a50f.js
@@ -724,8 +727,6 @@ htdocs/assets/chunk.6a4a2e783b37cbb546d8.js
 htdocs/assets/chunk.6dc02a209b512d38df7b.js
 htdocs/assets/chunk.6dd6cd2b8d708a847838.js
 htdocs/assets/chunk.6fb9446cd3a1e4162f23.js
-htdocs/assets/chunk.74b47acc3304cda57999.js
-htdocs/assets/chunk.74b47acc3304cda57999.js.LICENSE.txt
 htdocs/assets/chunk.76057315c3e98805ad92.js
 htdocs/assets/chunk.795052c5afd9fe9770f7.js
 htdocs/assets/chunk.7aa51abf8da857886f21.js
@@ -749,8 +750,6 @@ htdocs/assets/chunk.c0eac6c469124362798f.js
 htdocs/assets/chunk.c2e89276776bc4001b7d.js
 htdocs/assets/chunk.c48e30bef9e3a3c89206.js
 htdocs/assets/chunk.c58b003343b441f96482.js
-htdocs/assets/chunk.c6a92a810256235367f7.css
-htdocs/assets/chunk.c6a92a810256235367f7.js
 htdocs/assets/chunk.ca8f87e4ddcee105f67d.js
 htdocs/assets/chunk.cf9db3fa96aefac2ae93.js
 htdocs/assets/chunk.dd247792d6412088f19d.js
@@ -766,11 +765,10 @@ htdocs/assets/chunk.f43470b98126add2b774.js
 htdocs/assets/chunk.f85050719d758464af39.js
 htdocs/assets/chunk.f892731736e12e832ff0.js
 htdocs/assets/chunk.fe4db28a91ea76dd1ce9.js
-htdocs/assets/glyphicons.9f77083ee0aa923723c31e57276de831.css
 htdocs/assets/glyphicons.css
-htdocs/assets/openxpki.14701d1f61bc882d52e84c7e6fd4fda5.css
+htdocs/assets/openxpki.4a883123c7b630590a6b2b35b5fea353.css
 htdocs/assets/openxpki.css
-htdocs/assets/vendor.6225c04355f4f8ecd75c1d815947ccd0.css
+htdocs/assets/vendor.7eb52bc8b795001c8745f01b0d19fd0f.css
 htdocs/assets/vendor.9a97e5905f1e017dfc5113090edfbb1a.js
 htdocs/assets/vendor.css.map
 htdocs/assets/vendor.map
