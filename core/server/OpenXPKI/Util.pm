@@ -44,7 +44,7 @@ B<Parameters>
 
 =cut
 sub resolve_user_group {
-    my $class = shift if ($_[0] // '') eq __PACKAGE__; # support call via -> and ::
+    shift if ($_[0] // '') eq __PACKAGE__; # support call via -> and ::
     my ($user, $group, $label, $allow_empty) = @_;
 
     my ($u, $uid, $g, $gid);
@@ -84,7 +84,7 @@ B<Parameters>
 
 =cut
 sub asterisk_to_sql_wildcard {
-    my $class = shift if ($_[0] // '') eq __PACKAGE__; # support call via -> and ::
+    shift if ($_[0] // '') eq __PACKAGE__; # support call via -> and ::
     my $query = shift;
 
     $query =~ s/\*/%/g;
@@ -115,7 +115,7 @@ A I<HashRef> containing the given keys (or less, depending on the source hash).
 
 =cut
 sub filter_hash {
-    my $class = shift if ($_[0] // '') eq __PACKAGE__; # support call via -> and ::
+    shift if ($_[0] // '') eq __PACKAGE__; # support call via -> and ::
     my $hash = shift // {};
     my @keys = @_;
 
@@ -135,8 +135,7 @@ A I<ArrayRef> containing the noramlized PEM blocks
 =cut
 
 sub pem_to_list {
-
-    my $class = shift if ($_[0] // '') eq __PACKAGE__; # support call via -> and ::
+    shift if ($_[0] // '') eq __PACKAGE__; # support call via -> and ::
 
     my $input = shift;
 
@@ -179,7 +178,7 @@ C<1> if the ID indicates a regular workflow, C<0> another type
 =cut
 
 sub is_regular_workflow {
-    my $class = shift if ($_[0] // '') eq __PACKAGE__; # support call via -> and ::
+    shift if ($_[0] // '') eq __PACKAGE__; # support call via -> and ::
     my $wf_id = shift;
 
     return 0 unless defined $wf_id;
