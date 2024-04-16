@@ -140,6 +140,9 @@ devDependencies:
   eslint-plugin-qunit:
     specifier: ^8.1.1
     version: 8.1.1(eslint@9.0.0)
+  flatpickr:
+    specifier: ^4.6.13
+    version: 4.6.13
   js-yaml:
     specifier: ^4.1.0
     version: 4.1.0

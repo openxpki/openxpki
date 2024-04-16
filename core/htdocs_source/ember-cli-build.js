@@ -99,6 +99,9 @@ module.exports = function(defaults) {
   // Bootstrap
   app.import('node_modules/bootstrap/dist/css/bootstrap.css');
 
+  // Flatpickr
+  app.import('node_modules/flatpickr/dist/flatpickr.css');
+
   /********************************
    * Compilation
    ********************************/
