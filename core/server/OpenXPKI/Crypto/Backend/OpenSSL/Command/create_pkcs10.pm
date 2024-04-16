@@ -24,16 +24,13 @@ sub get_command
     ## user CSR generation
 
     # check minimum requirements
-    if (not exists $self->{PASSWD})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_PASSWD");
-    }
-    if (not exists $self->{KEY})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_KEY");
-    }
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_PASSWD"
+    ) unless $self->{PASSWD};
+
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_KEY"
+    ) unless $self->{KEY};
 
     # prepare parameters
     $passwd = $self->{PASSWD};
