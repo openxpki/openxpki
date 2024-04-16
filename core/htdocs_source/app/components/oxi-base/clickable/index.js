@@ -69,6 +69,7 @@ export default class OxiClickableComponent extends Component {
         // custom client-side click handler (overrides server-sent config)
         if (c.onClick) {
             debug(`oxi-base/clickable: executeAction - custom onClick() handler`)
+            if (c.onClick.constructor.name != 'AsyncFunction') throw new Error(`'onClick' must be an asynchronous function (Clickable with label="${c.label || ''}")`)
             c.loading = true
             c.onClick(c)
             .finally(() => c.loading = false)
