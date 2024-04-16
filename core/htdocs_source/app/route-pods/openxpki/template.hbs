@@ -131,15 +131,13 @@
             {{#if this.model.top.page.label}}
                 <h3>
                     {{this.model.top.page.label}}
-                    {{#if this.model.top.page.workflow_id}}
-                        <span class="ps-1 text-secondary text-opacity-50">
-                            #{{this.model.top.page.workflow_id}}
-                        </span>
-                    {{/if}}
                 </h3>
             {{/if}}
         </div>
-        <div class="col col-md-auto oxi-pagehead">
+        <div class="col col-md-auto oxi-pagehead" {{on-init this.setTempCopyElement}}>
+            {{#if this.workflowCopyIdButton}}
+                <OxiBase::Button @button={{this.workflowCopyIdButton}} class="btn-sm btn-light oxi-btn-copy-workflow-id" />
+            {{/if}}
             {{#each this.model.top.page.buttons as |btn|}}
                 <OxiBase::Button @button={{btn}} class="btn-sm" />
             {{/each}}
