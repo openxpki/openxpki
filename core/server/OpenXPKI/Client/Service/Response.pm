@@ -237,7 +237,6 @@ If not explicitely set it defaults to:
 has http_status_message => (
     is => 'ro',
     isa => 'Str|Undef',
-    init_arg => 'undef',
     lazy => 1,
     builder => '__build_http_status_message',
 );
