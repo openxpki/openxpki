@@ -257,7 +257,7 @@ Readonly HTTP status line I<Str>: C<"STATUS_CODE STATUS_MESSAGE">.
 has http_status_line => (
     is => 'ro',
     isa => 'Str',
-    init_arg => 'undef',
+    init_arg => undef,
     lazy => 1,
     builder => '__build_http_status_line',
 );
