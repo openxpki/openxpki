@@ -135,18 +135,19 @@ has error => (
 
 =head2 error_message
 
-Error message (only evaluated if L</error> has been set).
+Error message. Only used if L</error> has been set.
 
 Will be set automatically if L</workflow> was set and its context contains
 the C<error_code> item.
 
 =cut
+# Please not there is a method error_message() below
 has __error_message => (
     is => 'rw',
     isa => 'Str',
+    init_arg  => 'error_message',
     predicate => 'has_error_message',
     clearer => 'clear_error_message',
-    init_arg  => 'error_message',
 );
 
 =head2 retry_after
@@ -278,6 +279,7 @@ its context contains the C<transaction_id> item.
 has transaction_id => (
     is => 'rw',
     isa => 'Str',
+    init_arg => undef,
     lazy => 1,
     default => sub ($self) { $self->workflow->{context}->{transaction_id} // '' },
 );
@@ -292,6 +294,7 @@ May be I<undef>.
 has state => (
     is => 'rw',
     isa => 'Str|Undef',
+    init_arg => undef,
     lazy => 1,
     predicate => 'has_state',
     default => undef,
@@ -307,6 +310,7 @@ May be I<undef>.
 has proc_state => (
     is => 'rw',
     isa => 'Str|Undef',
+    init_arg => undef,
     lazy => 1,
     predicate => 'has_proc_state',
     default => undef,
