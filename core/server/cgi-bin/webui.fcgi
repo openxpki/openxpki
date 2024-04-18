@@ -25,6 +25,7 @@ use JSON;
 use Config::Std;
 use Log::Log4perl::MDC;
 use Crypt::CBC;
+use Crypt::JWT qw( decode_jwt );
 
 # Project modules
 use OpenXPKI::Log4perl;
@@ -192,11 +193,30 @@ while (my $cgi = CGI::Fast->new) {
     );
 
     my $sess_id;
-    try {
-        $sess_id = $session_cookie->fetch_id;
-    }
-    catch ($err) {
-        $log->error($err);
+    # TODO - we might want to embed this into the session handler
+    if ($ENV{SCRIPT_URL} =~ m{oidc_redirect\z} && $cgi->param('state')) {
+        try {
+            # the state paramater is the (encrypted) session id
+            # wrapped into a HMAC JWT using the extid cookie
+            $log->debug('Restore session from OIDC redirect');
+            my $hash_key = $cgi->cookie('oxi-extid') || die 'Unable to find CSRF cookie';
+            my $state = decode_jwt( key => $hash_key, token => $cgi->param('state') );
+            $sess_id = $state->{session_id};
+            $sess_id = $cipher->decrypt($sess_id) if ($cipher);
+            # TODO - need to handle errors here!
+        }
+        catch ($err) {
+            $log->error($err);
+            __handle_error($cgi, "I18N_OPENXPKI_UI_OIDC_LOGIN_FAILED");
+            next;
+        }
+    } else {
+        try {
+            $sess_id = $session_cookie->fetch_id;
+        }
+        catch ($err) {
+            $log->error($err);
+        }
     }
 
     Log::Log4perl::MDC->remove();
@@ -357,6 +377,7 @@ while (my $cgi = CGI::Fast->new) {
             backend => $backend_client,
             session => $session_front,
             log => $log,
+            $cipher ? (cipher => $cipher) : (),
             socket_path => $conf->{global}->{'socket'},
             script_url => $conf->{global}->{scripturl},
             $conf->{global}->{staticdir} ? (static_dir => $conf->{global}->{staticdir}) : (),

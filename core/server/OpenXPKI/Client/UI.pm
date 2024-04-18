@@ -5,15 +5,18 @@ use English;
 
 # Core modules
 use Encode;
+use JSON qw(encode_json decode_json);
 use Data::Dumper;
 use MIME::Base64;
 use Module::Load ();
 
 # CPAN modules
 use CGI::Session;
+use Crypt::JWT qw( encode_jwt decode_jwt );
 use URI::Escape;
 use Log::Log4perl::MDC;
-use Crypt::JWT qw( encode_jwt decode_jwt );
+use LWP::UserAgent;
+use HTTP::Request;
 use Moose::Util::TypeConstraints qw( enum ); # PLEASE NOTE: this enables all warnings via Moose::Exporter
 use Type::Params qw( signature_for );
 
@@ -34,6 +37,13 @@ has 'session' => (
     required => 1,
     is => 'rw',
     isa => 'CGI::Session|Undef',
+);
+
+# cipher object to encryt/decrypt protected values
+has 'cipher' => (
+    is => 'ro',
+    isa => 'Crypt::CBC',
+    predicate => 'has_cipher',
 );
 
 # Response structure (JSON or some raw bytes) and HTTP headers
@@ -858,6 +868,79 @@ sub handle_login {
                 return $uilogin;
             }
 
+        } elsif( $login_type  eq 'OIDC' ) {
+
+            my %oidc_client = map {
+                ($_ => ($auth->{$_} || die "OIDC setup incomplete, $_ is not set"));
+            } qw(client_id auth_uri token_uri client_secret);
+
+            $self->log->debug(Dumper $auth->{oidc});
+
+            # we use "page" to transport the token
+            if ($page =~ m{login!oidc!token!([\w\-\.]+)\z}) {
+                # Step 3 - use token to perform authentication
+                my $token = $1;
+                $self->log->debug('OIDC Login (3/3) - present token to backend');
+                $self->log->trace($token);
+                my $nonce = $self->session->param('oidc-nonce');
+                return $uilogin->init_login_missing_data unless ($nonce);
+
+                $self->session->param('oidc-nonce' => undef);
+                $reply = $self->backend()->send_receive_service_msg( 'GET_OIDC_LOGIN', {
+                    token => $token,
+                    client_id => $oidc_client{client_id},
+                    nonce => $nonce,
+                });
+
+            } elsif (my $code = $req->param('code')) {
+
+                # Step 2 - user was redirected from IdP
+                $self->log->debug("OIDC Login (2/3) - redeem auth code $code");
+                my $ua = LWP::UserAgent->new();
+                my $req = HTTP::Request->new('POST', $oidc_client{token_uri},
+                    HTTP::Headers->new( Content_Type => 'application/json' ),
+                    encode_json({
+                        code => $code,
+                        client_id => $oidc_client{client_id},
+                        client_secret => $oidc_client{client_secret},
+                        redirect_uri => 'https://dev.rapidpki.com/webui/democa/oidc_redirect',
+                        grant_type => 'authorization_code',
+                }));
+                my $response = $ua->request($req);
+                # TODO - error handling
+                $self->log->trace("OIDC Token Response: " .$response->decoded_content);
+                my $auth_info = decode_json($response->decoded_content);
+                $uilogin->redirect->to('login!oidc!token!'.$auth_info->{id_token});
+                return $uilogin;
+
+            } else {
+                # Initial step - assemble auth token request and send redirect
+                my $nonce = Data::UUID->new()->create_b64();
+                my $sess_id = $self->has_cipher ?
+                    $self->cipher->encrypt($self->session->id) :
+                    $self->session->id;
+
+                # TODO - this is only set if we had a roundtrip before
+                # move this into the session
+                my $hash_key = $cgi->cookie('oxi-extid');
+                my $auth_token = {
+                    response_type => 'code',
+                    client_id => $oidc_client{client_id},
+                    scope => ($auth->{scope} || 'openid profile email'),
+                    redirect_uri => 'https://dev.rapidpki.com/webui/democa/oidc_redirect',
+                    state => encode_jwt( alg => 'HS256', key => $hash_key, payload => {
+                        session_id => $sess_id,
+                        baseurl => 'https://dev.rapidpki.com/webui/democa/',
+                    }),
+                    nonce => $nonce,
+                };
+                $self->log->debug('OIDC Login (1/3) - redirect to ' . $oidc_client{auth_uri});
+                $self->session->param('oidc-nonce',$nonce);
+                my $loginurl = $oidc_client{auth_uri}.'?'.join('&', (map { $_ .'='. uri_escape($auth_token->{$_})  } keys %{$auth_token}));
+                $uilogin->redirect->external($loginurl);
+                return $uilogin;
+            }
+
         } elsif( $login_type  eq 'PASSWD' ) {
 
             # form send / credentials are passed (works with an empty form too...)
@@ -978,15 +1061,17 @@ sub _recreate_frontend_session {
     $self->log->trace('Got session info: '. Dumper $data) if $self->log->is_trace;
 
     # fetch redirect from old session before deleting it!
-    my $redirect = $self->session->param('redirect');
+    my %keep = map {
+        my $val = $self->session->param($_);
+        (defined $val) ? ($_ => $val) : ();
+    } ('redirect','baseurl');
+
+    $self->log->trace("Carry over session items: " . Dumper \%keep) if ($self->log->is_trace);
 
     # create a new session
     $self->_new_frontend_session;
 
-    if ($redirect) {
-        $self->log->trace('Carry over redirect target ' . $redirect);
-        $self->session->param('redirect', $redirect);
-    }
+    map { $self->session->param($_, $keep{$_}) } keys %keep;
 
     # set some data
     $self->session->param('backend_session_id', $self->backend->get_session_id );

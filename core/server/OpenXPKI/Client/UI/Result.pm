@@ -657,15 +657,17 @@ sub render {
             $url = $self->__persist_response( { data => $body } );
         }
 
+        $self->log->debug("Raw redirect target: $url");
         # if url does not start with http or slash, prepend baseurl + route name
         if ($url !~ m{\A http|/}x) {
-            my $baseurl = $self->session_param('baseurl');
+            my $baseurl = $self->session_param('baseurl') || $cgi->param('baseurl');
+            $self->log->debug("Adding baseurl $baseurl");
             $url = sprintf("%sopenxpki/%s", $baseurl, $url);
         }
-
         # HTTP redirect
         $self->log->debug("Sending HTTP redirect to: $url");
         print $cgi->redirect($url);
+
     }
 }
 

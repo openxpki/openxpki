@@ -7,6 +7,7 @@ use MIME::Base64 qw( encode_base64 decode_base64 );
 
 # CPAN modules
 use Crypt::CBC;
+use Data::UUID;
 use Moose::Util::TypeConstraints; # PLEASE NOTE: this enables all warnings via Moose::Exporter
 
 =head1 NAME
@@ -144,10 +145,24 @@ sub render {
         -name => 'oxi-login-timestamp',
         -value => ($self->session->param('login_timestamp') // 0),
     };
+
+    # site global and non-strict cookie used with external authentication
+    my $cookie_ext_id;
+    if (!$self->cgi->cookie('oxi-extid')) {
+        $cookie_ext_id = {
+            -SameSite => 'Lax',
+            -Secure => 1,
+            -HttpOnly => 1,
+            -name => 'oxi-extid',
+            -value => Data::UUID->new()->create_b64(),
+        };
+    }
+
     # The result of this method is fed into $cgi->header(-cookie => $cookie->render)
     return [
         $self->cgi->cookie($cookie_id),
         $self->cgi->cookie($cookie_last_login),
+        ($cookie_ext_id ? $self->cgi->cookie($cookie_ext_id) : ())
     ];
 }
 

@@ -149,6 +149,7 @@ sub __is_valid_message : PRIVATE {
             'GET_PASSWD_LOGIN',
             'GET_CLIENT_LOGIN',
             'GET_X509_LOGIN',
+            'GET_OIDC_LOGIN',
             'NEW_SESSION',
             'CONTINUE_SESSION',
             'DETACH_SESSION',
@@ -491,6 +492,13 @@ sub __handle_GET_CLIENT_LOGIN : PRIVATE {
 }
 
 sub __handle_GET_X509_LOGIN : PRIVATE {
+    ##! 1: 'start'
+    my $self = shift;
+
+    return $self->__handle_login( shift );
+}
+
+sub __handle_GET_OIDC_LOGIN : PRIVATE {
     ##! 1: 'start'
     my $self = shift;
 
