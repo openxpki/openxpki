@@ -30,15 +30,24 @@ sub init_structure {
         $self->pki_realm($realm);
     }
 
-    # To issue redirects to the UI, we store the referrer
-    # default is mainly relevant for test scripts
-    my $baseurl = $self->param('baseurl') || '/openxpki';
+    # Store the referrer to be able to issue internal UI redirects (without
+    # specifying the full path).
+    #
+    # We use a Browser-sent URL here because the Ember web UI (index.html)
+    # could have a different URL than the asynchronously called (CGI) backend.
+    # E.g.
+    #   Ember UI: https://localhost:9443/webui/democa/
+    #   Backend:  https://localhost:9443/cgi-bin/webui.fcgi
+    my $baseurl = $self->param('baseurl') || '/openxpki'; # default /openxpki is mainly relevant for test scripts
+
+    # strip spaces and trailing slash
     $baseurl =~ s{(\A\s+|\s+\z|/\z)}{}g;
     # prevent injection of external urls
     $baseurl =~ s{\w+://[^/]+}{};
+
     $self->session_param('baseurl',  $baseurl.'/#/');
     $self->_session->flush;
-    $self->log->debug("Baseurl from referrer: " . $baseurl);
+    $self->log->debug("Base URL from referrer: " . $baseurl);
 
     if ($self->session_param('is_logged_in') and $user) {
         $self->set_user(%{ $user });
