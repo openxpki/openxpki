@@ -87,21 +87,17 @@ sub declare_routes ($self, $r) {
         operation => 'validate_http',
     );
 
-    map {
-        $r->post('/acme/<endpoint>/'.$_.'/<resource_id>')->to(
-            %controller_params,
-            service_class => 'OpenXPKI::Client::Service::ACME::'.ucfirst($_),
-            operation => $_
-        );
-    } qw(order orders account authz cert);
+    $r->post('/acme/<endpoint>/'.$_.'/<resource_id>')->to(
+        %controller_params,
+        service_class => 'OpenXPKI::Client::Service::ACME::'.ucfirst($_),
+        operation => $_
+    ) for qw(order orders account authz cert);
 
-    map {
-        $r->post('/acme/<endpoint>/'.$_)->to(
-            %controller_params,
-            service_class => 'OpenXPKI::Client::Service::ACME::'.ucfirst(substr($_,3)),
-            operation => $_,
-        );
-    } qw(newAccount newAuthz newOrder);
+    $r->post('/acme/<endpoint>/'.$_)->to(
+        %controller_params,
+        service_class => 'OpenXPKI::Client::Service::ACME::'.ucfirst(substr($_,3)),
+        operation => $_,
+    ) for qw(newAccount newAuthz newOrder);
 
 }
 
