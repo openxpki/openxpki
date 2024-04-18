@@ -10,6 +10,36 @@ use OpenXPKI::Server::Context qw( CTX );
 
 # Use predefined numeric codes for dedicated problems
 our %named_messages = (
+    40080 => 'No method set in request',
+    40081 => 'Decoding of JSON encoded POST data failed',
+    40082 => 'Wrong input values',
+    40083 => 'RAW post not allowed (no method set in request)',
+    40084 => 'RAW post with unknown content type',
+    40085 => 'Unknown RPC error',
+    40086 => 'POST data contains invalid UTF8 octets',
+    40087 => 'Content type JOSE not enabled',
+    40088 => 'Processing JWS protected payload failed',
+    40089 => 'Method header is missing in JWS',
+    40090 => 'Unsupported JWS algorithm',
+    40091 => 'Content type pkcs7 not enabled',
+
+    40101 => 'Authentication credentials missing or incorrect',
+
+    40480 => 'Invalid method / setup incomplete',
+    40481 => 'Resume requested but no workflow found',
+    40482 => 'Resume requested but workflow is not in manual state',
+    40483 => 'Resume requested but expected workflow action not available',
+
+    50000 => 'Server exception',
+    50001 => 'Unable to fetch configuration from server - connect failed',
+    50080 => 'Could not unwrap PKCS#7 contents',
+    50081 => 'Workflow terminated in unexpected state',
+    50082 => 'Unable to query OpenAPI specification from OpenXPKI server',
+
+    50005 => 'ENV variable "server" and servername are both set but are mutually exclusive',
+    50006 => 'ENV variable "server" requested but RPC endpoint could not be determined from URL',
+    50007 => 'Requested RPC endpoint is not configured properly',
+
     '40000' => 'Bad Request',
     '40001' => 'Signature invalid',
     '40002' => 'Unable to parse request',
@@ -23,7 +53,7 @@ our %named_messages = (
     '40400' => 'Not Found',
     '40401' => 'Not Found (Empty request endpoint and no default server set)',
     '50000' => 'Server Error',
-    '50001' => 'Unable to initialize client',
+    '50002' => 'Unable to initialize client',
     '50003' => 'Unexpected response from backend',
     '50010' => 'Unable to initialize endpoint parameters',
     '50100' => 'Operation not implemented',
@@ -48,7 +78,7 @@ Response incl. workflow details:
 
 Error response:
 
-    die OpenXPKI::Client::Service::Response->new_error( 50001 );
+    die OpenXPKI::Client::Service::Response->new_error( 50002 );
 
 Error response with custom error message:
 
@@ -66,7 +96,7 @@ Error response with custom error message:
 
 =head2 result
 
-Service specific result I<Str>.
+Service specific result I<Str> or I<HashRef>.
 
     OpenXPKI::Client::Service::Response->new(
         result => json_encode(...),
@@ -75,7 +105,7 @@ Service specific result I<Str>.
 =cut
 has result => (
     is => 'rw',
-    isa => 'Str',
+    isa => 'Str|HashRef',
     lazy => 1,
     default => '',
     predicate => 'has_result',
@@ -356,7 +386,7 @@ Returns the custom error message if set:
 
 ...or a predefined message if a known internal error code was used:
 
-    my $r = OpenXPKI::Client::Service::Response->new_error( 50001 );
+    my $r = OpenXPKI::Client::Service::Response->new_error( 50002 );
     say $r->error_message;
     # Unable to initialize client
 

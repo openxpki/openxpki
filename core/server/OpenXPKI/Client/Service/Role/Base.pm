@@ -279,6 +279,22 @@ has config => (
 );
 sub _build_config ($self) { $self->config_obj->endpoint_config($self->endpoint) }
 
+has config_env_keys => (
+    is => 'rw',
+    isa => 'HashRef',
+    lazy => 1,
+    init_arg => undef,
+    builder => '_config_env_keys',
+);
+sub _config_env_keys ($self) {
+    my %keys;
+    if (my $keys_str = $self->config->{$self->operation}->{env}) {
+        %keys = map { $_ => 1 } split /\s*,\s*/, $keys_str;
+        $self->log->trace('Configured ENV keys: ' . join(', ', keys %keys)) if $self->log->is_trace;
+    }
+    return \%keys;
+}
+
 =head3 log
 
 A logger object, per default set
@@ -320,7 +336,7 @@ sub _build_backend ($self) {
     }
     catch ($err) {
         $self->log->error("Could not create client object: $err");
-        die OpenXPKI::Client::Service::Response->new_error( 50001 );
+        die OpenXPKI::Client::Service::Response->new_error( 50002 );
     }
 }
 
@@ -365,47 +381,45 @@ sub _build_wf_params ($self) {
 
         my $servername = $conf->{$operation}->{servername} || $conf->{global}->{servername};
         if ($servername) {
-            $p->{'server'} = $servername;
-            $p->{'interface'} = $self->service_name;
+            $p->{server} = $servername;
+            $p->{interface} = $self->service_name;
         }
 
-        my %envkeys;
-        if ($conf->{$operation}->{env}) {
-            %envkeys = map {$_ => 1} (split /\s*,\s*/, $conf->{$operation}->{env});
-            $self->log->trace("Found env keys: " . $conf->{$operation}->{env});
-        }
-
-        $p->{'client_ip'} = $self->remote_address if $envkeys{'client_ip'};
-        $p->{'user_agent'} = $self->request->headers->user_agent if $envkeys{'user_agent'};
-        $p->{'endpoint'} = $self->endpoint if $envkeys{'endpoint'};
+        $p->{client_ip} = $self->remote_address if $self->config_env_keys->{client_ip};
+        $p->{user_agent} = $self->request->headers->user_agent if $self->config_env_keys->{user_agent};
+        $p->{endpoint} = $self->endpoint if $self->config_env_keys->{endpoint};
 
         # be lazy and use endpoint name as servername
-        if ($envkeys{'server'}) {
-            die "ENV 'server' and 'servername' are both set but are mutually exclusive ('servername' might be set global config)\n"
+        if ($self->config_env_keys->{server}) {
+            die "ENV variable 'server' and 'servername' are both set but are mutually exclusive ('servername' might be set global config)\n"
               if $servername;
 
-            $p->{'server'} = $self->endpoint
-              or die "ENV 'server' requested but endpoint is not set\n";
+            $p->{server} = $self->endpoint
+              or die "ENV variable 'server' requested but endpoint could not be determined from URL\n";
 
-            $p->{'interface'} = $self->service_name;
+            $p->{interface} = $self->service_name;
         }
 
         # gather data from TLS session
         if ( $self->request->is_secure ) {
-            $self->log->debug("calling context is https");
+            $self->log->debug("Calling context is HTTPS");
+            $self->log->trace('Apache ENV keys: ' . join(', ', sort keys $self->apache_env->%*)) if $self->log->is_trace;
+
             my $auth_dn = $self->apache_env->{SSL_CLIENT_S_DN};
             my $auth_pem = $self->apache_env->{SSL_CLIENT_CERT};
             if ( defined $auth_dn ) {
-                $self->log->info("authenticated client DN: $auth_dn");
-                if ($envkeys{'signer_dn'}) {
-                    $p->{'signer_dn'} = $auth_dn;
+                $self->log->info("Authenticated client DN: $auth_dn");
+                if ($self->config_env_keys->{signer_dn}) {
+                    $p->{signer_dn} = $auth_dn;
                 }
-                if ($auth_pem && $envkeys{'signer_cert'}) {
-                    $p->{'signer_cert'} = $auth_pem;
+                if ($auth_pem && $self->config_env_keys->{signer_cert}) {
+                    $p->{signer_cert} = $auth_pem;
                 }
             } else {
-                $self->log->debug("unauthenticated (no cert)");
+                $self->log->debug("Unauthenticated (no cert)");
             }
+        } else {
+            $self->log->debug("Calling context is plain HTTP");
         }
 
         # legacy CGI mode
