@@ -156,9 +156,9 @@ sub handle_revocation_request ($self) {
 
     if ($response->has_error) {
         # noop
-    } elsif ($response->state eq 'SUCCESS') {
+    } elsif ($response->is_state('SUCCESS')) {
         $response->http_status_code(204);
-    } elsif ($response->state eq 'CANCELED') {
+    } elsif ($response->is_state('CANCELED')) {
         $response->http_status_code(409);
     } else {
         $response->http_status_code(400);

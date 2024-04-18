@@ -86,10 +86,10 @@ has result => (
 Extra HTTP headers to be added (I<HashRef>).
 
     OpenXPKI::Client::Service::Response->new(
+        ...
         extra_headers => {
             'content-type' => 'application/x-pem-file',
         },
-        result => $pem,
     );
 
 =cut
@@ -168,7 +168,7 @@ has retry_after => (
 Workflow info I<HashRef> as returned by
 L<OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info>.
 
-Setting this attribute will also set L</state> and L</proc_state> and maybe
+Setting this attribute also sets L</state>, L</proc_state> and
 L</error_message> according to the workflow informations.
 
 =cut
@@ -180,8 +180,9 @@ has workflow => (
     trigger => \&__process_workflow,
 );
 sub __process_workflow ($self, $workflow) {
-    $self->state($workflow->{state});
-    $self->proc_state($workflow->{proc_state});
+    $self->state($workflow->{state}) if $workflow->{state};
+    $self->proc_state($workflow->{proc_state}) if $workflow->{proc_state};
+    $self->__transaction_id($workflow->{context}->{transaction_id}) if $workflow->{context}->{transaction_id};
     $self->__error_message($workflow->{context}->{error_code}) if $workflow->{context}->{error_code};
 }
 
@@ -242,7 +243,7 @@ has http_status_message => (
 );
 sub __build_http_status_message ($self) {
     # Pending request
-    return sprintf('Request Pending - Retry Later (%s)', $self->transaction_id) if $self->is_pending;
+    return 'Request Pending - Retry Later' . ($self->has_transaction_id ? sprintf(' (%s)',  $self->__transaction_id) : '') if $self->is_pending;
     # Error
     return $self->error_message if $self->has_error;
     # Default
@@ -269,50 +270,40 @@ sub __build_http_status_line ($self) {
     );
 }
 
-=head2 transaction_id
+=head2 state
 
-Workflow transaction ID I<Str>, set automatically if L</workflow> was set and
-its context contains the C<transaction_id> item.
+Readonly workflow C<state> I<Str>, automatically set if L</workflow> was set.
 
 =cut
-has transaction_id => (
+has state => ( ## --> better __state and is_state($s) which will also test $self->has_state ??!
     is => 'rw',
     isa => 'Str',
     init_arg => undef,
-    lazy => 1,
-    default => sub ($self) { $self->workflow->{context}->{transaction_id} // '' },
-);
-
-=head2 state
-
-Workflow C<state> I<Str>, set automatically if L</workflow> was set.
-
-May be I<undef>.
-
-=cut
-has state => (
-    is => 'rw',
-    isa => 'Str|Undef',
-    init_arg => undef,
-    lazy => 1,
+    trigger => sub { die '"state" can only be set once' if scalar @_ > 2 },
     predicate => 'has_state',
-    default => undef,
 );
 
-=head2 state
+=head2 proc_state
 
-Workflow C<proc_state> I<Str>, set automatically if L</workflow> was set.
-
-May be I<undef>.
+Readonly workflow C<proc_state> I<Str>, automatically set if L</workflow> was set.
 
 =cut
 has proc_state => (
     is => 'rw',
-    isa => 'Str|Undef',
+    isa => 'Str',
     init_arg => undef,
-    lazy => 1,
+    trigger => sub { die '"proc_state" can only be set once' if scalar @_ > 2 },
     predicate => 'has_proc_state',
-    default => undef,
+);
+
+# Workflow transaction ID, set automatically if "workflow" was set and
+# its context contains the "transaction_id" item.
+has __transaction_id => (
+    is => 'rw',
+    isa => 'Str',
+    init_arg => undef,
+    trigger => sub { die '"__transaction_id" can only be set once' if scalar @_ > 2 },
+    predicate => 'has_transaction_id',
 );
 
 
@@ -385,7 +376,7 @@ sub error_message ($self) {
 
 =head2 is_server_error
 
-Returns C<1> if L</error> was set to C<5xxxx> or C<5xx> or C<0> othwerwise.
+Returns C<1> if L</error> was set to C<5xxxx> or C<5xx> or C<0> otherwise.
 
 =cut
 sub is_server_error ($self) {
@@ -395,7 +386,7 @@ sub is_server_error ($self) {
 
 =head2 is_client_error
 
-Returns C<1> if L</error> was set to C<5xxxx> or C<5xx> or C<0> othwerwise.
+Returns C<1> if L</error> was set to C<5xxxx> or C<5xx> or C<0> otherwise.
 
 =cut
 sub is_client_error ($self) {
@@ -403,9 +394,35 @@ sub is_client_error ($self) {
     return ($self->error >= 40000 and $self->error < 50000) ? 1 : 0;
 }
 
+=head2 is_state
+
+Returns C<1> if the workflow is in the given C<state>, C<0> otherwise (also if there is no C<state> information).
+
+Does a case insensitive string comparison.
+
+=cut
+sub is_state ($self, $state) {
+    return 0 unless $self->has_state;
+    return 0 unless lc($self->state) eq lc($state);
+    return 1;
+}
+
+=head2 is_proc_state
+
+Returns C<1> if the workflow is in the given C<proc_state>, C<0> otherwise (also if there is no C<proc_state> information).
+
+Does a case insensitive string comparison.
+
+=cut
+sub is_proc_state ($self, $proc_state) {
+    return 0 unless $self->proc_has_state;
+    return 0 unless lc($self->proc_state) eq lc($proc_state);
+    return 1;
+}
+
 =head2 add_debug_headers
 
-Adds some debugging HTTP headers if L</workflow> was set.
+Adds some debugging HTTP headers from workflow information if L</workflow> was previously set.
 
 =cut
 sub add_debug_headers ($self) {
@@ -414,10 +431,11 @@ sub add_debug_headers ($self) {
     if ($workflow->{id}) {
         $self->extra_headers->{'X-OpenXPKI-Workflow-Id'} = $workflow->{id};
     }
-    if (my $tid = $self->transaction_id) {
+    if ($self->has_transaction_id) {
+        my $tid = $self->__transaction_id;
         # this should usually be a hexadecimal string but to avoid any surprise
         # we check this here and encoded if needed.
-        $tid = Encode::encode("MIME-B", $tid) if ($tid =~ m{\W});
+        $tid = Encode::encode("MIME-B", $tid) if $tid =~ m{\W};
         $self->extra_headers->{'X-OpenXPKI-Transaction-Id'} = $tid;
     }
     if (my $error = $workflow->{context}->{error_code}) {
@@ -425,7 +443,7 @@ sub add_debug_headers ($self) {
         $error = substr(i18nGettext($error),0,64);
         # use mime encode if header is non-us-ascii, 42 chars plus tags is the
         # maximum to stay below 76 chars (starts to wrap otherwise)
-        $error = Encode::encode("MIME-B", substr($error,0,42)) if ($error =~ m{\W});
+        $error = Encode::encode("MIME-B", substr($error,0,42)) if $error =~ m{\W};
         $self->extra_headers->{'X-OpenXPKI-Error'} = $error;
     }
 }
