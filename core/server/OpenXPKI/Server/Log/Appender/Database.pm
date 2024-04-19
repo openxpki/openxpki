@@ -1,5 +1,4 @@
 package OpenXPKI::Server::Log::Appender::Database;
-use OpenXPKI -base => 'Log::Log4perl::Appender';
 
 # CPAN modules
 use Log::Log4perl::MDC;
@@ -8,6 +7,8 @@ use Log::Log4perl::Level;
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Database; # we must import "auto_id"
+
+use OpenXPKI -base => 'Log::Log4perl::Appender';
 
 sub new {
     my($proto, %p) = @_;
