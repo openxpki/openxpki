@@ -47,7 +47,7 @@ sub handleInput {
     $ctx->add($self->salt());
     my $hashed_key = $ctx->hexdigest;
 
-    $self->logger->debug("OTP login - plain token: $token - hashed token/dp key: $hashed_key");
+    $self->log->debug("OTP login - plain token: $token - hashed token/dp key: $hashed_key");
 
     my $val = CTX('api2')->get_data_pool_entry(
         namespace => $self->namespace(),
@@ -61,7 +61,7 @@ sub handleInput {
         error => OpenXPKI::Server::Authentication::Handle::USER_UNKNOWN
     ) unless $data;
 
-    $self->logger->trace('Got OTP token ' . Dumper $val ) if ($self->logger->is_trace);
+    $self->log->trace('Got OTP token ' . Dumper $val ) if ($self->log->is_trace);
 
     return OpenXPKI::Server::Authentication::Handle->new(
         username => $token,

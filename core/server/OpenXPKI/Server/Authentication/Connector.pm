@@ -57,7 +57,7 @@ sub handleInput {
     my $result;
     eval {
         my $mode = $self->mode();
-        $self->logger->debug("Query username $username with mode $mode");
+        $self->log->debug("Query username $username with mode $mode");
         # combined mode, make a "bind" query with get_hash
         # using a non-empty response as userinfo
         if ($mode eq 'combined') {

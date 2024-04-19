@@ -44,7 +44,7 @@ sub handleInput {
         if ($mode eq 'hash' || !$role) {
             $userinfo = CTX('config')->get_hash( [ @{$self->prefix()}, 'user', $username ] );
             ##! 64: $userinfo
-            $self->logger->trace("Got userinfo for #$username#: " . Dumper $userinfo) if ($self->logger->is_trace);
+            $self->log->trace("Got userinfo for #$username#: " . Dumper $userinfo) if ($self->log->is_trace);
             $digest = $userinfo->{digest} || '';
             delete $userinfo->{digest};
             # use role only if no static role is set
