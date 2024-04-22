@@ -1,5 +1,6 @@
 package OpenXPKI::Server::API2::Plugin::Cert::import_certificate;
 use OpenXPKI::Server::API2::EasyPlugin;
+use OpenXPKI;
 
 =head1 NAME
 
@@ -7,19 +8,10 @@ OpenXPKI::Server::API2::Plugin::Cert::import_certificate
 
 =cut
 
-# CPAN modules
-use Data::Dumper;
-use Type::Params qw( signature_for );
-
 # Project modules
-use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Types;
 use OpenXPKI::Crypt::X509;
-use OpenXPKI::Server::Database; # to get AUTO_ID
-
-# should be done after imports to safely disable warnings in Perl < 5.36
-use experimental 'signatures';
 
 =head1 COMMANDS
 

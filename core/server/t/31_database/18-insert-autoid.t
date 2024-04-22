@@ -1,6 +1,5 @@
-use strict;
-use warnings;
-use English;
+use OpenXPKI;
+
 use Test::More;
 use Test::Deep;
 use Test::Exception;
@@ -39,7 +38,7 @@ $db->run("SQL INSERT with automatic ID = sequence generation", 2, sub {
 
         $rownum = $dbi->insert(
             into => "test",
-            values => { id => OpenXPKI::Server::Database::AUTO_ID(), text => "Flatscreen", entropy => 10 },
+            values => { id => AUTO_ID, text => "Flatscreen", entropy => 10 },
         );
         ok $rownum == 1;
     } "correctly execute insert query";

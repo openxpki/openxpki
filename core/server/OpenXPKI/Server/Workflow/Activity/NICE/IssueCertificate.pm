@@ -1,22 +1,11 @@
-# OpenXPKI::Server::Workflow::Activity::NICE::IssueCertificate
-# Written by Oliver Welter for the OpenXPKI Project 2011
-# Copyright (c) 2011 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Activity::NICE::IssueCertificate;
+use OpenXPKI -base => 'OpenXPKI::Server::Workflow::Activity';
 
-use strict;
-use base qw( OpenXPKI::Server::Workflow::Activity );
-
-use English;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Database::Legacy;
 
 use OpenXPKI::Server::NICE::Factory;
-use OpenXPKI::Server::Database; # to get AUTO_ID
-
 
 sub execute {
 

@@ -1,17 +1,11 @@
 package OpenXPKI::Server::NICE;
-
-use Moose;
-
-use English;
+use OpenXPKI -class;
 
 use Encode;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use OpenXPKI::Crypt::X509;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Database::Legacy;
-use OpenXPKI::Server::Database; # to get AUTO_ID
 
 # Attribute Setup
 

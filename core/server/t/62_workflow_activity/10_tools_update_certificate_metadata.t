@@ -1,6 +1,5 @@
 #!/usr/bin/perl
-use strict;
-use warnings;
+use OpenXPKI;
 
 # Core modules
 use FindBin qw( $Bin );
@@ -19,7 +18,6 @@ use Data::UUID;
 use lib "$Bin/../lib";
 use lib "$Bin";
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::Database; # to get AUTO_ID
 use OpenXPKI::Test;
 
 plan tests => 3;

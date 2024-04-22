@@ -1,14 +1,9 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::PersistCertificateMetadata;
-
-use strict;
-use base qw( OpenXPKI::Server::Workflow::Activity );
+use OpenXPKI -base => 'OpenXPKI::Server::Workflow::Activity';
 
 use Workflow::Exception qw(configuration_error workflow_error);
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
-use OpenXPKI::Server::Database; # to get AUTO_ID
 
 sub execute {
     ##! 1: 'start'

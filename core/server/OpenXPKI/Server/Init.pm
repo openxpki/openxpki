@@ -19,7 +19,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Config;
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::VolatileVault;
-use OpenXPKI::Server::Database; # PLEASE NOTE: this enables all warnings via Moose::Exporter
+use OpenXPKI::Server::Database;
 use OpenXPKI::Server::Log;
 use OpenXPKI::Server::Log::CLI;
 use OpenXPKI::Server::API2;

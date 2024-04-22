@@ -3,10 +3,33 @@ use OpenXPKI;
 
 # Core modules
 use MIME::Base64;
+use Exporter qw( import );
+
+# Symbols to export by default
+our @EXPORT = qw( AUTO_ID );
 
 =head1 NAME
 
 OpenXPKI::Util - common utility functions to avoid duplicate code.
+
+=head1 SYNOPSIS
+
+    use OpenXPKI::Util;
+
+The subroutine L</AUTO_ID> is automatically exported, e.g.:
+
+    use OpenXPKI::Util;
+    use OpenXPKI::Server::Context qw( CTX );
+
+    CTX('dbi')->insert(
+        into => 'certificate_attributes',
+        values => {
+            attribute_key => AUTO_ID,
+            identifier => $cert_identifier,
+        }
+    );
+
+=cut
 
 =head1 FUNCTIONS
 
@@ -184,6 +207,21 @@ sub is_regular_workflow {
     return 0 unless defined $wf_id;
     return 0 unless $wf_id =~ m{\A\d+\z};
     return 1;
+}
+
+=head3 AUTO_ID
+
+Used in database C<INSERT>s to automatically set a primary key to the next
+serial number (i.e. sequence associated with the table).
+
+See L<OpenXPKI::Server::Database/insert> for details.
+
+
+=cut
+
+sub AUTO_ID :prototype() {
+    state $obj = bless {}, "OpenXPKI::Server::Database::AUTOINCREMENT";
+    return $obj;
 }
 
 1;

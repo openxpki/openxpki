@@ -1,5 +1,6 @@
 package OpenXPKI::Server::API2::Plugin::Cert::set_cert_metadata;
 use OpenXPKI::Server::API2::EasyPlugin;
+use OpenXPKI;
 
 =head1 NAME
 
@@ -8,10 +9,8 @@ OpenXPKI::Server::API2::Plugin::Cert::set_cert_metadata
 =cut
 
 # Project modules
-use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Types;
-use OpenXPKI::Server::Database; # to get AUTO_ID
 
 =head1 COMMANDS
 

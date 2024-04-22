@@ -1,32 +1,26 @@
 package OpenXPKI::Server::Database;
-use Moose;
+use OpenXPKI -class;
 
 =head1 Name
 
-OpenXPKI::Server::Database - Handles database connections and encapsulates DB
+OpenXPKI::Server::Database - Handle database connections and encapsulate DB
 specific drivers/functions.
 
 =cut
 
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
+# Core modules
+use Math::BigInt;
+use Module::Load;
+
+# CPAN modules
+use DBIx::Handler;
+use DBI::Const::GetInfoType; # provides %GetInfoType hash
+use SQL::Abstract::More;
+
+# Project modules
 use OpenXPKI::Server::Database::Role::Driver;
 use OpenXPKI::Server::Database::QueryBuilder;
 use OpenXPKI::Server::Database::Query;
-use DBIx::Handler;
-use DBI::Const::GetInfoType; # provides %GetInfoType hash
-use Math::BigInt;
-use SQL::Abstract::More;
-use Moose::Exporter;
-use Module::Load;
-use Type::Params qw( signature_for );
-
-# should be done after imports to safely disable warnings in Perl < 5.36
-use experimental 'signatures';
-
-# Export AUTO_ID
-Moose::Exporter->setup_import_methods(with_meta => [ 'AUTO_ID' ]);
-sub AUTO_ID { return bless {}, "OpenXPKI::Server::Database::AUTOINCREMENT" }
 
 ## TODO special handling for SQLite databases from OpenXPKI::Server::Init->get_dbi()
 # if ($params{TYPE} eq "SQLite") {
@@ -461,7 +455,7 @@ sub insert ($self, $arg) {
     # Replace AUTO_ID with value of next_id()
     for (keys %{ $arg->{values} }) {
         $arg->{values}->{$_} = $self->next_id($arg->{into})
-            if (ref $arg->{values}->{$_} eq "OpenXPKI::Server::Database::AUTOINCREMENT");
+            if (ref $arg->{values}->{$_} eq "OpenXPKI::Server::Database::AUTOINCREMENT"); # ::AUTOINCREMENT is a "virtual" package
     }
 
     my $query = $self->query_builder->insert($arg->%*);
@@ -922,9 +916,9 @@ Inserts rows into the database and returns the number of affected rows.
         }
     );
 
-To automatically set a primary key to the next serial number (i.e. sequence
-associated with this table) set it to C<AUTO_ID>. You need to C<use OpenXPKI::Server::Database;>
-to be able to use C<AUTO_ID>.
+B<AUTO_ID>: to automatically set a primary key to the next serial number (i.e. sequence
+associated with this table) set it to C<AUTO_ID>. The C<AUTO_ID> subroutine is provided
+by C<use OpenXPKI> or C<use OpenXPKI::Util>.
 
 Named parameters:
 

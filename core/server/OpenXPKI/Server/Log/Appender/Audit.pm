@@ -1,16 +1,11 @@
 package OpenXPKI::Server::Log::Appender::Audit;
+use OpenXPKI -base => 'Log::Log4perl::Appender';
 
-use strict;
-use English;
 use Log::Log4perl;
-use Data::Dumper;
 use Log::Log4perl::MDC;
 use Log::Log4perl::Level;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::Database; # we must import "auto_id"
 use Time::HiRes;
-
-our @ISA = qw(Log::Log4perl::Appender);
 
 sub new {
     my($proto, %p) = @_;
