@@ -40,7 +40,7 @@ button:
   workflow:
     copy_id:
       label: "Workflow #{id}"
-      tooltip: "Workflow-ID in kopieren"
+      tooltip: "Workflow-ID kopieren"
 
 component:
   oxifield_datetime:
