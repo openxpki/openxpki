@@ -11,7 +11,7 @@ TODO: {
 print STDERR "OpenXPKI::Crypto::PKCS7\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Crypto::TokenManager;
-use OpenXPKI qw (read_file);
+use OpenXPKI::FileUtils;
 # TODO: See Issue #188 - PKCS7 has been removed?
 #use OpenXPKI::Crypto::PKCS7;
 use Time::HiRes;
@@ -44,9 +44,9 @@ ok (defined $token, 'Parameter checks for get_token');
 
 ## load data
 
-my $passwd = OpenXPKI->read_file ("$basedir/test-ca/passwd.txt");
-my $rsa    = OpenXPKI->read_file ("$basedir/test-ca/rsa.pem");
-my $cert   = OpenXPKI->read_file ("$basedir/test-ca/cert.pem");
+my $passwd = OpenXPKI::FileUtils->read_file ("$basedir/test-ca/passwd.txt");
+my $rsa    = OpenXPKI::FileUtils->read_file ("$basedir/test-ca/rsa.pem");
+my $cert   = OpenXPKI::FileUtils->read_file ("$basedir/test-ca/cert.pem");
 my $content = "This is for example a passprase.";
 ok($passwd and $rsa and $cert);
 
