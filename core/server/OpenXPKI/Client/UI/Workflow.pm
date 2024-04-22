@@ -615,7 +615,7 @@ sub __get_action_buttons {
 
         my %button = (
             label => $wf_action_info->{label},
-            action => sprintf ('workflow!select!wf_action!%s!wf_id!%01d', $wf_action, $wf_info->{workflow}->{id}),
+            action => sprintf ('workflow!select!wf_action!%s!wf_id!%s', $wf_action, $wf_info->{workflow}->{id}),
         );
 
         # buttons in workflow start = only one initial start button
@@ -1571,7 +1571,7 @@ sub __get_breadcrumb {
     if ($wf_info->{workflow}->{id}) {
         return {
             class => 'workflow-type' ,
-            label => sprintf("%s #%01d", $wf_info->{workflow}->{title}, $wf_info->{workflow}->{id})
+            label => sprintf("%s #%s", $wf_info->{workflow}->{title}, $wf_info->{workflow}->{id})
         };
     }
     if ($wf_info->{workflow}->{state} eq 'INITIAL') {
@@ -1624,7 +1624,7 @@ sub __render_workflow_action_head {
         breadcrumb => $breadcrumb,
         description => $self->__get_templated_description($wf_info, $wf_action_info),
         css_class => 'workflow workflow-action ' . ($wf_action_info->{uiclass} || ''),
-        canonical_uri => sprintf('workflow!load!wf_id!%01d!wf_action!%s', $wf_info->{workflow}->{id}, $wf_action),
+        canonical_uri => sprintf('workflow!load!wf_id!%s!wf_action!%s', $wf_info->{workflow}->{id}, $wf_action),
         $wf_info->{workflow}->{id} ? (
             workflow_id => $wf_info->{workflow}->{id},
         ) : (),

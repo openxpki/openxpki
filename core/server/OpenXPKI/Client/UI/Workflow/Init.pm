@@ -88,7 +88,7 @@ sub init_start {
 
     $self->log->trace("wf info on create: " . Dumper $wf_info ) if $self->log->is_trace;
 
-    $self->log->info(sprintf "Create new workflow %s, got id %01d",  $wf_info->{workflow}->{type}, $wf_info->{workflow}->{id} );
+    $self->log->info(sprintf "Create new workflow %s, got id %s",  $wf_info->{workflow}->{type}, $wf_info->{workflow}->{id} );
 
     # this duplicates code from action_index
     if ($wf_info->{workflow}->{id} > 0 && !(grep { $_ =~ m{\A_} } keys %{$wf_info->{workflow}->{context}})) {

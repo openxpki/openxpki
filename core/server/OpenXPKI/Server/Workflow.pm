@@ -939,7 +939,7 @@ sub _get_next_state {
 
     if ( $self->_has_paused() ) {
         my $state = Workflow->NO_CHANGE_VALUE;
-        my $msg = sprintf( 'Workflow %d, Action %s has paused, return %s', $self->id, $action_name, $state );
+        my $msg = sprintf( 'Workflow #%s, Action %s has paused, return %s', $self->id, $action_name, $state );
         ##! 16: $msg
 
         return $state;

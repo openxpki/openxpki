@@ -540,7 +540,7 @@ sub handle_workflow {
 
     if ($wf_action && $wf_id) {
 
-        $self->logger->info(sprintf('execute workflow action %s on %01d', $wf_action, $wf_id));
+        $self->logger->info(sprintf("Execute workflow action '%s' on #%s", $wf_action, $wf_id));
         $self->logger->trace('Workflow params:  '. Dumper $wf_params) if $self->logger->is_trace;
         $reply = $run_and_check->('execute_workflow_activity' => {
             id => $wf_id,
@@ -552,7 +552,7 @@ sub handle_workflow {
 
     } elsif ($wf_id) {
 
-        $self->logger->debug(sprintf('request for workflow info on %01d', $wf_id));
+        $self->logger->debug(sprintf('Request for workflow info on #%s', $wf_id));
 
         $reply = $run_and_check->('get_workflow_info' => {
             id => $wf_id,

@@ -44,7 +44,7 @@ sub execute {
     if (!$approval_points) {
         CTX('log')->application()->debug('No approvals or value in invalid format!');
     } else {
-        CTX('log')->application()->info(sprintf ('Approval points for workflow %01d: %01d', $workflow->id, $approval_points));
+        CTX('log')->application()->info(sprintf ('Approval points for workflow #%s: %01d', $workflow->id, $approval_points));
     }
 
     $context->param({ $target_key => $approval_points });
