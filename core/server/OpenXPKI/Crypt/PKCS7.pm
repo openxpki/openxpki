@@ -6,14 +6,14 @@ with 'OpenXPKI::Role::IssuerSerial';
 use English;
 use MIME::Base64;
 use Convert::ASN1 ':tag';
+use Exporter qw( import );
 use OpenXPKI::Debug;
 use OpenXPKI::Crypt::DN;
 use OpenXPKI::Crypt::X509;
-use Moose::Exporter;
 
-Moose::Exporter->setup_import_methods(
-    as_is => ['decode_tag','encode_tag','find_oid']
-);
+# Symbols to export by default
+# (we avoid Moose::Exporter's import magic because that switches on all warnings again)
+our @EXPORT = qw( decode_tag encode_tag find_oid );
 
 our %oids = (
     # pkcs7 data types

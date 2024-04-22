@@ -1,5 +1,5 @@
 package OpenXPKI::Test;
-use Moose;
+use OpenXPKI qw( -class -typeconstraints );
 
 =head1 NAME
 
@@ -147,18 +147,16 @@ use Data::Dumper;
 use File::Path qw( remove_tree );
 use File::Temp qw( tempdir );
 use Module::Load ();
+use MIME::Base64;
 
 # CPAN modules
-use Moose::Exporter;
 use Moose::Util;
 use Moose::Meta::Class;
-use Moose::Util::TypeConstraints; # PLEASE NOTE: this enables all warnings via Moose::Exporter
+use Digest::SHA;
+use YAML::Tiny;
 use Test::More;
 use Test::Deep::NoTest qw( eq_deeply bag ); # use eq_deeply() without beeing in a test
-use Digest::SHA;
-use MIME::Base64;
-use YAML::Tiny;
-use Type::Params qw( signature_for );
+use Import::Into;
 
 # Project modules
 use OpenXPKI::Config;
@@ -175,12 +173,9 @@ use OpenXPKI::Test::ConfigWriter;
 use OpenXPKI::Test::CertHelper::Database;
 use OpenXPKI::Test::Log4perlCallerFilter;
 
-# should be done after imports to safely disable warnings in Perl < 5.36
-use experimental 'signatures';
-
-Moose::Exporter->setup_import_methods(
-    as_is     => [ \&OpenXPKI::Server::Context::CTX ],
-);
+sub import ($class) {
+    OpenXPKI::Server::Context->import::into(1, qw( CTX ));
+}
 
 subtype 'TestArrayRefOrStr', as 'ArrayRef[Any]';
 coerce 'TestArrayRefOrStr', from 'Str', via { [ $_ ] };

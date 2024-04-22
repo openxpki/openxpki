@@ -1,5 +1,5 @@
 package OpenXPKI::Client::Service::Role::Base;
-use OpenXPKI qw( -role -exporter -typeconstraints );
+use OpenXPKI qw( -role -typeconstraints );
 
 with 'OpenXPKI::Client::Service::Role::PickupWorkflow';
 
@@ -39,6 +39,7 @@ use Carp;
 use MIME::Base64;
 use Digest::SHA qw( sha1_hex );
 use List::Util qw( first );
+use Exporter qw( import );
 
 # CPAN modules
 use Crypt::PKCS10;
@@ -52,9 +53,9 @@ use OpenXPKI::Client::Service::Response;
 use OpenXPKI::Log4perl;
 
 
-Moose::Exporter->setup_import_methods(
-    as_is => [ 'cgi_safe_sub' ],
-);
+# Symbols to export by default
+# (we avoid Moose::Exporter's import magic because that switches on all warnings again)
+our @EXPORT = qw( cgi_safe_sub );
 
 =head2 ATTRIBUTES
 
