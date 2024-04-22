@@ -874,7 +874,7 @@ sub handle_login {
                 ($_ => ($auth->{$_} || die "OIDC setup incomplete, $_ is not set"));
             } qw(client_id auth_uri token_uri client_secret);
 
-            $self->log->debug(Dumper $auth->{oidc});
+            $self->log->trace(Dumper \%oidc_client) if ($self->log->is_trace);
 
             # we use "page" to transport the token
             if ($page =~ m{login!oidc!token!([\w\-\.]+)\z}) {
@@ -892,53 +892,65 @@ sub handle_login {
                     nonce => $nonce,
                 });
 
-            } elsif (my $code = $req->param('code')) {
-
-                # Step 2 - user was redirected from IdP
-                $self->log->debug("OIDC Login (2/3) - redeem auth code $code");
-                my $ua = LWP::UserAgent->new();
-                my $req = HTTP::Request->new('POST', $oidc_client{token_uri},
-                    HTTP::Headers->new( Content_Type => 'application/json' ),
-                    encode_json({
-                        code => $code,
-                        client_id => $oidc_client{client_id},
-                        client_secret => $oidc_client{client_secret},
-                        redirect_uri => 'https://dev.rapidpki.com/webui/democa/oidc_redirect',
-                        grant_type => 'authorization_code',
-                }));
-                my $response = $ua->request($req);
-                # TODO - error handling
-                $self->log->trace("OIDC Token Response: " .$response->decoded_content);
-                my $auth_info = decode_json($response->decoded_content);
-                $uilogin->redirect->to('login!oidc!token!'.$auth_info->{id_token});
-                return $uilogin;
-
             } else {
-                # Initial step - assemble auth token request and send redirect
-                my $nonce = Data::UUID->new()->create_b64();
-                my $sess_id = $self->has_cipher ?
-                    $self->cipher->encrypt($self->session->id) :
-                    $self->session->id;
 
-                # TODO - this is only set if we had a roundtrip before
-                # move this into the session
-                my $hash_key = $cgi->cookie('oxi-extid');
-                my $auth_token = {
-                    response_type => 'code',
-                    client_id => $oidc_client{client_id},
-                    scope => ($auth->{scope} || 'openid profile email'),
-                    redirect_uri => 'https://dev.rapidpki.com/webui/democa/oidc_redirect',
-                    state => encode_jwt( alg => 'HS256', key => $hash_key, payload => {
-                        session_id => $sess_id,
-                        baseurl => 'https://dev.rapidpki.com/webui/democa/',
-                    }),
-                    nonce => $nonce,
-                };
-                $self->log->debug('OIDC Login (1/3) - redirect to ' . $oidc_client{auth_uri});
-                $self->session->param('oidc-nonce',$nonce);
-                my $loginurl = $oidc_client{auth_uri}.'?'.join('&', (map { $_ .'='. uri_escape($auth_token->{$_})  } keys %{$auth_token}));
-                $uilogin->redirect->external($loginurl);
-                return $uilogin;
+                my $tt = OpenXPKI::Template->new;
+                my $uri_pattern = $auth->{redirect_uri} || 'https://[% host %]/webui/[% realm %]';
+                my $redirect_uri = $tt->render( $uri_pattern, {
+                    host => $ENV{HTTP_HOST},
+                    baseurl => $self->session->param('baseurl'),
+                    realm =>   $pki_realm,
+                    stack =>   $auth_stack,
+                });
+
+                if (my $code = $req->param('code')) {
+
+                    # Step 2 - user was redirected from IdP
+                    $self->log->debug("OIDC Login (2/3) - redeem auth code $code");
+                    my $ua = LWP::UserAgent->new();
+                    my $req = HTTP::Request->new('POST', $oidc_client{token_uri},
+                        HTTP::Headers->new( Content_Type => 'application/json' ),
+                        encode_json({
+                            code => $code,
+                            client_id => $oidc_client{client_id},
+                            client_secret => $oidc_client{client_secret},
+                            redirect_uri => $redirect_uri.'/oidc_redirect',
+                            grant_type => 'authorization_code',
+                    }));
+                    my $response = $ua->request($req);
+                    # TODO - error handling
+                    $self->log->trace("OIDC Token Response: " .$response->decoded_content);
+                    my $auth_info = decode_json($response->decoded_content);
+                    $uilogin->redirect->to('login!oidc!token!'.$auth_info->{id_token});
+                    return $uilogin;
+
+                } else {
+                    # Initial step - assemble auth token request and send redirect
+                    my $nonce = Data::UUID->new()->create_b64();
+                    my $sess_id = $self->has_cipher ?
+                        $self->cipher->encrypt($self->session->id) :
+                        $self->session->id;
+
+                    # TODO - this is only set if we had a roundtrip before
+                    # move this into the session
+                    my $hash_key = $cgi->cookie('oxi-extid');
+                    my $auth_token = {
+                        response_type => 'code',
+                        client_id => $oidc_client{client_id},
+                        scope => ($auth->{scope} || 'openid profile email'),
+                        redirect_uri => $redirect_uri.'/oidc_redirect',
+                        state => encode_jwt( alg => 'HS256', key => $hash_key, payload => {
+                            session_id => $sess_id,
+                            baseurl => $redirect_uri,
+                        }),
+                        nonce => $nonce,
+                    };
+                    $self->log->debug('OIDC Login (1/3) - redirect to ' . $oidc_client{auth_uri});
+                    $self->session->param('oidc-nonce',$nonce);
+                    my $loginurl = $oidc_client{auth_uri}.'?'.join('&', (map { $_ .'='. uri_escape($auth_token->{$_})  } keys %{$auth_token}));
+                    $uilogin->redirect->external($loginurl);
+                    return $uilogin;
+                }
             }
 
         } elsif( $login_type  eq 'PASSWD' ) {
