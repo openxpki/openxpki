@@ -197,7 +197,7 @@ This adds C<use Moose::Role> and C<use MooseX::Exporter> to the list of imports.
 
 =head3 use feature "current_sub"
 
-Provides the C<__SUB__> token that returns a reference to the current subroutine
+New C<__SUB__> token that returns a reference to the current subroutine
 or undef outside of a subroutine.
 
 =head3 use feature "isa"
@@ -212,7 +212,7 @@ Also see L<https://perldoc.perl.org/feature#The-'isa'-feature>.
 
 =head3 use feature "say"
 
-New function C<say> which behaves like C<print> with a trailing newline:
+New C<say> function which behaves like C<print> with a trailing newline:
 
     say "Yay";
 
@@ -220,7 +220,7 @@ Also see L<https://perldoc.perl.org/feature#The-'say'-feature>.
 
 =head3 use feature "signatures"
 
-Enables subroutine signatures:
+Enable subroutine signatures:
 
     sub message ($self, $a, $b) {
         ...
@@ -269,13 +269,13 @@ Also see L<https://perldoc.perl.org/feature#The-'bareword_filehandles'-feature>.
 
 =head3 use Data::Dumper
 
-Provides the C<Dumper> function:
+New C<Dumper> function:
 
     $self->log->trace(Dumper $obj) if $self->log->is_trace;
 
 =head3 use Scalar::Util "blessed"
 
-Provides the C<blessed> function:
+New C<blessed> function:
 
     if (blessed $result) {
         ...
@@ -283,7 +283,7 @@ Provides the C<blessed> function:
 
 =head3 use Type::Params "signature_for"
 
-Provides the C<signature_for> function:
+New C<signature_for> function:
 
     signature_for merge => (
         method => 1,
@@ -302,7 +302,7 @@ Also see L<https://metacpan.org/pod/Type::Params#signature_for-$function_name-=%
 
 =head3 use Feature::Compat::Try
 
-Provides syntax support for try/catch control flow:
+Try/catch control flow:
 
    try {
       attempt_a_thing();
