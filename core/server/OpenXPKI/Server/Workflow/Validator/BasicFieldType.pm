@@ -66,6 +66,7 @@ sub _validate {
         }
 
         # check for empty string
+        # (this needs to be done after the array processing)
         if ($is_required and $val eq '') {
             ##! 32: "$field - empty string"
             push @no_value, { name => $field, error => "I18N_OPENXPKI_UI_VALIDATOR_EMPTY_BUT_REQUIRED" };
