@@ -206,6 +206,7 @@ sub is_regular_workflow {
 
     return 0 unless defined $wf_id;
     return 0 unless $wf_id =~ m{\A\d+\z};
+    return 0 if $wf_id == 0;
     return 1;
 }
 
