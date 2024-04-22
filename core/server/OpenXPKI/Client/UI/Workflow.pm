@@ -18,6 +18,7 @@ use MIME::Base64;
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Dumper;
+use OpenXPKI::Util;
 
 
 # used to cache static patterns like the creator lookup
@@ -275,7 +276,7 @@ sub __render_from_workflow {
             breadcrumb => $self->__get_breadcrumb($wf_info, $wf_info->{state}->{label}),
             description => $desc,
             css_class => 'workflow workflow-proc-state workflow-proc-'.$wf_proc_state,
-            $wf_id ? (
+            OpenXPKI::Util->is_regular_workflow($wf_id) ? (
                 canonical_uri => "workflow!load!wf_id!${wf_id}",
                 workflow_id => $wf_id,
             ) : (),
@@ -431,7 +432,7 @@ sub __render_from_workflow {
             breadcrumb => $self->__get_breadcrumb($wf_info),
             description => $self->__get_templated_description($wf_info, $wf_info->{state}),
             css_class => 'workflow workflow-page ' . ($wf_info->{state}->{uiclass} || ''),
-            $wf_id ? (
+            OpenXPKI::Util->is_regular_workflow($wf_id) ? (
                 canonical_uri => "workflow!load!wf_id!${wf_id}",
                 workflow_id => $wf_id,
             ) : (),
@@ -585,7 +586,7 @@ sub __render_from_workflow {
         format => 'info',
         page => "workflow!info!wf_id!${wf_id}",
         target => 'popup',
-    ) if $wf_id;
+    ) if OpenXPKI::Util->is_regular_workflow($wf_id);
 
     return $self;
 }
@@ -1627,7 +1628,7 @@ sub __render_workflow_action_head {
         description => $self->__get_templated_description($wf_info, $wf_action_info),
         css_class => 'workflow workflow-action ' . ($wf_action_info->{uiclass} || ''),
         canonical_uri => sprintf('workflow!load!wf_id!%01d!wf_action!%s', $wf_info->{workflow}->{id}, $wf_action),
-        $wf_info->{workflow}->{id} ? (
+        OpenXPKI::Util->is_regular_workflow($wf_info->{workflow}->{id}) ? (
             workflow_id => $wf_info->{workflow}->{id},
         ) : (),
     );
