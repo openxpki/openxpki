@@ -97,6 +97,7 @@ sub import {
     Type::Params->import::into(1, qw( signature_for ));
 
     # Project modules
+    OpenXPKI::Debug->import::into(1);
     OpenXPKI::Exception->import::into(1);
     OpenXPKI::Util->import::into(1);
 
@@ -146,6 +147,7 @@ This is equivalent to adding the following imports to the calling package:
     use Feature::Compat::Try;
 
     # Project modules
+    use OpenXPKI::Debug;
     use OpenXPKI::Exception;
     use OpenXPKI::Util;
 
@@ -312,6 +314,18 @@ Provides syntax support for try/catch control flow:
    }
 
 Also see L<https://metacpan.org/pod/Feature::Compat::Try>.
+
+=head3 OpenXPKI modules
+
+=over
+
+=item * L<OpenXPKI::Debug>
+
+=item * L<OpenXPKI::Exception>
+
+=item * L<OpenXPKI::Util>
+
+=back
 
 =cut
 
