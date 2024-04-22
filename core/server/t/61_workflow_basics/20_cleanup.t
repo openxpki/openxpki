@@ -1,6 +1,5 @@
 #!/usr/bin/perl
-use strict;
-use warnings;
+use OpenXPKI;
 
 # Core modules
 use FindBin qw( $Bin );
@@ -10,7 +9,6 @@ use Test::More;
 use Test::Deep;
 use Test::Exception;
 use Data::UUID;
-use Feature::Compat::Try;
 
 #use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Workflow::Persister.*'} = 32;
 
@@ -85,7 +83,7 @@ throws_ok {
     );
 } qr/defaults must contain/, "fail on wrong arguments for persister defaults";
 
-sub items_ok($@) {
+sub items_ok :prototype($@) {
     my $testname = shift;
     my %args = @_;
     my $config = $args{config};
