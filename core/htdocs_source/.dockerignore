@@ -1,3 +1,4 @@
 dist
 dist-dev
 node_modules
+verdaccio-npm-cache

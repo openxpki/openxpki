@@ -15,6 +15,7 @@
 /coverage/
 /npm-debug.log*
 /testem.log
+/verdaccio-npm-cache/
 /yarn-error.log
 
 # ember-try
