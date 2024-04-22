@@ -251,6 +251,8 @@ not in ca operator mode.
 
 This option is not available on global commands.
 
+=back
+
 =cut
 
 1;

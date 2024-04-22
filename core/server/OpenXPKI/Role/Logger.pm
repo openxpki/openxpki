@@ -6,12 +6,16 @@ use OpenXPKI::Server::Context qw(CTX);
 
 =head1 Attributes
 
+=over
+
 =item log
 
 Holds an instance of Log::Log4perl::Logger.
 
 If not set from the implementation, C<_init_logger> is called as
 builder on first use.
+
+=back
 
 =cut
 

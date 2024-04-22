@@ -35,13 +35,15 @@ has authenticator => (
     required => 1,
 );
 
-=cut
+=pod
+
 has session_id => (
     is => 'rw',
     isa => 'Str',
     required => 0,
     predicate => 'has_session_id',
 );
+
 =cut
 
 sub send_message {

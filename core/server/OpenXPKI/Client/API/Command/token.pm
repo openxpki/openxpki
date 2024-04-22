@@ -57,7 +57,8 @@ sub handle_key {
     # load key into datapool
     if ($key_info->{key_store} eq "DATAPOOL") {
 
-=cut
+=pod
+
 # fix this for API access
         my $check_dv = $self->api->run_command("get_datavault_status", { check_online => 1 });
         if (!$check_dv->params) {
@@ -66,6 +67,7 @@ sub handle_key {
         if (!$check_dv->{online}) {
             die "Your datavault token is not online, unable to import key!";
         }
+
 =cut
         $self->api->run_command("set_data_pool_entry", {
             namespace => "sys.crypto.keys",

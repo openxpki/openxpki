@@ -22,19 +22,19 @@ the HTTP status code standard:
 
 =over
 
-=item 200
+=item Z<>200
 
 Successful response
 
-=item 400
+=item Z<>400
 
 Bad request, usually an input validation error.
 
-=item 500
+=item Z<>500
 
 Problems while talking to the backend server or other internal issues.
 
-=over
+=back
 
 =cut
 
