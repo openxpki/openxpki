@@ -6,11 +6,14 @@ import { A } from '@ember/array'
 import { debug } from '@ember/debug'
 import { detect } from 'detect-browser'
 import lite from 'caniuse-lite'
+import copy from 'copy-text-to-clipboard'
+import Link from 'openxpki/data/link'
 
 export default class OpenXpkiController extends Controller {
-    @service('oxi-config') config;
-    @service('oxi-content') content;
-    @service router;
+    @service('intl') intl
+    @service('oxi-config') config
+    @service('oxi-content') content
+    @service router
 
     /*
       Reserved Ember property:
@@ -29,7 +32,23 @@ export default class OpenXpkiController extends Controller {
     @tracked force = null
     // @tracked trigger = null
 
-    @tracked loading = false;
+    @tracked loading = false
+
+    // button to copy workflow ID to clipboard
+    tempCopyElement = null
+
+    get workflowCopyIdButton() {
+        if (this.model?.top?.page?.workflow_id) {
+            return Link.fromHash({
+                label: this.intl.t('button.workflow.copy_id.label', { id: this.model.top.page.workflow_id }),
+                tooltip: this.intl.t('button.workflow.copy_id.tooltip'),
+                format: 'none',
+                onClick: this.copyWorkflowIdToClipboard,
+            })
+        } else {
+            return null
+        }
+    }
 
     get breadcrumbs() {
         let bc = (this.model.breadcrumbs || []).filter(el => el.label)
@@ -106,5 +125,20 @@ export default class OpenXpkiController extends Controller {
     @action
     reload() {
         return window.location.reload();
+    }
+
+    @action
+    setTempCopyElement(element) {
+        this.tempCopyElement = element
+    }
+
+    @action
+    async copyWorkflowIdToClipboard(/*event*/) {
+        // target = DOM element where the temporary textarea will be appended,
+        // to stay within a focus trap, like in a modal.
+        copy(this.model.top.page.workflow_id, { target: this.tempCopyElement })
+
+        /* eslint-disable-next-line no-console */
+        console.info("Contents copied to clipboard")
     }
 }

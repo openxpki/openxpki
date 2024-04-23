@@ -36,6 +36,11 @@ has 'buttons' => (
     lazy => 1,
 );
 
+has 'workflow_id' => (
+    is => 'rw',
+    isa => 'Str',
+);
+
 # only for popups
 has 'large' => (
     is => 'rw',

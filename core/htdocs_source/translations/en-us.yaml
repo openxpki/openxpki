@@ -37,6 +37,10 @@ button:
   confirm_dialog:
     ok: "Confirm"
     cancel: "Abort"
+  workflow:
+    copy_id:
+      label: "Workflow #{id}"
+      tooltip: "Copy workflow ID"
 
 component:
   oxifield_datetime:
