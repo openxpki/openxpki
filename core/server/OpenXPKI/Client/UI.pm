@@ -924,7 +924,17 @@ sub handle_login {
                     $uilogin->redirect->to('login!oidc!token!'.$auth_info->{id_token});
                     return $uilogin;
 
+                } elsif ($self->session->param('oidc-nonce')) {
+
+                    # to avoid an endless loop in case the user is not willing
+                    # or able to complete the OIDC login, we use the nonce
+                    # in the session to detect a "returning user" and render an
+                    # info page instead of doing a redirect
+                    $self->logout_session( $cgi );
+                    return $uilogin->init_login_missing_data;
+
                 } else {
+
                     # Initial step - assemble auth token request and send redirect
                     my $nonce = Data::UUID->new()->create_b64();
                     my $sess_id = $self->has_cipher ?
