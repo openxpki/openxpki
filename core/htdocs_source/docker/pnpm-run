@@ -28,7 +28,7 @@ else
 fi
 
 # ...instead use /node_modules/ from the container
-mv /node_modules /build/node_modules
+ln -s /node_modules /build/node_modules
 
 cd /build
 

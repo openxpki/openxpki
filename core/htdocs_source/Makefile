@@ -45,6 +45,7 @@ ifneq (, $(shell bash -c 'command -v podman'))
 #	MANAGER_OPTS = --network slirp4netns:allow_host_loopback=true
 else
 	MANAGER = docker
+	MANAGER_OPTS_BUILD += --build-arg OXI_NODE_MODULES_OWNER=$(shell id -u):$(shell id -g)
 	MANAGER_OPTS_RUN += --network host --user $(shell id -u):$(shell id -g)
 #	MANAGER_OPTS = --add-host host.containers.internal:host-gateway
 endif
