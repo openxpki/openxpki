@@ -707,7 +707,7 @@ export default class OxiContentService extends Service {
     #getLoginTimestampCookie() {
         return new Map(
             // create an array of arrays [name,value] to feed the Map constructor
-            document.cookie.split(/;\s*/).map(c => c.match(/^([^=]+)=(.*)/).slice(1,3))
+            document.cookie.split(/;\s*/).map(c => c.match(/^([^=]*)=?(.*)/).slice(1,3))
         ).get('oxi-login-timestamp')
     }
 }
