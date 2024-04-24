@@ -85,7 +85,7 @@ The consuming class needs to implement the following methods.
 
 =head3 service_name
 
-Name of the service the class implements. Used e.g.
+Must return the name of the service that the class implements. Used e.g.
 
 =over
 
@@ -101,7 +101,9 @@ Name of the service the class implements. Used e.g.
 
 =head3 prepare
 
-Should be used to set the L</operation> attribute.
+Should be used to set the L</operation> attribute. May also be used for checks
+and preparations before the request / operation handling defined in
+L</op_handlers> starts.
 
     sub prepare ($self, $c) {
         # e.g.
@@ -110,8 +112,13 @@ Should be used to set the L</operation> attribute.
         $self->operation($self->query_params->param('operation') // '');
     }
 
-May also be used to checks and preparations before the request / operation
-handling as defined in L</op_handlers>.
+B<Passed parameters>
+
+=over
+
+=item * C<$c> - L<Mojolicious::Controller>
+
+=back
 
 =head3 send_response
 
@@ -128,6 +135,16 @@ Sends the response back to the HTTP client via a passed Mojolicious controller.
             return $c->render(data => $data);
         }
     }
+
+B<Passed parameters>
+
+=over
+
+=item * C<$c> - L<Mojolicious::Controller>
+
+=item * C<$response> - L<OpenXPKI::Client::Service::Response>
+
+=back
 
 =head3 op_handlers
 
@@ -146,6 +163,7 @@ I<CodeRefs>.
                 $self->handle_property_request('crl');
             },
             ['enroll', 're-enroll'] => \&handle_enrollment_request, # shortcut
+            #['enroll','re-enroll'] => $self->can('handle_enrollment_request'), # same
         ];
     }
 
@@ -172,9 +190,18 @@ Must return an L<OpenXPKI::Client::Service::Response>.
         );
     }
 
+B<Passed parameters>
+
+=over
+
+=item * C<$workflow> - workflow info I<HashRef> as returned by
+L<OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info>.
+
+=back
+
 =head1 ATTRIBUTES
 
-=head2 REQUIRED
+=head2 Required attributes
 
 These attributes will be set by L<OpenXPKI::Client::Web::Controller> so that
 the consuming service class does not need to care about setting them.
@@ -235,7 +262,7 @@ has endpoint => (
     required => 1,
 );
 
-=head2 OTHER
+=head2 Other readonly attributes
 
 =head3 config
 
