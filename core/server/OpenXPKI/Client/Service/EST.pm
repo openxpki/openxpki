@@ -137,10 +137,10 @@ sub prepare_enrollment_result ($self, $workflow) {
 }
 
 sub handle_revocation_request ($self) {
-    my $param = $self->wf_params;
+    my $param = { $self->wf_params->%* }; # copy hash
 
     # preset reason code if not already done from wrapper config
-    $param->{reason_code} = 'unspecified' unless defined $param->{reason_code};
+    $param->{reason_code} //= 'unspecified';
 
     my $body = $self->request->body
         or do {

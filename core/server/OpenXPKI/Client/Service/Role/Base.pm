@@ -635,13 +635,11 @@ B<Returns> an L<OpenXPKI::Client::Service::Response>.
 
 =cut
 sub handle_property_request ($self, $operation = $self->operation) {
-    my $param = $self->wf_params;
-
     # TODO - we need to consolidate the workflows for the different protocols
     my $workflow_type = $self->config->{$operation}->{workflow} ||
         $self->service_name.'_'.lc($operation);
 
-    my $response = $self->run_workflow($workflow_type, $param);
+    my $response = $self->run_workflow($workflow_type, $self->wf_params);
 
     return $response if $response->has_error;
 
