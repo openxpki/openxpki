@@ -8,10 +8,15 @@ sub service_name { 'est' } # required by OpenXPKI::Client::Service::Role::Base
 # Core modules
 use MIME::Base64;
 use List::Util qw( any );
+use Exporter qw( import );
 
 # Project modules
 use OpenXPKI::Crypt::X509;
 use OpenXPKI::Client::Service::Response;
+
+# Symbols to export by default
+# (we avoid Moose::Exporter's import magic because that switches on all warnings again)
+our @EXPORT = qw( cgi_safe_sub ); # provided by OpenXPKI::Client::Service::Role::Base
 
 
 # required by OpenXPKI::Client::Service::Role::Base

@@ -182,7 +182,7 @@ has workflow => (
 sub __process_workflow ($self, $workflow) {
     $self->state($workflow->{state}) if $workflow->{state};
     $self->proc_state($workflow->{proc_state}) if $workflow->{proc_state};
-    $self->__transaction_id($workflow->{context}->{transaction_id}) if $workflow->{context}->{transaction_id};
+    $self->transaction_id($workflow->{context}->{transaction_id}) if $workflow->{context}->{transaction_id};
     $self->__error_message($workflow->{context}->{error_code}) if $workflow->{context}->{error_code};
 }
 
@@ -243,7 +243,7 @@ has http_status_message => (
 );
 sub __build_http_status_message ($self) {
     # Pending request
-    return 'Request Pending - Retry Later' . ($self->has_transaction_id ? sprintf(' (%s)',  $self->__transaction_id) : '') if $self->is_pending;
+    return 'Request Pending - Retry Later' . ($self->has_transaction_id ? sprintf(' (%s)',  $self->transaction_id) : '') if $self->is_pending;
     # Error
     return $self->error_message if $self->has_error;
     # Default
@@ -298,11 +298,11 @@ has proc_state => (
 
 # Workflow transaction ID, set automatically if "workflow" was set and
 # its context contains the "transaction_id" item.
-has __transaction_id => (
+has transaction_id => (
     is => 'rw',
     isa => 'Str',
     init_arg => undef,
-    trigger => sub { die '"__transaction_id" can only be set once' if scalar @_ > 2 },
+    trigger => sub { die '"transaction_id" can only be set once' if scalar @_ > 2 },
     predicate => 'has_transaction_id',
 );
 
@@ -432,7 +432,7 @@ sub add_debug_headers ($self) {
         $self->extra_headers->{'X-OpenXPKI-Workflow-Id'} = $workflow->{id};
     }
     if ($self->has_transaction_id) {
-        my $tid = $self->__transaction_id;
+        my $tid = $self->transaction_id;
         # this should usually be a hexadecimal string but to avoid any surprise
         # we check this here and encoded if needed.
         $tid = Encode::encode("MIME-B", $tid) if $tid =~ m{\W};

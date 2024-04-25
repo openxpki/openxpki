@@ -39,7 +39,6 @@ use Carp;
 use MIME::Base64;
 use Digest::SHA qw( sha1_hex );
 use List::Util qw( first );
-use Exporter qw( import );
 
 # CPAN modules
 use Crypt::PKCS10;
@@ -52,10 +51,6 @@ use OpenXPKI::Client::Simple;
 use OpenXPKI::Client::Service::Response;
 use OpenXPKI::Log4perl;
 
-
-# Symbols to export by default
-# (we avoid Moose::Exporter's import magic because that switches on all warnings again)
-our @EXPORT = qw( cgi_safe_sub );
 
 =head2 ATTRIBUTES
 
