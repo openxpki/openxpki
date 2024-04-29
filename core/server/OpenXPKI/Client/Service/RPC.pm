@@ -7,6 +7,10 @@ sub service_name { 'rpc' } # required by OpenXPKI::Client::Service::Role::Base
 
 # Core modules
 use Exporter qw( import );
+use JSON::PP;
+
+# CPAN modules
+use Crypt::JWT qw( decode_jwt );
 
 # Project modules
 use OpenXPKI::Client::Service::Response;
@@ -15,6 +19,22 @@ use OpenXPKI::Serialization::Simple;
 # Symbols to export by default
 # (we avoid Moose::Exporter's import magic because that switches on all warnings again)
 our @EXPORT = qw( cgi_safe_sub ); # provided by OpenXPKI::Client::Service::Role::Base
+
+has json => (
+    is => 'ro',
+    isa => 'Object',
+    init_arg => undef,
+    lazy => 1,
+    default => sub {
+        my $json = JSON::PP->new->utf8;
+        # Use plain scalars as boolean values. The default representation as
+        # JSON::PP::Boolean would cause the values to be serialized later on.
+        # A JSON false would be converted to a trueish scalar "OXJSF1:false".
+        $json->boolean_values(0,1);
+
+        return $json;
+    },
+);
 
 has json_data => (
     is => 'rw',
@@ -222,6 +242,134 @@ around new_response => sub ($orig, $self, %args) {
     return $response;
 };
 
+sub try_set_operation ($self, $op) {
+    return if $self->has_operation;
+    return unless $op;
+    $self->operation($op);
+}
+
+sub parse_rpc_request_body ($self) {
+    return unless $self->request->body;
+
+    $self->failure( 40083 ) unless $self->config->{input}->{allow_raw_post};
+
+    my $content_type = $self->request->headers->content_type;
+
+    $self->log->debug("RPC postdata with Content-Type: $content_type");
+
+    my $json_str;
+
+    if ($content_type =~ m{\Aapplication/jose}) {
+        $self->failure( 40087 ) unless $self->config->{jose};
+
+        # The cert_identifier used to sign the token must be set as kid
+        # First run - set ignore_signature to just get the header with the kid
+        my ($cert_identifier, $cert);
+        my ($jwt_header, undef) = decode_jwt(
+            token => $self->request->body,
+            ignore_signature => 1,
+            decode_header => 1,
+            decode_payload => 0,
+        );
+
+        if ($jwt_header->{alg} !~ m{\A(R|E)S256\z}) {
+            $self->failure( 40090, { alg => $jwt_header->{alg} } );
+        }
+
+        $self->jwt_header($jwt_header);
+
+        # we currently only support "known" certificates as signers
+        # the recommended way is to use the x5t header field
+        if ($jwt_header->{x5t}) {
+            $cert_identifier = $jwt_header->{x5t};
+            $self->log->debug("JWT header has x5t set to $cert_identifier");
+
+        # as a fallback we support passing the identifier in the kid field
+        # to allow adding other key patterns later we use a namespace
+        } elsif (substr(($jwt_header->{kid}//''), 0, 6) eq 'certid') {
+            $cert_identifier = substr($jwt_header->{kid}, 7);
+            $self->log->debug("JWT header has kid set to $cert_identifier");
+
+        } else {
+            $self->failure( 40088, "No key id was found in the JWT header" );
+        }
+
+        # to prevent nasty attacks we require that the method name is part of the protected header
+        my $op = $jwt_header->{method} or $self->failure( 40089 );
+        $self->operation($op);
+
+        my $backend = $self->backend; # call outside the following try-catch block so OpenXPKI::Exception is not mangled
+        try {
+            # this will die if the certificate was not found
+            # TOOD - this call fails if no backend connection can be made which gives a misleading
+            # error code to the customer - this can also happen on a misconfigured auth stack :)
+            # might also be useful to have a validated "certificate" used for the session login
+            # so the likely best option would be some kind on "anonymous" client here
+            # See #903 and #904 on github
+            $cert = $backend->run_command('get_cert', { identifier => $cert_identifier, format => 'PEM' });
+
+            # use our json parser object to decode to limit parsing depth
+            $json_str = decode_jwt(token => $self->request->body, key => \$cert, decode_payload => 0);
+            $self->log->trace("Encoded JSON postdata: $json_str") if $self->log->is_trace;
+
+            $jwt_header->{signer_cert} = $cert;
+        }
+        catch ($err) {
+            $self->failure( 40088, $cert ? 'JWT signature could not be verified' : 'Given key id was not found' );
+        }
+
+        $self->jwt_header($jwt_header);
+
+    } elsif ($content_type =~ m{\Aapplication/pkcs7}) {
+        $self->failure( 40091 ) unless $self->config->{pkcs7};
+
+        $self->pkcs7($self->request->body);
+
+        my $backend = $self->backend; # call outside the following try-catch block so OpenXPKI::Exception is not mangled
+        try {
+            my $pkcs7_content = $backend->run_command('unwrap_pkcs7_signed_data', {
+                pkcs7 => $self->pkcs7,
+            });
+            $self->pkcs7_content($pkcs7_content);
+            $self->log->trace("PKCS7 content: " . Dumper $pkcs7_content) if $self->log->is_trace;
+            $json_str = $pkcs7_content->{value} or $self->failure( 50080 );
+        }
+        catch ($error) {
+            $self->failure( 50080, $error );
+        }
+
+        $self->log->trace("PKCS7 payload: " . $json_str) if $self->log->is_trace;
+
+    } elsif ($content_type =~ m{\Aapplication/json}) {
+
+        $json_str = $self->request->body;
+
+        $self->log->trace("Encoded JSON postdata: " . $json_str) if $self->log->is_trace;
+
+    } else {
+
+        $self->failure( 40084, { type => $content_type } );
+    }
+
+    $self->failure( 40081 ) unless $json_str;
+
+    # TODO - evaluate security implications regarding blessed objects
+    # and consider to filter out serialized objects for security reasons
+    $self->json->max_depth( $self->config->{input}->{parse_depth} || 5 );
+
+    # decode JSON
+    try {
+        my $json_data = $self->json->decode($json_str);
+        $self->json_data($json_data);
+        # read operation from JSON data if not found in URL before
+        $self->try_set_operation($json_data->{method});
+    }
+    catch ($error) {
+        $self->log->error($error);
+        $self->failure( 40081 );
+    }
+}
+
 sub handle_rpc_request ($self) {
     my $conf = $self->config->{$self->operation}
         or $self->failure( 40480, sprintf 'RPC method "%s" not found', $self->operation );
@@ -345,6 +493,8 @@ sub handle_rpc_request ($self) {
 #
 # Example:
 #   failure( 50007, "Error details" );
+
+# TODO Replace failure with throw_error and explicit $self->log->error()
 sub failure {
     my $self = shift;
     my $code = shift;

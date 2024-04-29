@@ -75,6 +75,7 @@ has operation => (
     is => 'rw',
     isa => 'Str',
     lazy => 1,
+    predicate => 'has_operation',
     default => sub { die "Attribute 'operation' has not been set" },
 );
 

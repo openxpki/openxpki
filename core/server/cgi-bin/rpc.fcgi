@@ -12,7 +12,6 @@ use English;
 use Encode;
 
 # CPAN modules
-use Crypt::JWT qw(decode_jwt);
 use Log::Log4perl;
 use Log::Log4perl::MDC;
 
@@ -98,6 +97,7 @@ $log = $config->logger;
 $log->info("RPC handler initialized");
 
 while (my $cgi = CGI::Fast->new("")) {
+    $openapi_mode = 0;
 
     my $req = OpenXPKI::Client::Service::RPC->cgi_to_mojo_request;
 
@@ -123,139 +123,19 @@ while (my $cgi = CGI::Fast->new("")) {
     );
 
     my $response = cgi_safe_sub $client, sub {
-        # check for request parameters in JSON data (HTTP body)
-        my $operation = $client->request_param('method');
-
-        if (my $raw = $client->request->body) {
-
-            $client->failure( 40083 ) unless $ep_config->{input}->{allow_raw_post};
-
-            my $content_type = $ENV{'CONTENT_TYPE'} || '';
-            if (!$content_type) {
-                $content_type =~ 'application/json';
-                $log->warn("RPC POSTDATA request without content-type header");
-            }
-
-            $log->debug("RPC postdata with Content-Type: $content_type");
-
-            # TODO - evaluate security implications regarding blessed objects
-            # and consider to filter out serialized objects for security reasons
-            $json->max_depth(  $ep_config->{input}->{parse_depth} || 5 );
-
-            if ($content_type =~ m{\Aapplication/jose}) {
-                $client->failure( 40087 ) unless $ep_config->{jose};
-
-                # The cert_identifier used to sign the token must be set as kid
-                # First run - set ignore_signature to just get the header with the kid
-                my ($cert_identifier, $cert);
-                my ($jwt_header, undef) = decode_jwt(token => $raw, ignore_signature => 1, decode_header => 1, decode_payload => 0);
-
-                if ($jwt_header->{alg} !~ m{\A(R|E)S256\z}) {
-                    $client->failure( 40090, { alg => $jwt_header->{alg} } );
-                }
-
-                $client->jwt_header($jwt_header);
-
-                # we currently only support "known" certificates as signers
-                # the recommended way is to use the x5t header field
-                if ($jwt_header->{x5t}) {
-                    $cert_identifier = $jwt_header->{x5t};
-                    $log->debug("JWT header has x5t set to $cert_identifier");
-                # as a fallback we support passing the identifier in the kid field
-                # to allow adding other key patterns later we use a namespace
-                } elsif (substr(($jwt_header->{kid}//''), 0, 6) eq 'certid') {
-                    $cert_identifier = substr($jwt_header->{kid}, 7);
-                    $log->debug("JWT header has kid set to $cert_identifier");
-                } else {
-                    $client->failure( 40088, "No key id was found in the JWT header" );
-                }
-
-                # to prevent nasty attacks we require that the method name is part of the protected header
-                $operation = $jwt_header->{method} || $client->failure( 40089 );
-
-                my $backend = $client->backend; # call outside the following try-catch block so OpenXPKI::Exception is not mangled
-                try {
-                    # this will die if the certificate was not found
-                    # TOOD - this call fails if no backend connection can be made which gives a misleading
-                    # error code to the customer - this can also happen on a misconfigured auth stack :)
-                    # might also be useful to have a validated "certificate" used for the session login
-                    # so the likely best option would be some kind on "anonymous" client here
-                    # See #903 and #904 on github
-                    $cert = $backend->run_command('get_cert', { identifier => $cert_identifier, format => 'PEM' });
-
-                    # use our json parser object to decode to limit parsing depth
-                    $raw = decode_jwt(token => $raw, key => \$cert, decode_payload => 0);
-                    $log->trace("Encoded JSON postdata: $raw") if $log->is_trace;
-
-                    $jwt_header->{signer_cert} = $cert;
-                }
-                catch ($err) {
-                    $client->failure( 40088, $cert ? 'JWT signature could not be verified' : 'Given key id was not found' );
-                }
-
-                $client->jwt_header($jwt_header);
-
-            } elsif ($content_type =~ m{\Aapplication/pkcs7}) {
-                $client->failure( 40091 ) unless $ep_config->{pkcs7};
-
-                $client->pkcs7($raw);
-
-                my $backend = $client->backend; # call outside the following try-catch block so OpenXPKI::Exception is not mangled
-                try {
-                    my $pkcs7_content = $backend->run_command('unwrap_pkcs7_signed_data', {
-                        pkcs7 => $client->pkcs7,
-                    });
-                    $client->pkcs7_content($pkcs7_content);
-                    $log->trace("PKCS7 content: " . Dumper $pkcs7_content) if $log->is_trace;
-                    $raw = $pkcs7_content->{value} or $client->failure( 50080 );
-                }
-                catch ($error) {
-                    $client->failure( 50080, $error );
-                }
-
-                $log->trace("PKCS7 payload: " . $raw) if $log->is_trace;
-
-            } elsif ($content_type =~ m{\Aapplication/json}) {
-
-                $log->trace("Encoded JSON postdata: " . $raw) if $log->is_trace;
-
-            } else {
-
-                $client->failure( 40084, { type => $content_type } );
-            }
-
-            # decode JSON
-            $client->failure( 40081 ) unless $raw;
-
-            try {
-                my $json_data = $json->decode($raw);
-                $client->json_data($json_data);
-                # read operation from JSON data if not found in URL before
-                $operation ||= $json_data->{method};
-            }
-            catch ($error) {
-                $log->error($error);
-                $client->failure( 40081 );
-            }
-        }
-
-        $operation ||= $route;
-
-        # method should be set now
-        $client->failure( 40080 ) unless $operation;
+        $client->try_set_operation($client->request_param('method'));
+        $client->parse_rpc_request_body;
+        $client->try_set_operation($route);
+        $client->failure( 40080 ) unless $client->has_operation;
 
         # special handling for requests for OpenAPI (Swagger) spec
-        if ($operation eq 'openapi-spec') {
+        if ($client->operation eq 'openapi-spec') {
             my $url = $client->request->url->to_abs;
             my $baseurl = sprintf "%s://%s%s", $url->protocol, $url->host_port, $url->path->to_abs_string;
             my $spec = $client->openapi_spec($baseurl) or $client->failure( 50082 );
             $openapi_mode = 1;
             return OpenXPKI::Client::Service::Response->new(result => $spec);
-        } else {
-            $openapi_mode = 0;
         }
-
-        $client->operation($operation);
 
         return $client->handle_rpc_request;
     };
