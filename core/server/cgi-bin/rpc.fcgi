@@ -55,16 +55,16 @@ sub send_output {
     if ($ENV{'HTTP_ACCEPT'} && $ENV{'HTTP_ACCEPT'} eq 'text/plain') {
         print $cgi->header( -type => 'text/plain', charset => 'utf8', -status => $status, %retry_head );
         if ($response->has_error) {
-            printf 'error.code=%s\n', $response->error;
-            printf 'error.message=%s\n', i18nGettext($response->error_message);
+            printf "error.code=%s\n", $response->error;
+            printf "error.message=%s\n", $response->error_message;
             printf "data.%s=%s\n", $_, $response->error_details->{$_} for keys $response->error_details->%*;
 
         } elsif ($response->has_result) {
-            printf 'id=%s\n', $response->result->{id};
-            printf 'state=%s\n', $response->result->{state};
-            printf 'retry_after=%s\n', $response->retry_after if $response->is_pending;
+            printf "id=%s\n", $response->result->{id};
+            printf "state=%s\n", $response->result->{state};
+            printf "retry_after=%s\n", $response->retry_after if $response->is_pending;
 
-            my $data = $response->has_result ? ($response->result->{wfdetails} // {}) : {};
+            my $data = $response->has_result ? ($response->result->{data} // {}) : {};
             printf "data.%s=%s\n", $_, $data->{$_} for keys $data->%*;
         }
 
@@ -77,16 +77,23 @@ sub send_output {
             print $json->encode({
                 error => {
                     code => $response->error,
-                    message => $config->language ? i18nGettext($response->error_message) : $response->error_message,
+                    message => $response->error_message,
                     $response->has_error_details ? (data => $response->error_details) : (),
                 }
             });
         } else {
-            my $data = $config->language ? i18n_walk($response->result) : $response->result;
             # run i18n tokenzier on output if a language is set
-            print $json->encode(
-                $openapi_mode ? $data : { result => $data },
-            );
+            my $data = $config->language ? i18n_walk($response->result) : $response->result;
+            if ($openapi_mode) {
+                print $json->encode($data);
+            } else {
+                print $json->encode({
+                    result => {
+                        $data->%*,
+                        $response->is_pending ? (retry_after => $response->retry_after) : (),
+                    }
+                });
+            }
         }
 
     }
@@ -126,13 +133,13 @@ while (my $cgi = CGI::Fast->new("")) {
         $client->try_set_operation($client->request_param('method'));
         $client->parse_rpc_request_body;
         $client->try_set_operation($route);
-        $client->failure( 40080 ) unless $client->has_operation;
+        die $client->new_response( 40080 ) unless $client->has_operation;
 
         # special handling for requests for OpenAPI (Swagger) spec
         if ($client->operation eq 'openapi-spec') {
             my $url = $client->request->url->to_abs;
             my $baseurl = sprintf "%s://%s%s", $url->protocol, $url->host_port, $url->path->to_abs_string;
-            my $spec = $client->openapi_spec($baseurl) or $client->failure( 50082 );
+            my $spec = $client->openapi_spec($baseurl) or die $client->new_response( 50082 );
             $openapi_mode = 1;
             return OpenXPKI::Client::Service::Response->new(result => $spec);
         }

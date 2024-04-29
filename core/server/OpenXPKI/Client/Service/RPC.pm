@@ -198,6 +198,7 @@ around new_response => sub ($orig, $self, %args) {
     if ($response->has_workflow) {
         my $wf = $response->workflow;
 
+        my $data;
         my $details = {
             id => $wf->{id},
             proc_state => $wf->{proc_state},
@@ -214,16 +215,17 @@ around new_response => sub ($orig, $self, %args) {
 
         } else {
             $details->{'state'} = $wf->{'state'};
+
             $self->log->info(sprintf(
                 'RPC request was processed properly. Workflow #%s: state "%s" (%s)',
                 $wf->{id}, $wf->{state}, $wf->{proc_state}
             ));
+
             # Add context parameters to the response if requested
             if (my $output = $self->config->{$self->operation}->{output}) {
                 my @keys = split /\s*,\s*/, $output;
                 $self->log->debug(sprintf 'Configured output keys for operation "%s": %s', $self->operation, join(', ', @keys));
 
-                $details->{data} = {};
                 for my $key (@keys) {
                     my $val = $wf->{context}->{$key};
                     next unless defined $val;
@@ -231,12 +233,24 @@ around new_response => sub ($orig, $self, %args) {
                     if (OpenXPKI::Serialization::Simple::is_serialized($val)) {
                         $val = OpenXPKI::Serialization::Simple->new->deserialize($val);
                     }
-                    $details->{data}->{$key} = $val;
+                    $data->{$key} = $val;
                 }
             }
         }
 
-        $response->result($details);
+        if ($response->has_error) {
+            $response->error_details({
+                $response->error_details->%*,
+                $details->%*,
+                $data->%*,
+            });
+
+        } else {
+            $response->result({
+                $details->%*,
+                $data ? (data => $data) : (),
+            });
+        }
     }
 
     return $response;
@@ -251,7 +265,7 @@ sub try_set_operation ($self, $op) {
 sub parse_rpc_request_body ($self) {
     return unless $self->request->body;
 
-    $self->failure( 40083 ) unless $self->config->{input}->{allow_raw_post};
+    die $self->new_response( 40083 ) unless $self->config->{input}->{allow_raw_post};
 
     my $content_type = $self->request->headers->content_type;
 
@@ -260,7 +274,7 @@ sub parse_rpc_request_body ($self) {
     my $json_str;
 
     if ($content_type =~ m{\Aapplication/jose}) {
-        $self->failure( 40087 ) unless $self->config->{jose};
+        die $self->new_response( 40087 ) unless $self->config->{jose};
 
         # The cert_identifier used to sign the token must be set as kid
         # First run - set ignore_signature to just get the header with the kid
@@ -273,7 +287,10 @@ sub parse_rpc_request_body ($self) {
         );
 
         if ($jwt_header->{alg} !~ m{\A(R|E)S256\z}) {
-            $self->failure( 40090, { alg => $jwt_header->{alg} } );
+            die $self->new_response(
+                error => 40090,
+                error_details => { alg => $jwt_header->{alg} },
+            );
         }
 
         $self->jwt_header($jwt_header);
@@ -291,11 +308,11 @@ sub parse_rpc_request_body ($self) {
             $self->log->debug("JWT header has kid set to $cert_identifier");
 
         } else {
-            $self->failure( 40088, "No key id was found in the JWT header" );
+            die $self->new_response( 40088, "No key id was found in the JWT header" );
         }
 
         # to prevent nasty attacks we require that the method name is part of the protected header
-        my $op = $jwt_header->{method} or $self->failure( 40089 );
+        my $op = $jwt_header->{method} or die $self->new_response( 40089 );
         $self->operation($op);
 
         my $backend = $self->backend; # call outside the following try-catch block so OpenXPKI::Exception is not mangled
@@ -315,13 +332,13 @@ sub parse_rpc_request_body ($self) {
             $jwt_header->{signer_cert} = $cert;
         }
         catch ($err) {
-            $self->failure( 40088, $cert ? 'JWT signature could not be verified' : 'Given key id was not found' );
+            die $self->new_response( 40088, $cert ? 'JWT signature could not be verified' : 'Given key id was not found' );
         }
 
         $self->jwt_header($jwt_header);
 
     } elsif ($content_type =~ m{\Aapplication/pkcs7}) {
-        $self->failure( 40091 ) unless $self->config->{pkcs7};
+        die $self->new_response( 40091 ) unless $self->config->{pkcs7};
 
         $self->pkcs7($self->request->body);
 
@@ -332,10 +349,10 @@ sub parse_rpc_request_body ($self) {
             });
             $self->pkcs7_content($pkcs7_content);
             $self->log->trace("PKCS7 content: " . Dumper $pkcs7_content) if $self->log->is_trace;
-            $json_str = $pkcs7_content->{value} or $self->failure( 50080 );
+            $json_str = $pkcs7_content->{value} or die $self->new_response( 50080 );
         }
         catch ($error) {
-            $self->failure( 50080, $error );
+            die $self->new_response( 50080, $error );
         }
 
         $self->log->trace("PKCS7 payload: " . $json_str) if $self->log->is_trace;
@@ -348,10 +365,13 @@ sub parse_rpc_request_body ($self) {
 
     } else {
 
-        $self->failure( 40084, { type => $content_type } );
+        die $self->new_response(
+            error => 40084,
+            error_details => { type => $content_type },
+        );
     }
 
-    $self->failure( 40081 ) unless $json_str;
+    die $self->new_response( 40081 ) unless $json_str;
 
     # TODO - evaluate security implications regarding blessed objects
     # and consider to filter out serialized objects for security reasons
@@ -366,18 +386,19 @@ sub parse_rpc_request_body ($self) {
     }
     catch ($error) {
         $self->log->error($error);
-        $self->failure( 40081 );
+        die $self->new_response( 40081 );
     }
 }
 
 sub handle_rpc_request ($self) {
     my $conf = $self->config->{$self->operation}
-        or $self->failure( 40480, sprintf 'RPC method "%s" not found', $self->operation );
+        or die $self->new_response( 40480 => sprintf 'RPC method "%s" not found', $self->operation );
 
     # "workflow" is required even though with "execute_action" we don't need it.
     # But the check here serves as a config validator so that a correct OpenAPI
     # Spec will be generated upon request.
-    $self->failure( 40480, sprintf 'Configuration of RPC method "%s" must contain "workflow" entry', $self->operation ) unless $conf->{workflow};
+    die $self->new_response( 40480 => sprintf 'Configuration of RPC method "%s" must contain "workflow" entry', $self->operation )
+      unless $conf->{workflow};
 
     $self->log->trace(
         sprintf 'Incoming RPC request "%s" on endpoint "%s" with parameters: %s',
@@ -423,16 +444,15 @@ sub handle_rpc_request ($self) {
     # start a new workflow, even if no "pickup" parameters were given.
     if (my $action = $conf->{execute_action}) {
         if (!$wf) {
-            $self->failure( 40481 );
+            die $self->new_response( 40481 );
 
         } elsif ($wf->{proc_state} ne 'manual') {
-            # TODO switch to Response, details are auto added
-            $self->failure( 40482, { id => $wf->{id}, 'state' => $wf->{'state'}, proc_state => $wf->{proc_state} } );
+            die $self->new_response( error => 40482, workflow => $wf );
 
         } else {
             my $actions_avail = $self->backend->run_command('get_workflow_activities', { id => $wf->{id} });
             if (!(grep { $_ eq $action } @{$actions_avail})) {
-                $self->failure( 40483, { id => $wf->{id}, 'state' => $wf->{'state'}, proc_state => $wf->{proc_state} } );
+                die $self->new_response( error => 40483, workflow => $wf );
             } else {
                 $self->log->debug("Resume #".$wf->{id}." and execute '$action' with params: " . join(", ", keys $self->wf_params->%*));
                 $wf = $self->backend->handle_workflow({
@@ -460,7 +480,7 @@ sub handle_rpc_request ($self) {
     $self->check_workflow_error($wf);
 
     # Error if pickup is not possible / configured
-    # $self->throw_error(
+    # die $self->new_response(
     #     error => 40006,
     #     workflow => $wf,
     # ) if (not $pickup_key and $wf->{proc_state} ne 'finished');
@@ -473,62 +493,6 @@ sub handle_rpc_request ($self) {
         return $self->new_response(workflow => $wf);
     }
 
-}
-
-# Takes the given error code and returns a HashRef like
-#   {
-#     error => {
-#       code => 50000,
-#       message => "...",
-#       data => { pid => $$, ... },
-#     }
-#   }
-# Also logs the error via $self->log->error().
-#
-# Parameters:
-#   $code - error code (Int)
-#   $message - optional: additional error message (Str)
-#   $messages - optional: two different messages for logging (internal) and client result (public) (ArrayRef)
-#   $data - optional: additional information for 'data' part (HashRef)
-#
-# Example:
-#   failure( 50007, "Error details" );
-
-# TODO Replace failure with throw_error and explicit $self->log->error()
-sub failure {
-    my $self = shift;
-    my $code = shift;
-    my @args = @_;
-
-    my $details = { pid => $$ };
-    my $msg_log = '';
-    my $msg_public = '';
-
-    # check remaining arguments
-    for my $arg (@args) {
-        # Scalar = additional error message
-        if (not ref $arg and length($arg)) {
-            $msg_public = $arg;
-            $msg_log = $arg;
-        }
-        # ArrayRef = two different additional error messages [external, internal]
-        elsif (ref $arg eq 'ARRAY') {
-            $msg_public = $arg->[0];
-            $msg_log = $arg->[1];
-        }
-        # HashRef = additional data
-        elsif (ref $arg eq 'HASH') {
-            $details = { %$details, %$arg };
-        }
-    }
-
-    $self->log->error(sprintf '%s: %s', $code, $msg_log);
-
-    $self->throw_error(
-        error => $code,
-        error_message => $msg_public,
-        error_details => $details,
-    );
 }
 
 sub openapi_spec {

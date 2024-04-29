@@ -353,7 +353,7 @@ sub _build_backend ($self) {
         });
     }
     catch ($err) {
-        $self->throw_error( 50002 => "Could not create client object: $err" );
+        die $self->new_response( 50002 => "Could not create client object: $err" );
     }
 }
 
@@ -456,7 +456,7 @@ sub _build_wf_params ($self) {
             die $err;
         } else {
             $self->log->error("$err"); # stringification
-            $self->throw_error( 50010 );
+            die $self->new_response( 50010 );
         }
     }
 }
@@ -534,7 +534,7 @@ sub handle_request ($self) {
 
     my $response;
     try {
-        $self->throw_error( 40008 ) unless $self->operation;
+        die $self->new_response( 40008 ) unless $self->operation;
 
         my $op_handlers = $self->op_handlers;
 
@@ -562,7 +562,7 @@ sub handle_request ($self) {
         }
 
         # error / fallback
-        $self->throw_error( 40007 => sprintf('Unknown operation "%s"', $self->operation) )
+        die $self->new_response( 40007 => sprintf('Unknown operation "%s"', $self->operation) )
           unless $response;
     }
     catch ($err) {
@@ -576,26 +576,27 @@ sub handle_request ($self) {
     return $response;
 }
 
-sub new_response ($self, %args) {
-    if (my $msg = $args{error_message}) {
-        $self->log->error($msg);
-        if ($msg =~ /I18N_OPENXPKI_UI_/) {
-            $args{error_message} = i18nGettext($msg) if $self->config_obj->language;
-        } else {
-            delete $args{error_message};
-        }
-    }
-    return OpenXPKI::Client::Service::Response->new(%args);
-}
-
-sub throw_error ($self, @args) {
+sub new_response ($self, @args) {
+    # shortcut with only error code or code+message
     if (scalar @args < 3 and $args[0] =~ /^\A\d+\z/) {
         @args = (
             error => $args[0],
             $args[1] ? (error_message => $args[1]) : (),
         );
     }
-    die $self->new_response(@args);
+
+    my %args_hash = @args;
+
+    # only send translated I18N_OPENXPKI_UI_ messages to client
+    if (my $msg = $args_hash{error_message}) {
+        $self->log->error($msg);
+        if ($msg =~ /I18N_OPENXPKI_UI_/) {
+            $args_hash{error_message} = i18nGettext($msg) if $self->config_obj->language;
+        } else {
+            delete $args_hash{error_message};
+        }
+    }
+    return OpenXPKI::Client::Service::Response->new(%args_hash);
 }
 
 sub new_error_response ($self, $error) {
@@ -659,7 +660,7 @@ sub handle_enrollment_request ($self) {
 
     if (not $self->wf_params->{server}) {
         $self->log->error("Parameter 'server' missing but required by enrollment workflow");
-        $self->throw_error( 40401 );
+        die $self->new_response( 40401 );
     }
 
     Log::Log4perl::MDC->put('server', $self->wf_params->{server});
@@ -701,7 +702,7 @@ sub handle_enrollment_request ($self) {
     # exception if pickup failed and there is no PKCS#10 parameter
     if ($pickup_failed and not $self->wf_params->{pkcs10}) {
         $self->log->debug('Workflow pickup failed and no PKCS#10 given');
-        $self->throw_error( 40005 );
+        die $self->new_response( 40005 );
     }
 
     #
@@ -730,7 +731,7 @@ sub handle_enrollment_request ($self) {
         $self->log->trace('Workflow context: ' . Dumper $workflow->{context}) if $self->log->is_trace;
 
         my $cert_identifier = $workflow->{context}->{cert_identifier}
-            or $self->throw_error(
+            or die $self->new_response(
                 error => 40006,
                 ($workflow->{context}->{error_code} ? (error_message => $workflow->{context}->{error_code}) : ()),
                 workflow => $workflow,
@@ -975,7 +976,7 @@ sub check_workflow_error ($self, $workflow) {
                     my @fields = map { $_->{name} } ($err->{ERRORS} // {})->@*;
                     $self->log->info( 'Failed fields: ' . join(', ', @fields) );
 
-                    $self->throw_error(
+                    die $self->new_response(
                         error => 40004,
                         $workflow ? (workflow => $workflow) : (),
                         error_details => { fields => $reply->{ERROR}->{ERRORS} // [] },
@@ -987,7 +988,7 @@ sub check_workflow_error ($self, $workflow) {
         my $msg = $self->backend->last_error // '';
         $self->log->error( join ': ', 'Internal server error', $msg||() );
 
-        $self->throw_error(
+        die $self->new_response(
             error => 50003,
             error_message => $msg,
             $workflow ? (workflow => $workflow) : (),
@@ -1032,7 +1033,7 @@ sub set_pkcs10_and_tid ($self, $pkcs10 = undef) {
     # Usually PEM encoded but without borders as POSTDATA
     $pkcs10 or do {
         $self->log->debug( 'Incoming enrollment with empty body' );
-        $self->throw_error( 40003 );
+        die $self->new_response( 40003 );
     };
 
     Crypt::PKCS10->setAPIversion(1);
@@ -1040,7 +1041,7 @@ sub set_pkcs10_and_tid ($self, $pkcs10 = undef) {
     if (!$decoded) {
         $self->log->error('Unable to parse PKCS10: '. Crypt::PKCS10->error);
         $self->log->debug($pkcs10);
-        $self->throw_error( 40002 );
+        die $self->new_response( 40002 );
     }
 
     $self->add_wf_param(pkcs10 =>$decoded->csrRequest(1));
