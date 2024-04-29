@@ -156,7 +156,7 @@ sub action_index {
         my $proc_state = $wf_info->{workflow}->{proc_state};
 
         $wf_args->{redirect} = (
-            $wf_info->{workflow}->{id} > 0
+            OpenXPKI::Util->is_regular_workflow($wf_info->{workflow}->{id})
             and $proc_state ne 'finished'
             and $proc_state ne 'archived'
         );

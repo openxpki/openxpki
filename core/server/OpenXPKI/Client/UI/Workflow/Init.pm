@@ -88,12 +88,15 @@ sub init_start {
 
     $self->log->trace("wf info on create: " . Dumper $wf_info ) if $self->log->is_trace;
 
-    $self->log->info(sprintf "Create new workflow %s, got id %s",  $wf_info->{workflow}->{type}, $wf_info->{workflow}->{id} );
+    my $wf_id = $wf_info->{workflow}->{id};
+    $self->log->info(sprintf "Create new workflow %s, got id %s",  $wf_info->{workflow}->{type}, $wf_id );
 
     # this duplicates code from action_index
-    if ($wf_info->{workflow}->{id} > 0 && !(grep { $_ =~ m{\A_} } keys %{$wf_info->{workflow}->{context}})) {
-
-        my $redirect = 'workflow!load!wf_id!'.$wf_info->{workflow}->{id};
+    if (
+        OpenXPKI::Util->is_regular_workflow($wf_id)
+        and not (grep { $_ =~ m{\A_} } keys %{$wf_info->{workflow}->{context}})
+    ) {
+        my $redirect = 'workflow!load!wf_id!'.$wf_id;
         my @activity = keys %{$wf_info->{activity}};
         if (scalar @activity == 1) {
             $redirect .= '!wf_action!'.$activity[0];
