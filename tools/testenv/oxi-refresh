@@ -65,9 +65,6 @@ OPTIONS
     --no-compile
         Skip compiling XS code parts.
 
-    --no-dbconf
-        Skip database configuration.
-
     --fast
         Shortcut for "--no-i18n --no-compile --no-dbconfig".
 
@@ -83,19 +80,16 @@ set -e
 # Command line options
 #
 IS_RESTART=1
-IS_DBCONFIG=1
 IS_FULLCONFIG=0
 oxi_install_params=()
 # Bash string manipulation: use # to strip text off $@ and see if string still equals original $@
 [[ "${@#--no-restart}" != "$@" ]] && IS_RESTART=0
-[[ "${@#--no-dbconf}" != "$@" ]]  && IS_DBCONFIG=0
-[[ "${@#--fast}" != "$@" ]]       && IS_DBCONFIG=0 && oxi_install_params+=(--fast)
+[[ "${@#--fast}" != "$@" ]]       && oxi_install_params+=(--fast)
 [[ "${@#--full}" != "$@" ]]       && IS_FULLCONFIG=1
 [[ "${@#--no-i18n}" != "$@" ]]    && oxi_install_params+=(--no-i18n)
 [[ "${@#--no-compile}" != "$@" ]] && oxi_install_params+=(--no-compile)
 
 echo "[$([ "$IS_FULLCONFIG" -eq 1 ] && echo "X" || echo " ")] Recreate DB and certs, wipe config"
-echo "[$([ "$IS_DBCONFIG" -eq 1 ] && echo "X" || echo " ")] Write database configuration file"
 echo "[$([ "$IS_RESTART" -eq 1 ] && echo "X" || echo " ")] Restart OpenXPKI & Apache"
 echo
 
@@ -191,19 +185,17 @@ __HANDLER
 sed -ri 's/(LOCATION:)\s*\/tmp.*/\1 \/var\/tmp/g' /etc/openxpki/config.d/realm/democa/publishing.yaml
 
 # database setup
-if [[ $IS_DBCONFIG -eq 1 ]]; then
-    echo "- configure MariaDB as database"
-    cat <<__DB > /etc/openxpki/config.d/system/database.yaml
-    main:
-        debug: 0
-        type: MariaDB2
-        host: $OXI_TEST_DB_MYSQL_DBHOST
-        port: $OXI_TEST_DB_MYSQL_DBPORT
-        name: $OXI_TEST_DB_MYSQL_NAME
-        user: $OXI_TEST_DB_MYSQL_USER
-        passwd: $OXI_TEST_DB_MYSQL_PASSWORD
+echo "- configure MariaDB as database"
+cat <<__DB > /etc/openxpki/config.d/system/database.yaml
+main:
+    debug: 0
+    type: MariaDB2
+    host: $OXI_TEST_DB_MYSQL_DBHOST
+    port: $OXI_TEST_DB_MYSQL_DBPORT
+    name: $OXI_TEST_DB_MYSQL_NAME
+    user: $OXI_TEST_DB_MYSQL_USER
+    passwd: $OXI_TEST_DB_MYSQL_PASSWORD
 __DB
-fi
 
 #
 # Compile and install OpenXPKI
