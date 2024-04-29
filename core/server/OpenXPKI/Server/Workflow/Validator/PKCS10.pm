@@ -5,8 +5,10 @@ use warnings;
 use base qw( OpenXPKI::Server::Workflow::Validator );
 use Workflow::Exception qw( validation_error );
 use Crypt::PKCS10 2.000;
+use MIME::Base64;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Debug;
+use OpenXPKI::Crypt::PKCS7;
 use English;
 
 sub _validate {
@@ -24,31 +26,45 @@ sub _validate {
     Crypt::PKCS10->setAPIversion(1);
     my $decoded = Crypt::PKCS10->new($pkcs10,
         ignoreNonBase64 => 1,
-        verifySignature => $verify_signature );
+        verifySignature => 0 );
+
+    my $error;
+    $error = Crypt::PKCS10->error unless($decoded);
+
+    # try to unwrap as PKCS7 renewal request containers if allowed
+    if (!$decoded && $self->param('unwrap_pkcs7')) {
+
+        eval{
+            ##! 16: 'try to parse a PKCS7'
+            my $p7 = OpenXPKI::Crypt::PKCS7->new($pkcs10);
+            ##! 128: $p7->envelope()
+            $pkcs10 = $p7->payload();
+            ##! 32: encode_base64($pkcs10)
+            $decoded = Crypt::PKCS10->new( $pkcs10,
+                ignoreNonBase64 => 1,
+                verifySignature => 0 );
+
+            die Crypt::PKCS10->error unless($decoded);
+            $error = undef;
+            CTX('log')->application()->info("Input was PKCS7 container, with valid PCKS10 payload");
+        };
+        $error = $EVAL_ERROR if($EVAL_ERROR);
+    }
+
+    $error =~ s/\s*$// if (defined $error);
 
     if (!$decoded) {
-
-        my $error = Crypt::PKCS10->error;
-        $error =~ s/\s*$//;
-        # Log the error
         CTX('log')->application()->error("Invalid PKCS#10 request ($error)");
-
-
-        # If signature verification was on, check if it only the signature is the problem
-        $decoded = Crypt::PKCS10->new($pkcs10,
-            ignoreNonBase64 => 1,
-            verifySignature => 0 );
-
-        if ($decoded) {
-              validation_error("I18N_OPENXPKI_UI_VALIDATOR_PKCS10_SIGNATURE_ERROR");
-        }
         validation_error("I18N_OPENXPKI_UI_VALIDATOR_PKCS10_PARSE_ERROR");
     }
 
+    if ($verify_signature && !$decoded->checkSignature()) {
+        CTX('log')->application()->error("Invalid signature on PKCS#10 request");
+        validation_error("I18N_OPENXPKI_UI_VALIDATOR_PKCS10_SIGNATURE_ERROR");
+    }
 
     if (!($decoded->subject() || $self->param('empty_subject'))) {
         CTX('log')->application()->error('PKCS#10 has no subject');
-
         validation_error('I18N_OPENXPKI_UI_VALIDATOR_PKCS10_NO_SUBJECT_ERROR');
     }
 
@@ -103,6 +119,15 @@ an empty subject (required with some SCEP clients and Microsoft CA services).
 
 Cryptographically verify the signature of the request - default is ON.
 (was changed in v2.3 as the module deps have been fixed).
+
+=item unwrap_pkcs7
+
+Renewal requests made by e.g. windows servers come with the PEM headers
+of a "normal" PKCS10 formatted request but are enveloped into a PKCS7
+signature. When set to a true value, the class tries to detect wrapped
+requests and validates the PKCS10 part.
+
+It does B<not> make any signature checks on the PKCS7 structure!
 
 =back
 
