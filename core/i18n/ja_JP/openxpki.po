@@ -26,6 +26,10 @@ msgstr "ワンタイムパスワード"
 msgid "I18N_OPENXPKI_UI_ACCOUNT_KEY_LABEL"
 msgstr "再試行"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ACCOUNT_STATUS_LABEL"
+msgstr "設定のバージョン"
+
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "リクエストされたアクションが見つかりません"
 
@@ -1251,6 +1255,10 @@ msgstr "次の通知までワークフローを一時停止します"
 
 msgid "I18N_OPENXPKI_UI_NO_SUCH_REALM_OR_SERVICE"
 msgstr "要求されたURLにサービスが割り当てられていません。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OIDC_LOGIN_FAILED"
+msgstr "ログインに失敗しました"
 
 msgid "I18N_OPENXPKI_UI_OOPS"
 msgstr "おっと、何か間違っています。"
@@ -3173,6 +3181,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_LABEL"
 msgstr "キーパラメータ"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_PARAMS_DESC"
+msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_PARAMS_LABEL"
+msgstr "キーパラメータ"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_HASH"
 msgstr "この証明書の担当者のメールアドレス"
 
@@ -4330,6 +4346,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_WORKFLOW_LABEL"
 msgstr "重複キーエラー(リクエスト）"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_INVALID_PARAMS_DESC"
+msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_INVALID_PARAMS_LABEL"
+msgstr "キーパラメータ"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL"
 msgstr "ステータス"
 
@@ -4557,6 +4581,14 @@ msgstr "ワークフローは正常終了しました。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON"
 msgstr "続ける"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_ACCOUNT_UPDATE_DESC"
+msgstr "証明書を認証します。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_ACCOUNT_UPDATE_LABEL"
+msgstr "証明書の認証"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_DOMAIN_VALIDATAION_DESC"

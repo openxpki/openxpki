@@ -27,6 +27,10 @@ msgstr "技术日志"
 msgid "I18N_OPENXPKI_UI_ACCOUNT_KEY_LABEL"
 msgstr "重试次数"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ACCOUNT_STATUS_LABEL"
+msgstr "配置版本"
+
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "找不到请求的动作"
 
@@ -1306,6 +1310,10 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_NO_SUCH_REALM_OR_SERVICE"
 msgstr "CRL序列号"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OIDC_LOGIN_FAILED"
+msgstr "使用给定的凭据登录失败！"
 
 msgid "I18N_OPENXPKI_UI_OOPS"
 msgstr "哎呀！出事了"
@@ -3295,6 +3303,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_LABEL"
 msgstr "密钥参数"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_PARAMS_DESC"
+msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_PARAMS_LABEL"
+msgstr "密钥参数"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_HASH"
 msgstr "该证书负责人的电子邮件地址。"
 
@@ -4471,6 +4487,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_WORKFLOW_LABEL"
 msgstr "重复密钥错误（请求）"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_INVALID_PARAMS_DESC"
+msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_INVALID_PARAMS_LABEL"
+msgstr "密钥参数"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL"
 msgstr "状态"
 
@@ -4705,6 +4729,14 @@ msgstr "此工作流程已成功完成，无法重新启动"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON"
 msgstr "继续"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_ACCOUNT_UPDATE_DESC"
+msgstr "将证书信息发布到已定义的存储库。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_ACCOUNT_UPDATE_LABEL"
+msgstr "发布证书"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_DOMAIN_VALIDATAION_DESC"

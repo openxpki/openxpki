@@ -32,6 +32,10 @@ msgstr "Workflow Id"
 msgid "I18N_OPENXPKI_UI_ACCOUNT_KEY_LABEL"
 msgstr "Retries"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ACCOUNT_STATUS_LABEL"
+msgstr "Stato"
+
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "Azione richiesta non trovata"
 
@@ -1525,6 +1529,10 @@ msgstr "Numero di serie del certificato"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_NO_SUCH_REALM_OR_SERVICE"
 msgstr "Numero di serie del certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OIDC_LOGIN_FAILED"
+msgstr "Impossibile effettuare il Login con le credenziali fornite!"
 
 # Remove?
 #, fuzzy
@@ -3755,6 +3763,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_LABEL"
 msgstr "Parametri Chiave"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_PARAMS_DESC"
+msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_PARAMS_LABEL"
+msgstr "Parametri Chiave"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_HASH"
 msgstr ""
 "Indirizzo Email della persona fisica responsabile per questo certificato."
@@ -5073,6 +5089,14 @@ msgstr "The subject alternative name of the certificate."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_WORKFLOW_LABEL"
 msgstr "Modifica Richiesta"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_INVALID_PARAMS_DESC"
+msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_INVALID_PARAMS_LABEL"
+msgstr "Parametri Chiave"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL"
 msgstr "Stato"
 
@@ -5335,6 +5359,17 @@ msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON"
 msgstr "Forza Ripristino"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_ACCOUNT_UPDATE_DESC"
+msgstr ""
+"Pubblica le Informazioni sulla Autorità di certificazione (CA, Certification "
+"Authority), ovvero Certificati della CA e Liste Revoche (CRL) in archivi "
+"predefiniti."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_ACCOUNT_UPDATE_LABEL"
+msgstr "Pubblica Informazioni CA"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_DOMAIN_VALIDATAION_DESC"

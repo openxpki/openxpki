@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2024-04-10 11:15+0200\n"
+"PO-Revision-Date: 2024-04-29 16:00+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -22,6 +22,9 @@ msgstr "Nutzerkonto ID"
 
 msgid "I18N_OPENXPKI_UI_ACCOUNT_KEY_LABEL"
 msgstr "Nutzerkonto Schlüssel"
+
+msgid "I18N_OPENXPKI_UI_ACCOUNT_STATUS_LABEL"
+msgstr "Kontostatus"
 
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "Die ausgewählte Aktion ist nicht verfügbar"
@@ -1191,6 +1194,9 @@ msgstr "Workflow wartet auf nächste Benachrichtung"
 
 msgid "I18N_OPENXPKI_UI_NO_SUCH_REALM_OR_SERVICE"
 msgstr "Unter dieser Adresse ist keine Service eingerichtet."
+
+msgid "I18N_OPENXPKI_UI_OIDC_LOGIN_FAILED"
+msgstr "Anmeldung fehlgeschlagen!"
 
 # Remove?
 msgid "I18N_OPENXPKI_UI_OOPS"
@@ -3201,6 +3207,14 @@ msgstr " "
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_LABEL"
 msgstr "Schlüsselparameter"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_PARAMS_DESC"
+msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_PARAMS_LABEL"
+msgstr "Schlüsselparameter"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_HASH"
 msgstr "Meta-Daten (key/value)"
 
@@ -4426,6 +4440,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_WORKFLOW_LABEL"
 msgstr "Schlüssel bereits in einem anderen Antrag verwendet"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_INVALID_PARAMS_DESC"
+msgstr ""
+"Der verwendete Schlüssel entspricht nicht den Vorgaben für dieses "
+"Zertifikatsprofil."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_INVALID_PARAMS_LABEL"
+msgstr "Ungültige Schlüsselparameter"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL"
 msgstr "Zustand"
 
@@ -4455,13 +4477,11 @@ msgstr ""
 "fortgesetzt. Weitere Informationen zum Grund der Pause und den geplanten "
 "Zeitpunkt der Fortsetzung finden Sie unten."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_DESC"
-msgstr "Dieser Sperrantrag muss genehmigt werden."
+msgstr "Dieser Workflow wartet auf weitere Bearbeitung."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_LABEL"
-msgstr "Genehmigung ausstehend"
+msgstr "Bearbeitung ausstehend"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_USER_DESC"
@@ -4694,6 +4714,12 @@ msgstr "Dieser Workflow wurde erfolgreich beendet."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON"
 msgstr "Weiter"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_ACCOUNT_UPDATE_DESC"
+msgstr "Aktualisierung eines bestehenden Nutzerkontos für ACME."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_ACCOUNT_UPDATE_LABEL"
+msgstr "ACME Aktualisierung eines Nutzerkontos"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_DOMAIN_VALIDATAION_DESC"
 msgstr ""

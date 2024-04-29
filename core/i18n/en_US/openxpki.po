@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2024-04-10 11:16+0200\n"
+"PO-Revision-Date: 2024-04-29 15:57+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -22,6 +22,9 @@ msgstr "Account ID"
 
 msgid "I18N_OPENXPKI_UI_ACCOUNT_KEY_LABEL"
 msgstr "Account Key"
+
+msgid "I18N_OPENXPKI_UI_ACCOUNT_STATUS_LABEL"
+msgstr "Account State"
 
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "Requested action not found"
@@ -1192,6 +1195,10 @@ msgstr "Workflow paused until next notification"
 
 msgid "I18N_OPENXPKI_UI_NO_SUCH_REALM_OR_SERVICE"
 msgstr "The requested URL has no service assigned."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OIDC_LOGIN_FAILED"
+msgstr "Login with the given credentials failed!"
 
 msgid "I18N_OPENXPKI_UI_OOPS"
 msgstr "Oops, something went wrong"
@@ -3069,6 +3076,12 @@ msgstr " "
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_LABEL"
 msgstr "Key Params"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_PARAMS_DESC"
+msgstr "  "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_PARAMS_LABEL"
+msgstr "Key Parameters"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_HASH"
 msgstr "Metadata (key/value)"
 
@@ -4239,6 +4252,15 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_WORKFLOW_LABEL"
 msgstr "Duplicate Key Error (Request)"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_INVALID_PARAMS_DESC"
+msgstr ""
+"The uploaded key is not compliant with the key policy for this profile. "
+"Please check your policy documentation on the accepted algorithms and "
+"parameters."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_INVALID_PARAMS_LABEL"
+msgstr "Invalid Key Parameters"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL"
 msgstr "State"
 
@@ -4474,8 +4496,14 @@ msgstr "This workflow has finished with success and can not be restarted"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON"
 msgstr "Continue"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_ACCOUNT_UPDATE_DESC"
+msgstr "Update to a registered ACME user account"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_ACCOUNT_UPDATE_LABEL"
+msgstr "ACME Account Update"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_DOMAIN_VALIDATAION_DESC"
-msgstr ""
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_DOMAIN_VALIDATAION_LABEL"
 msgstr "ACME Domain Validation"
