@@ -1,16 +1,20 @@
 package OpenXPKI::Client::Service::RPC;
 use OpenXPKI -class;
 
-with qw(
-    OpenXPKI::Client::Service::Role::Base
-    OpenXPKI::Client::Service::Role::PickupWorkflow
-);
+with 'OpenXPKI::Client::Service::Role::Base';
 
 sub service_name { 'rpc' } # required by OpenXPKI::Client::Service::Role::Base
 
+# Core modules
+use Exporter qw( import );
+
 # Project modules
 use OpenXPKI::Client::Service::Response;
+use OpenXPKI::Serialization::Simple;
 
+# Symbols to export by default
+# (we avoid Moose::Exporter's import magic because that switches on all warnings again)
+our @EXPORT = qw( cgi_safe_sub ); # provided by OpenXPKI::Client::Service::Role::Base
 
 has json_data => (
     is => 'rw',
@@ -41,14 +45,64 @@ has jwt_header => (
     predicate => 'has_jwt_header',
 );
 
+has use_status_codes => (
+    is => 'rw',
+    isa => 'Bool',
+    lazy => 1,
+    init_arg => undef,
+    default => sub ($self) { $self->config->{output}->{use_http_status_codes} ? 1 : 0 },
+);
+
 # required by OpenXPKI::Client::Service::Role::Base
 sub prepare { die "Not implemented yet" }
 
 # required by OpenXPKI::Client::Service::Role::Base
-sub send_response { die "Not implemented yet" }
+sub send_response ($self, $c, $response) {
+    die "Not implemented yet";
+
+    # my $status = '200 OK';
+    # my %retry_head;
+
+    # if ($self->use_status_codes) {
+    #     if ($response->has_error) {
+    #         $status = $response->http_status_line;
+    #     } elsif ($response->is_pending) {
+    #         $status = '202 Request Pending - Retry Later';
+    #         %retry_head = ('-retry-after' => $response->retry_after );
+    #     }
+    # }
+
+    # if ($ENV{'HTTP_ACCEPT'} && $ENV{'HTTP_ACCEPT'} eq 'text/plain') {
+    #     print $cgi->header( -type => 'text/plain', charset => 'utf8', -status => $status, %retry_head );
+    #     if ($response->has_error) {
+    #         print 'error.code=' . $response->error."\n";
+    #         print 'error.message=' . $response->error_message."\n";
+    #         printf "data.%s=%s\n", $_, $response->error_details->{$_} for keys $response->error_details->%*;
+
+    #     } elsif ($response->has_result) {
+    #         print 'id=' . $response->result->{id}."\n";
+    #         print 'state=' . $response->result->{state}."\n";
+    #         print 'retry_after=' . $response->retry_after ."\n" if $response->is_pending;
+
+    #         my $data = $response->has_result ? ($response->result->{data} // {}) : {};
+    #         printf "data.%s=%s\n", $_, $data->{$_} for keys $data->%*;
+    #     }
+
+    # } else {
+    #     print $cgi->header( -type => 'application/json', charset => 'utf8', -status => $status );
+    #     $json->max_depth(20);
+    #     $json->canonical( $canonical_keys ? 1 : 0 );
+
+    #     # run i18n tokenzier on output if a language is set
+    #     print $json->encode( $config->language ? i18n_walk($response->result) : $response->result );
+    # }
+};
 
 # required by OpenXPKI::Client::Service::Role::Base
 sub op_handlers { die "Not implemented yet" }
+
+# required by OpenXPKI::Client::Service::Role::Base
+sub prepare_enrollment_result {}
 
 # required by OpenXPKI::Client::Service::Role::Base
 sub fcgi_set_custom_wf_params ($self) {
@@ -59,7 +113,7 @@ sub fcgi_set_custom_wf_params ($self) {
         my @keys;
         @keys = split /\s*,\s*/, $self->config->{$self->operation}->{param};
         foreach my $key (@keys) {
-            my $val = $self->get_param($key);
+            my $val = $self->request_param($key);
             next unless (defined $val);
 
             if (!ref $val) {
@@ -108,29 +162,169 @@ sub fcgi_set_custom_wf_params ($self) {
     }
 }
 
-# required by OpenXPKI::Client::Service::Role::Base
-sub prepare_enrollment_result { die "Not implemented yet" }
-
 # Takes a key and returns either JSON value (if available) or the request parameter.
-sub get_param ($self, $k) {
+around request_param => sub ($orig, $self, $key) {
     if ($self->has_json_data) {
-        return $self->json_data->{$k}; # UTF-8 decoding already done by JSON modules
-
+        return $self->json_data->{$key};
     } else {
-        my $raw = $self->query_params->param($k);  # assume this is an UTF-8 encoded octet stream
-        return unless defined $raw; # ..to be able to test for undef below
-        # decode UTF-8
-        my $value;
+        return $self->$orig($key);
+    }
+};
+
+around new_response => sub ($orig, $self, %args) {
+    my $response = $self->$orig(%args);
+
+    # add workflow details to response
+    if ($response->has_workflow) {
+        my $wf = $response->workflow;
+
+        my $details = {
+            id => $wf->{id},
+            proc_state => $wf->{proc_state},
+            pid => $$,
+        };
+
+        # if the workflow is running, we do not expose any data of the workflows
+        if ($wf->{proc_state} eq 'running') {
+            $details->{'state'} = '--';
+            $self->log->info(sprintf(
+                'RPC request was processed properly. Workflow #%s: currently running',
+                $wf->{id}
+            ));
+
+        } else {
+            $details->{'state'} = $wf->{'state'};
+            $self->log->info(sprintf(
+                'RPC request was processed properly. Workflow #%s: state "%s" (%s)',
+                $wf->{id}, $wf->{state}, $wf->{proc_state}
+            ));
+            # Add context parameters to the response if requested
+            if (my $output = $self->config->{$self->operation}->{output}) {
+                my @keys = split /\s*,\s*/, $output;
+                $self->log->debug(sprintf 'Configured output keys for operation "%s": %s', $self->operation, join(', ', @keys));
+
+                $details->{data} = {};
+                for my $key (@keys) {
+                    my $val = $wf->{context}->{$key};
+                    next unless defined $val;
+                    next unless ($val ne '' or ref $val);
+                    if (OpenXPKI::Serialization::Simple::is_serialized($val)) {
+                        $val = OpenXPKI::Serialization::Simple->new->deserialize($val);
+                    }
+                    $details->{data}->{$key} = $val;
+                }
+            }
+        }
+
+        $response->result($details);
+    }
+
+    return $response;
+};
+
+sub handle_rpc_request ($self) {
+    my $conf = $self->config->{$self->operation}
+        or $self->failure( 40480, sprintf 'RPC method "%s" not found', $self->operation );
+
+    # "workflow" is required even though with "execute_action" we don't need it.
+    # But the check here serves as a config validator so that a correct OpenAPI
+    # Spec will be generated upon request.
+    $self->failure( 40480, sprintf 'Configuration of RPC method "%s" must contain "workflow" entry', $self->operation ) unless $conf->{workflow};
+
+    $self->log->trace(
+        sprintf 'Incoming RPC request "%s" on endpoint "%s" with parameters: %s',
+        $self->operation, $self->endpoint, Dumper $self->wf_params,
+    ) if $self->log->is_trace;
+
+    my $wf;
+
+    #
+    # Try pickup
+    #
+    my $pickup_key = $conf->{pickup};
+    if ($pickup_key) {
         try {
-            $value = Encode::decode("UTF-8", $raw, Encode::LEAVE_SRC | Encode::FB_CROAK)
-                or $self->failure(40086, [undef, "Could not decode field '$k'"]);
+            # pickup via workflow
+            if (my $wf_type = $conf->{pickup_workflow}) {
+                $wf = $self->pickup_via_workflow($wf_type, $pickup_key);
+
+            # pickup via datapool
+            } elsif (my $ns = $conf->{pickup_namespace}) {
+                $wf = $self->pickup_via_datapool($ns, $self->request_param($pickup_key));
+
+            # pickup via workflow attribute search
+            } else {
+                my $key = $conf->{pickup_attribute} || $pickup_key;
+                my $value = $self->request_param($pickup_key);
+                $wf = $self->pickup_via_attribute($conf->{workflow}, $key, $value);
+            }
         }
         catch ($error) {
-            $self->failure(40086, [undef, "Could not decode field '$k': $error"]);
+            if (blessed $error and $error->isa('OpenXPKI::Exception::WorkflowPickupFailed')) {
+                $self->log->debug('Workflow pickup failed');
+            }
+            else {
+                die $error;
+            }
         }
-
-        return $value;
     }
+
+    # Endpoint has a "resume and execute" definition so run action if possible
+    #
+    # If "execute_action" is defined it enforces "pickup_workflow" and we never
+    # start a new workflow, even if no "pickup" parameters were given.
+    if (my $action = $conf->{execute_action}) {
+        if (!$wf) {
+            $self->failure( 40481 );
+
+        } elsif ($wf->{proc_state} ne 'manual') {
+            # TODO switch to Response, details are auto added
+            $self->failure( 40482, { id => $wf->{id}, 'state' => $wf->{'state'}, proc_state => $wf->{proc_state} } );
+
+        } else {
+            my $actions_avail = $self->backend->run_command('get_workflow_activities', { id => $wf->{id} });
+            if (!(grep { $_ eq $action } @{$actions_avail})) {
+                $self->failure( 40483, { id => $wf->{id}, 'state' => $wf->{'state'}, proc_state => $wf->{proc_state} } );
+            } else {
+                $self->log->debug("Resume #".$wf->{id}." and execute '$action' with params: " . join(", ", keys $self->wf_params->%*));
+                $wf = $self->backend->handle_workflow({
+                    id => $wf->{id},
+                    activity => $action,
+                    params => $self->wf_params,
+                });
+            }
+        }
+    }
+
+    #
+    # Start new workflow if no pickup failed or was not configured
+    #
+    if (not $wf) {
+        $self->log->debug(sprintf("Initialize workflow '%s' with parameters: %s",
+            $conf->{workflow}, join(", ", keys $self->wf_params->%*)));
+
+        $wf = $self->backend->handle_workflow({
+            type => $conf->{workflow},
+            params => $self->wf_params,
+        });
+    }
+
+    $self->check_workflow_error($wf);
+
+    # Error if pickup is not possible / configured
+    # $self->throw_error(
+    #     error => 40006,
+    #     workflow => $wf,
+    # ) if (not $pickup_key and $wf->{proc_state} ne 'finished');
+
+    # Workflow paused - send "request pending" / ask client to retry
+    if ($pickup_key and $wf->{proc_state} ne 'finished') {
+        return $self->new_pending_response($wf);
+
+    } else {
+        return $self->new_response(workflow => $wf);
+    }
+
 }
 
 # Takes the given error code and returns a HashRef like
@@ -141,7 +335,7 @@ sub get_param ($self, $k) {
 #       data => { pid => $$, ... },
 #     }
 #   }
-# Also logs the error via $log->error().
+# Also logs the error via $self->log->error().
 #
 # Parameters:
 #   $code - error code (Int)
@@ -156,35 +350,35 @@ sub failure {
     my $code = shift;
     my @args = @_;
 
-    my $message = $OpenXPKI::Client::Service::Response::named_messages{$code} // 'Unknown error';
-    my $data = { pid => $$ };
-    my $details_log = '';
-    my $details_public = '';
+    my $details = { pid => $$ };
+    my $msg_log = '';
+    my $msg_public = '';
 
     # check remaining arguments
     for my $arg (@args) {
         # Scalar = additional error message
         if (not ref $arg and length($arg)) {
-            $details_public = ': '.$arg;
-            $details_log = ': '.$arg;
+            $msg_public = $arg;
+            $msg_log = $arg;
         }
         # ArrayRef = two different additional error messages [external, internal]
         elsif (ref $arg eq 'ARRAY') {
-            $details_public = ': '.$arg->[0];
-            $details_log = ': '.$arg->[1];
+            $msg_public = $arg->[0];
+            $msg_log = $arg->[1];
         }
         # HashRef = additional data
         elsif (ref $arg eq 'HASH') {
-            $data = { %$data, %$arg };
+            $details = { %$details, %$arg };
         }
     }
 
-    $self->log->error(sprintf '%s - %s%s', $code, $message, $details_log);
+    $self->log->error(sprintf '%s: %s', $code, $msg_log);
 
-    my $resp = OpenXPKI::Client::Service::Response->new_error($code => $message.$details_public);
-    $resp->result({ data => $data });
-
-    die $resp;
+    $self->throw_error(
+        error => $code,
+        error_message => $msg_public,
+        error_details => $details,
+    );
 }
 
 sub openapi_spec {

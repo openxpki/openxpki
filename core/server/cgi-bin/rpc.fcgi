@@ -21,7 +21,6 @@ use OpenXPKI::Exception;
 use OpenXPKI::Client::Config;
 use OpenXPKI::Client::Service::RPC;
 use OpenXPKI::Client::Service::Response;
-use OpenXPKI::Serialization::Simple;
 use OpenXPKI::i18n qw( i18nGettext i18n_walk );
 
 # Feature::Compat::Try should be done last to safely disable warnings
@@ -30,24 +29,24 @@ use Feature::Compat::Try;
 
 my $config;
 my $log;
+my $openapi_mode;
 
-my $use_status_codes = 0;
 my $json = JSON::PP->new->utf8;
-
 # Use plain scalars as boolean values. The default representation as
 # JSON::PP::Boolean would cause the values to be serialized later on.
 # A JSON false would be converted to a trueish scalar "OXJSF1:false".
 $json->boolean_values(0,1);
 
 sub send_output {
-    my ($cgi, $response, $canonical_keys) = @_;
+    my ($cgi, $response, $use_status_codes) = @_;
 
     my $status = '200 OK';
     my %retry_head;
 
     if ($use_status_codes) {
         if ($response->has_error) {
-            $status = $response->http_status_line;
+            $status = i18nGettext($response->http_status_line);
+            chomp $status;
         } elsif ($response->is_pending) {
             $status = '202 Request Pending - Retry Later';
             %retry_head = ("-retry-after" => $response->retry_after );
@@ -55,75 +54,77 @@ sub send_output {
     }
 
     if ($ENV{'HTTP_ACCEPT'} && $ENV{'HTTP_ACCEPT'} eq 'text/plain') {
-        my $data = $response->has_result ? ($response->result->{data} // {}) : {};
         print $cgi->header( -type => 'text/plain', charset => 'utf8', -status => $status, %retry_head );
         if ($response->has_error) {
-            print 'error.code=' . $response->error."\n";
-            print 'error.message=' . $response->error_message."\n";
+            printf 'error.code=%s\n', $response->error;
+            printf 'error.message=%s\n', i18nGettext($response->error_message);
+            printf "data.%s=%s\n", $_, $response->error_details->{$_} for keys $response->error_details->%*;
 
         } elsif ($response->has_result) {
-            print 'id=' . $response->result->{id}."\n";
-            print 'state=' . $response->result->{state}."\n";
-            print 'retry_after=' . $response->retry_after ."\n" if $response->is_pending;
+            printf 'id=%s\n', $response->result->{id};
+            printf 'state=%s\n', $response->result->{state};
+            printf 'retry_after=%s\n', $response->retry_after if $response->is_pending;
+
+            my $data = $response->has_result ? ($response->result->{wfdetails} // {}) : {};
+            printf "data.%s=%s\n", $_, $data->{$_} for keys $data->%*;
         }
-        do { printf "data.%s=%s\n", $_, $data->{$_} for keys $data->%* };
 
     } else {
         print $cgi->header( -type => 'application/json', charset => 'utf8', -status => $status );
         $json->max_depth(20);
-        $json->canonical( $canonical_keys ? 1 : 0 );
+        $json->canonical( $openapi_mode ? 1 : 0 );
 
-        # run i18n tokenzier on output if a language is set
-        print $json->encode( $config->language ? i18n_walk($response->result) : $response->result );
+        if ($response->has_error) {
+            print $json->encode({
+                error => {
+                    code => $response->error,
+                    message => $config->language ? i18nGettext($response->error_message) : $response->error_message,
+                    $response->has_error_details ? (data => $response->error_details) : (),
+                }
+            });
+        } else {
+            my $data = $config->language ? i18n_walk($response->result) : $response->result;
+            # run i18n tokenzier on output if a language is set
+            print $json->encode(
+                $openapi_mode ? $data : { result => $data },
+            );
+        }
+
     }
 }
 
-try {
-    $config = OpenXPKI::Client::Config->new('rpc');
-    $log = $config->logger;
-}
-catch ($error) {
-    my $cgi = CGI::Fast->new();
-    print $cgi->header( -type => 'application/json', charset => 'utf8', -status => '500 Client Connect Failed' );
-    print $json->encode( { error => { code => 50001, message => $OpenXPKI::Client::Service::Response::named_messages{50001} } } );
-    die "Client Connect Failed: $error";
-}
-
+$config = OpenXPKI::Client::Config->new('rpc');
+$log = $config->logger;
 $log->info("RPC handler initialized");
 
-my $client;
-
-CGI_LOOP:
 while (my $cgi = CGI::Fast->new("")) {
 
     my $req = OpenXPKI::Client::Service::RPC->cgi_to_mojo_request;
 
-    my $backend;
-
+    my $ep_config;
+    my ($endpoint, $route);
     try {
-        my $ep_config;
-        my ($endpoint, $route);
-        try {
-            ($endpoint, $route) = $config->parse_uri;
-            $ep_config = $config->endpoint_config($endpoint);
-        }
-        catch ($error) {
-            $log->error($error);
-            die OpenXPKI::Client::Service::Response->new_error( 50007 );
-        }
+        ($endpoint, $route) = $config->parse_uri;
+        $ep_config = $config->endpoint_config($endpoint);
+    }
+    catch ($error) {
+        $log->error($error);
+        send_output($cgi, OpenXPKI::Client::Service::Response->new_error(50007), 0);
+        next;
+    }
 
-        $client = OpenXPKI::Client::Service::RPC->new(
-            config_obj => $config,
-            apache_env => \%ENV,
-            remote_address => $ENV{REMOTE_ADDR},
-            request => $req,
-            endpoint => $endpoint,
-        );
+    my $client = OpenXPKI::Client::Service::RPC->new(
+        config_obj => $config,
+        apache_env => \%ENV,
+        remote_address => $ENV{REMOTE_ADDR},
+        request => $req,
+        endpoint => $endpoint,
+        take_pickup_value_from_request => 1,
+    );
 
-        $use_status_codes = $ep_config->{output} && $ep_config->{output}->{use_http_status_codes};
-
+    my $response = cgi_safe_sub $client, sub {
         # check for request parameters in JSON data (HTTP body)
-        my $operation = $client->query_params->param('method');
+        my $operation = $client->request_param('method');
 
         if (my $raw = $client->request->body) {
 
@@ -142,7 +143,6 @@ while (my $cgi = CGI::Fast->new("")) {
             $json->max_depth(  $ep_config->{input}->{parse_depth} || 5 );
 
             if ($content_type =~ m{\Aapplication/jose}) {
-
                 $client->failure( 40087 ) unless $ep_config->{jose};
 
                 # The cert_identifier used to sign the token must be set as kid
@@ -173,7 +173,7 @@ while (my $cgi = CGI::Fast->new("")) {
                 # to prevent nasty attacks we require that the method name is part of the protected header
                 $operation = $jwt_header->{method} || $client->failure( 40089 );
 
-                $backend = $client->backend();
+                my $backend = $client->backend; # call outside the following try-catch block so OpenXPKI::Exception is not mangled
                 try {
                     # this will die if the certificate was not found
                     # TOOD - this call fails if no backend connection can be made which gives a misleading
@@ -196,11 +196,11 @@ while (my $cgi = CGI::Fast->new("")) {
                 $client->jwt_header($jwt_header);
 
             } elsif ($content_type =~ m{\Aapplication/pkcs7}) {
-
                 $client->failure( 40091 ) unless $ep_config->{pkcs7};
 
                 $client->pkcs7($raw);
-                $backend = $client->backend;
+
+                my $backend = $client->backend; # call outside the following try-catch block so OpenXPKI::Exception is not mangled
                 try {
                     my $pkcs7_content = $backend->run_command('unwrap_pkcs7_signed_data', {
                         pkcs7 => $client->pkcs7,
@@ -249,208 +249,20 @@ while (my $cgi = CGI::Fast->new("")) {
             my $url = $client->request->url->to_abs;
             my $baseurl = sprintf "%s://%s%s", $url->protocol, $url->host_port, $url->path->to_abs_string;
             my $spec = $client->openapi_spec($baseurl) or $client->failure( 50082 );
-            send_output($cgi, OpenXPKI::Client::Service::Response->new(result => $spec), 1);
-            next CGI_LOOP;
+            $openapi_mode = 1;
+            return OpenXPKI::Client::Service::Response->new(result => $spec);
+        } else {
+            $openapi_mode = 0;
         }
 
         $client->operation($operation);
 
-        # "workflow" is required even though with "execute_action" we don't need it.
-        # But the check here serves as a config validator so that a correct OpenAPI
-        # Spec will be generated upon request.
-        my $workflow_type = $ep_config->{$operation}->{workflow};
-        $client->failure( 40480, "RPC method $operation not found or no workflow_type set" )
-          unless defined $workflow_type;
+        return $client->handle_rpc_request;
+    };
 
-        $log->trace( "Calling '$operation' on '$endpoint' with parameters: " . Dumper $client->wf_params ) if $log->is_trace;
+    send_output( $cgi, $response, $client->use_status_codes );
 
-        my $workflow;
-
-        try {
-            # create the client object
-            $backend = $client->backend;
-
-            # check for pickup parameter
-            if (my $pickup_key = $ep_config->{$operation}->{pickup}) {
-                my $pickup_value;
-                # "pickup_workflow" needs a parameter HashRef
-                if ($ep_config->{$operation}->{pickup_workflow}) {
-                    my @keys = split /\s*,\s*/, $pickup_key;
-                    foreach my $key (@keys) {
-                        # take value from param hash if defined, this makes data
-                        # from the environment available to the pickup workflow
-                        my $val = $client->wf_params->{$key} // $client->get_param($key);
-                        $pickup_value->{$key} = $val if defined $val;
-                    }
-                # "pickup_namespace" and "pickup_attribute" need a single value - see pickup_workflow()
-                } else {
-                    $pickup_value = $client->get_param($pickup_key);
-                }
-                if ($pickup_value) {
-                    $workflow = $client->pickup_workflow($ep_config->{$operation}, $pickup_value);
-                } else {
-                    $log->trace("Ignoring workflow pickup because '$pickup_key' has no value") if $log->is_trace;
-                }
-            }
-
-            # Endpoint has a "resume and execute" definition so run action if possible
-            #
-            # If "execute_action" is defined it enforces "pickup_workflow" and we never
-            # start a new workflow, even if no "pickup" parameters were given.
-            if (my $execute_action = $ep_config->{$operation}->{execute_action}) {
-                if (!$workflow) {
-                    $client->failure( 40481 );
-
-                } elsif ($workflow->{'proc_state'} ne 'manual') {
-                    $client->failure( 40482, { id => $workflow->{id}, 'state' => $workflow->{'state'}, proc_state => $workflow->{'proc_state'} } );
-
-                } else {
-                    my $actions_avail = $backend->run_command('get_workflow_activities', { id => $workflow->{id} });
-                    if (!(grep { $_ eq  $execute_action } @{$actions_avail})) {
-                        $client->failure( 40483, { id => $workflow->{id}, 'state' => $workflow->{'state'}, proc_state => $workflow->{'proc_state'} } );
-                    } else {
-                        $log->debug("Resume #".$workflow->{id}." and execute '$execute_action' with params: " . join(", ", keys $client->wf_params->%*));
-                        $workflow = $backend->handle_workflow({
-                            id => $workflow->{id},
-                            activity => $execute_action,
-                            params => $client->wf_params,
-                        });
-                    }
-                }
-
-            # pickup return undef if no workflow was found
-            } elsif (not $workflow) {
-                $log->debug("Initialize '$workflow_type' with params: " . join(", ", keys $client->wf_params->%*));
-                $workflow = $backend->handle_workflow({
-                    type => $workflow_type,
-                    params => $client->wf_params,
-                });
-            }
-
-            $log->trace( 'Workflow info '  . Dumper $workflow ) if $log->is_trace;
-        }
-        catch ($err) {
-            #
-            # Special internal error hash generated by failure() - rethrow
-            #
-            if (ref $err eq 'HASH' and $err->{rpc_failure}) {
-                die $err;
-            }
-
-            #
-            # OpenXPKI::Exception - convert into special internal error hash
-            #
-            if (blessed $err) {
-                $client->failure(40101, $err->message) if $err->isa('OpenXPKI::Exception::Authentication');
-                $client->failure(50000, $err->message) if $err->isa('OpenXPKI::Exception');
-            }
-
-            #
-            # Validation error
-            #
-            my $reply = $backend->last_reply();
-            # TODO this needs to be reworked
-            if ($reply->{ERROR}
-                && ($reply->{ERROR}->{CLASS}//'') eq 'OpenXPKI::Exception::InputValidator'
-                && $reply->{ERROR}->{ERRORS}
-            ) {
-                $log->trace(Dumper $reply);
-                my $error = join ", ", map { $_->{name} }  @{$reply->{ERROR}->{ERRORS}};
-                $client->failure( 40082, $error || $reply->{ERROR}->{LABEL} || '', { fields => $reply->{ERROR}->{ERRORS} } );
-
-            } else {
-                my $error;
-                my $error_code = 50000;
-                if ($reply->{ERROR} && $reply->{ERROR}->{LABEL}) {
-                    $error = $reply->{ERROR}->{LABEL};
-                }
-                else {
-                    $error = $backend->last_error;
-                    if (not $error) {
-                        if (blessed $err and $err->isa('OpenXPKI::Client::Service::Response')) {
-                            $error = $err->error_message;
-                            $error_code = $err->error;
-                        } else {
-                            $error = $err;
-                            $error_code = 40000;
-                        }
-                    }
-                }
-                $log->error($error);
-                my $msg_public = (($error//'') =~ /I18N_OPENXPKI_UI_/) ? $error : 'internal error';
-                $client->failure( $error_code, $msg_public );
-            }
-        }
-
-        my $response = OpenXPKI::Client::Service::Response->new;
-        my $res;
-
-        # no ID and not finished is an unrecoverable startup error
-        if (( $workflow->{'proc_state'} ne 'finished' && !$workflow->{id} ) || $workflow->{'proc_state'} eq 'exception') {
-
-            $client->failure( 50081, { id => $workflow->{id}, 'state' => $workflow->{'state'} } );
-
-        # if the workflow is running, we do not expose any data of the workflows
-        } elsif ( $workflow->{'proc_state'} eq 'running' ) {
-
-            $log->info(sprintf("RPC request was processed properly (Workflow: %s is currently running)",
-                $workflow->{id} ));
-            $res = { result => { id => $workflow->{id}, 'state' => '--', 'proc_state' => $workflow->{'proc_state'}, pid => $$ }};
-
-        } else {
-
-            $log->info(sprintf("RPC request was processed properly (Workflow: %s, State: %s (%s))",
-                $workflow->{id}, $workflow->{state}, $workflow->{'proc_state'}) );
-            $res = { result => { id => $workflow->{id}, 'state' => $workflow->{'state'}, 'proc_state' => $workflow->{'proc_state'}, pid => $$ }};
-
-            # if pickup is set and workflow is not in a final state we send a 202
-            if ($ep_config->{$operation}->{pickup}) {
-                if ($workflow->{'proc_state'} eq 'pause') {
-                    my $delay = $workflow->{'wake_up_at'} - time();
-                    $response->retry_after($delay > 30 ? $delay : 30);
-                    $log->debug("Need retry - workflow is paused - delay $delay");
-                } elsif ($workflow->{'proc_state'} ne 'finished') {
-                    $response->retry_after(300);
-                    $log->debug("Need retry - workflow is " . $workflow->{'proc_state'});
-                }
-            }
-
-            # Map context parameters to the response if requested
-            if ($ep_config->{$operation}->{output}) {
-                $res->{result}->{data} = {};
-                my @keys;
-                @keys = split /\s*,\s*/, $ep_config->{$operation}->{output};
-                $log->debug("Keys " . join(", ", @keys));
-                $log->trace("Raw context: ". Dumper $workflow->{context}) if $log->is_trace;
-                foreach my $key (@keys) {
-                    my $val = $workflow->{context}->{$key};
-                    next unless (defined $val);
-                    next unless ($val ne '' || ref $val);
-                    if (OpenXPKI::Serialization::Simple::is_serialized($val)) {
-                        $val = OpenXPKI::Serialization::Simple->new->deserialize( $val );
-                    }
-                    $res->{result}->{data}->{$key} = $val;
-                }
-            }
-        }
-
-        $response->result($res);
-        send_output( $cgi, $response );
-    }
-    catch ($err) {
-        # special internal error hash generated by failure()
-        if (blessed $err and $err->isa('OpenXPKI::Client::Service::Response')) {
-            send_output( $cgi, $err );
-        }
-        # unknown error
-        else {
-            $log->error($err) if $log;
-            send_output( $cgi, OpenXPKI::Client::Service::Response->new_error(400) );
-        }
-    }
-    finally {
-        $client->disconnect_backend if $client;
-    }
+    $client->disconnect_backend;
 }
 
 1;
