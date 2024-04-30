@@ -82,7 +82,7 @@ while (my $cgi = CGI::Fast->new("")) {
     $log->debug("Config created");
 
     if ($operation eq 'PKIOperation') {
-        my $response = cgi_safe_sub {
+        my $response = cgi_safe_sub $client, sub {
             try {
                 # this internally triggers a call to the backend to unwrap the
                 # scep message and returns the payload and some attributes
@@ -142,7 +142,7 @@ while (my $cgi = CGI::Fast->new("")) {
 
     my $mime;
 
-    my $response = cgi_safe_sub {
+    my $response = cgi_safe_sub $client, sub {
         if ($operation eq 'GetCACaps') {
             $mime = 'text/plain';
             return $client->handle_property_request;

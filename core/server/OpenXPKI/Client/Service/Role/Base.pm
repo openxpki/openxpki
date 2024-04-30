@@ -1,8 +1,6 @@
 package OpenXPKI::Client::Service::Role::Base;
 use OpenXPKI qw( -role -typeconstraints );
 
-with 'OpenXPKI::Client::Service::Role::PickupWorkflow';
-
 requires 'service_name';
 requires 'prepare';
 requires 'send_response';
@@ -50,6 +48,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Client::Simple;
 use OpenXPKI::Client::Service::Response;
 use OpenXPKI::Log4perl;
+use OpenXPKI::i18n qw( i18nGettext );
 
 
 =head2 ATTRIBUTES
@@ -109,7 +108,7 @@ L</op_handlers> starts.
         # e.g.
         $self->operation($c->stash('operation'));
         # or
-        $self->operation($self->query_params->param('operation') // '');
+        $self->operation($self->request_param('operation') // '');
     }
 
 B<Passed parameters>
@@ -184,7 +183,7 @@ Service specific processing of the successful enrollment workflow result.
 Must return an L<OpenXPKI::Client::Service::Response>.
 
     sub prepare_enrollment_result ($self, $workflow) {
-        return OpenXPKI::Client::Service::Response->new(
+        return $self->new_response(
             workflow => $workflow,
             result => $workflow->{context}->{cert_identifier},
         );
@@ -248,7 +247,7 @@ has request => (
     is => 'ro',
     isa => 'Mojo::Message::Request',
     required => 1,
-    handles => [qw( query_params body_params )],
+    handles => [qw( body_params )],
 );
 
 =head3 endpoint
@@ -260,6 +259,24 @@ has endpoint => (
     is => 'ro',
     isa => 'Str',
     required => 1,
+);
+
+=head2 Optional attributes
+
+=head3 take_pickup_value_from_request
+
+Per default (C<0>), the pickup value passed to L<OpenXPKI::Client::Service::Role::PickupWorkflow/pickup_workflow>
+is read from the currently configured C<transaction_id> (i.e.
+C<$self-E<gt>wf_params-E<gt>{transaction_id}>).
+
+Set this to C<1> to use a custom query parameter as the pickup value instead (C<$self-E<gt>request_param($key)>,
+where C<$key> is the current C<rpc.ENDPOINT.OPERATION.pickup>).
+
+=cut
+has take_pickup_value_from_request => (
+    is => 'ro',
+    isa => 'Bool',
+    default => 0,
 );
 
 =head2 Other readonly attributes
@@ -335,8 +352,7 @@ sub _build_backend ($self) {
         });
     }
     catch ($err) {
-        $self->log->error("Could not create client object: $err");
-        die OpenXPKI::Client::Service::Response->new_error( 50002 );
+        $self->throw_error( 50002 => "Could not create client object: $err" );
     }
 }
 
@@ -435,10 +451,11 @@ sub _build_wf_params ($self) {
         return $p;
     }
     catch ($err) {
-        if ($err->isa('OpenXPKI::Client::Service::Response')) {
+        if (blessed $err and $err->isa('OpenXPKI::Client::Service::Response')) {
             die $err;
         } else {
-            die OpenXPKI::Client::Service::Response->new_error( 50010 => "$err" ); # stringification
+            $self->log->error("$err"); # stringification
+            $self->throw_error( 50010 );
         }
     }
 }
@@ -475,6 +492,25 @@ after 'BUILD' => sub ($self, $args) {
     Log::Log4perl::MDC->put('endpoint', $self->endpoint);
 };
 
+=head2 request_param
+
+Returns the value of the given GET parameter.
+
+May be overwritten by the consuming class e.g. to query contents of a JSON request.
+
+B<Parameters>
+
+=over
+
+=item * C<$key> I<Str> - parameter name
+
+=back
+
+=cut
+sub request_param ($self, $key) {
+    return $self->request->query_params->param($key);
+}
+
 =head2 handle_request
 
 Main request handling method (called by L<OpenXPKI::Client::Web::Controller>):
@@ -497,7 +533,7 @@ sub handle_request ($self) {
 
     my $response;
     try {
-        die OpenXPKI::Client::Service::Response->new_error( 40008 ) unless $self->operation;
+        $self->throw_error( 40008 ) unless $self->operation;
 
         my $op_handlers = $self->op_handlers;
 
@@ -525,16 +561,11 @@ sub handle_request ($self) {
         }
 
         # error / fallback
-        $response //= OpenXPKI::Client::Service::Response->new_error(
-            40007 => sprintf('Unknown operation "%s"', $self->operation)
-        );
+        $self->throw_error( 40007 => sprintf('Unknown operation "%s"', $self->operation) )
+          unless $response;
     }
     catch ($err) {
-        if ($err->isa('OpenXPKI::Client::Service::Response')) {
-            $response = $err;
-        } else {
-            $response = OpenXPKI::Client::Service::Response->new_error(500 => "$err"); # stringification
-        }
+        $response = $self->new_error_response($err);
     }
 
     $self->log->debug('Status: ' . $response->http_status_line);
@@ -542,6 +573,64 @@ sub handle_request ($self) {
     $self->log->trace(Dumper $response) if $self->log->is_trace;
 
     return $response;
+}
+
+sub new_response ($self, %args) {
+    if (my $msg = $args{error_message}) {
+        $self->log->error($msg);
+        if ($msg =~ /I18N_OPENXPKI_UI_/) {
+            $args{error_message} = i18nGettext($msg) if $self->config_obj->language;
+        } else {
+            delete $args{error_message};
+        }
+    }
+    return OpenXPKI::Client::Service::Response->new(%args);
+}
+
+sub throw_error ($self, @args) {
+    if (scalar @args < 3 and $args[0] =~ /^\A\d+\z/) {
+        @args = (
+            error => $args[0],
+            $args[1] ? (error_message => $args[1]) : (),
+        );
+    }
+    die $self->new_response(@args);
+}
+
+sub new_error_response ($self, $error) {
+    if (blessed $error) {
+        if ($error->isa('OpenXPKI::Client::Service::Response')) {
+            return $error;
+
+        } elsif ($error->isa('OpenXPKI::Exception::Authentication')) {
+            return $self->new_response(error => 40101, error_message => $error->message);
+
+        } elsif ($error->isa('OpenXPKI::Exception')) {
+            return $self->new_response(error => 50000, error_message => $error->message);
+
+        } else {
+            return $self->new_response(error => 500, error_message => "$error"); # stringification
+        }
+
+    } else {
+        return $self->new_response(error => 500, error_message => $error);
+    }
+}
+
+sub new_pending_response ($self, $wf) {
+    my $retry_after;
+    if ($wf->{proc_state} eq 'pause') {
+        my $delay = $wf->{wake_up_at} - time;
+        $retry_after = ($delay < 30) ? 30 : $delay;
+    } else {
+        $retry_after = 300;
+    }
+
+    $self->log->info(sprintf 'Request pending - workflow is %s, retry after %ss', $wf->{'state'}, $retry_after);
+    return $self->new_response(
+        retry_after => $retry_after,
+        workflow => $wf,
+    );
 }
 
 =head2 add_wf_param
@@ -567,82 +656,191 @@ B<Returns> an L<OpenXPKI::Client::Service::Response>.
 sub handle_enrollment_request ($self) {
     $self->is_enrollment(1);
 
-    # Build configuration parameters. May be customized by service classes
-    # via add_wf_param(), e.g. for SCEP to inject data from the input.
-    my $param = $self->wf_params;
-
-    if (not $param->{server}) {
+    if (not $self->wf_params->{server}) {
         $self->log->error("Parameter 'server' missing but required by enrollment workflow");
-        return OpenXPKI::Client::Service::Response->new_error( 40401 );
+        $self->throw_error( 40401 );
     }
-    Log::Log4perl::MDC->put('server', $param->{server});
 
-    # create the client object
-    my $client = $self->backend;
+    Log::Log4perl::MDC->put('server', $self->wf_params->{server});
+    Log::Log4perl::MDC->put('tid', $self->wf_params->{transaction_id});
 
-    my ($pickup_config, $pickup_value) = $self->_build_pickup_config;
-    $self->log->trace(Dumper $pickup_config) if $self->log->is_trace;
+    #
+    # Try pickup
+    #
+    my $conf = {
+        workflow => 'certificate_enroll',
+        pickup => 'pkcs10',
+        pickup_attribute => 'transaction_id',
+        %{ $self->config->{$self->operation} || {} },
+    };
+    $self->log->trace("Resulting pickup config: " . Dumper $conf) if $self->log->is_trace;
 
+    my $pickup_failed;
     my $workflow;
-
     try {
-        # try pickup
-        $workflow = $self->pickup_workflow($pickup_config, $pickup_value);
+        if (my $wf_type = $conf->{pickup_workflow}) {
+            $workflow = $self->pickup_via_workflow($wf_type, $conf->{pickup});
 
-        # it was a pickup, it was not successful, we do not have a PKCS10
-        if ($pickup_value and not $workflow and not $param->{pkcs10}) {
-            $self->log->debug("Pickup failed and no PKCS10 given");
-            return OpenXPKI::Client::Service::Response->new_error( 40005 );
-        }
+        } elsif (my $ns = $conf->{pickup_namespace}) {
+            $workflow = $self->pickup_via_datapool($ns, $self->wf_params->{transaction_id});
 
-        # pickup return undef if no workflow was found - start new one
-        if (not $workflow) {
-            $self->log->debug(sprintf("Initialize workflow '%s' with parameters: %s",
-                $pickup_config->{workflow}, join(", ", keys %{$param})));
-
-            $workflow = $client->handle_workflow({
-                type => $pickup_config->{workflow},
-                params => $param,
-            });
+        } elsif (my $key = $conf->{pickup_attribute}) {
+            $workflow = $self->pickup_via_attribute($conf->{workflow}, $key, $self->wf_params->{transaction_id});
         }
     }
     catch ($error) {
-        $self->log->error( $error );
-        return OpenXPKI::Client::Service::Response->new_error( 50003 );
+        if (blessed $error and $error->isa('OpenXPKI::Exception::WorkflowPickupFailed')) {
+            $pickup_failed = 1;
+        }
+        else {
+            die $error;
+        }
+    }
+
+    # exception if pickup failed and there is no PKCS#10 parameter
+    if ($pickup_failed and not $self->wf_params->{pkcs10}) {
+        $self->log->debug('Workflow pickup failed and no PKCS#10 given');
+        $self->throw_error( 40005 );
+    }
+
+    #
+    # Start new workflow if:
+    # a) no pickup parameters found or
+    # b) failed pickup, but PKCS#10 given
+    #
+    if (not $workflow) {
+        $self->log->debug(sprintf("Initialize workflow '%s' with parameters: %s",
+            $conf->{workflow}, join(", ", keys $self->wf_params->%*)));
+
+        $workflow = $self->backend->handle_workflow({
+            type => $conf->{workflow},
+            params => $self->wf_params,
+        });
     }
 
     $self->check_workflow_error($workflow);
 
-    if ($workflow->{'proc_state'} ne 'finished') {
-        my $retry_after = 300;
-        if ($workflow->{'proc_state'} eq 'pause') {
-            my $delay = $workflow->{'wake_up_at'} - time();
-            $retry_after = ($delay > 30) ? $delay : 30;
-        }
+    # Workflow paused - send "request pending" / ask client to retry
+    if ($workflow->{proc_state} ne 'finished') {
+        return $self->new_pending_response($workflow);
 
-        $self->log->info('Request Pending - ' . $workflow->{'state'});
-        return OpenXPKI::Client::Service::Response->new(
-            retry_after => $retry_after,
-            workflow => $workflow,
-        );
+    # Workflow finised
+    } else {
+        $self->log->trace('Workflow context: ' . Dumper $workflow->{context}) if $self->log->is_trace;
+
+        my $cert_identifier = $workflow->{context}->{cert_identifier}
+            or $self->throw_error(
+                error => 40006,
+                ($workflow->{context}->{error_code} ? (error_message => $workflow->{context}->{error_code}) : ()),
+                workflow => $workflow,
+            );
+        $self->log->debug( 'Sending output for ' . $cert_identifier);
+
+        # implemented by consuming class
+        return $self->prepare_enrollment_result($workflow);
+    }
+}
+
+=head2 _build_pickup_config
+
+Build a configuration hash for the pickup workflow from
+
+=over
+
+=item * L</wf_params> and
+
+=item * the services' configuration for the current operation.
+
+=back
+
+B<Returns> A list C<($config, $value)>:
+
+=over
+
+=item * C<$config> - Pickup workflow configuration I<HashRef>
+
+=item * C<$value> - Pickup parameter I<HashRef> if C<$config-E<gt>{pickup_workflow}> is given, or transaction ID value I<Str> otherwise
+
+=back
+
+=cut
+
+sub pickup_via_workflow ($self, $wf_type, $keys_str) {
+    my $params;
+    my @keys = split /\s*,\s*/, $keys_str;
+    foreach my $key (@keys) {
+        # take value from param hash if defined, this makes data
+        # from the environment available to the pickup workflow
+        my $val = $self->wf_params->{$key} // $self->request_param($key);
+        $params->{$key} = $val if defined $val;
     }
 
-    $self->log->trace(Dumper $workflow->{context}) if $self->log->is_trace;
+    if (not scalar keys $params->%*) {
+        $self->log->debug('Ignoring pickup via workflow: all pickup keys are empty');
+        return;
+    }
+    $self->log->debug(sprintf 'Pickup via workflow "%s" with keys: %s', $wf_type, join(',', @keys));
 
-    my $cert_identifier = $workflow->{context}->{cert_identifier};
+    my $result = $self->backend->handle_workflow({
+        type => $wf_type,
+        params => $params,
+    });
+    die "No result from pickup workflow" unless $result->{context};
 
-    if (!$cert_identifier) {
-        return OpenXPKI::Client::Service::Response->new(
-            error => 40006,
-            ($workflow->{context}->{error_code} ? (error_message => $workflow->{context}->{error_code}) : ()),
-            workflow => $workflow,
-        );
+    $self->log->trace("Pickup workflow result: " . Dumper $result) if $self->log->is_trace;
+
+    return $self->_pickup($result->{context}->{workflow_id});
+}
+
+sub pickup_via_datapool ($self, $namespace, $key) {
+    if (not $key) {
+        $self->log->debug('Ignoring pickup via datapool: empty pickup key');
+        return;
+    }
+    $self->log->debug("Pickup via datapool: $namespace.$key" );
+
+    my $wfl = $self->backend->run_command('get_data_pool_entry', {
+        namespace => $namespace,
+        key => $key,
+    });
+
+    return $self->_pickup($wfl->{value});
+}
+
+sub pickup_via_attribute ($self, $wf_type, $key, $value) {
+    if (not $value) {
+        $self->log->debug('Ignoring pickup via attribute: empty pickup value');
+        return;
+    }
+    $self->log->debug("Pickup via attribute: $key = $value" );
+
+    my $wfl = $self->backend->run_command('search_workflow_instances', {
+        type => $wf_type,
+        attribute => { $key => $value },
+        limit => 2
+    });
+    die "Unable to pick up workflow - ambiguous search result" if @$wfl > 1;
+
+    return $self->_pickup(@$wfl == 1 ? $wfl->[0]->{workflow_id} : undef);
+}
+
+sub _pickup ($self, $wf_id) {
+    if (not $wf_id) {
+        $self->log->trace("Cannot pick up workflow: query did not return workflow ID");
+        OpenXPKI::Exception::WorkflowPickupFailed->throw;
     }
 
-    $self->log->debug( 'Sending output for ' . $cert_identifier);
+    if (ref $wf_id or $wf_id !~ m{\A\d+\z}) {
+        $self->log->error("Pickup result is not an integer number");
+        $self->log->trace(Dumper $wf_id) if $self->log->is_trace;
+        OpenXPKI::Exception::WorkflowPickupFailed->throw;
+    }
 
-    # implemented by consuming class
-    return $self->prepare_enrollment_result($workflow);
+    $self->log->debug("Pick up workflow #${wf_id}");
+    return (
+        $self->backend->handle_workflow({ id => $wf_id })
+        or OpenXPKI::Exception::WorkflowPickupFailed->throw
+    );
 }
 
 =head2 handle_property_request
@@ -708,7 +906,8 @@ B<Parameters>
 
 =back
 
-B<Returns> an L<OpenXPKI::Client::Service::Response>.
+B<Returns> an L<OpenXPKI::Client::Service::Response> or throws an
+L<OpenXPKI::Client::Service::Response> in case of errors.
 
 =cut
 sub run_workflow ($self, $workflow_type, $param) {
@@ -727,12 +926,12 @@ sub run_workflow ($self, $workflow_type, $param) {
     }
     catch ($err) {
         $self->log->error($err);
-        return OpenXPKI::Client::Service::Response->new_error( 50003 );
+        $self->new_error( 50003 );
     }
 
     $self->check_workflow_error($workflow);
 
-    return OpenXPKI::Client::Service::Response->new(
+    return $self->new_response(
         workflow => $workflow,
     );
 }
@@ -741,6 +940,9 @@ sub run_workflow ($self, $workflow_type, $param) {
 
 Checks the given workflow result I<HashRef> and dies with a
 L<OpenXPKI::Client::Service::Response> in case of workflow errors.
+
+If L<OpenXPKI::Client::Simple/last_error> returns a string starting with
+C<"I18N_OPENXPKI_UI_"> it is added to the error message.
 
 B<Parameters>
 
@@ -768,14 +970,27 @@ sub check_workflow_error ($self, $workflow) {
             if (my $class = $err->{CLASS}) {
                 if ($class eq 'OpenXPKI::Exception::InputValidator') {
                     $self->log->info( 'Input validation failed' );
-                    die OpenXPKI::Client::Service::Response->new_error( 40004 );
+
+                    my @fields = map { $_->{name} } ($err->{ERRORS} // {})->@*;
+                    $self->log->info( 'Failed fields: ' . join(', ', @fields) );
+
+                    $self->throw_error(
+                        error => 40004,
+                        $workflow ? (workflow => $workflow) : (),
+                        error_details => { fields => $reply->{ERROR}->{ERRORS} // [] },
+                    );
                 }
             }
-            $self->log->error( 'Internal server error: ' . $err->{LABEL} );
-        } else {
-            $self->log->error( 'Internal server error' );
         }
-        die OpenXPKI::Client::Service::Response->new_error( 50003 );
+
+        my $msg = $self->backend->last_error // '';
+        $self->log->error( join ': ', 'Internal server error', $msg||() );
+
+        $self->throw_error(
+            error => 50003,
+            error_message => $msg,
+            $workflow ? (workflow => $workflow) : (),
+        );
     }
 }
 
@@ -816,7 +1031,7 @@ sub set_pkcs10_and_tid ($self, $pkcs10 = undef) {
     # Usually PEM encoded but without borders as POSTDATA
     $pkcs10 or do {
         $self->log->debug( 'Incoming enrollment with empty body' );
-        die OpenXPKI::Client::Service::Response->new_error( 40003 );
+        $self->throw_error( 40003 );
     };
 
     Crypt::PKCS10->setAPIversion(1);
@@ -824,67 +1039,11 @@ sub set_pkcs10_and_tid ($self, $pkcs10 = undef) {
     if (!$decoded) {
         $self->log->error('Unable to parse PKCS10: '. Crypt::PKCS10->error);
         $self->log->debug($pkcs10);
-        die OpenXPKI::Client::Service::Response->new_error( 40002 );
+        $self->throw_error( 40002 );
     }
 
     $self->add_wf_param(pkcs10 =>$decoded->csrRequest(1));
     $self->add_wf_param(transaction_id => sha1_hex($decoded->csrRequest));
-}
-
-=head2 _build_pickup_config
-
-Build a configuration hash for the pickup workflow from
-
-=over
-
-=item * L</wf_params> and
-
-=item * the services' configuration for the current operation.
-
-=back
-
-B<Returns> A list C<($config, $value)>:
-
-=over
-
-=item * C<$config> - Pickup workflow configuration I<HashRef>
-
-=item * C<$value> - Pickup parameter I<HashRef> if C<$config-E<gt>{pickup_workflow}> is given, or transaction ID value I<Str> otherwise
-
-=back
-
-=cut
-sub _build_pickup_config ($self) {
-    my $conf = $self->config;
-    my $param = $self->wf_params;
-
-    my $pickup_config = {
-        workflow => 'certificate_enroll',
-        pickup => 'pkcs10',
-        pickup_attribute => 'transaction_id',
-        %{$conf->{$self->operation} || {}},
-    };
-
-    Log::Log4perl::MDC->put('tid', $param->{transaction_id});
-
-    # check for pickup parameter
-    my $pickup_value;
-    # namespace needs a single value
-    if ($pickup_config->{pickup_workflow}) {
-        # explicit pickup paramters are set
-        my @keys = split /\s*,\s*/, $pickup_config->{pickup};
-        foreach my $key (@keys) {
-            # take value from param hash if defined, this makes data
-            # from the environment available to the pickup workflow
-            my $val = $param->{$key} // $self->request->param($key);
-            $pickup_value->{$key} = $val if (defined $val);
-        }
-    } else {
-        # pickup via transaction_id
-        $pickup_value = $param->{transaction_id};
-    }
-
-    return ($pickup_config, $pickup_value);
 }
 
 =head1 LEGACY CGI METHODS
@@ -918,23 +1077,13 @@ Class method to wrap legacy CGI request handling in a try-catch block so that
 always an L<OpenXPKI::Client::Service::Response> is returned.
 
 =cut
-sub cgi_safe_sub :prototype(&) {
-
-    my $handler_sub = shift;
-
-    my $response;
+sub cgi_safe_sub :prototype($&) ($self, $handler_sub) {
     try {
-        $response = $handler_sub->();
+        return $handler_sub->();
     }
     catch ($err) {
-        if ($err->isa('OpenXPKI::Client::Service::Response')) {
-            $response = $err;
-        } else {
-            $response = OpenXPKI::Client::Service::Response->new_error( 500 => "$err" ); # stringification
-        }
+        return $self->new_error_response($err);
     }
-
-    return $response;
 }
 
 =head2 cgi_headers

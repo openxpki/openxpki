@@ -54,7 +54,7 @@ has attr => (
 # required by OpenXPKI::Client::Service::Role::Base
 sub prepare ($self, $c) {
     # set operation from request parameter
-    $self->operation($self->query_params->param('operation') // '');
+    $self->operation($self->request_param('operation') // '');
 }
 
 # required by OpenXPKI::Client::Service::Role::Base
@@ -121,7 +121,7 @@ sub op_handlers {
             my $message;
             # GET: read Base64 encoded message from URL parameter
             if ($self->request->method eq 'GET') {
-                $message = $self->query_params->param('message');
+                $message = $self->request_param('message');
                 $self->log->debug("Got PKIOperation via GET");
             # POST: read message from request body
             } else {

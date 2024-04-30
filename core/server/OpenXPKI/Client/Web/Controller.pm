@@ -39,13 +39,22 @@ sub index ($self) {
 
     # preparations and checks
     $self->log->debug("Request handling (1/3): preparations and checks");
-    $service->prepare($self);
 
-    # request handling
-    $self->log->debug("Request handling (2/3): process request");
-    my $response = $service->handle_request;
-    die "Result of $class->handle_request() is not an instance of OpenXPKI::Client::Service::Response"
-      unless $response->isa('OpenXPKI::Client::Service::Response');
+    my $response;
+    try {
+        $service->prepare($self);
+    }
+    catch ($err) {
+        $response = $service->new_error_response($err);
+    }
+
+    if (not $response) {
+        # request handling
+        $self->log->debug("Request handling (2/3): process request");
+        $response = $service->handle_request;
+        die "Result of $class->handle_request() is not an instance of OpenXPKI::Client::Service::Response"
+          unless $response->isa('OpenXPKI::Client::Service::Response');
+    }
 
     # service specific HTTP headers
     $self->res->headers->add($_ => $response->extra_headers->{$_}) for keys $response->extra_headers->%*;

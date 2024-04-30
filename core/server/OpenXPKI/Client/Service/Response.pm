@@ -12,11 +12,9 @@ use OpenXPKI::Server::Context qw( CTX );
 our %named_messages = (
     40080 => 'No method set in request',
     40081 => 'Decoding of JSON encoded POST data failed',
-    40082 => 'Wrong input values',
     40083 => 'RAW post not allowed (no method set in request)',
     40084 => 'RAW post with unknown content type',
     40085 => 'Unknown RPC error',
-    40086 => 'POST data contains invalid UTF8 octets',
     40087 => 'Content type JOSE not enabled',
     40088 => 'Processing JWS protected payload failed',
     40089 => 'Method header is missing in JWS',
@@ -30,7 +28,7 @@ our %named_messages = (
     40482 => 'Resume requested but workflow is not in manual state',
     40483 => 'Resume requested but expected workflow action not available',
 
-    50000 => 'Server exception',
+    50000 => 'Server error',
     50001 => 'Unable to fetch configuration from server - connect failed',
     50080 => 'Could not unwrap PKCS#7 contents',
     50081 => 'Workflow terminated in unexpected state',
@@ -52,7 +50,6 @@ our %named_messages = (
     '40100' => 'Unauthorized',
     '40400' => 'Not Found',
     '40401' => 'Not Found (Empty request endpoint and no default server set)',
-    '50000' => 'Server Error',
     '50002' => 'Unable to initialize client',
     '50003' => 'Unexpected response from backend',
     '50010' => 'Unable to initialize endpoint parameters',
@@ -163,7 +160,23 @@ has error => (
     default => 0,
 );
 
-=head2 error_message
+=head2 error_details
+
+Error details I<HashRef>.
+
+=cut
+has error_details => (
+    is => 'rw',
+    isa => 'HashRef',
+    traits => ['Hash'],
+    handles => {
+        'has_error_details' => 'count',
+    },
+    lazy => 1,
+    default => sub { {} },
+);
+
+=head2 custom_error_message
 
 Error message. Only used if L</error> has been set.
 
@@ -172,12 +185,11 @@ the C<error_code> item.
 
 =cut
 # Please not there is a method error_message() below
-has __error_message => (
+has custom_error_message => (
     is => 'rw',
     isa => 'Str',
     init_arg  => 'error_message',
-    predicate => 'has_error_message',
-    clearer => 'clear_error_message',
+    predicate => 'has_custom_error_message',
 );
 
 =head2 retry_after
@@ -205,15 +217,19 @@ L</error_message> according to the workflow informations.
 has workflow => (
     is => 'rw',
     isa => 'HashRef',
-    predicate => 'has_workflow',
-    default => sub { return {}; },
+    traits => ['Hash'],
+    handles => {
+        'has_workflow' => 'count',
+    },
+    lazy => 1,
+    default => sub { {} },
     trigger => \&__process_workflow,
 );
 sub __process_workflow ($self, $workflow) {
     $self->state($workflow->{state}) if $workflow->{state};
     $self->proc_state($workflow->{proc_state}) if $workflow->{proc_state};
     $self->transaction_id($workflow->{context}->{transaction_id}) if $workflow->{context}->{transaction_id};
-    $self->__error_message($workflow->{context}->{error_code}) if $workflow->{context}->{error_code};
+    $self->custom_error_message($workflow->{context}->{error_code}) if $workflow->{context}->{error_code};
 }
 
 =head2 http_status_code
@@ -372,7 +388,7 @@ sub new_error ($class, @args) {
     die 'new_error() requires an error code' unless @args > 0;
     return $class->new(
         error => $args[0],
-        scalar @args > 1 ? ( error_message => $args[1] ) : (),
+        defined $args[1] ? ( error_message => $args[1] ) : (),
     );
 }
 
@@ -382,7 +398,7 @@ Returns the custom error message if set:
 
     my $r = OpenXPKI::Client::Service::Response->new_error( 500 => 'Something bad happened');
     say $r->error_message;
-    # Something bad happened
+    # Server error: Something bad happened
 
 ...or a predefined message if a known internal error code was used:
 
@@ -397,11 +413,17 @@ sub error_message ($self) {
     return ''
       unless $self->has_error;
 
-    return i18nGettext($self->__error_message)
-      if $self->has_error_message;
+    my @msg;
+    # general message
+    my $general = $named_messages{$self->error};
+    push @msg, $general if $general;
+    # detailed message
+    push @msg, i18nGettext($self->custom_error_message) if $self->has_custom_error_message;
 
-    return ($named_messages{$self->error}
-      || sprintf('Unknown error (%s)', $self->error));
+    # generic fallback message
+    @msg = sprintf('Unknown error (%s)', $self->error) unless scalar @msg;
+
+    return join ': ', @msg;
 }
 
 =head2 is_server_error

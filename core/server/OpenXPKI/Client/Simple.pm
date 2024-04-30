@@ -454,7 +454,7 @@ sub run_command {
     $self->last_reply( $reply );
     if ($reply->{SERVICE_MSG} ne 'COMMAND') {
         my $message;
-        if (my $err = $reply->{'ERROR'}) {
+        if (my $err = $reply->{ERROR}) {
             if ($err->{PARAMS} && $err->{PARAMS}->{__ERROR__}) {
                 $message = $err->{PARAMS}->{__ERROR__};
             } elsif($err->{LABEL}) {

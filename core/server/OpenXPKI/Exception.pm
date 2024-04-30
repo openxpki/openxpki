@@ -16,28 +16,32 @@ use Exception::Class (
     },
     # Validation failed on workflow or api input field
     'OpenXPKI::Exception::InputValidator' => {
-        isa         => 'OpenXPKI::Exception',
+        isa => 'OpenXPKI::Exception',
         fields => [ 'errors', 'action' ],
     },
     # Authentication request was not successful
     'OpenXPKI::Exception::Authentication' => {
-        isa         => 'OpenXPKI::Exception',
+        isa => 'OpenXPKI::Exception',
         fields => [ 'stack', 'error', 'authinfo' ],
     },
     # Timeout while waiting for a socket or external process
     'OpenXPKI::Exception::Timeout' => {
-        isa         => 'OpenXPKI::Exception',
+        isa => 'OpenXPKI::Exception',
         fields => [ 'error', 'command', 'timeout' ],
     },
     # Error during socket communication
     'OpenXPKI::Exception::Socket' => {
-        isa         => 'OpenXPKI::Exception',
+        isa => 'OpenXPKI::Exception',
         fields => [ 'error', 'socket' ],
     },
     # Error while executing a command
     'OpenXPKI::Exception::Command' => {
-        isa         => 'OpenXPKI::Exception',
+        isa => 'OpenXPKI::Exception',
         fields => [ 'error' ],
+    },
+    # Error while executing a command
+    'OpenXPKI::Exception::WorkflowPickupFailed' => {
+        isa => 'OpenXPKI::Exception',
     },
 );
 

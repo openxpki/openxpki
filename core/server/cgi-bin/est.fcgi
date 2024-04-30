@@ -72,7 +72,7 @@ while (my $cgi = CGI::Fast->new("")) {
 
     my $mime = "application/pkcs7-mime; smime-type=certs-only";
 
-    my $response = cgi_safe_sub {
+    my $response = cgi_safe_sub $client, sub {
         if ($operation eq 'cacerts') {
             my $r = $client->handle_property_request;
 
