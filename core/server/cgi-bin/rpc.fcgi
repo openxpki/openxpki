@@ -5,9 +5,7 @@ use warnings;
 # Core modules
 use CGI;
 use CGI::Fast;
-use Data::Dumper;
 use JSON::PP;
-use Scalar::Util qw( blessed );
 use English;
 use Encode;
 
