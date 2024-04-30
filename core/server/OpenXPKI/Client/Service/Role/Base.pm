@@ -5,7 +5,7 @@ requires 'service_name';
 requires 'prepare';
 requires 'send_response';
 requires 'op_handlers';
-requires 'fcgi_set_custom_wf_params';
+requires 'cgi_set_custom_wf_params';
 requires 'prepare_enrollment_result';
 
 =head1 NAME
@@ -28,7 +28,7 @@ A consuming class that implements a service generally looks like this:
     sub send_response ($self, $c, $response) { ... }
     sub op_handlers { ... }
     sub prepare_enrollment_result ($self, $workflow) { ... }
-    sub fcgi_set_custom_wf_params ($self) { ... }
+    sub cgi_set_custom_wf_params ($self) { ... }
 
 =cut
 
@@ -167,11 +167,11 @@ I<CodeRefs>.
         ];
     }
 
-=head3 fcgi_set_custom_wf_params
+=head3 cgi_set_custom_wf_params
 
 Legacy method for CGI to add service specific workflow parameters.
 
-    sub fcgi_set_custom_wf_params ($self) {
+    sub cgi_set_custom_wf_params ($self) {
         if ($self->operation eq 'enroll') {
             $self->add_wf_param(server => $self->endpoint);
         }
@@ -440,7 +440,7 @@ sub _build_wf_params ($self) {
         }
 
         # legacy CGI mode
-        $self->fcgi_set_custom_wf_params if ($ENV{GATEWAY_INTERFACE} and $ENV{REMOTE_ADDR});
+        $self->cgi_set_custom_wf_params if ($ENV{GATEWAY_INTERFACE} and $ENV{REMOTE_ADDR});
 
         # merge custom parameters set by consuming class
         $p = {

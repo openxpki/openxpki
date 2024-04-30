@@ -104,7 +104,7 @@ sub op_handlers {
 }
 
 # required by OpenXPKI::Client::Service::Role::Base
-sub fcgi_set_custom_wf_params ($self) {
+sub cgi_set_custom_wf_params ($self) {
     # TODO this should be merged with the stuff in Base without
     # having protocol specific items in the core code
     if (any { $self->operation eq $_ } qw( simpleenroll simplereenroll simplerevoke )) {

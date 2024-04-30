@@ -236,7 +236,7 @@ sub op_handlers {
 sub prepare_enrollment_result {}
 
 # required by OpenXPKI::Client::Service::Role::Base
-sub fcgi_set_custom_wf_params ($self) {
+sub cgi_set_custom_wf_params ($self) {
     # Only parameters which are whitelisted in the config are mapped!
     # This is crucial to prevent injection of server-only parameters
     # like the autoapprove flag...

@@ -214,7 +214,7 @@ sub op_handlers {
 }
 
 # required by OpenXPKI::Client::Service::Role::Base
-sub fcgi_set_custom_wf_params ($self) {
+sub cgi_set_custom_wf_params ($self) {
     # Only handle PKIOperation
     return unless 'PKIOperation' eq $self->operation;
 
