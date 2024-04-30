@@ -19,7 +19,7 @@ use OpenXPKI::Types;
 
 =cut
 protected_command "config_show" => {
-    path => { isa => 'Str', required => 0, matching => qr/^ \w+(\.\w+)? $/sxi},
+    path => { isa => 'Str', required => 0, matching => qr/^ \w+(\.\w+)* $/sxi},
 } => sub {
     my ($self, $params) = @_;
     my $path = $params->path;
