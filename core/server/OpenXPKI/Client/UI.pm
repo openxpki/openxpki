@@ -895,7 +895,7 @@ sub handle_login {
             } else {
 
                 my $tt = OpenXPKI::Template->new;
-                my $uri_pattern = $auth->{redirect_uri} || 'https://[% host %]/webui/[% realm %]';
+                my $uri_pattern = $auth->{redirect_uri} || 'https://[% host _ baseurl %]';
                 my $redirect_uri = $tt->render( $uri_pattern, {
                     host => $ENV{HTTP_HOST},
                     baseurl => $self->session->param('baseurl'),
@@ -922,6 +922,7 @@ sub handle_login {
                     $self->log->trace("OIDC Token Response: " .$response->decoded_content);
                     my $auth_info = decode_json($response->decoded_content);
                     $uilogin->redirect->to('login!oidc!token!'.$auth_info->{id_token});
+                    return $uilogin->init_login_missing_data unless ($auth_info->{id_token});
                     return $uilogin;
 
                 } elsif ($self->session->param('oidc-nonce')) {
