@@ -34,6 +34,15 @@ sub declare_routes ($self, $r) {
         endpoint => 'default',
     );
 
+    # RPC urls look like
+    #   /rpc/enroll?method=IssueCertificate
+    #   /rpc/enroll/IssueCertificate
+    $r->any('/rpc/<endpoint>/<method>')->to(
+        %controller_params,
+        service_class => 'OpenXPKI::Client::Service::RPC',
+        method => '',
+    );
+
     # SCEP urls look like
     #   /scep/server?operation=PKIOperation                 # incl. endpoint/server
     #   /scep/server/pkiclient.exe?operation=PKIOperation   # incl. endpoint/server
@@ -46,7 +55,7 @@ sub declare_routes ($self, $r) {
 
     # ACME urls look like (full pattern)
     # /acme/<endpoint>/<objectclass>/<resource id>/<sub method>
-    # but we need to handle some special path directly
+    # but we need to handle some special paths directly
 
     # /acme/<endpoint> - directory request
     $r->get('/acme/<endpoint>')->to(

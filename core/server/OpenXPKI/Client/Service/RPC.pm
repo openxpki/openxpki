@@ -15,6 +15,7 @@ use Crypt::JWT qw( decode_jwt );
 # Project modules
 use OpenXPKI::Client::Service::Response;
 use OpenXPKI::Serialization::Simple;
+use OpenXPKI::i18n qw( i18n_walk );
 
 # Symbols to export by default
 # (we avoid Moose::Exporter's import magic because that switches on all warnings again)
@@ -73,53 +74,163 @@ has use_status_codes => (
     default => sub ($self) { $self->config->{output}->{use_http_status_codes} ? 1 : 0 },
 );
 
+has openapi_mode => (
+    is => 'rw',
+    isa => 'Bool',
+    lazy => 1,
+    init_arg => undef,
+    default => 0,
+);
+
 # required by OpenXPKI::Client::Service::Role::Base
-sub prepare { die "Not implemented yet" }
+sub prepare ($self, $c) {
+    #
+    # Parse request
+    #
+    $self->try_set_operation($self->request_param('method'));
+    $self->parse_rpc_request_body;
+    $self->try_set_operation($c->stash('method'));
+    die $self->new_response( 40080 ) unless $self->has_operation;
+
+    #
+    # Add custom workflow parameters
+    #
+    # Gather data from TLS session
+    if ($self->request->is_secure) {
+        my $auth_dn = $self->apache_env->{SSL_CLIENT_S_DN};
+        my $auth_pem = $self->apache_env->{SSL_CLIENT_CERT};
+
+        # TODO tls_client_dn / tls_client_cert always have the same value as signer_dn / signer_cert
+        if (defined $auth_dn) {
+            $self->add_wf_param(tls_client_dn => $auth_dn) if $self->config_env_keys->{tls_client_dn};
+
+            if ($auth_pem) {
+                $self->add_wf_param(tls_client_cert => $auth_pem) if $self->config_env_keys->{tls_client_cert};
+                if (
+                    ($self->config_env_keys->{signer_chain} or $self->config_env_keys->{tls_client_chain})
+                    and $self->apache_env->{SSL_CLIENT_CERT_CHAIN_0}
+                ) {
+                    my @chain;
+                    for (my $cc=0; $cc<=3; $cc++)   {
+                        my $chaincert = $self->apache_env->{'SSL_CLIENT_CERT_CHAIN_' . $cc};
+                        last unless $chaincert;
+                        push @chain, $chaincert;
+                    }
+                    $self->add_wf_param(signer_chain => \@chain) if $self->config_env_keys->{signer_chain};
+                    $self->add_wf_param(tls_client_chain => \@chain) if $self->config_env_keys->{tls_client_chain};
+                }
+            }
+        }
+    }
+
+    if ($self->has_pkcs7_content) {
+        $self->add_wf_param(_pkcs7 => $self->pkcs7) if $self->config_env_keys->{pkcs7};
+        $self->add_wf_param(signer_cert => $self->pkcs7_content->{signer}) if $self->config_env_keys->{signer_cert};
+    }
+
+    if ($self->has_jwt_header) {
+        $self->add_wf_param(signer_cert => $self->jwt_header->{signer_cert}) if $self->config_env_keys->{signer_cert};
+    }
+
+    # Only parameters which are whitelisted in the config are mapped!
+    # This is crucial to prevent injection of server-only parameters
+    # like the autoapprove flag...
+    if ($self->config->{$self->operation}->{param}) {
+        my @keys;
+        @keys = split /\s*,\s*/, $self->config->{$self->operation}->{param};
+        foreach my $key (@keys) {
+            my $val = $self->request_param($key);
+            next unless (defined $val);
+
+            if (!ref $val) {
+                $val =~ s/\A\s+//;
+                $val =~ s/\s+\z//;
+            }
+            $self->add_wf_param($key => $val);
+        }
+    }
+}
 
 # required by OpenXPKI::Client::Service::Role::Base
 sub send_response ($self, $c, $response) {
-    die "Not implemented yet";
+    if ($self->use_status_codes) {
+        if ($response->is_pending) {
+            $c->res->headers->add('-retry-after' => $response->retry_after);
+        }
+    } else {
+        $self->res->code('200');
+        $self->res->message('OK');
+    }
 
-    # my $status = '200 OK';
-    # my %retry_head;
+    # plain text
+    if (($c->req->headers->accept//'') eq 'text/plain') {
+        my $output;
 
-    # if ($self->use_status_codes) {
-    #     if ($response->has_error) {
-    #         $status = $response->http_status_line;
-    #     } elsif ($response->is_pending) {
-    #         $status = '202 Request Pending - Retry Later';
-    #         %retry_head = ('-retry-after' => $response->retry_after );
-    #     }
-    # }
+        if ($response->has_error) {
+            $output.= sprintf "error.code=%s\n", $response->error;
+            $output.= sprintf "error.message=%s\n", $response->error_message;
+            $output.= sprintf "data.%s=%s\n", $_, $response->error_details->{$_} for keys $response->error_details->%*;
 
-    # if ($ENV{'HTTP_ACCEPT'} && $ENV{'HTTP_ACCEPT'} eq 'text/plain') {
-    #     print $cgi->header( -type => 'text/plain', charset => 'utf8', -status => $status, %retry_head );
-    #     if ($response->has_error) {
-    #         print 'error.code=' . $response->error."\n";
-    #         print 'error.message=' . $response->error_message."\n";
-    #         printf "data.%s=%s\n", $_, $response->error_details->{$_} for keys $response->error_details->%*;
+        } elsif ($response->has_result) {
+            $output.= sprintf "id=%s\n", $response->result->{id};
+            $output.= sprintf "state=%s\n", $response->result->{state};
+            $output.= sprintf "retry_after=%s\n", $response->retry_after if $response->is_pending;
 
-    #     } elsif ($response->has_result) {
-    #         print 'id=' . $response->result->{id}."\n";
-    #         print 'state=' . $response->result->{state}."\n";
-    #         print 'retry_after=' . $response->retry_after ."\n" if $response->is_pending;
+            my $data = $response->has_result ? ($response->result->{data} // {}) : {};
+            $output.= sprintf "data.%s=%s\n", $_, $data->{$_} for keys $data->%*;
+        }
 
-    #         my $data = $response->has_result ? ($response->result->{data} // {}) : {};
-    #         printf "data.%s=%s\n", $_, $data->{$_} for keys $data->%*;
-    #     }
+        return $c->render(text => $output);
 
-    # } else {
-    #     print $cgi->header( -type => 'application/json', charset => 'utf8', -status => $status );
-    #     $json->max_depth(20);
-    #     $json->canonical( $canonical_keys ? 1 : 0 );
+    # JSON
+    } else {
+        my $data;
 
-    #     # run i18n tokenzier on output if a language is set
-    #     print $json->encode( $config->language ? i18n_walk($response->result) : $response->result );
-    # }
-};
+        if ($response->has_error) {
+            $data = {
+                error => {
+                    code => $response->error,
+                    message => $response->error_message,
+                    $response->has_error_details ? (data => $response->error_details) : (),
+                }
+            };
+
+        } else {
+            # run i18n tokenzier on output if a language is set
+            $data = $self->config_obj->language ? i18n_walk($response->result) : $response->result;
+            # wrap in "result" hash item
+            if (not $self->openapi_mode) {
+                $data = {
+                    result => {
+                        $data->%*,
+                        $response->is_pending ? (retry_after => $response->retry_after) : (),
+                    }
+                };
+            }
+        }
+
+        # JSON encoding
+        $self->json->max_depth(20);
+        $self->json->canonical($self->openapi_mode);
+        my $json_str = $self->json->encode($data);
+
+        return $c->render(data => $json_str, format => 'json'); # formats are defined in Mojolicious::Types
+    }
+}
 
 # required by OpenXPKI::Client::Service::Role::Base
-sub op_handlers { die "Not implemented yet" }
+sub op_handlers {
+    return [
+        'openapi-spec' => sub ($self) {
+            $self->openapi_mode(1);
+            my $url = $self->request->url->to_abs;
+            my $baseurl = sprintf "%s://%s%s", $url->protocol, $url->host_port, $url->path->to_abs_string;
+            my $spec = $self->openapi_spec($baseurl) or die $self->new_response( 50082 );
+            return $self->new_response(result => $spec);
+        },
+        qr/^.*/ => \&handle_rpc_request,
+    ];
+}
 
 # required by OpenXPKI::Client::Service::Role::Base
 sub prepare_enrollment_result {}
