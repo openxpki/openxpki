@@ -20,7 +20,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Client::Config;
 use OpenXPKI::Client::Service::RPC;
 use OpenXPKI::Client::Service::Response;
-use OpenXPKI::i18n qw( i18nGettext i18n_walk );
+use OpenXPKI::i18n qw( i18n_walk );
 
 # Feature::Compat::Try should be done last to safely disable warnings
 use Feature::Compat::Try;
@@ -44,7 +44,7 @@ sub send_output {
 
     if ($use_status_codes) {
         if ($response->has_error) {
-            $status = i18nGettext($response->http_status_line);
+            $status = $response->http_status_line;
             chomp $status;
         } elsif ($response->is_pending) {
             $status = '202 Request Pending - Retry Later';
