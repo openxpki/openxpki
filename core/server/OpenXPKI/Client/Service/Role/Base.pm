@@ -36,7 +36,7 @@ A consuming class that implements a service generally looks like this:
 use Carp;
 use MIME::Base64;
 use Digest::SHA qw( sha1_hex );
-use List::Util qw( first );
+use List::Util qw( any );
 
 # CPAN modules
 use Crypt::PKCS10;
@@ -543,13 +543,24 @@ sub handle_request ($self) {
 
         my $i = 0;
         while (my $ops = $op_handlers->[$i++]) {
-            $ops = ref $ops eq 'ARRAY' ? $ops : [ $ops ];
+            # convert ArrayRef / String / Regexp to list of Regexp
+            my @op_res = map {
+                if (ref $_ eq 'Regexp') {
+                    $_;
+                } elsif (ref $_ eq '') {
+                    qr/\A\Q$_\E\z/;
+                } else {
+                    die sprintf('Matching rule for handler no. %i in %s->op_handlers() is not an ArrayRef, Regexp or String', $i/2+1, $self->meta->name)
+                }
+            } ref $ops eq 'ARRAY' ? $ops->@* : ($ops);
+
             my $handler = $op_handlers->[$i++];
 
-            die sprintf('Handler for "%s" in %s->op_handlers() is missing or not a code reference', join(',', $ops->@*), $self->meta->name)
+            die sprintf('Handler no. %i in %s->op_handlers() is missing or not a code reference', ($i-1)/2+1, $self->meta->name)
               unless ref $handler eq 'CODE';
 
-            if (my $op = first { $_ eq $self->operation } $ops->@*) {
+            if (any { $self->operation =~ $_  } @op_res) {
+                $self->log->trace(sprintf 'Matching rule no. %i in %s->op_handlers(), execute handler', ($i-1)/2+1, $self->meta->name);
                 $response = $handler->($self);
 
                 die sprintf('Return value of operation handler for "%s" specified in %s->op_handlers() is not an instance of "OpenXPKI::Client::Service::Response"', $self->operation, $self->meta->name)
