@@ -10,50 +10,56 @@ use OpenXPKI::Server::Context qw( CTX );
 
 # Use predefined numeric codes for dedicated problems
 our %named_messages = (
+    #
+    # Client errors
+    #
+    40000 => 'Bad Request',
+    40001 => 'Signature invalid',
+    40002 => 'Unable to parse request',
+    40003 => 'Request body is empty',
+    40004 => 'Missing or invalid parameters',
+    40005 => 'No result for given pickup parameters',
+    40006 => 'Request was rejected',
+    40007 => 'Unknown operation',
+    40008 => 'No operation specified',
+    # RPC
     40080 => 'No method set in request',
     40081 => 'Decoding of JSON encoded POST data failed',
     40083 => 'RAW post not allowed (no method set in request)',
     40084 => 'RAW post with unknown content type',
-    40085 => 'Unknown RPC error',
     40087 => 'Content type JOSE not enabled',
     40088 => 'Processing JWS protected payload failed',
     40089 => 'Method header is missing in JWS',
     40090 => 'Unsupported JWS algorithm',
     40091 => 'Content type pkcs7 not enabled',
 
+    40100 => 'Unauthorized',
     40101 => 'Authentication credentials missing or incorrect',
 
+    40400 => 'Not Found',
+    40401 => 'Not Found (Empty request endpoint and no default server set)',
+    # RPC
     40480 => 'Invalid method / setup incomplete',
     40481 => 'Resume requested but no workflow found',
     40482 => 'Resume requested but workflow is not in manual state',
     40483 => 'Resume requested but expected workflow action not available',
 
+    #
+    # Server errors
+    #
     50000 => 'Server error',
     50001 => 'Unable to fetch configuration from server - connect failed',
-    50080 => 'Could not unwrap PKCS#7 contents',
-    50081 => 'Workflow terminated in unexpected state',
-    50082 => 'Unable to query OpenAPI specification from OpenXPKI server',
-
+    50002 => 'Unable to initialize client',
+    50003 => 'Unexpected response from backend',
     50005 => 'ENV variable "server" and servername are both set but are mutually exclusive',
     50006 => 'ENV variable "server" requested but RPC endpoint could not be determined from URL',
     50007 => 'Requested RPC endpoint is not configured properly',
+    50010 => 'Unable to initialize endpoint parameters',
+    # RPC
+    50080 => 'Could not unwrap PKCS#7 contents',
+    50082 => 'Unable to query OpenAPI specification from OpenXPKI server',
 
-    '40000' => 'Bad Request',
-    '40001' => 'Signature invalid',
-    '40002' => 'Unable to parse request',
-    '40003' => 'Request body is empty',
-    '40004' => 'Missing or invalid parameters',
-    '40005' => 'No result for given pickup parameters',
-    '40006' => 'Request was rejected',
-    '40007' => 'Unknown operation',
-    '40008' => 'No operation specified',
-    '40100' => 'Unauthorized',
-    '40400' => 'Not Found',
-    '40401' => 'Not Found (Empty request endpoint and no default server set)',
-    '50002' => 'Unable to initialize client',
-    '50003' => 'Unexpected response from backend',
-    '50010' => 'Unable to initialize endpoint parameters',
-    '50100' => 'Operation not implemented',
+    50100 => 'Operation not implemented',
 );
 
 =head1 NAME
@@ -208,7 +214,7 @@ has retry_after => (
 =head2 workflow
 
 Workflow info I<HashRef> as returned by
-L<OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info>.
+L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info>.
 
 Setting this attribute also sets L</state>, L</proc_state> and
 L</error_message> according to the workflow informations.

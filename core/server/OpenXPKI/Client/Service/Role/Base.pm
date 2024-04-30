@@ -195,7 +195,7 @@ B<Passed parameters>
 =over
 
 =item * C<$workflow> - workflow info I<HashRef> as returned by
-L<OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info>.
+L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info>.
 
 =back
 
@@ -587,6 +587,39 @@ sub handle_request ($self) {
     return $response;
 }
 
+=head2 add_wf_param
+
+Allows to add service specific workflow parameters, e.g. in L</op_handlers> or
+L</prepare>.
+
+    $self->add_wf_param(server => $self->endpoint) if $self->operation eq 'enroll';
+
+=head2 new_response
+
+Helper to create a new L<OpenXPKI::Client::Service::Response>:
+
+    $self->new_response( 40080 );
+    # is equal to:
+    OpenXPKI::Client::Service::Response->new(
+        error => 40080
+    );
+
+    $self->new_response( 500 => 'Something bad happened');
+    # is equal to:
+    $self->new_response(
+        error => 500,
+        error_message => 'Something bad happened',
+    );
+    # and:
+    OpenXPKI::Client::Service::Response->new(
+        error => 500,
+        error_message => 'Something bad happened',
+    );
+
+If parameter B<error_message> is given and starts with C<"I18N_OPENXPKI_UI_">
+it will be translated. Otherwise it will be logged and removed.
+
+=cut
 sub new_response ($self, @args) {
     # shortcut with only error code or code+message
     if (scalar @args < 3 and $args[0] =~ /^\A\d+\z/) {
@@ -610,6 +643,34 @@ sub new_response ($self, @args) {
     return OpenXPKI::Client::Service::Response->new(%args_hash);
 }
 
+=head2 new_error_response
+
+Helper to translate any error into an instance of
+L<OpenXPKI::Client::Service::Response>.
+
+    my $response;
+    try {
+        ...
+    }
+    catch ($err) {
+        $response = $self->new_error_response($err);
+    }
+
+Properly detects these error types:
+
+=over
+
+=item * C<OpenXPKI::Client::Service::Response>,
+
+=item * L<OpenXPKI::Exception>,
+
+=item * C<OpenXPKI::Exception::Authentication>,
+
+=item * strings
+
+=back
+
+=cut
 sub new_error_response ($self, $error) {
     if (blessed $error) {
         if ($error->isa('OpenXPKI::Client::Service::Response')) {
@@ -630,28 +691,40 @@ sub new_error_response ($self, $error) {
     }
 }
 
-sub new_pending_response ($self, $wf) {
+=head2 new_pending_response
+
+Helper to create a new L<OpenXPKI::Client::Service::Response> from a pending
+workflow:
+
+    if ($workflow->{proc_state} ne 'finished') {
+        return $self->new_pending_response($workflow);
+    }
+
+B<Parameters>
+
+=over
+
+=item * C<$workflow> I<HashRef> - workflow information as returned by
+L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info>
+
+=back
+
+=cut
+sub new_pending_response ($self, $workflow) {
     my $retry_after;
-    if ($wf->{proc_state} eq 'pause') {
-        my $delay = $wf->{wake_up_at} - time;
+    if ($workflow->{proc_state} eq 'pause') {
+        my $delay = $workflow->{wake_up_at} - time;
         $retry_after = ($delay < 30) ? 30 : $delay;
     } else {
         $retry_after = 300;
     }
 
-    $self->log->info(sprintf 'Request pending - workflow is %s, retry after %ss', $wf->{'state'}, $retry_after);
+    $self->log->info(sprintf 'Request pending - workflow is %s, retry after %ss', $workflow->{'state'}, $retry_after);
     return $self->new_response(
         retry_after => $retry_after,
-        workflow => $wf,
+        workflow => $workflow,
     );
 }
-
-=head2 add_wf_param
-
-Allows to add service specific workflow parameters, e.g. in L</op_handlers> or
-L</prepare>.
-
-    $self->add_wf_param(server => $self->endpoint) if $self->operation eq 'enroll';
 
 =head2 handle_enrollment_request
 
@@ -754,30 +827,27 @@ sub handle_enrollment_request ($self) {
     }
 }
 
-=head2 _build_pickup_config
+=head2 pickup_via_workflow
 
-Build a configuration hash for the pickup workflow from
+Resume a workflow by retrieving its ID via a pickup workflow.
 
-=over
-
-=item * L</wf_params> and
-
-=item * the services' configuration for the current operation.
-
-=back
-
-B<Returns> A list C<($config, $value)>:
+B<Parameters>
 
 =over
 
-=item * C<$config> - Pickup workflow configuration I<HashRef>
+=item * C<$wf_type> I<Str> - Workflow type of the pickup workflow
 
-=item * C<$value> - Pickup parameter I<HashRef> if C<$config-E<gt>{pickup_workflow}> is given, or transaction ID value I<Str> otherwise
+=item * C<$keys_str> I<Str> - Comma separated list of parameter names to read
+from C<$self-E<gt>wf_params> or the request parameters and pass to the pickup
+workflow
 
 =back
+
+B<Returns> a workflow info I<HashRef> as returned by
+L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info> or C<undef>
+if no workflow was found.
 
 =cut
-
 sub pickup_via_workflow ($self, $wf_type, $keys_str) {
     my $params;
     my @keys = split /\s*,\s*/, $keys_str;
@@ -805,6 +875,25 @@ sub pickup_via_workflow ($self, $wf_type, $keys_str) {
     return $self->_pickup($result->{context}->{workflow_id});
 }
 
+=head2 pickup_via_datapool
+
+Resume a workflow by retrieving its ID from the datapool.
+
+B<Parameters>
+
+=over
+
+=item * C<$namespace> I<Str> - Datapool namespace
+
+=item * C<$key> I<Str> - Datapool key
+
+=back
+
+B<Returns> a workflow info I<HashRef> as returned by
+L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info> or C<undef>
+if no workflow was found.
+
+=cut
 sub pickup_via_datapool ($self, $namespace, $key) {
     if (not $key) {
         $self->log->debug('Ignoring pickup via datapool: empty pickup key');
@@ -820,6 +909,28 @@ sub pickup_via_datapool ($self, $namespace, $key) {
     return $self->_pickup($wfl->{value});
 }
 
+=head2 pickup_via_attribute
+
+Resume a workflow by retrieving its ID with an attribute search (API command
+L<search_workflow_instances|OpenXPKI::Server::API2::Plugin::Workflow::search_workflow_instances/search_workflow_instances>).
+
+B<Parameters>
+
+=over
+
+=item * C<$wf_type> I<Str> - type of the workflow to be resumed
+
+=item * C<$key> I<Str> - attribute name
+
+=item * C<$value> I<Str> - attribute value
+
+=back
+
+B<Returns> a workflow info I<HashRef> as returned by
+L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info> or C<undef>
+if no workflow was found.
+
+=cut
 sub pickup_via_attribute ($self, $wf_type, $key, $value) {
     if (not $value) {
         $self->log->debug('Ignoring pickup via attribute: empty pickup value');
@@ -955,14 +1066,15 @@ Checks the given workflow result I<HashRef> and dies with a
 L<OpenXPKI::Client::Service::Response> in case of workflow errors.
 
 If L<OpenXPKI::Client::Simple/last_error> returns a string starting with
-C<"I18N_OPENXPKI_UI_"> it is added to the error message.
+C<"I18N_OPENXPKI_UI_"> it is added to the error message (this filtering is done
+in L</new_response>).
 
 B<Parameters>
 
 =over
 
 =item * C<$workflow> I<HashRef> - workflow information as returned by
-L<OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info>
+L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info>
 
 =back
 

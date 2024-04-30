@@ -105,7 +105,7 @@ validation or autodiscovery of the tenant.
 =back
 
 B<Returns> a I<HashRef> with workflow information, see
-L<OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info> for more details.
+L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info> for more details.
 
 =cut
 command "create_workflow_instance" => {

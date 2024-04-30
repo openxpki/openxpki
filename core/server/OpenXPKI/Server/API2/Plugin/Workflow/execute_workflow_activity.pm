@@ -59,7 +59,7 @@ database again.
 =back
 
 B<Returns> a I<HashRef> with workflow information, see
-L<OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info> for more details.
+L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info> for more details.
 
 B<Changes compared to API v1:>
 
