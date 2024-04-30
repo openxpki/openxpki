@@ -45,7 +45,7 @@ sub init_structure {
     # prevent injection of external urls
     $baseurl =~ s{\w+://[^/]+}{};
 
-    $self->session_param('baseurl',  $baseurl.'/#/');
+    $self->session_param('baseurl',  $baseurl );
     $self->_session->flush;
     $self->log->debug("Base URL from referrer: " . $baseurl);
 

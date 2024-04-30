@@ -662,7 +662,7 @@ sub render {
         if ($url !~ m{\A http|/}x) {
             my $baseurl = $self->session_param('baseurl') || $cgi->param('baseurl');
             $self->log->debug("Adding baseurl $baseurl");
-            $url = sprintf("%sopenxpki/%s", $baseurl, $url);
+            $url = sprintf("%s/#/openxpki/%s", $baseurl, $url);
         }
         # HTTP redirect
         $self->log->debug("Sending HTTP redirect to: $url");
