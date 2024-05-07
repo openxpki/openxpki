@@ -908,21 +908,23 @@ sub handle_login {
                     # Step 2 - user was redirected from IdP
                     $self->log->debug("OIDC Login (2/3) - redeem auth code $code");
                     my $ua = LWP::UserAgent->new();
-                    my $req = HTTP::Request->new('POST', $oidc_client{token_uri},
-                        HTTP::Headers->new( Content_Type => 'application/json' ),
-                        encode_json({
-                            code => $code,
-                            client_id => $oidc_client{client_id},
-                            client_secret => $oidc_client{client_secret},
-                            redirect_uri => $redirect_uri.'/oidc_redirect',
-                            grant_type => 'authorization_code',
-                    }));
-                    my $response = $ua->request($req);
-                    # TODO - error handling
+                    # For whatever reason this must be www-form encoded and not JSON
+                    my $response = $ua->post( $oidc_client{token_uri}, [
+                        code => $code,
+                        client_id => $oidc_client{client_id},
+                        client_secret => $oidc_client{client_secret},
+                        redirect_uri => $redirect_uri.'/oidc_redirect',
+                        grant_type => 'authorization_code',
+                    ]);
                     $self->log->trace("OIDC Token Response: " .$response->decoded_content);
+                    if (!$response->is_success) {
+                        $self->log->warn("Unable to redeem token, error was: " . $response->decoded_content);
+                        $uilogin->status->error('Unable to redeem token');
+                        $uilogin->redirect->to('login!missing_data');
+                        return $uilogin;
+                    }
                     my $auth_info = decode_json($response->decoded_content);
                     $uilogin->redirect->to('login!oidc!token!'.$auth_info->{id_token});
-                    return $uilogin->init_login_missing_data unless ($auth_info->{id_token});
                     return $uilogin;
 
                 } elsif ($self->session->param('oidc-nonce')) {
