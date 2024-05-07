@@ -105,9 +105,15 @@ if [[ $IS_FULLCONFIG -eq 1 ]]; then
 # keep keys and additional files
 else
     echo "Update OpenXPKI config in /etc/openxpki"
-    echo "- copy config"
+
+    # remove workflow/def
+    echo "- remove existing workflows"
+    for realm_dir in /etc/openxpki/config.d/realm/*; do
+        rm -rf "$realm_dir/workflow/def"
+    done
 
     # copy config/ to /etc/openxpki
+    echo "- copy config"
     pushd $OXI_TEST_SAMPLECONFIG_DIR > /dev/null
         DESTDIR= make install >>$LOG 2>&1
     popd > /dev/null
