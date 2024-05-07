@@ -1444,7 +1444,7 @@ msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_FINISH_LABEL"
 msgstr "cerca adesso"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_PASSPHRASE_LABEL"
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_TEXT_LABEL"
 msgstr "Relazioni"
 
 #, fuzzy

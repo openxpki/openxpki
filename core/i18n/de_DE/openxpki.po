@@ -1131,8 +1131,8 @@ msgstr "Meine Workflows"
 msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_FINISH_LABEL"
 msgstr "Fertig: HSM freischalten"
 
-msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_PASSPHRASE_LABEL"
-msgstr "Passphrase"
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_TEXT_LABEL"
+msgstr "Eingabe"
 
 msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_RESET_LABEL"
 msgstr "Reset: HSM sperren"

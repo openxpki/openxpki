@@ -1484,7 +1484,7 @@ msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_FINISH_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_PASSPHRASE_LABEL"
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_TEXT_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
