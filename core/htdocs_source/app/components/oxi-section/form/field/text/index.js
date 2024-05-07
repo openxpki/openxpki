@@ -3,6 +3,7 @@ import { tracked  } from '@glimmer/tracking';
 import { action, set as emSet } from '@ember/object';
 import { scheduleOnce } from '@ember/runloop';
 import { service } from '@ember/service';
+import { guidFor } from '@ember/object/internals'
 
 export default class OxiFieldTextComponent extends Component {
     @service('intl') intl;
@@ -23,9 +24,10 @@ export default class OxiFieldTextComponent extends Component {
     @tracked searchResults = [];
     searchIndex = 0;
     searchPrevious = null;
-    searchTimer = null;
     acFieldRefParams = new Map(); // mapping: (source field name) => (parameter name for autocomplete query)
     acOtherFieldsReferenced = false
+
+    #id = guidFor(this)
 
     constructor() {
         super(...arguments);
@@ -127,13 +129,13 @@ export default class OxiFieldTextComponent extends Component {
         this.label = '';
 
         // cancel old search query timer on new input
-        if (this.searchTimer) clearTimeout(this.searchTimer); // after check value === this.searchPrevious !
+        this.content.cancelTimer(this.#id)
 
         // don't search short values
         if ((value||"").length < 3) { this.isDropdownOpen = false; return }
 
         // start search query after 300ms without input
-        this.searchTimer = setTimeout(() => {
+        this.content.addTimer(this, this.#id, function() {
             let searchIndex = ++this.searchIndex;
 
             // resolve referenced fields and their values
@@ -158,7 +160,7 @@ export default class OxiFieldTextComponent extends Component {
                 }
                 this.isDropdownOpen = true;
             });
-        }, 300);
+        }, 0.3);
     }
 
     @action
@@ -221,7 +223,7 @@ export default class OxiFieldTextComponent extends Component {
     @action
     onBlur() {
         this.isDropdownOpen = false
-        if (this.searchTimer) clearTimeout(this.searchTimer)
+        this.content.cancelTimer(this.#id)
     }
 
     @action

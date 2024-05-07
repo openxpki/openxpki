@@ -5,6 +5,7 @@ import { later, next, cancel } from '@ember/runloop'
 import { isArray } from '@ember/array'
 import { action, set as emSet } from '@ember/object'
 import { debug } from '@ember/debug'
+import { guidFor } from '@ember/object/internals'
 import fetch from 'fetch'
 import Page from 'openxpki/data/page'
 
@@ -41,6 +42,8 @@ export default class OxiContentService extends Service {
     last_session_id = null // to track server-side logouts with session id changes
     #loginTimestamp = null // to track logouts in another browser window via Cookie comparison
 
+    @tracked refreshTimers = new Map()
+
     /*
     Custom handlers for exceptions returned by the server (HTTP status codes):
         [
@@ -55,6 +58,8 @@ export default class OxiContentService extends Service {
 
     #focusFavourite = null // hash containing element + rank for the current focus favourite
     #willSetFocusOnNextRunLoop = false
+
+    #id = guidFor(this)
 
     TARGET = Object.freeze({
         TOP: Symbol("TOP"),
@@ -80,6 +85,10 @@ export default class OxiContentService extends Service {
           .replace(/[_\s]/g, '-')
           .replace(/[^a-z0-9-]/g, '')
           .replace(/-+/g, '-')
+    }
+
+    get isAutoRefresh() {
+        return this.refreshTimers.has(`${this.#id}/page_refresh`)
     }
 
     /**
@@ -197,9 +206,14 @@ export default class OxiContentService extends Service {
 
         if (verbose) this.#setLoadingBanner(this.intl.t('site.banner.loading'))
 
-        if (this.refreshTimer) {
-            cancel(this.refreshTimer)
-            this.refreshTimer = null
+        if (partial) {
+            this.cancelTimer(`${this.#id}/page_refresh`)
+        }
+        else {
+            // Remove all refresh timers to prevent that an OpenXPKI page refresh
+            // (!= browser reload) leads to multiple parallel request timers.
+            // Or that the requests continue if another OpenXPKI page is opened.
+            this.cancelAllTimers()
         }
 
         // resolve target
@@ -213,6 +227,11 @@ export default class OxiContentService extends Service {
             if (!doc) {
                 this.#setLoadingBanner(null)
                 return {}
+            }
+
+            if (doc?.status?.level == 'error') {
+                debug('Stopping all timers / refreshes because of page status level "error"')
+                this.cancelAllTimers()
             }
 
             // chain backend calls via Promise
@@ -244,7 +263,7 @@ export default class OxiContentService extends Service {
                 // Auto refresh
                 if (doc.refresh) {
                     debug("requestPage(): response - \"refresh\" " + doc.refresh.href + ", " + doc.refresh.timeout)
-                    this.#autoRefreshOnce(doc.refresh.href, doc.refresh.timeout)
+                    this.addTimer(this, `${this.#id}/page_refresh`, function() { this.requestPage({ page: doc.refresh.href }) }, doc.refresh.timeout)
                 }
 
                 // Redirect
@@ -510,6 +529,48 @@ export default class OxiContentService extends Service {
         this.#focusFavourite.element.focus()
     }
 
+    /**
+     * Register a new timer.
+     *
+     * @param {object} ctx - context (`this` will be set to this context when `cb` is executed)
+     * @param {string} id - timer ID
+     * @param {function} cb - callback function to be executed
+     * @param {number} timeoutSec - timeout in seconds until `cb` will be executed
+     */
+    addTimer(ctx, id, cb, timeoutSec) {
+        this.cancelTimer(id)
+        debug(`Register timer "${id}"`)
+        this.refreshTimers.set(id, later(ctx, cb, timeoutSec * 1000))
+        this.refreshTimers = this.refreshTimers // trigger Ember refresh
+    }
+
+    /**
+     * Cancel and deregister a timer.
+     *
+     * Does nothing if the timer with the given ID does not exist.
+     *
+     * @param {string} id - timer ID
+     */
+    cancelTimer(id) {
+        let oldTimer = this.refreshTimers.get(id)
+        if (!oldTimer) return
+
+        debug(`Cancel timer "${id}"`)
+        cancel(oldTimer)
+        this.refreshTimers.delete(id)
+        this.refreshTimers = this.refreshTimers // trigger Ember refresh
+    }
+
+    /**
+     * Cancel and deregister all timers.
+     */
+    cancelAllTimers() {
+        debug('Cancel all timers')
+        for (const timer of this.refreshTimers.values()) cancel(timer)
+        this.refreshTimers.clear()
+        this.refreshTimers = this.refreshTimers // trigger Ember refresh
+    }
+
     // Sets the loading state, i.e. dims the page and shows a banner with the
     // given message.
     // If 'message' is set to null, the banner will be hidden.
@@ -524,8 +585,8 @@ export default class OxiContentService extends Service {
     }
 
     #ping(href, timeout) {
-        if (this.pingTimer) cancel(this.pingTimer)
-        this.pingTimer = later(this, () => {
+        this.cancelTimer(`${this.#id}/ping`)
+        this.addTimer(this, `${this.#id}/ping`, function() {
             fetch(href, {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
@@ -536,13 +597,7 @@ export default class OxiContentService extends Service {
                 /* eslint-disable-next-line no-console */
                 console.error(`Error loading ${href} (network error: ${error.name})`)
             })
-            return this.#ping(href, timeout)
-        }, timeout)
-    }
-
-    #autoRefreshOnce(page, timeout) {
-        this.refreshTimer = later(this, function() {
-            this.requestPage({ page })
+            this.#ping(href, timeout)
         }, timeout)
     }
 

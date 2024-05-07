@@ -21,15 +21,4 @@ sub is_set {
     return $self->has_href;
 }
 
-around 'resolve' => sub {
-    my $orig = shift;
-    my $self = shift;
-
-    # convert seconds to milliseconds
-    my $result = $self->$orig;
-    $result->{timeout} *= 1000;
-
-    return $result;
-};
-
 __PACKAGE__->meta->make_immutable;

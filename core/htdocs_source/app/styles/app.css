@@ -177,14 +177,14 @@ img.toplogo {
 
 .oxi-loading-banner {
   position: fixed;
-  top: 1%;
+  top: 5%;
   right: 1%;
   z-index:1002;
 }
 
 .oxi-refresh-banner {
   position: fixed;
-  top: 3%;
+  top: 5%;
   right: 1%;
   z-index:1002;
 }

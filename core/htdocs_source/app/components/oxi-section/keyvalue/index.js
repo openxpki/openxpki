@@ -1,7 +1,7 @@
 import Component from '@glimmer/component'
 import { service } from '@ember/service'
 import { set as emSet } from '@ember/object'
-import { later, cancel } from '@ember/runloop'
+import { guidFor } from '@ember/object/internals'
 
 /**
  * Draws a list of key/value pairs.
@@ -18,8 +18,9 @@ import { later, cancel } from '@ember/runloop'
 export default class OxiSectionKeyvalueComponent extends Component {
     @service('oxi-content') content
 
-    refreshTimers = new Map()
     items = []
+
+    #id = guidFor(this)
 
     get hasLabels() {
         return this.items.filter(i => typeof i.label !== 'undefined' && i.label !== 0 && i.label !== null).length > 0
@@ -40,21 +41,7 @@ export default class OxiSectionKeyvalueComponent extends Component {
         this.items = items.filter(item => item.format !== 'raw' || item.value !== '')
     }
 
-    // lifecycle hook of @glimmer/component
-    willDestroy() {
-        super.willDestroy(...arguments)
-        // Remove all refresh timers to prevent that an OpenXPKI page refresh
-        // (!= browser reload) leads to multiple parallel request timers.
-        // Or that the requests continue if another OpenXPKI page is opened.
-        for (const timer of this.refreshTimers.values()) cancel(timer)
-    }
-
     startRefresh(item) {
-        if (this.content?.status?.level == 'error') {
-            console.info('Suppressing content refresh because of page status level "error"')
-            return
-        }
-
         let timeout = item.refresh.timeout
         let uri = item.refresh.uri
         if (! timeout) throw new Error("Key 'timeout' is missing in 'refresh' property.")
@@ -71,7 +58,7 @@ export default class OxiSectionKeyvalueComponent extends Component {
                 emSet(item, "value", doc.value)
                 // item.value = doc.value
                 if (!this.isDestroying && !this.isDestroyed) {
-                    this.refreshTimers.set(item._id, later(this, refreshRequest, timeout * 1000))
+                    this.content.addTimer(this, `${this.#id}/${item._id}`, refreshRequest, timeout)
                 }
             })
             .finally(() => {
@@ -80,8 +67,7 @@ export default class OxiSectionKeyvalueComponent extends Component {
         }
 
         // cancel old search query timer on new input
-        let oldTimer = this.refreshTimers.get(item._id)
-        if (oldTimer) cancel(oldTimer)
+        this.content.cancelTimer(`${this.#id}/${item._id}`)
         // immediately run first refresh
         refreshRequest()
     }
