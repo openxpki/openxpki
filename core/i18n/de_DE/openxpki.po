@@ -5011,12 +5011,6 @@ msgstr "ja"
 #~ msgid "I18N_OPENXPKI_UI_CUST"
 #~ msgstr "ja"
 
-#~ msgid "I18N_OPENXPKI_UI_DATAPOOL_DELETE_ENTRY"
-#~ msgstr "Löschen"
-
-#~ msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
-#~ msgstr "Ändern"
-
 #~ msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
 #~ msgstr "Die eingegebene Zeitangabe ist ungültig/nicht zulässig."
 

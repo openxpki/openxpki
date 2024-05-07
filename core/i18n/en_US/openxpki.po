@@ -474,6 +474,9 @@ msgstr "unspecified / other reason"
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
 msgstr "This is just a prefix"
 
+msgid "I18N_OPENXPKI_UI_DATAPOOL_DELETE_ENTRY"
+msgstr "Delete"
+
 msgid "I18N_OPENXPKI_UI_DATAPOOL_ENCRYPTED"
 msgstr "Format"
 
@@ -494,6 +497,9 @@ msgstr "Expires before"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_KEY"
 msgstr "Entry"
+
+msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
+msgstr "Modify"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_MTIME"
 msgstr "Modification"
@@ -1136,14 +1142,14 @@ msgstr "My Workflows"
 msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_FINISH_LABEL"
 msgstr "Finish: Unlock HSM"
 
-msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_TEXT_LABEL"
-msgstr "Input"
-
 msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_RESET_LABEL"
 msgstr "Reset: Lock HSM"
 
 msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_SUBMIT_LABEL"
 msgstr "Send"
+
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_TEXT_LABEL"
+msgstr "Input"
 
 msgid "I18N_OPENXPKI_UI_NCIPHER_PAGE_DESC"
 msgstr "Please follow the instructions of the console output."
@@ -4780,12 +4786,6 @@ msgstr "Yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CUST"
 #~ msgstr "Yes"
-
-#~ msgid "I18N_OPENXPKI_UI_DATAPOOL_DELETE_ENTRY"
-#~ msgstr "Delete"
-
-#~ msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
-#~ msgstr "Modify"
 
 #~ msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
 #~ msgstr "The entered date/time could not be validated."

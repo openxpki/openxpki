@@ -592,6 +592,11 @@ msgstr ""
 
 # Remove?
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_DELETE_ENTRY"
+msgstr "Chiave"
+
+# Remove?
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_DATAPOOL_ENCRYPTED"
 msgstr "Chiave"
 
@@ -621,6 +626,10 @@ msgstr "mostra le liste di revoca precedenti"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DATAPOOL_KEY"
 msgstr "Chiave"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
+msgstr "Nome utente"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DATAPOOL_MTIME"
@@ -1444,16 +1453,16 @@ msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_FINISH_LABEL"
 msgstr "cerca adesso"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_TEXT_LABEL"
-msgstr "Relazioni"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_RESET_LABEL"
 msgstr "cerca adesso"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_SUBMIT_LABEL"
 msgstr "cerca adesso"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_TEXT_LABEL"
+msgstr "Relazioni"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_NCIPHER_PAGE_DESC"
@@ -5716,15 +5725,6 @@ msgstr "Sì"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CUST"
 #~ msgstr "Chiave"
-
-# Remove?
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_DATAPOOL_DELETE_ENTRY"
-#~ msgstr "Chiave"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
-#~ msgstr "Nome utente"
 
 #~ msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
 #~ msgstr "Il valore date/time inserito non è stato convalidato."

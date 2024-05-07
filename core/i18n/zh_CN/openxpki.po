@@ -501,6 +501,11 @@ msgstr "指定您希望吊销证书的原因。"
 
 # Remove?
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_DELETE_ENTRY"
+msgstr "密钥"
+
+# Remove?
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_DATAPOOL_ENCRYPTED"
 msgstr "密钥"
 
@@ -530,6 +535,10 @@ msgstr "最后更新"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DATAPOOL_KEY"
 msgstr "密钥"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
+msgstr "用户名"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DATAPOOL_MTIME"
@@ -1234,16 +1243,16 @@ msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_FINISH_LABEL"
 msgstr "马上搜索"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_TEXT_LABEL"
-msgstr "密码短语"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_RESET_LABEL"
 msgstr "马上搜索"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_SUBMIT_LABEL"
 msgstr "马上搜索"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_TEXT_LABEL"
+msgstr "密码短语"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_NCIPHER_PAGE_DESC"
@@ -5036,15 +5045,6 @@ msgstr "是"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CUST"
 #~ msgstr "是"
-
-# Remove?
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_DATAPOOL_DELETE_ENTRY"
-#~ msgstr "密钥"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
-#~ msgstr "用户名"
 
 #~ msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
 #~ msgstr "输入的日期/时间无法验证。"
