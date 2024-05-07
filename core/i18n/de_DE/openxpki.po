@@ -469,6 +469,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
 msgstr ""
 
+msgid "I18N_OPENXPKI_UI_DATAPOOL_DELETE_ENTRY"
+msgstr "Löschen"
+
 msgid "I18N_OPENXPKI_UI_DATAPOOL_ENCRYPTED"
 msgstr "Format"
 
@@ -489,6 +492,9 @@ msgstr "Ablauf vor"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_KEY"
 msgstr "Eintrag"
+
+msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
+msgstr "Ändern"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_MTIME"
 msgstr "Letzte Änderung"
@@ -1131,14 +1137,14 @@ msgstr "Meine Workflows"
 msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_FINISH_LABEL"
 msgstr "Fertig: HSM freischalten"
 
-msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_TEXT_LABEL"
-msgstr "Eingabe"
-
 msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_RESET_LABEL"
 msgstr "Reset: HSM sperren"
 
 msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_SUBMIT_LABEL"
 msgstr "Senden"
+
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_TEXT_LABEL"
+msgstr "Eingabe"
 
 msgid "I18N_OPENXPKI_UI_NCIPHER_PAGE_DESC"
 msgstr "Bitte folgen Sie den Anweisungen der Konsolenausgabe."

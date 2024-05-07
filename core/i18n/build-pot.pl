@@ -26,7 +26,7 @@ foreach my $dir (@ARGV) {
 }
 
 sub extract_tags {
-    my $filename = $_;
+    my $fn = $_;
     my $rel_name = $File::Find::name;
     my $dir_name = $File::Find::topdir;
     $rel_name =~ s/$basedir\///;
@@ -36,15 +36,15 @@ sub extract_tags {
             # to be searched for tags
             return;
         }
-        # skip hidden files or backup files
-        if ($filename =~ m{ \A \. }xms || $filename =~ m{ ~ \z }xms) {
-           return;
-        }
-        # dont scan po files itself (files in config/contrib/)
-        if ($filename =~ m{ \A openxpki.po }xms ) {
-           return;
-        }
-        open my $FILE, '<', $filename;
+
+        # skip
+        return unless -e $fn;                     # non-existing symlink source
+        return if $fn =~ m{ \A \. }xms;           # hidden file
+        return if $fn =~ m{ ~ \z }xms;            # backup file
+        return if $fn =~ m{ \A openxpki\.po }xms; # po file (config/contrib/)
+        return if $fn eq 'Makefile';              # Makefile
+
+        open my $FILE, '<', $fn;
         while (my $line = <$FILE>) {
             while ($line =~ s{ ($prefix [A-Z0-9\_]+[A-Z0-9]) }{}xms) {
                 $tags{$1} = 1;
