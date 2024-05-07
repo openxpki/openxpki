@@ -128,11 +128,17 @@
     }}
     <div class="row row-cols-1 row-cols-md-2 justify-content-between">
         <div class="col col-md-auto oxi-pagehead">
-            {{#if this.model.top.page.label}}
-                <h3>
+            <h3>
+                {{#if this.model.top.page.label}}
                     {{this.model.top.page.label}}
-                </h3>
-            {{/if}}
+                {{/if}}
+                {{#if this.model.isAutoRefresh}}
+                    <span class="alert alert-info py-1 ms-2 fs-6" role="alert">
+                        <span class="glyphicon glyphicon-refresh spin-slow"></span>
+                        &nbsp;{{t 'site.banner.autorefresh'}}
+                    </span>
+                {{/if}}
+            </h3>
         </div>
         <div class="col col-md-auto oxi-pagehead" {{on-init this.setTempCopyElement}}>
             {{#if this.workflowCopyIdButton}}
@@ -202,15 +208,6 @@
         <BsButton {{on "click" Modal.close}}>{{t 'site.close_popup'}}</BsButton>
     </Modal.footer>
 </BsModal>
-
-{{#if this.model.isAutoRefresh}}
-    <div class="oxi-refresh-banner">
-        <span class="alert alert-info" role="alert">
-            <span class="glyphicon glyphicon-refresh spin-slow"></span>
-            &nbsp;{{t 'site.banner.autorefresh'}}
-        </span>
-    </div>
-{{/if}}
 
 {{#if this.model.loadingBanner}}
     <div class="dimmer"></div>

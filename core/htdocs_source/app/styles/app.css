@@ -182,13 +182,6 @@ img.toplogo {
   z-index:1002;
 }
 
-.oxi-refresh-banner {
-  position: fixed;
-  top: 5%;
-  right: 1%;
-  z-index:1002;
-}
-
 .spin {
   -webkit-animation: spin 1000ms infinite linear;
   animation: spin 1000ms infinite linear;
