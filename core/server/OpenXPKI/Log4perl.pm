@@ -142,7 +142,7 @@ sub _add_patternlayout_spec {
 
 sub get_logger {
     my ($class, @args) = @_;
-    # if someone called ::init instead of ->init, $class contains the first
+    # if someone called ::get_logger() instead of ->get_logger(), $class contains the first
     # argument instead of the class name
     unshift (@args, $class) if $class ne __PACKAGE__;
 

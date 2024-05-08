@@ -42,8 +42,17 @@ Mojolicious URL routes belonging to the service.
     }
 
 The implementing service class must set OpenXPKI's special Mojolicious stash
-parameter C<service_class> to a package which consumes
+parameters:
+
+=over
+
+=item * C<service_class> = the service class that consumes
 L<OpenXPKI::Client::Service::Role::Base> (usually C<__PACKAGE__>).
+
+=item * C<endpoint> = the service endpoint (e.g. statically set to C<"default">
+or dynamically set via URL path).
+
+=back
 
 B<Passed parameters>
 
