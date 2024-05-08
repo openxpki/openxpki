@@ -727,7 +727,7 @@ Properly detects these error types:
 
 =item * C<OpenXPKI::Client::Service::Response>,
 
-=item * L<OpenXPKI::Exception>,
+=item * L<C<OpenXPKI::Exception>>,
 
 =item * C<OpenXPKI::Exception::Authentication>,
 
