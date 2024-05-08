@@ -1182,7 +1182,6 @@ msgstr "Konfiguriertes NICE backend ist nicht verfügbar!"
 msgid "I18N_OPENXPKI_UI_NICE_UPDATE_DOMAINLIST"
 msgstr "Aktualisiere Domainliste"
 
-# Remove?
 msgid "I18N_OPENXPKI_UI_NO"
 msgstr "Nein"
 
@@ -1202,9 +1201,8 @@ msgid "I18N_OPENXPKI_UI_NO_SUCH_REALM_OR_SERVICE"
 msgstr "Unter dieser Adresse ist keine Service eingerichtet."
 
 msgid "I18N_OPENXPKI_UI_OIDC_LOGIN_FAILED"
-msgstr "Anmeldung fehlgeschlagen!"
+msgstr "Anmeldung über den externen Dienst wurde abgebrochen!"
 
-# Remove?
 msgid "I18N_OPENXPKI_UI_OOPS"
 msgstr "Oops, hier ist etwas schiefgegangen"
 

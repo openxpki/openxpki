@@ -21,6 +21,7 @@ use Moose::Util::TypeConstraints qw( enum ); # PLEASE NOTE: this enables all war
 use Type::Params qw( signature_for );
 
 # Project modules
+use OpenXPKI::Dumper;
 use OpenXPKI::Template;
 use OpenXPKI::Client;
 use OpenXPKI::Client::UI::Bootstrap;
@@ -874,7 +875,7 @@ sub handle_login {
                 ($_ => ($auth->{$_} || die "OIDC setup incomplete, $_ is not set"));
             } qw(client_id auth_uri token_uri client_secret);
 
-            $self->log->trace(Dumper \%oidc_client) if ($self->log->is_trace);
+            $self->log->trace(SDumper \%oidc_client) if ($self->log->is_trace);
 
             # we use "page" to transport the token
             if ($page =~ m{login!oidc!token!([\w\-\.]+)\z}) {
@@ -941,7 +942,7 @@ sub handle_login {
                     # Initial step - assemble auth token request and send redirect
                     my $nonce = Data::UUID->new()->create_b64();
                     my $sess_id = $self->has_cipher ?
-                        $self->cipher->encrypt($self->session->id) :
+                        encode_base64($self->cipher->encrypt($self->session->id)) :
                         $self->session->id;
 
                     # TODO - this is only set if we had a roundtrip before

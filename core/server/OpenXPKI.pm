@@ -98,6 +98,7 @@ sub import {
 
     # Project modules
     OpenXPKI::Debug->import::into(1);
+    OpenXPKI::Dumper->import::into(1);
     OpenXPKI::Exception->import::into(1);
     OpenXPKI::Util->import::into(1);
 

@@ -154,9 +154,9 @@ sub __get_cookie_cipher {
         $sha->add($key) if $key;
         map { $sha->add($ENV{$_}) if $ENV{$_} } split /\W+/, $conf->{session}->{fingerprint};
         $key = $sha->digest;
-        $log->trace(sprintf('Cookie encryption key: %*vx', '', $key)) if $log->trace;
     }
     return unless ($key);
+    $log->trace(sprintf('Cookie encryption key: %*vx', '', $key)) if $log->trace;
     my $cipher = Crypt::CBC->new(
         -key => $key,
         -pbkdf => 'opensslv2',
@@ -201,8 +201,9 @@ while (my $cgi = CGI::Fast->new) {
             $log->debug('Restore session from OIDC redirect');
             my $hash_key = $cgi->cookie('oxi-extid') || die 'Unable to find CSRF cookie';
             my $state = decode_jwt( key => $hash_key, token => $cgi->param('state') );
+            $log->trace(Dumper $state) if $log->is_trace;
             $sess_id = $state->{session_id};
-            $sess_id = $cipher->decrypt($sess_id) if ($cipher);
+            $sess_id = $cipher->decrypt(decode_base64($sess_id)) if ($cipher);
             # TODO - need to handle errors here!
         }
         catch ($err) {
