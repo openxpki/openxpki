@@ -347,7 +347,7 @@ sub _config_env_keys ($self) {
 =head3 log
 
 A logger object, per default set
-C<OpenXPKI::Log4perl-E<gt>get_logger('client.' . $self-E<gt>service_name)>.
+C<OpenXPKI::Log4perl-E<gt>get_logger('openxpki.client.' . $self-E<gt>service_name)>.
 
 =cut
 has log => (
@@ -359,7 +359,7 @@ has log => (
     lazy => 1,
     builder => '_build_log',
 );
-sub _build_log ($self) { OpenXPKI::Log4perl->get_logger('client.' . $self->service_name) }
+sub _build_log ($self) { OpenXPKI::Log4perl->get_logger('openxpki.client.' . $self->service_name) }
 
 =head3 backend
 
