@@ -210,17 +210,21 @@ around BUILDARGS => sub {
     my $orig = shift;
     my $class = shift;
 
-    my $args = shift;
-    if (!ref $args) {
-        $args = { service => $args };
+    my %args;
+    if (@_ == 1) {
+        if (ref $_[0]) {
+            %args = $_[0]->%*;
+        } else {
+            $args{service} = $_[0];
+        }
+    } else {
+        %args = @_;
     }
 
     # try to read service name from ENV
-    if ($ENV{OPENXPKI_CLIENT_SERVICE_NAME}) {
-        $args->{service} = $ENV{OPENXPKI_CLIENT_SERVICE_NAME};
-    }
+    $args{service} = $ENV{OPENXPKI_CLIENT_SERVICE_NAME} if $ENV{OPENXPKI_CLIENT_SERVICE_NAME};
 
-    return $class->$orig( $args );
+    return $class->$orig( %args );
 
 };
 
