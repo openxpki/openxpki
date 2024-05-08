@@ -12,13 +12,14 @@ use OpenXPKI::Client::Service::Response;
 sub index ($self) {
     # read target service class
     my $class = $self->stash('service_class') or die "Missing parameter 'service_class' in Mojolicious stash";
+    my $no_config = $self->stash('no_config');
 
     # load and instantiate service class
     my $service;
     try {
         Module::Load::load($class);
         $service = $class->new(
-            config_obj => $self->oxi_config($class->service_name),
+            config_obj => $self->oxi_config($class->service_name, $no_config),
             apache_env => $self->stash('apache_env'),
             remote_address => $self->tx->remote_address,
             request => $self->req,

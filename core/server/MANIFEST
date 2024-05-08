@@ -96,14 +96,14 @@ OpenXPKI/Client/API/Response.pm
 
 # Wrappers for EST, RPC...
 OpenXPKI/Client/Service/EST.pm
-OpenXPKI/Client/Service/RPC.pm
+OpenXPKI/Client/Service/Healthcheck.pm
 OpenXPKI/Client/Service/Response.pm
+OpenXPKI/Client/Service/RPC.pm
 OpenXPKI/Client/Service/SCEP.pm
 OpenXPKI/Client/Service/Role/Base.pm
 OpenXPKI/Client/Service/Role/Info.pm
 OpenXPKI/Client/Web.pm
 OpenXPKI/Client/Web/Controller.pm
-OpenXPKI/Client/Web/Healthcheck.pm
 
 # New UI Client
 OpenXPKI/Client/UI.pm

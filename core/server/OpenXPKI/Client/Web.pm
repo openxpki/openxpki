@@ -9,7 +9,6 @@ use Module::Load ();
 use Mojo::Util qw( url_unescape encode tablify );
 
 # Project modules
-use OpenXPKI::Client;
 use OpenXPKI::Client::Config;
 use OpenXPKI::Log4perl;
 
@@ -27,31 +26,23 @@ sub startup ($self) {
 
     # Helpers
     $self->helper(oxi_config => $self->can('helper_oxi_config'));
-    $self->helper(oxi_client => $self->can('helper_oxi_client'));
 
     # Routes
-    my $r = $self->routes;
-    $r->namespaces(['OpenXPKI::Client::Web']); # Mojolicious defaults is OpenXPKI::Client::Web::Controller::*
-
-    # Health Check
-    $r->get('/healthcheck' => sub { shift->redirect_to('check', command => 'ping') });
-    $r->get('/healthcheck/<command>')->to('Healthcheck#index')->name('check');
-
-    # my $services = $self->oxi_config->list_services;
-    my $services = [ qw( est rpc scep acme ) ];
-
-    my $common_route = $r->to(
+    my $r = $self->routes->to( # some common stash values / config
         namespace => '',
         controller => 'OpenXPKI::Client::Web::Controller',
         action => 'index',
     );
+
+    # my $services = $self->oxi_config->list_services;
+    my $services = [ qw( healthcheck est rpc scep acme ) ];
 
     for my $service ($services->@*) {
         # fetch the class that consumes OpenXPKI::Client::Service::Role::Info
         my $class = $self->_load_service_class($service) or next;
         $self->log->info(sprintf 'Define routes for service "%s"', $service);
         my $declare_routes = $class->can('declare_routes'); # best way to invoke method on dynamic class
-        $declare_routes->($common_route);
+        $declare_routes->($r); # call method
     }
 
     if ($self->log->is_debug) {
@@ -65,20 +56,19 @@ sub startup ($self) {
     $self->hook(before_server_start => sub ($server, $app) {
         $self->log->debug(sprintf 'Start OpenXPKI HTTP server in "%s" mode (pid %s)', $self->mode, $$);
 
-        my $close_connection = sub {
-            $self->log->debug("Stop OpenXPKI HTTP server: pid = $$");
-            $app->oxi_client->close_connection if $app->oxi_client(skip_creation => 1);
+        my $on_finish = sub {
+            $self->log->debug("Stop OpenXPKI HTTP server (pid $$)");
         };
 
         if ($server->isa('Mojo::Server::Prefork')) {
-            $server->on(finish => $close_connection);
+            $server->on(finish => $on_finish);
         }
 
         elsif ($server->isa('Mojo::Server::Daemon')) {
             # this does currently not work
             # (it was proposed by a Mojolicious developer in 2018:
             # https://github.com/mojolicious/mojo/issues/1255#issuecomment-417866464)
-            $server->ioloop->on(finish => $close_connection);
+            $server->ioloop->on(finish => $on_finish);
         }
     });
 
@@ -123,47 +113,20 @@ sub startup ($self) {
 
 # We implement the config helper to be able to cache configurations across
 # multiple requests.
-sub helper_oxi_config ($self, $service) {
+sub helper_oxi_config ($self, $service, $no_config) {
     state $configs = {}; # cache config object accross requests
 
     die "No service specified in call to helper 'oxi_config'" unless $service;
 
     unless ($configs->{$service}) {
         $self->log->debug("Load configuration for service '$service'");
-        $configs->{$service} = OpenXPKI::Client::Config->new($service);
+        $configs->{$service} = OpenXPKI::Client::Config->new(
+            service => $service,
+            $no_config ? ( default => {} ) : (),
+        );
     }
 
     return $configs->{$service};
-}
-
-signature_for helper_oxi_client => (
-    method => 1,
-    named => [
-        skip_creation => 'Bool', { default => 0 },
-    ],
-);
-sub helper_oxi_client ($self, $arg) {
-    state $client; # cache client accross requests
-
-    if ($client and not $client->is_connected) {
-        $client = undef;
-    }
-
-    unless ($client or $arg->skip_creation) {
-        try {
-            $client = OpenXPKI::Client->new({
-                SOCKETFILE => $socketfile,
-            });
-            $client->init_session;
-            $self->log->debug("Got new client: " . $client->session_id);
-        }
-        catch ($err) {
-            $client = undef;
-            $self->log->error("Unable to bootstrap client: $err");
-        }
-    }
-
-    return $client;
 }
 
 sub _load_service_class ($self, $service) {
