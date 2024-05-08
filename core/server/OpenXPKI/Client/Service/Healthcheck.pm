@@ -13,7 +13,6 @@ use List::Util qw( any );
 
 # Project modules
 use OpenXPKI::Client;
-use OpenXPKI::Client::Service::Response;
 
 
 has allowed_commands => (

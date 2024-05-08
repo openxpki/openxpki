@@ -36,6 +36,8 @@ our %named_messages = (
     40100 => 'Unauthorized',
     40101 => 'Authentication credentials missing or incorrect',
 
+    40300 => 'HTTPS required',
+
     40400 => 'Not Found',
     40401 => 'Not Found (Empty request endpoint and no default server set)',
     # RPC

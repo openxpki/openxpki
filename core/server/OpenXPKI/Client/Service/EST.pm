@@ -15,7 +15,6 @@ use Exporter qw( import );
 
 # Project modules
 use OpenXPKI::Crypt::X509;
-use OpenXPKI::Client::Service::Response;
 
 # Symbols to export by default
 # (we avoid Moose::Exporter's import magic because that switches on all warnings again)
@@ -44,7 +43,7 @@ sub prepare ($self, $c) {
         $self->log->debug("EST request via insecure connection (plain HTTP) - allowed via configuration");
     } else {
         $self->log->error('EST request via insecure connection (plain HTTP)');
-        die OpenXPKI::Client::Service::Response->new_error( 403 => "HTTPS required" );
+        die $self->new_response( 40300 );
     }
 
     $c->res->headers->content_type("application/pkcs7-mime; smime-type=certs-only"); # default
@@ -112,7 +111,7 @@ sub op_handlers {
         # "serverkeygen" and "fullcmc" are not supported
         ['serverkeygen', 'fullcmc'] => sub ($self) {
             $self->log->error(sprintf('Operation "%s" not implemented', $self->operation));
-            return OpenXPKI::Client::Service::Response->new_error( 50100 );
+            return $self->new_response( 50100 );
         },
     ];
 }
@@ -144,7 +143,7 @@ sub prepare_enrollment_result ($self, $workflow) {
     $result =~ s{-----(BEGIN|END) PKCS7-----}{}g;
     $result =~ s{\s}{}gxms;
 
-    return OpenXPKI::Client::Service::Response->new(
+    return $self->new_response(
         result => $result,
         workflow => $workflow,
     );
@@ -159,14 +158,14 @@ sub handle_revocation_request ($self) {
     my $body = $self->request->body
         or do {
             $self->log->debug( 'Incoming revocation request with empty body' );
-            return OpenXPKI::Client::Service::Response->new_error( 40003 );
+            return $self->new_response( 40003 );
         };
 
     try {
         my $x509 = OpenXPKI::Crypt::X509->new( decode_base64($body) );
         $param->{certificate} = $x509->pem;
     } catch ($error) {
-        return OpenXPKI::Client::Service::Response->new_error( 40002 );
+        return $self->new_response( 40002 );
     }
 
     my $workflow_type = $self->config->{simplerevoke}->{workflow} || 'certificate_revoke';

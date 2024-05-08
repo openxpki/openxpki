@@ -6,7 +6,6 @@ use Module::Load ();
 
 # Project modules
 use OpenXPKI::Log4perl;
-use OpenXPKI::Client::Service::Response;
 
 
 sub index ($self) {
