@@ -627,28 +627,58 @@ L</prepare>.
 
 =head2 new_response
 
-Helper to create a new L<OpenXPKI::Client::Service::Response>:
+Helper to create a new L<OpenXPKI::Client::Service::Response> with shortcut
+syntax and an error message filter.
+
+The error may be given as an internal code only:
 
     $self->new_response( 40080 );
     # is equal to:
+    $self->new_response(
+        error => 40080,
+    );
+    # and results in:
     OpenXPKI::Client::Service::Response->new(
         error => 40080
     );
 
-    $self->new_response( 500 => 'Something bad happened');
+An additional custom error message may also be specified.
+
+If B<error_message> is given and starts with C<"I18N_OPENXPKI_UI_">
+it will be translated:
+
+    $self->new_response( 500 => 'I18N_OPENXPKI_UI_BLAH' );
     # is equal to:
     $self->new_response(
         error => 500,
-        error_message => 'Something bad happened',
+        error_message => 'I18N_OPENXPKI_UI_BLAH',
     );
-    # and:
+    # and results in:
+    $self->log->error('I18N_OPENXPKI_UI_BLAH');
     OpenXPKI::Client::Service::Response->new(
         error => 500,
-        error_message => 'Something bad happened',
+        error_message => i18nGettext('I18N_OPENXPKI_UI_BLAH'),
     );
 
-If parameter B<error_message> is given and starts with C<"I18N_OPENXPKI_UI_">
-it will be translated. Otherwise it will be logged and removed.
+If it starts with C<"urn:ietf:params:acme:error">
+it will be kept as is:
+
+    $self->new_response( 400 => 'urn:ietf:params:acme:error:rejectedIdentifier' );
+    # results in:
+    $self->log->error('urn:ietf:params:acme:error:rejectedIdentifier');
+    OpenXPKI::Client::Service::Response->new(
+        error => 400,
+        error_message => 'urn:ietf:params:acme:error:rejectedIdentifier',
+    );
+
+Otherwise it will be logged and removed:
+
+    $self->new_response( 500 => 'Something bad happened');
+    # results in:
+    $self->log->error('Something bad happened');
+    OpenXPKI::Client::Service::Response->new(
+        error => 500,
+    );
 
 =cut
 sub new_response ($self, @args) {
@@ -666,8 +696,12 @@ sub new_response ($self, @args) {
     if (my $msg = $args_hash{error_message}) {
         $self->log->error($msg);
         if ($msg =~ /I18N_OPENXPKI_UI_/) {
+            # keep I18N string (but translate)
             $args_hash{error_message} = i18nGettext($msg) if $self->config_obj->language;
+        } elsif ($msg =~ m{\Aurn:ietf:params:acme:error}) {
+            # keep ACME error code
         } else {
+            # delete other internal messages
             delete $args_hash{error_message};
         }
     }
