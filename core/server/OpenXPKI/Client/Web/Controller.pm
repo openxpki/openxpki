@@ -11,7 +11,7 @@ use OpenXPKI::Client::Service::Response;
 
 sub index ($self) {
     # read target service class
-    my $class = $self->stash('service_class') or die "Missing 'service_class' in Mojolicious stash";
+    my $class = $self->stash('service_class') or die "Missing parameter 'service_class' in Mojolicious stash";
 
     # load and instantiate service class
     my $service;

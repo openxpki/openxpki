@@ -613,7 +613,7 @@ sub handle_request ($self) {
 
     $self->log->debug('Status: ' . $response->http_status_line);
     $self->log->error($response->error_message) if $response->has_error;
-    $self->log->trace(Dumper $response) if $self->log->is_trace;
+    $self->log->trace('Response: ' . Dumper $response) if $self->log->is_trace;
 
     return $response;
 }

@@ -63,7 +63,7 @@ sub startup ($self) {
 
     # Mojolicious server start hook
     $self->hook(before_server_start => sub ($server, $app) {
-        $self->log->debug(sprintf "Start OpenXPKI HTTP server in '%s' mode: pid = %s", $self->mode, $$);
+        $self->log->debug(sprintf 'Start OpenXPKI HTTP server in "%s" mode (pid %s)', $self->mode, $$);
 
         my $close_connection = sub {
             $self->log->debug("Stop OpenXPKI HTTP server: pid = $$");
@@ -115,7 +115,7 @@ sub startup ($self) {
         }
 
         if ($self->mode eq 'development') {
-            $self->log->trace('Development mode: enforcing HTTPS');
+            $self->log->trace('Development mode: enforce HTTPS');
             $c->req->url->base->scheme('https');
         }
     });
