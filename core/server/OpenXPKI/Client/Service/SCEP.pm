@@ -1,7 +1,10 @@
 package OpenXPKI::Client::Service::SCEP;
 use OpenXPKI -class;
 
-with 'OpenXPKI::Client::Service::Role::Base';
+with qw(
+    OpenXPKI::Client::Service::Role::Info
+    OpenXPKI::Client::Service::Role::Base
+);
 
 sub service_name { 'scep' } # required by OpenXPKI::Client::Service::Role::Base
 
@@ -50,6 +53,18 @@ has attr => (
     predicate => 'has_attr',
 );
 
+
+# required by OpenXPKI::Client::Service::Role::Info
+sub declare_routes ($r) {
+    # SCEP urls look like
+    #   /scep/server?operation=PKIOperation                 # incl. endpoint/server
+    #   /scep/server/pkiclient.exe?operation=PKIOperation   # incl. endpoint/server
+    # <*throwaway> is a catchall placeholder which is optional (because a default is given).
+    $r->any('/scep/<endpoint>/<*throwaway>')->to(
+        service_class => __PACKAGE__,
+        throwaway => '',
+    );
+}
 
 # required by OpenXPKI::Client::Service::Role::Base
 sub prepare ($self, $c) {

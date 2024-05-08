@@ -1,8 +1,12 @@
 package OpenXPKI::Client::Web;
 use OpenXPKI -base => 'Mojolicious';
 
+# Core modules
+use re qw( regexp_pattern );
+use Module::Load ();
+
 # CPAN modules
-use Mojo::Util qw( url_unescape );
+use Mojo::Util qw( url_unescape encode tablify );
 
 # Project modules
 use OpenXPKI::Client;
@@ -12,103 +16,6 @@ use OpenXPKI::Log4perl;
 
 my $socketfile = $ENV{OPENXPKI_CLIENT_SOCKETFILE} || '/var/openxpki/openxpki.socket';
 
-sub declare_routes ($self, $r) {
-    # Health Check
-    $r->get('/healthcheck' => sub { shift->redirect_to('check', command => 'ping') });
-    $r->get('/healthcheck/<command>')->to('Healthcheck#index')->name('check');
-
-    # Reserved Mojolicious keywords to load our shared controller
-    my %controller_params = (
-        namespace => '',
-        controller => 'OpenXPKI::Client::Web::Controller',
-        action => 'index',
-    );
-
-    # EST urls look like
-    #   /.well-known/est/cacerts
-    #   /.well-known/est/namedservice/cacerts  # incl. endpoint
-    # <endpoint> is optional because a default is given.
-    $r->any('/.well-known/est/<endpoint>/<operation>')->to(
-        %controller_params,
-        service_class => 'OpenXPKI::Client::Service::EST',
-        endpoint => 'default',
-    );
-
-    # RPC urls look like
-    #   /rpc/enroll?method=IssueCertificate
-    #   /rpc/enroll/IssueCertificate
-    $r->any('/rpc/<endpoint>/<method>')->to(
-        %controller_params,
-        service_class => 'OpenXPKI::Client::Service::RPC',
-        method => '',
-    );
-
-    # SCEP urls look like
-    #   /scep/server?operation=PKIOperation                 # incl. endpoint/server
-    #   /scep/server/pkiclient.exe?operation=PKIOperation   # incl. endpoint/server
-    # <*throwaway> is a catchall placeholder which is optional (because a default is given).
-    $r->any('/scep/<endpoint>/<*throwaway>')->to(
-        %controller_params,
-        service_class => 'OpenXPKI::Client::Service::SCEP',
-        throwaway => '',
-    );
-
-    # ACME urls look like (full pattern)
-    # /acme/<endpoint>/<objectclass>/<resource id>/<sub method>
-    # but we need to handle some special paths directly
-
-    # /acme/<endpoint> - directory request
-    $r->get('/acme/<endpoint>')->to(
-        %controller_params,
-        service_class => 'OpenXPKI::Client::Service::ACME',
-        operation => 'directory'
-    );
-
-    # /acme/<endpoint>/newNonce - nonce request
-    $r->any(['GET', 'HEAD'] => '/acme/<endpoint>/newNonce')->to(
-        %controller_params,
-        service_class => 'OpenXPKI::Client::Service::ACME',
-        operation => 'nonce'
-    );
-
-    $r->post('/acme/<endpoint>/order/<resource_id>/finalize')->to(
-        %controller_params,
-        service_class => 'OpenXPKI::Client::Service::ACME::Order',
-        operation => 'finalize',
-    );
-
-    $r->post('/acme/<endpoint>/revokeCert')->to(
-        %controller_params,
-        service_class => 'OpenXPKI::Client::Service::ACME::Cert',
-        operation => 'revokeCert',
-    );
-
-    # not yet implemented in backend
-    $r->post('/acme/<endpoint>/keyChange')->to(
-        %controller_params,
-        service_class => 'OpenXPKI::Client::Service::ACME::Account',
-        operation => 'keyChange',
-    );
-
-    $r->post('/acme/<endpoint>/chall-http/<resource_id>')->to(
-        %controller_params,
-        service_class => 'OpenXPKI::Client::Service::ACME::Authz',
-        operation => 'validate_http',
-    );
-
-    $r->post('/acme/<endpoint>/'.$_.'/<resource_id>')->to(
-        %controller_params,
-        service_class => 'OpenXPKI::Client::Service::ACME::'.ucfirst($_),
-        operation => $_
-    ) for qw(order orders account authz cert);
-
-    $r->post('/acme/<endpoint>/'.$_)->to(
-        %controller_params,
-        service_class => 'OpenXPKI::Client::Service::ACME::'.ucfirst(substr($_,3)),
-        operation => $_,
-    ) for qw(newAccount newAuthz newOrder);
-
-}
 
 sub startup ($self) {
 
@@ -118,14 +25,41 @@ sub startup ($self) {
 
     $self->exception_format('txt') unless 'development' eq $self->mode;
 
-    # Routes
-    my $r = $self->routes;
-    $r->namespaces(['OpenXPKI::Client::Web']); # Mojolicious defaults is OpenXPKI::Client::Web::Controller::*
-    $self->declare_routes($r);
-
     # Helpers
     $self->helper(oxi_config => $self->can('helper_oxi_config'));
     $self->helper(oxi_client => $self->can('helper_oxi_client'));
+
+    # Routes
+    my $r = $self->routes;
+    $r->namespaces(['OpenXPKI::Client::Web']); # Mojolicious defaults is OpenXPKI::Client::Web::Controller::*
+
+    # Health Check
+    $r->get('/healthcheck' => sub { shift->redirect_to('check', command => 'ping') });
+    $r->get('/healthcheck/<command>')->to('Healthcheck#index')->name('check');
+
+    # my $services = $self->oxi_config->list_services;
+    my $services = [ qw( est rpc scep acme ) ];
+
+    my $common_route = $r->to(
+        namespace => '',
+        controller => 'OpenXPKI::Client::Web::Controller',
+        action => 'index',
+    );
+
+    for my $service ($services->@*) {
+        # fetch the class that consumes OpenXPKI::Client::Service::Role::Info
+        my $class = $self->_load_service_class($service) or next;
+        $self->log->info(sprintf 'Define routes for service "%s"', $service);
+        my $declare_routes = $class->can('declare_routes'); # best way to invoke method on dynamic class
+        $declare_routes->($common_route);
+    }
+
+    if ($self->log->is_debug) {
+        my $rows = [];
+        $self->_walk_route($_, 0, $rows) for $self->routes->children->@*;
+        $self->log->debug('Routes:');
+        $self->log->debug($_) for map { "  $_" } split "\n", tablify($rows);
+    }
 
     # Mojolicious server start hook
     $self->hook(before_server_start => sub ($server, $app) {
@@ -149,7 +83,6 @@ sub startup ($self) {
     });
 
 
-    # Change scheme if "X-Forwarded-HTTPS" header is set
     $self->hook(before_dispatch => sub ($c) {
         $self->log->trace(sprintf 'Incoming %s request', uc($c->req->url->base->protocol)); # ->protocol: Normalized version of ->scheme
 
@@ -168,7 +101,7 @@ sub startup ($self) {
         }
         $c->stash(apache_env => $apache_env);
 
-        # Inject forwarded query parameters into Mojo::Request.
+        # Inject query parameters forwarded by Apache into Mojo::Request.
         # NOTE:
         # We need this workaround because Apache cannot forward the
         # QUERY_STRING to the backend server. The "proxy_pass" documentation
@@ -231,6 +164,51 @@ sub helper_oxi_client ($self, $arg) {
     }
 
     return $client;
+}
+
+sub _load_service_class ($self, $service) {
+    my @variants = (
+        sprintf("OpenXPKI::Client::Service::%s", uc $service),
+        sprintf("OpenXPKI::Client::Service::%s", ucfirst $service),
+        sprintf("OpenXPKI::Client::Service::%s", $service),
+    );
+
+    for my $pkg (@variants) {
+        try {
+            Module::Load::load($pkg);
+        }
+        catch ($err) {
+            next if $err =~ /^Can't locate/;
+            die sprintf 'Could not load class for service "%s": %s', $service, $err;
+        }
+
+        die sprintf 'Class "%s" must consume role OpenXPKI::Client::Service::Role::Info', $pkg
+            unless $pkg->DOES('OpenXPKI::Client::Service::Role::Info');
+
+        return $pkg;
+    }
+
+    $self->log->warn(sprintf 'Unsupported service "%s": no class found (OpenXPKI::Client::Service::*)', $service);
+    return;
+}
+
+# from Mojolicious::Command::routes
+sub _walk_route ($self, $route, $depth, $rows) {
+    # Pattern
+    my $prefix = '';
+    if (my $i = $depth * 2) { $prefix .= ' ' x $i . '+' }
+    push @$rows, my $row = [$prefix . ($route->pattern->unparsed || '/')];
+
+    # Methods
+    my $methods = $route->methods;
+    push @$row, (!$methods ? '*' : uc join ',', @$methods) . ($route->is_websocket ? ' (WS)' : '');
+
+    # Regex
+    my $pattern = $route->pattern;
+    $pattern->match('/', $route->is_endpoint && !$route->partial);
+    push @$row, (regexp_pattern $pattern->regex)[0];
+
+    _walk($_, $depth+1, $rows) for $route->children->@*;
 }
 
 1;

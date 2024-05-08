@@ -1,7 +1,10 @@
 package OpenXPKI::Client::Service::RPC;
 use OpenXPKI -class;
 
-with 'OpenXPKI::Client::Service::Role::Base';
+with qw(
+    OpenXPKI::Client::Service::Role::Info
+    OpenXPKI::Client::Service::Role::Base
+);
 
 sub service_name { 'rpc' } # required by OpenXPKI::Client::Service::Role::Base
 
@@ -81,6 +84,17 @@ has openapi_mode => (
     init_arg => undef,
     default => 0,
 );
+
+# required by OpenXPKI::Client::Service::Role::Info
+sub declare_routes ($r) {
+    # RPC urls look like
+    #   /rpc/enroll?method=IssueCertificate
+    #   /rpc/enroll/IssueCertificate
+    $r->any('/rpc/<endpoint>/<method>')->to(
+        service_class => __PACKAGE__,
+        method => '',
+    );
+}
 
 # required by OpenXPKI::Client::Service::Role::Base
 sub prepare ($self, $c) {

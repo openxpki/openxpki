@@ -2,6 +2,7 @@ package OpenXPKI::Client::Service::Role::Base;
 use OpenXPKI qw( -role -typeconstraints );
 
 requires 'service_name';
+requires 'declare_routes';
 requires 'prepare';
 requires 'send_response';
 requires 'op_handlers';
@@ -24,6 +25,7 @@ A consuming class that implements a service generally looks like this:
 
     # The class needs to define all methods required by C<OpenXPKI::Client::Service::Role::Base>
     sub service_name { 'xproto' }
+    sub declare_routes ($r) { ... }
     sub prepare ($self, $c) { ... }
     sub send_response ($self, $c, $response) { ... }
     sub op_handlers { ... }
@@ -98,6 +100,35 @@ Must return the name of the service that the class implements. Used e.g.
 =back
 
     sub service_name { 'xproto' }
+
+=head3 declare_routes
+
+Called by L<OpenXPKI::Client::Web>, this method must set up all Mojolicious
+URL routes belonging to the service.
+
+    # in package OpenXPKI::Client::Service::RPC
+    sub declare_routes ($r) {
+        # RPC urls look like
+        #   /rpc/enroll?method=IssueCertificate
+        #   /rpc/enroll/IssueCertificate
+        $r->any('/rpc/<endpoint>/<method>')->to(
+            service_class => __PACKAGE__,
+            method => '',
+        );
+    }
+
+The implementing service class must ensure that OpenXPKI's special Mojolicious
+stash parameter C<service_class> is set to the package that processes the
+route and consumes L<OpenXPKI::Client::Service::Role::Base>
+(usually C<__PACKAGE__>).
+
+B<Passed parameters>
+
+=over
+
+=item * C<$r> - L<Mojolicious::Routes>
+
+=back
 
 =head3 prepare
 

@@ -1,7 +1,10 @@
 package OpenXPKI::Client::Service::EST;
 use OpenXPKI -class;
 
-with 'OpenXPKI::Client::Service::Role::Base';
+with qw(
+    OpenXPKI::Client::Service::Role::Info
+    OpenXPKI::Client::Service::Role::Base
+);
 
 sub service_name { 'est' } # required by OpenXPKI::Client::Service::Role::Base
 
@@ -18,6 +21,17 @@ use OpenXPKI::Client::Service::Response;
 # (we avoid Moose::Exporter's import magic because that switches on all warnings again)
 our @EXPORT = qw( cgi_safe_sub ); # provided by OpenXPKI::Client::Service::Role::Base
 
+# required by OpenXPKI::Client::Service::Role::Info
+sub declare_routes ($r) {
+    # EST urls look like
+    #   /.well-known/est/cacerts
+    #   /.well-known/est/namedservice/cacerts  # incl. endpoint
+    # <endpoint> is optional because a default is given.
+    $r->any('/.well-known/est/<endpoint>/<operation>')->to(
+        service_class => __PACKAGE__,
+        endpoint => 'default',
+    );
+}
 
 # required by OpenXPKI::Client::Service::Role::Base
 sub prepare ($self, $c) {
