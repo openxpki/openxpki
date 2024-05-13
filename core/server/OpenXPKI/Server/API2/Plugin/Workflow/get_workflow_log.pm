@@ -1,5 +1,5 @@
 package OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_log;
-use OpenXPKI::Server::API2::EasyPlugin;
+use OpenXPKI -plugin;
 
 =head1 NAME
 

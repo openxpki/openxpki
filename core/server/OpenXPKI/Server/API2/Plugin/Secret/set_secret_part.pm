@@ -1,5 +1,5 @@
 package OpenXPKI::Server::API2::Plugin::Secret::set_secret_part;
-use OpenXPKI::Server::API2::EasyPlugin;
+use OpenXPKI -plugin;
 
 =head1 NAME
 

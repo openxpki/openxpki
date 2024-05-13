@@ -1,5 +1,5 @@
 package OpenXPKI::Server::API2::Plugin::Profile::preset_subject_parts_from_profile;
-use OpenXPKI::Server::API2::EasyPlugin;
+use OpenXPKI -plugin;
 
 =head1 NAME
 

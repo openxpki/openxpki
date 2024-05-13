@@ -1,5 +1,5 @@
 package OpenXPKI::Server::API2::Plugin::Crypto::get_key_identifier_from_data;
-use OpenXPKI::Server::API2::EasyPlugin;
+use OpenXPKI -plugin;
 
 =head1 NAME
 

@@ -1,5 +1,5 @@
 package OpenXPKI::Server::API2::Plugin::Workflow::list_workflow_titles;
-use OpenXPKI::Server::API2::EasyPlugin;
+use OpenXPKI -plugin;
 
 =head1 NAME
 

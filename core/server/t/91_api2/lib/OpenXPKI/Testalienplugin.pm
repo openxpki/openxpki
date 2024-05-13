@@ -1,5 +1,5 @@
 package OpenXPKI::Testalienplugin;
-use OpenXPKI::Server::API2::EasyPlugin;
+use OpenXPKI -plugin;
 
 command "alienplugin" => {} => sub {
     my ($self, $params) = @_;

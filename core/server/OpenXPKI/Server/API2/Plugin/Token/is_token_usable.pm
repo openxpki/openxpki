@@ -1,5 +1,5 @@
 package OpenXPKI::Server::API2::Plugin::Token::is_token_usable;
-use OpenXPKI::Server::API2::EasyPlugin;
+use OpenXPKI -plugin;
 
 =head1 NAME
 

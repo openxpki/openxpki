@@ -1,5 +1,5 @@
 package OpenXPKI::Server::API2::Plugin::Workflow::search_workflow_instances;
-use OpenXPKI::Server::API2::EasyPlugin;
+use OpenXPKI -plugin;
 
 with 'OpenXPKI::Server::API2::TenantRole';
 

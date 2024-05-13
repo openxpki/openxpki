@@ -1,5 +1,5 @@
 package OpenXPKI::Server::API2::Plugin::Datapool::set_data_pool_entry;
-use OpenXPKI::Server::API2::EasyPlugin;
+use OpenXPKI -plugin;
 
 with 'OpenXPKI::Server::API2::Plugin::Datapool::Util';
 

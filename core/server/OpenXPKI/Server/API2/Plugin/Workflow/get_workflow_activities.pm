@@ -1,5 +1,5 @@
 package OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_activities;
-use OpenXPKI::Server::API2::EasyPlugin;
+use OpenXPKI -plugin;
 
 =head1 NAME
 

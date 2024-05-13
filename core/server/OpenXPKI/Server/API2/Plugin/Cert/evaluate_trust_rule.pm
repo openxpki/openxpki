@@ -1,5 +1,5 @@
 package OpenXPKI::Server::API2::Plugin::Cert::evaluate_trust_rule;
-use OpenXPKI::Server::API2::EasyPlugin;
+use OpenXPKI -plugin;
 
 =head1 NAME
 

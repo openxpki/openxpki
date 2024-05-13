@@ -1,5 +1,5 @@
 package OpenXPKI::Server::API2::Plugin::Users::search_users;
-use OpenXPKI::Server::API2::EasyPlugin;
+use OpenXPKI -plugin;
 =head1 NAME
 
 OpenXPKI::Server::API2::Plugin::Users::search_users

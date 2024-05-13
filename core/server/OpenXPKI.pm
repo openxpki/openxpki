@@ -28,6 +28,9 @@ OpenXPKI - Base module to reduce boilerlate code in our packages.
     # Moose role
     use OpenXPKI -role;
 
+    # API plugin
+    use OpenXPKI -plugin;
+
 =cut
 
 sub import {
@@ -45,6 +48,7 @@ sub import {
     my $moose_typeconstraints = delete $flags{-typeconstraints};
     my $moose_nonmoose = delete $flags{-nonmoose};
     my $moose_role = delete $flags{-role};
+    my $plugin = delete $flags{-plugin};
 
     die sprintf(
         'Unknown options: "use OpenXPKI qw( ... %s )" (called at %s line %s)',
@@ -63,7 +67,10 @@ sub import {
         }
         Moose::Exporter->import::into(1) if $moose_exporter;
         Moose::Util::TypeConstraints->import::into(1) if $moose_typeconstraints;
-
+    # API plugin
+    } elsif ($plugin) {
+        Moose->import::into(1);
+        OpenXPKI::Server::API2::Plugin->import::into(1);
     # Plain old Perl package / class
     } else {
         base->import::into(1, $poc_base) if $poc_base;

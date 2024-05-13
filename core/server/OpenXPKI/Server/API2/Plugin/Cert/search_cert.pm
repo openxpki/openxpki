@@ -1,5 +1,5 @@
 package OpenXPKI::Server::API2::Plugin::Cert::search_cert;
-use OpenXPKI::Server::API2::EasyPlugin;
+use OpenXPKI -plugin;
 
 with 'OpenXPKI::Server::API2::TenantRole';
 

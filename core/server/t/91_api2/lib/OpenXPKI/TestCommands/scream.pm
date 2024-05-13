@@ -1,5 +1,5 @@
 package OpenXPKI::TestCommands::scream;
-use OpenXPKI::Server::API2::EasyPlugin;
+use OpenXPKI -plugin;
 
 command "scream" => {
     how =>  { isa => 'Str', required => 1 },

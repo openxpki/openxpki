@@ -1,5 +1,5 @@
 package OpenXPKI::Server::API2::Plugin::Token::handle_alias;
-use OpenXPKI::Server::API2::EasyPlugin;
+use OpenXPKI -plugin;
 
 =head1 NAME
 

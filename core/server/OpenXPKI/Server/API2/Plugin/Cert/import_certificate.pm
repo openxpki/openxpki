@@ -1,5 +1,5 @@
 package OpenXPKI::Server::API2::Plugin::Cert::import_certificate;
-use OpenXPKI::Server::API2::EasyPlugin;
+use OpenXPKI -plugin;
 use OpenXPKI;
 
 =head1 NAME

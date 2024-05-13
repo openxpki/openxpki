@@ -1,5 +1,5 @@
 package OpenXPKI::Server::API2::Plugin::Profile::get_field_definition;
-use OpenXPKI::Server::API2::EasyPlugin;
+use OpenXPKI -plugin;
 
 =head1 NAME
 

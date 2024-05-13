@@ -1,5 +1,5 @@
 package OpenXPKI::Server::API2::Plugin::Profile::get_cert_subject_profiles;
-use OpenXPKI::Server::API2::EasyPlugin;
+use OpenXPKI -plugin;
 
 =head1 NAME
 

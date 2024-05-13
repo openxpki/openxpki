@@ -298,8 +298,8 @@ OpenXPKI/Server/Log/Layout/Audit.pm
 OpenXPKI/Server.pm
 OpenXPKI/Server/API2.pm
 OpenXPKI/Server/API2/Autoloader.pm
-OpenXPKI/Server/API2/EasyPlugin.pm
 OpenXPKI/Server/API2/TenantRole.pm
+OpenXPKI/Server/API2/Plugin.pm
 OpenXPKI/Server/API2/PluginMetaClassTrait.pm
 OpenXPKI/Server/API2/PluginRole.pm
 OpenXPKI/Server/API2/Types.pm

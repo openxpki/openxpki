@@ -1,5 +1,5 @@
 package OpenXPKI::Server::API2::Plugin::Workflow::wakeup_resume_workflow;
-use OpenXPKI::Server::API2::EasyPlugin;
+use OpenXPKI -plugin;
 
 =head1 NAME
 

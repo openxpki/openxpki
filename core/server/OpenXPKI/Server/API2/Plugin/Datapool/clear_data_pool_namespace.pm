@@ -1,5 +1,5 @@
 package OpenXPKI::Server::API2::Plugin::Datapool::clear_data_pool_namespace;
-use OpenXPKI::Server::API2::EasyPlugin;
+use OpenXPKI -plugin;
 
 with 'OpenXPKI::Server::API2::Plugin::Datapool::Util';
 

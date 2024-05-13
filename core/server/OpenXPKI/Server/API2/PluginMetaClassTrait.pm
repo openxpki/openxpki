@@ -1,5 +1,5 @@
 package OpenXPKI::Server::API2::PluginMetaClassTrait;
-use Moose::Role;
+use OpenXPKI -role;
 
 =head1 NAME
 
@@ -8,21 +8,10 @@ OpenXPKI::Server::API2::PluginMetaClassTrait - Moose metaclass role (aka.
 
 =head2 DESCRIPTION
 
-B<Not intended for direct use.> Please C<use OpenXPKI::Server::API2::EasyPlugin;>
-instead.
+B<Not intended for direct use.> Please C<use OpenXPKI -plugin> instead.
 
 This role manages API parameters and their specifications for the API plugin classes.
-It will be applied when you say C<use OpenXPKI::Server::API2::EasyPlugin>.
-
-=cut
-
-# Core Modules
-use Data::Dumper;
-
-# Project modules
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
-
+It will be applied when you say C<use OpenXPKI::Server::API2::Plugin>.
 
 =head1 ATTRIBUTES
 
@@ -71,7 +60,7 @@ generated container class (type L<Moose::Meta::Class>).
 Values are I<HashRefs> with the attribute options (extended version of Moose's I<has>
 keyword options).
 
-For more details please see L<OpenXPKI::Server::API2::EasyPlugin/command>.
+For more details please see L<OpenXPKI::Server::API2::Plugin/command>.
 
 =back
 
@@ -156,11 +145,26 @@ sub new_param_object {
 
     my $param_metaclass = $self->param_classes->{$command}
         or OpenXPKI::Exception->throw (
-            message => "API command $command is not managed by __PACKAGE__",
+            message => "API command $command is not managed by " . __PACKAGE__,
             params => { command => $command }
         );
 
     return $param_metaclass->new_object(%{ $params });
 }
+
+# =head2 execute
+
+# Executes the given API command.
+
+# =cut
+# signature_for execute => (
+#     method => 1,
+#     positional => [ 'OpenXPKI::Server::API2', 'Str', 'HashRef' ],
+# );
+# sub execute ($self, $api, $command, $params) {
+#     my $instance = $self->new_object(rawapi => $api);
+#     my $param_obj = $self->new_param_object($command, $params); # provided by OpenXPKI::Server::API2::PluginMetaClassTrait
+#     return $self->find_method_by_name($command)->execute($instance, $param_obj);
+# }
 
 1;

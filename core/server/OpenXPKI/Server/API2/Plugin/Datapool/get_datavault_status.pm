@@ -1,5 +1,5 @@
 package OpenXPKI::Server::API2::Plugin::Datapool::get_datavault_status;
-use OpenXPKI::Server::API2::EasyPlugin;
+use OpenXPKI -plugin;
 
 with 'OpenXPKI::Server::API2::Plugin::Datapool::Util';
 

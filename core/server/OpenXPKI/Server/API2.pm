@@ -1,5 +1,5 @@
 package OpenXPKI::Server::API2;
-use Moose;
+use OpenXPKI -class;
 
 =head1 NAME
 
@@ -12,22 +12,11 @@ functions
 use Module::Load ();
 use File::Spec;
 use IO::Dir 1.03;
-use Scalar::Util qw( blessed );
-
-# CPAN modules
-use Type::Params qw( signature_for );
 
 # Project modules
 use OpenXPKI::Server::Log;
-use OpenXPKI::Exception;
 use OpenXPKI::Server::API2::PluginRole;
 use OpenXPKI::Server::API2::Autoloader;
-
-# Feature::Compat::Try should be done last to safely disable warnings
-use Feature::Compat::Try;
-
-# should be done after imports to safely disable warnings in Perl < 5.36
-use experimental 'signatures';
 
 =head1 SYNOPSIS
 
@@ -80,7 +69,7 @@ more precise) is available via C<CTX('api2')>.
 This class acts as a dispatcher (single entrypoint) to execute API commands via
 L<dispatch>.
 
-It makes available all API commands defined in the C<OpenXPKI::Server::API2::EasyPlugin>
+It makes available all API commands defined in the C<OpenXPKI::Server::API2::Plugin>
 namespace.
 
 For easy access to the API commands you should use the autoloader instance
@@ -88,14 +77,12 @@ returned by L</autoloader>.
 
 =head2 Create a plugin class
 
-Standard (and easy) way to define a new plugin class with API commands: create
-a new package in the C<OpenXPKI::Server::API2::EasyPlugin> namespace (any
-deeper hierarchy is okay) and in your package use
-L<OpenXPKI::Server::API2::EasyPlugin> as described there.
+Create a new package in the C<OpenXPKI::Server::API2::Plugin> namespace (any
+deeper hierarchy is okay) and in your package
+C<use L<OpenXPKI> -plugin> as described there.
 
-=cut
-
-
+All plugins are expected to consume L<OpenXPKI::Server::API2::PluginRole> and
+have meta class role L<OpenXPKI::Server::API2::PluginMetaClassTrait> applied.
 
 =head1 ATTRIBUTES
 
@@ -185,7 +172,7 @@ has acl_rule_accessor => (
 Optional: Perl package namespace that will be searched for the command plugins
 (classes).
 
-Default: C<OpenXPKI::Server::API2::EasyPlugin>
+Default: C<OpenXPKI::Server::API2::Plugin>
 
 Example:
 
@@ -197,25 +184,6 @@ has namespace => (
     isa => 'Str',
     lazy => 1,
     default => __PACKAGE__."::Plugin",
-);
-
-=head2 command_role
-
-Optional: role that all command classes are expected to have. This allows
-the API to distinct between command modules that shall be registered and helper
-classes.
-
-Default: C<OpenXPKI::Server::API2::PluginRole>.
-
-B<ATTENTION>: if you change this make sure the role you specify requires at
-least the same methods as L<OpenXPKI::Server::API2::PluginRole>.
-
-=cut
-has command_role => (
-    is => 'rw',
-    isa => 'Str',
-    lazy => 1,
-    default => "OpenXPKI::Server::API2::PluginRole",
 );
 
 =head2 commands
@@ -286,15 +254,21 @@ sub _load_plugins {
 
         Module::Load::load($pkg);
 
-        if (not $pkg->DOES($self->command_role)) {
-            $self->log->trace("API - ignore $pkg (does not consume ".$self->command_role.") - $file");
+        if (not $pkg->DOES('OpenXPKI::Server::API2::PluginRole')) {
+            $self->log->trace("API - ignore $pkg (does not consume OpenXPKI::Server::API2::PluginRole) - $file");
             next;
         }
 
-        $self->log->trace("API - register $pkg: ".join(", ", @{ $pkg->commands })." - $file");
+        # paranoia
+        OpenXPKI::Exception->throw (
+            message => "API plugin ${pkg}'s meta class does not consume OpenXPKI::Server::API2::PluginMetaClassTrait",
+            params => { namespace => $self->namespace }
+        ) unless $pkg->meta->meta->does_role('OpenXPKI::Server::API2::PluginMetaClassTrait');
+
+        $self->log->trace("API - register $pkg: ".join(", ", $pkg->meta->command_list)." - $file");
 
         # store commands and their source package
-        for my $cmd (@{ $pkg->commands }) {
+        for my $cmd ($pkg->meta->command_list) {
             # check if command was previously defined by another package
             my $earlier_pkg = $cmd_package_map->{$cmd};
             if ($earlier_pkg) {
@@ -306,7 +280,7 @@ sub _load_plugins {
             }
 
             if (substr($cmd,0,2) eq '__' && not $self->enable_protected) {
-                $self->log->trace("API - skipping protected command $pkg: ".join(", ", @{ $pkg->commands })." - $file");
+                $self->log->trace("API - skipping protected command $pkg: ".join(", ", $pkg->meta->command_list)." - $file");
                 next;
             }
 
@@ -397,9 +371,10 @@ sub dispatch ($self, $arg) {
 
     my $result;
     try {
-        $result = $package
-            ->new(rawapi => $self)
-            ->execute($command, $all_params);
+#        $result = $package->meta->execute($self, $command, $all_params);
+        my $cmd_obj = $package->new(rawapi => $self);
+        my $param_obj = $package->meta->new_param_object($command, $all_params); # provided by OpenXPKI::Server::API2::PluginMetaClassTrait
+        $result = $cmd_obj->$command($param_obj);
     }
     catch ($err) {
         my $msg = $err;
@@ -668,7 +643,7 @@ B<Parameters>
 
 =over
 
-=item * C<$namespace> - Perl namespace (e.g. C<OpenXPKI::Server::API2::EasyPlugin>)
+=item * C<$namespace> - Perl namespace (e.g. C<OpenXPKI::Server::API2::Plugin>)
 
 =back
 
@@ -718,10 +693,11 @@ sub _list_modules {
             }
             # recurse
             for my $entry (@entries) {
+                my $dir = File::Spec->catdir($dir, $entry);
                 next unless (
                     File::Spec->no_upwards($entry)
                     and $entry =~ $dir_rx
-                    and -d File::Spec->catdir($dir, $entry)
+                    and -d $dir
                 );
                 my $newpfx = $prefix.$entry."::";
                 if (!exists($seen_prefixes{$newpfx})) {
@@ -832,7 +808,7 @@ command code. It also helps reducing the number of individual Perl module files.
 
 =item * B<No base class>:
 
-When you use L<OpenXPKI::Server::API2::EasyPlugin> to define a plugin class all
+When you use L<OpenXPKI::Server::API2::Plugin> to define a plugin class all
 functionality is added via Moose roles instead of a base class. This allows for
 plugin classes to be based on any other classes if needed.
 

@@ -1,8 +1,8 @@
-package OpenXPKI::Server::API2::EasyPlugin;
+package OpenXPKI::Server::API2::Plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::EasyPlugin - Define an OpenXPKI API plugin
+OpenXPKI::Server::API2::Plugin - Define an OpenXPKI API plugin
 
 =cut
 
@@ -20,7 +20,7 @@ use OpenXPKI::Server::API2::PluginMetaClassTrait;
 To define a new API plugin simply say:
 
     package OpenXPKI::Server::API2::Plugin::MyTopic::MyActions;
-    use OpenXPKI::Server::API2::EasyPlugin;
+    use OpenXPKI::Server::API2::Plugin;
 
     command "aaa" => {
         # parameters
@@ -51,13 +51,12 @@ It currently does not seem to be possible to set a custom base class for your
 plugin, but you can instead easily add another role to it:
 
     package OpenXPKI::Server::API2::Plugin::MyTopic::MyActions;
-    use OpenXPKI::Server::API2::EasyPlugin;
+    use OpenXPKI -plugin;
 
     with "OpenXPKI::Server::API2::Plugin::MyTopic::Base";
 
 =cut
 Moose::Exporter->setup_import_methods(
-    also => [ "Moose" ],
     with_meta => [ "command", "protected_command" ],
     base_class_roles => [ "OpenXPKI::Server::API2::PluginRole" ],
     class_metaroles => {
@@ -69,7 +68,7 @@ Moose::Exporter->setup_import_methods(
 =head1 KEYWORDS (imported functions)
 
 The following functions are imported into the package that uses
-C<OpenXPKI::Server::API2::EasyPlugin>.
+C<OpenXPKI::Server::API2::Plugin>.
 
 =head2 command
 

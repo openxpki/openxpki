@@ -1,5 +1,5 @@
 package OpenXPKI::Server::API2::Plugin::Control::purge_application_log;
-use OpenXPKI::Server::API2::EasyPlugin;
+use OpenXPKI -plugin;
 
 =head1 NAME
 

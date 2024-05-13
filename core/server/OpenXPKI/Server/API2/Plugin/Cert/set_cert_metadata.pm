@@ -1,5 +1,5 @@
 package OpenXPKI::Server::API2::Plugin::Cert::set_cert_metadata;
-use OpenXPKI::Server::API2::EasyPlugin;
+use OpenXPKI -plugin;
 use OpenXPKI;
 
 =head1 NAME

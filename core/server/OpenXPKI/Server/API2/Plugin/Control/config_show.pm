@@ -1,5 +1,5 @@
 package OpenXPKI::Server::API2::Plugin::Control::config_show;
-use OpenXPKI::Server::API2::EasyPlugin;
+use OpenXPKI -plugin;
 
 =head1 NAME
 
