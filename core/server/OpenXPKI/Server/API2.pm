@@ -725,22 +725,22 @@ The structure of the configuration subtree (below the realm) is as follows:
 
     acl:
         <role name>:
-            # "allow" or "deny"
-            policy: allow
+            policy: allow   # default policy: "allow" or "deny"
             commands:
-                # deny access to this command
+                # deny access to command1
                 <command1>: 0
 
-                # allow unfiltered access to this command
+                # allow unfiltered access to command2
                 <command2>: 1
 
-                # allow access and preprocess arguments
+                # allow command3 and preprocess arguments
                 <command3>:
                     <parameter>:
-                        default: <string>
-                        force:   <string>
-                        match:   <regex>
-                        block:   1
+                        required: 1
+                        force:    <string>
+                        default:  <string>
+                        match:    <regex>
+                        block:    1
 
                 <command4>:
                     ...
@@ -749,48 +749,63 @@ The structure of the configuration subtree (below the realm) is as follows:
             ...
 
 The ACL processor first looks if the command name has a key in the
-I<commands> tree, if no key is found the action given by I<policy> is
-taken. If no policy is set, the default is deny.
-
-To allow unfiltered access to a command, set a true scalar value.
-
-To fully deny access to the command, set a false scalar value.
-
-To grant access with some control over the parameters given, use a hash
-where the attribute names are the keys and the value is a hash with the
-rules to be applied on the parameter:
+I<commands> tree:
 
 =over
 
-=item * B<force>
+=item * B<Command not specified>: if no key is found the action given by I<policy> is
+taken. If no policy is set, the default is deny.
 
-Enforce parameter to the given value (overwrites a given value).
+=item * B<True> value: allow unfiltered access to a command.
+
+=item * B<False> value: fully deny access to the command.
+
+=item * B<Detailed parameter rules>: to grant access to a command while
+restricting its parameters a hash can be specified.
+
+Default policy for parameters not mentioned in the given hash is to allow them.
+
+Key is the parameter name and value is a hash with rules:
+
+=over
+
+=item C<B<required>>
+
+Mark parameter as required.
 
     acl:
         CA Operator:
             search_cert:
                 status:
+                    required: 1
+
+=item C<B<force>>
+
+Enforce parameter value (overwrites a given value).
+
                     force: ISSUED
 
-=item * B<default>
+=item C<B<default>>
 
-Default value if none was given.
+Set a default value if none was given (cannot be used together with C<force>).
 
                     default: ISSUED
 
-=item * B<match>
+=item C<B<match>>
 
 Match parameter against regular expression. The Regex is executed using the
 modifiers C</msx>, so please escape spaces.
 
                     match: \A (ISSUED|REVOKED) \z
 
-=item * B<block>
+=item C<B<block>>
 
-Block parameter so that an exception will be thrown if the caller tries to set
+Block parameter. An exception will be thrown if the caller tries to set
 it.
 
                     block: 1
+
+=back
 
 =back
 

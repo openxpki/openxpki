@@ -7,15 +7,13 @@ OpenXPKI::Server::API2::PluginRole - Base role for API plugins
 
 =head1 DESCRIPTION
 
-B<Not intended for direct use.> Please C<use OpenXPKI -plugin>
-instead.
+B<Not intended for direct use:> please C<use OpenXPKI -plugin> instead.
 
 =head1 ATTRIBUTES
 
 =head2 api
 
-Instance of the L<API autoloader|OpenXPKI::Server::API2::Autoloader>. Will be
-set automatically.
+Readonly: instance of the L<API autoloader|OpenXPKI::Server::API2::Autoloader>.
 
 =cut
 has api => (
@@ -28,8 +26,8 @@ has api => (
 
 =head2 rawapi
 
-Instance of the L<raw API|OpenXPKI::Server::API2>. Will be injected by the API
-upon instantiation.
+Instance of the L<raw API|OpenXPKI::Server::API2>. Injected by
+L<OpenXPKI::Server::API2/dispatch>.
 
 =cut
 has rawapi => (

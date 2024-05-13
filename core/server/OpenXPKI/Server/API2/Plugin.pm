@@ -17,10 +17,10 @@ use OpenXPKI::Server::API2::PluginMetaClassTrait;
 
 =head1 DESCRIPTION
 
-To define a new API plugin simply say:
+To define a new API plugin:
 
     package OpenXPKI::Server::API2::Plugin::MyTopic::MyActions;
-    use OpenXPKI::Server::API2::Plugin;
+    use OpenXPKI -plugin;
 
     command "aaa" => {
         # parameters
@@ -35,10 +35,9 @@ This will modify your package as follows:
 
 =over
 
-=item * imports C<Moose> (i.e. adds "use Moose;" so you don't have to do it)
+=item * adds C<use Moose;>
 
-=item * provides the L</command> keyword (just an imported sub really) to
-define API commands
+=item * provides the L</command> keyword to define API commands
 
 =item * applies the Moose role L<OpenXPKI::Server::API2::PluginRole>
 
@@ -47,7 +46,7 @@ L<OpenXPKI::Server::API2::PluginMetaClassTrait>
 
 =back
 
-It currently does not seem to be possible to set a custom base class for your
+It does not seem to be possible to set a custom base class for your
 plugin, but you can instead easily add another role to it:
 
     package OpenXPKI::Server::API2::Plugin::MyTopic::MyActions;

@@ -8,10 +8,10 @@ OpenXPKI::Server::API2::PluginMetaClassTrait - Moose metaclass role (aka.
 
 =head2 DESCRIPTION
 
-B<Not intended for direct use.> Please C<use OpenXPKI -plugin> instead.
+B<Not intended for direct use:> please C<use OpenXPKI -plugin> instead.
 
-This role manages API parameters and their specifications for the API plugin classes.
-It will be applied when you say C<use OpenXPKI::Server::API2::Plugin>.
+Manage API parameters and their specifications for the API plugin classes.
+This role/trait is applied by L<OpenXPKI::Server::API2::Plugin>.
 
 =head1 ATTRIBUTES
 
@@ -39,12 +39,12 @@ has param_classes => (
 
 =head2 add_param_specs
 
-Adds parameter specifications for the given API command.
+Add parameter specifications for the given API command.
 
 A new L<Moose::Meta::Class> is created with the name I<${command}_ParamObject>.
-Attributes are added to the class that will hold the API command parameters.
-Type constraints specified via 'matching' are created and attached to the
-attributes.
+Attributes are added to this class which will store the API command parameters.
+Type constraints specified via the L<C<matching>|OpenXPKI::Server::API2::Plugin/command>
+parameter are created and attached to the attributes.
 
 B<Parameters>
 
