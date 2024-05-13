@@ -13,13 +13,6 @@ B<Not intended for direct use:> please C<use OpenXPKI -plugin> instead.
 Manage API parameters and their specifications for the API plugin classes.
 This role/trait is applied by L<OpenXPKI::Server::API2::Plugin>.
 
-=head1 ATTRIBUTES
-
-=head2 param_classes
-
-Returns a I<HashRef>: keys are the API command names and values the auto-generated
-parameter classes of type L<Moose::Meta::Class>.
-
 =head1 METHODS
 
 =head2 command_list
@@ -27,9 +20,20 @@ parameter classes of type L<Moose::Meta::Class>.
 Returns a I<list> with all API command names defined by the API plugin.
 
 =cut
-has param_classes => (
+
+# Command meta information I<HashRef>:
+#     {
+#         'command_1' => {
+#             param_metaclass => Moose::Meta::Class->create(...),
+#             is_protected => 0,
+#         },
+#         'command_2' => {
+#             ...
+#         }
+#     }
+has _command_meta => (
     is => 'rw',
-    isa => 'HashRef[Str]',
+    isa => 'HashRef',
     traits => [ 'Hash' ],
     handles => {
         command_list => 'keys',
@@ -65,17 +69,19 @@ For more details please see L<OpenXPKI::Server::API2::Plugin/command>.
 =back
 
 =cut
-sub add_param_specs {
-    my ($self, $command, $params_specs) = @_;
-
+signature_for add_param_specs => (
+    method => 1,
+    positional => [ 'Str', 'HashRef' ],
+);
+sub add_param_specs ($self, $command, $params_specs) {
     my $param_metaclass = Moose::Meta::Class->create(
-        join("::", $self->name, "${command}_ParamObject"),
+        join("::", $self->name, "${command}_Params"),
     );
 
     # Add API command parameters to the newly created class as Moose attributes
-    for my $param_name (sort keys %{ $params_specs }) {
+    for my $param_name (sort keys $params_specs->%*) {
         # the parameter specs like "isa => ..., required => ..."
-        my $spec = { %{ $params_specs->{$param_name} } }; # copy param to prevent modifying it via delete() below
+        my $spec = { $params_specs->{$param_name}->%* }; # copy params to prevent modifying it via delete() below
 
         OpenXPKI::Exception->throw(
             message => "'isa' must specified when defining an API command parameter",
@@ -106,11 +112,48 @@ sub add_param_specs {
             accessor => $param_name,
             clearer => "clear_${param_name}",
             predicate => "has_${param_name}",
-            %{ $spec },
+            $spec->%*,
         );
     }
     # internally register the new parameter class
-    $self->param_classes->{$command} = $param_metaclass;
+    $self->param_metaclass($command, $param_metaclass);
+}
+
+=head2 param_metaclass
+
+Accessor to set or retrieve a L<Moose::Meta::Class> defining the parameters for
+the given command.
+
+    $self->param_metaclass($cmd);                                  # getter
+    $self->param_metaclass($cmd, Moose::Meta::Class->create(...)); # setter
+
+=cut
+sub param_metaclass ($self, $command, $param_metaclass = undef) {
+    return $self->_set_cmd_meta($command, 'param_metaclass', $param_metaclass);
+}
+
+=head2 is_protected
+
+Accessor to set or retrieve the protection status of the given command.
+
+    $self->is_protected($cmd);      # getter
+    $self->is_protected($cmd, 1);   # setter
+
+=cut
+sub is_protected ($self, $command, $is_protected = undef) {
+    return $self->_set_cmd_meta($command, 'is_protected', $is_protected);
+}
+
+# Getter / Setter for arbitrary command meta data
+sub _set_cmd_meta ($self, $command, $spec, $value) {
+    if (defined $value) {
+        $self->_command_meta->{$command}->{$spec} = $value;
+    } else {
+        die "API command '$command' is not managed by " . __PACKAGE__
+          unless $self->_command_meta->{$command};
+    }
+
+    return $self->_command_meta->{$command}->{$spec};
 }
 
 =head2 new_param_object
@@ -139,17 +182,9 @@ B<Parameters>
 =back
 
 =cut
-sub new_param_object {
-    my ($self, $command, $params) = @_;
+sub new_param_object ($self, $command, $params) {
     ##! 4: "API: new_param_object($command => {".join(", ", map { "$_ => ".$params->{$_} } keys %{ $params })."})"
-
-    my $param_metaclass = $self->param_classes->{$command}
-        or OpenXPKI::Exception->throw (
-            message => "API command $command is not managed by " . __PACKAGE__,
-            params => { command => $command }
-        );
-
-    return $param_metaclass->new_object(%{ $params });
+    return $self->param_metaclass($command)->new_object($params->%*);
 }
 
 # =head2 execute

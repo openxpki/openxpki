@@ -358,13 +358,12 @@ sub __handle_command {
     my $message = shift;
 
     try {
-
-        CTX('dbi')->start_txn();
-        my $result = $self->api()->dispatch(
+        CTX('dbi')->start_txn;
+        my $result = $self->api->dispatch(
             command => $message->command,
             params => $message->params
         );
-        CTX('dbi')->commit();
+        CTX('dbi')->commit;
 
         $result = { result => $result } unless (ref $result eq 'HASH');
 
@@ -390,14 +389,14 @@ sub __handle_protectedcommand {
     my $message = shift;
 
     try {
-
-        CTX('dbi')->start_txn();
-        my $result = $self->api()->dispatch(
+        CTX('dbi')->start_txn;
+        my $result = $self->api->dispatch(
             # TODO rework protected command marker
-            command => '__'.$message->command,
-            params => $message->params
+            command => $message->command,
+            params => $message->params,
+            protected_call => 1,
         );
-        CTX('dbi')->commit();
+        CTX('dbi')->commit;
 
         $result = { result => $result } unless (ref $result eq 'HASH');
 
@@ -427,7 +426,7 @@ sub _init_api {
     # TODO - define ACL handling in void context
     #my $enable_acls = not CTX('config')->get(['api','acl','disabled']);
     return OpenXPKI::Server::API2->new(
-        enable_protected => 1,
+        enable_protection => 1,
         enable_acls => 0, #$enable_acls,
         #acl_rule_accessor => sub { CTX('config')->get_hash(['api','acl', CTX('session')->data->role]) },
     );

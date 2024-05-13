@@ -111,7 +111,7 @@ B<Parameters>
 
 =over
 
-=item * C<$command_name> - name of the API command
+=item * C<$command> - name of the API command
 
 =item * C<$params> - I<HashRef> containing the parameter specifications. Keys
 are the parameter names and values are I<HashRefs> with options.
@@ -130,7 +130,7 @@ You can use all Moose types (I<Str>, I<Int> etc) plus OpenXPKI's own types
 defined in L<OpenXPKI::Types> (C<OpenXPKI::Server::API2>
 automatically imports them).
 
-=item * C<$function> - I<CodeRef> with the command implementation. On invocation
+=item * C<$code_ref> - I<CodeRef> with the command implementation. On invocation
 it gets passed two parameters:
 
 =over
@@ -151,26 +151,34 @@ if you don't know what that means.
 
 =cut
 sub command {
-    my ($meta, $command_name, $params, $code_ref) = @_;
+    my ($meta, $command, $params, $code_ref) = @_;
 
-    # Add a method of the given name to the calling class
-    $meta->add_method($command_name, $code_ref);
-
-    # Add a parameter class (see OpenXPKI::Server::API2::PluginMetaClassTrait)
-    $meta->add_param_specs($command_name, $params);
+    _command($meta, $command, $params, $code_ref, 0);
 }
 
-# copy of command that registers the command with the name starting
-# with two underscores - should be reworked to use roles
+=head2 protected_command
+
+Define a protected API command. All parameters are equivalent to L</command>.
+
+Commands are only protected if L<OpenXPKI::Server::API2/enable_protection> is
+set to TRUE. In this case they can only be called by passing
+C<protected_call =E<gt> 1> to L<OpenXPKI::Server::API2/dispatch>.
+
+
+=cut
 sub protected_command {
+    my ($meta, $command, $params, $code_ref) = @_;
 
-    my ($meta, $command_name, $params, $code_ref) = @_;
-
-    # Add a method of the given name to the calling class
-    $meta->add_method("__$command_name", $code_ref);
-
-    # Add a parameter class (see OpenXPKI::Server::API2::PluginMetaClassTrait)
-    $meta->add_param_specs("__$command_name", $params);
-
+    _command($meta, $command, $params, $code_ref, 1);
 }
+
+#
+sub _command {
+    my ($meta, $command, $params, $code_ref, $is_protected) = @_;
+
+    $meta->add_method($command, $code_ref);    # Add a method to calling class
+    $meta->add_param_specs($command, $params); # Add a parameter class (OpenXPKI::Server::API2::PluginMetaClassTrait)
+    $meta->is_protected($command, $is_protected);    # Set protection flag (OpenXPKI::Server::API2::PluginMetaClassTrait)
+}
+
 1;

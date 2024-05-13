@@ -135,16 +135,19 @@ has enable_acls => (
     default => 1,
 );
 
-=head2 enable_protected
+=head2 enable_protection
 
-Optional: set to TRUE to enable running protected commands
+Optional: set to TRUE to enable protection of commands.
+
+Protected commands are defined via L<C<protected_command()>|OpenXPKI::Server::API2::Plugin/protected_command>
+and must then be called by passing C<protected_call =E<gt> 1> to L</dispatch>.
 
 Default: FALSE
 
 Can only be set via constructor.
 
 =cut
-has enable_protected => (
+has enable_protection => (
     is => 'ro',
     isa => 'Bool',
     default => 0,
@@ -278,12 +281,6 @@ sub _load_plugins {
                     params => { now_file => $file, previous_file => $earlier_file }
                 );
             }
-
-            if (substr($cmd,0,2) eq '__' && not $self->enable_protected) {
-                $self->log->trace("API - skipping protected command $pkg: ".join(", ", $pkg->meta->command_list)." - $file");
-                next;
-            }
-
             $cmd_package_map->{$cmd} = $pkg;
         }
     }
@@ -334,6 +331,9 @@ B<Named parameters>
 
 =item * C<params> - Parameter hash
 
+=item * C<protected_call> - Optional: must be set to TRUE to call a protected
+command while L</enable_protection> is TRUE
+
 =back
 
 =cut
@@ -341,18 +341,29 @@ signature_for dispatch => (
     method => 1,
     named => [
         command => 'Str',
-        params  => 'Optional[ HashRef ]', { default => {} },
+        params => 'Optional[ HashRef ]', { default => {} },
+        protected_call => 'Bool', { default => 0 },
     ],
 );
 sub dispatch ($self, $arg) {
     my $command = $arg->command;
 
+    # Known command?
     my $package = $self->commands->{ $command }
         or OpenXPKI::Exception->throw(
             message => "Unknown API command",
             params => { command => $command, caller => sprintf("%s:%s", ($self->my_caller())[1,2]) },
         );
 
+    # Protected command?
+    if ($package->meta->is_protected($command) and not $arg->protected_call) {
+        OpenXPKI::Exception->throw(
+            message => "Forbidden call to protected API command",
+            params => { command => $command, caller => sprintf("%s:%s", ($self->my_caller())[1,2]) }
+        );
+    }
+
+    # ACL checks / parameter rewriting
     my $all_params;
     if ($self->enable_acls) {
         my $rules = $self->_get_acl_rules($command)
@@ -369,6 +380,7 @@ sub dispatch ($self, $arg) {
 
     $self->log->debug("API call to '$command'") if $self->log->is_debug;
 
+    # Call command method
     my $result;
     try {
 #        $result = $package->meta->execute($self, $command, $all_params);
@@ -414,7 +426,7 @@ sub command_help ($self, $command) {
     ) unless (blessed $meta && $meta->isa('Moose::Meta::Class'));
 
     # This is a 'Moose::Meta::Class' holding attributes and coderef
-    my @attributes = $meta->param_classes->{$command}->get_all_attributes;
+    my @attributes = $meta->param_metaclass($command)->get_all_attributes;
 
     # each item is a 'Moose::Meta::Attribute'
     my %arguments = map {
