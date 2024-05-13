@@ -1,14 +1,20 @@
 package OpenXPKI::Server::API2::PluginRole;
+use OpenXPKI -role;
 
 =head1 NAME
 
 OpenXPKI::Server::API2::PluginRole - Base role for API plugins
 
-=cut
+=head1 DESCRIPTION
 
-use Moose::Role;
+B<Not intended for direct use.> Please C<use OpenXPKI::Server::API2::EasyPlugin;>
+instead.
 
-use OpenXPKI::Types;
+This role accesses the metadata that is provided by meta class role
+L<OpenXPKI::Server::API2::PluginMetaClassTrait>.
+
+Therefore it expects the consuming class to also have
+L<OpenXPKI::Server::API2::PluginMetaClassTrait> applied.
 
 =head1 ATTRIBUTES
 
@@ -38,33 +44,38 @@ has rawapi => (
     required => 1,
 );
 
-=head1 REQUIRES
+=head1 METHODS
 
-This role requires the consuming class to implement the following methods:
+=cut
+
+sub BUILD {} # overridden by consuming class' BUILD method (if any)
+after BUILD => sub ($self, $args) {
+    # ensure we have the meta class methods provided by OpenXPKI::Server::API2::PluginMetaClassTrait
+    die sprintf $self->meta->name . '\'s meta class does not consume OpenXPKI::Server::API2::PluginMetaClassTrait'
+      unless $self->meta->meta->does_role('OpenXPKI::Server::API2::PluginMetaClassTrait');
+};
 
 =head2 commands
 
-Must return an I<ArrayRef> with the names of all API commands that this class
-implements (i.e. that can be passed to L<execute>).
+Returns the list of commands that the plugin package contains.
 
 =cut
-requires 'commands';
+sub commands ($self) {
+    return [ $self->meta->command_list ]; # provided by OpenXPKI::Server::API2::PluginMetaClassTrait
+}
 
 =head2 execute
 
-Must execute the given API command.
-
-B<Parameters>
-
-=over
-
-=item * C<$command> - API command I<Str>
-
-=item * C<%params> - parameter I<HashRef>
-
-=back
+Executes the given API command.
 
 =cut
-requires 'execute';
+signature_for execute => (
+    method => 1,
+    positional => [ 'Str', 'HashRef' ],
+);
+sub execute ($self, $command, $params) {
+    my $param_obj = $self->meta->new_param_object($command, $params); # provided by OpenXPKI::Server::API2::PluginMetaClassTrait
+    return $self->$command($param_obj);
+}
 
 1;

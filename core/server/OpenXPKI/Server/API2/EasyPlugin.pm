@@ -11,8 +11,8 @@ use Moose ();
 use Moose::Exporter;
 
 # Project modules
-use OpenXPKI::Server::API2::EasyPluginRole;
-use OpenXPKI::Server::API2::EasyPluginMetaClassTrait;
+use OpenXPKI::Server::API2::PluginRole;
+use OpenXPKI::Server::API2::PluginMetaClassTrait;
 
 
 =head1 DESCRIPTION
@@ -40,10 +40,10 @@ This will modify your package as follows:
 =item * provides the L</command> keyword (just an imported sub really) to
 define API commands
 
-=item * applies the Moose role L<OpenXPKI::Server::API2::EasyPluginRole>
+=item * applies the Moose role L<OpenXPKI::Server::API2::PluginRole>
 
 =item * applies the Moose metaclass role (aka. "trait")
-L<OpenXPKI::Server::API2::EasyPluginMetaClassTrait>
+L<OpenXPKI::Server::API2::PluginMetaClassTrait>
 
 =back
 
@@ -59,9 +59,9 @@ plugin, but you can instead easily add another role to it:
 Moose::Exporter->setup_import_methods(
     also => [ "Moose" ],
     with_meta => [ "command", "protected_command" ],
-    base_class_roles => [ "OpenXPKI::Server::API2::EasyPluginRole" ],
+    base_class_roles => [ "OpenXPKI::Server::API2::PluginRole" ],
     class_metaroles => {
-        class => [ 'OpenXPKI::Server::API2::EasyPluginMetaClassTrait' ],
+        class => [ 'OpenXPKI::Server::API2::PluginMetaClassTrait' ],
     },
 );
 
@@ -158,7 +158,7 @@ sub command {
     # Add a method of the given name to the calling class
     $meta->add_method($command_name, $code_ref);
 
-    # Add a parameter class (see OpenXPKI::Server::API2::EasyPluginMetaClassTrait)
+    # Add a parameter class (see OpenXPKI::Server::API2::PluginMetaClassTrait)
     $meta->add_param_specs($command_name, $params);
 }
 
@@ -171,7 +171,7 @@ sub protected_command {
     # Add a method of the given name to the calling class
     $meta->add_method("__$command_name", $code_ref);
 
-    # Add a parameter class (see OpenXPKI::Server::API2::EasyPluginMetaClassTrait)
+    # Add a parameter class (see OpenXPKI::Server::API2::PluginMetaClassTrait)
     $meta->add_param_specs("__$command_name", $params);
 
 }

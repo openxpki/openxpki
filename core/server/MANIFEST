@@ -299,9 +299,8 @@ OpenXPKI/Server.pm
 OpenXPKI/Server/API2.pm
 OpenXPKI/Server/API2/Autoloader.pm
 OpenXPKI/Server/API2/EasyPlugin.pm
-OpenXPKI/Server/API2/EasyPluginMetaClassTrait.pm
-OpenXPKI/Server/API2/EasyPluginRole.pm
 OpenXPKI/Server/API2/TenantRole.pm
+OpenXPKI/Server/API2/PluginMetaClassTrait.pm
 OpenXPKI/Server/API2/PluginRole.pm
 OpenXPKI/Server/API2/Types.pm
 OpenXPKI/Server/API2/Plugin/tenant_handler.pm

@@ -80,7 +80,7 @@ more precise) is available via C<CTX('api2')>.
 This class acts as a dispatcher (single entrypoint) to execute API commands via
 L<dispatch>.
 
-It makes available all API commands defined in the C<OpenXPKI::Server::API2::Plugin>
+It makes available all API commands defined in the C<OpenXPKI::Server::API2::EasyPlugin>
 namespace.
 
 For easy access to the API commands you should use the autoloader instance
@@ -89,7 +89,7 @@ returned by L</autoloader>.
 =head2 Create a plugin class
 
 Standard (and easy) way to define a new plugin class with API commands: create
-a new package in the C<OpenXPKI::Server::API2::Plugin> namespace (any
+a new package in the C<OpenXPKI::Server::API2::EasyPlugin> namespace (any
 deeper hierarchy is okay) and in your package use
 L<OpenXPKI::Server::API2::EasyPlugin> as described there.
 
@@ -185,7 +185,7 @@ has acl_rule_accessor => (
 Optional: Perl package namespace that will be searched for the command plugins
 (classes).
 
-Default: C<OpenXPKI::Server::API2::Plugin>
+Default: C<OpenXPKI::Server::API2::EasyPlugin>
 
 Example:
 
@@ -668,7 +668,7 @@ B<Parameters>
 
 =over
 
-=item * C<$namespace> - Perl namespace (e.g. C<OpenXPKI::Server::API2::Plugin>)
+=item * C<$namespace> - Perl namespace (e.g. C<OpenXPKI::Server::API2::EasyPlugin>)
 
 =back
 
@@ -826,29 +826,20 @@ it.
 
 =item * B<One or more commands per class>:
 
-Each plugin class can specify one or
-more API commands. This allows to keep helper functions that are shared between
-several API commands close to the command code. It also helps reducing the
-number of individual Perl module files.
+Each plugin class can specify one or more API commands. This allows to keep
+helper functions that are shared between several API commands close to the
+command code. It also helps reducing the number of individual Perl module files.
 
 =item * B<No base class>:
 
-When you use L<OpenXPKI::Server::API2::EasyPlugin> to
-define a plugin class all functionality is added via Moose roles instead of
-a base class. This allows for plugin classes to be based on any other classes
-if needed.
+When you use L<OpenXPKI::Server::API2::EasyPlugin> to define a plugin class all
+functionality is added via Moose roles instead of a base class. This allows for
+plugin classes to be based on any other classes if needed.
 
 =item * B<Standard magic>:
 
-Syntactic sugar and helper functions only use Moose's
-standard way to e.g. customize meta classes or inject roles. No other black
-magic is used.
-
-=item * B<Breakout allowed>:
-
-Using L<OpenXPKI::Server::API2::EasyPlugin> is not
-a must, API plugins might be implemented differently by manually adding the role
-L<OpenXPKI::Server::API2::PluginRole> to a plugin class.
+Syntactic sugar and helper functions only use Moose's standard way to e.g.
+customize meta classes or inject roles. No other black magic is used.
 
 =back
 
