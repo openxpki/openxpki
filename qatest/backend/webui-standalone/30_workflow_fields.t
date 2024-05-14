@@ -8,7 +8,7 @@ use FindBin qw( $Bin );
 use File::Temp qw( tempdir );
 
 # CPAN modules
-use Test::Deep;
+use Test::Deep ':v1';
 use CGI::Session;
 
 #use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Client::UI::Workflow'} = 100;

@@ -8,7 +8,7 @@ use FindBin qw( $Bin );
 
 # CPAN modules
 use Test::More;
-use Test::Deep;
+use Test::Deep ':v1';
 use Test::Exception;
 
 use lib $Bin, "$Bin/../../lib", "$Bin/../../../core/server/t/lib";

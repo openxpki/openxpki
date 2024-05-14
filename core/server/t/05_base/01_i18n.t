@@ -6,7 +6,7 @@ use FindBin qw( $Bin );
 
 use Test::More;
 use Test::Exception;
-use Test::Deep;
+use Test::Deep ':v1';
 
 use Log::Log4perl qw( :easy );
 Log::Log4perl->easy_init($FATAL);

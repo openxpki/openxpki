@@ -10,7 +10,7 @@ use File::Temp qw( tempfile );
 
 # CPAN modules
 use Test::More;
-use Test::Deep;
+use Test::Deep ':v1';
 use Test::Exception;
 
 #use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Workflow::Validator::BasicFieldType.*'} = 32;

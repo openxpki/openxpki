@@ -15,7 +15,7 @@ use MockUI;
 #Log::Log4perl->easy_init($DEBUG);
 Log::Log4perl->easy_init($ERROR);
 
-use Test::Deep;
+use Test::Deep ':v1';
 use Test::More tests => 6;
 
 package main;

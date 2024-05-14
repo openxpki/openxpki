@@ -9,7 +9,7 @@ use File::Temp qw( tempfile );
 
 # CPAN modules
 use Test::More tests => 6;
-use Test::Deep;
+use Test::Deep ':v1';
 use Test::Exception;
 
 #use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Workflow::Validator::PasswordQuality.*'} = 100;

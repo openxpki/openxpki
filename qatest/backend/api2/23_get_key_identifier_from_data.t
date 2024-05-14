@@ -10,7 +10,7 @@ use MIME::Base64;
 
 # CPAN modules
 use Test::More;
-use Test::Deep;
+use Test::Deep ':v1';
 use Test::Exception;
 
 # Project modules

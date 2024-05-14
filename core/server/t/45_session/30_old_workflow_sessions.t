@@ -10,7 +10,7 @@ use File::Temp qw( tempdir );
 # CPAN modules
 use Test::More;
 use Test::Exception;
-use Test::Deep;
+use Test::Deep ':v1';
 
 # Project modules
 use lib "$Bin/../lib";

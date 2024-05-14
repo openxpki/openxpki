@@ -8,7 +8,7 @@ use FindBin qw( $Bin );
 
 # CPAN modules
 use Test::More;
-use Test::Deep;
+use Test::Deep ':v1';
 use Test::Exception;
 
 #use OpenXPKI::Debug; BEGIN { $OpenXPKI::Debug::LEVEL{'OpenXPKI::Crypto::Secret.*'} = 100 }

@@ -4,7 +4,7 @@ use warnings;
 # Core modules
 use Test::More tests => 17;
 use Test::Exception;
-use Test::Deep;
+use Test::Deep ':v1';
 
 # CPAN modules
 use Log::Log4perl qw(:easy);

@@ -29,7 +29,7 @@ use English;
 # CPAN modules
 use Test::More;
 use Test::Exception;
-use Test::Deep;
+use Test::Deep ':v1';
 
 # Project modules
 use Log::Log4perl qw(:easy);

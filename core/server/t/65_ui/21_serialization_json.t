@@ -4,7 +4,7 @@ use warnings;
 # Core modules
 use Test::More tests => 4;
 use Test::Exception;
-use Test::Deep;
+use Test::Deep ':v1';
 
 BEGIN { use_ok( 'OpenXPKI::Serialization::JSON' ); }
 

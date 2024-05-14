@@ -10,7 +10,7 @@ use TAP::Parser::YAMLish::Writer;
 # CPAN modules
 use Test::More;
 use Test::Exception;
-use Test::Deep;
+use Test::Deep ':v1';
 use Log::Log4perl qw(:easy);
 
 # Project modules

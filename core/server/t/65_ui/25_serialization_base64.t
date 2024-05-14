@@ -4,7 +4,7 @@ use warnings;
 # Core modules
 use Test::More tests => 6;
 use Test::Exception;
-use Test::Deep;
+use Test::Deep ':v1';
 use MIME::Base64;
 
 BEGIN { use_ok( 'OpenXPKI::Serialization::Simple' ); }
