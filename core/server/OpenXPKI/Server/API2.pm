@@ -26,6 +26,7 @@ B<Default usage>:
 
     my $api = OpenXPKI::Server::API2->new(
         acl_rule_accessor => sub { CTX('config')->get('acl.rules.' . CTX('session')->data->role ) },
+        log => OpenXPKI::Server::Log->new(CONFIG => '')->system,
     );
     printf "Available commands: %s\n", join(", ", keys %{$api->commands});
 
@@ -88,16 +89,13 @@ have meta class role L<OpenXPKI::Server::API2::PluginMetaClassTrait> applied.
 
 =head2 log
 
-Optional: L<Log::Log4perl::Logger>.
-
-Default: C<OpenXPKI::Server::Log-E<gt>new(CONFIG =E<gt> undef)-E<gt>system>.
+Required: L<Log::Log4perl::Logger>.
 
 =cut
 has log => (
-    is => 'rw',
+    is => 'ro',
     isa => 'Log::Log4perl::Logger',
-    lazy => 1,
-    default => sub { OpenXPKI::Server::Log->new(CONFIG => undef)->system }, # CONFIG => undef: reuse existing Log4Perl config
+    required => 1,
 );
 
 =head2 autoloader

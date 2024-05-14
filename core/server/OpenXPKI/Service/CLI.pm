@@ -429,6 +429,7 @@ sub _init_api {
         enable_protection => 1,
         enable_acls => 0, #$enable_acls,
         #acl_rule_accessor => sub { CTX('config')->get_hash(['api','acl', CTX('session')->data->role]) },
+        log => CTX('log')->system,
     );
 }
 

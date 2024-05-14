@@ -618,6 +618,7 @@ sub __handle_COMMAND : PRIVATE {
         $api{$ident} = OpenXPKI::Server::API2->new(
             enable_acls => $enable_acls,
             acl_rule_accessor => sub { CTX('config')->get_hash(['api','acl', CTX('session')->data->role]) },
+            log => CTX('log')->system,
         );
     }
 
