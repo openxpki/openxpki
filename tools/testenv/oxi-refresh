@@ -65,6 +65,9 @@ OPTIONS
     --no-compile
         Skip compiling XS code parts.
 
+    --no-ee
+        Skip enterprise code.
+
     --fast
         Shortcut for "--no-i18n --no-compile --no-dbconfig".
 
@@ -88,6 +91,7 @@ oxi_install_params=()
 [[ "${@#--full}" != "$@" ]]       && IS_FULLCONFIG=1
 [[ "${@#--no-i18n}" != "$@" ]]    && oxi_install_params+=(--no-i18n)
 [[ "${@#--no-compile}" != "$@" ]] && oxi_install_params+=(--no-compile)
+[[ "${@#--no-ee}" != "$@" ]]      && oxi_install_params+=(--no-ee)
 
 echo "[$([ "$IS_FULLCONFIG" -eq 1 ] && echo "X" || echo " ")] Recreate DB and certs, wipe config"
 echo "[$([ "$IS_RESTART" -eq 1 ] && echo "X" || echo " ")] Restart OpenXPKI & Apache"

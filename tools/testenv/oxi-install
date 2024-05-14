@@ -63,6 +63,7 @@ set -e
 PARAMS=""
 IS_I18N=1
 IS_COMPILE=1
+COPY_EE_CODE=1
 while (( "$#" )); do
     case "$1" in
         --no-i18n)
@@ -71,6 +72,10 @@ while (( "$#" )); do
         ;;
         --no-compile)
             IS_COMPILE=0
+            shift
+            ;;
+        --no-ee)
+            COPY_EE_CODE=0
             shift
             ;;
         --fast)
@@ -152,10 +157,19 @@ echo "- synchronize source code from host to $OXI_CORE_DIR"
 rsync -a --delete "${rsync_exclude[@]}" $OXI_SOURCE_DIR/core/ $OXI_CORE_DIR >$LOG 2>&1
 
 # Copy EE Perl modules
-if [ -d $OXI_EE_SOURCE_DIR/opt/myperl/site_perl/OpenXPKI ]; then
+if [[ $COPY_EE_CODE -eq 1 && -d $OXI_EE_SOURCE_DIR/opt/myperl/site_perl/OpenXPKI ]]; then
     echo "  --> incl. EE code"
     rsync -a $OXI_EE_SOURCE_DIR/opt/myperl/site_perl/  $OXI_CORE_DIR/server/ >$LOG 2>&1
 fi
+
+# Set version so Makefile.PL does not need "vergen" (which we will not copy to $OXI_CORE_DIR)
+OXI_VERSION=$(cat $OXI_SOURCE_DIR/.VERSION_MAJOR <(echo .) $OXI_SOURCE_DIR/.VERSION_MINOR <(echo .) $OXI_SOURCE_DIR/.VERSION_RELEASE | tr -d "\n" )
+cat <<__VERSION > $OXI_CORE_DIR/server/OpenXPKI/VERSION.pm
+package OpenXPKI::VERSION;
+our \$VERSION = '$OXI_VERSION';
+1;
+__VERSION
+echo "- OpenXPKI version: $OXI_VERSION"
 
 # Copy web UI files
 echo "- synchronize UI code"
@@ -163,19 +177,21 @@ rsync -a --delete "${rsync_exclude[@]}" $OXI_SOURCE_DIR/core/server/htdocs/ /var
 rsync -a --delete "${rsync_exclude[@]}" $OXI_SOURCE_DIR/core/server/cgi-bin/ /usr/lib/cgi-bin/ >$LOG 2>&1
 
 # Copy EE web UI files
-if [ -d $OXI_EE_SOURCE_DIR/opt/myperl/share/cgi-bin ]; then
-    echo -e "  --> incl. EE code"
-    rsync -a $OXI_EE_SOURCE_DIR/opt/myperl/share/cgi-bin/ /usr/lib/cgi-bin/ >$LOG 2>&1
-fi
+if [ $COPY_EE_CODE -eq 1 ]; then
+    if [ -d $OXI_EE_SOURCE_DIR/opt/myperl/share/cgi-bin ]; then
+        echo -e "  --> incl. EE code"
+        rsync -a $OXI_EE_SOURCE_DIR/opt/myperl/share/cgi-bin/ /usr/lib/cgi-bin/ >$LOG 2>&1
+    fi
 
-# Copy EE /usr files (must be done after copying files with "rsync -a --delete ... /usr/lib/cgi-bin")
-if [ -d $OXI_EE_SOURCE_DIR/usr ]; then
-    echo -e "- synchronize EE /usr files"
-    rsync -a $OXI_EE_SOURCE_DIR/usr/ /usr/ >$LOG 2>&1
+    # Copy EE /usr files (must be done after copying files with "rsync -a --delete ... /usr/lib/cgi-bin")
+    if [ -d $OXI_EE_SOURCE_DIR/usr ]; then
+        echo -e "- synchronize EE /usr files"
+        rsync -a $OXI_EE_SOURCE_DIR/usr/ /usr/ >$LOG 2>&1
+    fi
 fi
 
 # Copy EE scripts
-if [ -d $OXI_EE_SOURCE_DIR/opt/myperl/bin ]; then
+if [[ $COPY_EE_CODE -eq 1 && -d $OXI_EE_SOURCE_DIR/opt/myperl/bin ]]; then
     echo "- synchronize EE scripts and add them to Makefile.PL:"
     rsync -a $OXI_EE_SOURCE_DIR/opt/myperl/bin/ $OXI_CORE_DIR/server/bin/ >$LOG 2>&1
 
@@ -195,14 +211,6 @@ if [[ -n "$OXI_TEST_SAMPLECONFIG_DIR" && -e $OXI_TEST_SAMPLECONFIG_DIR/contrib/h
     mkdir -p /var/www/static/_global
     cp $OXI_TEST_SAMPLECONFIG_DIR/contrib/home.html /var/www/static/_global/home.html
 fi
-
-# Set version so Makefile.PL does not need "vergen" (which we will not copy to $OXI_CORE_DIR)
-OXI_VERSION=$(cat $OXI_SOURCE_DIR/.VERSION_MAJOR <(echo .) $OXI_SOURCE_DIR/.VERSION_MINOR <(echo .) $OXI_SOURCE_DIR/.VERSION_RELEASE | tr -d "\n" )
-cat <<__VERSION > $OXI_CORE_DIR/server/OpenXPKI/VERSION.pm
-package OpenXPKI::VERSION;
-our \$VERSION = '$OXI_VERSION';
-1;
-__VERSION
 
 echo "- purge installed code"
 perl -e 'use v5.10; say for grep { -d && /^[^\.]/ } @INC' |\
