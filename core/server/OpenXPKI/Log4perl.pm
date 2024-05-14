@@ -56,7 +56,7 @@ B<Parameters:>
 
 =item * C<$config>
 
-configuration: file path, reference to SCALAR or HashRef or empty string
+configuration: file path, ScalarRef, HashRef or empty string
 
 =item * C<$fallback_prio>
 
@@ -67,8 +67,8 @@ the given config (optional, default: WARN)
 
 If the first parameter is undef or the config file is not found, the
 constructor will print a warning message. So if you are fine with the default
-screen logger, pass an empty string as first an, optional, the wanted log
-level as second parameter.
+screen logger, pass an empty string as C<$config> and, optionally, the desired
+log level as C<$fallback_prio>.
 
 =cut
 
@@ -85,23 +85,23 @@ sub init_or_fallback {
 
     my @warnings = ();
 
-    # config is set and not empty
-    if ($config) {
-        if (!ref $config) {
-            if (!-f $config) {
+    # Error checks
+    if ($config) { # config is set and not empty
+        if (not ref $config) {
+            if (not -f $config) {
                 push @warnings, "Log4perl configuration file $config not found";
                 $config = undef;
             }
-        } elsif (!(ref $config eq 'SCALAR' or ref $config eq 'HASH')) {
+        } elsif (ref $config ne 'SCALAR' and ref $config ne 'HASH') {
             push @warnings, "Unsupported format for Log4perl configuration (expected: filename, ScalarRef or HashRef)";
             $config = undef;
         }
-    # pass an empty string to tell us you are fine with the default logger
-    } elsif (!defined $config) {
+    } elsif (not defined $config) {
         # if not initialized: complain and init screen logger
         push @warnings, "Initializing Log4perl in fallback mode (output to STDERR)";
     }
 
+    # Fallback default
     $config = {
         "log4perl.rootLogger" => uc($fallback_prio).", SCREEN",
         "log4perl.appender.SCREEN" => "Log::Log4perl::Appender::Screen",
@@ -110,7 +110,7 @@ sub init_or_fallback {
     } unless($config);
 
     Log::Log4perl->init($config);
-    Log::Log4perl->get_logger("")->warn($_) for @warnings;
+    Log::Log4perl->get_logger('')->warn($_) for @warnings;
 
 }
 
@@ -152,5 +152,3 @@ sub get_logger {
 }
 
 1;
-
-__END__;
