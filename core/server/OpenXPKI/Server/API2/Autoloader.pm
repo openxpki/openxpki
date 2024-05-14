@@ -1,6 +1,8 @@
 package OpenXPKI::Server::API2::Autoloader;
-use strict;
-use warnings;
+use OpenXPKI -class;
+
+# Project modules
+use OpenXPKI::Server::API2;
 
 =head1 NAME
 
@@ -14,27 +16,14 @@ instead.
 
 =cut
 
-# Project modules
-use OpenXPKI::Exception;
+has api => (
+    is => 'ro',
+    isa => 'OpenXPKI::Server::API2',
+    required => 1,
+);
 
-
-sub new {
-    my $class = shift;
-    my %args = @_;
-
-    OpenXPKI::Exception->throw(__PACKAGE__."->new() is a constructor, not an instance method")
-        if ref $class;
-
-    OpenXPKI::Exception->throw("Error in call to ".__PACKAGE__."->new(): parameter 'api' missing or not of type OpenXPKI::Server::API2")
-        unless ($args{api} and ref $args{api} and $args{api}->isa("OpenXPKI::Server::API2"));
-
-    return bless { %args }, $class;
-}
-
-sub AUTOLOAD {
-    my ($self, @args) = @_;
-
-    our $AUTOLOAD; # $AUTOLOAD is a magic var containing the full name of the requested sub
+sub AUTOLOAD ($self, @args) {
+    our $AUTOLOAD; # $AUTOLOAD is a magic variable containing the full name of the requested sub
     my $command = $AUTOLOAD;
     $command =~ s/.*:://;
     return if $command eq "DESTROY";
@@ -51,10 +40,10 @@ sub AUTOLOAD {
             params => { command => $command },
         );
     }
-    $self->{api}->dispatch(
+    $self->api->dispatch(
         command => $command,
         params => { @args },
     );
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
