@@ -3,13 +3,14 @@ use strict;
 use warnings;
 
 # CPAN modules
-use Log::Log4perl qw(:easy);
+use Log::Log4perl qw( :easy );
 use Mojo::Server::Prefork;
 use Mojo::Util qw( extract_usage getopt url_escape );
 use Mojo::File;
 
 # Project modules
 use OpenXPKI::Util;
+use OpenXPKI::Log4perl;
 
 my ($help, $development);
 
@@ -26,13 +27,19 @@ my $enc_path = url_escape(Mojo::File->new('/run/openxpki-client.sock'));
 
 $ENV{MOJO_MODE} = 'production' unless $development;
 
+Log::Log4perl->easy_init($ENV{MOJO_MODE} eq 'production' ? $WARN : $DEBUG) unless Log::Log4perl->initialized;
+
 my $daemon = Mojo::Server::Prefork->new(
     listen => ["http+unix://$enc_path"],
     reverse_proxy => 1,
 );
 
-$daemon->build_app('OpenXPKI::Client::Web');
-#$daemon->load_app("$Bin/healthcheck.pl");
+$daemon->build_app('OpenXPKI::Client::Web' => {
+    # "root" client logger
+    log => OpenXPKI::Log4perl->get_logger('openxpki.client'),
+    # config object
+    #oxi_config_obj => ...,
+});
 
 $daemon->start; # socketfile will be created only after this
 

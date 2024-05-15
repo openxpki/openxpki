@@ -146,8 +146,6 @@ sub get_logger {
     # argument instead of the class name
     unshift (@args, $class) if $class ne __PACKAGE__;
 
-    die "get_logger() is only implemented for client side use for now" unless caller(0) =~ /^OpenXPKI::Client/;
-
     return OpenXPKI::Log4perl::MojoLogger->get_logger(@args);
 }
 

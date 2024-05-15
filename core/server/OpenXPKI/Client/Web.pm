@@ -7,20 +7,16 @@ use Module::Load ();
 
 # CPAN modules
 use Mojo::Util qw( url_unescape encode tablify );
-use Log::Log4perl qw( :easy );
 
 # Project modules
 use OpenXPKI::Client::Config;
-use OpenXPKI::Log4perl;
 
 
 my $socketfile = $ENV{OPENXPKI_CLIENT_SOCKETFILE} || '/var/openxpki/openxpki.socket';
 
 
 sub startup ($self) {
-    # Set "root" client logger
-    Log::Log4perl->easy_init($ENV{MOJO_MODE} eq 'production' ? $WARN : $DEBUG) unless Log::Log4perl->initialized;
-    $self->log(OpenXPKI::Log4perl->get_logger('openxpki.client'));
+    #my $config = $self->{oxi_config_obj} or die 'Missing parameter "oxi_config_obj" to ' . __PACKAGE__ . '->new()';
 
     #$self->secrets(['Mojolicious rocks']);
 
