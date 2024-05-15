@@ -135,12 +135,19 @@ sub register_login {
         deserialize => 'simple',
     );
 
+    my $userinfo = $handle->userinfo();
+    # in case the userinfo hash is not set, create it and write back
+    if (!defined $userinfo) {
+        $userinfo = {};
+        $handle->userinfo($userinfo);
+    }
+
     if ($dp_val) {
         my $val = $dp_val->{value};
-        $handle->userinfo()->{last_login} = $val->{last_login};
+        $userinfo->{last_login} = $val->{last_login};
         $self->log->trace('Got last_login from datapool: ' . Dumper $val) if ($self->log->is_trace);
     } else {
-        $handle->userinfo()->{last_login} = time();
+        $userinfo->{last_login} = time();
         $self->log->trace('No last_login found');
     }
 
