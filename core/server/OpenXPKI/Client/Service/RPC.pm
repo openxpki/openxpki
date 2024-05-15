@@ -170,8 +170,8 @@ sub send_response ($self, $c, $response) {
             $c->res->headers->add('-retry-after' => $response->retry_after);
         }
     } else {
-        $self->res->code('200');
-        $self->res->message('OK');
+        $c->res->code('200');
+        $c->res->message('OK');
     }
 
     # plain text
