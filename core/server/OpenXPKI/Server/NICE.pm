@@ -251,7 +251,7 @@ sub __import_chain {
         ##! 8: 'New intermediate was imported ' . $issuer_identifier
         if (my $issuer_group = $self->register_issuer()) {
             ##! 8: 'Register as issuer in ' . $issuer_group
-            my $issuer_alias = CTX('api2')->register_alias(
+            my $issuer_alias = CTX('api2')->create_alias(
                 identifier =>  $issuer_identifier,
                 alias_group => $issuer_group,
             );
