@@ -39,7 +39,7 @@ sub startup ($self) {
     );
 
     # my $services = $self->oxi_config->list_services;
-    my $services = [ qw( healthcheck est rpc scep acme ) ];
+    my $services = [ qw( healthcheck est rpc scep ) ];
 
     for my $service ($services->@*) {
         # fetch the class that consumes OpenXPKI::Client::Service::Role::Info
