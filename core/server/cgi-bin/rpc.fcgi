@@ -119,6 +119,7 @@ while (my $cgi = CGI::Fast->new("")) {
     }
 
     my $client = OpenXPKI::Client::Service::RPC->new(
+        service_name => 'rpc',
         config_obj => $config,
         apache_env => \%ENV,
         remote_address => $ENV{REMOTE_ADDR},

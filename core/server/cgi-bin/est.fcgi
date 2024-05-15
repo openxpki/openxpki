@@ -62,6 +62,7 @@ while (my $cgi = CGI::Fast->new("")) {
     }
 
     my $client = OpenXPKI::Client::Service::EST->new(
+        service_name => 'est',
         config_obj => $config,
         apache_env => \%ENV,
         remote_address => $ENV{REMOTE_ADDR},

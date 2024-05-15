@@ -6,8 +6,6 @@ with qw(
     OpenXPKI::Client::Service::Role::Base
 );
 
-sub service_name { 'rpc' } # required by OpenXPKI::Client::Service::Role::Base
-
 # Core modules
 use Exporter qw( import );
 use JSON::PP;

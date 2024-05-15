@@ -1,7 +1,6 @@
 package OpenXPKI::Client::Service::Role::Base;
 use OpenXPKI qw( -role -typeconstraints );
 
-requires 'service_name';
 requires 'declare_routes';
 requires 'prepare';
 requires 'send_response';
@@ -55,6 +54,27 @@ use OpenXPKI::i18n qw( i18nGettext );
 
 =head2 ATTRIBUTES
 
+=head3 service_name
+
+Internal name of the service that the class implements. Used e.g.
+
+=over
+
+=item * for configuration lookups,
+
+=item * to create the C<Log4perl> logger,
+
+=item * as part of the fallback workflow name in L</handle_property_request>.
+
+=back
+
+=cut
+has service_name => (
+    is => 'ro',
+    isa => 'Str',
+    required => 1,
+);
+
 =head3 operation
 
 Defines the requested PKI operation (service specific). Used e.g.
@@ -84,22 +104,6 @@ has operation => (
 =head2 REQUIRED METHODS
 
 The consuming class needs to implement the following methods.
-
-=head3 service_name
-
-Must return the name of the service that the class implements. Used e.g.
-
-=over
-
-=item * for configuration lookups,
-
-=item * to create the C<Log4perl> logger,
-
-=item * as part of the fallback workflow name in L</handle_property_request>.
-
-=back
-
-    sub service_name { 'xproto' }
 
 =head3 declare_routes
 

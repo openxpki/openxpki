@@ -6,8 +6,6 @@ with qw(
     OpenXPKI::Client::Service::Role::Base
 );
 
-sub service_name { 'healthcheck' } # required by OpenXPKI::Client::Service::Role::Base
-
 # Core modules
 use List::Util qw( any );
 

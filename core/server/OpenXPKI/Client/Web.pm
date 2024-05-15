@@ -27,8 +27,12 @@ sub startup ($self) {
     # Helpers
     $self->helper(oxi_config => $self->can('helper_oxi_config'));
 
+    #
     # Routes
-    my $r = $self->routes->to( # some common stash values / config
+    #
+
+    # some common stash values / config
+    $self->routes->to(
         namespace => '',
         controller => 'OpenXPKI::Client::Web::Controller',
         action => 'index',
@@ -40,9 +44,12 @@ sub startup ($self) {
     for my $service ($services->@*) {
         # fetch the class that consumes OpenXPKI::Client::Service::Role::Info
         my $class = $self->_load_service_class($service) or next;
-        $self->log->info(sprintf 'Define routes for service "%s"', $service);
-        my $declare_routes = $class->can('declare_routes'); # best way to invoke method on dynamic class
-        $declare_routes->($r); # call method
+        # inject "service_name" into stash, but only for this route
+        my $child_route = $self->routes->under(sub ($c) { $c->stash(service_name => $service) });
+        # ->can() is the best way to invoke a method on a dynamic class
+        my $declare_routes = $class->can('declare_routes');
+        # call declare_routes()
+        $declare_routes->($child_route);
     }
 
     if ($self->log->is_debug) {
@@ -52,8 +59,10 @@ sub startup ($self) {
         $self->log->debug($_) for map { "  $_" } split "\n", tablify($rows);
     }
 
-    # Mojolicious server start hook
-    $self->hook(before_server_start => sub ($server, $app) {
+    #
+    # Logging on server start / shutdown
+    #
+    $self->hook(before_server_start => sub ($server, $app) { # Mojolicious server start hook
         $self->log->debug(sprintf 'Start OpenXPKI HTTP server in "%s" mode (pid %s)', $self->mode, $$);
 
         my $on_finish = sub {
@@ -72,14 +81,21 @@ sub startup ($self) {
         }
     });
 
-
-    $self->hook(before_dispatch => sub ($c) {
+    #
+    # Inject query string and Apache ENV from our custom HTTP headers
+    #
+    $self->hook(before_dispatch => sub ($c) { # Mojolicious request dispatch hook
         $self->log->trace(sprintf 'Incoming %s request', uc($c->req->url->base->protocol)); # ->protocol: Normalized version of ->scheme
 
+        if ($self->mode eq 'development') {
+            $self->log->trace('Development mode: enforce HTTPS');
+            $c->req->url->base->scheme('https');
+        }
+
+        # Inject forwarded Apache ENV into Mojo::Request
         $self->log->error("Missing header X-OpenXPKI-Apache-ENVSET - Apache setup seems to be incomplete")
             unless $c->req->headers->header('X-OpenXPKI-Apache-ENVSET');
 
-        # Inject forwarded Apache ENV into Mojo::Request
         my $headers = $c->req->headers->to_hash;
         my $apache_env = {};
         for my $header (sort keys $headers->%*) {
@@ -102,11 +118,6 @@ sub startup ($self) {
             my $query = url_unescape($query_escaped);
             $c->req->url->query($query);
             $self->log->trace("Apache QUERY_STRING received via header: $query");
-        }
-
-        if ($self->mode eq 'development') {
-            $self->log->trace('Development mode: enforce HTTPS');
-            $c->req->url->base->scheme('https');
         }
     });
 }
@@ -148,10 +159,11 @@ sub _load_service_class ($self, $service) {
         die sprintf 'Class "%s" must consume role OpenXPKI::Client::Service::Role::Info', $pkg
             unless $pkg->DOES('OpenXPKI::Client::Service::Role::Info');
 
+        $self->log->debug(sprintf 'Service "%s": enabled (%s)', $service, $pkg);
         return $pkg;
     }
 
-    $self->log->warn(sprintf 'Unsupported service "%s": no class found (OpenXPKI::Client::Service::*)', $service);
+    $self->log->warn(sprintf 'Service "%s": skipped - no matching class found', $service);
     return;
 }
 

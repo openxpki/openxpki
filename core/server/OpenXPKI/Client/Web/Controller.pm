@@ -11,6 +11,7 @@ use OpenXPKI::Log4perl;
 sub index ($self) {
     # read target service class
     my $class = $self->stash('service_class') or die "Missing parameter 'service_class' in Mojolicious stash";
+    my $service_name = $self->stash('service_name') or die "Missing parameter 'service_class' in Mojolicious stash";
     my $no_config = $self->stash('no_config');
 
     # load and instantiate service class
@@ -18,7 +19,8 @@ sub index ($self) {
     try {
         Module::Load::load($class);
         $service = $class->new(
-            config_obj => $self->oxi_config($class->service_name, $no_config),
+            service_name => $service_name,
+            config_obj => $self->oxi_config($service_name, $no_config),
             apache_env => $self->stash('apache_env'),
             remote_address => $self->tx->remote_address,
             request => $self->req,
@@ -32,7 +34,7 @@ sub index ($self) {
     }
 
     # replace Mojolicious logger by our own
-    $self->app->log(OpenXPKI::Log4perl->get_logger('client.' . $service->service_name));
+    $self->app->log(OpenXPKI::Log4perl->get_logger('client.' . $service_name));
     $self->stash('mojo.log' => undef); # reset DefaultHelper "log" (i.e. $self->log) which accesses stash "mojo.log"
 
     $self->log->debug("Service class $class instantiated");
@@ -46,6 +48,7 @@ sub index ($self) {
     }
     catch ($err) {
         $response = $service->new_error_response($err);
+        $self->log->warn("Request handling (2/3) skipped due to error " . $response->error . ": " . $response->error_message);
     }
 
     if (not $response) {

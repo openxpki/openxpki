@@ -6,8 +6,6 @@ with qw(
     OpenXPKI::Client::Service::Role::Base
 );
 
-sub service_name { 'est' } # required by OpenXPKI::Client::Service::Role::Base
-
 # Core modules
 use MIME::Base64;
 use List::Util qw( any );
