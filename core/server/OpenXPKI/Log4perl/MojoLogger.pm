@@ -61,7 +61,7 @@ has max_history_size => (
           logconfess
         } ) {
 
-        *{ __PACKAGE__ . "::$method" } = sub { shift->emit( message => $method => @_ ) };
+        *{ __PACKAGE__ . "::$method" } = sub { shift->emit( message => ($method, @_) ) }; # handled in _message() below
     }
 }
 
