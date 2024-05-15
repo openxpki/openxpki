@@ -594,7 +594,7 @@ sub disconnect {
 
     my $self = shift;
 
-    $self->logger()->info('Disconnect client');
+    $self->logger()->debug('Disconnect client');
 
     # Use detach if an external session was provided
     # otherwise the session will be terminated!
