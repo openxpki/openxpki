@@ -354,7 +354,7 @@ sub dispatch ($self, $arg) {
         );
 
     # Protected command?
-    if ($package->meta->is_protected($command) and not $arg->protected_call) {
+    if ($self->enable_protection and $package->meta->is_protected($command) and not $arg->protected_call) {
         OpenXPKI::Exception->throw(
             message => "Forbidden call to protected API command",
             params => { command => $command, caller => sprintf("%s:%s", ($self->my_caller())[1,2]) }

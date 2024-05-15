@@ -21,7 +21,7 @@ Log::Log4perl->easy_init({
 use lib "$Bin/lib";
 
 
-plan tests => 11;
+plan tests => 16;
 
 
 use_ok "OpenXPKI::Server::API2";
@@ -41,7 +41,7 @@ lives_and {
 } "manually register a plugin class";
 
 lives_and {
-    cmp_deeply [ keys %{ $api->commands } ], bag('givetheparams', 'scream', 'alienplugin');
+    cmp_deeply [ keys %{ $api->commands } ], bag('givetheparams', 'scream', 'protected', 'alienplugin');
 } "query available commands";
 
 TODO: {
@@ -75,6 +75,34 @@ throws_ok {
 lives_and {
     my $result = $api->dispatch(command => "givetheparams", params => { name => "Max", size => 5, level => 4 });
     cmp_deeply $result, { name => "Max", size => 5, level => 4 };
-} "correctly execute command";
+} "execute standard command";
+
+lives_and {
+    my $result = $api->dispatch(command => "protected", params => { echo => "Hello" });
+    is $result, "Hello";
+} "execute protected command like any other with API protection disabled";
+
+lives_ok {
+    $api = OpenXPKI::Server::API2->new(
+        namespace => "OpenXPKI::TestCommands",
+        log => Log::Log4perl->get_logger(),
+        enable_acls => 0,
+        enable_protection => 1,
+    );
+} "instantiate API in DOS Protected Mode";
+
+lives_and {
+    my $result = $api->dispatch(command => "givetheparams", params => { name => "Max", size => 5, level => 4 });
+    cmp_deeply $result, { name => "Max", size => 5, level => 4 };
+} "execute standard command";
+
+throws_ok {
+    $api->dispatch(command => "protected", params => { echo => "Hello" });
+} qr/ call .* protected /msxi, "complain about calling protected command without explicit flag";
+
+lives_and {
+    my $result = $api->dispatch(command => "protected", params => { echo => "Hello" }, protected_call => 1);
+    is $result, "Hello";
+} "execute protected command with explicit flag";
 
 1;
