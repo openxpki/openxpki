@@ -1,12 +1,15 @@
 package OpenXPKI::Client::Config;
-use Moose;
+use OpenXPKI qw( -class -typeconstraints );
 
-use feature 'state';
+# Core modules
 use File::Spec;
+
+# CPAN modules
 use Cache::LRU;
 use Config::Std;
-use Data::Dumper;
 use Log::Log4perl::MDC;
+
+# Project modules
 use OpenXPKI::Client;
 use OpenXPKI::Log4perl;
 use OpenXPKI::Log4perl::MojoLogger;
@@ -108,11 +111,14 @@ config file read but can also be set.
 =cut
 
 has 'logger' => (
-    required => 0,
-    lazy => 1,
     is => 'rw',
-    isa => 'Object',
-    builder => '_build_logger',
+    isa => duck_type( [qw(
+           trace    debug    info    warn    error    fatal
+        is_trace is_debug is_info is_warn is_error is_fatal
+    )] ),
+    init_arg => undef,
+    lazy => 1,
+    default => sub ($self) { OpenXPKI::Log4perl->get_logger($self->log_facility) },
 );
 
 =head3 logconf
@@ -141,6 +147,18 @@ has 'logconf' => (
         syswrite    => 1,
         utf8        => 1
     }}
+);
+
+has 'log_facility' => (
+    is => 'ro',
+    isa => 'Str',
+    init_arg => undef,
+    lazy => 1,
+    default => sub ($self) {
+        $self->default->{logger}
+            ? 'openxpki.client.' . $self->service # the logger for this is defined in __init_log4perl()
+            : ($self->default->{global}->{log_facility} || '')
+    },
 );
 
 =head3 default
@@ -424,16 +442,6 @@ sub __load_config {
     return \%config;
 }
 
-sub _build_logger {
-    my $self = shift;
-
-    return OpenXPKI::Log4perl->get_logger(
-        $self->default->{logger}
-            ? 'client.'.$self->service
-            : ( $self->default->{global}->{log_facility} || '' )
-    );
-}
-
 sub __init_log4perl {
     my $self = shift;
 
@@ -452,9 +460,6 @@ sub __init_log4perl {
     my $loglevel = uc($conf->{log_level}) || 'WARN';
     delete $conf->{log_level};
 
-    # facility is constructed from service
-    my $log_facility = 'client.'.$self->service;
-
     # fill in the service name into the filename pattern
     $conf->{filename} = sprintf($conf->{filename}, $self->service);
 
@@ -471,8 +476,8 @@ sub __init_log4perl {
 
     # assemble the final hash
     my $log_config = {
-        "log4perl.category.$log_facility" => "$loglevel, Logfile",
-        'log4perl.appender.Logfile'       => 'Log::Log4perl::Appender::File',
+        'log4perl.category.' . $self->log_facility => "$loglevel, Logfile",
+        'log4perl.appender.Logfile' => 'Log::Log4perl::Appender::File',
     };
     map {
         $log_config->{'log4perl.appender.Logfile.'.$_} = $conf->{$_};
