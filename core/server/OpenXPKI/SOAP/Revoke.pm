@@ -14,7 +14,7 @@ use OpenXPKI::Serialization::Simple;
 
 use Log::Log4perl;
 
-my $log = $main::config->logger();
+my $log = $main::config->log();
 
 $log->info("SOAP interface NG initialized ");
 

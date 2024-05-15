@@ -55,7 +55,7 @@ sub __load_config {
     my $cgi = shift;
 
     my $config = OpenXPKI::Client::Config->new('webui');
-    $log = $config->logger();
+    $log = $config->log();
     # do NOT call config here as webui does not
     # use the URI based  endpoint logic yet
     $conf = $config->default();

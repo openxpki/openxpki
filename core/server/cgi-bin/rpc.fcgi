@@ -98,7 +98,7 @@ sub send_output {
 }
 
 $config = OpenXPKI::Client::Config->new('rpc');
-$log = $config->logger;
+$log = $config->log;
 $log->info("RPC handler initialized");
 
 while (my $cgi = CGI::Fast->new("")) {

@@ -14,7 +14,7 @@ use OpenXPKI::Client::Config;
 use OpenXPKI::Client::Service::EST;
 
 my $config = OpenXPKI::Client::Config->new('est');
-my $log = $config->logger();
+my $log = $config->log();
 $log->info("EST handler initialized");
 
 while (my $cgi = CGI::Fast->new("")) {

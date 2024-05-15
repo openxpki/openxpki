@@ -16,7 +16,7 @@ use Feature::Compat::Try;
 
 
 my $config = OpenXPKI::Client::Config->new('scep');
-my $log = $config->logger();
+my $log = $config->log();
 $log->info("SCEP handler initialized");
 
 while (my $cgi = CGI::Fast->new("")) {

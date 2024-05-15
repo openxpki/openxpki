@@ -110,7 +110,7 @@ config file read but can also be set.
 
 =cut
 
-has 'logger' => (
+has 'log' => (
     is => 'rw',
     isa => duck_type( [qw(
            trace    debug    info    warn    error    fatal
@@ -259,8 +259,8 @@ sub BUILD {
 
     $self->__init_log4perl;
 
-    $self->logger->debug(sprintf("Config for service '%s' loaded", $self->service));
-    $self->logger->trace('Global config: ' . Dumper $config ) if $self->logger->is_trace;
+    $self->log->debug(sprintf("Config for service '%s' loaded", $self->service));
+    $self->log->trace('Global config: ' . Dumper $config ) if $self->log->is_trace;
 
 }
 
@@ -354,15 +354,15 @@ sub parse_uri {
     }
 
     if (!$ep) {
-        $self->logger->warn("Unable to detect script name - please check the docs");
-        $self->logger->trace(Dumper \%ENV) if $self->logger->is_trace;
+        $self->log->warn("Unable to detect script name - please check the docs");
+        $self->log->trace(Dumper \%ENV) if $self->log->is_trace;
         return ('', '');
     } elsif (($service =~ m{(est|cmc)}) && !$rt) {
-        $self->logger->trace("URI without endpoint, setting route: $ep");
+        $self->log->trace("URI without endpoint, setting route: $ep");
         $rt = $ep;
         $ep = 'default';
     } else {
-        $self->logger->trace("Parsed URI: $ep => ".($rt // '<undef>'));
+        $self->log->trace("Parsed URI: $ep => ".($rt // '<undef>'));
     }
 
     # Populate the endpoint to the MDC
@@ -388,7 +388,7 @@ sub endpoint_config {
         # non existing files and other errors are handled inside loader
         $config = $self->__load_config($endpoint);
         $self->_cache()->set( $endpoint  => $config );
-        $self->logger()->debug('added config to cache ' . $endpoint);
+        $self->log()->debug('added config to cache ' . $endpoint);
     }
 
     $self->language($config->{global}->{default_language} || $self->default()->{global}->{default_language} || '');
@@ -407,7 +407,7 @@ sub __load_config {
     if ($endpoint) {
         # config via socket
         if ($self->has_client()) {
-            $self->logger()->debug("Autodetect config for service '".$self->service."' via socket");
+            $self->log()->debug("Autodetect config for service '".$self->service."' via socket");
             my $reply = $self->client()->send_receive_service_msg(
                 GET_ENDPOINT_CONFIG => { interface => $self->service, endpoint => $endpoint }
             );
@@ -418,10 +418,10 @@ sub __load_config {
     }
 
     if ($file) {
-        $self->logger()->debug("Autodetect config file for service '".$self->service."': $file");
+        $self->log()->debug("Autodetect config file for service '".$self->service."': $file");
         $file = File::Spec->catfile( $self->basepath, $file );
         if (! -f $file ) {
-            $self->logger()->debug('No config file found, falling back to default');
+            $self->log()->debug('No config file found, falling back to default');
             $file = undef;
         }
     }
@@ -430,14 +430,14 @@ sub __load_config {
     return $self->default() unless($file);
 
     if (!read_config $file => $config) {
-        $self->logger()->error('Unable to read config from file ' . $file);
+        $self->log()->error('Unable to read config from file ' . $file);
         die "Could not read client config file $file ";
     }
 
     # cast to an unblessed hash
     my %config = %{$config};
 
-    $self->logger()->trace('Script config: ' . Dumper \%config ) if $self->logger->is_trace;
+    $self->log()->trace('Script config: ' . Dumper \%config ) if $self->log->is_trace;
 
     return \%config;
 }

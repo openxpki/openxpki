@@ -11,7 +11,7 @@ use OpenXPKI::Client::Config;
 
 our $config = OpenXPKI::Client::Config->new('soap');
 my $conf = $config->default();
-my $log = $config->logger();
+my $log = $config->log();
 
 $log->info("SOAP handler initialized");
 
