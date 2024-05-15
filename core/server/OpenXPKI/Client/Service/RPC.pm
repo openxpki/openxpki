@@ -314,8 +314,8 @@ around request_param => sub ($orig, $self, $key) {
     }
 };
 
-around new_response => sub ($orig, $self, %args) {
-    my $response = $self->$orig(%args);
+around new_response => sub ($orig, $self, @args) {
+    my $response = $self->$orig(@args);
 
     # add workflow details to response
     if ($response->has_workflow) {
