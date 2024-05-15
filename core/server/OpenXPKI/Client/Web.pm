@@ -7,6 +7,7 @@ use Module::Load ();
 
 # CPAN modules
 use Mojo::Util qw( url_unescape encode tablify );
+use Log::Log4perl qw( :easy );
 
 # Project modules
 use OpenXPKI::Client::Config;
@@ -17,8 +18,9 @@ my $socketfile = $ENV{OPENXPKI_CLIENT_SOCKETFILE} || '/var/openxpki/openxpki.soc
 
 
 sub startup ($self) {
-
-    $self->log(OpenXPKI::Log4perl->get_logger(''));
+    # Set "root" client logger
+    Log::Log4perl->easy_init($ENV{MOJO_MODE} eq 'production' ? $WARN : $DEBUG) unless Log::Log4perl->initialized;
+    $self->log(OpenXPKI::Log4perl->get_logger('openxpki.client'));
 
     #$self->secrets(['Mojolicious rocks']);
 
@@ -88,7 +90,7 @@ sub startup ($self) {
         $self->log->trace(sprintf 'Incoming %s request', uc($c->req->url->base->protocol)); # ->protocol: Normalized version of ->scheme
 
         if ($self->mode eq 'development') {
-            $self->log->trace('Development mode: enforce HTTPS');
+            $self->log->warn('Development mode: enforce HTTPS');
             $c->req->url->base->scheme('https');
         }
 

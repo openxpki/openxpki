@@ -19,8 +19,6 @@ getopt
 
 die extract_usage, "\n" if $help;
 
-# Log::Log4perl->easy_init($FATAL);
-
 # FATAL("Socket: " . $ENV{LISTEN_FDS});
 # FATAL("Socket: " . $ENV{LISTEN_FDNAMES});
 
