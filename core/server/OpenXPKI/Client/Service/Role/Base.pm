@@ -363,7 +363,7 @@ has log => (
     lazy => 1,
     builder => '_build_log',
 );
-sub _build_log ($self) { OpenXPKI::Log4perl->get_logger('openxpki.client.' . $self->service_name) }
+sub _build_log ($self) { $self->config_obj->log }
 
 =head3 backend
 

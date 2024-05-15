@@ -16,11 +16,14 @@ sub index ($self) {
 
     # load and instantiate service class
     my $service;
+    my $config;
     try {
+        $config = $self->oxi_config($service_name, $no_config);
+
         Module::Load::load($class);
         $service = $class->new(
             service_name => $service_name,
-            config_obj => $self->oxi_config($service_name, $no_config),
+            config_obj => $config,
             apache_env => $self->stash('apache_env'),
             remote_address => $self->tx->remote_address,
             request => $self->req,
@@ -34,7 +37,7 @@ sub index ($self) {
     }
 
     # replace Mojolicious logger by our own
-    $self->app->log(OpenXPKI::Log4perl->get_logger('client.' . $service_name));
+    $self->app->log($config->log);
     $self->stash('mojo.log' => undef); # reset DefaultHelper "log" (i.e. $self->log) which accesses stash "mojo.log"
 
     $self->log->debug("Service class $class instantiated");
