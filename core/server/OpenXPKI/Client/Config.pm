@@ -190,7 +190,7 @@ has language => (
     default => '',
     trigger => sub {
         my $self = shift;
-        set_language($self->language());
+        set_language($self->language);
     },
 );
 
@@ -384,14 +384,14 @@ sub endpoint_config {
     my $endpoint = shift;
 
     my $config;
-    if (!($config = $self->_cache()->get( $endpoint ))) {
+    if (!($config = $self->_cache->get( $endpoint ))) {
         # non existing files and other errors are handled inside loader
         $config = $self->__load_config($endpoint);
-        $self->_cache()->set( $endpoint  => $config );
-        $self->log()->debug('added config to cache ' . $endpoint);
+        $self->_cache->set( $endpoint  => $config );
+        $self->log->debug('added config to cache ' . $endpoint);
     }
 
-    $self->language($config->{global}->{default_language} || $self->default()->{global}->{default_language} || '');
+    $self->language($config->{global}->{default_language} || $self->default->{global}->{default_language} || '');
 
     return $config;
 
@@ -406,9 +406,9 @@ sub __load_config {
     my $config;
     if ($endpoint) {
         # config via socket
-        if ($self->has_client()) {
-            $self->log()->debug("Autodetect config for service '".$self->service."' via socket");
-            my $reply = $self->client()->send_receive_service_msg(
+        if ($self->has_client) {
+            $self->log->debug("Autodetect config for service '".$self->service."' via socket");
+            my $reply = $self->client->send_receive_service_msg(
                 GET_ENDPOINT_CONFIG => { interface => $self->service, endpoint => $endpoint }
             );
             die "Unable to fetch endpoint default configuration from backend" unless (ref $reply->{PARAMS});
@@ -418,26 +418,26 @@ sub __load_config {
     }
 
     if ($file) {
-        $self->log()->debug("Autodetect config file for service '".$self->service."': $file");
+        $self->log->debug("Autodetect config file for service '".$self->service."': $file");
         $file = File::Spec->catfile( $self->basepath, $file );
         if (! -f $file ) {
-            $self->log()->debug('No config file found, falling back to default');
+            $self->log->debug('No config file found, falling back to default');
             $file = undef;
         }
     }
 
     # if no config file is given, use the default
-    return $self->default() unless($file);
+    return $self->default unless($file);
 
     if (!read_config $file => $config) {
-        $self->log()->error('Unable to read config from file ' . $file);
+        $self->log->error('Unable to read config from file ' . $file);
         die "Could not read client config file $file ";
     }
 
     # cast to an unblessed hash
     my %config = %{$config};
 
-    $self->log()->trace('Script config: ' . Dumper \%config ) if $self->log->is_trace;
+    $self->log->trace('Script config: ' . Dumper \%config ) if $self->log->is_trace;
 
     return \%config;
 }
@@ -452,7 +452,7 @@ sub __init_log4perl {
 
     # logger section is merged with the default config from the class
     my $conf = {
-        %{$self->logconf()},
+        %{$self->logconf},
         %{$self->default->{logger}}
     };
 
