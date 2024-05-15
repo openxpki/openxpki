@@ -54,7 +54,7 @@ sub startup ($self) {
 
     if ($self->log->is_debug) {
         my $rows = [];
-        $self->_walk_route($_, 0, $rows) for $self->routes->children->@*;
+        _walk_route($_, 0, $rows) for $self->routes->children->@*;
         $self->log->debug('Routes:');
         $self->log->debug($_) for map { "  $_" } split "\n", tablify($rows);
     }
@@ -168,7 +168,7 @@ sub _load_service_class ($self, $service) {
 }
 
 # from Mojolicious::Command::routes
-sub _walk_route ($self, $route, $depth, $rows) {
+sub _walk_route ($route, $depth, $rows) {
     # Pattern
     my $prefix = '';
     if (my $i = $depth * 2) { $prefix .= ' ' x $i . '+' }
@@ -183,7 +183,7 @@ sub _walk_route ($self, $route, $depth, $rows) {
     $pattern->match('/', $route->is_endpoint && !$route->partial);
     push @$row, (regexp_pattern $pattern->regex)[0];
 
-    _walk($_, $depth+1, $rows) for $route->children->@*;
+    _walk_route($_, $depth+1, $rows) for $route->children->@*;
 }
 
 1;
