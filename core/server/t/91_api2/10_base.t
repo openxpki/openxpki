@@ -21,7 +21,7 @@ Log::Log4perl->easy_init({
 use lib "$Bin/lib";
 
 
-plan tests => 16;
+plan tests => 15;
 
 
 use_ok "OpenXPKI::Server::API2";
@@ -36,12 +36,7 @@ lives_ok {
 } "instantiate";
 
 lives_and {
-    my @commands = $api->register_plugin("OpenXPKI::Testalienplugin");
-    cmp_deeply \@commands, [ 'alienplugin' ];
-} "manually register a plugin class";
-
-lives_and {
-    cmp_deeply [ keys %{ $api->commands } ], bag('givetheparams', 'scream', 'protected', 'alienplugin');
+    cmp_deeply [ keys %{ $api->commands } ], bag('givetheparams', 'scream', 'protected');
 } "query available commands";
 
 TODO: {

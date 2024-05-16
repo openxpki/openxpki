@@ -47,16 +47,6 @@ B<Different plugin namespace> for auto-discovery:
         namespace => "My::Command::Plugins",
     );
 
-B<Disable plugin auto-discovery>:
-
-    my $api = OpenXPKI::Server::API2->new(
-        commands => {},
-    );
-
-B<Manually register> a plugin outside the default namespace:
-
-    my @commands = $api->register_plugin("OpenXPKI::MyAlienplugin");
-
 =head1 DESCRIPTION
 
 Please note that all classes in the C<OpenXPKI::Server::API2::> namespace are
@@ -284,37 +274,6 @@ sub _load_plugins {
     }
 
     return $cmd_package_map;
-}
-
-=head2 register_plugin
-
-Manually register a plugin class containing API commands.
-
-This is usually not neccessary because plugin classes are auto-discovered
-as described L<above|/DESCRIPTION>.
-
-Returns a plain C<list> of API commands that were found.
-
-B<Parameters>
-
-=over
-
-=item * C<$packages> - class/package name I<Str> or I<ArrayRef> of package names
-
-=back
-
-=cut
-
-sub register_plugin {
-    my ($self, $packages) = @_;
-    # convert string to arrayref
-    $packages = [ $packages ] unless (ref $packages or "") eq "ARRAY";
-    # convert arrayref to hashref
-    my $pkg_map = { map { $_ => "manually added" } @$packages };
-
-    my $pkg_by_cmd = $self->_load_plugins($pkg_map);
-    $self->add_commands( %{ $pkg_by_cmd } );
-    return ( keys %{ $pkg_by_cmd } );
 }
 
 =head2 dispatch
