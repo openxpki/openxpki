@@ -6,12 +6,22 @@ use OpenXPKI -role;
 OpenXPKI::Server::API2::PluginMetaClassTrait - Moose metaclass role (aka.
 "trait") for API plugins
 
-=head2 DESCRIPTION
+=head1 DESCRIPTION
 
 B<Not intended for direct use:> please C<use OpenXPKI -plugin> instead.
 
 Manage API parameters and their specifications for the API plugin classes.
 This role/trait is applied by L<OpenXPKI::Server::API2::Plugin>.
+
+=head1 ATTRIBUTES
+
+#             namespace => 'OpenXPKI::Server::API2::Plugin::test',
+=cut
+has namespace => (
+    is => 'rw',
+    isa => 'Str',
+    predicate => 'has_namespace',
+);
 
 =head1 METHODS
 

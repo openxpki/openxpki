@@ -12,6 +12,7 @@ functions
 use Module::Load ();
 use File::Spec;
 use IO::Dir 1.03;
+use List::Util qw( any );
 
 # Project modules
 use OpenXPKI::Server::Log;
@@ -28,7 +29,7 @@ B<Default usage>:
         acl_rule_accessor => sub { CTX('config')->get('acl.rules.' . CTX('session')->data->role ) },
         log => OpenXPKI::Server::Log->new(CONFIG => '')->system,
     );
-    printf "Available commands: %s\n", join(", ", keys %{$api->commands});
+    printf "Available commands in root namespace: %s\n", join(", ", keys $api->commands->%*);
 
     my $api_direct = $api->autoloader;
 
@@ -143,8 +144,8 @@ has enable_protection => (
 
 =head2 acl_rule_accessor
 
-Only if C<enable_acls = 1>: callback that should return the ACL configuration
-I<HashRef> for the current user (role).
+Optional, only if C<enable_acls = 1>: callback that should return the ACL
+configuration I<HashRef> for the current user (role).
 
 Example:
 
@@ -177,34 +178,25 @@ has namespace => (
     default => __PACKAGE__."::Plugin",
 );
 
-=head2 commands
+# I<HashRef> containing registered API commands under their respective relative
+# namespace and their Perl packages. The hash is built on first access.
 
-I<HashRef> containing registered API commands and their Perl packages. The hash
-is built on first access, only manually set this if you want to disable the
-auto-discovery of plugin modules.
+# If no namespace is specified in a plugin class the commands are assigned to
+# the default namespace C<""> (empty string).
 
-Structure:
+# Structure:
 
-    {
-        "API command 1" => "Perl package name",
-        "API command 2" => ...,
-    }
-
-=head1 METHODS
-
-=head2 add_commands
-
-Register the given C<command =E<gt> package> mappings to the list of known API
-commands.
-
-=cut
-has commands => (
+#     {
+#         'namespace1' => {
+#             'command_a' => 'OpenXPKI::Server::API2::Plugin::namespace1::command',
+#             'command_b' => 'OpenXPKI::Server::API2::Plugin::namespace1::command',
+#         },
+#         ...
+#     }
+has _commands => (
     is => 'rw',
-    isa => 'HashRef[Str]',
-    traits => [ 'Hash' ],
-    handles => {
-        add_commands => 'set',
-    },
+    isa => 'HashRef',
+    init_arg => undef,
     lazy => 1,
     builder => "_build_commands",
 );
@@ -213,6 +205,7 @@ sub _build_commands {
     # Code taken from Plugin::Simple
     my $self = shift;
 
+    my $result = {};
     my @modules = ();
     my $pkg_map = {};
     try {
@@ -225,24 +218,11 @@ sub _build_commands {
         );
     }
 
-    return $self->_load_plugins($pkg_map);
-}
+    # Try to load the given plugin classes.
+    $self->log->debug("Loading ".(scalar keys $pkg_map->%*)." API plugins");
 
-#
-# Tries to load the given plugin classes.
-#
-# Returns a HashRef that contains the C<command =E<gt> package> mappings.
-#
-sub _load_plugins {
-    my ($self, $pkg_map) = @_;
-
-    my $cmd_package_map = {};
-
-    $self->log->debug("Loading ".(scalar keys %{ $pkg_map })." API plugins");
-
-    for my $pkg (keys %{ $pkg_map }) {
+    for my $pkg (keys $pkg_map->%*) {
         my $file = $pkg_map->{$pkg};
-
         Module::Load::load($pkg);
 
         if (not $pkg->DOES('OpenXPKI::Server::API2::PluginRole')) {
@@ -256,12 +236,23 @@ sub _load_plugins {
             params => { namespace => $self->namespace }
         ) unless $pkg->meta->meta->does_role('OpenXPKI::Server::API2::PluginMetaClassTrait');
 
+        my $root_namespace = $self->namespace;
+        my $namespace = '';
+        if ($pkg->meta->has_namespace) {
+            $namespace = $pkg->meta->namespace;
+            if ($namespace !~ /^\Q$root_namespace\E/) {
+                $self->log->warn("API - ignore $pkg (its namespace $namespace is not below this API namespace)");
+                next;
+            }
+            $namespace =~ s/^\Q$root_namespace\E:://;
+        }
+
         $self->log->trace("API - register $pkg: ".join(", ", $pkg->meta->command_list)." - $file");
 
         # store commands and their source package
         for my $cmd ($pkg->meta->command_list) {
             # check if command was previously defined by another package
-            my $earlier_pkg = $cmd_package_map->{$cmd};
+            my $earlier_pkg = $result->{$namespace}->{$cmd};
             if ($earlier_pkg) {
                 my $earlier_file = $pkg_map->{$earlier_pkg};
                 OpenXPKI::Exception->throw(
@@ -269,11 +260,90 @@ sub _load_plugins {
                     params => { now_file => $file, previous_file => $earlier_file }
                 );
             }
-            $cmd_package_map->{$cmd} = $pkg;
+            $result->{$namespace}->{$cmd} = $pkg;
         }
     }
 
-    return $cmd_package_map;
+    # Check if a command name equals a relative namespace (this would confuse our autoloader magic)
+    for my $namespace (keys $result->%*) {
+        for my $cmd ($result->{$namespace}->%*) {
+            OpenXPKI::Exception->throw(
+                message => sprintf("API command name '%s' in %s equals a (relative) namespace name", $cmd, $result->{$namespace}->{$cmd})
+            ) if exists $result->{$cmd};
+        }
+    }
+
+    return $result;
+}
+
+=head2 rel_namespaces
+
+Readonly: an I<ArrayRef> of all relative command namespaces, i.e. with this
+API's root namespace parts cut off.
+
+If there are no namespaces defined in any plugin this only contains a single
+item C<""> (empty string).
+
+=cut
+has rel_namespaces => (
+    is => 'rw',
+    isa => 'ArrayRef',
+    init_arg => undef,
+    lazy => 1,
+    default => sub ($self) { [ keys $self->_commands->%* ] },
+);
+
+=head2 has_non_root_namespaces
+
+Readonly: returns TRUE if there is any non-root namespace.
+
+=cut
+has has_non_root_namespaces => (
+    is => 'rw',
+    isa => 'Bool',
+    init_arg => undef,
+    lazy => 1,
+    default => sub ($self) { (scalar $self->rel_namespaces->@* > 1 or any { $_ ne '' } $self->rel_namespaces->@*) ? 1 : 0 },
+);
+
+=head1 METHODS
+
+=head2 commands
+
+Returns a I<HashRef> with API commands of the given relative namespace and
+their Perl packages.
+
+    my $root_cmds = $api->commands;
+    my $config_cmds = $api->commands('config');
+
+If no namespace is specified the commands of this API's root namespace (i.e.
+usually those that did not explicitely set a namespace) are returned.
+
+Structure:
+
+    {
+        'command_a' => 'OpenXPKI::Server::API2::Plugin::namespace1::command',
+        'command_b' => 'OpenXPKI::Server::API2::Plugin::namespace1::command',
+        ...
+    }
+
+B<Parameters>
+
+=over
+
+=item * C<$namespace> - Optional: relative (!) namespace
+
+=back
+
+=cut
+signature_for commands => (
+    method => 1,
+    positional => [
+        'Optional[ Str ]',
+    ],
+);
+sub commands ($self, $namespace = '') {
+    return $self->_commands->{$namespace} // {};
 }
 
 =head2 dispatch
@@ -284,7 +354,10 @@ B<Named parameters>
 
 =over
 
-=item * C<command> - API command name
+=item * C<rel_namespace> - Optional: B<relative> command namespace. Default: C<"">
+(root namespace = API namespace)
+
+=item * C<command> - Command name
 
 =item * C<params> - Parameter hash
 
@@ -297,36 +370,47 @@ command while L</enable_protection> is TRUE
 signature_for dispatch => (
     method => 1,
     named => [
+        rel_namespace => 'Str', { default => '' },
         command => 'Str',
         params => 'Optional[ HashRef ]', { default => {} },
         protected_call => 'Bool', { default => 0 },
     ],
 );
 sub dispatch ($self, $arg) {
+    my $rel_ns = $arg->rel_namespace;
     my $command = $arg->command;
 
+    # Known namespace?
+    if (not any { $rel_ns eq $_ } $self->rel_namespaces->@*) {
+        OpenXPKI::Exception->throw(
+            message => "Unknown API namespace",
+            params => { namespace => $rel_ns, command => $command, caller => sprintf("%s:%s", ($self->my_caller())[1,2]) },
+        );
+    }
+
     # Known command?
-    my $package = $self->commands->{ $command }
+    my $package = $self->commands($rel_ns)->{ $command }
         or OpenXPKI::Exception->throw(
             message => "Unknown API command",
-            params => { command => $command, caller => sprintf("%s:%s", ($self->my_caller())[1,2]) },
+            params => { namespace => $rel_ns, command => $command, caller => sprintf("%s:%s", ($self->my_caller())[1,2]) },
         );
 
     # Protected command?
     if ($self->enable_protection and $package->meta->is_protected($command) and not $arg->protected_call) {
         OpenXPKI::Exception->throw(
             message => "Forbidden call to protected API command",
-            params => { command => $command, caller => sprintf("%s:%s", ($self->my_caller())[1,2]) }
+            params => { namespace => $rel_ns, command => $command, caller => sprintf("%s:%s", ($self->my_caller())[1,2]) }
         );
     }
 
     # ACL checks / parameter rewriting
+    my $ns_and_command = ($rel_ns ? "$rel_ns." : '') . $command;
     my $all_params;
     if ($self->enable_acls) {
-        my $rules = $self->_get_acl_rules($command)
+        my $rules = $self->_get_acl_rules($ns_and_command)
             or OpenXPKI::Exception->throw(
                 message => "ACL does not permit call to API command",
-                params => { command => $command, caller => sprintf("%s:%s", ($self->my_caller())[1,2]) }
+                params => { namespace => $rel_ns, command => $command, caller => sprintf("%s:%s", ($self->my_caller())[1,2]) }
             );
 
         $all_params = $self->_apply_acl_rules($command, $rules, $arg->params);
@@ -335,7 +419,7 @@ sub dispatch ($self, $arg) {
         $all_params = $arg->params;
     }
 
-    $self->log->debug("API call to '$command'") if $self->log->is_debug;
+    $self->log->debug("API call to '$ns_and_command'");
 
     # Call command method
     my $result;
@@ -357,7 +441,7 @@ sub dispatch ($self, $arg) {
         }
         OpenXPKI::Exception->throw(
             message => "Error while executing API command",
-            params => { command => $command, error => $msg, caller => sprintf("%s:%s", ($self->my_caller())[1,2]) }, # stringify in case error is an object
+            params => { namespace => $rel_ns, command => $command, error => $msg, caller => sprintf("%s:%s", ($self->my_caller())[1,2]) }, # stringify in case error is an object
         );
     }
 
@@ -575,7 +659,6 @@ sub _get_acl_rules {
     my $cmd_config = $all_cmd_configs->{$command};
     # command not specified (or not a TRUE value)
     if ($cmd_config) {
-
         # filter definition
         if (ref $cmd_config eq 'HASH') {
             return $cmd_config;
@@ -583,14 +666,11 @@ sub _get_acl_rules {
         } else {
             return {};
         }
-
-
     }
     # defined but false value => deny
     if (defined $cmd_config) {
         $self->log->debug("ACL config: command '$command' explicit deny") if $self->log->is_debug;
         return;
-
     }
 
     # allowed by default policy
@@ -601,7 +681,6 @@ sub _get_acl_rules {
 
     $self->log->debug("ACL config: command '$command' not allowed") if $self->log->is_debug;
     return;
-
 }
 
 =head2 _list_modules
@@ -696,14 +775,14 @@ The structure of the configuration subtree (below the realm) is as follows:
         <role name>:
             policy: allow   # default policy: "allow" or "deny"
             commands:
-                # deny access to command1
-                <command1>: 0
+                # deny access to command1 (root namespace)
+                command1: 0
 
-                # allow unfiltered access to command2
-                <command2>: 1
+                # allow unfiltered access to namespace1.command1
+                "<namespace1.command1>": 1
 
-                # allow command3 and preprocess arguments
-                <command3>:
+                # allow namespace1.command2 and preprocess arguments
+                "<namespace1.command2>":
                     <parameter>:
                         required: 1
                         force:    <string>
@@ -711,11 +790,14 @@ The structure of the configuration subtree (below the realm) is as follows:
                         match:    <regex>
                         block:    1
 
-                <command4>:
+                "<namespace2.command1>":
                     ...
 
         <role name>:
             ...
+
+For commands in the root namespace (i.e. those where no namespace is set in the
+plugin class) only the command name needs to be given without leading dot.
 
 The ACL processor first looks if the command name has a key in the
 I<commands> tree:

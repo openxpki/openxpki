@@ -22,6 +22,8 @@ To define a new API plugin:
     package OpenXPKI::Server::API2::Plugin::MyTopic::MyActions;
     use OpenXPKI -plugin;
 
+    set_namespace_to_parent;
+
     command "aaa" => {
         # parameters
     } => sub {
@@ -31,7 +33,18 @@ To define a new API plugin:
         ...
     };
 
-This will modify your package as follows:
+If no namespace is specified in a plugin class the commands are assigned to
+the default namespace of the API.
+
+It does not seem to be possible to set a custom base class for your
+plugin, but you can instead easily add another role to it:
+
+    package OpenXPKI::Server::API2::Plugin::MyTopic::MyActions;
+    use OpenXPKI -plugin;
+
+    with "OpenXPKI::Server::API2::Plugin::MyTopic::Base";
+
+C<use OpenXPKI -plugin> will modify your package as follows:
 
 =over
 
@@ -46,18 +59,10 @@ L<OpenXPKI::Server::API2::PluginMetaClassTrait>
 
 =back
 
-It does not seem to be possible to set a custom base class for your
-plugin, but you can instead easily add another role to it:
-
-    package OpenXPKI::Server::API2::Plugin::MyTopic::MyActions;
-    use OpenXPKI -plugin;
-
-    with "OpenXPKI::Server::API2::Plugin::MyTopic::Base";
-
 =cut
 Moose::Exporter->setup_import_methods(
-    with_meta => [ "command", "protected_command" ],
-    base_class_roles => [ "OpenXPKI::Server::API2::PluginRole" ],
+    with_meta => [ 'command', 'protected_command', 'set_namespace', 'set_namespace_to_parent' ],
+    base_class_roles => [ 'OpenXPKI::Server::API2::PluginRole' ],
     class_metaroles => {
         class => [ 'OpenXPKI::Server::API2::PluginMetaClassTrait' ],
     },
@@ -75,7 +80,7 @@ Define an API command including input parameter types.
 
 Example:
 
-    command "givetheparams" => {
+    command 'givetheparams' => {
         name => { isa => 'Str', matching => qr/^(?!Donald).*/, required => 1 },
         size => { isa => 'Int', matching => sub { $_ > 0 } },
     } => sub {
@@ -94,7 +99,7 @@ Example:
 Note that this can be written as (except for the dots obviously)
 
     command(
-        "givetheparams",
+        'givetheparams',
         {
             name => ...
             size => ...
@@ -179,6 +184,42 @@ sub _command {
     $meta->add_method($command, $code_ref);    # Add a method to calling class
     $meta->add_param_specs($command, $params); # Add a parameter class (OpenXPKI::Server::API2::PluginMetaClassTrait)
     $meta->is_protected($command, $is_protected);    # Set protection flag (OpenXPKI::Server::API2::PluginMetaClassTrait)
+}
+
+=head2 set_namespace_to_parent
+
+Set the command namespace to the current classes parent namespace
+(default is the API's root namespace).
+
+    package OpenXPKI::Server::API2::Plugin::MyTopic::info;
+
+    set_namespace_to_parent;
+    # is the same as:
+    set_namespace 'OpenXPKI::Server::API2::Plugin::MyTopic';
+
+=cut
+sub set_namespace_to_parent {
+    my ($meta) = @_;
+
+    my $caller_package = caller(1);
+
+    my @parts = split '::', $caller_package;
+    pop @parts;
+
+    $meta->namespace(join '::', @parts);
+}
+
+=head2 set_namespace
+
+Set the command namespace (default is the API's root namespace).
+
+Must be specified as a full Perl package name.
+
+=cut
+sub set_namespace :prototype($) {
+    my ($meta, $namespace) = @_;
+
+    $meta->namespace($namespace);
 }
 
 1;

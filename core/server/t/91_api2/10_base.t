@@ -21,9 +21,6 @@ Log::Log4perl->easy_init({
 use lib "$Bin/lib";
 
 
-plan tests => 15;
-
-
 use_ok "OpenXPKI::Server::API2";
 
 my $api;
@@ -36,7 +33,15 @@ lives_ok {
 } "instantiate";
 
 lives_and {
-    cmp_deeply [ keys %{ $api->commands } ], bag('givetheparams', 'scream', 'protected');
+    cmp_deeply $api->rel_namespaces, [ '' ];
+} "query available namespaces (only root = \"\")";
+
+lives_and {
+    is $api->has_non_root_namespaces, 0;
+} "has_non_root_namespaces == FALSE";
+
+lives_and {
+    cmp_deeply [ keys $api->commands->%* ], bag('givetheparams', 'scream', 'protected');
 } "query available commands";
 
 TODO: {
@@ -100,4 +105,4 @@ lives_and {
     is $result, "Hello";
 } "execute protected command with explicit flag";
 
-1;
+done_testing;

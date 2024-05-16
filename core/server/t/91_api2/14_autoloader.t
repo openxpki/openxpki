@@ -21,23 +21,33 @@ Log::Log4perl->easy_init({
 use lib "$Bin/lib";
 
 
-plan tests => 3;
-
-
 use_ok "OpenXPKI::Server::API2";
 
 my $auto;
 lives_ok {
     $auto = OpenXPKI::Server::API2->new(
-        namespace => "OpenXPKI::TestCommands",
+        namespace => "OpenXPKI::TestCommandsNamespace",
         log => Log::Log4perl->get_logger(),
         enable_acls => 0,
     )->autoloader;
 } "instantiate";
 
+throws_ok {
+    $auto->TheUnknown;
+} qr/unknown[\w\s]+command/i, "complain about unknown command in root namespace";
+
+throws_ok {
+    $auto->config->create;
+} qr/unknown[\w\s]+command/i, "complain about unknown command";
+
 lives_and {
-    my $result = $auto->givetheparams(name => "Max", size => 5);
-    cmp_deeply $result, { name => "Max", size => 5, level => 0 };
+    my $result = $auto->info(size => 5, level => 3);
+    cmp_deeply $result, { size => 5, level => 3 };
 } "correctly execute command";
 
-1;
+lives_and {
+    my $result = $auto->config->info;
+    is $result, 'CONFIG_INFO';
+} "execute config.info";
+
+done_testing;
