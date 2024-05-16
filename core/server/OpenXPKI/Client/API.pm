@@ -211,7 +211,7 @@ sub load_class {
     my $impl_class = "OpenXPKI::Client::API::Command::${command}::${subcommand}";
     my $error = Mojo::Loader::load_class($impl_class);
     if ($error) {
-        LOGDIE(die ref $error ? $error : "Unable to find ${subcommand} in ${command}");
+        LOGDIE(ref $error ? $error : "Unable to find ${subcommand} in ${command}");
     }
     return $impl_class;
 }
