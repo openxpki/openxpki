@@ -32,6 +32,9 @@ has namespace => (
     predicate => 'has_namespace',
 );
 
+# cache Autoloader objects for each namespace
+my $namespace_loaders = {};
+
 sub AUTOLOAD ($self, @args) {
     our $AUTOLOAD; # $AUTOLOAD is a magic variable containing the full name of the requested sub
     my $method = $AUTOLOAD;
@@ -43,7 +46,9 @@ sub AUTOLOAD ($self, @args) {
         and not $self->has_namespace                             # and it's not yet set (in the command chain)
         and any { $_ eq $method } $self->api->rel_namespaces->@* # and it's a known namespace
     ) {
-        return __PACKAGE__->new(api => $self->api, mode => 'command', namespace => $method);
+        $namespace_loaders->{$method} = __PACKAGE__->new(api => $self->api, mode => 'command', namespace => $method)
+            unless $namespace_loaders->{$method};
+        return $namespace_loaders->{$method};
 
     # call command
     } else {
