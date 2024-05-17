@@ -31,9 +31,20 @@ core/htdocs_source/docs-api
 tools/testdata/generated-*
 tools/docker-test/scripts.tar
 
+# Debian
+package/debian/deb/core/
+package/debian/**/changelog
+package/debian/**/control
+
+# VERSION
+**/VERSION
+
 #
 # Others
 #
+
+# Perl modules
+local/
 
 # EE repo
 myperl-openxpki-ee/
