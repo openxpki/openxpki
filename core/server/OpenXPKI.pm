@@ -49,6 +49,7 @@ sub import {
     my $moose_nonmoose = delete $flags{-nonmoose};
     my $moose_role = delete $flags{-role};
     my $plugin = delete $flags{-plugin};
+    $moose_class = 1 if ($plugin and not $moose_class and not $moose_role);
 
     die sprintf(
         'Unknown options: "use OpenXPKI qw( ... %s )" (called at %s line %s)',
@@ -67,16 +68,18 @@ sub import {
         }
         Moose::Exporter->import::into(1) if $moose_exporter;
         Moose::Util::TypeConstraints->import::into(1) if $moose_typeconstraints;
-    # API plugin
-    } elsif ($plugin) {
-        Moose->import::into(1);
-        OpenXPKI::Base::API::Plugin->import::into(1);
     # Plain old Perl package / class
     } else {
         base->import::into(1, $poc_base) if $poc_base;
         strict->import::into(1);
         warnings->import::into(1);
     }
+
+    # API plugin
+    if ($plugin) {
+        OpenXPKI::Base::API::Plugin->import::into(1);
+    }
+
     utf8->import::into(1);
     English->import::into(1);
 

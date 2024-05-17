@@ -1,14 +1,9 @@
 package OpenXPKI::Client::API::Command::config::smtptest;
+use OpenXPKI -plugin;
 
-use Moose;
-extends 'OpenXPKI::Client::API::Command::config';
-with 'OpenXPKI::Client::API::Command::NeedRealm';
-
-use MooseX::ClassAttribute;
-
-use OpenXPKI::Client::API::Response;
-use OpenXPKI::DTO::Field;
-use OpenXPKI::DTO::Field::String;
+with 'OpenXPKI::Client::API::Command::config';
+set_namespace_to_parent;
+__PACKAGE__->needs_realm;
 
 =head1 NAME
 
@@ -23,29 +18,18 @@ test message from the configuration!
 
 =cut
 
-class_has 'param_spec' => (
-    is      => 'ro',
-    isa => 'ArrayRef[OpenXPKI::DTO::Field]',
-    default => sub {[
-        OpenXPKI::DTO::Field::String->new( name => 'mailto', label => 'The email address to send the mail to', required => 1 ),
-        OpenXPKI::DTO::Field::String->new( name => 'message', label => 'The message template to send', value => 'testmail' ),
-    ]},
-);
+command "smtptest" => {
+    mailto => { isa => 'Str', label => 'The email address to send the mail to', required => 1 },
+    message => { isa => 'Str', label => 'The message template to send', default => 'testmail' },
+} => sub ($self, $param) {
 
-sub execute {
-
-    my $self = shift;
-    my $req = shift;
-
-    my $res = $self->api->run_command('send_notification', {
-        message => $req->param('message'),
-        params => { notify_to => $req->param('mailto') },
+    my $res = $self->rawapi->run_command('send_notification', {
+        message => $param->message,
+        params => { notify_to => $param->mailto },
     });
-    return OpenXPKI::Client::API::Response->new( payload => $res );
-}
+    return $res;
+};
 
-__PACKAGE__->meta()->make_immutable();
-
-1;
+__PACKAGE__->meta->make_immutable;
 
 

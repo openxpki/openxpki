@@ -1,17 +1,8 @@
 package OpenXPKI::Client::API::Command::api::help;
+use OpenXPKI -plugin;
 
-use Moose;
-extends 'OpenXPKI::Client::API::Command::api';
-
-use MooseX::ClassAttribute;
-
-use Data::Dumper;
-
-use OpenXPKI::Client::API::Response;
-use OpenXPKI::DTO::Field;
-use OpenXPKI::DTO::Field::Bool;
-use OpenXPKI::DTO::Field::Int;
-use OpenXPKI::DTO::Field::String;
+with 'OpenXPKI::Client::API::Command::api';
+set_namespace_to_parent;
 
 =head1 NAME
 
@@ -23,25 +14,11 @@ Show the argument list for the given command.
 
 =cut
 
-class_has 'param_spec' => (
-    is      => 'ro',
-    isa => 'ArrayRef[OpenXPKI::DTO::Field]',
-    default => sub {[
-        OpenXPKI::DTO::Field::String->new( name => 'command', label => 'Command', hint => 'list_command', required => 1 ),
-    ]},
-);
+command "help" => {
+    command => { isa => 'Str', label => 'Command', hint => 'hint_command', required => 1 },
+} => sub ($self, $param) {
 
-sub execute {
+    return $self->help_command( $param->command );
+};
 
-    my $self = shift;
-    my $req = shift;
-
-    return OpenXPKI::Client::API::Response->new(
-        payload => $self->help_command( $req->param('command') )
-    );
-
-}
-
-__PACKAGE__->meta()->make_immutable();
-
-1;
+__PACKAGE__->meta->make_immutable;

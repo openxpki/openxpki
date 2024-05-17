@@ -1,19 +1,12 @@
 package OpenXPKI::Client::API::Command::token::add;
+use OpenXPKI -plugin;
 
-use Moose;
-extends 'OpenXPKI::Client::API::Command::token';
-with 'OpenXPKI::Client::API::Command::NeedRealm';
+with 'OpenXPKI::Client::API::Command::token';
+set_namespace_to_parent;
+__PACKAGE__->needs_realm;
 with 'OpenXPKI::Client::API::Command::Protected';
 
-use MooseX::ClassAttribute;
-
 use OpenXPKI::Crypt::X509;
-
-use OpenXPKI::Client::API::Response;
-use OpenXPKI::DTO::Field;
-use OpenXPKI::DTO::Field::Int;
-use OpenXPKI::DTO::Field::File;
-use OpenXPKI::DTO::Field::String;
 
 =head1 NAME
 
@@ -25,76 +18,63 @@ Add a new generation of a crytographic token.
 
 =cut
 
-class_has 'param_spec' => (
-    is      => 'ro',
-    isa => 'ArrayRef[OpenXPKI::DTO::Field]',
-    default => sub {[
-        OpenXPKI::DTO::Field::String->new( name => 'type', 'label' => 'Token type (e.g. certsign)', hint => 'hint_type', required => 1 ),
-        OpenXPKI::DTO::Field::File->new( name => 'cert', label => 'Certificate file' ),
-        OpenXPKI::DTO::Field::String->new( name => 'identifier', label => 'Certificate identifier' ),
-        OpenXPKI::DTO::Field::File->new( name => 'key', label => 'Key file' ),
-        OpenXPKI::DTO::Field::Int->new( name => 'generation', label => 'Generation' ),
-        OpenXPKI::DTO::Field::Int->new( name => 'notbefore', label => 'Validity override (notbefore)' ),
-        OpenXPKI::DTO::Field::Int->new( name => 'notafter', label => 'Validity override (notafter)' ),
-    ]},
-);
-
-sub hint_type {
-    my $self = shift;
-    my $req = shift;
-    my $groups = $self->api->run_command('list_token_groups');
+sub hint_type ($self, $input_params) {
+    my $groups = $self->rawapi->run_command('list_token_groups');
     return [ keys %{$groups->params} ];
 }
 
-sub execute {
+command "add" => {
+    type => { isa => 'Str', 'label' => 'Token type (e.g. certsign)', hint => 'hint_type', required => 1 },
+    cert => { isa => 'FileContents', label => 'Certificate file' },
+    identifier => { isa => 'Str', label => 'Certificate identifier' },
+    key => { isa => 'FileContents', label => 'Key file' },
+    generation => { isa => 'Int', label => 'Generation' },
+    notbefore => { isa => 'Int', label => 'Validity override (notbefore)' },
+    notafter => { isa => 'Int', label => 'Validity override (notafter)' },
+} => sub ($self, $param) {
 
-    my $self = shift;
-    my $req = shift;
-
-    my $type = $req->param('type');
-    my $groups = $self->api->run_command('list_token_groups');
+    my $type = $param->type;
+    my $groups = $self->rawapi->run_command('list_token_groups');
     die "Token group '$type' is not a valid selection" unless ($groups->params->{$type});
 
     my $group = $groups->params->{$type};
     my $cert_identifier;
-    if ($req->param('cert')) {
-        my $x509 = OpenXPKI::Crypt::X509->new($req->param('cert'));
+    if ($param->cert) {
+        my $x509 = OpenXPKI::Crypt::X509->new($param->cert);
         $cert_identifier = $x509->get_cert_identifier();
-        $self->api->run_command('import_certificate', {
+        $self->rawapi->run_command('import_certificate', {
             data => $x509->pem,
             ignore_existing => 1
         });
         $self->log->debug("Certificate ($cert_identifier) was imported");
-    } elsif ($req->param('identifier')) {
-        $cert_identifier = $req->param('identifier')
+    } elsif ($param->identifier) {
+        $cert_identifier = $param->identifier
     } else {
         die "You must provide either a PEM encoded certificate or an existing identifier";
     }
 
-    my $param = {
+    my $cmd_param = {
         alias_group => $group,
         identifier => $cert_identifier,
     };
-
-    foreach my $key ('generation','notbefore','notafter') {
-        $param->{$key} = $req->param($key) if ($req->param($key));
+    foreach my $key (qw( generation notbefore notafter )) {
+        my $predicate = "has_$key";
+        $cmd_param->{$key} = $param->$key if $param->$predicate;
     }
 
     # TODO root alias
 
-    my $res = $self->api->run_protected_command('create_alias', $param );
+    my $res = $self->rawapi->run_protected_command('create_alias', $cmd_param);
     my $alias = $res->params->{alias};
     $self->log->debug("Alias $alias was created");
 
     # we now add the key
-    if ($req->param('key')) {
-        my $token = $self->handle_key($alias, $req->param('key'));
+    if ($param->key) {
+        my $token = $self->handle_key($alias, $param->key);
         $res->params->{key_name} = $token->{key_name};
     }
 
-    return OpenXPKI::Client::API::Response->new( payload => $res );
-}
+    return $res;
+};
 
-__PACKAGE__->meta()->make_immutable();
-
-1;
+__PACKAGE__->meta->make_immutable;

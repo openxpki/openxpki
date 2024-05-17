@@ -150,6 +150,17 @@ A clearer named C<clear_*> to clear the attribute and a predicate C<has_*> to
 test if it's set. See L<Moose::Manual::Attributes/Predicate and clearer methods>
 if you don't know what that means.
 
+When using any type that has a coercion defined the C<coerce =E<gt> 1> option
+will automatically be set (by
+L<OpenXPKI::Base::API::PluginMetaClassTrait/add_param_specs>):
+
+    command "doit" => {
+        types => { isa => 'ArrayRefOrCommaList' }, # will set coerce => 1
+    } => sub {
+        my ($self, $params) = @_;
+        print join(", ", @{ $params->types }), "\n";
+    };
+
 =back
 
 =back

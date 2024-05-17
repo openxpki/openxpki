@@ -1,12 +1,7 @@
 package OpenXPKI::Client::API::Command::config;
+use OpenXPKI -role;
 
-use Moose;
-extends 'OpenXPKI::Client::API::Command';
-
-# Core modules
-use Data::Dumper;
-use List::Util qw( none );
-
+with 'OpenXPKI::Client::API::Command';
 
 =head1 NAME
 
@@ -33,7 +28,5 @@ Feed me!
 =back
 
 =cut
-
-__PACKAGE__->meta()->make_immutable();
 
 1;

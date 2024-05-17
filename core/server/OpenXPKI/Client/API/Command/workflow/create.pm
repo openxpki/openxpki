@@ -1,16 +1,9 @@
 package OpenXPKI::Client::API::Command::workflow::create;
+use OpenXPKI -plugin;
 
-
-use Moose;
-extends 'OpenXPKI::Client::API::Command::workflow';
-
-use MooseX::ClassAttribute;
-
-use Data::Dumper;
-
-use OpenXPKI::Client::API::Response;
-use OpenXPKI::DTO::Field;
-use OpenXPKI::DTO::Field::String;
+with 'OpenXPKI::Client::API::Command::workflow';
+set_namespace_to_parent;
+__PACKAGE__->needs_realm;
 
 =head1 NAME
 
@@ -22,46 +15,27 @@ Initiate a new workflow
 
 =cut
 
-class_has 'param_spec' => (
-    is      => 'ro',
-    isa => 'ArrayRef[OpenXPKI::DTO::Field]',
-    default => sub {[
-        OpenXPKI::DTO::Field::String->new( name => 'type', label => 'Workflow Type', hint => 'hint_type', required => 1 ),
-    ]},
-);
-
-sub hint_type {
-
-    my $self = shift;
-    my $req = shift;
-    my $input = shift;
-
+sub hint_type ($self, $input_params) {
     # TODO - we need a new API method to get ALL types and not only the used ones!
-    my $types = $self->api->run_command('get_workflow_instance_types');
-    my %types = %{$types->params};
-    $self->log()->trace(Dumper \%types) if ($self->log()->is_trace);
+    my $types = $self->rawapi->run_command('get_workflow_instance_types');
+    my %types = $types->params->%*;
+    $self->log->trace(Dumper \%types) if $self->log->is_trace;
     return [ map { sprintf '%s (%s)', $_, $types{$_}->{label} } sort keys %types ];
-
 }
 
-sub execute {
+command "create" => {
+    type => { isa => 'Str', label => 'Workflow Type', hint => 'hint_type', required => 1 },
+} => sub ($self, $param) {
 
-    my $self = shift;
-    my $req = shift;
+    my $wf_parameters = $self->_build_hash_from_payload($param);
+    $self->log->info(Dumper $wf_parameters);
 
-    my $wf_parameters = {};
-    if ($req->payload()) {
-        $wf_parameters = $self->_build_hash_from_payload($req);
-        $self->log->info(Dumper $wf_parameters);
-    }
-    my $res = $self->api->run_command('create_workflow_instance', {
-        workflow => $req->param('type'),
+    my $res = $self->rawapi->run_command('create_workflow_instance', {
+        workflow => $param->type,
         params => $wf_parameters,
     });
-    return OpenXPKI::Client::API::Response->new( payload => $res );
+    return $res;
 
-}
+};
 
-__PACKAGE__->meta()->make_immutable();
-
-1;
+__PACKAGE__->meta->make_immutable;

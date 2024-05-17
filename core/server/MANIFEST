@@ -10,6 +10,7 @@ Makefile.PL
 OpenXPKI.pm
 OpenXPKI/Base/API/APIRole.pm
 OpenXPKI/Base/API/Autoloader.pm
+OpenXPKI/Base/API/ParamAttributeTrait.pm
 OpenXPKI/Base/API/Plugin.pm
 OpenXPKI/Base/API/PluginMetaClassTrait.pm
 OpenXPKI/Base/API/PluginRole.pm
@@ -52,7 +53,6 @@ OpenXPKI/Client/Simple.pm
 # New CLI / API
 OpenXPKI/Client/API.pm
 OpenXPKI/Client/API/Command.pm
-OpenXPKI/Client/API/Command/NeedRealm.pm
 OpenXPKI/Client/API/Command/Protected.pm
 OpenXPKI/Client/API/Command/acme.pm
 OpenXPKI/Client/API/Command/acme/create.pm
@@ -96,7 +96,6 @@ OpenXPKI/Client/API/Command/workflow/resume.pm
 OpenXPKI/Client/API/Command/workflow/show.pm
 OpenXPKI/Client/API/Command/workflow/wakeup.pm
 
-OpenXPKI/Client/API/Request.pm
 OpenXPKI/Client/API/Response.pm
 
 # Wrappers for EST, RPC...
@@ -245,14 +244,6 @@ OpenXPKI/Crypto/Backend/OpenSSL/Command/verify_cert.pm
 
 # Reusable Data Objects for APIs
 OpenXPKI/DTO/Authenticator.pm
-OpenXPKI/DTO/Field.pm
-OpenXPKI/DTO/Field/Bool.pm
-OpenXPKI/DTO/Field/Directory.pm
-OpenXPKI/DTO/Field/Epoch.pm
-OpenXPKI/DTO/Field/File.pm
-OpenXPKI/DTO/Field/Int.pm
-OpenXPKI/DTO/Field/Realm.pm
-OpenXPKI/DTO/Field/String.pm
 OpenXPKI/DTO/Message.pm
 OpenXPKI/DTO/Message/Authenticate.pm
 OpenXPKI/DTO/Message/Command.pm

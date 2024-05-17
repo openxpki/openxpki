@@ -14,6 +14,9 @@ use File::Spec;
 use IO::Dir 1.03;
 use List::Util qw( any );
 
+# CPAN modules
+use Moose::Util qw( does_role );
+
 # Project modules
 use OpenXPKI::Server::Log;
 use OpenXPKI::Base::API::PluginRole;
@@ -27,6 +30,7 @@ Perl package namespace that will be searched for the command plugin classes.
 
 =cut
 requires 'namespace';
+requires 'handle_dispatch_error';
 
 =head1 SYNOPSIS
 
@@ -43,7 +47,7 @@ Then to use it:
         acl_rule_accessor => sub { CTX('config')->get('acl.rules.' . CTX('session')->data->role ) },
         log => OpenXPKI::Server::Log->new(CONFIG => '')->system,
     );
-    printf "Available commands in root namespace: %s\n", join(", ", keys $api->commands->%*);
+    printf "Available commands in root namespace: %s\n", join(", ", keys $api->namespace_commands->%*);
 
     my $api_direct = $api->autoloader;
 
@@ -90,7 +94,7 @@ C<use L<OpenXPKI> -plugin> as described there.
 All plugins are expected to consume L<OpenXPKI::Base::API::PluginRole> and
 have meta class role L<OpenXPKI::Base::API::PluginMetaClassTrait> applied.
 
-=head1 ATTRIBUTES
+=head1 CONSTRUCTOR PARAMETERS
 
 =head2 log
 
@@ -101,31 +105,6 @@ has log => (
     is => 'ro',
     isa => 'Log::Log4perl::Logger',
     required => 1,
-);
-
-=head2 autoloader
-
-Returns an instance of L<OpenXPKI::Base::API::Autoloader> that allows to
-directly call API commands. E.g.:
-
-    my $api = OpenXPKI::Server::API2->new( ... );
-    my $api_direct = $api->autoloader;
-
-    # call command in the root namespace:
-    $api_direct->search_cert(pki_realm => ...)
-
-    # call command in the config namespace:
-    $api_direct->config->show;
-
-=cut
-has autoloader => (
-    is => 'ro',
-    isa => 'OpenXPKI::Base::API::Autoloader',
-    lazy => 1,
-    default => sub {
-        my $self = shift;
-        return OpenXPKI::Base::API::Autoloader->new(api => $self);
-    },
 );
 
 =head2 enable_acls
@@ -178,6 +157,45 @@ has acl_rule_accessor => (
     default => sub { die "Attribute 'acl_rule_accessor' not set in ".__PACKAGE__."\n" },
 );
 
+=head1 ATTRIBUTES
+
+=head2 autoloader
+
+Readonly: returns an instance of L<OpenXPKI::Base::API::Autoloader> that
+allows to directly call API commands. E.g.:
+
+    my $api = OpenXPKI::Server::API2->new( ... );
+    my $api_direct = $api->autoloader;
+
+    # call command in the root namespace:
+    $api_direct->search_cert(pki_realm => ...)
+
+    # call command in the config namespace:
+    $api_direct->config->show;
+
+=cut
+has autoloader => (
+    is => 'ro',
+    isa => 'OpenXPKI::Base::API::Autoloader',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        return OpenXPKI::Base::API::Autoloader->new(api => $self);
+    },
+);
+
+=head2 plugin_packages
+
+I<ArrayRef> of the Perl packages of all loaded plugins.
+
+=cut
+has plugin_packages => (
+    is => 'rw',
+    isa => 'ArrayRef',
+    init_arg => undef,
+    default => sub { [] },
+);
+
 # I<HashRef> containing registered API commands under their respective relative
 # namespace and their Perl packages. The hash is built on first access.
 
@@ -193,18 +211,16 @@ has acl_rule_accessor => (
 #         },
 #         ...
 #     }
-has _commands => (
+has _namespace_commands => (
     is => 'rw',
     isa => 'HashRef',
     init_arg => undef,
     lazy => 1,
-    builder => "_build_commands",
+    builder => "_build_namespace_commands",
 );
 
-sub _build_commands {
-    # Code taken from Plugin::Simple
-    my $self = shift;
-
+sub _build_namespace_commands ($self) {
+    # Code inspired by Plugin::Simple
     my $result = {};
     my @modules = ();
     my $pkg_map = {};
@@ -219,14 +235,14 @@ sub _build_commands {
     }
 
     # Try to load the given plugin classes.
-    $self->log->debug("Loading ".(scalar keys $pkg_map->%*)." API plugins in namespace " . $self->namespace);
+    $self->log->debug("Checking ".(scalar keys $pkg_map->%*)." packages in API plugin namespace " . $self->namespace);
 
-    for my $pkg (keys $pkg_map->%*) {
+    for my $pkg (sort keys $pkg_map->%*) {
         my $file = $pkg_map->{$pkg};
         Module::Load::load($pkg);
 
-        if (not $pkg->DOES('OpenXPKI::Base::API::PluginRole')) {
-            $self->log->trace("API - ignore $pkg (does not consume OpenXPKI::Base::API::PluginRole) - $file");
+        if (not does_role($pkg, 'OpenXPKI::Base::API::PluginRole')) {
+            $self->log->trace("API - ignore $pkg (does not consume OpenXPKI::Base::API::PluginRole)");
             next;
         }
 
@@ -247,7 +263,8 @@ sub _build_commands {
             $namespace =~ s/^\Q$root_namespace\E:://;
         }
 
-        $self->log->trace("API - register $pkg: ".join(", ", $pkg->meta->command_list)." - $file");
+        $self->log->trace("API - register $pkg: ".join(", ", $pkg->meta->command_list));
+        push $self->plugin_packages->@*, $pkg;
 
         # store commands and their source package
         for my $cmd ($pkg->meta->command_list) {
@@ -290,7 +307,7 @@ has rel_namespaces => (
     isa => 'ArrayRef',
     init_arg => undef,
     lazy => 1,
-    default => sub ($self) { [ keys $self->_commands->%* ] },
+    default => sub ($self) { [ keys $self->_namespace_commands->%* ] },
 );
 
 =head2 has_non_root_namespaces
@@ -308,13 +325,13 @@ has has_non_root_namespaces => (
 
 =head1 METHODS
 
-=head2 commands
+=head2 namespace_commands
 
 Returns a I<HashRef> with API commands of the given relative namespace and
 their Perl packages.
 
-    my $root_cmds = $api->commands;
-    my $config_cmds = $api->commands('config');
+    my $root_cmds = $api->namespace_commands;
+    my $config_cmds = $api->namespace_commands('config');
 
 If no namespace is specified the commands of this API's root namespace (i.e.
 usually those that did not explicitely set a namespace) are returned.
@@ -336,14 +353,14 @@ B<Parameters>
 =back
 
 =cut
-signature_for commands => (
+signature_for namespace_commands => (
     method => 1,
     positional => [
         'Optional[ Str ]',
     ],
 );
-sub commands ($self, $namespace = '') {
-    return $self->_commands->{$namespace} // {};
+sub namespace_commands ($self, $namespace = '') {
+    return $self->_namespace_commands->{$namespace} // {};
 }
 
 =head2 dispatch
@@ -389,7 +406,7 @@ sub dispatch ($self, $arg) {
     }
 
     # Known command?
-    my $package = $self->commands($rel_ns)->{ $command }
+    my $package = $self->namespace_commands($rel_ns)->{ $command }
         or OpenXPKI::Exception->throw(
             message => "Unknown API command",
             params => { namespace => $rel_ns, command => $command, caller => sprintf("%s:%s", ($self->my_caller())[1,2]) },
@@ -425,24 +442,17 @@ sub dispatch ($self, $arg) {
     my $result;
     try {
 #        $result = $package->meta->execute($self, $command, $all_params);
-        my $cmd_obj = $package->new(rawapi => $self);
+        my $plugin = $package->new(rawapi => $self);
+
+        if (my $preprocess = $self->can('preprocess_params')) {
+            $preprocess->($self, $command, $all_params, $plugin);
+        }
+
         my $param_obj = $package->meta->new_param_object($command, $all_params); # provided by OpenXPKI::Base::API::PluginMetaClassTrait
-        $result = $cmd_obj->$command($param_obj);
+        $result = $plugin->$command($param_obj);
     }
     catch ($err) {
-        my $msg = $err;
-        if (blessed($err)) {
-            if ($err->isa("OpenXPKI::Exception")) {
-                $err->rethrow;
-            }
-            elsif ($err->isa("Moose::Exception")) {
-                $msg = $err->message;
-            }
-        }
-        OpenXPKI::Exception->throw(
-            message => "Error while executing API command",
-            params => { namespace => $rel_ns, command => $command, error => $msg, caller => sprintf("%s:%s", ($self->my_caller())[1,2]) }, # stringify in case error is an object
-        );
+        return $self->handle_dispatch_error($err);
     }
 
     return $result;
@@ -456,18 +466,8 @@ signature_for command_help => (
     ],
 );
 sub command_help ($self, $command) {
-
-    my $package = $self->commands->{ $command };
-
-    # command ensures that the packages was loaded before
-    my $meta = $package->meta;
-
-    OpenXPKI::Exception->throw(
-        'Unable to find help for given API command'
-    ) unless (blessed $meta && $meta->isa('Moose::Meta::Class'));
-
     # This is a 'Moose::Meta::Class' holding attributes and coderef
-    my @attributes = $meta->param_metaclass($command)->get_all_attributes;
+    my $attributes = $self->get_command_attributes(undef, $command);
 
     # each item is a 'Moose::Meta::Attribute'
     my %arguments = map {
@@ -476,10 +476,35 @@ sub command_help ($self, $command) {
                 'type' => ($_->has_type_constraint ? $_->type_constraint->name : 'unknown'),
                 'documentation' => ($_->documentation || ''),
         })
-    } @attributes;
+    } $attributes->@*;
 
     return \%arguments;
 
+}
+
+=head2 get_command_attributes
+
+Returns an I<ArrayRef> with the L<Moose::Meta::Attribute> objects of the
+parameters of the given command.
+
+=cut
+signature_for get_command_attributes => (
+    method => 1,
+    positional => [ 'Str', 'Str' ],
+);
+sub get_command_attributes ($self, $namespace, $command) {
+    $namespace //= ''; # convert undef to empty string (= root namespace)
+    my $package = $self->namespace_commands($namespace)->{ $command };
+    my $meta = $package->meta;
+
+    OpenXPKI::Exception->throw(
+        'Unable to find help for given API command'
+    ) unless (blessed $meta && $meta->isa('Moose::Meta::Class'));
+
+    # param_metaclass() returns a 'Moose::Meta::Class'
+    my @attributes = sort { $a->name cmp $b->name } $meta->param_metaclass($command)->get_all_attributes;
+
+    return \@attributes; # ArrayRef of Moose::Meta::Attribute
 }
 
 =head2 my_caller

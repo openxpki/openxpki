@@ -1,16 +1,10 @@
 package OpenXPKI::Client::API::Command::token::delete;
+use OpenXPKI -plugin;
 
-use Moose;
-extends 'OpenXPKI::Client::API::Command::token';
-with 'OpenXPKI::Client::API::Command::NeedRealm';
+with 'OpenXPKI::Client::API::Command::token';
+set_namespace_to_parent;
+__PACKAGE__->needs_realm;
 with 'OpenXPKI::Client::API::Command::Protected';
-
-use MooseX::ClassAttribute;
-
-use OpenXPKI::Client::API::Response;
-use OpenXPKI::DTO::Field;
-use OpenXPKI::DTO::Field::Bool;
-use OpenXPKI::DTO::Field::String;
 
 =head1 NAME
 
@@ -22,42 +16,30 @@ Delete the token for a given alias name
 
 =cut
 
-class_has 'param_spec' => (
-    is      => 'ro',
-    isa => 'ArrayRef[OpenXPKI::DTO::Field]',
-    default => sub {[
-        OpenXPKI::DTO::Field::String->new( name => 'alias', 'label' => 'Alias', required => 1 ),
-        OpenXPKI::DTO::Field::Bool->new( name => 'remove-key', 'label' => 'Remove the key' ),
-    ]},
-);
+command "delete" => {
+    alias => { isa => 'Str', 'label' => 'Alias', required => 1, trigger => \&check_alias  },
+    remove_key => { isa => 'Bool', 'label' => 'Remove the key' },
+} => sub ($self, $param) {
 
-sub execute {
+    my $alias = $param->alias;
 
-    my $self = shift;
-    my $req = shift;
+    my $res = $self->rawapi->run_command('show_alias', { alias => $alias });
+    die "Alias '$alias not' found\n" unless $res->param('alias');
 
-    my $alias = $req->param('alias');
-    my $param = { alias => $alias };
-
-    my $res = $self->api->run_command('show_alias', $param );
-    die "Alias '$alias not' found" unless $res->param('alias');
-
-    if ($req->param('remove-key')) {
-        my $token = $self->api->run_command('get_token_info', $param );
+    if ($param->remove_key) {
+        my $token = $self->rawapi->run_command('get_token_info', { alias => $alias });
         if ($token->param('key_store') ne 'DATAPOOL') {
-            die "Unable to remove key as key is not stored in datapool";
+            die "Unable to remove key as key is not stored in datapool\n";
         }
-        $self->api->run_command('delete_data_pool_entry', {
+        $self->rawapi->run_command('delete_data_pool_entry', {
             namespace => 'sys.crypto.keys',
             key => $token->param('key_name'),
         });
     }
 
-    $res = $self->api->run_protected_command('delete_alias', $param );
+    $res = $self->rawapi->run_protected_command('delete_alias', { alias => $alias });
 
-    return OpenXPKI::Client::API::Response->new( payload => $res );
-}
+    return $res;
+};
 
-__PACKAGE__->meta()->make_immutable();
-
-1;
+__PACKAGE__->meta->make_immutable;

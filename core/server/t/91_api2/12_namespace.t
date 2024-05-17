@@ -32,7 +32,7 @@ lives_ok {
 } "instantiate";
 
 lives_and {
-    cmp_deeply [ keys $api->commands->%* ], ['info'];
+    cmp_deeply [ keys $api->namespace_commands->%* ], ['info'];
 } "query available commands in root namespace";
 
 lives_and {
@@ -40,15 +40,15 @@ lives_and {
 } "has_non_root_namespaces == TRUE";
 
 lives_and {
-    cmp_deeply [ keys $api->commands('config')->%* ], bag(qw( info show ));
+    cmp_deeply [ keys $api->namespace_commands('config')->%* ], bag(qw( info show ));
 } "query available commands in 'config' namespace";
 
 lives_and {
-    cmp_deeply [ keys $api->commands('user')->%* ], bag(qw( create delete ));
+    cmp_deeply [ keys $api->namespace_commands('user')->%* ], bag(qw( create delete ));
 } "query available commands in 'user' namespace";
 
 lives_and {
-    cmp_deeply [ keys $api->commands('workflow')->%* ], bag(qw( create pickup ));
+    cmp_deeply [ keys $api->namespace_commands('workflow')->%* ], bag(qw( create pickup ));
 } "query available commands in 'workflow' namespace";
 
 throws_ok {

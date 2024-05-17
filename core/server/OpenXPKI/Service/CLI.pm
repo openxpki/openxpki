@@ -331,9 +331,9 @@ sub __handle_enquiry {
     if ($enquiry eq 'command') {
         if (my $command = $message->param('command')) {
             ##! 64: $command
-            $result = $self->api()->command_help($command);
+            $result = $self->api->command_help($command);
         } else {
-            $result = { result => [ sort keys %{$self->api()->commands} ] }
+            $result = { result => [ sort keys $self->api->commands->%* ] }
         }
     } elsif ($enquiry eq 'realm') {
         $result = { result => $self->api->get_realm_list };

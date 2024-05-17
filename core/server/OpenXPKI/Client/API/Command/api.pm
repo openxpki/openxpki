@@ -1,12 +1,7 @@
 package OpenXPKI::Client::API::Command::api;
+use OpenXPKI -role;
 
-use Moose;
-extends 'OpenXPKI::Client::API::Command';
-
-# Core modules
-use Data::Dumper;
-use List::Util qw( none );
-
+with 'OpenXPKI::Client::API::Command';
 
 =head1 NAME
 
@@ -22,36 +17,14 @@ Feed me!
 
 =cut
 
-
-sub list_command {
-
-    my $self = shift;
-    my $req = shift;
-
-    my $actions = $self->api->run_enquiry('command');
-    $self->log->trace(Dumper $actions->result) if ($self->log->is_trace);
+sub hint_command ($self, $input_params){
+    my $actions = $self->rawapi->run_enquiry('command');
+    $self->log->trace(Dumper $actions->result) if $self->log->is_trace;
     return $actions->result || [];
-
 }
 
-sub help_command {
-
-    my $self = shift;
-    my $command = shift;
-    return $self->api->run_enquiry('command', { command => $command })->params;
-
+sub help_command ($self, $command) {
+    return $self->rawapi->run_enquiry('command', { command => $command })->params;
 }
-
-sub execute_command {
-
-    my $self = shift;
-    my $command = shift;
-    my $params = shift;
-    return $self->api->run_command($command, $params);
-
-}
-
-
-__PACKAGE__->meta()->make_immutable();
 
 1;

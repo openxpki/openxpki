@@ -1,16 +1,9 @@
 package OpenXPKI::Client::API::Command::datapool::show;
+use OpenXPKI -plugin;
 
-use Moose;
-extends 'OpenXPKI::Client::API::Command::datapool';
-
-use MooseX::ClassAttribute;
-
-use Data::Dumper;
-
-use OpenXPKI::Client::API::Response;
-use OpenXPKI::DTO::Field;
-use OpenXPKI::DTO::Field::Bool;
-use OpenXPKI::DTO::Field::String;
+with 'OpenXPKI::Client::API::Command::datapool';
+set_namespace_to_parent;
+__PACKAGE__->needs_realm;
 
 =head1 NAME
 
@@ -25,46 +18,35 @@ information.
 
 =cut
 
-class_has 'param_spec' => (
-    is      => 'ro',
-    isa => 'ArrayRef[OpenXPKI::DTO::Field]',
-    default => sub {[
-        OpenXPKI::DTO::Field::String->new( name => 'namespace', label => 'Namespace', hint => 'hint_namespace', required => 1 ),
-        OpenXPKI::DTO::Field::String->new( name => 'key', label => 'Key if the item to be removed', hint => 'hint_key',required => 1 ),
-        OpenXPKI::DTO::Field::Bool->new( name => 'metadata', label => 'Show Metadata' ),
-        OpenXPKI::DTO::Field::Bool->new( name => 'decrypt', label => 'Decrypt encrypted items' ),
-        OpenXPKI::DTO::Field::Bool->new( name => 'deserialize', label => 'Deserialize Item', description => 'Unpack serialized value' ),
-    ]},
-);
-
-sub execute {
-
-    my $self = shift;
-    my $req = shift;
+command "show" => {
+    namespace => { isa => 'Str', label => 'Namespace', hint => 'hint_namespace', required => 1 },
+    key => { isa => 'Str', label => 'Key if the item to be removed', hint => 'hint_key',required => 1 },
+    metadata => { isa => 'Bool', label => 'Show Metadata' },
+    decrypt => { isa => 'Bool', label => 'Decrypt encrypted items' },
+    deserialize => { isa => 'Bool', label => 'Deserialize Item', description => 'Unpack serialized value' },
+} => sub ($self, $param) {
 
     my %param;
-    if ($req->param('decrypt')) {
+    if ($param->decrypt) {
         $param{'with_attributes'} = 1;
     }
 
-    my $res = $self->api->run_command('get_data_pool_entry', {
-        namespace => $req->param('namespace'),
-        key =>  $req->param('key'),
-        decrypt => ($req->param('decrypt') ? 1 :0),
-        ($req->param('deserialize') ? (deserialize => 'simple') : ()),
+    my $res = $self->rawapi->run_command('get_data_pool_entry', {
+        namespace => $param->namespace,
+        key =>  $param->key,
+        decrypt => ($param->decrypt ? 1 :0),
+        ($param->deserialize ? (deserialize => 'simple') : ()),
 
     });
 
-    if (!$req->param('metadata')) {
+    if (!$param->metadata) {
         $res = { result => $res->param('value') };
     }
 
-    return OpenXPKI::Client::API::Response->new( payload => $res );
+    return $res;
 
-}
+};
 
-__PACKAGE__->meta()->make_immutable();
-
-1;
+__PACKAGE__->meta->make_immutable;
 
 

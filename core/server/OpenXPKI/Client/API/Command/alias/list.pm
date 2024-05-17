@@ -1,17 +1,11 @@
 package OpenXPKI::Client::API::Command::alias::list;
+use OpenXPKI -plugin;
 
-use Moose;
-extends 'OpenXPKI::Client::API::Command::alias';
-with 'OpenXPKI::Client::API::Command::NeedRealm';
-
-use MooseX::ClassAttribute;
+with 'OpenXPKI::Client::API::Command::alias';
+set_namespace_to_parent;
+__PACKAGE__->needs_realm;
 
 use List::Util 'any';
-
-use OpenXPKI::Client::API::Response;
-use OpenXPKI::DTO::Field;
-use OpenXPKI::DTO::Field::Bool;
-use OpenXPKI::DTO::Field::String;
 
 =head1 NAME
 
@@ -23,22 +17,9 @@ List (non-token) alias entries
 
 =cut
 
-class_has 'param_spec' => (
-    is      => 'ro',
-    isa => 'ArrayRef[OpenXPKI::DTO::Field]',
-    default => sub {[
-        OpenXPKI::DTO::Field::String->new( name => 'group', 'label' => 'Token group (e.g. tg_server)', hint => 'hint_group' ),
-        OpenXPKI::DTO::Field::Bool->new( name => 'expired' ),
-        OpenXPKI::DTO::Field::Bool->new( name => 'valid' ),
-        OpenXPKI::DTO::Field::Bool->new( name => 'upcoming' ),
-    ]},
-);
-
-sub hint_group {
-
-    my $self = shift;
-    my $aliases = $self->api->run_command('list_alias_groups');
-    my $tokens = $self->api->run_command('list_token_groups');
+sub hint_group ($self, $input_params) {
+    my $aliases = $self->rawapi->run_command('list_alias_groups');
+    my $tokens = $self->rawapi->run_command('list_token_groups');
 
     my @groups;
     while (my $item = shift @{$aliases->param('result')}) {
@@ -47,29 +28,29 @@ sub hint_group {
     return  \@groups;
 }
 
-sub execute {
-
-    my $self = shift;
-    my $req = shift;
+command "list" => {
+    group => { isa => 'Str', label => 'Token group (e.g. tg_server)', hint => 'hint_group', trigger => \&check_group },
+    expired => { isa => 'Bool' },
+    valid => { isa => 'Bool' },
+    upcoming => { isa => 'Bool' },
+} => sub ($self, $param) {
 
     my $groups = $self->hint_group();
     my $res = {};
 
     my %validity;
     foreach my $key ('expired','valid','upcoming') {
-        $validity{$key} = 1 if ($req->param($key));
+        $validity{$key} = 1 if $param->$key;
     }
 
     foreach my $group (@$groups) {
-        my $entries = $self->api->run_command('list_aliases', { group => $group, %validity } );
+        my $entries = $self->rawapi->run_command('list_aliases', { group => $group, %validity } );
         $res->{$group} = {
             count => (scalar @{$entries->result}),
             item => $entries->result,
         };
     }
-    return OpenXPKI::Client::API::Response->new( payload => $res );
-}
+    return $res;
+};
 
-__PACKAGE__->meta()->make_immutable();
-
-1;
+__PACKAGE__->meta->make_immutable;

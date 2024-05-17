@@ -1,16 +1,17 @@
 package OpenXPKI::Client::API::Command::alias;
+use OpenXPKI -role;
 
-use Moose;
-extends 'OpenXPKI::Client::API::Command';
+with 'OpenXPKI::Client::API::Command';
 
 # Core modules
-use Data::Dumper;
-use List::Util qw( none );
+use List::Util qw( any );
 
+# Project modules
+use OpenXPKI::DTO::ValidationException;
 
 =head1 NAME
 
-OpenXPKI::CLI::Command::token
+OpenXPKI::Client::API::Command::alias
 
 =head1 SYNOPSIS
 
@@ -38,45 +39,27 @@ Feed me!
 
 =cut
 
-__PACKAGE__->meta()->make_immutable();
-
-
-sub preprocess {
-
-    my $self = shift;
-    my $req = shift;
-
-    my $res = $self->_preprocess($req);
-
-    return OpenXPKI::Client::API::Response->new(
-        state => 400,
-        payload => $res
-    ) if ($res);
-
-    # check if group / alias is not a token
-    my ($group, $input);
-    if ($req->param('group')) {
-        $input = 'group';
-        $group = $req->param('group');
-    } elsif (my $alias = $req->param('alias')) {
-        $input = 'alias';
-        ($group) = $alias =~ m{(.*)-\d+\z};
-    }
-    return unless ($group);
-
-    $self->log->debug('Alias from group ' . $group);
-    my $groups = $self->api->run_command('list_token_groups');
-    return if (none { $_ eq $group } values %{$groups->params});
-
-    # TODO - throw exception
-    return OpenXPKI::Client::API::Response->new(
-        state => 400,
-        payload => OpenXPKI::DTO::ValidationException->new(
-            field => $input, reason => 'value',
-            message => 'Given alias group must be handled using the token command'
-        )
-    );
+sub check_group ($self, $group) {
+    $self->_assert_no_token_group('group', $group);
 }
 
+sub check_alias ($self, $alias) {
+    my ($group) = $alias =~ m{(.*)-\d+\z};
+    $self->_assert_no_token_group('alias', $group);
+}
+
+# check if group / alias is not a token
+sub _assert_no_token_group ($self, $field_name, $group) {
+    return unless $group;
+
+    my $groups = $self->rawapi->run_command('list_token_groups');
+
+    if (any { $_ eq $group } values %{$groups->params}) {
+        die OpenXPKI::DTO::ValidationException->new(
+            field => $field_name, reason => 'value',
+            message => 'Given '.$field_name.' is a token group, it must be managed using the "token" command',
+        );
+    }
+}
 
 1;

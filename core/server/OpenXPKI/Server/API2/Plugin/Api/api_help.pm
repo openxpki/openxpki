@@ -39,7 +39,7 @@ command "api_help" => {
     my $command = $params->command;
 
     # query the 'command => package' mapping
-    my $package = $self->rawapi->commands->{$command};
+    my $package = $self->rawapi->namespace_commands->{$command};
     return "ERROR: Unknown API command '$command'" unless $package;
 
     # find module path

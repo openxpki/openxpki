@@ -1,18 +1,9 @@
 package OpenXPKI::Client::API::Command::datapool::list;
+use OpenXPKI -plugin;
 
-use Moose;
-extends 'OpenXPKI::Client::API::Command::datapool';
-
-use MooseX::ClassAttribute;
-
-use Data::Dumper;
-
-use OpenXPKI::Client::API::Response;
-use OpenXPKI::DTO::Field;
-use OpenXPKI::DTO::Field::Int;
-use OpenXPKI::DTO::Field::String;
-use OpenXPKI::DTO::Field::Bool;
-
+with 'OpenXPKI::Client::API::Command::datapool';
+set_namespace_to_parent;
+__PACKAGE__->needs_realm;
 
 =head1 NAME
 
@@ -24,33 +15,21 @@ List datapool keys/items for a given namespace
 
 =cut
 
-class_has 'param_spec' => (
-    is      => 'ro',
-    isa => 'ArrayRef[OpenXPKI::DTO::Field]',
-    default => sub {[
-        OpenXPKI::DTO::Field::String->new( name => 'namespace', label => 'Namespace', hint => 'hint_namespace', required => 1 ),
-        OpenXPKI::DTO::Field::Int->new( name => 'limit', label => 'Result Count', value => 25 ),
-        OpenXPKI::DTO::Field::Bool->new( name => 'metadata', label => 'Show Metadata' ),
-
-    ]},
-);
-
-sub execute {
-
-    my $self = shift;
-    my $req = shift;
+command "list" => {
+    namespace => { isa => 'Str', label => 'Namespace', hint => 'hint_namespace', required => 1 },
+    limit => { isa => 'Int', label => 'Result Count', default => 25 },
+    metadata => { isa => 'Bool', label => 'Show Metadata' },
+} => sub ($self, $param) {
 
     my %query = (
-        namespace => $req->param('namespace'),
+        namespace => $param->namespace,
     );
-    $query{metadata} = 1 if ($req->param('metadata'));
-    my $res = $self->api->run_command('list_data_pool_entries', \%query );
-    return OpenXPKI::Client::API::Response->new( payload => $res );
+    $query{metadata} = 1 if ($param->metadata);
+    my $res = $self->rawapi->run_command('list_data_pool_entries', \%query );
+    return $res;
 
-}
+};
 
-__PACKAGE__->meta()->make_immutable();
-
-1;
+__PACKAGE__->meta->make_immutable;
 
 

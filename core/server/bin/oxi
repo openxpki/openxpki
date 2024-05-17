@@ -1,16 +1,14 @@
 #!/usr/bin/env perl
+use OpenXPKI;
 
-use v5.32;
 use Getopt::Long;
 use Pod::Usage;
-use Data::Dumper;
 use JSON::PP;
 use YAML;
-use Scalar::Util qw( blessed );
 
 use OpenXPKI::i18n qw(set_language);
 use OpenXPKI::Client::API;
-use OpenXPKI::Client::API::Request;
+use OpenXPKI::Client::API::Response;
 use OpenXPKI::Client::CLI;
 use OpenXPKI::DTO::Authenticator;
 
@@ -18,27 +16,28 @@ set_language('en_US');
 use Log::Log4perl qw(:easy :no_extra_logdie_message);
 pod2usage( -verbose => 1 ) unless (@ARGV);
 
-my %opt;
+my $verbose = 0;
+my %opt = ('verbose' => \$verbose);
 Getopt::Long::Configure('pass_through','bundling');
 GetOptions( \%opt, ('verbose|v+','json','json-pretty','auth-key|k=s','auth-config|c=s','no-caop','help'));
 Getopt::Long::Configure('no_pass_through');
 
 my $l4p_level;
 my $l4p_layout = '%m%n';
-if ($opt{verbose} > 2) {
+if ($verbose > 2) {
     $l4p_level = $TRACE;
     $l4p_layout = '%l %F:%L %m%n';
-} elsif ($opt{verbose} == 2) {
+} elsif ($verbose == 2) {
     $l4p_level = $DEBUG;
     $l4p_layout = '%m%n';
-} elsif ($opt{verbose} == 1) {
+} elsif ($verbose == 1) {
     $l4p_level = $INFO;
 } else {
     $l4p_level = $ERROR;
 }
 Log::Log4perl->easy_init({ level => $l4p_level, layout => $l4p_layout });
 
-my $api = OpenXPKI::Client::API->new();
+my $api = OpenXPKI::Client::API->new(enable_acls => 0);
 
 # help is also avail via flag for subcommands
 if ($opt{help} && @ARGV) {
@@ -55,26 +54,18 @@ if ($command eq 'help') {
         exit 0;
     }
 
-    say "oxi COMMAND [SUBCOMMAND] [OPTIONS] PARAMETER";
+    say "oxi COMMAND [SUBCOMMAND] [OPTIONS] ARGUMENTS";
     say "";
-    say "Available commands:";
-    my $commands = $api->commands();
-    map {
-        printf "%12s: %s\n\n", $_, $commands->{$_};
-    } sort keys %{$commands};
+    say $api->help;
     exit 0;
 }
 
 my $subcommand = shift;
 # List subcommands for command
-if (!$subcommand) {
-    say "oxi $command [SUBCOMMAND] [OPTIONS] PARAMETER";
+if (not $subcommand) {
+    say "oxi $command [SUBCOMMAND] [OPTIONS] ARGUMENTS";
     say "";
-    say "Available subcommands for $command:";
-    my $commands = $api->routes($command);
-    map {
-        printf "%12s: %s\n\n", $_, $commands->{$_};
-    } sort keys %{$commands};
+    say $api->help($command);
     exit 0;
 }
 
@@ -90,21 +81,20 @@ while (@ARGV && substr($ARGV[0],0,1) ne '-') {
 }
 
 # Create GetOption spec from the parameters recorded in the command
-if (my @spec = @{$api->param_spec($command, $subcommand)}) {
-    my @getopts = map {
-        $_->getopt_type
-            ? ($_->name . (defined $_->hint ? ':' : '=') . $_->getopt_type)
-            : $_->name # boolean
-    } @spec;
+if (my @getopts = $api->getopt_params($command, $subcommand)) {
     DEBUG(Dumper \@getopts);
     GetOptions( \%params, @getopts ) || exit 1;
     DEBUG(Dumper \%params);
 }
 
+# reserved internal command parameters
+$params{positional_args} = \@extra_args if @extra_args;
+$params{payload} = \@ARGV if @ARGV;
+
 # TODO - Review if there is a better place for this
 my %auth_args;
 
-# For non-global commands the API injects 'realm' into param_spec
+# For non-global commands the API injects 'realm' into the list of required parameters.
 # So if realm is present and set we put it into auth_args
 # NB: Realm argument for commands is pki_realm
 if ($params{realm}) {
@@ -143,16 +133,24 @@ my $client = OpenXPKI::Client::CLI->new(
 );
 $api->client($client);
 
-# assemble request object
-my $req = OpenXPKI::Client::API::Request->new(
-    params => \%params,
-    (@extra_args ? (args => \@extra_args) : ()),
-    (@ARGV ? (payload => \@ARGV) : ()),
-);
-
-TRACE(Dumper $req);
-# Dispatch request - returns O::C::API::Response
-my $res = $api->dispatch($command, $subcommand, $req);
+# Dispatch request
+my $res;
+try {
+    my $payload = $api->dispatch(
+        rel_namespace => $command,
+        command => $subcommand,
+        params => \%params,
+    );
+    $res = OpenXPKI::Client::API::Response->new(
+        payload => $payload,
+    );
+}
+catch ($err) {
+    $res = OpenXPKI::Client::API::Response->new(
+        payload => $err,
+        state => 400,
+    );
+}
 TRACE(Dumper $res);
 
 my $json = JSON::PP->new();
@@ -210,7 +208,7 @@ Type C<help> to get the list of available commands.
 
 Type the name of any command to get available subcommands.
 
-Type C<help> C<<command>> C<[<subcommand>]> for detailed help
+Type C<help E<lt>commandE<gt> [E<lt>subcommandE<gt>]> for detailed help
 on a command or subcommand.
 
 =head2 Global Options

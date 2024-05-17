@@ -1,12 +1,7 @@
 package OpenXPKI::Client::API::Command::datapool;
+use OpenXPKI -role;
 
-use Moose;
-extends 'OpenXPKI::Client::API::Command';
-with 'OpenXPKI::Client::API::Command::NeedRealm';
-
-# Core modules
-use Data::Dumper;
-use List::Util qw( none );
+with 'OpenXPKI::Client::API::Command';
 
 =head1 NAME
 
@@ -36,29 +31,17 @@ Feed me!
 
 =cut
 
-sub hint_namespace {
-    my $self = shift;
-    my $req = shift;
-
-    my $types = $self->api->run_command('list_data_pool_namespaces');
-    $self->log->trace(Dumper $types) if ($self->log->is_trace);
+sub hint_namespace ($self, $input_params) {
+    my $types = $self->rawapi->run_command('list_data_pool_namespaces');
     return $types->result;
-
 }
 
-sub hint_key {
-    my $self = shift;
-    my $req = shift;
-
-    my $keys = $self->api->run_command('list_data_pool_entries', {
-        namespace => $req->param('namespace')
+sub hint_key ($self, $input_params) {
+    my $keys = $self->rawapi->run_command('list_data_pool_entries', {
+        namespace => $input_params->{namespace},
     });
-    $self->log->trace(Dumper $keys) if ($self->log->is_trace);
     return [ map { $_->{key} } @{$keys->result} ];
-
 }
 
-
-__PACKAGE__->meta()->make_immutable();
 
 1;

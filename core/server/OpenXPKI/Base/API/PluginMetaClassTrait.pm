@@ -1,5 +1,11 @@
 package OpenXPKI::Base::API::PluginMetaClassTrait;
-use OpenXPKI -role;
+use OpenXPKI qw( -role -typeconstraints );
+
+# Core modules
+use List::Util qw( any );
+
+# CPAN modules
+use Moose::Meta::TypeConstraint;
 
 =head1 NAME
 
@@ -30,6 +36,29 @@ has namespace => (
 );
 
 =head1 METHODS
+
+=head2 add_default_attribute_spec
+
+Add the given attribute specification to all commands of the plugin.
+
+    $self->meta->add_default_attribute_spec(
+        realm => { is => 'Str', required => 1, label => 'PKI Realm' },
+    );
+
+Accepts the same options as the C<$param_specs> hash of L</add_param_specs>
+and thus the same as the C<$params> hash in
+L<OpenXPKI::Base::API::Plugin/command>.
+
+=cut
+has _default_attribute_specs => (
+    is => 'rw',
+    isa => 'HashRef[HashRef]',
+    traits => [ 'Hash' ],
+    handles => {
+        add_default_attribute_spec => 'set',
+    },
+    default => sub { {} },
+);
 
 =head2 command_list
 
@@ -80,11 +109,15 @@ generated container class (type L<Moose::Meta::Class>).
 Values are I<HashRefs> with the attribute options (extended version of Moose's I<has>
 keyword options).
 
+When using any type with a coercion the C<coerce =E<gt> 1> option will
+automatically be set.
+
 For more details please see L<OpenXPKI::Base::API::Plugin/command>.
 
 =back
 
 =cut
+
 signature_for add_param_specs => (
     method => 1,
     positional => [ 'Str', 'HashRef' ],
@@ -95,16 +128,35 @@ sub add_param_specs ($self, $command, $params_specs) {
     );
 
     # Add API command parameters to the newly created class as Moose attributes
+    $self->_add_attributes($command, $param_metaclass, $params_specs);
+    # Add default API command parameters
+    $self->_add_attributes($command, $param_metaclass, $self->_default_attribute_specs);
+    # internally register the new parameter class
+    $self->param_metaclass($command, $param_metaclass);
+}
+
+signature_for _add_attributes => (
+    method => 1,
+    positional => [ 'Str', 'Moose::Meta::Class', 'HashRef' ],
+);
+sub _add_attributes ($self, $command, $param_metaclass, $params_specs) {
     for my $param_name (sort keys $params_specs->%*) {
         # the parameter specs like "isa => ..., required => ..."
         my $spec = { $params_specs->{$param_name}->%* }; # copy params to prevent modifying it via delete() below
 
         OpenXPKI::Exception->throw(
-            message => "'isa' must specified when defining an API command parameter",
+            message => "Parameter '$param_name' collides with default parameter of same name",
+            params => { command => $command, parameter => $param_name, spec => Dumper($spec) }
+        ) if (any { $param_name eq $_ } keys $self->_default_attribute_specs->%*);
+
+        OpenXPKI::Exception->throw(
+            message => "'isa' must be specified when defining an API command parameter",
             params => { command => $command, parameter => $param_name, spec => Dumper($spec) }
         ) unless $spec->{isa};
 
         my $isa = delete $spec->{isa};
+        my $type = Moose::Util::TypeConstraints::find_or_create_isa_type_constraint($isa);
+
         if ($spec->{matching}) {
             # FIXME Implement
             my $matching = delete $spec->{matching};
@@ -113,26 +165,26 @@ sub add_param_specs ($self, $command, $params_specs) {
                 params => { command => $command, parameter => $param_name }
             ) unless (ref $matching eq 'Regexp' or ref $matching eq 'CODE');
 
-            require Moose::Util::TypeConstraints;
-            my $parent_type = Moose::Util::TypeConstraints::find_or_create_isa_type_constraint($isa);
             # we create a new anonymous subtype and overwrite the old type in $isa
             $isa = Moose::Meta::TypeConstraint->new(
-                parent => $parent_type,
+                parent => $type,
                 constraint => ( ref $matching eq 'CODE' ? $matching : sub { $_ =~ $matching } ),
-                message => sub { my $val = shift; return "either attribute is not a '$parent_type' or constraints defined in 'matching' where violated" },
+                message => sub { my $val = shift; return "either attribute is not a '$type' or constraints defined in 'matching' where violated" },
             );
         }
         # add a Moose attribute to the parameter container class
+
         $param_metaclass->add_attribute($param_name,
+            is => 'rw',
             isa => $isa,
+            traits => [ 'OpenXPKI::Base::API::ParamAttributeTrait' ],
             accessor => $param_name,
             clearer => "clear_${param_name}",
             predicate => "has_${param_name}",
+            $type->has_coercion ? (coerce => 1) : (),
             $spec->%*,
         );
     }
-    # internally register the new parameter class
-    $self->param_metaclass($command, $param_metaclass);
 }
 
 =head2 param_metaclass

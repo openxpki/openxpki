@@ -1,16 +1,10 @@
 package OpenXPKI::Client::API::Command::alias::update;
+use OpenXPKI -plugin;
 
-use Moose;
-extends 'OpenXPKI::Client::API::Command::alias';
-with 'OpenXPKI::Client::API::Command::NeedRealm';
+with 'OpenXPKI::Client::API::Command::alias';
+set_namespace_to_parent;
+__PACKAGE__->needs_realm;
 with 'OpenXPKI::Client::API::Command::Protected';
-
-use MooseX::ClassAttribute;
-
-use OpenXPKI::Client::API::Response;
-use OpenXPKI::DTO::Field;
-use OpenXPKI::DTO::Field::Epoch;
-use OpenXPKI::DTO::Field::String;
 
 =head1 NAME
 
@@ -22,42 +16,30 @@ Update an existing alias entry
 
 =cut
 
-class_has 'param_spec' => (
-    is      => 'ro',
-    isa => 'ArrayRef[OpenXPKI::DTO::Field]',
-    default => sub {[
-        OpenXPKI::DTO::Field::String->new( name => 'alias', 'label' => 'Alias', hint => 'hint_type', required => 1 ),
-        OpenXPKI::DTO::Field::Epoch->new( name => 'notbefore', label => 'Validity override (notbefore)' ),
-        OpenXPKI::DTO::Field::Epoch->new( name => 'notafter', label => 'Validity override (notafter)' ),
-    ]},
-);
-
-sub hint_type {
-    my $self = shift;
-    my $req = shift;
-    my $groups = $self->api->run_command('list_token_groups');
+sub hint_alias ($self, $input_params) {
+    my $groups = $self->rawapi->run_command('list_token_groups');
     return [ keys %{$groups->params} ];
 }
 
-sub execute {
+command "update" => {
+    alias => { isa => 'Str', 'label' => 'Alias', hint => 'hint_alias', required => 1, trigger => \&check_alias },
+    notbefore => { isa => 'Epoch', label => 'Validity override (notbefore)' },
+    notafter => { isa => 'Epoch', label => 'Validity override (notafter)' },
+} => sub ($self, $param) {
 
-    my $self = shift;
-    my $req = shift;
+    my $alias = $param->alias;
+    my $cmd_param = { alias => $alias };
 
-    my $alias = $req->param('alias');
-    my $param = { alias => $alias };
-
-    foreach my $key ('notbefore','notafter') {
-        $param->{$key} = $req->param($key) if (defined $req->param($key));
+    foreach my $key (qw( notbefore notafter )) {
+        my $predicate = "has_$key";
+        $cmd_param->{$key} = $param->$key if $param->$predicate;
     }
 
-    die "At least one update parameter is mandatory" unless (scalar keys %$param);
+    die "At least one update parameter is mandatory" unless (scalar keys %$cmd_param);
 
-    my $res = $self->api->run_protected_command('update_alias', $param );
-    $self->log->debug("Alias $alias was updated");
-    return OpenXPKI::Client::API::Response->new( payload => $res );
-}
+    my $res = $self->rawapi->run_protected_command('update_alias', $cmd_param);
+    $self->log->debug("Alias '$alias' was updated");
+    return $res;
+};
 
-__PACKAGE__->meta()->make_immutable();
-
-1;
+__PACKAGE__->meta->make_immutable;

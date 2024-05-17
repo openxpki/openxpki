@@ -1,15 +1,21 @@
 package OpenXPKI::Client::API;
-
 use OpenXPKI -class;
-use Mojo::Loader;
 
+with 'OpenXPKI::Base::API::APIRole';
+
+# required by OpenXPKI::Base::API::APIRole
+sub namespace { 'OpenXPKI::Client::API::Command' }
+
+# Core modules
+use List::Util qw( any none );
+
+# CPAN modules
 use Pod::Find qw(pod_where);
 use Pod::POM;
 use Pod::POM::View::Text;
-
 use Log::Log4perl qw(:easy :no_extra_logdie_message);
 
-use OpenXPKI::DTO::Field::Realm;
+# Project modules
 use OpenXPKI::DTO::Message::Command;
 use OpenXPKI::DTO::Message::Enquiry;
 use OpenXPKI::DTO::Message::ProtectedCommand;
@@ -24,9 +30,7 @@ Root class that provides an API to access the commands defined below
 C<OpenXPKI::Client::API::Command>. The constuctor of the API does not
 take any arguments.
 
-The API is structured into commands and subcommands, input is handled
-by the C<OpenXPKI::Client::API::Request> class, description and
-validation of input fields is implemented by C<OpenXPKI::DTO::Field>.
+The API is structured into commands and subcommands.
 
 The result of any dispatch is a C<OpenXPKI::Client::API::Response>
 instance.
@@ -49,15 +53,14 @@ has commands => (
     lazy => 1,
 );
 
-sub _build_commands {
-    my $self = shift;
-    my @plugins = Mojo::Loader::find_modules('OpenXPKI::Client::API::Command');
+sub _build_commands ($self) {
     my %commands = map {
         my $pod = $self->getpod($_, 'SYNOPSIS');
         $pod =~ s{\A[^\n]*\n\s+(.+?)[\s\n]*\z}{$1}ms;
         $pod =~ s{[\s\n]*\z}{}ms;
         (substr($_,32) => $pod);
-    } @plugins;
+    } map { $self->namespace . '::' . $_ } $self->rel_namespaces->@*;
+
     return \%commands;
 }
 
@@ -76,6 +79,66 @@ has client => (
     predicate => 'has_client',
 );
 
+my %internal_command_attributes = (
+    payload => { isa => 'ArrayRef[Str]' },
+    positional_args => { isa => 'ArrayRef[Str]' }
+);
+
+sub BUILD ($self, $args) {
+    # add these attributes to all API commands
+    for my $pkg ($self->plugin_packages->@*) {
+        $pkg->meta->add_default_attribute_spec(%internal_command_attributes);
+    }
+}
+
+# required by OpenXPKI::Base::API::APIRole
+sub handle_dispatch_error ($self, $err) {
+    if (blessed $err) {
+        if ($err->isa("Moose::Exception")) {
+            if ($err->isa('Moose::Exception::AttributeIsRequired')) {
+                die OpenXPKI::DTO::ValidationException->new( field => $err->attribute_init_arg, reason => 'required' );
+            }
+            if (
+                $err->isa('Moose::Exception::ValidationFailed')
+                or $err->isa('Moose::Exception::ValidationFailedForTypeConstraint')
+            ) {
+                die OpenXPKI::DTO::ValidationException->new( field => $err->attribute->init_arg, reason => 'type' );
+            }
+        }
+        $err->rethrow if $err->can('rethrow');
+    }
+    die $err;
+}
+
+=head2 preprocess_params
+
+A hook called by L<OpenXPKI::Base::API::APIRole/dispatch>.
+
+It processes the C<hint> parameter attribute and the special C<FFFile>
+type.
+
+It throws a C<OpenXPKI::DTO::ValidationException> object on validation
+errors.
+
+=cut
+# $params - ArrayRef[Moose::Meta::Attribute]
+sub preprocess_params ($self, $command, $input_params, $plugin) {
+    my @params = $plugin->meta->param_metaclass($command)->get_all_attributes;
+
+    foreach my $param (@params) { # $param->isa('Moose::Meta::Attribute')
+        my $name = $param->name;
+        my $val = $input_params->{$name};
+        # Empty input + hint flag = load choices
+        if (defined $val) {
+            if ($val eq '' and $param->has_hint) {
+                $self->log->debug('Call hint method to get choices');
+                my $choices = $param->hint->($plugin, $input_params);
+                $self->log->trace('Result from hint method: ' . Dumper $choices) if $self->log->is_trace;
+                die OpenXPKI::DTO::ValidationException->new( field => $name, reason => 'choice', choices => $choices );
+            }
+        }
+    }
+}
 
 =head2 getpod I<package> I<section>
 
@@ -85,11 +148,7 @@ to read the POD from. Returns plain text by applying Pod::POM::View::Text
 
 =cut
 
-sub getpod {
-
-    my $self = shift;
-    my $package = shift;
-    my $section = shift || 'USAGE';
+sub getpod ($self, $package, $section = 'USAGE') {
     my $path = pod_where({-inc => 1}, ($package));
 
     return "no documentation available" unless($path);
@@ -102,7 +161,9 @@ sub getpod {
     return "ERROR: Missing section $section in $path" unless scalar @heading_blocks;
 
     # need to add subsections ?
-    return Pod::POM::View::Text->print($heading_blocks[0]->content);
+    my $pod = Pod::POM::View::Text->print($heading_blocks[0]->content);
+    $pod =~ s/\s+$//m;
+    return $pod;
 
     my @cmd_blocks = grep { $_->title eq $package } $heading_blocks[0]->head2;
     return "ERROR: No description found for '$package' in $path" unless scalar @cmd_blocks;
@@ -111,7 +172,7 @@ sub getpod {
 
 }
 
-=head2 routes I<command>
+=head2 subcommands I<command>
 
 Find the available subcommands for the given I<command> by iterating
 over all perl modules found in the constructed namespace. Return
@@ -122,189 +183,161 @@ Will die if the command can not be found in the I<commands> list.
 
 =cut
 
-sub routes {
-
-    my $self = shift;
-    my $command = shift;
-
-    my $command_ref = $self->commands();
-    if (!$command_ref->{$command}) {
-        die "command $command does not exist";
+sub subcommands ($self, $command) {
+    if (none { $command eq $_ } $self->rel_namespaces->@*) {
+        die "Unknown command '$command'\n";
     }
-
-    my $base = "OpenXPKI::Client::API::Command::$command";
-    my @subcmd = Mojo::Loader::find_modules($base);
+    my @subcmd = keys $self->namespace_commands($command)->%*;
     my %subcmd = map {
-        my $pod = $self->getpod($_, 'SYNOPSIS');
+        my $pod = $self->getpod($self->namespace . "::${command}::${_}", 'SYNOPSIS');
         $pod =~ s{\A[^\n]*\n\s+(.+?)[\s\n]*\z}{$1}ms;
         $pod =~ s{[\s\n]*\z}{}ms;
-        (substr($_,length($base)+2) => $pod);
+        ($_ => $pod);
     } @subcmd;
     return \%subcmd;
-
 }
 
 =head2 help I<command> [I<subcommand>]
 
 Runs C<getpod> on the package name constructed from the given arguments.
 
-If a I<subcommand> is given, evaluates the parameter specification by
-running C<param_spec> and renders a description on the parameters.
+If a I<subcommand> is given, evaluates the parameter specification and
+renders a description on the parameters.
 
 =cut
 
-sub help {
-
-    my $self = shift;
-    my $command = shift;
-    my $subcommand = shift;
+sub help ($self, $command = '', $subcommand = '') {
+    unless ($command) {
+        my $pod = "Available commands:";
+        my $commands = $self->commands;
+        $pod .= sprintf "%12s: %s\n", $_, $commands->{$_} for sort keys $commands->%*;
+        return $pod;
+    }
 
     LOGDIE("Invalid characters in command") unless($command =~ m{\A\w+\z});
     # TODO - select right sections and enhance formatting
-    if (!$subcommand) {
-        return $self->getpod("OpenXPKI::Client::API::Command::${command}", 'SYNOPSIS');
+    unless ($subcommand) {
+        my $pod = $self->getpod($self->namespace . "::${command}", 'SYNOPSIS');
+        $pod .= "\n\nAvailable subcommands:\n";
+        my $subcmds = $self->subcommands($command);
+        $pod .= sprintf "%12s: %s\n", $_, $subcmds->{$_} for sort keys $subcmds->%*;
+        return $pod;
     }
 
     LOGDIE("Invalid characters in subcommand") unless($subcommand =~ m{\A\w+\z});
-    my $pod = $self->getpod("OpenXPKI::Client::API::Command::${command}::${subcommand}", 'SYNOPSIS');
+    my $pod = $self->getpod($self->namespace . "::${command}::${subcommand}", 'SYNOPSIS');
 
     # Generate parameter help from spec
     # Might be useful to write POD and parse to text to have unified layout
-    my @spec = @{$self->param_spec($command, $subcommand)};
-    return $pod unless(@spec);
-
-    $pod .= "Parameters\n";
-    map {
-        $pod .= sprintf('  %s (%s)', $_->label, $_->name);
-        $pod .= ', ' . $_->openapi_type;
-        $pod .= ', required' if ($_->required);
-        $pod .= ', hint' if (defined $_->hint);
-        $pod .= ', default: '.$_->value if ($_->has_value);
-        $pod .= "\n    " . $_->description if ($_->description);
-        $pod .= "\n\n";
-    } @spec;
+    try {
+        # list of Moose::Meta::Attribute
+        if (my @spec = $self->get_command_attributes($command, $subcommand)->@*) {
+            $pod .= "\n\nParameters:\n";
+            for my $param (@spec) {
+                $pod .= sprintf('  - %s: %s', $param->name, $param->label);
+                $pod .= ', ' . $self->openapi_type($param);
+                $pod .= ', required' if $param->is_required;
+                $pod .= ', hint' if $param->has_hint;
+                $pod .= ', default: '.$param->default if $param->has_default;
+                $pod .= "\n    " . $param->description if $param->has_description;
+                $pod .= "\n";
+            };
+        }
+    }
+    catch ($err) {
+        $self->log->warn("Error fetching parameter list for command '$command.$subcommand': $err");
+    }
 
     return $pod;
-
 }
 
-=head2 load_class I<command> I<subcommand>
+=head2 getopt_params I<command> [I<subcommand>]
 
-Constructs the package name from the given arguments and loads the class
-into the perl namespace. The return value is the name of the class, the
-command does not create a class instance.
-
-The command dies if the class can not be loaded.
+Return the parameters required to run C<Getopt::Long/GetOptions>.
 
 =cut
 
-sub load_class {
+sub getopt_params ($self, $command, $subcommand) {
+    my @spec = $self->get_command_attributes($command, $subcommand)->@*;
 
-    my $self = shift;
-    my $command = shift;
-    my $subcommand = shift;
-    my $request = shift;
-
-   LOGDIE("Invalid characters in command") unless($command =~ m{\A\w+\z});
-   LOGDIE("Invalid characters in subcommand") unless($subcommand =~ m{\A\w+\z});
-
-    my $impl_class = "OpenXPKI::Client::API::Command::${command}::${subcommand}";
-    my $error = Mojo::Loader::load_class($impl_class);
-    if ($error) {
-        LOGDIE(ref $error ? $error : "Unable to find ${subcommand} in ${command}");
-    }
-    return $impl_class;
+    return map {
+        my $type = $self->getopt_type($_);
+        $type
+            ? ($_->name . ($_->has_hint ? ':' : '=') . $type)
+            : $_->name
+    } @spec;
 }
 
-=head2 param_spec I<command> I<subcommand>
-
-Returns the I<param_spec> for the given I<subcommand>.
-
-=cut
-
-sub param_spec {
-
-    my $self = shift;
-    my $impl_class = $self->load_class(shift, shift);
-
-    my $spec = $impl_class->param_spec();
-    if ($impl_class->DOES('OpenXPKI::Client::API::Command::NeedRealm')) {
-        # If it is NOT a protected command we need the realm for authentication
-        unshift @$spec, OpenXPKI::DTO::Field::Realm->new( required => 1 );
-    }
-    return $spec;
-}
-
-
-=head2 dispatch I<command> I<subcommand> I<request object>
-
-Runs the stated command on the input data passed via the request object.
-
-The request is first handed over to the commands C<preprocess> handler
-which might result in a validation error. On success, the C<execute>
-method is called to handle the request.
-
-The request must be an C<OpenXPKI::Client::API::Request> object.
-
-The return value is an instance of C<OpenXPKI::Client::API::Response>
-with the payload holding the result of the command. If a validation
-error occurs, the result code is 400 and the payload is an instance of
-C<OpenXPKI::DTO::ValidationException>.
-
-The C<execute> method is wrapped by a try/catch and expected to return
-an instance of C<OpenXPKI::Client::API::Response>.
-
-Check the documentation of C<OpenXPKI::Client::API::Command> for more
-details.
-
-=cut
-
-sub dispatch {
-
-    my $self = shift;
-    my $command_ref = $self->load_class(shift, shift)->new( api => $self );
-    my $request = shift;
-
-    # Returns a validation error object in case something went wrong
-    # Preprocess MIGHT change the paramters in the request object!
-    if (my $validation = $command_ref->preprocess($request)) {
-        return $validation;
-    }
-
-    # Must return the response data structure
-    my $ret;
-    try {
-        $ret = $command_ref->execute($request);
-        if (!blessed $ret) {
-            $self->log->debug('Return value of command is not a blessed object');
-            die "$ret";
+signature_for getopt_type => (
+    method => 1,
+    positional => [ 'Moose::Meta::Attribute' ],
+);
+sub getopt_type ($self, $attribute) {
+    return $self->map_value_type(
+        $attribute,
+        {
+            'Int' => 'i',
+            'Num' => 'f',
+            'Str' => 's',
+            'Bool' => '',
         }
-        if (!$ret->isa('OpenXPKI::Client::API::Response')) {
-            $self->log->debug('Return value of command is not a response object');
-            die $ret;
+    );
+}
+
+signature_for openapi_type => (
+    method => 1,
+    positional => [ 'Moose::Meta::Attribute' ],
+);
+sub openapi_type ($self, $attribute) {
+    return $self->map_value_type(
+        $attribute,
+        {
+            'Int' => 'integer',
+            'Num' => 'numeric',
+            'Str' => 'string',
+            'Bool' => 'boolean',
         }
-    } catch ($err) {
-        $ret = OpenXPKI::Client::API::Response->new(
-            state => 400, payload => $err
-        );
+    );
+}
+
+signature_for map_value_type => (
+    method => 1,
+    positional => [ 'Moose::Meta::Attribute', 'HashRef' ],
+);
+sub map_value_type ($self, $attribute, $map) {
+    my @to_check = $attribute->type_constraint;
+
+    while (my $type = shift @to_check) {
+        # If current type constraint is known, return its mapped type
+        return $map->{$type->name} if any { $type->name eq $_ } keys $map->%*;
+
+        # Type coercion - check all "from" types
+        if ($type->has_coercion) {
+            push @to_check, map { find_type_constraint($_) } $type->coercion->type_coercion_map->@*;
+        }
+
+        # Union type ("Str | Undef") - check all parts
+        if ($type->isa('Moose::Meta::TypeConstraint::Union')) {
+            push @to_check, $type->type_constraints->@*;
+
+        # Derived type - check parent
+        } elsif ($type->has_parent) {
+            push @to_check, $type->parent;
+        }
     }
-    return $ret;
+
+    return;
 }
 
 =head2 run_enquiry I<topic>, I<params>
 
 =cut
 
-sub run_enquiry {
-
-    my $self = shift;
-    my $topic = shift;
-    my $params = shift;
-
-    $self->log->debug("Running service enquiry on topic $topic");
+sub run_enquiry ($self, $topic, $params) {
+    $self->log->debug("Running service enquiry on topic '$topic'");
     my $msg = OpenXPKI::DTO::Message::Enquiry->new(
         topic => $topic,
-        defined $params ? (params =>  $params) : ()
+        defined $params ? (params => $params) : ()
     );
 
     return $self->send_message($msg);
@@ -314,16 +347,11 @@ sub run_enquiry {
 
 =cut
 
-sub run_command {
-
-    my $self = shift;
-    my $command = shift;
-    my $params = shift;
-
-    $self->log->debug("Running command $command");
+sub run_command ($self, $command, $params) {
+    $self->log->debug("Running command '$command'");
     my $msg = OpenXPKI::DTO::Message::Command->new(
         command => $command,
-        defined $params ? (params =>  $params) : ()
+        defined $params ? (params => $params) : ()
     );
 
     return $self->send_message($msg);
@@ -333,42 +361,29 @@ sub run_command {
 
 =cut
 
-sub run_protected_command {
-
-    my $self = shift;
-    my $command = shift;
-    my $params = shift;
-
-    $self->log->debug("Running command $command in protected mode");
+sub run_protected_command ($self, $command, $params) {
+    $self->log->debug("Running command '$command' in protected mode");
     my $msg = OpenXPKI::DTO::Message::ProtectedCommand->new(
         command => $command,
-        defined $params ? (params =>  $params) : ()
+        defined $params ? (params => $params) : ()
     );
 
     return $self->send_message($msg);
-
 }
 
-sub send_message {
-
-    my $self = shift;
-    my $msg = shift;
-
-    my $resp = $self->client()->send_message($msg);
+sub send_message ($self, $msg) {
+    my $resp = $self->client->send_message($msg);
 
     OpenXPKI::Exception::Command->throw(
         message => $resp->message,
-    ) if ($resp->isa('OpenXPKI::DTO::Message::ErrorResponse'));
+    ) if $resp->isa('OpenXPKI::DTO::Message::ErrorResponse');
 
     OpenXPKI::Exception::Command->throw(
         message => 'Got unknown response on command execution',
         error => $resp,
-    ) unless ($resp->isa('OpenXPKI::DTO::Message::Response'));
+    ) unless $resp->isa('OpenXPKI::DTO::Message::Response');
 
     return $resp;
-
 }
 
-__PACKAGE__->meta()->make_immutable();
-
-1;
+__PACKAGE__->meta->make_immutable;

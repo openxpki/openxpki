@@ -18,7 +18,7 @@ command "api_list" => {
 } => sub {
     my ($self, $params) = @_;
 
-    return join "\n", sort keys %{ $self->rawapi->commands };
+    return join "\n", sort keys %{ $self->rawapi->namespace_commands };
 };
 
 __PACKAGE__->meta->make_immutable;

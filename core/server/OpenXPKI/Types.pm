@@ -4,6 +4,10 @@ use Moose::Util::TypeConstraints; # PLEASE NOTE: this enables all warnings via M
 # Core modules
 use Math::BigInt;
 
+# Project modules
+use OpenXPKI::FileUtils;
+use OpenXPKI::DateTime;
+
 =head1 NAME
 
 OpenXPKI::Types - Collection of Moose types used for API command
@@ -265,16 +269,52 @@ Enumeration of supported serialization formats:
 =cut
 enum 'SerializationFormat', [qw( simple )];
 
+=head2 ReadableFile
+
+=cut
+subtype 'ReadableFile',
+    as 'Str',
+    where { -f $_  && -r $_ },
+    message { sprintf "'%s' is not a valid and accessible file",  $_ };
+
+=head2 FileContents
+
+=cut
+coerce 'FileContents',
+    as 'Str',
+    from 'ReadableFile',
+    via { OpenXPKI::FileUtils->new->read_file($_) };
+
+=head2 ReadableDir
+
+=cut
+subtype 'ReadableDir',
+    as 'Str',
+    where { -d $_ && -r $_ },
+    message { sprintf "'%s' is not a valid and accessible directory",  $_ };
+
+=head2 Epoch
+
+=cut
+subtype 'Epoch',
+    as 'Int';
+
+coerce 'Epoch',
+    from 'Str',
+    via { OpenXPKI::DateTime::get_validity({ VALIDITYFORMAT => 'detect', VALIDITY => $_} )->epoch };
+
 =head1 COERCION
 
-For some of the types you must also specify C<coerce =E<gt> 1> for the automatic
-type conversions to work, e.g.:
+When using any type with a coercion in an API command the C<coerce =E<gt> 1>
+option will automatically be set by L<OpenXPKI::Base::API::PluginMetaClassTrait/add_param_specs>:
 
     command "doit" => {
-        types => { isa => 'ArrayRefOrCommaList', coerce => 1, },
+        types => { isa => 'ArrayRefOrCommaList' }, # will set coerce => 1
     } => sub {
         my ($self, $params) = @_;
         print join(", ", @{ $params->types }), "\n";
     };
 
-no Moose::Util::TypeConstraints;
+=cut
+
+1;

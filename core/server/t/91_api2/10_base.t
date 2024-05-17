@@ -40,7 +40,7 @@ lives_and {
 } "has_non_root_namespaces == FALSE";
 
 lives_and {
-    cmp_deeply [ keys $api->commands->%* ], bag('givetheparams', 'scream', 'protected');
+    cmp_deeply [ keys $api->namespace_commands->%* ], bag('givetheparams', 'scream', 'protected');
 } "query available commands";
 
 TODO: {

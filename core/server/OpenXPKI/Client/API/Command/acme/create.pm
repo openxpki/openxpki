@@ -1,92 +1,70 @@
 package OpenXPKI::Client::API::Command::acme::create;
+use OpenXPKI -plugin;
 
-use Moose;
-extends 'OpenXPKI::Client::API::Command::acme';
-
-use MooseX::ClassAttribute;
+with 'OpenXPKI::Client::API::Command::acme';
+set_namespace_to_parent;
+__PACKAGE__->needs_realm;
 
 use JSON::PP qw(decode_json);
 use Crypt::JWT qw(encode_jwt);
 use Crypt::PK::ECC;
 use Crypt::PK::RSA;
-use Data::Dumper;
 use Digest::SHA qw(sha256);
 
 use MIME::Base64 qw(decode_base64url encode_base64url);
 
-use OpenXPKI::Client::API::Response;
-use OpenXPKI::DTO::Field;
-use OpenXPKI::DTO::Field::String;
-use OpenXPKI::DTO::Field::Realm;
-
 =head1 NAME
 
-OpenXPKI::Client::API::Command::acme::create;
+OpenXPKI::Client::API::Command::acme::create
 
 =head1 SYNOPSIS
 
-Register a new acme account with an external ca and write the
+Register a new ACME account with an external CA and write the
 registration information to the datapool.
 
 =cut
 
-class_has 'param_spec' => (
-    is      => 'ro',
-    isa => 'ArrayRef[OpenXPKI::DTO::Field]',
-    default => sub {[
-        OpenXPKI::DTO::Field::String->new( name => 'directory', label => 'Directory Url', required => 1 ),
-        OpenXPKI::DTO::Field::String->new( name => 'contact', label => 'Contact (email address)', required => 1 ),
-        OpenXPKI::DTO::Field::String->new( name => 'label', label => 'Account Label' ),
-        OpenXPKI::DTO::Field::String->new( name => 'keyspec', label => 'RSA bits (rsaXXXX) or curve name',
-            value => 'secp384r1', 'hint' => 'hint_keyspec' ),
-        OpenXPKI::DTO::Field::String->new( name => 'eab-kid', label => 'Ext. Account ID' ),
-        OpenXPKI::DTO::Field::String->new( name => 'eab-mac', label => 'Ext. Account MAC Key' ),
-    ]},
-);
-
 sub hint_keyspec {
-
-    my $self = shift;
-    my $req = shift;
-    my $input = shift;
     return [ 'secp384r1 (default)', 'secp256r1', 'secp521r1', 'rsa2048', 'rsa3072', 'rsa4096' ];
-
 }
 
-sub execute {
+command "create" => {
+    directory => { isa => 'Str', label => 'Directory Url', required => 1 },
+    contact => { isa => 'Str', label => 'Contact (email address)', required => 1 },
+    label => { isa => 'Str', label => 'Account Label', required => 1 },
+    keyspec => { isa => 'Str', label => 'RSA bits (rsaXXXX) or curve name', default => 'secp384r1', hint => 'hint_keyspec' },
+    eab_kid => { isa => 'Str', label => 'Ext. Account ID' },
+    eab_mac => { isa => 'Str', label => 'Ext. Account MAC Key' },
 
-    my $self = shift;
-    my $req = shift;
+} => sub ($self, $param) {
 
-    my $label = $req->param('label') || encode_base64url(sha256($req->param('directory')));
+    my $label = $param->label || encode_base64url(sha256($param->directory));
 
-    my $res = $self->api->run_command('get_data_pool_entry', {
+    my $res = $self->rawapi->run_command('get_data_pool_entry', {
         namespace => 'nice.acme.account',
         key => $label,
     });
 
-    return OpenXPKI::Client::API::Response->new( state => 400,
-        payload => 'ACME account for this label already exists' ) if ($res);
+    die "ACME account for this label already exists\n" if $res->result;
 
-    $self->LOCATION($req->param('directory'));
+    $self->LOCATION($param->directory);
 
-    return OpenXPKI::Client::API::Response->new( state => 400,
-        payload => 'You must pass both or no external binding parameters' )
-            if ($req->param('eab-kid') xor $req->param('eab-mac'));
+    die "You must pass both or no external binding parameters\n"
+        if ($param->eab_kid xor $param->eab_mac);
 
     my $eab;
     $eab = {
-        kid => $req->param('eab-kid'),
-        mac => $req->param('eab-mac')
-    } if ($req->param('eab-kid'));
+        kid => $param->eab_kid,
+        mac => $param->eab_mac
+    } if ($param->eab_kid);
 
     my $account = $self->_registerAccount(
-        $req->param('keyspec'),
-        $req->param('contact'),
+        $param->keyspec,
+        $param->contact,
         $eab
     );
 
-    $self->api->run_command('set_data_pool_entry', {
+    $self->rawapi->run_command('set_data_pool_entry', {
         namespace => 'nice.acme.account',
         key => $label,
         value => $account,
@@ -94,13 +72,12 @@ sub execute {
         encrypt => 1,
     });
 
-    return OpenXPKI::Client::API::Response->new( payload => {
+    return {
         account_id => $account->{kid},
         thumbprint => $account->{thumbprint},
         label => $label
-    });
-
-}
+    };
+};
 
 # might move this into the core api
 sub _registerAccount {
@@ -189,7 +166,4 @@ sub _registerAccount {
 
 }
 
-__PACKAGE__->meta()->make_immutable();
-
-1;
-
+__PACKAGE__->meta->make_immutable;

@@ -1,18 +1,9 @@
 package OpenXPKI::Client::API::Command::datapool::add;
+use OpenXPKI -plugin;
 
-
-use Moose;
-extends 'OpenXPKI::Client::API::Command::datapool';
-
-use MooseX::ClassAttribute;
-
-use Data::Dumper;
-
-use OpenXPKI::Client::API::Response;
-use OpenXPKI::DTO::Field;
-use OpenXPKI::DTO::Field::Bool;
-use OpenXPKI::DTO::Field::Epoch;
-use OpenXPKI::DTO::Field::String;
+with 'OpenXPKI::Client::API::Command::datapool';
+set_namespace_to_parent;
+__PACKAGE__->needs_realm;
 
 =head1 NAME
 
@@ -24,34 +15,23 @@ Add a new value to the datapool
 
 =cut
 
-class_has 'param_spec' => (
-    is      => 'ro',
-    isa => 'ArrayRef[OpenXPKI::DTO::Field]',
-    default => sub {[
-        OpenXPKI::DTO::Field::String->new( name => 'namespace', label => 'Namespace', hint => 'hint_namespace', required => 1 ),
-        OpenXPKI::DTO::Field::String->new( name => 'key', label => 'Key', required => 1 ),
-        OpenXPKI::DTO::Field::String->new( name => 'value', label => 'Value', required => 1 ),
-        OpenXPKI::DTO::Field::Epoch->new( name => 'expiry', label => 'Expiry Date' ),
-        OpenXPKI::DTO::Field::Bool->new( name => 'encrypt', label => 'Encrypt' ),
-    ]},
-);
+command "add" => {
+    namespace => { isa => 'Str', label => 'Namespace', hint => 'hint_namespace', required => 1 },
+    key => { isa => 'Str', label => 'Key', required => 1 },
+    value => { isa => 'Str', label => 'Value', required => 1 },
+    expiry => { isa => 'Epoch', label => 'Expiry Date' },
+    encrypt => { isa => 'Bool', label => 'Encrypt' },
+} => sub ($self, $param) {
 
-sub execute {
-
-    my $self = shift;
-    my $req = shift;
-
-    my $res = $self->api->run_command('set_data_pool_entry', {
-        namespace => $req->param('namespace'),
-        key =>  $req->param('key'),
-        value => $req->param('value'),
-        ($req->param('expiry') ? (expiration_date => $req->param('expiry')) : ()),
-        ($req->param('encrypt') ? (encrypt => 1) : ()),
+    my $res = $self->rawapi->run_command('set_data_pool_entry', {
+        namespace => $param->namespace,
+        key =>  $param->key,
+        value => $param->value,
+        ($param->expiry ? (expiration_date => $param->expiry) : ()),
+        ($param->encrypt ? (encrypt => 1) : ()),
     });
-    return OpenXPKI::Client::API::Response->new( payload => $res );
+    return $res;
 
-}
+};
 
-__PACKAGE__->meta()->make_immutable();
-
-1;
+__PACKAGE__->meta->make_immutable;

@@ -1,11 +1,9 @@
 package OpenXPKI::Client::API::Command::workflow;
+use OpenXPKI -role;
 
-use Moose;
-extends 'OpenXPKI::Client::API::Command';
-with 'OpenXPKI::Client::API::Command::NeedRealm';
+with 'OpenXPKI::Client::API::Command';
 
 # Core modules
-use Data::Dumper;
 use List::Util qw( none );
 
 use OpenXPKI::Serialization::Simple;
@@ -61,7 +59,5 @@ sub deserialize_context {
         $ctx->{$key} = $ser->deserialize($ctx->{$key});
     }
 }
-
-__PACKAGE__->meta()->make_immutable();
 
 1;

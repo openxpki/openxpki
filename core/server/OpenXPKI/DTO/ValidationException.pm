@@ -3,11 +3,10 @@ package OpenXPKI::DTO::ValidationException;
 # TODO - merge with OpenXPKI::Exception
 
 use Moose;
-use OpenXPKI::DTO::Field;
 
 has 'field' => (
     is => 'ro',
-    isa => 'OpenXPKI::DTO::Field|Str',
+    isa => 'Str',
     required => 1,
 );
 
@@ -22,7 +21,7 @@ has 'message' => (
     isa => 'Str', # Enum
     required => 0,
     lazy => 1,
-    builder => '_build_hint',
+    builder => '_build_message',
 );
 
 has 'choices' => (
@@ -32,11 +31,11 @@ has 'choices' => (
     predicate => 'has_choices',
 );
 
-sub _build_hint {
+sub _build_message {
 
     my $self = shift;
 
-    my $name = $self->field()->name();
+    my $name = $self->field;
     if ($self->has_choices) {
         return "Value for *$name* must be one of\n  ". join("\n  ", @{$self->choices} );
     }

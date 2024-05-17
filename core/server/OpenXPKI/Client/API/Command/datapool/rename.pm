@@ -1,18 +1,9 @@
 package OpenXPKI::Client::API::Command::datapool::rename;
+use OpenXPKI -plugin;
 
-
-use Moose;
-extends 'OpenXPKI::Client::API::Command::datapool';
-
-use MooseX::ClassAttribute;
-
-use Data::Dumper;
-
-use OpenXPKI::Client::API::Response;
-use OpenXPKI::DTO::Field;
-use OpenXPKI::DTO::Field::Bool;
-use OpenXPKI::DTO::Field::Epoch;
-use OpenXPKI::DTO::Field::String;
+with 'OpenXPKI::Client::API::Command::datapool';
+set_namespace_to_parent;
+__PACKAGE__->needs_realm;
 
 =head1 NAME
 
@@ -24,30 +15,19 @@ Change the key of an existing datapool value
 
 =cut
 
-class_has 'param_spec' => (
-    is      => 'ro',
-    isa => 'ArrayRef[OpenXPKI::DTO::Field]',
-    default => sub {[
-        OpenXPKI::DTO::Field::String->new( name => 'namespace', label => 'Namespace', hint => 'hint_namespace', required => 1 ),
-        OpenXPKI::DTO::Field::String->new( name => 'key', label => 'Key', hint => 'hint_key', required => 1 ),
-        OpenXPKI::DTO::Field::String->new( name => 'newkey', label => 'New value of for key', required => 1 ),
-    ]},
-);
+command "rename" => {
+    namespace => { isa => 'Str', label => 'Namespace', hint => 'hint_namespace', required => 1 },
+    key => { isa => 'Str', label => 'Key', hint => 'hint_key', required => 1 },
+    newkey => { isa => 'Str', label => 'New value of for key', required => 1 },
+} => sub ($self, $param) {
 
-sub execute {
-
-    my $self = shift;
-    my $req = shift;
-
-    my $res = $self->api->run_command('modify_data_pool_entry', {
-        namespace => $req->param('namespace'),
-        key =>  $req->param('key'),
-        newkey => $req->param('newkey'),
+    my $res = $self->rawapi->run_command('modify_data_pool_entry', {
+        namespace => $param->namespace,
+        key =>  $param->key,
+        newkey => $param->newkey,
     });
-    return OpenXPKI::Client::API::Response->new( payload => $res );
+    return $res;
 
-}
+};
 
-__PACKAGE__->meta()->make_immutable();
-
-1;
+__PACKAGE__->meta->make_immutable;

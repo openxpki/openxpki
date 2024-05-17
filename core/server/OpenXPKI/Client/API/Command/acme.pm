@@ -1,9 +1,8 @@
 package OpenXPKI::Client::API::Command::acme;
+use OpenXPKI -role;
 
-use Moose;
-extends 'OpenXPKI::Client::API::Command';
+with 'OpenXPKI::Client::API::Command';
 with 'Connector::Role::SSLUserAgent';
-with 'OpenXPKI::Client::API::Command::NeedRealm';
 
 # Core modules
 use JSON;
@@ -62,7 +61,5 @@ sub nonce {
     my $self = shift;
     return $self->agent->get($self->directory()->{newNonce})->header('replay-nonce');
 }
-
-__PACKAGE__->meta()->make_immutable();
 
 1;
