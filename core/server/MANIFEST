@@ -163,6 +163,7 @@ OpenXPKI/Connector/WorkflowContext.pm
 # Wrappers around Crypt::* modules
 OpenXPKI/Crypt/CRL.pm
 OpenXPKI/Crypt/DN.pm
+OpenXPKI/Crypt/ECDH.pm
 OpenXPKI/Crypt/PKCS7.pm
 OpenXPKI/Crypt/PKCS10.pm
 OpenXPKI/Crypt/PubKey.pm
