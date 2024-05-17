@@ -13,7 +13,7 @@ use Test::Exception;
 use DateTime;
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init({
-    level => $ENV{TEST_VERBOSE} ? $DEBUG : $OFF,
+    level => $ENV{TEST_VERBOSE} ? $TRACE : $OFF,
     layout  => '# %-5p %m%n',
 });
 
@@ -21,12 +21,11 @@ Log::Log4perl->easy_init({
 use lib "$Bin/lib";
 
 
-use_ok "OpenXPKI::Server::API2";
+use_ok "OpenXPKI::TestCommandsNamespace";
 
 my $auto;
 lives_ok {
-    $auto = OpenXPKI::Server::API2->new(
-        namespace => "OpenXPKI::TestCommandsNamespace",
+    $auto = OpenXPKI::TestCommandsNamespace->new(
         log => Log::Log4perl->get_logger(),
         enable_acls => 0,
     )->autoloader;

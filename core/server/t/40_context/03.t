@@ -22,7 +22,7 @@ my $oxitest = OpenXPKI::Test->new();
 is ref CTX('config'), 'OpenXPKI::Config', "CTX('config')";
 is ref CTX('log'), 'OpenXPKI::Server::Log', "CTX('log')";
 is ref CTX('dbi'), 'OpenXPKI::Server::Database', "CTX('dbi')";
-is ref CTX('api2'), 'OpenXPKI::Server::API2::Autoloader', "CTX('api2')";
+is ref CTX('api2'), 'OpenXPKI::Base::API::Autoloader', "CTX('api2')";
 is ref CTX('authentication'), 'OpenXPKI::Server::Authentication', "CTX('authentication')";
 
 done_testing;

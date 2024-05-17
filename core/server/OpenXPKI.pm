@@ -70,7 +70,7 @@ sub import {
     # API plugin
     } elsif ($plugin) {
         Moose->import::into(1);
-        OpenXPKI::Server::API2::Plugin->import::into(1);
+        OpenXPKI::Base::API::Plugin->import::into(1);
     # Plain old Perl package / class
     } else {
         base->import::into(1, $poc_base) if $poc_base;

@@ -8,6 +8,11 @@ LICENSE
 CHANGES
 Makefile.PL
 OpenXPKI.pm
+OpenXPKI/Base/API/APIRole.pm
+OpenXPKI/Base/API/Autoloader.pm
+OpenXPKI/Base/API/Plugin.pm
+OpenXPKI/Base/API/PluginMetaClassTrait.pm
+OpenXPKI/Base/API/PluginRole.pm
 OpenXPKI/Config.pm
 OpenXPKI/Control.pm
 OpenXPKI/DateTime.pm
@@ -298,11 +303,7 @@ OpenXPKI/Server/Log/Layout/Audit.pm
 
 OpenXPKI/Server.pm
 OpenXPKI/Server/API2.pm
-OpenXPKI/Server/API2/Autoloader.pm
 OpenXPKI/Server/API2/TenantRole.pm
-OpenXPKI/Server/API2/Plugin.pm
-OpenXPKI/Server/API2/PluginMetaClassTrait.pm
-OpenXPKI/Server/API2/PluginRole.pm
 OpenXPKI/Server/API2/Types.pm
 OpenXPKI/Server/API2/Plugin/tenant_handler.pm
 OpenXPKI/Server/API2/Plugin/Api/Util/ModuleFinder.pm

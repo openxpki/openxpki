@@ -1,27 +1,23 @@
-package OpenXPKI::Server::API2::Autoloader;
+package OpenXPKI::Base::API::Autoloader;
 use OpenXPKI -class;
 
 # Core modules
 use List::Util qw( any );
 
-# Project modules
-use OpenXPKI::Server::API2;
-
 =head1 NAME
 
-OpenXPKI::Server::API2::Autoloader - Thin wrapper around the API that virtually
+OpenXPKI::Base::API::Autoloader - Thin wrapper around the API that virtually
 provides all API commands as instance methods
 
 =head2 DESCRIPTION
 
-B<Not intended for direct use.> Please use L<OpenXPKI::Server::API2/autoloader>
-instead.
+B<Not intended for direct use> - this is part of the internal API magic.
 
 =cut
 
 has api => (
     is => 'ro',
-    isa => 'OpenXPKI::Server::API2',
+    does => 'OpenXPKI::Base::API::APIRole',
     required => 1,
 );
 

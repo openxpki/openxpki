@@ -13,7 +13,7 @@ use Test::Exception;
 use DateTime;
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init({
-    level => $ENV{TEST_VERBOSE} ? $DEBUG : $OFF,
+    level => $ENV{TEST_VERBOSE} ? $TRACE : $OFF,
     layout  => '# %-5p %m%n',
 });
 
@@ -21,12 +21,11 @@ Log::Log4perl->easy_init({
 use lib "$Bin/lib";
 
 
-use_ok "OpenXPKI::Server::API2";
+use_ok "OpenXPKI::TestCommands";
 
 my $api;
 lives_ok {
-    $api = OpenXPKI::Server::API2->new(
-        namespace => "OpenXPKI::TestCommands",
+    $api = OpenXPKI::TestCommands->new(
         log => Log::Log4perl->get_logger(),
         enable_acls => 0,
     );
@@ -83,8 +82,7 @@ lives_and {
 } "execute protected command like any other with API protection disabled";
 
 lives_ok {
-    $api = OpenXPKI::Server::API2->new(
-        namespace => "OpenXPKI::TestCommands",
+    $api = OpenXPKI::TestCommands->new(
         log => Log::Log4perl->get_logger(),
         enable_acls => 0,
         enable_protection => 1,

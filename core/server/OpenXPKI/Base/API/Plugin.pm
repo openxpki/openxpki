@@ -1,8 +1,8 @@
-package OpenXPKI::Server::API2::Plugin;
+package OpenXPKI::Base::API::Plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin - Define an OpenXPKI API plugin
+OpenXPKI::Base::API::Plugin - Define an OpenXPKI API plugin
 
 =cut
 
@@ -11,13 +11,13 @@ use Moose ();
 use Moose::Exporter;
 
 # Project modules
-use OpenXPKI::Server::API2::PluginRole;
-use OpenXPKI::Server::API2::PluginMetaClassTrait;
+use OpenXPKI::Base::API::PluginRole;
+use OpenXPKI::Base::API::PluginMetaClassTrait;
 
 
 =head1 DESCRIPTION
 
-To define a new API plugin:
+B<Not intended for direct use> - C<use OpenXPKI -plugin> instead:
 
     package OpenXPKI::Server::API2::Plugin::MyTopic::MyActions;
     use OpenXPKI -plugin;
@@ -52,19 +52,19 @@ C<use OpenXPKI -plugin> will modify your package as follows:
 
 =item * provides the L</command> keyword to define API commands
 
-=item * applies the Moose role L<OpenXPKI::Server::API2::PluginRole>
+=item * applies the Moose role L<OpenXPKI::Base::API::PluginRole>
 
 =item * applies the Moose metaclass role (aka. "trait")
-L<OpenXPKI::Server::API2::PluginMetaClassTrait>
+L<OpenXPKI::Base::API::PluginMetaClassTrait>
 
 =back
 
 =cut
 Moose::Exporter->setup_import_methods(
     with_meta => [ 'command', 'protected_command', 'set_namespace', 'set_namespace_to_parent' ],
-    base_class_roles => [ 'OpenXPKI::Server::API2::PluginRole' ],
+    base_class_roles => [ 'OpenXPKI::Base::API::PluginRole' ],
     class_metaroles => {
-        class => [ 'OpenXPKI::Server::API2::PluginMetaClassTrait' ],
+        class => [ 'OpenXPKI::Base::API::PluginMetaClassTrait' ],
     },
 );
 
@@ -72,7 +72,7 @@ Moose::Exporter->setup_import_methods(
 =head1 KEYWORDS (imported functions)
 
 The following functions are imported into the package that uses
-C<OpenXPKI::Server::API2::Plugin>.
+C<OpenXPKI::Base::API::Plugin>.
 
 =head2 command
 
@@ -132,8 +132,8 @@ L<TRUE|perldata/"Scalar values"> value is returned.
 =back
 
 You can use all Moose types (I<Str>, I<Int> etc) plus OpenXPKI's own types
-defined in L<OpenXPKI::Types> (C<OpenXPKI::Server::API2>
-automatically imports them).
+defined in L<OpenXPKI::Types> (they are automatically imported by
+C<use OpenXPKI -plugin>).
 
 =item * C<$code_ref> - I<CodeRef> with the command implementation. On invocation
 it gets passed two parameters:
@@ -165,9 +165,9 @@ sub command {
 
 Define a protected API command. All parameters are equivalent to L</command>.
 
-Commands are only protected if L<OpenXPKI::Server::API2/enable_protection> is
+Commands are only protected if L<OpenXPKI::Base::API::APIRole/enable_protection> is
 set to TRUE. In this case they can only be called by passing
-C<protected_call =E<gt> 1> to L<OpenXPKI::Server::API2/dispatch>.
+C<protected_call =E<gt> 1> to L<OpenXPKI::Base::API::APIRole/dispatch>.
 
 
 =cut
@@ -182,8 +182,8 @@ sub _command {
     my ($meta, $command, $params, $code_ref, $is_protected) = @_;
 
     $meta->add_method($command, $code_ref);    # Add a method to calling class
-    $meta->add_param_specs($command, $params); # Add a parameter class (OpenXPKI::Server::API2::PluginMetaClassTrait)
-    $meta->is_protected($command, $is_protected);    # Set protection flag (OpenXPKI::Server::API2::PluginMetaClassTrait)
+    $meta->add_param_specs($command, $params); # Add a parameter class (OpenXPKI::Base::API::PluginMetaClassTrait)
+    $meta->is_protected($command, $is_protected);    # Set protection flag (OpenXPKI::Base::API::PluginMetaClassTrait)
 }
 
 =head2 set_namespace_to_parent

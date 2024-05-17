@@ -1,21 +1,27 @@
-package OpenXPKI::Server::API2::PluginMetaClassTrait;
+package OpenXPKI::Base::API::PluginMetaClassTrait;
 use OpenXPKI -role;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::PluginMetaClassTrait - Moose metaclass role (aka.
+OpenXPKI::Base::API::PluginMetaClassTrait - Moose metaclass role (aka.
 "trait") for API plugins
 
 =head1 DESCRIPTION
 
-B<Not intended for direct use:> please C<use OpenXPKI -plugin> instead.
+B<Not intended for direct use> - this is part of the internal API magic.
 
 Manage API parameters and their specifications for the API plugin classes.
-This role/trait is applied by L<OpenXPKI::Server::API2::Plugin>.
+This role/trait is applied by L<OpenXPKI::Base::API::Plugin>.
 
 =head1 ATTRIBUTES
 
-#             namespace => 'OpenXPKI::Server::API2::Plugin::test',
+=head2 namespace
+
+The namespace I<Str> of the commands defined in the current class.
+
+Default to C<""> (empty string), which is the
+L<root namespace|OpenXPKI::Base::API::APIRole/namespace> of the API.
+
 =cut
 has namespace => (
     is => 'rw',
@@ -57,7 +63,7 @@ Add parameter specifications for the given API command.
 
 A new L<Moose::Meta::Class> is created with the name I<${command}_ParamObject>.
 Attributes are added to this class which will store the API command parameters.
-Type constraints specified via the L<C<matching>|OpenXPKI::Server::API2::Plugin/command>
+Type constraints specified via the L<C<matching>|OpenXPKI::Base::API::Plugin/command>
 parameter are created and attached to the attributes.
 
 B<Parameters>
@@ -74,7 +80,7 @@ generated container class (type L<Moose::Meta::Class>).
 Values are I<HashRefs> with the attribute options (extended version of Moose's I<has>
 keyword options).
 
-For more details please see L<OpenXPKI::Server::API2::Plugin/command>.
+For more details please see L<OpenXPKI::Base::API::Plugin/command>.
 
 =back
 
@@ -204,11 +210,11 @@ sub new_param_object ($self, $command, $params) {
 # =cut
 # signature_for execute => (
 #     method => 1,
-#     positional => [ 'OpenXPKI::Server::API2', 'Str', 'HashRef' ],
+#     positional => [ 'OpenXPKI::Base::API::APIRole', 'Str', 'HashRef' ],
 # );
 # sub execute ($self, $api, $command, $params) {
 #     my $instance = $self->new_object(rawapi => $api);
-#     my $param_obj = $self->new_param_object($command, $params); # provided by OpenXPKI::Server::API2::PluginMetaClassTrait
+#     my $param_obj = $self->new_param_object($command, $params); # provided by OpenXPKI::Base::API::PluginMetaClassTrait
 #     return $self->find_method_by_name($command)->execute($instance, $param_obj);
 # }
 

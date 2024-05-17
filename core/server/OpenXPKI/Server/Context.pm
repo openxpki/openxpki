@@ -277,7 +277,7 @@ Usage:
 
     # attach the API object to the global context
     OpenXPKI::Server::Context::setcontext({
-        'api2' => OpenXPKI::Server::API2->new()->autoloader,
+        'test' => OpenXPKI::Server::Test->new,
     });
 
 =head2 hascontext

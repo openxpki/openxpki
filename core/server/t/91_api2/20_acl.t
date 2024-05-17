@@ -13,7 +13,7 @@ use Test::Exception;
 use DateTime;
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init({
-    level => $ENV{TEST_VERBOSE} ? $DEBUG : $OFF,
+    level => $ENV{TEST_VERBOSE} ? $TRACE : $OFF,
     layout  => '# %-5p %m%n',
 });
 
@@ -24,15 +24,14 @@ use lib "$Bin/lib";
 plan tests => 12;
 
 
-use_ok "OpenXPKI::Server::API2";
+use_ok "OpenXPKI::TestCommands";
 
 my $api;
 
 my $CURRENT_ROLE;
 
 lives_ok {
-    $api = OpenXPKI::Server::API2->new(
-        namespace => "OpenXPKI::TestCommands",
+    $api = OpenXPKI::TestCommands->new(
         log => Log::Log4perl->get_logger(),
         acl_rule_accessor => sub {
             return {
