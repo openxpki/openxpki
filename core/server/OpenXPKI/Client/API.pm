@@ -208,7 +208,7 @@ renders a description on the parameters.
 
 =cut
 
-sub help ($self, $command = '', $subcommand = '') {
+sub help ($self, $command = '', $subcommand = '', @) {
     unless ($command) {
         my $pod = "Available commands:";
         my $commands = $self->commands;
