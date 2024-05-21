@@ -23,24 +23,19 @@ command "show" => {
     namespace => { isa => 'Str', label => 'Namespace', hint => 'hint_namespace', required => 1 },
     key => { isa => 'Str', label => 'Key if the item to be removed', hint => 'hint_key',required => 1 },
     metadata => { isa => 'Bool', label => 'Show Metadata' },
-    decrypt => { isa => 'Bool', label => 'Decrypt encrypted items' },
-    deserialize => { isa => 'Bool', label => 'Deserialize Item', description => 'Unpack serialized value' },
+    decrypt => { isa => 'Bool', label => 'Decrypt encrypted items', default => 0 },
+    deserialize => { isa => 'Bool', label => 'Deserialize Item', description => 'Unpack serialized value', default => 0 },
 } => sub ($self, $param) {
-
-    my %param;
-    if ($param->decrypt) {
-        $param{'with_attributes'} = 1;
-    }
 
     my $res = $self->rawapi->run_command('get_data_pool_entry', {
         namespace => $param->namespace,
         key =>  $param->key,
-        decrypt => ($param->decrypt ? 1 :0),
+        decrypt => $param->decrypt,
         ($param->deserialize ? (deserialize => 'simple') : ()),
 
     });
 
-    if (!$param->metadata) {
+    if (not $param->has_metadata) {
         $res = { result => $res->param('value') };
     }
 

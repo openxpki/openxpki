@@ -20,10 +20,9 @@ command "show" => {
     path => { isa => 'Str', label => 'Path to dump' },
 } => sub ($self, $param) {
 
-    my $params;
-    if (my $path = $param->path) {
-        $params->{path} = $path;
-    }
+    my $params = {
+         $param->has_path ? (path => $param->path) : (),
+    };
     my $res = $self->rawapi->run_protected_command('config_show', $params);
     return $res;
 

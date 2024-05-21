@@ -40,6 +40,7 @@ command "add" => {
 
     my $group = $groups->params->{$type};
     my $cert_identifier;
+
     if ($param->has_cert) {
         my $x509 = OpenXPKI::Crypt::X509->new($param->cert->$*); # type "FileContents" is a ScalarRef
         $cert_identifier = $x509->get_cert_identifier();
@@ -48,8 +49,10 @@ command "add" => {
             ignore_existing => 1
         });
         $self->log->debug("Certificate ($cert_identifier) was imported");
-    } elsif ($param->identifier) {
+
+    } elsif ($param->has_identifier) {
         $cert_identifier = $param->identifier
+
     } else {
         die "You must provide either a PEM encoded certificate or an existing identifier";
     }

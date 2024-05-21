@@ -18,19 +18,18 @@ Show information on an existing workflow
 
 command "show" => {
     id => { isa => 'Int', label => 'Workflow Id', required => 1 },
-    attributes => { isa => 'Bool', label => 'Show Attributes' },
-    deserialize => { isa => 'Bool', label => 'Deserialize Context', description => 'Unpack serialized context items' },
+    attributes => { isa => 'Bool', label => 'Show Attributes', default => 0 },
+    deserialize => { isa => 'Bool', label => 'Deserialize Context', description => 'Unpack serialized context items', default => 0 },
 } => sub ($self, $param) {
 
-    my %param;
-    if ($param->attributes) {
-        $param{'with_attributes'} = 1;
-    }
-    $self->log->trace(Dumper \%param) if ($self->log->is_trace);
-    my $res = $self->rawapi->run_command('get_workflow_info', { id => $param->id, %param });
-    if ($param->deserialize) {
-       $self->deserialize_context($res);
-    }
+    my $cmd_param = {
+        id => $param->id,
+        $param->attributes ? (with_attributes => 1) : (),
+    };
+
+    my $res = $self->rawapi->run_command('get_workflow_info', $cmd_param);
+    $self->deserialize_context($res) if $param->deserialize;
+
     return $res;
 
 };

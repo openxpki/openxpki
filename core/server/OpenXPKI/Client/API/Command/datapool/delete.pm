@@ -23,12 +23,12 @@ command "delete" => {
 } => sub ($self, $param) {
 
     my $res;
-    if ($param->key) {
+    if ($param->has_key) {
         $res = $self->rawapi->run_command('delete_data_pool_entry', {
             namespace => $param->namespace,
             key =>  $param->key,
         });
-    } elsif ($param->all) {
+    } elsif ($param->has_all) {
         $res = $self->rawapi->run_command('clear_data_pool_namespace', {
             namespace => $param->namespace,
         });

@@ -57,7 +57,7 @@ command "create" => {
     $eab = {
         kid => $param->eab_kid,
         mac => $param->eab_mac
-    } if ($param->eab_kid);
+    } if ($param->has_eab_kid);
 
     my $account = $self->_registerAccount(
         $param->keyspec,

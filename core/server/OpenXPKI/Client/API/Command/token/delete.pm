@@ -19,7 +19,7 @@ Delete the token for a given alias name
 
 command "delete" => {
     alias => { isa => 'Str', 'label' => 'Alias', required => 1 },
-    remove_key => { isa => 'Bool', 'label' => 'Remove the key' },
+    remove_key => { isa => 'Bool', 'label' => 'Remove the key', default => 0 },
 } => sub ($self, $param) {
 
     my $alias = $param->alias;

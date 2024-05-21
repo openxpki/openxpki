@@ -44,7 +44,7 @@ command "add" => {
             ignore_existing => 1
         });
         $self->log->debug("Certificate ($cert_identifier) was imported");
-    } elsif ($param->identifier) {
+    } elsif ($param->has_identifier) {
         $cert_identifier = $param->identifier
     } else {
         die "You must provide either a PEM encoded certificate or an existing identifier";

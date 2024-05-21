@@ -24,7 +24,7 @@ command "list" => {
     my $res = { token_types => $groups->params, token_groups => {} };
 
     my @names = values %{$groups->params};
-    if ($param->type) {
+    if ($param->has_type) {
         @names = ( $groups->param($param->type) );
     }
 

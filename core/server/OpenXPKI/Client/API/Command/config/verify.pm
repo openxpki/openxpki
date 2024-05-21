@@ -30,10 +30,10 @@ command "verify" => {
     # the given path is known to exist as this is checked by the validator already!
     my $conf = OpenXPKI::Config::Backend->new( LOCATION => $param->config );
     # YAML was ok but there is no system node
-    if (!$conf->get_hash('system')) {
-        die 'No *system* node was found';
-    } elsif (my $path = $param->path) {
-        my @path = split /\./, $path;
+    die 'No *system* node was found' unless $conf->get_hash('system');
+
+    if ($param->has_path) {
+        my @path = split /\./, $param->path;
         my $hash = $conf->get_hash( shift @path );
         foreach my $item (@path) {
             if (!defined $hash->{$item}) {
@@ -41,30 +41,21 @@ command "verify" => {
             }
             $hash = $hash->{$item};
         }
-        $res = {
-            digest => $conf->checksum(),
-            path => $path,
-            value => $hash
-        };
-    } elsif (my $module = $param->module) {
-        my $res_lint = $self->lint_module($conf, $module, $self->_build_hash_from_payload($param));
+        $res = { digest => $conf->checksum, path => $param->path, value => $hash };
 
-        $res = { digest => $conf->checksum(), $module => $res_lint };
+    } elsif ($param->has_module) {
+        my $res_lint = $self->lint_module($conf, $param->module, $self->_build_hash_from_payload($param));
+        $res = { digest => $conf->checksum, $param->module => $res_lint };
 
     } else {
-        $res = { digest => $conf->checksum() };
+        $res = { digest => $conf->checksum };
     }
 
     return $res;
 
 };
 
-sub lint_module {
-    my $self = shift;
-    my $config = shift;
-    my $module = shift;
-    my $params = shift;
-
+sub lint_module ($self, $config, $module, $params) {
     my $uc_module = ucfirst($module);
     my $class = "OpenXPKI::Config::Lint::$uc_module";
     if (Mojo::Loader::load_class($class)) {

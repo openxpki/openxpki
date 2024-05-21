@@ -21,8 +21,8 @@ Show the alias for a given alias name
 
 command "show" => {
     alias => { isa => 'Str', 'label' => 'Alias', required => 1 },
-    key => { isa => 'Bool', 'label' => 'Show key details' },
-    cert => { isa => 'Bool', 'label' => 'Show certificate details'},
+    key => { isa => 'Bool', 'label' => 'Show key details', default => 0 },
+    cert => { isa => 'Bool', 'label' => 'Show certificate details', default => 0 },
 } => sub ($self, $param) {
 
     my $alias = $param->alias;

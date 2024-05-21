@@ -22,11 +22,11 @@ command "list" => {
     metadata => { isa => 'Bool', label => 'Show Metadata' },
 } => sub ($self, $param) {
 
-    my %query = (
+    my $query = {
         namespace => $param->namespace,
-    );
-    $query{metadata} = 1 if ($param->metadata);
-    my $res = $self->rawapi->run_command('list_data_pool_entries', \%query);
+        $param->has_metadata ? (metadata => 1) : (),
+    };
+    my $res = $self->rawapi->run_command('list_data_pool_entries', $query);
     return $res;
 
 };
