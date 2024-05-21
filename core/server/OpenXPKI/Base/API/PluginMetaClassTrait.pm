@@ -1,5 +1,5 @@
 package OpenXPKI::Base::API::PluginMetaClassTrait;
-use OpenXPKI qw( -role -typeconstraints );
+use OpenXPKI qw( -role -types );
 
 # Core modules
 use List::Util qw( any );
@@ -231,8 +231,8 @@ sub _add_attributes ($self, $param_metaclass, $param_specs, $is_default = 0) {
                 message => sub { my $val = shift; return "either attribute is not a '$type' or constraints defined in 'matching' where violated" },
             );
         }
-        # add a Moose attribute to the parameter container class
 
+        # add a Moose attribute to the parameter container class
         $param_metaclass->add_attribute($param_name,
             is => 'rw',
             isa => $isa,

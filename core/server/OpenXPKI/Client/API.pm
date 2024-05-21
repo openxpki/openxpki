@@ -1,5 +1,5 @@
 package OpenXPKI::Client::API;
-use OpenXPKI -class;
+use OpenXPKI qw( -class -typeconstraints );
 
 with 'OpenXPKI::Base::API::APIRole';
 

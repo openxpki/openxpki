@@ -1,5 +1,5 @@
 package OpenXPKI::Client::API::PluginMetaClassTrait;
-use OpenXPKI qw( -role -typeconstraints );
+use OpenXPKI -role;
 
 # CPAN modules
 use Moose::Util ();

@@ -50,6 +50,7 @@ sub import {
     my $moose_role = delete $flags{-role};
     my $plugin = delete $flags{-plugin};
     my $client_plugin = delete $flags{-client_plugin};
+    my $types = delete $flags{-types};
     $moose_class = 1 if (($plugin or $client_plugin) and not $moose_role);
 
     die sprintf(
@@ -68,13 +69,14 @@ sub import {
             Moose::Role->import::into(1);
         }
         Moose::Exporter->import::into(1) if $moose_exporter;
-        Moose::Util::TypeConstraints->import::into(1) if $moose_typeconstraints;
     # Plain old Perl package / class
     } else {
         base->import::into(1, $poc_base) if $poc_base;
         strict->import::into(1);
         warnings->import::into(1);
     }
+
+    Moose::Util::TypeConstraints->import::into(1) if $moose_typeconstraints;
 
     # API plugin
     if ($plugin or $client_plugin) {
@@ -113,6 +115,7 @@ sub import {
     OpenXPKI::Dumper->import::into(1);
     OpenXPKI::Exception->import::into(1);
     OpenXPKI::Util->import::into(1);
+    OpenXPKI::Types->import::into(1) if $types;
 
     # Disable "experimental" warnings: should be done after other imports to safely disable warnings in Perl < 5.36
     warnings->unimport::out_of(1, qw(

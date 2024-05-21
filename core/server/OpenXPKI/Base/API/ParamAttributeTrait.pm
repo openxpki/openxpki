@@ -1,5 +1,5 @@
 package OpenXPKI::Base::API::ParamAttributeTrait;
-use OpenXPKI qw( -role -typeconstraints );
+use OpenXPKI -role;
 
 =head1 NAME
 
