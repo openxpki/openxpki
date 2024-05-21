@@ -236,6 +236,7 @@ sub help ($self, $command = '', $subcommand = '', @) {
         if (my @spec = $self->get_command_attributes($command, $subcommand)->@*) {
             $pod .= "\n\nParameters:\n";
             for my $param (@spec) {
+                next if exists $internal_command_attributes{$param->name};
                 $pod .= sprintf('  - %s: %s', $param->name, $param->label);
                 $pod .= ', ' . $self->openapi_type($param);
                 $pod .= ', required' if $param->is_required;
@@ -267,7 +268,7 @@ sub getopt_params ($self, $command, $subcommand) {
         $type
             ? ($_->name . ($_->has_hint ? ':' : '=') . $type)
             : $_->name
-    } @spec;
+    } grep { not exists $internal_command_attributes{$_->name} } @spec;
 }
 
 signature_for getopt_type => (
