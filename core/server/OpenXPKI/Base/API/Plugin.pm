@@ -190,9 +190,9 @@ sub protected_command {
 sub _command {
     my ($meta, $command, $params, $code_ref, $is_protected) = @_;
 
-    $meta->add_method($command, $code_ref);    # Add a method to calling class
-    $meta->add_param_specs($command, $params); # Add a parameter class (OpenXPKI::Base::API::PluginMetaClassTrait)
-    $meta->is_protected($command, $is_protected);    # Set protection flag (OpenXPKI::Base::API::PluginMetaClassTrait)
+    $meta->add_method($command, $code_ref);         # Add method to calling class (Moose::Meta::Class)
+    $meta->param_specs($command, $params);          # Add parameter specifications (OpenXPKI::Base::API::PluginMetaClassTrait)
+    $meta->is_protected($command, $is_protected);   # Set protection flag (OpenXPKI::Base::API::PluginMetaClassTrait)
 }
 
 sub command_setup :prototype(@) {

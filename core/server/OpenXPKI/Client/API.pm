@@ -123,7 +123,7 @@ errors.
 =cut
 # $params - ArrayRef[Moose::Meta::Attribute]
 sub preprocess_params ($self, $command, $input_params, $plugin) {
-    my @params = $plugin->meta->param_metaclass($command)->get_all_attributes;
+    my @params = $plugin->meta->get_param_metaclass($command)->get_all_attributes;
 
     foreach my $param (@params) { # $param->isa('Moose::Meta::Attribute')
         my $name = $param->name;

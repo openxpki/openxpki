@@ -70,8 +70,9 @@ Returns a I<list> with all API command names defined by the API plugin.
 # Command meta information I<HashRef>:
 #     {
 #         'command_1' => {
-#             param_metaclass => Moose::Meta::Class->create(...),
-#             is_protected => 0,
+#             param_spec => { ... },                                # raw parameters
+#             param_metaclass => Moose::Meta::Class->create(...),   # class lazily created from raw parameters
+#             is_protected => 0,                                    # flag for protected commands
 #         },
 #         'command_2' => {
 #             ...
@@ -87,14 +88,19 @@ has _command_meta => (
     default => sub { {} },
 );
 
-=head2 add_param_specs
+=head2 param_specs
 
-Add parameter specifications for the given API command.
+Accessor to set or retrieve parameter specifications for the given API command.
 
-A new L<Moose::Meta::Class> is created with the name I<${command}_ParamObject>.
+Eventually a new L<Moose::Meta::Class> will be created with the name
+I<${command}_ParamObject>.
+
 Attributes are added to this class which will store the API command parameters.
 Type constraints specified via the L<C<matching>|OpenXPKI::Base::API::Plugin/command>
 parameter are created and attached to the attributes.
+
+The class creation is deferred to speed up API initialization and to allow
+for L</add_default_attribute_spec> to come into effect first.
 
 B<Parameters>
 
@@ -119,52 +125,104 @@ For more details please see L<OpenXPKI::Base::API::Plugin/command>.
 
 =cut
 
-signature_for add_param_specs => (
+signature_for param_specs => (
     method => 1,
-    positional => [ 'Str', 'HashRef' ],
+    positional => [ 'Str', 'Optional[HashRef]' ],
 );
-sub add_param_specs ($self, $command, $params_specs) {
-    my $param_metaclass = Moose::Meta::Class->create(
-        join("::", $self->name, "${command}_Params"),
-    );
-
-    # Add API command parameters to the newly created class as Moose attributes
-    $self->_add_attributes($command, $param_metaclass, $params_specs);
-    # Add default API command parameters
-    $self->_add_attributes($command, $param_metaclass, $self->_default_attribute_specs);
-    # internally register the new parameter class
-    $self->param_metaclass($command, $param_metaclass);
+sub param_specs ($self, $command, $specs = undef) {
+    return $self->_cmd_meta($command, 'param_specs', $specs);
 }
 
+=head2 get_param_metaclass
+
+Retrieve/create a L<Moose::Meta::Class> defining the parameters for the given
+command.
+
+    $self->get_param_metaclass($cmd);
+
+=cut
+sub get_param_metaclass ($self, $command) {
+    my $metaclass = $self->_cmd_meta($command, 'param_metaclass');
+
+    # Getter: create meta class on first access
+    if (not defined $metaclass) {
+        my $param_specs = $self->param_specs($command)
+          or die "No parameter specifications found for command '$command'\n";
+
+        $metaclass = Moose::Meta::Class->create(
+            join("::", $self->name, "${command}_Params"),
+        );
+
+        try {
+            # Add API command parameters to the newly created class as Moose attributes
+            $self->_add_attributes($metaclass, $param_specs);
+            # Add default API command parameters
+            $self->_add_attributes($metaclass, $self->_default_attribute_specs, 1);
+            # internally register the new parameter class
+            $self->_cmd_meta($command, 'param_metaclass', $metaclass);
+        }
+        catch ($err) {
+            OpenXPKI::Exception->throw(
+                message => "API command '$command': $err",
+                params => { command => $command, spec => Dumper($param_specs) }
+            );
+        }
+    }
+
+    return $metaclass;
+}
+
+=head2 is_protected
+
+Accessor to set or retrieve the protection status of the given command.
+
+    $self->is_protected($cmd);      # getter
+    $self->is_protected($cmd, 1);   # setter
+
+=cut
+sub is_protected ($self, $command, $is_protected = undef) {
+    return $self->_cmd_meta($command, 'is_protected', $is_protected);
+}
+
+# Getter / Setter for arbitrary command meta data
+signature_for _cmd_meta => (
+    method => 1,
+    positional => [ 'Str', 'Str', 'Optional[Any]' ],
+);
+sub _cmd_meta ($self, $command, $spec, $value = undef) {
+    if (defined $value) {
+        $self->_command_meta->{$command}->{$spec} = $value;
+    } else {
+        die "API command '$command' is not managed by " . __PACKAGE__
+          unless $self->_command_meta->{$command};
+    }
+
+    return $self->_command_meta->{$command}->{$spec};
+}
+
+# add attributes to command parameter meta class
 signature_for _add_attributes => (
     method => 1,
-    positional => [ 'Str', 'Moose::Meta::Class', 'HashRef' ],
+    positional => [ 'Moose::Meta::Class', 'HashRef', 'Optional[Bool]' ],
 );
-sub _add_attributes ($self, $command, $param_metaclass, $params_specs) {
-    for my $param_name (sort keys $params_specs->%*) {
+sub _add_attributes ($self, $param_metaclass, $param_specs, $is_default = 0) {
+    for my $param_name (sort keys $param_specs->%*) {
         # the parameter specs like "isa => ..., required => ..."
-        my $spec = { $params_specs->{$param_name}->%* }; # copy params to prevent modifying it via delete() below
+        my $spec = { $param_specs->{$param_name}->%* }; # copy params to prevent modifying it via delete() below
 
-        OpenXPKI::Exception->throw(
-            message => "Parameter '$param_name' collides with default parameter of same name",
-            params => { command => $command, parameter => $param_name, spec => Dumper($spec) }
-        ) if (any { $param_name eq $_ } keys $self->_default_attribute_specs->%*);
+        die "Parameter '$param_name' collides with default parameter of same name\n"
+          if (not $is_default and any { $param_name eq $_ } keys $self->_default_attribute_specs->%*);
 
-        OpenXPKI::Exception->throw(
-            message => "'isa' must be specified when defining an API command parameter",
-            params => { command => $command, parameter => $param_name, spec => Dumper($spec) }
-        ) unless $spec->{isa};
+        die "'isa' missing in parameter '$param_name'\n"
+          unless $spec->{isa};
 
         my $isa = delete $spec->{isa};
         my $type = Moose::Util::TypeConstraints::find_or_create_isa_type_constraint($isa);
 
         if ($spec->{matching}) {
-            # FIXME Implement
             my $matching = delete $spec->{matching};
-            OpenXPKI::Exception->throw(
-                message => "'matching' must be a reference either of type Regexp or CODE",
-                params => { command => $command, parameter => $param_name }
-            ) unless (ref $matching eq 'Regexp' or ref $matching eq 'CODE');
+            die "'matching' must be a reference of type Regexp or CODE in parameter '$param_name'\n"
+              unless (ref $matching eq 'Regexp' or ref $matching eq 'CODE');
 
             # we create a new anonymous subtype and overwrite the old type in $isa
             $isa = Moose::Meta::TypeConstraint->new(
@@ -186,43 +244,6 @@ sub _add_attributes ($self, $command, $param_metaclass, $params_specs) {
             $spec->%*,
         );
     }
-}
-
-=head2 param_metaclass
-
-Accessor to set or retrieve a L<Moose::Meta::Class> defining the parameters for
-the given command.
-
-    $self->param_metaclass($cmd);                                  # getter
-    $self->param_metaclass($cmd, Moose::Meta::Class->create(...)); # setter
-
-=cut
-sub param_metaclass ($self, $command, $param_metaclass = undef) {
-    return $self->_set_cmd_meta($command, 'param_metaclass', $param_metaclass);
-}
-
-=head2 is_protected
-
-Accessor to set or retrieve the protection status of the given command.
-
-    $self->is_protected($cmd);      # getter
-    $self->is_protected($cmd, 1);   # setter
-
-=cut
-sub is_protected ($self, $command, $is_protected = undef) {
-    return $self->_set_cmd_meta($command, 'is_protected', $is_protected);
-}
-
-# Getter / Setter for arbitrary command meta data
-sub _set_cmd_meta ($self, $command, $spec, $value) {
-    if (defined $value) {
-        $self->_command_meta->{$command}->{$spec} = $value;
-    } else {
-        die "API command '$command' is not managed by " . __PACKAGE__
-          unless $self->_command_meta->{$command};
-    }
-
-    return $self->_command_meta->{$command}->{$spec};
 }
 
 =head2 new_param_object
@@ -253,7 +274,7 @@ B<Parameters>
 =cut
 sub new_param_object ($self, $command, $params) {
     ##! 4: "API: new_param_object($command => {".join(", ", map { "$_ => ".$params->{$_} } keys %{ $params })."})"
-    return $self->param_metaclass($command)->new_object($params->%*);
+    return $self->get_param_metaclass($command)->new_object($params->%*);
 }
 
 signature_for set_command_behaviour => (

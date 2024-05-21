@@ -502,7 +502,7 @@ sub get_command_attributes ($self, $namespace, $command) {
     ) unless (blessed $meta && $meta->isa('Moose::Meta::Class'));
 
     # param_metaclass() returns a 'Moose::Meta::Class'
-    my @attributes = sort { $a->name cmp $b->name } $meta->param_metaclass($command)->get_all_attributes;
+    my @attributes = sort { $a->name cmp $b->name } $meta->get_param_metaclass($command)->get_all_attributes;
 
     return \@attributes; # ArrayRef of Moose::Meta::Attribute
 }
