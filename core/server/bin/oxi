@@ -134,6 +134,7 @@ my $client = OpenXPKI::Client::CLI->new(
 $api->client($client);
 
 # Dispatch request
+TRACE "Command parameters: " . Dumper  \%params;
 my $res;
 try {
     my $payload = $api->dispatch(
