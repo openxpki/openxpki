@@ -4,6 +4,8 @@ package OpenXPKI::DTO::ValidationException;
 
 use Moose;
 
+use OpenXPKI::Client::API::Util;
+
 has 'field' => (
     is => 'ro',
     isa => 'Str',
@@ -35,7 +37,8 @@ sub _build_message {
 
     my $self = shift;
 
-    my $name = $self->field;
+    my $name = OpenXPKI::Client::API::Util::to_cli_field($self->field);
+
     if ($self->has_choices) {
         return "Value for *$name* must be one of\n  ". join("\n  ", @{$self->choices} );
     }

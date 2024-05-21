@@ -19,6 +19,7 @@ use Log::Log4perl qw(:easy :no_extra_logdie_message);
 use OpenXPKI::DTO::Message::Command;
 use OpenXPKI::DTO::Message::Enquiry;
 use OpenXPKI::DTO::Message::ProtectedCommand;
+use OpenXPKI::Client::API::Util;
 
 =head1 NAME
 
@@ -114,8 +115,8 @@ sub handle_dispatch_error ($self, $err) {
 
 A hook called by L<OpenXPKI::Base::API::APIRole/dispatch>.
 
-It processes the C<hint> parameter attribute and the special C<FFFile>
-type.
+It converts minuses to underscores in parameter names and processes the C<hint>
+parameter attribute.
 
 It throws a C<OpenXPKI::DTO::ValidationException> object on validation
 errors.
@@ -123,22 +124,29 @@ errors.
 =cut
 # $params - ArrayRef[Moose::Meta::Attribute]
 sub preprocess_params ($self, $command, $input_params, $plugin) {
-    my @params = $plugin->meta->get_param_metaclass($command)->get_all_attributes;
-
-    foreach my $param (@params) { # $param->isa('Moose::Meta::Attribute')
-        my $name = $param->name;
+    for my $name (keys $input_params->%*) {
         my $val = $input_params->{$name};
-        # Empty input + hint flag = load choices
-        if (defined $val) {
-            if ($val eq '' and $param->has_hint) {
-                $self->log->debug('Call hint method to get choices');
-                my $hint_cb = $plugin->can($param->hint)
-                  or die "Method '".$param->hint."' not found in ".$plugin->meta->name."\n";
-                my $choices = $hint_cb->($plugin, $input_params);
-                $self->log->trace('Result from hint method: ' . Dumper $choices) if $self->log->is_trace;
-                die OpenXPKI::DTO::ValidationException->new( field => $name, reason => 'choice', choices => $choices );
-            }
+
+        # convert minus to underscore
+        my $new_name = OpenXPKI::Client::API::Util::to_api_field($name);
+        if ($new_name ne $name) {
+            $input_params->{$new_name} = $val;
+            delete $input_params->{$name};
+            $name = $new_name;
         }
+
+        # parameter hints - Empty input + hint flag = show choices
+        next unless (defined $val and $val eq '');
+
+        my $param = $plugin->meta->get_param_metaclass($command)->get_attribute($name);
+        next unless $param->has_hint;
+
+        $self->log->debug('Call hint method "'.$param->hint.'" to get choices');
+        my $hint_cb = $plugin->can($param->hint)
+          or die "Method '".$param->hint."' not found in ".$plugin->meta->name."\n";
+        my $choices = $hint_cb->($plugin, $input_params);
+        $self->log->trace('Result from hint method: ' . Dumper $choices) if $self->log->is_trace;
+        die OpenXPKI::DTO::ValidationException->new( field => $name, reason => 'choice', choices => $choices );
     }
 }
 
@@ -237,7 +245,7 @@ sub help ($self, $command = '', $subcommand = '', @) {
             $pod .= "\n\nParameters:\n";
             for my $param (@spec) {
                 next if exists $internal_command_attributes{$param->name};
-                $pod .= sprintf('  - %s: %s', $param->name, $param->label);
+                $pod .= sprintf('  - %s: %s', OpenXPKI::Client::API::Util::to_cli_field($param->name), $param->label);
                 $pod .= ', ' . $self->openapi_type($param);
                 $pod .= ', required' if $param->is_required;
                 $pod .= ', hint' if $param->has_hint;
@@ -265,9 +273,8 @@ sub getopt_params ($self, $command, $subcommand) {
 
     return map {
         my $type = $self->getopt_type($_);
-        $type
-            ? ($_->name . ($_->has_hint ? ':' : '=') . $type)
-            : $_->name
+        my $name = OpenXPKI::Client::API::Util::to_cli_field($_->name);
+        $name . ($type ? ($_->has_hint ? ':' : '=') . $type : '')
     } grep { not exists $internal_command_attributes{$_->name} } @spec;
 }
 

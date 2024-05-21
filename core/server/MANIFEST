@@ -99,6 +99,7 @@ OpenXPKI/Client/API/PluginMetaClassTrait.pm
 OpenXPKI/Client/API/PluginRole.pm
 
 OpenXPKI/Client/API/Response.pm
+OpenXPKI/Client/API/Util.pm
 
 # Wrappers for EST, RPC...
 OpenXPKI/Client/Service/EST.pm
