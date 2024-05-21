@@ -82,9 +82,8 @@ while (@ARGV && substr($ARGV[0],0,1) ne '-') {
 
 # Create GetOption spec from the parameters recorded in the command
 if (my @getopts = $api->getopt_params($command, $subcommand)) {
-    DEBUG(Dumper \@getopts);
+    TRACE('GetOptions parameters: ' . Dumper \@getopts);
     GetOptions( \%params, @getopts ) || exit 1;
-    DEBUG(Dumper \%params);
 }
 
 # reserved internal command parameters
