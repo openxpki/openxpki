@@ -1,7 +1,9 @@
 package OpenXPKI::TestCommandsNamespace::workflow;
 use OpenXPKI -plugin;
 
-set_namespace __PACKAGE__;
+command_setup
+    parent_namespace => 1,
+;
 
 command "create" => {} => sub {
     return "WF_CREATED";

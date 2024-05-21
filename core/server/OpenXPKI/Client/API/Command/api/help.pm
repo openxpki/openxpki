@@ -1,12 +1,13 @@
 package OpenXPKI::Client::API::Command::api::help;
 use OpenXPKI -plugin;
 
-with 'OpenXPKI::Client::API::Command::api';
-set_namespace_to_parent;
+command_setup
+    parent_namespace_role => 1,
+;
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::api::help;
+OpenXPKI::Client::API::Command::api::help
 
 =head1 SYNOPSIS
 

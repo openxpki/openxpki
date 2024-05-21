@@ -1,17 +1,17 @@
 package OpenXPKI::Client::API::Command::config::verify;
 use OpenXPKI -plugin;
 
-with 'OpenXPKI::Client::API::Command::config';
-set_namespace_to_parent;
-
 # TODO - this is not protected but does not need a realm as its local...
-with 'OpenXPKI::Client::API::Command::Protected';
+command_setup
+    parent_namespace_role => 1,
+    protected => 1,
+;
 
 use OpenXPKI::Config::Backend;
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::config::show;
+OpenXPKI::Client::API::Command::config::verify
 
 =head1 SYNOPSIS
 

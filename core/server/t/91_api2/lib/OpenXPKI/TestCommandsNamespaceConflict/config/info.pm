@@ -1,7 +1,9 @@
 package OpenXPKI::TestCommandsNamespaceConflict::config::info;
 use OpenXPKI -plugin;
 
-set_namespace_to_parent;
+command_setup
+    parent_namespace => 1,
+;
 
 command "info" => {} => sub {
     return "CONFIG_INFO";

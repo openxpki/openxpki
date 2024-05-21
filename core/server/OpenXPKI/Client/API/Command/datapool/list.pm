@@ -1,9 +1,10 @@
 package OpenXPKI::Client::API::Command::datapool::list;
 use OpenXPKI -plugin;
 
-with 'OpenXPKI::Client::API::Command::datapool';
-set_namespace_to_parent;
-__PACKAGE__->needs_realm;
+command_setup
+    parent_namespace_role => 1,
+    needs_realm => 1,
+;
 
 =head1 NAME
 
@@ -25,7 +26,7 @@ command "list" => {
         namespace => $param->namespace,
     );
     $query{metadata} = 1 if ($param->metadata);
-    my $res = $self->rawapi->run_command('list_data_pool_entries', \%query );
+    my $res = $self->rawapi->run_command('list_data_pool_entries', \%query);
     return $res;
 
 };

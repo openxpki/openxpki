@@ -15,17 +15,6 @@ Base role for all implementations handled by C<OpenXPKI::Client::API>.
 
 =head1 METHODS
 
-=cut
-sub needs_realm ($class) {
-    $class->meta->add_default_attribute_spec(
-        realm => {
-            isa => 'Str', required => 1,
-            label => 'PKI Realm', description => 'Name of the realm to operate this command on',
-            hint => 'list_realm',
-        }
-    );
-}
-
 =head2 hint_realm
 
 Return the list of available realms by calling the backend.
@@ -38,15 +27,6 @@ sub hint_realm ($self, $input_params) {
     my $reply = $client->send_receive_service_msg('GET_REALM_LIST');
     $self->log->trace('Reply from GET_REALM_LIST: ' . Dumper $reply) if $self->log->is_trace;
     return [ map { $_->{name} } $reply->{PARAMS}->@* ];
-}
-
-=head2 is_protected
-
-Return true if the command is marked as a protected command
-
-=cut
-sub is_protected ($self) {
-    return $self->DOES('OpenXPKI::Client::API::Command::Protected');
 }
 
 sub _build_hash_from_payload ($self, $param, $allow_bool = 0) {

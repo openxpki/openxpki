@@ -1,7 +1,9 @@
 package OpenXPKI::TestCommandsNamespace::config::show;
 use OpenXPKI -plugin;
 
-set_namespace_to_parent;
+command_setup
+    parent_namespace => 1,
+;
 
 command "show" => {} => sub {
     return { a => 1, b => 2 };

@@ -1,9 +1,10 @@
 package OpenXPKI::Client::API::Command::acme::show;
 use OpenXPKI -plugin;
 
-with 'OpenXPKI::Client::API::Command::acme';
-set_namespace_to_parent;
-__PACKAGE__->needs_realm;
+command_setup
+    parent_namespace_role => 1,
+    needs_realm => 1,
+;
 
 =head1 NAME
 

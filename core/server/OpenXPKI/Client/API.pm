@@ -132,7 +132,9 @@ sub preprocess_params ($self, $command, $input_params, $plugin) {
         if (defined $val) {
             if ($val eq '' and $param->has_hint) {
                 $self->log->debug('Call hint method to get choices');
-                my $choices = $param->hint->($plugin, $input_params);
+                my $hint_cb = $plugin->can($param->hint)
+                  or die "Method '".$param->hint."' not found in ".$plugin->meta->name."\n";
+                my $choices = $hint_cb->($plugin, $input_params);
                 $self->log->trace('Result from hint method: ' . Dumper $choices) if $self->log->is_trace;
                 die OpenXPKI::DTO::ValidationException->new( field => $name, reason => 'choice', choices => $choices );
             }
@@ -333,7 +335,7 @@ sub map_value_type ($self, $attribute, $map) {
 
 =cut
 
-sub run_enquiry ($self, $topic, $params) {
+sub run_enquiry ($self, $topic, $params = undef) {
     $self->log->debug("Running service enquiry on topic '$topic'");
     my $msg = OpenXPKI::DTO::Message::Enquiry->new(
         topic => $topic,
@@ -347,7 +349,7 @@ sub run_enquiry ($self, $topic, $params) {
 
 =cut
 
-sub run_command ($self, $command, $params) {
+sub run_command ($self, $command, $params = undef) {
     $self->log->debug("Running command '$command'");
     my $msg = OpenXPKI::DTO::Message::Command->new(
         command => $command,
@@ -361,7 +363,7 @@ sub run_command ($self, $command, $params) {
 
 =cut
 
-sub run_protected_command ($self, $command, $params) {
+sub run_protected_command ($self, $command, $params = undef) {
     $self->log->debug("Running command '$command' in protected mode");
     my $msg = OpenXPKI::DTO::Message::ProtectedCommand->new(
         command => $command,

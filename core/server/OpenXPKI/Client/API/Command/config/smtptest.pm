@@ -1,13 +1,14 @@
 package OpenXPKI::Client::API::Command::config::smtptest;
 use OpenXPKI -plugin;
 
-with 'OpenXPKI::Client::API::Command::config';
-set_namespace_to_parent;
-__PACKAGE__->needs_realm;
+command_setup
+    parent_namespace_role => 1,
+    needs_realm => 1,
+;
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::config::smtptest;
+OpenXPKI::Client::API::Command::config::smtptest
 
 =head1 SYNOPSIS
 

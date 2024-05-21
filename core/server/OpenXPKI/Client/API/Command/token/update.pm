@@ -1,16 +1,17 @@
 package OpenXPKI::Client::API::Command::token::update;
 use OpenXPKI -plugin;
 
-with 'OpenXPKI::Client::API::Command::token';
-set_namespace_to_parent;
-__PACKAGE__->needs_realm;
-with 'OpenXPKI::Client::API::Command::Protected';
+command_setup
+    parent_namespace_role => 1,
+    needs_realm => 1,
+    protected => 1,
+;
 
 use OpenXPKI::Serialization::Simple;
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::token::add
+OpenXPKI::Client::API::Command::token::update
 
 =head1 SYNOPSIS
 

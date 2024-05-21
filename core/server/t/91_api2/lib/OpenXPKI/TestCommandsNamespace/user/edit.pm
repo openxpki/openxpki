@@ -1,7 +1,9 @@
 package OpenXPKI::TestCommandsNamespace::user::edit;
 use OpenXPKI -plugin;
 
-set_namespace_to_parent;
+command_setup
+    parent_namespace => 1,
+;
 
 command "create" => {} => sub {
     return "USER_CREATED";

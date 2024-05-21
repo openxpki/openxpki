@@ -2,7 +2,6 @@ package OpenXPKI::Client::API::Response;
 
 use Moose;
 
-
 =head1 NAME
 
 OpenXPKI::Client::API::Response

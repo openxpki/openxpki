@@ -40,17 +40,13 @@ has description => (
 
 =head2 hint
 
-Optional: I<CodeRef> or method name I<Str> that references a helper method used to
+Optional: Method name I<Str> that references a helper method used to
 show type hints on the attribute.
 
 =cut
-my $code_ref_or_str = subtype as 'CodeRef';
-coerce $code_ref_or_str, from 'Str', via { \&{$_} };
-
 has hint => (
     is => 'ro',
-    isa => $code_ref_or_str,
-    coerce => 1,
+    isa => 'Str',
     predicate => 'has_hint',
 );
 

@@ -1,13 +1,14 @@
 package OpenXPKI::Client::API::Command::token::list;
 use OpenXPKI -plugin;
 
-with 'OpenXPKI::Client::API::Command::token';
-set_namespace_to_parent;
-__PACKAGE__->needs_realm;
+command_setup
+    parent_namespace_role => 1,
+    needs_realm => 1,
+;
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::token::status
+OpenXPKI::Client::API::Command::token::list
 
 =head1 SYNOPSIS
 

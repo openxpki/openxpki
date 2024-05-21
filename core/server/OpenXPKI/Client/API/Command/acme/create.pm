@@ -1,17 +1,10 @@
 package OpenXPKI::Client::API::Command::acme::create;
 use OpenXPKI -plugin;
 
-with 'OpenXPKI::Client::API::Command::acme';
-set_namespace_to_parent;
-__PACKAGE__->needs_realm;
-
-use JSON::PP qw(decode_json);
-use Crypt::JWT qw(encode_jwt);
-use Crypt::PK::ECC;
-use Crypt::PK::RSA;
-use Digest::SHA qw(sha256);
-
-use MIME::Base64 qw(decode_base64url encode_base64url);
+command_setup
+    parent_namespace_role => 1,
+    needs_realm => 1,
+;
 
 =head1 NAME
 
@@ -23,6 +16,14 @@ Register a new ACME account with an external CA and write the
 registration information to the datapool.
 
 =cut
+
+use JSON::PP qw(decode_json);
+use Crypt::JWT qw(encode_jwt);
+use Crypt::PK::ECC;
+use Crypt::PK::RSA;
+use Digest::SHA qw(sha256);
+
+use MIME::Base64 qw(decode_base64url encode_base64url);
 
 sub hint_keyspec {
     return [ 'secp384r1 (default)', 'secp256r1', 'secp521r1', 'rsa2048', 'rsa3072', 'rsa4096' ];

@@ -195,7 +195,6 @@ if (blessed $res->payload and $res->payload->isa('OpenXPKI::Exception')) {
 ERROR(sprintf "Something went wrong (%d, %s)", $res->state, ref $res->payload);
 exit 255;
 
-
 =head1 NAME
 
 oxi - tool for managing OpenXPKI instances and artefacts

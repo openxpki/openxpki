@@ -1,8 +1,9 @@
 package OpenXPKI::Client::API::Command::api::list;
 use OpenXPKI -plugin;
 
-with 'OpenXPKI::Client::API::Command::api';
-set_namespace_to_parent;
+command_setup
+    parent_namespace_role => 1,
+;
 
 =head1 NAME
 

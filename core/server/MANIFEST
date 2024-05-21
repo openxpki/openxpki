@@ -53,7 +53,6 @@ OpenXPKI/Client/Simple.pm
 # New CLI / API
 OpenXPKI/Client/API.pm
 OpenXPKI/Client/API/Command.pm
-OpenXPKI/Client/API/Command/Protected.pm
 OpenXPKI/Client/API/Command/acme.pm
 OpenXPKI/Client/API/Command/acme/create.pm
 OpenXPKI/Client/API/Command/acme/list.pm

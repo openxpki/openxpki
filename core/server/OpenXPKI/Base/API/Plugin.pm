@@ -22,8 +22,6 @@ B<Not intended for direct use> - C<use OpenXPKI -plugin> instead:
     package OpenXPKI::Server::API2::Plugin::MyTopic::MyActions;
     use OpenXPKI -plugin;
 
-    set_namespace_to_parent;
-
     command "aaa" => {
         # parameters
     } => sub {
@@ -61,7 +59,7 @@ L<OpenXPKI::Base::API::PluginMetaClassTrait>
 
 =cut
 Moose::Exporter->setup_import_methods(
-    with_meta => [ 'command', 'protected_command', 'set_namespace', 'set_namespace_to_parent' ],
+    with_meta => [ 'command', 'protected_command', 'command_setup' ],
     base_class_roles => [ 'OpenXPKI::Base::API::PluginRole' ],
     class_metaroles => {
         class => [ 'OpenXPKI::Base::API::PluginMetaClassTrait' ],
@@ -197,40 +195,11 @@ sub _command {
     $meta->is_protected($command, $is_protected);    # Set protection flag (OpenXPKI::Base::API::PluginMetaClassTrait)
 }
 
-=head2 set_namespace_to_parent
-
-Set the command namespace to the current classes parent namespace
-(default is the API's root namespace).
-
-    package OpenXPKI::Server::API2::Plugin::MyTopic::info;
-
-    set_namespace_to_parent;
-    # is the same as:
-    set_namespace 'OpenXPKI::Server::API2::Plugin::MyTopic';
-
-=cut
-sub set_namespace_to_parent {
-    my ($meta) = @_;
+sub command_setup :prototype(@) {
+    my ($meta, @args) = @_;
 
     my $caller_package = caller(1);
-
-    my @parts = split '::', $caller_package;
-    pop @parts;
-
-    $meta->namespace(join '::', @parts);
-}
-
-=head2 set_namespace
-
-Set the command namespace (default is the API's root namespace).
-
-Must be specified as a full Perl package name.
-
-=cut
-sub set_namespace :prototype($) {
-    my ($meta, $namespace) = @_;
-
-    $meta->namespace($namespace);
+    $meta->set_command_behaviour(caller => $caller_package, @args);
 }
 
 1;

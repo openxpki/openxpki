@@ -1,6 +1,5 @@
 package OpenXPKI::Client::Simple;
 
-
 =head1 NAME
 
 OpenXPKI::Client::Simple - an easy way to connect to the openxpki daemon and run commands
