@@ -274,16 +274,23 @@ enum 'SerializationFormat', [qw( simple )];
 =cut
 subtype 'ReadableFile',
     as 'Str',
-    where { -f $_  && -r $_ },
+    where { -f $_ && -r $_ },
     message { sprintf "'%s' is not a valid and accessible file",  $_ };
 
 =head2 FileContents
 
+A C<ScalarRef> with file contents, coerced from L</ReadableFile>.
+
+It cannot be of type C<Str> because coercion will not happen (i.e. is not
+triggered) if the source and the target have the same type.
+
 =cut
+subtype 'FileContents',
+    as 'ScalarRef';
+
 coerce 'FileContents',
-    as 'Str',
     from 'ReadableFile',
-    via { OpenXPKI::FileUtils->new->read_file($_) };
+    via { \OpenXPKI::FileUtils->new->read_file($_) };
 
 =head2 ReadableDir
 

@@ -34,8 +34,8 @@ command "add" => {
 } => sub ($self, $param) {
 
     my $cert_identifier;
-    if ($param->cert) {
-        my $x509 = OpenXPKI::Crypt::X509->new($param->cert);
+    if ($param->has_cert) {
+        my $x509 = OpenXPKI::Crypt::X509->new($param->cert->$*); # type "FileContents" is a ScalarRef
         $cert_identifier = $x509->get_cert_identifier();
         $self->rawapi->run_command('import_certificate', {
             data => $x509->pem,

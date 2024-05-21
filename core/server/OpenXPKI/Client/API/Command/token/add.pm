@@ -40,8 +40,8 @@ command "add" => {
 
     my $group = $groups->params->{$type};
     my $cert_identifier;
-    if ($param->cert) {
-        my $x509 = OpenXPKI::Crypt::X509->new($param->cert);
+    if ($param->has_cert) {
+        my $x509 = OpenXPKI::Crypt::X509->new($param->cert->$*); # type "FileContents" is a ScalarRef
         $cert_identifier = $x509->get_cert_identifier();
         $self->rawapi->run_command('import_certificate', {
             data => $x509->pem,
@@ -70,8 +70,8 @@ command "add" => {
     $self->log->debug("Alias $alias was created");
 
     # we now add the key
-    if ($param->key) {
-        my $token = $self->handle_key($alias, $param->key);
+    if ($param->has_key) {
+        my $token = $self->handle_key($alias, $param->key->$*); # type "FileContents" is a ScalarRef
         $res->params->{key_name} = $token->{key_name};
     }
 
