@@ -1,6 +1,8 @@
 package OpenXPKI::Client::API::PluginRole;
 use OpenXPKI -role;
 
+with 'OpenXPKI::Role::Logger';
+
 use OpenXPKI::Client;
 
 =head1 NAME
@@ -25,6 +27,27 @@ sub hint_realm ($self, $input_params) {
     my $reply = $client->send_receive_service_msg('GET_REALM_LIST');
     $self->log->trace('Reply from GET_REALM_LIST: ' . Dumper $reply) if $self->log->is_trace;
     return [ map { $_->{name} } $reply->{PARAMS}->@* ];
+}
+
+sub build_hash_from_payload ($self, $param, $allow_bool = 0) {
+    return {} unless $param->has_payload;
+
+    my %result;
+    foreach my $arg ($param->payload->@*) {
+        my ($key, $val) = split('=', $arg, 2);
+        $val = 1 if (not defined $val and $allow_bool);
+        next unless defined $val;
+        if ($result{$key}) {
+            if (not ref $result{$key}) {
+                $result{$key} = [$result{$key}, $val];
+            } else {
+                push @{$result{$key}}, $val;
+            }
+        } else {
+            $result{$key} = $val;
+        }
+    }
+    return \%result;
 }
 
 1;

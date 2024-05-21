@@ -1,7 +1,6 @@
 package OpenXPKI::Client::API::Command::acme;
 use OpenXPKI -role;
 
-with 'OpenXPKI::Client::API::Command';
 with 'Connector::Role::SSLUserAgent';
 
 # Core modules

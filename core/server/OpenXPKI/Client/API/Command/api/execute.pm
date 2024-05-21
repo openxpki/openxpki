@@ -27,7 +27,7 @@ command "execute" => {
 } => sub ($self, $param) {
 
     my $command = $param->command;
-    my $payload = $self->_build_hash_from_payload($param, 1);
+    my $payload = $self->build_hash_from_payload($param, 1);
 
     my $api_params = $self->help_command($command);
     my $cmd_parameters;

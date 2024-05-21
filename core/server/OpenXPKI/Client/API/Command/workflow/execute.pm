@@ -27,7 +27,7 @@ command "execute" => {
     action => { isa => 'Str', label => 'Action', hint => 'hint_action', required => 1 },
 } => sub ($self, $param) {
 
-    my $wf_parameters = $self->_build_hash_from_payload($param);
+    my $wf_parameters = $self->build_hash_from_payload($param);
 
     my $res = $self->rawapi->run_command('execute_workflow_activity', {
             id => $param->id,

@@ -1,8 +1,6 @@
 package OpenXPKI::Client::API::Command::token;
 use OpenXPKI -role;
 
-with 'OpenXPKI::Client::API::Command';
-
 # Core modules
 use List::Util qw( none );
 

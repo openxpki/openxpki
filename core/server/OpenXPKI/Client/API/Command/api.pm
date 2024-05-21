@@ -1,8 +1,6 @@
 package OpenXPKI::Client::API::Command::api;
 use OpenXPKI -role;
 
-with 'OpenXPKI::Client::API::Command';
-
 =head1 NAME
 
 OpenXPKI::CLI::Command::api

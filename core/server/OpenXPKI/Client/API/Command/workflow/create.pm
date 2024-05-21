@@ -28,7 +28,7 @@ command "create" => {
     type => { isa => 'Str', label => 'Workflow Type', hint => 'hint_type', required => 1 },
 } => sub ($self, $param) {
 
-    my $wf_parameters = $self->_build_hash_from_payload($param);
+    my $wf_parameters = $self->build_hash_from_payload($param);
     $self->log->info(Dumper $wf_parameters);
 
     my $res = $self->rawapi->run_command('create_workflow_instance', {

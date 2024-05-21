@@ -44,7 +44,7 @@ command "verify" => {
         $res = { digest => $conf->checksum, path => $param->path, value => $hash };
 
     } elsif ($param->has_module) {
-        my $res_lint = $self->lint_module($conf, $param->module, $self->_build_hash_from_payload($param));
+        my $res_lint = $self->lint_module($conf, $param->module, $self->build_hash_from_payload($param));
         $res = { digest => $conf->checksum, $param->module => $res_lint };
 
     } else {

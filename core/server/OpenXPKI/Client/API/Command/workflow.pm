@@ -1,11 +1,6 @@
 package OpenXPKI::Client::API::Command::workflow;
 use OpenXPKI -role;
 
-with 'OpenXPKI::Client::API::Command';
-
-# Core modules
-use List::Util qw( none );
-
 use OpenXPKI::Serialization::Simple;
 
 =head1 NAME
