@@ -18,11 +18,12 @@ Delete the token for a given alias name
 =cut
 
 command "delete" => {
-    alias => { isa => 'Str', 'label' => 'Alias', required => 1, trigger => \&check_alias  },
+    alias => { isa => 'Str', 'label' => 'Alias', required => 1 },
     remove_key => { isa => 'Bool', 'label' => 'Remove the key' },
 } => sub ($self, $param) {
 
     my $alias = $param->alias;
+    $self->check_alias($alias);
 
     my $res = $self->rawapi->run_command('show_alias', { alias => $alias });
     die "Alias '$alias not' found\n" unless $res->param('alias');

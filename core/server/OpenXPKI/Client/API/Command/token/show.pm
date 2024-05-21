@@ -20,12 +20,13 @@ Show the alias for a given alias name
 =cut
 
 command "show" => {
-    alias => { isa => 'Str', 'label' => 'Alias', required => 1, trigger => \&check_alias  },
+    alias => { isa => 'Str', 'label' => 'Alias', required => 1 },
     key => { isa => 'Bool', 'label' => 'Show key details' },
     cert => { isa => 'Bool', 'label' => 'Show certificate details'},
 } => sub ($self, $param) {
 
     my $alias = $param->alias;
+    $self->check_alias($alias);
 
     my $res = $self->rawapi->run_command('show_alias', { alias => $alias } );
     die "Alias '$alias not' found" unless $res->param('alias');

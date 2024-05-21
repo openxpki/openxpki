@@ -18,11 +18,13 @@ Delete an alias
 =cut
 
 command "delete" => {
-    alias => { isa => 'Str', 'label' => 'Alias', required => 1, trigger => \&check_alias },
+    alias => { isa => 'Str', 'label' => 'Alias', required => 1 },
     remove_key => { isa => 'Bool', 'label' => 'Remove the key' },
 } => sub ($self, $param) {
 
     my $alias = $param->alias;
+    $self->check_alias($alias);
+
     my $cmd_param = { alias => $alias };
 
     my $res = $self->rawapi->run_command('show_alias', $cmd_param );

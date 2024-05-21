@@ -23,12 +23,14 @@ sub hint_alias ($self, $input_params) {
 }
 
 command "update" => {
-    alias => { isa => 'Str', 'label' => 'Alias', hint => 'hint_alias', required => 1, trigger => \&check_alias },
+    alias => { isa => 'Str', 'label' => 'Alias', hint => 'hint_alias', required => 1 },
     notbefore => { isa => 'Epoch', label => 'Validity override (notbefore)' },
     notafter => { isa => 'Epoch', label => 'Validity override (notafter)' },
 } => sub ($self, $param) {
 
     my $alias = $param->alias;
+    $self->check_alias($alias);
+
     my $cmd_param = { alias => $alias };
 
     foreach my $key (qw( notbefore notafter )) {

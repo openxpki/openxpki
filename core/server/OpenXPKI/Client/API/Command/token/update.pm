@@ -25,7 +25,7 @@ sub hint_type ($self, $input_params) {
 }
 
 command "update" => {
-    alias => { isa => 'Str', 'label' => 'Alias', hint => 'hint_type', required => 1, trigger => \&check_alias  },
+    alias => { isa => 'Str', 'label' => 'Alias', hint => 'hint_type', required => 1 },
     key => { isa => 'FileContents', label => 'Key file (new)' },
     key_update => { isa => 'FileContents', label => 'Key file (update)' },
     notbefore => { isa => 'Epoch', label => 'Validity override (notbefore)' },
@@ -33,9 +33,10 @@ command "update" => {
 } => sub ($self, $param) {
 
     my $alias = $param->alias;
-    my $cmd_param = {
-        alias => $alias,
-    };
+    $self->check_alias($alias);
+
+    my $cmd_param = { alias => $alias };
+
     foreach my $key (qw( notbefore notafter )) {
         my $predicate = "has_$key";
         $cmd_param->{$key} = $param->$key if $param->$predicate;

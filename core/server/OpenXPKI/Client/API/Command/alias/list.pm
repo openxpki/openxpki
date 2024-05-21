@@ -30,11 +30,13 @@ sub hint_group ($self, $input_params) {
 }
 
 command "list" => {
-    group => { isa => 'Str', label => 'Token group (e.g. tg_server)', hint => 'hint_group', trigger => \&check_group },
+    group => { isa => 'Str', label => 'Token group (e.g. tg_server)', hint => 'hint_group' },
     expired => { isa => 'Bool' },
     valid => { isa => 'Bool' },
     upcoming => { isa => 'Bool' },
 } => sub ($self, $param) {
+
+    $self->check_group($param->group);
 
     my $groups = $self->hint_group();
     my $res = {};

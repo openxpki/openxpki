@@ -25,13 +25,15 @@ sub hint_type ($self, $input_params) {
 }
 
 command "add" => {
-    group => { isa => 'Str', 'label' => 'Token group (e.g. tg_server)', required => 1, trigger => \&check_group },
+    group => { isa => 'Str', 'label' => 'Token group (e.g. tg_server)', required => 1 },
     cert => { isa => 'FileContents', label => 'Certificate file' },
     identifier => { isa => 'Str', label => 'Certificate identifier' },
     generation => { isa => 'Int', label => 'Generation' },
     notbefore => { isa => 'Int', label => 'Validity override (notbefore)' },
     notafter => { isa => 'Int', label => 'Validity override (notafter)' },
 } => sub ($self, $param) {
+
+    $self->check_group($param->group);
 
     my $cert_identifier;
     if ($param->has_cert) {
