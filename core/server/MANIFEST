@@ -95,6 +95,10 @@ OpenXPKI/Client/API/Command/workflow/resume.pm
 OpenXPKI/Client/API/Command/workflow/show.pm
 OpenXPKI/Client/API/Command/workflow/wakeup.pm
 
+OpenXPKI/Client/API/Plugin.pm
+OpenXPKI/Client/API/PluginMetaClassTrait.pm
+OpenXPKI/Client/API/PluginRole.pm
+
 OpenXPKI/Client/API/Response.pm
 
 # Wrappers for EST, RPC...

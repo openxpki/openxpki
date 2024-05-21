@@ -1,5 +1,5 @@
 package OpenXPKI::Client::API::Command::config::verify;
-use OpenXPKI -plugin;
+use OpenXPKI -client_plugin;
 
 # TODO - this is not protected but does not need a realm as its local...
 command_setup

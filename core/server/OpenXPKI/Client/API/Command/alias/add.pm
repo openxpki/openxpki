@@ -1,5 +1,5 @@
 package OpenXPKI::Client::API::Command::alias::add;
-use OpenXPKI -plugin;
+use OpenXPKI -client_plugin;
 
 command_setup
     parent_namespace_role => 1,

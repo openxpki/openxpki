@@ -1,5 +1,5 @@
 package OpenXPKI::TestCommandsNamespace::info;
-use OpenXPKI -plugin;
+use OpenXPKI -client_plugin;
 
 command "info" => {
     size => { isa => 'Int' },

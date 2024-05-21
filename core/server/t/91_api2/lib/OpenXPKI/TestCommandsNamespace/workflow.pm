@@ -1,8 +1,8 @@
 package OpenXPKI::TestCommandsNamespace::workflow;
-use OpenXPKI -plugin;
+use OpenXPKI -client_plugin;
 
 command_setup
-    parent_namespace => 1,
+    namespace => __PACKAGE__,
 ;
 
 command "create" => {} => sub {

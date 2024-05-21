@@ -1,5 +1,5 @@
 package OpenXPKI::TestCommandsNamespace::config::show;
-use OpenXPKI -plugin;
+use OpenXPKI -client_plugin;
 
 command_setup
     parent_namespace => 1,

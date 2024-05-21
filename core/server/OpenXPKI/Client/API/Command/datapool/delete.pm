@@ -1,5 +1,5 @@
 package OpenXPKI::Client::API::Command::datapool::delete;
-use OpenXPKI -plugin;
+use OpenXPKI -client_plugin;
 
 command_setup
     parent_namespace_role => 1,

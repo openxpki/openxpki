@@ -49,7 +49,8 @@ sub import {
     my $moose_nonmoose = delete $flags{-nonmoose};
     my $moose_role = delete $flags{-role};
     my $plugin = delete $flags{-plugin};
-    $moose_class = 1 if ($plugin and not $moose_class and not $moose_role);
+    my $client_plugin = delete $flags{-client_plugin};
+    $moose_class = 1 if (($plugin or $client_plugin) and not $moose_role);
 
     die sprintf(
         'Unknown options: "use OpenXPKI qw( ... %s )" (called at %s line %s)',
@@ -76,8 +77,9 @@ sub import {
     }
 
     # API plugin
-    if ($plugin) {
+    if ($plugin or $client_plugin) {
         OpenXPKI::Base::API::Plugin->import::into(1);
+        OpenXPKI::Client::API::Plugin->import::into(1) if $client_plugin;
     }
 
     utf8->import::into(1);

@@ -1,5 +1,5 @@
 package OpenXPKI::Client::API::Command::workflow::wakeup;
-use OpenXPKI -plugin;
+use OpenXPKI -client_plugin;
 
 command_setup
     parent_namespace_role => 1,

@@ -10,11 +10,6 @@ OpenXPKI::Base::API::Plugin - Define an OpenXPKI API plugin
 use Moose ();
 use Moose::Exporter;
 
-# Project modules
-use OpenXPKI::Base::API::PluginRole;
-use OpenXPKI::Base::API::PluginMetaClassTrait;
-
-
 =head1 DESCRIPTION
 
 B<Not intended for direct use> - C<use OpenXPKI -plugin> instead:
@@ -59,7 +54,7 @@ L<OpenXPKI::Base::API::PluginMetaClassTrait>
 
 =cut
 Moose::Exporter->setup_import_methods(
-    with_meta => [ 'command', 'protected_command', 'command_setup' ],
+    with_meta => [ 'command', 'protected_command' ],
     base_class_roles => [ 'OpenXPKI::Base::API::PluginRole' ],
     class_metaroles => {
         class => [ 'OpenXPKI::Base::API::PluginMetaClassTrait' ],
@@ -193,13 +188,6 @@ sub _command {
     $meta->add_method($command, $code_ref);         # Add method to calling class (Moose::Meta::Class)
     $meta->param_specs($command, $params);          # Add parameter specifications (OpenXPKI::Base::API::PluginMetaClassTrait)
     $meta->is_protected($command, $is_protected);   # Set protection flag (OpenXPKI::Base::API::PluginMetaClassTrait)
-}
-
-sub command_setup :prototype(@) {
-    my ($meta, @args) = @_;
-
-    my $caller_package = caller(1);
-    $meta->set_command_behaviour(caller => $caller_package, @args);
 }
 
 1;
