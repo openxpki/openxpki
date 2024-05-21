@@ -23,7 +23,7 @@ command "resume" => {
     force => { isa => 'Bool' },
 } => sub ($self, $param) {
 
-    my $res = $self->rawapi->run_command('resume_workflow', {
+    my $res = $self->run_command('resume_workflow', {
         id => $param->id,
         async => $param->async ? 1 : 0,
         wait => $param->wait ? 1 : 0,

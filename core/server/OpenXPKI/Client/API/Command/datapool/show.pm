@@ -27,7 +27,7 @@ command "show" => {
     deserialize => { isa => 'Bool', label => 'Deserialize Item', description => 'Unpack serialized value', default => 0 },
 } => sub ($self, $param) {
 
-    my $res = $self->rawapi->run_command('get_data_pool_entry', {
+    my $res = $self->run_command('get_data_pool_entry', {
         namespace => $param->namespace,
         key =>  $param->key,
         decrypt => $param->decrypt,

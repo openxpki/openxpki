@@ -17,7 +17,7 @@ List workflow ids based on given filter criteria.
 =cut
 
 sub hint_type ($self, $input_params) {
-    my $types = $self->rawapi->run_command('get_workflow_instance_types');
+    my $types = $self->run_command('get_workflow_instance_types');
     $self->log->trace('Workflow instance types: ' . Dumper $types) if $self->log->is_trace;
     return [ map { sprintf '%s (%s)', $_, $types->{$_}->{label} } sort keys %$types ];
 }
@@ -38,7 +38,7 @@ command "list" => {
         $param->$predicate ? ($_ => $param->$_) : ()
     } qw( type proc_state state limit );
 
-    my $res = $self->rawapi->run_command('search_workflow_instances', \%query );
+    my $res = $self->run_command('search_workflow_instances', \%query );
     return $res;
 };
 

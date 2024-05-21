@@ -24,7 +24,7 @@ command "add" => {
     encrypt => { isa => 'Bool', label => 'Encrypt' },
 } => sub ($self, $param) {
 
-    my $res = $self->rawapi->run_command('set_data_pool_entry', {
+    my $res = $self->run_command('set_data_pool_entry', {
         namespace => $param->namespace,
         key =>  $param->key,
         value => $param->value,

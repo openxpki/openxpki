@@ -17,7 +17,7 @@ Run a bare API command on the server
 =cut
 
 sub hint_command ($self, $input_params) {
-    my $actions = $self->rawapi->run_enquiry('command');
+    my $actions = $self->run_enquiry('command');
     $self->log->trace(Dumper $actions->result) if ($self->log->is_trace);
     return $actions->result || [];
 }
@@ -45,7 +45,7 @@ command "execute" => {
         die "One or more arguments are not accepted by the API command: " . join(',', @keys);
     }
 
-    my $res = $self->rawapi->run_command($param->command, $cmd_parameters);
+    my $res = $self->run_command($param->command, $cmd_parameters);
     return $res;
 
 };

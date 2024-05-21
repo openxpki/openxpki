@@ -41,7 +41,7 @@ command "create" => {
 
     my $label = $param->label || encode_base64url(sha256($param->directory));
 
-    my $res = $self->rawapi->run_command('get_data_pool_entry', {
+    my $res = $self->run_command('get_data_pool_entry', {
         namespace => 'nice.acme.account',
         key => $label,
     });
@@ -65,7 +65,7 @@ command "create" => {
         $eab
     );
 
-    $self->rawapi->run_command('set_data_pool_entry', {
+    $self->run_command('set_data_pool_entry', {
         namespace => 'nice.acme.account',
         key => $label,
         value => $account,

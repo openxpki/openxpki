@@ -23,7 +23,7 @@ command "fail" => {
     reason => { isa => 'Bool', label => 'Error reason' },
 } => sub ($self, $param) {
 
-    my $res = $self->rawapi->run_command('fail_workflow', {
+    my $res = $self->run_command('fail_workflow', {
         id => $param->id,
         error => $param->error || '',
         reason => $param->reason || '',

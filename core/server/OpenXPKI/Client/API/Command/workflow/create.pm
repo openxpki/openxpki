@@ -18,7 +18,7 @@ Initiate a new workflow
 
 sub hint_type ($self, $input_params) {
     # TODO - we need a new API method to get ALL types and not only the used ones!
-    my $types = $self->rawapi->run_command('get_workflow_instance_types');
+    my $types = $self->run_command('get_workflow_instance_types');
     my %types = $types->params->%*;
     $self->log->trace(Dumper \%types) if $self->log->is_trace;
     return [ map { sprintf '%s (%s)', $_, $types{$_}->{label} } sort keys %types ];
@@ -31,7 +31,7 @@ command "create" => {
     my $wf_parameters = $self->build_hash_from_payload($param);
     $self->log->info(Dumper $wf_parameters);
 
-    my $res = $self->rawapi->run_command('create_workflow_instance', {
+    my $res = $self->run_command('create_workflow_instance', {
         workflow => $param->type,
         params => $wf_parameters,
     });

@@ -26,7 +26,7 @@ command "update" => {
     my $res;
     if ($param->has_value) {
         # get the old value to copy over expiry and encryption
-        my $old = $self->rawapi->run_command('get_data_pool_entry', {
+        my $old = $self->run_command('get_data_pool_entry', {
             namespace => $param->namespace,
             key =>  $param->key,
         });
@@ -34,7 +34,7 @@ command "update" => {
         my $expiration = $param->expiry // $old->param('expiration_date');
         my $encrypt = $old->param('encrypt') // 0;
 
-        $self->rawapi->run_command('set_data_pool_entry', {
+        $self->run_command('set_data_pool_entry', {
             namespace => $param->namespace,
             key =>  $param->key,
             value => $param->value,
@@ -43,13 +43,13 @@ command "update" => {
             force => 1,
         });
 
-        $res = $self->rawapi->run_command('get_data_pool_entry', {
+        $res = $self->run_command('get_data_pool_entry', {
             namespace => $param->namespace,
             key =>  $param->key,
         });
 
     } elsif ($param->has_expiry) {
-        $res = $self->rawapi->run_command('modify_data_pool_entry', {
+        $res = $self->run_command('modify_data_pool_entry', {
             namespace => $param->namespace,
             key =>  $param->key,
             expiration_date => $param->expiry,

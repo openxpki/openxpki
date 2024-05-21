@@ -24,11 +24,11 @@ command "show" => {
     my $alias = $param->alias;
     $self->check_alias($alias);
 
-    my $res = $self->rawapi->run_command('show_alias', { alias => $alias });
+    my $res = $self->run_command('show_alias', { alias => $alias });
     die "Alias '$alias not' found" unless $res->param('alias');
 
     if ($param->has_cert) {
-        my $cert = $self->rawapi->run_command('get_cert', { identifier => $res->{identifier}, format => 'DBINFO' } );
+        my $cert = $self->run_command('get_cert', { identifier => $res->{identifier}, format => 'DBINFO' } );
         map { $res->{'cert_'.$_} = $cert->param($_); } ('subject','issuer_dn','status','notbefore','notafter');
     }
 

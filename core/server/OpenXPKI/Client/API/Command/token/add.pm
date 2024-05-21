@@ -20,7 +20,7 @@ Add a new generation of a crytographic token.
 =cut
 
 sub hint_type ($self, $input_params) {
-    my $groups = $self->rawapi->run_command('list_token_groups');
+    my $groups = $self->run_command('list_token_groups');
     return [ keys %{$groups->params} ];
 }
 
@@ -35,7 +35,7 @@ command "add" => {
 } => sub ($self, $param) {
 
     my $type = $param->type;
-    my $groups = $self->rawapi->run_command('list_token_groups');
+    my $groups = $self->run_command('list_token_groups');
     die "Token group '$type' is not a valid selection" unless ($groups->params->{$type});
 
     my $group = $groups->params->{$type};
@@ -44,7 +44,7 @@ command "add" => {
     if ($param->has_cert) {
         my $x509 = OpenXPKI::Crypt::X509->new($param->cert->$*); # type "FileContents" is a ScalarRef
         $cert_identifier = $x509->get_cert_identifier();
-        $self->rawapi->run_command('import_certificate', {
+        $self->run_command('import_certificate', {
             data => $x509->pem,
             ignore_existing => 1
         });
@@ -68,7 +68,7 @@ command "add" => {
 
     # TODO root alias
 
-    my $res = $self->rawapi->run_protected_command('create_alias', $cmd_param);
+    my $res = $self->run_protected_command('create_alias', $cmd_param);
     my $alias = $res->params->{alias};
     $self->log->debug("Alias $alias was created");
 

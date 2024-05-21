@@ -27,10 +27,10 @@ command "delete" => {
 
     my $cmd_param = { alias => $alias };
 
-    my $res = $self->rawapi->run_command('show_alias', $cmd_param );
+    my $res = $self->run_command('show_alias', $cmd_param );
     die "Alias '$alias not' found" unless $res->param('alias');
 
-    $res = $self->rawapi->run_protected_command('delete_alias', $cmd_param );
+    $res = $self->run_protected_command('delete_alias', $cmd_param );
     return $res;
 };
 

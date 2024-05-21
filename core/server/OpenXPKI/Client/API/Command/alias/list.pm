@@ -19,8 +19,8 @@ List (non-token) alias entries
 =cut
 
 sub hint_group ($self, $input_params) {
-    my $aliases = $self->rawapi->run_command('list_alias_groups');
-    my $tokens = $self->rawapi->run_command('list_token_groups');
+    my $aliases = $self->run_command('list_alias_groups');
+    my $tokens = $self->run_command('list_token_groups');
 
     my @groups;
     while (my $item = shift @{$aliases->param('result')}) {
@@ -47,7 +47,7 @@ command "list" => {
     }
 
     foreach my $group (@$groups) {
-        my $entries = $self->rawapi->run_command('list_aliases', { group => $group, %validity } );
+        my $entries = $self->run_command('list_aliases', { group => $group, %validity } );
         $res->{$group} = {
             count => (scalar @{$entries->result}),
             item => $entries->result,

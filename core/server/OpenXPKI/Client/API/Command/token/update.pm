@@ -20,7 +20,7 @@ Add a new generation of a crytographic token.
 =cut
 
 sub hint_type ($self, $input_params) {
-    my $groups = $self->rawapi->run_command('list_token_groups');
+    my $groups = $self->run_command('list_token_groups');
     return [ keys %{$groups->params} ];
 }
 
@@ -44,10 +44,10 @@ command "update" => {
 
     my $res;
     if ((scalar keys %$param) > 1) {
-        $res = $self->rawapi->run_protected_command('update_alias', $cmd_param );
+        $res = $self->run_protected_command('update_alias', $cmd_param );
         $self->log->debug("Alias '$alias' was updated");
     } else {
-        $res = $self->rawapi->run_command('show_alias', $cmd_param );
+        $res = $self->run_command('show_alias', $cmd_param );
         die "Alias '$alias' not found" unless $res;
     }
 

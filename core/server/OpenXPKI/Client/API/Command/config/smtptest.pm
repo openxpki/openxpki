@@ -24,7 +24,7 @@ command "smtptest" => {
     message => { isa => 'Str', label => 'The message template to send', default => 'testmail' },
 } => sub ($self, $param) {
 
-    my $res = $self->rawapi->run_command('send_notification', {
+    my $res = $self->run_command('send_notification', {
         message => $param->message,
         params => { notify_to => $param->mailto },
     });

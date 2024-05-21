@@ -26,7 +26,7 @@ command "list" => {
         namespace => $param->namespace,
         $param->has_metadata ? (metadata => 1) : (),
     };
-    my $res = $self->rawapi->run_command('list_data_pool_entries', $query);
+    my $res = $self->run_command('list_data_pool_entries', $query);
     return $res;
 
 };

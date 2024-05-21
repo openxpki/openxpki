@@ -22,7 +22,7 @@ command "wakeup" => {
     wait => { isa => 'Bool' },
 } => sub ($self, $param) {
 
-    my $res = $self->rawapi->run_command('wakeup_workflow', {
+    my $res = $self->run_command('wakeup_workflow', {
         id => $param->id,
         async => $param->async ? 1 : 0,
         wait => $param->wait ? 1 : 0,

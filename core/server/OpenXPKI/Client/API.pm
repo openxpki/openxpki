@@ -16,9 +16,6 @@ use Pod::POM::View::Text;
 use Log::Log4perl qw(:easy :no_extra_logdie_message);
 
 # Project modules
-use OpenXPKI::DTO::Message::Command;
-use OpenXPKI::DTO::Message::Enquiry;
-use OpenXPKI::DTO::Message::ProtectedCommand;
 use OpenXPKI::Client::API::Util;
 
 =head1 NAME
@@ -337,63 +334,6 @@ sub map_value_type ($self, $attribute, $map) {
     }
 
     return;
-}
-
-=head2 run_enquiry I<topic>, I<params>
-
-=cut
-
-sub run_enquiry ($self, $topic, $params = undef) {
-    $self->log->debug("Running service enquiry on topic '$topic'");
-    my $msg = OpenXPKI::DTO::Message::Enquiry->new(
-        topic => $topic,
-        defined $params ? (params => $params) : ()
-    );
-
-    return $self->send_message($msg);
-}
-
-=head2 run_command I<command>, I<params>
-
-=cut
-
-sub run_command ($self, $command, $params = undef) {
-    $self->log->debug("Running command '$command'");
-    my $msg = OpenXPKI::DTO::Message::Command->new(
-        command => $command,
-        defined $params ? (params => $params) : ()
-    );
-
-    return $self->send_message($msg);
-}
-
-=head2 run_protected_command I<command>, I<params>
-
-=cut
-
-sub run_protected_command ($self, $command, $params = undef) {
-    $self->log->debug("Running command '$command' in protected mode");
-    my $msg = OpenXPKI::DTO::Message::ProtectedCommand->new(
-        command => $command,
-        defined $params ? (params => $params) : ()
-    );
-
-    return $self->send_message($msg);
-}
-
-sub send_message ($self, $msg) {
-    my $resp = $self->client->send_message($msg);
-
-    OpenXPKI::Exception::Command->throw(
-        message => $resp->message,
-    ) if $resp->isa('OpenXPKI::DTO::Message::ErrorResponse');
-
-    OpenXPKI::Exception::Command->throw(
-        message => 'Got unknown response on command execution',
-        error => $resp,
-    ) unless $resp->isa('OpenXPKI::DTO::Message::Response');
-
-    return $resp;
 }
 
 __PACKAGE__->meta->make_immutable;

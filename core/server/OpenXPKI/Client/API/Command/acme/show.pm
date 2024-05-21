@@ -21,7 +21,7 @@ command "show" => {
     with_privatekey => { isa => 'Bool', label => 'Show Private Key' },
 } => sub ($self, $param) {
 
-    my $res = $self->rawapi->run_command('get_data_pool_entry', {
+    my $res = $self->run_command('get_data_pool_entry', {
         namespace => 'nice.acme.account',
         key => $param->id,
         deserialize => 'simple',

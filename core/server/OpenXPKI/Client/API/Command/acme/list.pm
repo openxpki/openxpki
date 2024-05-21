@@ -22,13 +22,13 @@ To get account data and key information please use I<show>.
 command "list" => {
 } => sub ($self, $param) {
 
-    my $res = $self->rawapi->run_command('list_data_pool_entries', {
+    my $res = $self->run_command('list_data_pool_entries', {
         namespace => 'nice.acme.account',
     });
 
     my @result;
     foreach my $account (@{$res->result}) {
-        $res = $self->rawapi->run_command('get_data_pool_entry', {
+        $res = $self->run_command('get_data_pool_entry', {
             namespace => 'nice.acme.account',
             key => $account->{key},
             deserialize => 'simple',

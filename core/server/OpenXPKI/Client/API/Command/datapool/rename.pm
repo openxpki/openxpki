@@ -22,7 +22,7 @@ command "rename" => {
     newkey => { isa => 'Str', label => 'New value of for key', required => 1 },
 } => sub ($self, $param) {
 
-    my $res = $self->rawapi->run_command('modify_data_pool_entry', {
+    my $res = $self->run_command('modify_data_pool_entry', {
         namespace => $param->namespace,
         key =>  $param->key,
         newkey => $param->newkey,

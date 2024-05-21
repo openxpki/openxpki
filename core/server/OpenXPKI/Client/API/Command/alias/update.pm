@@ -18,7 +18,7 @@ Update an existing alias entry
 =cut
 
 sub hint_alias ($self, $input_params) {
-    my $groups = $self->rawapi->run_command('list_token_groups');
+    my $groups = $self->run_command('list_token_groups');
     return [ keys %{$groups->params} ];
 }
 
@@ -40,7 +40,7 @@ command "update" => {
 
     die "At least one update parameter is mandatory" unless (scalar keys %$cmd_param);
 
-    my $res = $self->rawapi->run_protected_command('update_alias', $cmd_param);
+    my $res = $self->run_protected_command('update_alias', $cmd_param);
     $self->log->debug("Alias '$alias' was updated");
     return $res;
 };

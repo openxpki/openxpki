@@ -25,21 +25,21 @@ command "delete" => {
     my $alias = $param->alias;
     $self->check_alias($alias);
 
-    my $res = $self->rawapi->run_command('show_alias', { alias => $alias });
+    my $res = $self->run_command('show_alias', { alias => $alias });
     die "Alias '$alias not' found\n" unless $res->param('alias');
 
     if ($param->remove_key) {
-        my $token = $self->rawapi->run_command('get_token_info', { alias => $alias });
+        my $token = $self->run_command('get_token_info', { alias => $alias });
         if ($token->param('key_store') ne 'DATAPOOL') {
             die "Unable to remove key as key is not stored in datapool\n";
         }
-        $self->rawapi->run_command('delete_data_pool_entry', {
+        $self->run_command('delete_data_pool_entry', {
             namespace => 'sys.crypto.keys',
             key => $token->param('key_name'),
         });
     }
 
-    $res = $self->rawapi->run_protected_command('delete_alias', { alias => $alias });
+    $res = $self->run_protected_command('delete_alias', { alias => $alias });
 
     return $res;
 };

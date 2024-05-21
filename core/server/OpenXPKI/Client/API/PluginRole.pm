@@ -3,7 +3,11 @@ use OpenXPKI -role;
 
 with 'OpenXPKI::Role::Logger';
 
+# Project modules
 use OpenXPKI::Client;
+use OpenXPKI::DTO::Message::Command;
+use OpenXPKI::DTO::Message::Enquiry;
+use OpenXPKI::DTO::Message::ProtectedCommand;
 
 =head1 NAME
 
@@ -48,6 +52,63 @@ sub build_hash_from_payload ($self, $param, $allow_bool = 0) {
         }
     }
     return \%result;
+}
+
+=head2 run_enquiry I<topic>, I<params>
+
+=cut
+
+sub run_enquiry ($self, $topic, $params = undef) {
+    $self->log->debug("Running service enquiry on topic '$topic'");
+    my $msg = OpenXPKI::DTO::Message::Enquiry->new(
+        topic => $topic,
+        defined $params ? (params => $params) : ()
+    );
+
+    return $self->_send_message($msg);
+}
+
+=head2 run_command I<command>, I<params>
+
+=cut
+
+sub run_command ($self, $command, $params = undef) {
+    $self->log->debug("Running command '$command'");
+    my $msg = OpenXPKI::DTO::Message::Command->new(
+        command => $command,
+        defined $params ? (params => $params) : ()
+    );
+
+    return $self->_send_message($msg);
+}
+
+=head2 run_protected_command I<command>, I<params>
+
+=cut
+
+sub run_protected_command ($self, $command, $params = undef) {
+    $self->log->debug("Running command '$command' in protected mode");
+    my $msg = OpenXPKI::DTO::Message::ProtectedCommand->new(
+        command => $command,
+        defined $params ? (params => $params) : ()
+    );
+
+    return $self->_send_message($msg);
+}
+
+sub _send_message ($self, $msg) {
+    my $resp = $self->rawapi->client->send_message($msg);
+
+    OpenXPKI::Exception::Command->throw(
+        message => $resp->message,
+    ) if $resp->isa('OpenXPKI::DTO::Message::ErrorResponse');
+
+    OpenXPKI::Exception::Command->throw(
+        message => 'Got unknown response on command execution',
+        error => $resp,
+    ) unless $resp->isa('OpenXPKI::DTO::Message::Response');
+
+    return $resp;
 }
 
 1;

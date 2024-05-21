@@ -17,7 +17,7 @@ Run action on an existing workflow instance
 =cut
 
 sub hint_action ($self, $input_params) {
-    my $actions = $self->rawapi->run_command('get_workflow_activities', { id => $input_params->{id} });
+    my $actions = $self->run_command('get_workflow_activities', { id => $input_params->{id} });
     $self->log->trace(Dumper $actions->result) if ($self->log->is_trace);
     return $actions->result || [];
 }
@@ -29,7 +29,7 @@ command "execute" => {
 
     my $wf_parameters = $self->build_hash_from_payload($param);
 
-    my $res = $self->rawapi->run_command('execute_workflow_activity', {
+    my $res = $self->run_command('execute_workflow_activity', {
             id => $param->id,
             activity => $param->action,
             params => $wf_parameters,

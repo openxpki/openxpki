@@ -20,7 +20,7 @@ command "reset" => {
     id => { isa => 'Int', label => 'Workflow Id', required => 1 },
 } => sub ($self, $param) {
 
-    my $res = $self->rawapi->run_command('reset_workflow', {
+    my $res = $self->run_command('reset_workflow', {
         id => $param->id,
     });
     return $res;

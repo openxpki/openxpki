@@ -20,7 +20,7 @@ command "list" => {
     type => { isa => 'Str', 'label' => 'Token type (e.g. certsign)', hint => 'hint_type' },
 } => sub ($self, $param) {
 
-    my $groups = $self->rawapi->run_command('list_token_groups');
+    my $groups = $self->run_command('list_token_groups');
     my $res = { token_types => $groups->params, token_groups => {} };
 
     my @names = values %{$groups->params};
@@ -29,14 +29,14 @@ command "list" => {
     }
 
     foreach my $group (@names) {
-        my $entries = $self->rawapi->run_command('list_active_aliases', { group => $group });
+        my $entries = $self->run_command('list_active_aliases', { group => $group });
         my $grp = {
             count => (scalar @{$entries->result}),
             active => $entries->result->[0]->{alias},
             token => [],
         };
         foreach my $entry (@{$entries->result}) {
-            my $token = $self->rawapi->run_command('get_token_info', { alias => $entry->{alias} });
+            my $token = $self->run_command('get_token_info', { alias => $entry->{alias} });
             delete $token->params->{key_cert};
             push @{$grp->{token}}, $token->params;
         }

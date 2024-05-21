@@ -28,17 +28,17 @@ command "show" => {
     my $alias = $param->alias;
     $self->check_alias($alias);
 
-    my $res = $self->rawapi->run_command('show_alias', { alias => $alias } );
+    my $res = $self->run_command('show_alias', { alias => $alias } );
     die "Alias '$alias not' found" unless $res->param('alias');
 
     my $info = $res->params;
     if ($param->key) {
-        my $token = $self->rawapi->run_command('get_token_info', { alias => $alias } );
+        my $token = $self->run_command('get_token_info', { alias => $alias } );
         map { $info->{$_} = $token->param($_); } qw( key_name key_store key_engine );
     }
 
     if ($param->cert) {
-        my $cert = $self->rawapi->run_command('get_cert', { identifier => $info->{identifier}, format => 'DBINFO' } );
+        my $cert = $self->run_command('get_cert', { identifier => $info->{identifier}, format => 'DBINFO' } );
         map { $info->{'cert_'.$_} = $cert->param($_); } qw( subject issuer_dn status notbefore notafter );
     }
 

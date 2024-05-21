@@ -42,7 +42,7 @@ sub handle_key {
     my $key = shift;
     my $force = shift || 0;
 
-    my $token = $self->rawapi->run_command("get_token_info", {
+    my $token = $self->run_command("get_token_info", {
         alias => $alias
     });
     my $key_info = $token->params;
@@ -56,7 +56,7 @@ sub handle_key {
 =pod
 
 # fix this for API access
-        my $check_dv = $self->rawapi->run_command("get_datavault_status", { check_online => 1 });
+        my $check_dv = $self->run_command("get_datavault_status", { check_online => 1 });
         if (!$check_dv->params) {
             die "You must setup a datavault token before you can import keys into the system!";
         }
@@ -65,7 +65,7 @@ sub handle_key {
         }
 
 =cut
-        $self->rawapi->run_command("set_data_pool_entry", {
+        $self->run_command("set_data_pool_entry", {
             namespace => "sys.crypto.keys",
             encrypt => 1,
             force => $force,
@@ -82,7 +82,7 @@ sub handle_key {
             die "directory for '$keyfile' does not exists, won't create it!";
         }
 
-        my $user_info = $self->rawapi->run_protected_command('config_show', { path => 'system.server.user' });
+        my $user_info = $self->run_protected_command('config_show', { path => 'system.server.user' });
         my $user = $user_info->params->{result};
         my $uid = getpwnam($user) // die "$user not known\n";
 
@@ -97,7 +97,7 @@ sub handle_key {
         die "Unsupported key storage for automated key import"
     }
 
-    return $self->rawapi->run_command("get_token_info", {
+    return $self->run_command("get_token_info", {
         alias => $alias
     });
 
@@ -112,7 +112,7 @@ sub check_alias ($self, $alias) {
 sub _assert_token_group ($self, $field_name, $group) {
     return unless $group;
 
-    my $groups = $self->rawapi->run_command('list_token_groups');
+    my $groups = $self->run_command('list_token_groups');
 
     if (none { $_ eq $group } values %{$groups->params}) {
         die OpenXPKI::DTO::ValidationException->new(

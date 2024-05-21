@@ -23,7 +23,7 @@ command "show" => {
     my $params = {
          $param->has_path ? (path => $param->path) : (),
     };
-    my $res = $self->rawapi->run_protected_command('config_show', $params);
+    my $res = $self->run_protected_command('config_show', $params);
     return $res;
 
 };

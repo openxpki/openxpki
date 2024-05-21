@@ -27,7 +27,7 @@ command "show" => {
         $param->attributes ? (with_attributes => 1) : (),
     };
 
-    my $res = $self->rawapi->run_command('get_workflow_info', $cmd_param);
+    my $res = $self->run_command('get_workflow_info', $cmd_param);
     $self->deserialize_context($res) if $param->deserialize;
 
     return $res;
