@@ -193,8 +193,17 @@ has plugin_packages => (
     is => 'rw',
     isa => 'ArrayRef',
     init_arg => undef,
-    default => sub { [] },
+    lazy => 1,
+    builder => "_build_plugin_packages",
 );
+sub _build_plugin_packages ($self) {
+    my @result;
+    for my $ns ($self->rel_namespaces->@*) {
+        my $pkg_by_cmd = $self->namespace_commands($ns);
+        push @result, List::Util::uniq values $pkg_by_cmd->%*;
+    }
+    return \@result;
+}
 
 # I<HashRef> containing registered API commands under their respective relative
 # namespace and their Perl packages. The hash is built on first access.
@@ -264,7 +273,6 @@ sub _build_namespace_commands ($self) {
         }
 
         $self->log->trace("API - register $pkg: ".join(", ", $pkg->meta->command_list));
-        push $self->plugin_packages->@*, $pkg;
 
         # store commands and their source package
         for my $cmd ($pkg->meta->command_list) {
