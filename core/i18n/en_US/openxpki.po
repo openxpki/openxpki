@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2024-05-08 09:34+0200\n"
+"PO-Revision-Date: 2024-05-21 14:33+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -61,6 +61,10 @@ msgstr "Backend session terminated - please re-login"
 
 msgid "I18N_OPENXPKI_UI_BACKEND_UNREACHABLE"
 msgstr "Backend service is not reachable or not responding"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BLAH"
+msgstr "No"
 
 msgid "I18N_OPENXPKI_UI_BULK_APPROVE_CRR_LABEL"
 msgstr "Approve Revocation"
@@ -385,6 +389,14 @@ msgstr "Lookup in CMDB failed!"
 msgid "I18N_OPENXPKI_UI_CONFIG_STATUS_LABEL"
 msgstr "Config Version"
 
+msgid "I18N_OPENXPKI_UI_CONFIRM_DELETE_DESC"
+msgstr ""
+"Please confirm the deletion of the selected items. This action can not be "
+"undone!"
+
+msgid "I18N_OPENXPKI_UI_CONFIRM_DELETE_LABEL"
+msgstr "Confirm Delete"
+
 msgid "I18N_OPENXPKI_UI_CRL_BACK_TO_LIST"
 msgstr "back to overview"
 
@@ -474,6 +486,15 @@ msgstr "unspecified / other reason"
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
 msgstr "This is just a prefix"
 
+msgid "I18N_OPENXPKI_UI_DATAPOOL_ACME_ACCOUNT_LABEL"
+msgstr "ACME Account Information (NICE)"
+
+msgid "I18N_OPENXPKI_UI_DATAPOOL_ACME_REGISTRATION_LABEL"
+msgstr "ACME Account Registrations (Endpoints)"
+
+msgid "I18N_OPENXPKI_UI_DATAPOOL_CRYPTO_KEYS_LABEL"
+msgstr "Cryptographic Keys"
+
 msgid "I18N_OPENXPKI_UI_DATAPOOL_DELETE_ENTRY"
 msgstr "Delete"
 
@@ -500,6 +521,9 @@ msgstr "Entry"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
 msgstr "Modify"
+
+msgid "I18N_OPENXPKI_UI_DATAPOOL_MOTD_LABEL"
+msgstr "Message of the Day"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_MTIME"
 msgstr "Modification"

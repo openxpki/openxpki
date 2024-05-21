@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2024-04-29 16:00+0200\n"
+"PO-Revision-Date: 2024-05-21 14:35+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -61,6 +61,10 @@ msgstr "Sitzung abgelaufen - bitte erneut anmelden"
 
 msgid "I18N_OPENXPKI_UI_BACKEND_UNREACHABLE"
 msgstr "Der Server ist nicht erreichbar oder antwortet nicht"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BLAH"
+msgstr "Nein"
 
 msgid "I18N_OPENXPKI_UI_BULK_APPROVE_CRR_LABEL"
 msgstr "Sperrung genehmigen"
@@ -383,6 +387,14 @@ msgstr "Prüfung gegen die CMDB fehlgeschlagen"
 msgid "I18N_OPENXPKI_UI_CONFIG_STATUS_LABEL"
 msgstr "Konfiguration"
 
+msgid "I18N_OPENXPKI_UI_CONFIRM_DELETE_DESC"
+msgstr ""
+"Bitte bestätigen Sie die Löschung der ausgewählten Objekte. Diese Aktion "
+"kann nicht rückgängig gemacht werden!"
+
+msgid "I18N_OPENXPKI_UI_CONFIRM_DELETE_LABEL"
+msgstr "Löschung Bestätigen"
+
 msgid "I18N_OPENXPKI_UI_CRL_BACK_TO_LIST"
 msgstr "zurück zur Listenansicht"
 
@@ -469,6 +481,15 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
 msgstr ""
 
+msgid "I18N_OPENXPKI_UI_DATAPOOL_ACME_ACCOUNT_LABEL"
+msgstr "ACME Kontoinformation (NICE)"
+
+msgid "I18N_OPENXPKI_UI_DATAPOOL_ACME_REGISTRATION_LABEL"
+msgstr "ACME Registrierungen (Endpunkte)"
+
+msgid "I18N_OPENXPKI_UI_DATAPOOL_CRYPTO_KEYS_LABEL"
+msgstr "Kryptographische Schlüssel"
+
 msgid "I18N_OPENXPKI_UI_DATAPOOL_DELETE_ENTRY"
 msgstr "Löschen"
 
@@ -495,6 +516,9 @@ msgstr "Eintrag"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
 msgstr "Ändern"
+
+msgid "I18N_OPENXPKI_UI_DATAPOOL_MOTD_LABEL"
+msgstr "Message of the Day"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_MTIME"
 msgstr "Letzte Änderung"
@@ -3211,18 +3235,15 @@ msgstr " "
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_LABEL"
 msgstr "Schlüsselparameter"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_PARAMS_DESC"
 msgstr " "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_PARAMS_LABEL"
 msgstr "Schlüsselparameter"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_HASH"
 msgstr "Meta-Daten (key/value)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_AUTH_ENDPOINT_LABEL"
 msgstr "Endpunkt"
 
@@ -5045,6 +5066,10 @@ msgstr "ja"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_REVIEW_LABEL"
 #~ msgstr "FEHLER"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SUCCESS_LABEL"
+#~ msgstr "ERFOLGREICH"
 
 # fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_DESC"
