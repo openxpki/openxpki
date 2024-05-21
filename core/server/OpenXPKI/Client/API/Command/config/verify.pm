@@ -7,8 +7,6 @@ command_setup
     protected => 1,
 ;
 
-use OpenXPKI::Config::Backend;
-
 =head1 NAME
 
 OpenXPKI::Client::API::Command::config::verify
@@ -19,6 +17,12 @@ Show information of the (running) OpenXPKI configuration or
 validate a configuration tree.
 
 =cut
+
+# CPAN modules
+use Mojo::Loader;
+
+# Project modules
+use OpenXPKI::Config::Backend;
 
 command "verify" => {
     config => { isa => 'ReadableDir', label => 'Path to local config tree', default => '/etc/openxpki/config.d' },
