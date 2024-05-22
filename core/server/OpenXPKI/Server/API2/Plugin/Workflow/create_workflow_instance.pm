@@ -331,7 +331,7 @@ sub _handle_lock {
             ($expiry ? (expiration_date => $expiry): ()),
         );
         ##! 32: 'Lock was created'
-        CTX('log')->workflow->info(sprintf "Lock for workflow #%s was created with %s/%s", $id, $namespace, $key);
+        CTX('log')->workflow->info(sprintf "Lock for workflow #%01d was created with %s/%s", $id, $namespace, $key);
     };
     if ($EVAL_ERROR) {
         ##! 8: 'Error creating lock ' . $EVAL_ERROR

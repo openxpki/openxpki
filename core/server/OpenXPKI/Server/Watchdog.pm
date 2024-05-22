@@ -759,7 +759,7 @@ sub __scan_for_paused_workflows {
     $self->__flag_for_wakeup( $wf_id ) or return;
 
     ##! 16: 'WF now ready to re-instantiate '
-    CTX('log')->workflow()->info(sprintf( 'Watchdog: paused workflow #%s now ready to re-instantiate, start fork process', $wf_id ));
+    CTX('log')->workflow()->info(sprintf( 'Watchdog: paused workflow %01d now ready to re-instantiate, start fork process', $wf_id ));
 
 
     $self->__wake_up_workflow({
@@ -792,7 +792,7 @@ sub __flag_for_wakeup {
 
     ##! 16: 'set random key '.$rand_key
 
-    CTX('log')->workflow()->debug(sprintf( 'Watchdog: paused workflow #%s found, mark with flag "%s"', $wf_id, $rand_key ));
+    CTX('log')->workflow()->debug(sprintf( 'Watchdog: paused workflow %d found, mark with flag "%s"', $wf_id, $rand_key ));
 
 
     CTX('dbi')->start_txn;
@@ -825,9 +825,9 @@ sub __flag_for_wakeup {
     # 1. other process committed changes -> our update's where clause misses ($row_count = 0).
     # 2. other process did not commit -> timeout exception because of DB row lock
     if ($@ or $row_count < 1) {
-        ##! 16: sprintf('some other process took workflow #%s, return', $wf_id)
+        ##! 16: sprintf('some other process took workflow %01d, return', $wf_id)
         CTX('dbi')->rollback;
-        CTX('log')->system()->warn(sprintf( 'Watchdog: paused workflow #%s: update with mark "%s" failed', $wf_id, $rand_key ));
+        CTX('log')->system()->warn(sprintf( 'Watchdog: paused workflow %01d: update with mark "%s" failed', $wf_id, $rand_key ));
         return;
     }
 
@@ -918,7 +918,7 @@ sub __auto_archive_workflows {
         }
     }
     catch ($err) {
-        CTX('log')->system->error(sprintf('Error archiving workflow #%s: %s', $id, $err));
+        CTX('log')->system->error(sprintf('Error archiving workflow %01d: %s', $id, $err));
     }
 
     $self->_next_auto_archiving( time + $self->interval_auto_archiving );
@@ -943,7 +943,7 @@ sub __flag_for_archiving {
 
     return unless ($wf_id and $expected_archive_at);
 
-    CTX('log')->workflow->debug(sprintf('Watchdog: auto-archiving workflow #%s, setting flag', $wf_id));
+    CTX('log')->workflow->debug(sprintf('Watchdog: auto-archiving workflow %01d, setting flag', $wf_id));
 
     CTX('dbi')->start_txn;
 
@@ -971,12 +971,12 @@ sub __flag_for_archiving {
     # 1. other process did not commit -> timeout exception because of DB row lock
     catch ($err) {
         CTX('dbi')->rollback;
-        CTX('log')->system->warn(sprintf('Watchdog: auto-archiving workflow #%s failed (most probably other process does same job): %s', $wf_id, $err));
+        CTX('log')->system->warn(sprintf('Watchdog: auto-archiving workflow %d failed (most probably other process does same job): %s', $wf_id, $err));
         return;
     }
     # 2. other process committed changes -> our update's where clause misses ($update_count = 0).
     if ($update_count < 1) {
-        CTX('log')->system->warn(sprintf('Watchdog: auto-archiving workflow #%s failed (already archived by other process)', $wf_id));
+        CTX('log')->system->warn(sprintf('Watchdog: auto-archiving workflow %d failed (already archived by other process)', $wf_id));
         return;
     }
 

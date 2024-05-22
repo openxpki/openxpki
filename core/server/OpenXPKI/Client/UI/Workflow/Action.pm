@@ -99,7 +99,7 @@ sub action_index {
             return $self;
         }
         Log::Log4perl::MDC->put('wfid', $wf_args->{wf_id});
-        $self->log->info(sprintf "Run '%s' on workflow #%s", $wf_args->{wf_action}, $wf_args->{wf_id} );
+        $self->log->info(sprintf "Run '%s' on workflow %01d", $wf_args->{wf_action}, $wf_args->{wf_id} );
 
         # send input data to workflow
         $wf_info = $self->send_command_v2( 'execute_workflow_activity', {
@@ -145,7 +145,7 @@ sub action_index {
         }
         $self->log->trace("wf info on create: " . Dumper $wf_info ) if $self->log->is_trace;
 
-        $self->log->info(sprintf "Create new workflow %s, got id #%s",  $wf_args->{wf_type}, $wf_info->{workflow}->{id} );
+        $self->log->info(sprintf "Create new workflow %s, got id %01d",  $wf_args->{wf_type}, $wf_info->{workflow}->{id} );
 
         # purge the workflow token
         $self->__purge_wf_token;
@@ -229,28 +229,28 @@ sub action_handle {
 
 
     if ('fail' eq $handle) {
-        $self->log->info(sprintf "Workflow #%s set to failure by operator", $wf_args->{wf_id} );
+        $self->log->info(sprintf "Workflow %01d set to failure by operator", $wf_args->{wf_id} );
 
         $wf_info = $self->send_command_v2( 'fail_workflow', {
             id => $wf_args->{wf_id},
         });
     } elsif ('wakeup' eq $handle) {
-        $self->log->info(sprintf "Workflow #%s trigger wakeup", $wf_args->{wf_id} );
+        $self->log->info(sprintf "Workflow %01d trigger wakeup", $wf_args->{wf_id} );
         $wf_info = $self->send_command_v2( 'wakeup_workflow', {
             id => $wf_args->{wf_id}, async => 1, wait => 1
         });
     } elsif ('resume' eq $handle) {
-        $self->log->info(sprintf "Workflow #%s trigger resume", $wf_args->{wf_id} );
+        $self->log->info(sprintf "Workflow %01d trigger resume", $wf_args->{wf_id} );
         $wf_info = $self->send_command_v2( 'resume_workflow', {
             id => $wf_args->{wf_id}, async => 1, wait => 1
         });
     } elsif ('reset' eq $handle) {
-        $self->log->info(sprintf "Workflow #%s trigger reset", $wf_args->{wf_id} );
+        $self->log->info(sprintf "Workflow %01d trigger reset", $wf_args->{wf_id} );
         $wf_info = $self->send_command_v2( 'reset_workflow', {
             id => $wf_args->{wf_id}
         });
     } elsif ('archive' eq $handle) {
-        $self->log->info(sprintf "Workflow #%s trigger archive", $wf_args->{wf_id} );
+        $self->log->info(sprintf "Workflow %01d trigger archive", $wf_args->{wf_id} );
         $wf_info = $self->send_command_v2( 'archive_workflow', {
             id => $wf_args->{wf_id}
         });

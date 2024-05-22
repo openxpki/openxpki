@@ -184,7 +184,7 @@ sub send_response ($self, $c, $response) {
             $output.= sprintf "data.%s=%s\n", $_, $response->error_details->{$_} for keys $response->error_details->%*;
 
         } elsif ($response->has_result) {
-            $output.= sprintf "id=%s\n", $response->result->{id};
+            $output.= sprintf "id=%01d\n", $response->result->{id};
             $output.= sprintf "state=%s\n", $response->result->{state};
             $output.= sprintf "retry_after=%s\n", $response->retry_after if $response->is_pending;
 
@@ -332,7 +332,7 @@ around new_response => sub ($orig, $self, @args) {
         if ($wf->{proc_state} eq 'running') {
             $details->{'state'} = '--';
             $self->log->info(sprintf(
-                'RPC request was processed properly. Workflow #%s: currently running',
+                'RPC request was processed properly. Workflow #%01d: currently running',
                 $wf->{id}
             ));
 
@@ -340,7 +340,7 @@ around new_response => sub ($orig, $self, @args) {
             $details->{'state'} = $wf->{'state'};
 
             $self->log->info(sprintf(
-                'RPC request was processed properly. Workflow #%s: state "%s" (%s)',
+                'RPC request was processed properly. Workflow #%01d: state "%s" (%s)',
                 $wf->{id}, $wf->{state}, $wf->{proc_state}
             ));
 
