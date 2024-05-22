@@ -97,6 +97,13 @@ echo "[$([ "$IS_FULLCONFIG" -eq 1 ] && echo "X" || echo " ")] Recreate DB and ce
 echo "[$([ "$IS_RESTART" -eq 1 ] && echo "X" || echo " ")] Restart OpenXPKI & Apache"
 echo
 
+# stop OpenXPKI early to prevent crashes due to DB access problems etc.
+if [[ $IS_RESTART -eq 1 ]]; then
+    set +e
+    openxpkictl stop >>$LOG 2>&1
+    set -e
+fi
+
 #
 # Configuration (copy and modify)
 #
