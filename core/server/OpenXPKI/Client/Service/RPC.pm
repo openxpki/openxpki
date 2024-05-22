@@ -386,16 +386,26 @@ sub try_set_operation ($self, $op) {
 }
 
 sub parse_rpc_request_body ($self) {
-    return unless $self->request->body;
-
-    die $self->new_response( 40083 ) unless $self->config->{input}->{allow_raw_post};
-
     my $content_type = $self->request->headers->content_type;
 
+    $self->log->trace('HTTP request method: ' . $self->request->method);
+    return unless $self->request->body;
+
+    #
+    # application/x-www-form-urlencoded - nothing to do
+    #
+    if ($content_type =~ m{\Aapplication/x-www-form-urlencoded}) {
+        $self->log->trace("URL encoded payload: " . Dumper $self->request->params->to_hash) if $self->log->is_trace;
+        return; # no parsing required: Mojolicious already decoded the request parameters
+    }
+
+    die $self->new_response( 40083 ) unless $self->config->{input}->{allow_raw_post};
     $self->log->debug("RPC postdata with Content-Type: $content_type");
 
     my $json_str;
-
+    #
+    # application/jose
+    #
     if ($content_type =~ m{\Aapplication/jose}) {
         die $self->new_response( 40087 ) unless $self->config->{jose};
 
@@ -450,7 +460,7 @@ sub parse_rpc_request_body ($self) {
 
             # use our json parser object to decode to limit parsing depth
             $json_str = decode_jwt(token => $self->request->body, key => \$cert, decode_payload => 0);
-            $self->log->trace("Encoded JSON postdata: $json_str") if $self->log->is_trace;
+            $self->log->trace("JWT encoded JSON payload: $json_str") if $self->log->is_trace;
 
             $jwt_header->{signer_cert} = $cert;
         }
@@ -459,7 +469,9 @@ sub parse_rpc_request_body ($self) {
         }
 
         $self->jwt_header($jwt_header);
-
+    #
+    # application/pkcs7
+    #
     } elsif ($content_type =~ m{\Aapplication/pkcs7}) {
         die $self->new_response( 40091 ) unless $self->config->{pkcs7};
 
@@ -480,12 +492,18 @@ sub parse_rpc_request_body ($self) {
 
         $self->log->trace("PKCS7 payload: " . $json_str) if $self->log->is_trace;
 
+    #
+    # application/json
+    #
     } elsif ($content_type =~ m{\Aapplication/json}) {
 
         $json_str = $self->request->body;
 
-        $self->log->trace("Encoded JSON postdata: " . $json_str) if $self->log->is_trace;
+        $self->log->trace("JSON payload: " . $json_str) if $self->log->is_trace;
 
+    #
+    # unknown content type
+    #
     } else {
 
         die $self->new_response(
