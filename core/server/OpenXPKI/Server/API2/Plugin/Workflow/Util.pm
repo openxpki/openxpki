@@ -428,10 +428,13 @@ sub get_wf_info ($self, $arg) {
 
     my $head = CTX('config')->get_hash([ 'workflow', 'def', $workflow->type, 'head' ]);
 
+    # enforce numeric workflow ID (Perl's internal flag) for correct JSON encoding
+    my $id = $workflow->id; $id+=0 if ($id and $id =~ /^\d+$/);
+
     my $basic_wf_info = {
         workflow => {
             type        => $workflow->type,
-            id          => $workflow->id,
+            id          => $id,
             state       => $workflow->state,
             description => $head->{description},
             label       => $head->{label},

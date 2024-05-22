@@ -323,7 +323,7 @@ around new_response => sub ($orig, $self, @args) {
 
         my $data;
         my $details = {
-            id => $wf->{id},
+            id => int($wf->{id}),
             proc_state => $wf->{proc_state},
             pid => $$,
         };

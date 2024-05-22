@@ -175,7 +175,7 @@ command "create_workflow_instance" => {
     # it does not exist in the fresh context after creation, fixes #442.
     # We set it directly to prevent triggering any "on update" methods.
     # Only set this on non-volatile workflows (numeric ids).
-    $context->{PARAMS}{'workflow_id'} = $id if ($id =~ m{\A\d+\z});
+    $context->{PARAMS}{'workflow_id'} = $id if OpenXPKI::Util->is_regular_workflow($id);
 
     # same for creator
     $context->{PARAMS}{'creator'} = $creator;
