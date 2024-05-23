@@ -397,7 +397,7 @@ sub __process_actions {
 
         # Additional params are read from the object itself
         my $param = $conn->get_hash([ @path, 'param' ] );
-        $action->{$_} = $param->{$_} for sort keys %{$param};
+        $action->{$_} = $param->{$_} for keys $param->%*;
 
         $self->logger()->trace("Adding action " . (Dumper $action)) if $self->logger->is_trace;
         ##! 32: 'Action definition: ' . Dumper($action)
