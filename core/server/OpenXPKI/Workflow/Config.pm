@@ -62,7 +62,14 @@ sub _build_workflow_config {
     my @persister = sort $conn->get_keys('workflow.persister');
     foreach my $persister (@persister) {
         my $conf = $conn->get_hash(['workflow','persister', $persister]);
+
+        # Additional parameter below 'param' sub node are shifted on leve up
+        if (my $param = delete $conf->{param}) {
+            $conf = { $param->%*, $conf->%* };
+        }
+
         $conf->{name} = $persister;
+
         push @{$wf_conf->{persister}}, $conf;
     }
 
