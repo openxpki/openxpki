@@ -1041,7 +1041,7 @@ sub _pickup ($self, $wf_id) {
         $self->log->error("Could not fetch workflow info for workflow #$wf_id");
         OpenXPKI::Exception::WorkflowPickupFailed->throw;
     }
-    return $wf_info;
+    return $wf_info->{workflow};
 }
 
 =head2 handle_property_request
