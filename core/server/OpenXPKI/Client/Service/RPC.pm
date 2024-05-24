@@ -322,6 +322,8 @@ around new_response => sub ($orig, $self, @args) {
         my $wf = $response->workflow;
 
         my $data;
+
+        no warnings "numeric"; # int("V435435") would give a warning
         my $details = {
             id => int($wf->{id}),
             proc_state => $wf->{proc_state},
