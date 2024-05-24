@@ -696,16 +696,16 @@ sub new_response ($self, @args) {
 
     my %args_hash = @args;
 
-    # only send translated I18N_OPENXPKI_UI_ messages to client
+    # only send translated I18N_OPENXPKI_UI_ messages (and ACME error codes) to client
     if (my $msg = $args_hash{error_message}) {
-        $self->log->error($msg);
         if ($msg =~ /I18N_OPENXPKI_UI_/) {
             # keep I18N string (but translate)
             $args_hash{error_message} = i18nTokenizer($msg) if $self->config_obj->language;
         } elsif ($msg =~ m{\Aurn:ietf:params:acme:error}) {
             # keep ACME error code
         } else {
-            # delete other internal messages
+            # delete (but log) other internal message
+            $self->log->error($msg);
             delete $args_hash{error_message};
         }
     }
@@ -879,7 +879,7 @@ sub handle_enrollment_request ($self) {
     if ($workflow->{proc_state} ne 'finished') {
         return $self->new_pending_response($workflow);
 
-    # Workflow finised
+    # Workflow finished
     } else {
         $self->log->trace('Workflow context: ' . Dumper $workflow->{context}) if $self->log->is_trace;
 
