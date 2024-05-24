@@ -568,6 +568,7 @@ sub handle_rpc_request ($self) {
                 my $value = $self->request_param($pickup_key);
                 $wf = $self->pickup_via_attribute($conf->{workflow}, $key, $value);
             }
+            $self->check_workflow_error($wf);
         }
         catch ($error) {
             if (blessed $error and $error->isa('OpenXPKI::Exception::WorkflowPickupFailed')) {

@@ -229,7 +229,8 @@ B<Passed parameters>
 
 =over
 
-=item * C<$workflow> - workflow info I<HashRef> as returned by
+=item * C<$workflow> - workflow info I<HashRef>. Equals the item C<workflow>
+in the I<HashRef> returned by
 L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info>.
 
 =back
@@ -774,8 +775,9 @@ B<Parameters>
 
 =over
 
-=item * C<$workflow> I<HashRef> - workflow information as returned by
-L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info>
+=item * C<$workflow> - workflow info I<HashRef>. Equals the item C<workflow>
+in the I<HashRef> returned by
+L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info>.
 
 =back
 
@@ -843,6 +845,7 @@ sub handle_enrollment_request ($self) {
         } elsif (my $key = $conf->{pickup_attribute}) {
             $workflow = $self->pickup_via_attribute($conf->{workflow}, $key, $self->wf_params->{transaction_id});
         }
+        $self->check_workflow_error($workflow);
     }
     catch ($error) {
         if (blessed $error and $error->isa('OpenXPKI::Exception::WorkflowPickupFailed')) {
@@ -885,7 +888,7 @@ sub handle_enrollment_request ($self) {
         my $cert_identifier = $workflow->{context}->{cert_identifier}
             or die $self->new_response(
                 error => 40006,
-                ($workflow->{context}->{error_code} ? (error_message => $workflow->{context}->{error_code}) : ()),
+                $workflow->{context}->{error_code} ? (error_message => $workflow->{context}->{error_code}) : (),
                 workflow => $workflow,
             );
         $self->log->debug( 'Sending output for ' . $cert_identifier);
@@ -911,9 +914,10 @@ workflow
 
 =back
 
-B<Returns> a workflow info I<HashRef> as returned by
-L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info> or C<undef>
-if no workflow was found.
+B<Returns> a workflow info I<HashRef> or C<undef> if no workflow was found.
+
+The I<HashRef> equals the item C<workflow> in the I<HashRef> returned by
+L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info>.
 
 =cut
 sub pickup_via_workflow ($self, $wf_type, $keys_str) {
@@ -957,9 +961,10 @@ B<Parameters>
 
 =back
 
-B<Returns> a workflow info I<HashRef> as returned by
-L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info> or C<undef>
-if no workflow was found.
+B<Returns> a workflow info I<HashRef> or C<undef> if no workflow was found.
+
+The I<HashRef> equals the item C<workflow> in the I<HashRef> returned by
+L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info>.
 
 =cut
 sub pickup_via_datapool ($self, $namespace, $key) {
@@ -994,9 +999,10 @@ B<Parameters>
 
 =back
 
-B<Returns> a workflow info I<HashRef> as returned by
-L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info> or C<undef>
-if no workflow was found.
+B<Returns> a workflow info I<HashRef> or C<undef> if no workflow was found.
+
+The I<HashRef> equals the item C<workflow> in the I<HashRef> returned by
+L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info>.
 
 =cut
 sub pickup_via_attribute ($self, $wf_type, $key, $value) {
@@ -1101,8 +1107,9 @@ B<Parameters>
 
 =back
 
-B<Returns> a workflow information I<HashRef> (as returned by
-L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info>).
+B<Returns> a workflow info I<HashRef>. The I<HashRef> equals the item
+C<workflow> in the I<HashRef> returned by
+L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info>.
 
 Throws an L<OpenXPKI::Client::Service::Response> in case of errors.
 
@@ -1117,11 +1124,11 @@ sub run_workflow ($self, %args) {
     }
     catch ($err) {
         $self->log->error($err);
-        $self->_check_workflow_error(undef, $err);
+        $self->check_workflow_error(undef, $err);
         die $self->new_error_response( 50003 ); # fallback
     }
 
-    $self->_check_workflow_error($wf_info);
+    $self->check_workflow_error($wf_info);
     return $wf_info;
 }
 
@@ -1136,13 +1143,14 @@ sub run_workflow ($self, %args) {
 #
 # =over
 #
-# =item * C<$workflow> I<HashRef> - workflow information as returned by
-# L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info>
+# =item * C<$workflow> - workflow info I<HashRef>. Equals the item C<workflow>
+# in the I<HashRef> returned by
+# L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info>.
 #
 # =back
 #
 # B<Returns> nothing if successful.
-sub _check_workflow_error ($self, $workflow, $error = '') {
+sub check_workflow_error ($self, $workflow, $error = '') {
     $self->log->trace('Workflow result: '  . Dumper $workflow) if ($workflow and $self->log->is_trace);
 
     if (

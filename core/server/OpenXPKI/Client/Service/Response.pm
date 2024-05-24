@@ -215,7 +215,7 @@ has retry_after => (
 
 =head2 workflow
 
-Workflow info I<HashRef> as returned by
+Workflow info I<HashRef>. Equals the item C<workflow> in the I<HashRef> returned by
 L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info>.
 
 Setting this attribute also sets L</state>, L</proc_state> and
