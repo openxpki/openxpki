@@ -1272,12 +1272,19 @@ always an L<OpenXPKI::Client::Service::Response> is returned.
 
 =cut
 sub cgi_safe_sub :prototype($&) ($self, $handler_sub) {
+    my $response;
     try {
-        return $handler_sub->();
+        $response = $handler_sub->();
     }
     catch ($err) {
-        return $self->new_error_response($err);
+        $response = $self->new_error_response($err);
     }
+
+    $self->log->debug('HTTP status: [' . $response->http_status_line . ']');
+    $self->log->trace(Dumper $response) if $self->log->is_trace;
+    $self->log->error($response->error_message) if $response->has_error;
+
+    return $response;
 }
 
 =head2 cgi_headers

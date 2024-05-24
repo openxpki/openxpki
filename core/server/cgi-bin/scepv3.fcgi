@@ -116,10 +116,6 @@ while (my $cgi = CGI::Fast->new("")) {
         $response->add_debug_headers if $client->config->{output}->{headers};
         my @extra_header = %{ $client->cgi_headers($response->extra_headers) };
 
-        $log->debug('Status: ' . $response->http_status_line);
-        $log->trace(Dumper $response) if $log->is_trace;
-        $log->error($response->error_message) if $response->has_error;
-
         if (!$response->is_server_error()) {
             my $out = $client->generate_pkcs7_response( $response );
             $log->trace($out) if ($log->is_trace);

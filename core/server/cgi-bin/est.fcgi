@@ -97,10 +97,6 @@ while (my $cgi = CGI::Fast->new("")) {
         }
     };
 
-    $log->debug('Status: ' . $response->http_status_line);
-    $log->trace(Dumper $response) if $log->is_trace;
-    $log->error($response->error_message) if $response->has_error;
-
     $client->disconnect_backend;
 
     $response->add_debug_headers if $client->config->{output}->{headers};
