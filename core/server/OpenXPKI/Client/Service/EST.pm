@@ -168,7 +168,9 @@ sub handle_revocation_request ($self) {
 
     my $workflow_type = $self->config->{simplerevoke}->{workflow} || 'certificate_revoke';
 
-    my $response = $self->run_workflow($workflow_type, $param);
+    my $response = $self->new_response(
+        workflow => $self->run_workflow(type => $workflow_type, params => $param)
+    );
 
     if ($response->has_error) {
         # noop

@@ -868,13 +868,11 @@ sub handle_enrollment_request ($self) {
         $self->log->debug(sprintf("Initialize workflow '%s' with parameters: %s",
             $conf->{workflow}, join(", ", keys $self->wf_params->%*)));
 
-        $workflow = $self->backend->handle_workflow({
+        $workflow = $self->run_workflow(
             type => $conf->{workflow},
             params => $self->wf_params,
-        });
+        );
     }
-
-    $self->check_workflow_error($workflow);
 
     # Workflow paused - send "request pending" / ask client to retry
     if ($workflow->{proc_state} ne 'finished') {
@@ -934,10 +932,10 @@ sub pickup_via_workflow ($self, $wf_type, $keys_str) {
     }
     $self->log->debug(sprintf 'Pickup via workflow "%s" with keys: %s', $wf_type, join(',', @keys));
 
-    my $result = $self->backend->handle_workflow({
+    my $result = $self->run_workflow(
         type => $wf_type,
         params => $params,
-    });
+    );
     die "No result from pickup workflow" unless $result->{context};
 
     $self->log->trace("Pickup workflow result: " . Dumper $result) if $self->log->is_trace;
@@ -1031,10 +1029,13 @@ sub _pickup ($self, $wf_id) {
     }
 
     $self->log->debug("Pick up workflow #${wf_id}");
-    return (
-        $self->backend->handle_workflow({ id => $wf_id })
-        or OpenXPKI::Exception::WorkflowPickupFailed->throw
-    );
+
+    my $wf_info = $self->backend->run_command(get_workflow_info => { id => $wf_id });
+    if (not $wf_info) {
+        $self->log->error("Could not fetch workflow info for workflow #$wf_id");
+        OpenXPKI::Exception::WorkflowPickupFailed->throw;
+    }
+    return $wf_info;
 }
 
 =head2 handle_property_request
@@ -1072,7 +1073,9 @@ sub handle_property_request ($self, $operation = $self->operation) {
     my $workflow_type = $self->config->{$operation}->{workflow} ||
         $self->service_name.'_'.lc($operation);
 
-    my $response = $self->run_workflow($workflow_type, $self->wf_params);
+    my $response = $self->new_response(
+        workflow => $self->run_workflow(type => $workflow_type, params => $self->wf_params)
+    );
 
     return $response if $response->has_error;
 
@@ -1094,65 +1097,53 @@ B<Parameters>
 
 =over
 
-=item * C<$workflow_type> I<Str> - workflow type
-
-=item * C<$param> I<HashRef> - workflow parameters
+=item * C<%args> I<Hash> - arguments to pass to C<handle_workflow>
 
 =back
 
-B<Returns> an L<OpenXPKI::Client::Service::Response> or throws an
-L<OpenXPKI::Client::Service::Response> in case of errors.
+B<Returns> a workflow information I<HashRef> (as returned by
+L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info>).
+
+Throws an L<OpenXPKI::Client::Service::Response> in case of errors.
 
 =cut
-sub run_workflow ($self, $workflow_type, $param) {
-    $self->log->debug( "Start workflow type '$workflow_type'" );
-    $self->log->trace( 'Workflow parameters: '  . Dumper $param ) if $self->log->is_trace;
-
+sub run_workflow ($self, %args) {
     # create the client object
     my $client = $self->backend;
-    my $workflow;
+    my $wf_info;
 
     try {
-        $workflow = $client->handle_workflow({
-            type => $workflow_type,
-            params => $param
-        });
+        $wf_info = $client->handle_workflow(\%args);
     }
     catch ($err) {
         $self->log->error($err);
-        $self->new_error( 50003 );
+        $self->_check_workflow_error(undef, $err);
+        die $self->new_error_response( 50003 ); # fallback
     }
 
-    $self->check_workflow_error($workflow);
-
-    return $self->new_response(
-        workflow => $workflow,
-    );
+    $self->_check_workflow_error($wf_info);
+    return $wf_info;
 }
 
-=head2 check_workflow_error
-
-Checks the given workflow result I<HashRef> and dies with a
-L<OpenXPKI::Client::Service::Response> in case of workflow errors.
-
-If L<OpenXPKI::Client::Simple/last_error> returns a string starting with
-C<"I18N_OPENXPKI_UI_"> it is added to the error message (this filtering is done
-in L</new_response>).
-
-B<Parameters>
-
-=over
-
-=item * C<$workflow> I<HashRef> - workflow information as returned by
-L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info>
-
-=back
-
-B<Returns> nothing if successful.
-
-=cut
-sub check_workflow_error ($self, $workflow) {
-    $self->log->trace( 'Workflow result: '  . Dumper $workflow ) if $self->log->is_trace;
+# Checks the given workflow result I<HashRef> and dies with a
+# L<OpenXPKI::Client::Service::Response> in case of workflow errors.
+#
+# If L<OpenXPKI::Client::Simple/last_error> returns a string starting with
+# C<"I18N_OPENXPKI_UI_"> it is added to the error message (this filtering is done
+# in L</new_response>).
+#
+# B<Parameters>
+#
+# =over
+#
+# =item * C<$workflow> I<HashRef> - workflow information as returned by
+# L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info>
+#
+# =back
+#
+# B<Returns> nothing if successful.
+sub _check_workflow_error ($self, $workflow, $error = '') {
+    $self->log->trace('Workflow result: '  . Dumper $workflow) if ($workflow and $self->log->is_trace);
 
     if (
         not $workflow
@@ -1167,10 +1158,11 @@ sub check_workflow_error ($self, $workflow) {
                     $self->log->info( 'Input validation failed' );
 
                     my @fields = map { $_->{name} } ($err->{ERRORS} // {})->@*;
-                    $self->log->info( 'Failed fields: ' . join(', ', @fields) );
+                    $self->log->info( 'Failed fields: ' . join(', ', @fields) ) if scalar @fields;
 
                     die $self->new_response(
                         error => 40004,
+                        $error ? (error_message => $error) : (),
                         $workflow ? (workflow => $workflow) : (),
                         error_details => { fields => $reply->{ERROR}->{ERRORS} // [] },
                     );
@@ -1178,12 +1170,10 @@ sub check_workflow_error ($self, $workflow) {
             }
         }
 
-        my $msg = $self->backend->last_error // '';
-        $self->log->error( join ': ', 'Internal server error', $msg||() );
-
+        my $msg = $self->backend->last_error || $error;
         die $self->new_response(
             error => 50003,
-            error_message => $msg,
+            $msg ? (error_message => $msg) : (),
             $workflow ? (workflow => $workflow) : (),
         );
     }

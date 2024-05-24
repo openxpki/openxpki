@@ -596,11 +596,11 @@ sub handle_rpc_request ($self) {
                 die $self->new_response( error => 40483, workflow => $wf );
             } else {
                 $self->log->debug("Resume #".$wf->{id}." and execute '$action' with params: " . join(", ", keys $self->wf_params->%*));
-                $wf = $self->backend->handle_workflow({
+                $wf = $self->run_workflow(
                     id => $wf->{id},
                     activity => $action,
                     params => $self->wf_params,
-                });
+                );
             }
         }
     }
@@ -612,13 +612,11 @@ sub handle_rpc_request ($self) {
         $self->log->debug(sprintf("Initialize workflow '%s' with parameters: %s",
             $conf->{workflow}, join(", ", keys $self->wf_params->%*)));
 
-        $wf = $self->backend->handle_workflow({
+        $wf = $self->run_workflow(
             type => $conf->{workflow},
             params => $self->wf_params,
-        });
+        );
     }
-
-    $self->check_workflow_error($wf);
 
     # Error if pickup is not possible / configured
     # die $self->new_response(
