@@ -1,4 +1,5 @@
 package OpenXPKI::Client::Simple;
+use OpenXPKI -class;
 
 =head1 NAME
 
@@ -12,68 +13,22 @@ given auth info on each new instance (subsequent commands within one call
 are run on the same session). If you pass (and maintain) a session object to
 the constructor, it is used to persist the backend session during requests.
 
-=head1 CONSTRUCTION
-
-The client is constructed calling the new method, the required configuration
-can be set via one of three options:
-
-=head2 Explicit Config
-
-Pass the configuration as hash to the new method, must set at least
-I<config.socket> and I<config.realm> (omit if server has only one realm).
-
-The default authentication is anonymous but can be overidden by setting
-I<auth.stack> and appropriate keys for the chosen login method.
-
-An instance of Log4perl can be passed via I<logger>, default is to log to
-STDERR with loglevel error.
-
-=head2 Explicit Config from File
-
-Pass the name of the config file to use as string to the new method, the
-file must be in the standard config ini format and have at least a section
-I<global> providing I<socket> and I<realm>.
-
-If an I<auth> section exists, it is mapped as is to the I<auth> parameter.
-
-You can set a loglevel and logfile location using I<log.file> and
-I<log.level>. Loglevel must be a Log4perl Level name without the leading
-dollar sign (e.g. level=DEBUG).
-
-=head2 Implicit Config from File
-
-If you do not pass a I<config> argument to the new method, the class tries
-to find a config file at
-
-=over
-
-=item string set in the environment OPENXPKI_CLIENT_CONF
-
-=item $HOME/.openxpki.conf
-
-=item /etc/openxpki/client.conf
-
-=back
-
-The same rules as above apply, in case you pass auth or logger as explicit
-arguments the settings in the file are ignored.
-
 =cut
 
-use English;
-use Moose;
+# Core modules
 use Getopt::Long;
 use Pod::Usage;
-use Data::Dumper;
-use Config::Std;
 use File::Spec;
-use OpenXPKI::Client;
-use OpenXPKI::Exception::Authentication;
-use OpenXPKI::Serialization::Simple;
+
+# CPAN modules
+use Config::Std;
 use Log::Log4perl qw(:easy :levels);
 use Log::Log4perl::Level;
 
-use Data::Dumper;
+# Project modules
+use OpenXPKI::Client;
+use OpenXPKI::Serialization::Simple;
+
 
 has auth => (
     is => 'rw',
@@ -103,14 +58,14 @@ has 'realm' => (
     is => 'ro',
     isa => 'Str',
     lazy => 1,
-    default  => sub { my $self = shift; return $self->_config()->{'realm'} }
+    default  => sub ($self) { $self->_config->{'realm'} },
 );
 
 has 'socket' => (
     is => 'ro',
     isa => 'Str',
     lazy => 1,
-    default  => sub { my $self = shift; return $self->_config()->{'socket'} }
+    default  => sub ($self) { $self->_config->{'socket'} },
 );
 
 has client => (
@@ -124,10 +79,14 @@ has client => (
 has logger => (
     is => 'rw',
     isa => 'Object',
-    builder  => '_build_logger',
     init_arg => 'logger',
     lazy => 1,
+    builder  => '_build_logger',
 );
+sub _build_logger {
+    Log::Log4perl->easy_init($ERROR) unless Log::Log4perl->initialized;
+    return Log::Log4perl->get_logger;
+};
 
 has last_reply => (
     is => 'rw',
@@ -141,14 +100,52 @@ has last_error => (
     default => undef,
 );
 
-sub _build_logger {
-    if(!Log::Log4perl->initialized()) {
-        Log::Log4perl->easy_init($ERROR);
-    }
-    return Log::Log4perl->get_logger();
-};
-
 =head1 METHODS
+
+=head2 new
+
+The required configuration can be set via one of three options:
+
+=head3 Explicit Config
+
+Pass the configuration as hash to the new method, must set at least
+I<config.socket> and I<config.realm> (omit if server has only one realm).
+
+The default authentication is anonymous but can be overidden by setting
+I<auth.stack> and appropriate keys for the chosen login method.
+
+An instance of Log4perl can be passed via I<logger>, default is to log to
+STDERR with loglevel error.
+
+=head3 Explicit Config from File
+
+Pass the name of the config file to use as string to the new method, the
+file must be in the standard config ini format and have at least a section
+I<global> providing I<socket> and I<realm>.
+
+If an I<auth> section exists, it is mapped as is to the I<auth> parameter.
+
+You can set a loglevel and logfile location using I<log.file> and
+I<log.level>. Loglevel must be a Log4perl Level name without the leading
+dollar sign (e.g. level=DEBUG).
+
+=head3 Implicit Config from File
+
+If you do not pass a I<config> argument to the new method, the class tries
+to find a config file at
+
+=over
+
+=item string set in the environment OPENXPKI_CLIENT_CONF
+
+=item $HOME/.openxpki.conf
+
+=item /etc/openxpki/client.conf
+
+=back
+
+The same rules as above apply, in case you pass auth or logger as explicit
+arguments the settings in the file are ignored.
 
 =cut
 
