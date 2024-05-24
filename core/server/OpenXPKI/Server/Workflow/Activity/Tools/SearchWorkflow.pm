@@ -72,7 +72,7 @@ sub execute {
 
     ##! 64: 'Result ' . Dumper $result
 
-    my @ids = map { ($_->{'workflow_id'} != $workflow->id()) ? ($_->{'workflow_id'}) : () } @{$result};
+    my @ids = map { ($_->{workflow_id} ne $workflow->id) ? ($_->{workflow_id}) : () } @{$result};
 
     ##! 32: 'Ids ' . Dumper \@ids
 

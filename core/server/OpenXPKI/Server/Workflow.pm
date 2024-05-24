@@ -19,6 +19,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::DateTime;
+use OpenXPKI::Util;
 
 # Feature::Compat::Try should be done last to safely disable warnings
 use Feature::Compat::Try;
@@ -615,7 +616,7 @@ sub get_global_actions {
     my ($self) = @_;
 
     # Volatile workflows do not have any actions
-    return [] if $self->id < 1;
+    return [] unless OpenXPKI::Util->is_regular_workflow($self->id);
 
     my $role = CTX('session')->data->role || 'Anonymous';
 
