@@ -22,6 +22,8 @@ command "delete" => {
     remove_key => { isa => 'Bool', 'label' => 'Remove the key' },
 } => sub ($self, $param) {
 
+    # TODO Parameter remove_key is not processed
+
     my $alias = $param->alias;
     $self->check_alias($alias);
 

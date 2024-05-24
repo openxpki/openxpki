@@ -172,6 +172,7 @@ sub getpod ($self, $package, $section = 'USAGE') {
     $pod =~ s/\s+$//m;
     return $pod;
 
+    # FIXME Code after return
     my @cmd_blocks = grep { $_->title eq $package } $heading_blocks[0]->head2;
     return "ERROR: No description found for '$package' in $path" unless scalar @cmd_blocks;
 
