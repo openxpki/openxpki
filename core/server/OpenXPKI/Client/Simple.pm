@@ -425,13 +425,6 @@ sub __jwt_signature {
 
 }
 
-
-sub run_legacy_command {
-    my $self = shift;
-    my $command = shift;
-    die "run_legacy_command is no longer supported (command $command)";
-}
-
 sub run_command {
 
     my $self = shift;
