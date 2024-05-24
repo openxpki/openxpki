@@ -434,7 +434,7 @@ sub run_command {
 
     die "run_command must be called with API version 2 ($command / $api)" if ($api != 2);
 
-    my $reply = $self->client()->send_receive_service_msg('COMMAND', {
+    my $reply = $self->client->send_receive_service_msg('COMMAND', {
         COMMAND => $command,
         PARAMS => $params,
         API => $api
@@ -450,12 +450,11 @@ sub run_command {
                 $message = $err->{LABEL};
             }
         } else {
-            $message = 'unknown error';
+            $message = "Unknown error when trying to run command '$command'";
         }
-        $self->logger()->error($message);
-        $self->logger()->trace(Dumper $reply) if $self->logger->is_trace;
+        $self->logger->trace("Server error when trying to run '$command'. Reply was: " . Dumper $reply) if $self->logger->is_trace;
         $self->last_error($message);
-        die "Error running command: $message";
+        die "$message\n";
     }
     $self->last_error('');
     return $reply->{PARAMS};
