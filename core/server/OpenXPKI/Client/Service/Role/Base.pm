@@ -698,6 +698,7 @@ sub new_response ($self, @args) {
 
     # only send translated I18N_OPENXPKI_UI_ messages (and ACME error codes) to client
     if (my $msg = $args_hash{error_message}) {
+        chomp $msg;
         if ($msg =~ /I18N_OPENXPKI_UI_/) {
             # keep I18N string (but translate)
             $args_hash{error_message} = i18nTokenizer($msg) if $self->config_obj->language;
