@@ -5,7 +5,7 @@ use OpenXPKI qw( -class -typeconstraints );
 use Mojo::Message::Response;
 
 # Project modules
-use OpenXPKI::i18n qw(i18nGettext);
+use OpenXPKI::i18n qw( i18nGettext );
 use OpenXPKI::Server::Context qw( CTX );
 
 # Use predefined numeric codes for dedicated problems
@@ -426,7 +426,7 @@ sub error_message ($self) {
     my $general = $named_messages{$self->error};
     push @msg, $general if $general;
     # detailed message
-    push @msg, i18nGettext($self->custom_error_message) if $self->has_custom_error_message;
+    push @msg, $self->custom_error_message if $self->has_custom_error_message;
 
     # generic fallback message
     @msg = sprintf('Unknown error (%s)', $self->error) unless scalar @msg;
