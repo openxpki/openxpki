@@ -49,7 +49,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Client::Simple;
 use OpenXPKI::Client::Service::Response;
 use OpenXPKI::Log4perl;
-use OpenXPKI::i18n qw( i18nGettext );
+use OpenXPKI::i18n qw( i18nTokenizer );
 
 
 =head2 ATTRIBUTES
@@ -661,7 +661,7 @@ it will be translated:
     $self->log->error('I18N_OPENXPKI_UI_BLAH');
     OpenXPKI::Client::Service::Response->new(
         error => 500,
-        error_message => i18nGettext('I18N_OPENXPKI_UI_BLAH'),
+        error_message => i18nTokenizer('I18N_OPENXPKI_UI_BLAH'),
     );
 
 If it starts with C<"urn:ietf:params:acme:error">
@@ -701,7 +701,7 @@ sub new_response ($self, @args) {
         $self->log->error($msg);
         if ($msg =~ /I18N_OPENXPKI_UI_/) {
             # keep I18N string (but translate)
-            $args_hash{error_message} = i18nGettext($msg) if $self->config_obj->language;
+            $args_hash{error_message} = i18nTokenizer($msg) if $self->config_obj->language;
         } elsif ($msg =~ m{\Aurn:ietf:params:acme:error}) {
             # keep ACME error code
         } else {
