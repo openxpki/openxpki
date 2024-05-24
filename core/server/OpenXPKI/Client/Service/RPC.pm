@@ -363,9 +363,9 @@ around new_response => sub ($orig, $self, @args) {
 
         if ($response->has_error) {
             $response->error_details({
-                $response->error_details->%*,
+                $response->has_error_details ? ($response->error_details->%*) : (),
                 $details->%*,
-                $data->%*,
+                $data ? ($data->%*) : (),
             });
 
         } else {
