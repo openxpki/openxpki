@@ -25,6 +25,8 @@ sub execute {
     my $template = $self->param('template');
     my $private_key = $self->param('private_key') || '';
 
+    configuration_error('No cert_identifier given') unless($cert_identifier);
+
     my $target_key = $self->param('target_key') || 'certificate_export';
 
     my $encode = $self->param('base64');
