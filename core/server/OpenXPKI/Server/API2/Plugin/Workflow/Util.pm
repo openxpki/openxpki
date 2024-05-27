@@ -166,15 +166,15 @@ sub _execute_activity_sync {
 
     my $log = CTX('log')->workflow;
 
-    OpenXPKI::Server::__set_process_name("workflow: id %s", $workflow->id());
+    OpenXPKI::Server::__set_process_name("workflow: id %s", $workflow->id);
     # run activity
     eval { $self->_run_activity($workflow, $activity) };
 
     if (my $eval_err = $EVAL_ERROR) {
-       $log->error(sprintf ("Error executing workflow activity '%s' on workflow id %01d (type %s): %s",
-            $activity, $workflow->id(), $workflow->type(), $eval_err));
+       $log->error(sprintf ('Error executing workflow activity "%s" on workflow id #%s (type "%s"): %s',
+            $activity, $workflow->id, $workflow->type, $eval_err));
 
-        OpenXPKI::Server::__set_process_name("workflow: id %s (exception)", $workflow->id());
+        OpenXPKI::Server::__set_process_name("workflow: id %s (exception)", $workflow->id);
 
         my $logcfg = { priority => 'error', facility => 'workflow' };
 
