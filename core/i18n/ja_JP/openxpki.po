@@ -67,6 +67,11 @@ msgstr "再ログインしてください"
 msgid "I18N_OPENXPKI_UI_BACKEND_UNREACHABLE"
 msgstr "バックエンドサービスに到達できない、または応答しませんでした"
 
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BLAH"
+msgstr "いいえ"
+
 msgid "I18N_OPENXPKI_UI_BULK_APPROVE_CRR_LABEL"
 msgstr "失効の承認"
 
@@ -395,6 +400,14 @@ msgstr "CMDBの検索に失敗しました。"
 msgid "I18N_OPENXPKI_UI_CONFIG_STATUS_LABEL"
 msgstr "設定のバージョン"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CONFIRM_DELETE_DESC"
+msgstr "システムに最も適したホスト名（ドメイン名）を入力します。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CONFIRM_DELETE_LABEL"
+msgstr "関連性"
+
 msgid "I18N_OPENXPKI_UI_CRL_BACK_TO_LIST"
 msgstr "概要に戻る"
 
@@ -484,6 +497,19 @@ msgstr "詳細不明/その他の理由"
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
 msgstr "証明書を失効する理由を指定します。"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_ACME_ACCOUNT_LABEL"
+msgstr "証明書検索結果"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_ACME_REGISTRATION_LABEL"
+msgstr "証明書検索結果"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_CRYPTO_KEYS_LABEL"
+msgstr "キー"
+
 # Remove?
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DATAPOOL_DELETE_ENTRY"
@@ -523,6 +549,10 @@ msgstr "キー"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
+msgstr "ユーザ名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_MOTD_LABEL"
 msgstr "ユーザ名"
 
 #, fuzzy
@@ -811,6 +841,9 @@ msgstr "エクスポートする私有鍵にパスワードを設定します。
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_FILENAME_LABEL"
 msgstr "キーストアのダウンロード"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
+msgstr "ダウンロードフォーマット"
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_DESC"
 msgstr ""
@@ -4925,9 +4958,6 @@ msgstr "はい"
 
 #~ msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
 #~ msgstr "入力された日付/時刻を検証できませんでした。"
-
-#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
-#~ msgstr "ダウンロードフォーマット"
 
 #~ msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST2001"
 #~ msgstr "GOST 2001"

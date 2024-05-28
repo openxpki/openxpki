@@ -75,6 +75,10 @@ msgstr "后端会话已终止-请重新登录"
 msgid "I18N_OPENXPKI_UI_BACKEND_UNREACHABLE"
 msgstr "曲线名称"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BLAH"
+msgstr "不"
+
 msgid "I18N_OPENXPKI_UI_BULK_APPROVE_CRR_LABEL"
 msgstr "批准吊销"
 
@@ -403,6 +407,14 @@ msgstr "使用给定的凭据登录失败！"
 msgid "I18N_OPENXPKI_UI_CONFIG_STATUS_LABEL"
 msgstr "配置版本"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CONFIRM_DELETE_DESC"
+msgstr "输入系统的完全限定主机名（域名）。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CONFIRM_DELETE_LABEL"
+msgstr "关系"
+
 msgid "I18N_OPENXPKI_UI_CRL_BACK_TO_LIST"
 msgstr "返回总览"
 
@@ -499,6 +511,19 @@ msgstr "未指定/其他原因"
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
 msgstr "指定您希望吊销证书的原因。"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_ACME_ACCOUNT_LABEL"
+msgstr "您的搜索查询结果"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_ACME_REGISTRATION_LABEL"
+msgstr "您的搜索查询结果"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_CRYPTO_KEYS_LABEL"
+msgstr "密钥"
+
 # Remove?
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DATAPOOL_DELETE_ENTRY"
@@ -538,6 +563,10 @@ msgstr "密钥"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
+msgstr "用户名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_MOTD_LABEL"
 msgstr "用户名"
 
 #, fuzzy
@@ -840,6 +869,9 @@ msgstr "导出密码"
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_FILENAME_LABEL"
 msgstr "密钥库下载"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
+msgstr "下载格式"
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_DESC"
 msgstr "密钥库的格式，大多数应用程序使用PKCS12容器。"
@@ -5048,9 +5080,6 @@ msgstr "是"
 
 #~ msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
 #~ msgstr "输入的日期/时间无法验证。"
-
-#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
-#~ msgstr "下载格式"
 
 #~ msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD"
 #~ msgstr "加密密码"
