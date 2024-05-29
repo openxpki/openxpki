@@ -194,13 +194,13 @@ while (my $cgi = CGI::Fast->new) {
 
     my $sess_id;
     # TODO - we might want to embed this into the session handler
-    if ($ENV{SCRIPT_URL} =~ m{oidc_redirect\z} && $cgi->param('state')) {
+    if ($ENV{SCRIPT_URL} =~ m{oidc_redirect\z} && (my $oidc_state = $cgi->param('state'))) {
         try {
             # the state paramater is the (encrypted) session id
             # wrapped into a HMAC JWT using the extid cookie
             $log->debug('Restore session from OIDC redirect');
             my $hash_key = $cgi->cookie('oxi-extid') || die 'Unable to find CSRF cookie';
-            my $state = decode_jwt( key => $hash_key, token => $cgi->param('state') );
+            my $state = decode_jwt( key => $hash_key, token => $oidc_state );
             $log->trace(Dumper $state) if $log->is_trace;
             $sess_id = $state->{session_id};
             $sess_id = $cipher->decrypt(decode_base64($sess_id)) if ($cipher);
