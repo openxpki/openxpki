@@ -22,6 +22,7 @@ our %named_messages = (
     40006 => 'Request was rejected',
     40007 => 'Unknown operation',
     40008 => 'No operation specified',
+    40009 => 'Invalid content type',
     # RPC
     40080 => 'No method set in request',
     40081 => 'Decoding of JSON encoded POST data failed',
