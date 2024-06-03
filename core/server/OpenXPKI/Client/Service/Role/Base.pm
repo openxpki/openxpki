@@ -49,7 +49,6 @@ use OpenXPKI::Exception;
 use OpenXPKI::Client::Simple;
 use OpenXPKI::Client::Service::Response;
 use OpenXPKI::Log4perl;
-use OpenXPKI::i18n qw( i18nTokenizer );
 
 
 =head2 ATTRIBUTES
@@ -633,86 +632,13 @@ L</prepare>.
 
 =head2 new_response
 
-Helper to create a new L<OpenXPKI::Client::Service::Response> with shortcut
-syntax and an error message filter.
+Helper to create an C<OpenXPKI::Client::Service::Response> object.
 
-The error may be given as an internal code only:
-
-    $self->new_response( 40080 );
-    # is equal to:
-    $self->new_response(
-        error => 40080,
-    );
-    # and results in:
-    OpenXPKI::Client::Service::Response->new(
-        error => 40080
-    );
-
-An additional custom error message may also be specified.
-
-If B<error_message> is given and starts with C<"I18N_OPENXPKI_UI_">
-it will be translated:
-
-    $self->new_response( 500 => 'I18N_OPENXPKI_UI_BLAH' );
-    # is equal to:
-    $self->new_response(
-        error => 500,
-        error_message => 'I18N_OPENXPKI_UI_BLAH',
-    );
-    # and results in:
-    $self->log->error('I18N_OPENXPKI_UI_BLAH');
-    OpenXPKI::Client::Service::Response->new(
-        error => 500,
-        error_message => i18nTokenizer('I18N_OPENXPKI_UI_BLAH'),
-    );
-
-If it starts with C<"urn:ietf:params:acme:error">
-it will be kept as is:
-
-    $self->new_response( 400 => 'urn:ietf:params:acme:error:rejectedIdentifier' );
-    # results in:
-    $self->log->error('urn:ietf:params:acme:error:rejectedIdentifier');
-    OpenXPKI::Client::Service::Response->new(
-        error => 400,
-        error_message => 'urn:ietf:params:acme:error:rejectedIdentifier',
-    );
-
-Otherwise it will be logged and removed:
-
-    $self->new_response( 500 => 'Something bad happened');
-    # results in:
-    $self->log->error('Something bad happened');
-    OpenXPKI::Client::Service::Response->new(
-        error => 500,
-    );
+See L<OpenXPKI::Client::Service::Response/new> for syntax details.
 
 =cut
 sub new_response ($self, @args) {
-    # shortcut with only error code or code+message
-    if (scalar @args < 3 and $args[0] =~ /^\A\d+\z/) {
-        @args = (
-            error => $args[0],
-            $args[1] ? (error_message => $args[1]) : (),
-        );
-    }
-
-    my %args_hash = @args;
-
-    # only send translated I18N_OPENXPKI_UI_ messages (and ACME error codes) to client
-    if (my $msg = $args_hash{error_message}) {
-        chomp $msg;
-        if ($msg =~ /I18N_OPENXPKI_UI_/) {
-            # keep I18N string (but translate)
-            $args_hash{error_message} = i18nTokenizer($msg) if $self->config_obj->language;
-        } elsif ($msg =~ m{\Aurn:ietf:params:acme:error}) {
-            # keep ACME error code
-        } else {
-            # delete (but log) other internal message
-            $self->log->error($msg);
-            delete $args_hash{error_message};
-        }
-    }
-    return OpenXPKI::Client::Service::Response->new(%args_hash);
+    return OpenXPKI::Client::Service::Response->new(@args);
 }
 
 =head2 new_error_response

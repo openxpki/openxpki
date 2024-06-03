@@ -5,8 +5,9 @@ use OpenXPKI qw( -class -typeconstraints );
 use Mojo::Message::Response;
 
 # Project modules
-use OpenXPKI::i18n qw( i18nGettext );
+use OpenXPKI::i18n qw( i18nGettext i18nTokenizer );
 use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Log4perl;
 
 # Use predefined numeric codes for dedicated problems
 our %named_messages = (
@@ -199,6 +200,7 @@ has custom_error_message => (
     isa => 'Str',
     init_arg  => 'error_message',
     predicate => 'has_custom_error_message',
+    clearer => 'clear_custom_error_message',
 );
 
 =head2 retry_after
@@ -361,19 +363,106 @@ has transaction_id => (
     predicate => 'has_transaction_id',
 );
 
+=head2 log
 
-# this allows a constructor with the error code as scalar
-around BUILDARGS => sub {
+A logger object, per default set
+C<OpenXPKI::Log4perl-E<gt>get_logger>.
 
-    my $orig = shift;
-    my $class = shift;
+=cut
+has log => (
+    is => 'rw',
+    isa => duck_type( [qw(
+           trace    debug    info    warn    error    fatal
+        is_trace is_debug is_info is_warn is_error is_fatal
+    )] ),
+    lazy => 1,
+    builder => '_build_log',
+);
+sub _build_log ($self) { OpenXPKI::Log4perl->get_logger }
 
-    return $class->$orig( error => $_[0] ) if (@_ == 1 and not ref $_[0]);
-    return $class->$orig( @_ );
-
-};
 
 =head1 METHODS
+
+=head2 new
+
+Constructor with shortcut syntax and an error message filter.
+
+An error code may be given as an internal code only:
+
+    OpenXPKI::Client::Service::Response->new( 40080 );
+    # equal to:
+    OpenXPKI::Client::Service::Response->new(
+        error => 40080
+    );
+
+An additional custom error message may also be specified:
+
+=over
+
+=item * if B<error_message> is given and starts with C<"I18N_OPENXPKI_UI_">
+it will be translated:
+
+    OpenXPKI::Client::Service::Response->new( 500 => 'I18N_OPENXPKI_UI_BLAH' );
+    # equal to:
+    OpenXPKI::Client::Service::Response->new(
+        error => 500,
+        error_message => i18nTokenizer('I18N_OPENXPKI_UI_BLAH'),
+    );
+
+=item * if it starts with C<"urn:ietf:params:acme:error"> it will be kept as is:
+
+    OpenXPKI::Client::Service::Response->new( 400 => 'urn:ietf:params:acme:error:rejectedIdentifier' );
+    # equal to:
+    OpenXPKI::Client::Service::Response->new(
+        error => 400,
+        error_message => 'urn:ietf:params:acme:error:rejectedIdentifier',
+    );
+
+=item * otherwise it will be logged and removed:
+
+    OpenXPKI::Client::Service::Response->new( 500 => 'Something bad happened');
+    # equal to:
+    $self->log->error('Something bad happened');
+    OpenXPKI::Client::Service::Response->new(
+        error => 500,
+    );
+
+=back
+
+=cut
+
+around BUILDARGS => sub ($orig, $class, @args) {
+    # shortcut: only scalar error code or code+message
+    if (scalar @args < 3 and not blessed $args[0] and $args[0] =~ /^\A\d+\z/) {
+        @args = (
+            error => $args[0],
+            $args[1] ? (error_message => $args[1]) : (),
+        );
+    }
+
+    return $class->$orig( @args );
+};
+
+sub BUILD ($self, $args) {
+    # don't send internal error messages to client except:
+    # - ACME error codes and
+    # - translated I18N_OPENXPKI_UI_* messages
+    if ($self->has_custom_error_message) {
+        my $msg = $self->custom_error_message;
+        chomp $msg;
+        if ($msg =~ /I18N_OPENXPKI_UI_/) {
+            # keep I18N string (but translate)
+            $self->custom_error_message(i18nTokenizer($msg));
+        } elsif ($msg =~ m{\Aurn:ietf:params:acme:error}) {
+            # keep ACME error code
+            $self->custom_error_message($msg);
+        } else {
+            # delete (but log) other internal message
+            $self->log->error($msg);
+            $self->clear_custom_error_message;
+        }
+    }
+}
 
 =head2 new_error
 
