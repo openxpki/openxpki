@@ -39,10 +39,16 @@ sub import {
 
     my %flags;
     while (my $flag = shift) {
+        # -base must be followed by the name of the base class
         $flags{$flag} = $flag eq '-base' ? shift : 1;
     }
 
-    my $poc_base = delete $flags{-base};
+    my $poc_base;
+    if (exists $flags{-base}) {
+        $poc_base = delete $flags{-base} # $poc_base = name of base class
+          or die sprintf 'Missing base class after "use OpenXPKI -base" called at %s line %s'."\n", $caller_file, $caller_line;
+    }
+
     my $moose_class = delete $flags{-class};
     my $moose_exporter = delete $flags{-exporter};
     my $moose_typeconstraints = delete $flags{-typeconstraints};
@@ -54,7 +60,7 @@ sub import {
     $moose_class = 1 if (($plugin or $client_plugin) and not $moose_role);
 
     die sprintf(
-        'Unknown options: "use OpenXPKI qw( ... %s )" (called at %s line %s)',
+        'Unknown options in "use OpenXPKI qw( ... %s )" called at %s line %s'."\n",
         join(' ', keys %flags), $caller_file, $caller_line
     ) if scalar keys %flags;
 
