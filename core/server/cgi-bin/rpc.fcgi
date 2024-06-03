@@ -114,7 +114,7 @@ while (my $cgi = CGI::Fast->new("")) {
     }
     catch ($error) {
         $log->error($error);
-        send_output($cgi, OpenXPKI::Client::Service::Response->new_error(50007), 0);
+        send_output($cgi, OpenXPKI::Client::Service::Response->new( 50007 ), 0);
         next;
     }
 

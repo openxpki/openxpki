@@ -85,11 +85,11 @@ Response incl. workflow details:
 
 Error response:
 
-    die OpenXPKI::Client::Service::Response->new_error( 50002 );
+    die OpenXPKI::Client::Service::Response->new( 50002 );
 
 Error response with custom error message:
 
-    die OpenXPKI::Client::Service::Response->new_error(
+    die OpenXPKI::Client::Service::Response->new(
         400 => 'urn:ietf:params:acme:error:alreadyRevoked'
     );
 
@@ -98,6 +98,10 @@ Error response with custom error message:
         error => 400,
         error_message => 'urn:ietf:params:acme:error:alreadyRevoked',
     );
+
+Error response with predefined plus custom error message:
+
+    die OpenXPKI::Client::Service::Response->new( 50002 => 'We have had a problem' );
 
 =head1 ATTRIBUTES
 
@@ -466,45 +470,38 @@ sub BUILD ($self, $args) {
 
 =head2 new_error
 
-Alternate constructor to specify HTTP error codes and error messages.
-
-    OpenXPKI::Client::Service::Response->new_error( 500 );
-    # is equal to:
-    OpenXPKI::Client::Service::Response->new(
-        error => 500
-    );
-
-    OpenXPKI::Client::Service::Response->new_error( 500 => 'Something bad happened');
-    # is equal to:
-    OpenXPKI::Client::Service::Response->new(
-        error => 500,
-        error_message => 'Something bad happened',
-    );
+Alias for L</new>.
 
 =cut
-sub new_error ($class, @args) {
-    die 'new_error() requires an error code' unless @args > 0;
-    return $class->new(
-        error => $args[0],
-        defined $args[1] ? ( error_message => $args[1] ) : (),
-    );
-}
+sub new_error { shift->new(@_) }
 
 =head2 error_message
 
-Returns the custom error message if set:
+Returns error message depending on the error details:
 
-    my $r = OpenXPKI::Client::Service::Response->new_error( 500 => 'Something bad happened');
+=over
+
+=item * custom error message if it was given
+
+    my $r = OpenXPKI::Client::Service::Response->new( 500 => 'Something bad happened');
     say $r->error_message;
-    # Server error: Something bad happened
+    # "Something bad happened"
 
-...or a predefined message if a known internal error code was used:
+=item * predefined message if only internal error code was given
 
-    my $r = OpenXPKI::Client::Service::Response->new_error( 50002 );
+    my $r = OpenXPKI::Client::Service::Response->new( 50002 );
     say $r->error_message;
-    # Unable to initialize client
+    # "Unable to initialize client"
 
-Returns the empty string if L</error> was not set.
+=item * predefined + custom error message if both were given
+
+    my $r = OpenXPKI::Client::Service::Response->new( 50002 => 'Something bad happened');
+    say $r->error_message;
+    # "Unable to initialize client: Something bad happened"
+
+=item * the empty string if L</error> was not set
+
+=back
 
 =cut
 sub error_message ($self) {
