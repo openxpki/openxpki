@@ -33,6 +33,7 @@ sub set_locale_prefix {
 sub i18nGettext {
     my $text = shift;
     warn "Parameter expansion with i18nGettext() is no longer supported" if @_;
+    return $text unless $language;
 
     # translate
     return _i18n_gettext($text);
@@ -61,6 +62,7 @@ sub i18nTokenizer {
     my $text = shift;
 
     return unless defined $text;
+    return $text unless $language;
 
     $text =~ s/(I18N_OPENXPKI_UI_[A-Z0-9a-z\_-]+)/_i18n_gettext($1)/ge;
     return $text;
@@ -69,6 +71,7 @@ sub i18nTokenizer {
 sub i18n_walk {
     my $data = shift;
     die 'Parameter must be either HashRef or ArrayRef' unless (ref $data eq 'HASH' or ref $data eq 'ARRAY');
+    return $data unless $language;
 
     local %_translated_refs;
     return _walk($data);
