@@ -10,6 +10,8 @@ use Log::Log4perl::Level;
 # Project modules
 use OpenXPKI::Log4perl::MojoLogger;
 
+our $default_facility;
+
 =head1 NAME
 
 OpenXPKI::Log4perl - Tiny wrapper around L<Log::Log4perl>'s init methods to
@@ -146,7 +148,18 @@ sub get_logger {
     # argument instead of the class name
     unshift (@args, $class) if $class ne __PACKAGE__;
 
+    @args = ($default_facility) if (not scalar @args and $default_facility);
     return OpenXPKI::Log4perl::MojoLogger->get_logger(@args);
+}
+
+sub set_default_facility {
+    my ($class, @args) = @_;
+    # if someone called ::get_logger() instead of ->get_logger(), $class contains the first
+    # argument instead of the class name
+    unshift (@args, $class) if $class ne __PACKAGE__;
+
+    my $default = $args[0] or return;
+    $default_facility = $default;
 }
 
 1;

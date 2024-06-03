@@ -527,6 +527,7 @@ has custom_wf_params => (
 sub BUILD {}
 after 'BUILD' => sub ($self, $args) {
     Log::Log4perl::MDC->put('endpoint', $self->endpoint);
+    OpenXPKI::Log4perl->set_default_facility($self->config_obj->log_facility);
 };
 
 =head2 request_param
