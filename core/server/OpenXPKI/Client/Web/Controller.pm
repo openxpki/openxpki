@@ -13,6 +13,7 @@ sub index ($self) {
     my $class = $self->stash('service_class') or die "Missing parameter 'service_class' in Mojolicious stash";
     my $service_name = $self->stash('service_name') or die "Missing parameter 'service_class' in Mojolicious stash";
     my $no_config = $self->stash('no_config');
+    my $endpoint = $self->stash('endpoint') or die "Missing parameter 'endpoint' in Mojolicious stash";
 
     # load and instantiate service class
     my $service;
@@ -27,7 +28,7 @@ sub index ($self) {
             apache_env => $self->stash('apache_env'),
             remote_address => $self->tx->remote_address,
             request => $self->req,
-            endpoint => $self->stash('endpoint'),
+            endpoint => $endpoint,
         );
         die "Service class $class does not consume role OpenXPKI::Client::Service::Role::Base"
           unless $service->DOES('OpenXPKI::Client::Service::Role::Base');
