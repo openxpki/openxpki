@@ -1,6 +1,9 @@
 package OpenXPKI::Dumper;
+use strict;
+use warnings;
 
 use Data::Dumper;
+
 use Exporter 'import';
 our @EXPORT = qw(SDumper);
 
@@ -39,15 +42,15 @@ sub CensorHash {
 __END__;
 
 
-=head1 Name
+=head1 NAME
 
 OpenXPKI::Dumper
 
-=head1 Description
+=head1 DESCRIPTION
 
 Implement Data::Dumper like methods to output hash refs.
 
-=head1 Methods
+=head1 METHODS
 
 =head2 CensorHash
 
@@ -59,6 +62,6 @@ If the given argument is not a hashref, it is returned as is.
 
 =head2 SDumper
 
-Dumps the value of the given hash using Data::Dumper after
-calling CensorHash.
+Dumps the value of the given hash using L<Data::Dumper> after
+calling L</CensorHash>.
 
