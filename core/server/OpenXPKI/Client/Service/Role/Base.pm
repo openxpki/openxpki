@@ -34,7 +34,7 @@ A consuming class that implements a service generally looks like this:
 =cut
 
 # Core modules
-use Carp;
+use Carp ();
 use MIME::Base64;
 use Digest::SHA qw( sha1_hex );
 use List::Util qw( any );
@@ -97,7 +97,10 @@ has operation => (
     isa => 'Str',
     lazy => 1,
     predicate => 'has_operation',
-    default => sub { die "Attribute 'operation' has not been set" },
+    default => sub {
+        local $Carp::CarpLevel = 1;
+        Carp::confess "Attempt to read empty attribute 'operation'\n";
+    },
 );
 
 =head2 REQUIRED METHODS

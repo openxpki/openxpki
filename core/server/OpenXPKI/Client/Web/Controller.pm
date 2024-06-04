@@ -49,6 +49,7 @@ sub index ($self) {
     my $response;
     try {
         $service->prepare($self);
+        die "$class->operation must be set in $class->prepare()\n" unless $service->has_operation;
     }
     catch ($err) {
         $response = $service->new_error_response($err);
