@@ -10,7 +10,7 @@ requires 'prepare_enrollment_result';
 
 =head1 NAME
 
-OpenXPKI::Client::Service::Role::Base - Base role for all service classes (i.e.
+OpenXPKI::Client::Service::Role::Base - Base role for all HTTP services (i.e.
 protocol implementations)
 
 =head1 DESCRIPTION
@@ -105,51 +105,24 @@ has operation => (
 
 =head2 REQUIRED METHODS
 
-The consuming class needs to implement the following methods.
-
-=head3 declare_routes
-
-Called by L<OpenXPKI::Client::Web>, this method must set up all Mojolicious
-URL routes belonging to the service.
-
-    # in package OpenXPKI::Client::Service::RPC
-    sub declare_routes ($r) {
-        # RPC urls look like
-        #   /rpc/enroll?method=IssueCertificate
-        #   /rpc/enroll/IssueCertificate
-        $r->any('/rpc/<endpoint>/<method>')->to(
-            service_class => __PACKAGE__,
-            method => '',
-        );
-    }
-
-The implementing service class must ensure that OpenXPKI's special Mojolicious
-stash parameter C<service_class> is set to the package that processes the
-route and consumes L<OpenXPKI::Client::Service::Role::Base>
-(usually C<__PACKAGE__>).
-
-B<Passed parameters>
-
-=over
-
-=item * C<$r> - L<Mojolicious::Routes>
-
-=back
+The consuming class needs to implement the following methods:
 
 =head3 prepare
 
-Should be used to set the L</operation> attribute. May also be used for checks
-and preparations before the request / operation handling defined in
-L</op_handlers> starts.
+Do service specific checks and preparations before the request / operation
+handling as defined in L</op_handlers> starts.
+
+Must set the L</operation> attribute.
+
+Example:
 
     sub prepare ($self, $c) {
-        # e.g.
         $self->operation($c->stash('operation'));
         # or
         $self->operation($self->request_param('operation') // '');
     }
 
-B<Passed parameters>
+B<Parameters>
 
 =over
 
@@ -159,7 +132,9 @@ B<Passed parameters>
 
 =head3 send_response
 
-Sends the response back to the HTTP client via a passed Mojolicious controller.
+Convert the L<OpenXPKI::Client::Service::Response> object into a service
+specific HTTP response and send it to the HTTP client via the Mojolicious
+controller.
 
     sub send_response ($self, $c, $response) {
         $self->disconnect_backend;
@@ -173,7 +148,7 @@ Sends the response back to the HTTP client via a passed Mojolicious controller.
         }
     }
 
-B<Passed parameters>
+B<Parameters>
 
 =over
 
@@ -227,7 +202,7 @@ Must return an L<OpenXPKI::Client::Service::Response>.
         );
     }
 
-B<Passed parameters>
+B<Parameters>
 
 =over
 

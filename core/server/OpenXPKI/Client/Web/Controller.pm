@@ -7,7 +7,61 @@ use Module::Load ();
 # Project modules
 use OpenXPKI::Log4perl;
 
+=head1 NAME
 
+OpenXPKI::Client::Web::Controller - Common Mojolicious controller
+
+=head1 DESCRIPTION
+
+This is the central Mojolicious routing target (i.e. entrypoint) for requests
+of all services. See L</index> for details.
+
+=head1 METHODS
+
+=head2 index
+
+(Enforced by L<OpenXPKI::Client::Web/startup> as the routing target for all
+HTTP service requests)
+
+Service request processing:
+
+=over
+
+=item 1. Class instantiation
+
+=over
+
+=item * Read the I<service_class> stash value set by C<L<declare_routes()|OpenXPKI::Client::Service::Role::Info/declare_routes>>,
+
+=item * load the named class which must consume L<OpenXPKI::Client::Service::Role::Base> and
+
+=item * create a service instance object.
+
+=back
+
+=item 2. Checks
+
+Call the service objects' C<L<prepare()|OpenXPKI::Client::Service::Role::Base/prepare>> method
+for checks and general setup. The object attribute C<L<operation|OpenXPKI::Client::Service::Role::Base/operation>>
+is expected to be set by C<prepare()>.
+
+=item 3. Request processing
+
+Call the roles' C<L<handle_request()|OpenXPKI::Client::Service::Role::Base/handle_request>>
+method which itself queries the objects' C<L<op_handlers()|OpenXPKI::Client::Service::Role::Base/op_handlers>>
+to fetch a request handler callback matching the C<operation> attribute.
+
+Return value of C<handle_request()> is a L<OpenXPKI::Client::Service::Response> object.
+
+=item 4. HTTP response
+
+Turn the L<OpenXPKI::Client::Service::Response> object into a service specific
+HTTP response by calling the objects' C<L<send_response()|OpenXPKI::Client::Service::Role::Base/send_response>>
+method.
+
+=back
+
+=cut
 sub index ($self) {
     # read target service class
     my $class = $self->stash('service_class') or die "Missing parameter 'service_class' in Mojolicious stash";

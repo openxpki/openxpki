@@ -14,7 +14,108 @@ use OpenXPKI::Client::Config;
 
 my $socketfile = $ENV{OPENXPKI_CLIENT_SOCKETFILE} || '/var/openxpki/openxpki.socket';
 
+=head1 NAME
 
+OpenXPKI::Client::Web - Mojolicious application: entry point for HTTP request handling
+
+=head1 DESCRIPTION
+
+Service (aka. "client protocol") requests are handled by Mojolicious based
+request processing. This deprecates the old FCGI scripts.
+
+Services are enabled via client configuration and their Perl classes are then
+autodiscovered in L<OpenXPKI::Client::Web>.
+
+=cut
+# TODO Document client service configuration once specified
+=pod
+
+We use a common Mojolicious controller L<OpenXPKI::Client::Web::Controller>
+for all services and requests to avoid code duplication and enforce some
+processing standards.
+
+Each service must provide a class that consumes the
+L<OpenXPKI::Client::Service::Role::Info> role. Method
+C<L<declare_routes()|OpenXPKI::Client::Service::Role::Info/declare_routes>>
+required by this role is responsible for the registration of the Mojolicious
+URL routes for the service. Every route is expected to contain the
+I<service_class> stash parameter. This parameter is used by the controller to
+instantiate the service specific request processing class which must consume
+L<OpenXPKI::Client::Service::Role::Base>. Usually both roles are consumed by
+the same class.
+
+Overview of the relevant packages:
+
+=over
+
+=item C<OpenXPKI::Client::Web>
+
+Service discovery and setup (Mojolicious application), see L</startup>.
+
+=item C<L<OpenXPKI::Client::Web::Controller>>
+
+Request handling and pre-/post-processing (common Mojolicious controller used by all services).
+
+=item C<L<OpenXPKI::Client::Service::Role::Info>>
+
+Service route info role.
+
+=item C<L<OpenXPKI::Client::Service::Role::Base>>
+
+Service request processing role.
+
+=back
+
+=cut
+
+###############################################################################
+
+=head1 METHODS
+
+=head2 startup
+
+Called by Mojolicious it does the following:
+
+=over
+
+=item Load service classes
+
+Try and load the service I<info> classes for all configured services under the
+package namespace C<OpenXPKI::Client::Service::*>.
+
+For a configured service named C<"est"> the following class lookups are done:
+
+    OpenXPKI::Client::Service::EST
+    OpenXPKI::Client::Service::Est
+    OpenXPKI::Client::Service::est
+
+A service I<info> class must consume L<OpenXPKI::Client::Service::Role::Info>.
+
+=item Register routes
+
+Call all service info classes' static
+C<L<declare_routes()|OpenXPKI::Client::Service::Role::Info/declare_routes>>
+methods which register all routes of the given service below
+C<https://E<lt>hostE<gt>/E<lt>service_nameE<gt>/>. For every route two special
+OpenXPKI Mojolicious stash values I<service_class> and I<endpoint> are expected
+to be set.
+
+The target L<OpenXPKI::Client::Web::Controller/index> and the Mojolicious stash
+parameter C<service_name> are automatically set for every route.
+
+=item Inject ENV
+
+Register a Mojolicious C<before_dispatch> hook that will inject ENV variables
+sent via C<X-OpenXPKI-Apache-ENV-*> HTTP headers.
+
+=item Helper C<oxi_config>
+
+Register the Mojolicious helper C<oxi_config> which returns an instance of
+L<OpenXPKI::Client::Config>. Used in L<OpenXPKI::Client::Web::Controller>.
+
+=back
+
+=cut
 sub startup ($self) {
     #my $config = $self->{oxi_config_obj} or die 'Missing parameter "oxi_config_obj" to ' . __PACKAGE__ . '->new()';
 
