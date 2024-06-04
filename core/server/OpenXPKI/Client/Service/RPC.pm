@@ -543,11 +543,6 @@ sub handle_rpc_request ($self) {
     die $self->new_response( 40480 => sprintf 'Configuration of RPC method "%s" must contain "workflow" entry', $self->operation )
       unless $conf->{workflow};
 
-    $self->log->trace(
-        sprintf 'Incoming RPC request "%s" on endpoint "%s" with parameters: %s',
-        $self->operation, $self->endpoint, Dumper $self->wf_params,
-    ) if $self->log->is_trace;
-
     my $wf;
 
     #

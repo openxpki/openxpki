@@ -544,7 +544,7 @@ B<Returns> an L<OpenXPKI::Client::Service::Response> and does not throw exceptio
 
 =cut
 sub handle_request ($self) {
-    $self->log->debug(sprintf('Incoming %s request "%s" on endpoint "%s"', uc($self->service_name), $self->operation, $self->endpoint)) if $self->log->is_debug;
+    $self->log->debug(sprintf('%s request "%s" on endpoint "%s"', uc($self->service_name), $self->operation, $self->endpoint)) if $self->log->is_debug;
 
     my $response;
     try {

@@ -74,6 +74,7 @@ sub index ($self) {
     my $config;
     try {
         $config = $self->oxi_config($service_name, $no_config);
+        $config->log->info(sprintf 'Incoming request: %s %s', $self->req->method, $self->url_for);
 
         Module::Load::load($class);
         $service = $class->new(
