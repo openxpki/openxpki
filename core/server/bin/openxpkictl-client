@@ -1,6 +1,10 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+use English;
+
+# Core modules
+use POSIX ();
 
 # CPAN modules
 use Log::Log4perl qw( :easy );
@@ -13,43 +17,91 @@ use OpenXPKI::Util;
 use OpenXPKI::Log4perl;
 
 my ($help, $development);
+my $user;
+my $group;
+my $socket_file = '/run/openxpki-client.sock';
+my $socket_user;
+my $socket_group;
 
 getopt
     'h|help' => \$help,
-    'd|dev|debug'  => \$development;
+    'd|dev|debug' => \$development,
+    'user|u=s' => \$user,
+    'group|g=s' => \$group,
+    'socket-file|s=s' => \$socket_file,
+    'socket-user=s' => \$socket_user,
+    'socket-group=s' => \$socket_group;
 
 die extract_usage, "\n" if $help;
 
 # FATAL("Socket: " . $ENV{LISTEN_FDS});
 # FATAL("Socket: " . $ENV{LISTEN_FDNAMES});
 
-my $enc_path = url_escape(Mojo::File->new('/run/openxpki-client.sock'));
-
+#
+# Setup
+#
 $ENV{MOJO_MODE} = 'production' unless $development;
 
-Log::Log4perl->easy_init($ENV{MOJO_MODE} eq 'production' ? $WARN : $DEBUG) unless Log::Log4perl->initialized;
+Log::Log4perl->easy_init(($ENV{MOJO_MODE}//'') eq 'production' ? $WARN : $DEBUG) unless Log::Log4perl->initialized;
+
+my $enc_path = url_escape(Mojo::File->new($socket_file));
 
 my $daemon = Mojo::Server::Prefork->new(
     listen => ["http+unix://$enc_path"],
     reverse_proxy => 1,
 );
 
+my $log = OpenXPKI::Log4perl->get_logger('openxpki.client');
+
 $daemon->build_app('OpenXPKI::Client::Web' => {
     # "root" client logger
-    log => OpenXPKI::Log4perl->get_logger('openxpki.client'),
+    log => $log,
     # config object
     #oxi_config_obj => ...,
 });
 
+#
+# Start daemon
+#
 $daemon->start; # socketfile will be created only after this
 
-# modify socket ownership and permissions
-my ($u,$uid,$g,$gid) = OpenXPKI::Util->resolve_user_group('root', 'www-data');
-my $socket_path = $daemon->ioloop->acceptor($daemon->acceptors->[0])->handle->hostpath;
-chmod 0660, $socket_path;
-chown $uid, $gid, $socket_path;
+#
+# Modify socket ownership and permissions
+#
+my (undef, $s_uid, undef, $s_gid) = OpenXPKI::Util->resolve_user_group($socket_user, $socket_group, 'socket', 1);
+#my $socket_file = $daemon->ioloop->acceptor($daemon->acceptors->[0])->handle->hostpath;
+chmod 0660, $socket_file;
+my @changes = ();
+if (defined $s_uid) {
+    chown $s_uid, -1, $socket_file;
+    push @changes, "user = $socket_user";
+}
+if (defined $s_gid) {
+    chown -1, $s_gid, $socket_file;
+    push @changes, "group = $socket_group";
+}
+$log->info('Socket ownership set to: ' . join(', ', @changes)) if @changes;
 
-# Run, Forest, run!
+#
+# Drop permissions
+#
+my (undef, $uid, undef, $gid) = OpenXPKI::Util->resolve_user_group($user, $group, 'Mojolicious daemon', 1);
+@changes = ();
+if (defined $uid) {
+    $ENV{USER} = getpwuid($uid);
+    $ENV{HOME} = ((getpwuid($uid))[7]);
+    POSIX::setuid($uid);
+    push @changes, "user = $user";
+}
+if (defined $gid) {
+    POSIX::setgid($gid);
+    push @changes, "group = $group";
+}
+$log->info('Dropped privileges, new process ownership: ' . join(', ', @changes)) if @changes;
+
+#
+# Run event loop, Run!
+#
 $daemon->run;
 
 =head1 NAME
@@ -64,11 +116,31 @@ openxpkictl-client [OPTIONS]
 
 =over
 
-=item B<-h>
+=item B<--user STRING>
 
-=item B<--help>
+=item B<-u STRING>
 
-Print a brief help message.
+Target user for the daemon (default: current user)
+
+=item B<--group STRING>
+
+=item B<-g STRING>
+
+Target group for the daemon (default: current group)
+
+=item B<--socket-user STRING>
+
+Target user for the socket file (default: process user)
+
+=item B<--socket-group STRING>
+
+Target group for the socket file (default: process group)
+
+=item B<--socket-file FILE>
+
+=item B<-s FILE>
+
+Path of the socket file (default: /run/openxpki-client.sock)
 
 =item B<-d>
 
@@ -82,10 +154,16 @@ Switch Mojolicious into "development" mode:
 
 =item * treat all requests as if transmitted over HTTPS,
 
-=item * output all log messages to the screen (ignores Log4perl configuration),
+=item * log to screen (ignore Log4perl configuration),
 
 =item * print detailed Mojolicious exceptions.
 
 =back
+
+=item B<-h>
+
+=item B<--help>
+
+Print a brief help message
 
 =back
