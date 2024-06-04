@@ -199,9 +199,12 @@ the C<error_code> item.
 
 =cut
 # Please not there is a method error_message() below
+my $str_or_any = subtype as 'Str';
+coerce $str_or_any, from 'Any', via { "$_" };
 has custom_error_message => (
     is => 'rw',
-    isa => 'Str',
+    isa => $str_or_any,
+    coerce => 1,
     init_arg  => 'error_message',
     predicate => 'has_custom_error_message',
     clearer => 'clear_custom_error_message',
