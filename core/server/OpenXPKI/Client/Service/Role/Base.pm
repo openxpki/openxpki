@@ -741,12 +741,15 @@ sub handle_enrollment_request ($self) {
     my $pickup_failed;
     my $workflow;
     try {
+        # pickup via workflow
         if (my $wf_type = $conf->{pickup_workflow}) {
             $workflow = $self->pickup_via_workflow($wf_type, $conf->{pickup});
 
+        # pickup via datapool
         } elsif (my $ns = $conf->{pickup_namespace}) {
             $workflow = $self->pickup_via_datapool($ns, $self->wf_params->{transaction_id});
 
+        # pickup via workflow attribute search
         } elsif (my $key = $conf->{pickup_attribute}) {
             $workflow = $self->pickup_via_attribute($conf->{workflow}, $key, $self->wf_params->{transaction_id});
         }
