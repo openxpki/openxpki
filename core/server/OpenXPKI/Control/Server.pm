@@ -1,8 +1,7 @@
-# OpenXPKI::Control::Server
-#
-# Written 2012 by Oliver Welter for the OpenXPKI project
-# Copyright (C) 2012 by The OpenXPKI Project
-#
+package OpenXPKI::Control::Server;
+
+# BIG FAT WARNING! Do not "use" any system packages in the file header,
+# as this will prevent the OXI::Debug filter from working
 
 =head1 OpenXPKI::Control::Server
 
@@ -31,11 +30,6 @@ the OpenXPKI::Config Layer is intanciated and queried for the needed
 values.
 
 =cut
-
-# BIG FAT WARNING! Do not "use" any system packages in the file header,
-# as this will prevent the OXI::Debug filter from working
-
-package OpenXPKI::Control::Server;
 
 use strict;
 use warnings;
@@ -136,7 +130,7 @@ sub start {
     }
 
     # Load the required locations from the config
-    my $config = OpenXPKI::Control::Server::__probe_config( $args );
+    my $config = __probe_config( $args );
     my $pidfile  = $config->{PIDFILE};
     my $socketfile = $config->{SOCKETFILE};
 
@@ -147,14 +141,14 @@ sub start {
 
     # Test if there is a pid file for the current config
     if (!defined $pid && -e $pidfile) {
-        $pid = OpenXPKI::Control::Server::__slurp($pidfile);
+        $pid = __slurp($pidfile);
     }
 
     # If a pid is given, we just check if the server is there
     if (defined $pid && kill(0, $pid)) {
-        if (OpenXPKI::Control::Server::status({SOCKETFILE => $socketfile,SILENT => 1}) == 0) {
+        if (status({SOCKETFILE => $socketfile,SILENT => 1}) == 0) {
             if ($restart) {
-                OpenXPKI::Control::Server::stop({SOCKETFILE => $socketfile, PID => $pid, SILENT => $silent});
+                stop({SOCKETFILE => $socketfile, PID => $pid, SILENT => $silent});
             } else {
                 print STDERR "OpenXPKI Server already running. PID: $pid\n";
                 return 0;
@@ -238,7 +232,7 @@ sub start {
             } until $kid > 0;
 
             # check if child noticed a startup error
-            my $msg = OpenXPKI::Control::Server::__slurp $READ_FROM_KID;
+            my $msg = __slurp $READ_FROM_KID;
 
             if ($msg && length $msg)
             {
@@ -250,7 +244,7 @@ sub start {
             }
 
             # find out if the server is REALLY running properly
-            if (OpenXPKI::Control::Server::status({ SOCKETFILE => $socketfile, SLEEP => undef })) {
+            if (status({ SOCKETFILE => $socketfile, SLEEP => undef })) {
                 print STDERR "Status check failed\n";
                 return 2;
             }
@@ -322,14 +316,14 @@ sub stop {
 
     my $pid;
     if ($args->{PIDFILE}) {
-        $pid = OpenXPKI::Control::Server::__slurp($args->{PIDFILE});
+        $pid = __slurp($args->{PIDFILE});
         die "Unable to read pidfile ($args->{PIDFILE})\n" unless ($pid);
     } elsif ($args->{PID}) {
         $pid = $args->{PID};
     } else {
-        my $config = OpenXPKI::Control::Server::__probe_config( $args );
+        my $config = __probe_config( $args );
         if ($config->{PIDFILE}) {
-            $pid = OpenXPKI::Control::Server::__slurp($config->{PIDFILE});
+            $pid = __slurp($config->{PIDFILE});
             die "Unable to read pidfile ($config->{PIDFILE})\n" unless ($pid);
         } else {
             die "You must specify either a PID or PIDFILE\n";
@@ -346,7 +340,7 @@ sub stop {
     print STDOUT "Stopping OpenXPKI\n" if (not $silent);
 
     # get all PIDs which belong to the current process group
-    my @pids = OpenXPKI::Control::Server::__get_processgroup_pids($process_group);
+    my @pids = __get_processgroup_pids($process_group);
     my $attempts = 5;
     my $process_count;
 
@@ -418,18 +412,18 @@ sub status {
     my $socketfile = $args->{SOCKETFILE};
 
     if (!$socketfile) {
-        my $config = OpenXPKI::Control::Server::__probe_config( $args );
+        my $config = __probe_config( $args );
         $socketfile = $config->{SOCKETFILE};
     }
 
     die "No socketfile and no config given" unless($socketfile);
 
-    my $client = OpenXPKI::Control::Server::__connect_openxpki_daemon($socketfile);
+    my $client = __connect_openxpki_daemon($socketfile);
     if (!$client) {
         if (not $args->{SLEEP})
         {
             ## wait for a starting server ...
-            return OpenXPKI::Control::Server::status ({SOCKETFILE => $args->{SOCKETFILE}, SLEEP => 5, SILENT => $silent});
+            return status ({SOCKETFILE => $args->{SOCKETFILE}, SLEEP => 5, SILENT => $silent});
         }
         print STDERR "OpenXPKI server is not running or does not accept requests.\n" if (not $silent);
         return 2;
@@ -460,7 +454,7 @@ sub get_version ($arg) {
     if ($is_enterprise) {
         my $license = $arg->config
             ? $arg->config->get('system.license')
-            : OpenXPKI::Control::Server::__probe_config( $arg->config_args )->{license};
+            : __probe_config( $arg->config_args )->{license};
         my $version = "OpenXPKI Enterprise Edition v$OpenXPKI::VERSION::VERSION";
         $version .= "\n" . OpenXPKI::Enterprise::get_license_string($license) if $license;
         return $version;
@@ -491,14 +485,14 @@ sub reload {
 
     my $pid;
     if ($args->{PIDFILE}) {
-        $pid = OpenXPKI::Control::Server::__slurp($args->{PIDFILE});
+        $pid = __slurp($args->{PIDFILE});
         die "Unable to read pidfile ($args->{PIDFILE})\n" unless ($pid);
     } elsif ($args->{PID}) {
         $pid = $args->{PID};
     } else {
-        my $config = OpenXPKI::Control::Server::__probe_config( $args );
+        my $config = __probe_config( $args );
         if ($config->{PIDFILE}) {
-            $pid = OpenXPKI::Control::Server::__slurp($config->{PIDFILE});
+            $pid = __slurp($config->{PIDFILE});
             die "Unable to read pidfile ($config->{PIDFILE})\n" unless ($pid);
         } else {
             die "You must specify either a PID or PIDFILE\n";
