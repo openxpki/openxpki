@@ -100,7 +100,7 @@ echo
 # stop OpenXPKI early to prevent crashes due to DB access problems etc.
 if [[ $IS_RESTART -eq 1 ]]; then
     set +e
-    openxpkictl stop >>$LOG 2>&1
+    openxpkictl stop server >>$LOG 2>&1
     set -e
 fi
 
@@ -255,9 +255,9 @@ if [[ $IS_RESTART -eq 1 ]]; then
     # oxi-initdb (above) already restarts OpenXPKI
     if [[ $IS_FULLCONFIG -ne 1 ]]; then
         echo "Restart OpenXPKI"
-        openxpkictl restart                                           >>$LOG 2>&1
+        openxpkictl restart server                                    >>$LOG 2>&1
 
-        if [[ $(openxpkictl status 2>&1) != *"is running"* ]]; then
+        if [[ $(openxpkictl status server 2>&1) != *"is running"* ]]; then
             echo -e "\nERROR: Could not start OpenXPKI. Please see logs in /var/log/openxpki"
             exit 333
         fi

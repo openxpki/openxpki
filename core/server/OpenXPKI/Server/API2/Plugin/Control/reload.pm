@@ -18,7 +18,7 @@ use OpenXPKI::Control::Server;
 
 Send a reload command to the server which will terminate all childs.
 
-This is the same as "openxpkictl reload".
+This is the same as "openxpkictl reload server".
 
 B<Parameters>
 
@@ -30,7 +30,7 @@ command "reload" => {
 
     my ($self, $params) = @_;
 
-    OpenXPKI::Control::Server::reload();
+    OpenXPKI::Control::Server->new->reload;
     return 1;
 
 };

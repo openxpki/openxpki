@@ -22,7 +22,7 @@ trap '_exit $?' EXIT
 echo -e "Recreate database and certificates"
 
 echo -e "- stop OpenXPKI"
-openxpkictl stop                                                  >$LOG 2>&1
+openxpkictl stop server                                                >$LOG 2>&1
 
 set -e
 
@@ -39,9 +39,9 @@ chmod -R 750 /etc/openxpki/local/keys/
 chown -R www-data:www-data /etc/openxpki/tls/
 
 echo -e "- start OpenXPKI"
-openxpkictl start                                                 >$LOG 2>&1
+openxpkictl start server                                              >$LOG 2>&1
 
-if [[ $(openxpkictl status 2>&1) != *"is running"* ]]; then
+if [[ $(openxpkictl status server 2>&1) != *"is running"* ]]; then
     echo -e "\nERROR: Could not start OpenXPKI. Please see logs in /var/log/openxpki"
     exit 333
 fi

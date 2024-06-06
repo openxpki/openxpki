@@ -26,7 +26,7 @@ echo -n "Restart OpenXPKI (y/n)? "
 read P
 
 if [ "$P" == "y" ]; then
-    openxpkictl restart
+    openxpkictl restart server
 fi
 
 cd $OLDPWD;

@@ -7,7 +7,7 @@
 # where the database configuration is set in OXI_TEST_DB_MYSQL_USER etc.
 #
 # The MySQL database should be freshly created, i.e. without any data in it:
-#   openxpkictl stop
+#   openxpkictl stop server
 #   tools/testenv/mysql-create-db.sh && tools/testenv/mysql-create-schema.sh
 #
 # The resulting certificates are available in two forms below ./certificates/:

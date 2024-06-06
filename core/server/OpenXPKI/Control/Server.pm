@@ -1,4 +1,7 @@
 package OpenXPKI::Control::Server;
+use OpenXPKI -class;
+
+with 'OpenXPKI::Control::Role';
 
 # BIG FAT WARNING! Do not "use" any system packages in the file header,
 # as this will prevent the OXI::Debug filter from working
@@ -31,10 +34,6 @@ values.
 
 =cut
 
-use strict;
-use warnings;
-use English;
-
 # Core modules
 use POSIX ":sys_wait_h";
 use Digest::SHA qw( sha256_base64 );
@@ -42,19 +41,92 @@ use File::Temp;
 
 # CPAN modules
 use Proc::ProcessTable;
-use Type::Params qw( signature_for );
 
 # Project modules
 use OpenXPKI::VERSION;
-use OpenXPKI::Debug;
 
-# Feature::Compat::Try should be done last to safely disable warnings
-use Feature::Compat::Try;
 
-# should be done after imports to safely disable warnings in Perl < 5.36
-use experimental 'signatures';
+has cfg => (
+    is => 'rw',
+    isa => 'HashRef',
+    lazy => 1,
+    default => sub ($self) {
+        $ENV{OPENXPKI_CONF_PATH} = $self->config_path if $self->has_config_path;
 
-=head2 start {CONFIG, SILENT, PID, DEBUG, KEEP_TEMP}
+        require OpenXPKI::Config;
+        my $config = OpenXPKI::Config->new;
+
+        return {
+            pidfile => $config->get('system.server.pid_file') || '',
+            socketfile => $config->get('system.server.socket_file') || '',
+            type => $config->get('system.server.type') || 'Fork',
+            depend => $config->get_hash('system.version.depend') || undef,
+            license => $config->get('system.license') || '',
+        };
+    },
+);
+
+
+sub getopt_params ($self, $command) {
+    return qw(
+        debug=s@
+        keep-temp-files=s
+        quiet
+        nd|no-detach
+        nocensor
+    );
+}
+
+sub start ($self, $args = [], $opts = {}) {
+    my %params = ();
+
+    $params{restart} = $opts->{__restart} ? 1 : 0;
+    $params{silent} = $opts->{quiet} ? 1 : 0;
+    $params{foreground} = $opts->{nd} ? 1 : 0;
+
+    if (defined $opts->{debug}) {
+        my @debug = split(m{,}, join(',', $opts->{debug}->@*));
+        $params{debug_level} = {};
+        $params{debug_bitmask} = {};
+        $params{debug_nocensor} = 1 if defined $opts->{nocensor};
+
+        for my $param (@debug) {
+            my ($module, $op, $level) = ($param =~ m{ \A ((?!\d).+?)?([:=])?((0b)?\d+)? \z }xms);
+
+            # default values if not specified
+            $level //= 1;
+            $op = ':' if (not $module and not $op); # if only number was given: interpret as level
+            $module //= '.*';
+
+            # convert binary bitmask/level specifications
+            if ($level =~ /^0b(.*)/) {
+                $level = unpack("N", pack("B32", substr("0"x32 . $1, -32)));
+            }
+
+            # operator ":" - a maximum level
+            if ($op and $op eq ":") {
+                $params{debug_level}->{$module} = $level;
+            }
+            # operator "=" - a bitmask
+            else {
+                # also assume it's a bitmask if no operator and no number were given
+                $params{debug_bitmask}->{$module} = $level;
+            }
+        }
+    }
+
+    if ($opts->{'keep-temp-files'}) {
+        if ($opts->{'keep-temp-files'} eq 'yes') {
+            $params{keep_temp} = 1;
+        } else {
+            warn sprintf("You need to set --keep-temp-files to 'yes' ('%s' was given) ", $opts->{'keep-temp-files'});
+        }
+    }
+
+    exit $self->__start( %params );
+}
+
+=head2 __start {CONFIG, SILENT, PID, DEBUG, KEEP_TEMP}
 
 Start the server.
 
@@ -86,69 +158,60 @@ or other confidential data!
 =back
 
 =cut
+signature_for __start => (
+    method => 1,
+    named => [
+        silent => 'Bool', { default => 0 },
+        foreground => 'Bool', { default => 0 },
+        restart => 'Bool', { default => 0 },
+        debug_level => 'HashRef', { default => {} },
+        debug_bitmask => 'HashRef', { default => {} },
+        debug_nocensor => 'Bool', { default => 0 },
+        keep_temp => 'Bool', { default => 0 },
+    ],
+);
+sub __start ($self, $arg) {
 
-sub start {
-
-    my $args = shift;
-    my $silent = $args->{SILENT};
-    my $pid        = $args->{PID};
-    my $foreground = $args->{NODETACH};
-    my $restart = $args->{RESTART};
-    my $debug_level = $args->{DEBUG_LEVEL} || 0;
-    my $debug_bitmask = $args->{DEBUG_BITMASK} || 0;
-    my $debug_nocensor = $args->{DEBUG_NOCENSOR} || 0;
-
-
-    if ($args->{KEEP_TEMP}) {
-        $File::Temp::KEEP_ALL = 1;
-    }
+    $File::Temp::KEEP_ALL = 1 if $arg->keep_temp;
 
     # We must set the debug options before loading any OXI classes
     # Parsing any class before the debug level is set will exlude the class
     # from debugging!
     #
     # DEBUG_LEVEL is a hash with the module name (or regex)
-    # as key and the level as value or just an integer for the global level
-    if (ref $debug_level eq 'HASH') {
-        foreach my $module (keys %{$debug_level}) {
-            my $level = $debug_level->{$module};
-            $OpenXPKI::Debug::LEVEL{$module} = $level;
-        }
+    # as key and the level as value
+    foreach my $module (keys $arg->debug_level->%*) {
+        my $level = $arg->debug_level->{$module};
+        $OpenXPKI::Debug::LEVEL{$module} = $level;
     }
 
     # DEBUG_BITMASK is a hash with the module name (or regex)
-    # as key and the bitmask as value or just an integer for the global bitmask
-    if (ref $debug_bitmask eq 'HASH') {
-        foreach my $module (keys %{$debug_bitmask}) {
-            my $bitmask = $debug_bitmask->{$module};
-            $OpenXPKI::Debug::BITMASK{$module} = $bitmask;
-        }
+    # as key and the bitmask as value
+    foreach my $module (keys $arg->debug_bitmask->%*) {
+        my $bitmask = $arg->debug_bitmask->{$module};
+        $OpenXPKI::Debug::BITMASK{$module} = $bitmask;
     }
 
-    if ($debug_nocensor) {
-        $OpenXPKI::Debug::NOCENSOR = 1;
-    }
+    $OpenXPKI::Debug::NOCENSOR = 1 if $arg->debug_nocensor;
 
     # Load the required locations from the config
-    my $config = __probe_config( $args );
-    my $pidfile  = $config->{PIDFILE};
-    my $socketfile = $config->{SOCKETFILE};
+    my $pidfile  = $self->cfg->{pidfile};
+    my $socketfile = $self->cfg->{socketfile};
 
-    if (!$socketfile) {
-        print STDERR "Unable to load configuration\n";
+    if (not $socketfile) {
+        print STDERR "Missing system.server.socket_file in config\n";
         return 1;
     }
 
     # Test if there is a pid file for the current config
-    if (!defined $pid && -e $pidfile) {
-        $pid = __slurp($pidfile);
-    }
+    my $pid;
+    $pid = __slurp($pidfile) if -e $pidfile;
 
     # If a pid is given, we just check if the server is there
-    if (defined $pid && kill(0, $pid)) {
-        if (status({SOCKETFILE => $socketfile,SILENT => 1}) == 0) {
-            if ($restart) {
-                stop({SOCKETFILE => $socketfile, PID => $pid, SILENT => $silent});
+    if (defined $pid and kill(0, $pid)) {
+        if ($self->__status(silent => 1) == 0) {
+            if ($arg->restart) {
+                $self->__stop(pid => $pid, silent => $arg->silent);
             } else {
                 print STDERR "OpenXPKI Server already running. PID: $pid\n";
                 return 0;
@@ -156,7 +219,7 @@ sub start {
         }
     }
 
-    if ($config->{depend} && (my $core = $config->{depend}->{core})) {
+    if ($self->cfg->{depend} && (my $core = $self->cfg->{depend}->{core})) {
         my ($Major, $Minor) = ($OpenXPKI::VERSION::VERSION =~ m{\A(\d)\.(\d+)});
         my ($major, $minor) = ($core =~ m{\A(\d)\.(\d+)});
         if ($major != $Major) {
@@ -166,123 +229,36 @@ sub start {
         if ($Minor < $minor) {
             # config is set for the coming up major version while this
             # is a development build (odd numbers are development)
-            if (($minor - $Minor) == 1  && $Minor%2) {
+            if (($minor - $Minor) == 1 and $Minor % 2) {
                 print STDERR sprintf "Config dependency (%s) matches upcoming release\n",
                     $core;
             } else {
-                print STDERR sprintf "Config dependency (%s) not fullfilled by this release (%s)\n",
+                print STDERR sprintf "Config dependency (%s) not fulfilled by this release (%s)\n",
                     $core, $OpenXPKI::VERSION::VERSION;
                 return 1;
             }
         }
     } else {
-        print STDERR "Config depend is not set - unable to check config prereq!\n";
+        print STDERR "Config entry system.version.depend is not set - unable to check required version!\n";
         print STDERR "Hint: Add expected minimum version to 'system.version.depend.core'\n";
     }
 
-    if (not $silent) {
-        my $version = get_version(config => $config->{oxi_config});
+    if (not $arg->silent) {
+        my $version = $self->get_version;
         print STDOUT "Starting $version\n";
     }
     unlink $pidfile if ($pidfile && -e $pidfile);
 
-    # fork off server launcher
-    my $redo_count = 0;
-    my $READ_FROM_KID;
-    if (! $foreground) {
-        # fork server away to background
-      FORK:
-        do {
-            # this open call efectively does a fork and attaches the child's
-            # STDOUT to $READ_FROM_KID, allowing the child to send us data.
-            $pid = open($READ_FROM_KID, "-|");
-            if (! defined $pid) {
-                if ($!{EAGAIN}) {
-                # recoverable fork error
-                    if ($redo_count > 5) {
-                                ## the first message is part of the informal daemon startup message
-                                ## the second message is a real error message
-                        print STDOUT "FAILED.\n" if (not $silent);
-                        print STDERR "Could not fork process\n";
-                        return 2;
-                    }
-                            ## this is only an informal message and not an error - so do not use STDERR
-                    print STDOUT '.' if (not $silent);
-                    sleep 5;
-                    $redo_count++;
-                    redo FORK;
-                }
-
-                # other fork error
-                    ## the first message is part of the informal daemon startup message
-                    ## the second message is a real error message
-                print STDOUT "FAILED.\n" if (not $silent);
-                print STDERR "Could not fork process: $ERRNO\n";
-                return 2;
-            }
-        } until defined $pid;
-
-        if ($pid) {
-            # parent here
-            # child process pid is available in $pid
-
-            my $kid;
-            do {
-                $kid = waitpid(-1, WNOHANG);
-            } until $kid > 0;
-
-            # check if child noticed a startup error
-            my $msg = __slurp($READ_FROM_KID);
-
-            if ($msg && length $msg)
-            {
-                ## the first message is part of the informal daemon startup message
-                ## the second message is a real error message
-                print STDOUT "FAILED.\n" if (not $silent);
-                print STDERR "$msg\n";
-                return 2;
-            }
-
-            # find out if the server is REALLY running properly
-            if (status({ SOCKETFILE => $socketfile, SLEEP => undef })) {
-                print STDERR "Status check failed\n";
-                return 2;
-            }
-
-            ## this is only an informal message and not an error - so do not use STDERR
-            print STDOUT "DONE.\n" if (not $silent);
-        } else {
-            # child here
-            # parent process pid is available with getppid
-
-            # everything printed to STDOUT here will be available to the
-            # parent on its $READ_FROM_KID file descriptor
-            eval
-            {
-                ## SILENT is required to work correctly with start-stop-daemons
-                ## during a normal System V init
-                require OpenXPKI::Server;
-                my $server = OpenXPKI::Server->new ( "SILENT" => $silent ? 1 : 0 , TYPE => $config->{TYPE} );
-                $server->start;
-            };
-            if ($EVAL_ERROR)
-            {
-                print STDERR $EVAL_ERROR;
-                return 2;
-            }
-            close(STDOUT);
-            close(STDERR);
-            return 0;
-        }
-    }
-    else {
-        # foreground requested, do not fork
+    # common start procedure for forking and foreground mode
+    my $start_server = sub {
         eval {
+            # SILENT is required to work correctly with start-stop-daemons
+            # during a normal System V init
             require OpenXPKI::Server;
             my $server = OpenXPKI::Server->new(
-                'SILENT' => $silent ? 1 : 0,
-                'TYPE'   => $config->{TYPE},
-                'NODETACH' => $args->{NODETACH}
+                SILENT => $arg->silent,
+                TYPE => $self->cfg->{type},
+                NODETACH => $arg->foreground,
             );
             $server->start;
         };
@@ -290,12 +266,100 @@ sub start {
             print STDERR $EVAL_ERROR;
             return 2;
         }
+        return 0;
+    };
+
+    # foreground mode
+    if ($arg->foreground) {
+        return $start_server->();
     }
-    return 0;
+
+    # fork off server launcher
+    my $redo_count = 0;
+    my $READ_FROM_KID;
+
+    # fork server away to background
+    FORK:
+    do {
+        # this open call efectively does a fork and attaches the child's
+        # STDOUT to $READ_FROM_KID, allowing the child to send us data.
+        $pid = open($READ_FROM_KID, "-|");
+        if (not defined $pid) {
+            if ($!{EAGAIN}) {
+            # recoverable fork error
+                if ($redo_count > 5) {
+                            ## the first message is part of the informal daemon startup message
+                            ## the second message is a real error message
+                    print STDOUT "FAILED.\n" unless $arg->silent;
+                    print STDERR "Could not fork process\n";
+                    return 2;
+                }
+                        ## this is only an informal message and not an error - so do not use STDERR
+                print STDOUT '.' unless $arg->silent;
+                sleep 5;
+                $redo_count++;
+                redo FORK;
+            }
+
+            # other fork error
+                ## the first message is part of the informal daemon startup message
+                ## the second message is a real error message
+            print STDOUT "FAILED.\n" unless $arg->silent;
+            print STDERR "Could not fork process: $ERRNO\n";
+            return 2;
+        }
+    } until defined $pid;
+
+    # parent here
+    # child process pid is available in $pid
+    if ($pid) {
+
+        my $kid;
+        do {
+            $kid = waitpid(-1, WNOHANG);
+        } until $kid > 0;
+
+        # check if child noticed a startup error
+        my $msg = __slurp($READ_FROM_KID);
+
+        if ($msg && length $msg)
+        {
+            ## the first message is part of the informal daemon startup message
+            ## the second message is a real error message
+            print STDOUT "FAILED.\n" unless $arg->silent;
+            print STDERR "$msg\n";
+            return 2;
+        }
+
+        # find out if the server is REALLY running properly
+        if ($self->__status > 0) {
+            print STDERR "Status check failed\n";
+            return 2;
+        }
+
+        ## this is only an informal message and not an error - so do not use STDERR
+        print STDOUT "DONE.\n" unless $arg->silent;
+        return 0;
+
+    # child here
+    # parent process pid is available with getppid
+    } else {
+        # everything printed to STDOUT here will be available to the
+        # parent on its $READ_FROM_KID file descriptor
+        $start_server->();
+        close STDOUT;
+        close STDERR;
+        return 0;
+    }
 }
 
+sub stop ($self, $args = [], $opts = {}) {
+    my %params = ();
+    $params{silent} = $opts->{quiet} ? 1 : 0;
+    exit $self->__stop( %params );
+}
 
-=head2 stop
+=head2 __stop
 
 Stop the server
 
@@ -303,31 +367,25 @@ Parameters:
 
 =over
 
-=item PID or PIDFILE
+=item PID
 
 =back
 
 =cut
 
-sub stop {
-
-    my $args = shift;
-    my $silent = $args->{SILENT};
-
+signature_for __stop => (
+    method => 1,
+    named => [
+        silent => 'Bool', { default => 0 },
+        pid => 'Int', { optional => 1 },
+    ],
+);
+sub __stop ($self, $arg) {
     my $pid;
-    if ($args->{PIDFILE}) {
-        $pid = __slurp($args->{PIDFILE});
-        die "Unable to read pidfile ($args->{PIDFILE})\n" unless ($pid);
-    } elsif ($args->{PID}) {
-        $pid = $args->{PID};
+    if (defined $arg->pid) {
+        $pid = $arg->pid;
     } else {
-        my $config = __probe_config( $args );
-        if ($config->{PIDFILE}) {
-            $pid = __slurp($config->{PIDFILE});
-            die "Unable to read pidfile ($config->{PIDFILE})\n" unless ($pid);
-        } else {
-            die "You must specify either a PID or PIDFILE\n";
-        }
+        $pid = $self->__get_pid;
     }
 
     if (kill(0, $pid) == 0) {
@@ -337,7 +395,7 @@ sub stop {
 
     my $process_group = getpgrp($pid);
 
-    print STDOUT "Stopping OpenXPKI\n" if (not $silent);
+    print STDOUT "Stopping OpenXPKI\n" unless $arg->silent;
 
     # get all PIDs which belong to the current process group
     my @pids = __get_processgroup_pids($process_group);
@@ -348,7 +406,7 @@ sub stop {
     while ($attempts-- > 0) {
         $process_count = scalar @pids;
         last if ($process_count <= 0);
-        print STDOUT "Stopping gracefully, $process_count (sub)processes remaining...\n" if (not $silent);
+        print STDOUT "Stopping gracefully, $process_count (sub)processes remaining...\n" unless $arg->silent;
         foreach my $p (@pids) {
             kill(15, $p);
         }
@@ -362,7 +420,7 @@ sub stop {
     while ($attempts-- > 0) {
         $process_count = scalar @pids;
         last if ($process_count <= 0);
-        print STDOUT "Killing un-cooperative process the hard way, $process_count (sub)processes remaining...\n" if (not $silent);
+        print STDOUT "Killing un-cooperative process the hard way, $process_count (sub)processes remaining...\n" unless $arg->silent;
         foreach my $p (@pids) {
             kill(9, $p);
         }
@@ -373,16 +431,30 @@ sub stop {
     @pids = __still_alive(\@pids);    # find out which ones are still alive
     $process_count = scalar @pids;
     if ($process_count <= 0) {
-        print STDOUT "DONE.\n" if (not $silent);
+        print STDOUT "DONE.\n" unless $arg->silent;
         return 0;
     } else {
-        print STDOUT "FAILED.\n" if (not $silent);
+        print STDOUT "FAILED.\n" unless $arg->silent;
         print STDERR "Could not terminate OpenXPKI process ".join(" ", @pids).".\n";
         return 2;
     }
 }
 
-=head2 status
+sub restart ($self, $args = [], $opts = {}) {
+    $self->start($args, { $opts->%*, __restart => 1 });
+}
+
+sub status ($self, $args = [], $opts = {}) {
+    my %params = ();
+    $params{silent} = $opts->{quiet} ? 1 : 0;
+
+    if ($self->__status(%params) > 0) {
+        exit 3;
+    }
+    exit 0;
+}
+
+=head2 __status
 
 Check if the server is running
 
@@ -398,49 +470,38 @@ Wait I<sleep> seconds before testing
 
 =cut
 
-sub status {
+signature_for __status => (
+    method => 1,
+    named => [
+        silent => 'Bool', { default => 0 },
+    ],
+);
+sub __status ($self, $arg) {
+    my $socketfile = $self->cfg->{socketfile}
+        or die "Missing system.server.socket_file in config";
 
-    my $args = shift;
-    my $silent = $args->{SILENT};
-
-    if (defined $args->{SLEEP} and $args->{SLEEP} > 0)
-    {
-        ## this helps to give the server some reaction time
-        sleep $args->{SLEEP};
+    my $client;
+    my $i = 4;
+    while ($i-- > 0) {
+        $client = __connect_openxpki_daemon($socketfile);
+        last if $client;
+        sleep 2 if $i > 0;
     }
-
-    my $socketfile = $args->{SOCKETFILE};
-
-    if (!$socketfile) {
-        my $config = __probe_config( $args );
-        $socketfile = $config->{SOCKETFILE};
+    if (not $client) {
+        print STDERR "OpenXPKI server is not running or does not accept requests.\n" unless $arg->silent;
+        return 3;
     }
-
-    die "No socketfile and no config given" unless($socketfile);
-
-    my $client = __connect_openxpki_daemon($socketfile);
-    if (!$client) {
-        if (not $args->{SLEEP})
-        {
-            ## wait for a starting server ...
-            return status ({SOCKETFILE => $args->{SOCKETFILE}, SLEEP => 5, SILENT => $silent});
-        }
-        print STDERR "OpenXPKI server is not running or does not accept requests.\n" if (not $silent);
-        return 2;
-
-    }
-    print STDOUT "OpenXPKI Server is running and accepting requests.\n" unless ($silent);
+    print STDOUT "OpenXPKI Server is running and accepting requests.\n" unless $arg->silent;
     return 0;
 }
 
 signature_for get_version => (
+    method => 1,
     named => [
         config => 'OpenXPKI::Config', { optional => 1 },
-        config_args => 'HashRef', { optional => 1 },
     ],
 );
-sub get_version ($arg) {
-
+sub get_version ($self, $arg) {
     my $is_enterprise = 0;
     try {
         require OpenXPKI::Enterprise;
@@ -454,7 +515,7 @@ sub get_version ($arg) {
     if ($is_enterprise) {
         my $license = $arg->config
             ? $arg->config->get('system.license')
-            : __probe_config( $arg->config_args )->{license};
+            : $self->cfg->{license};
         my $version = "OpenXPKI Enterprise Edition v$OpenXPKI::VERSION::VERSION";
         $version .= "\n" . OpenXPKI::Enterprise::get_license_string($license) if $license;
         return $version;
@@ -468,41 +529,12 @@ sub get_version ($arg) {
 
 Reload some parts of the config (sends a HUP to the server pid)
 
-Parameters:
-
-=over
-
-=item PID or PIDFILE
-
-=back
-
 =cut
 
-sub reload {
-
-    my $args = shift;
-    my $silent = $args->{SILENT};
-
-    my $pid;
-    if ($args->{PIDFILE}) {
-        $pid = __slurp($args->{PIDFILE});
-        die "Unable to read pidfile ($args->{PIDFILE})\n" unless ($pid);
-    } elsif ($args->{PID}) {
-        $pid = $args->{PID};
-    } else {
-        my $config = __probe_config( $args );
-        if ($config->{PIDFILE}) {
-            $pid = __slurp($config->{PIDFILE});
-            die "Unable to read pidfile ($config->{PIDFILE})\n" unless ($pid);
-        } else {
-            die "You must specify either a PID or PIDFILE\n";
-        }
-    }
-
-    print STDOUT "Sending reload command to OpenXPKI server.\n" unless ($silent);
-
+sub reload ($self, $args = [], $opts = {}) {
+    my $pid = $self->__get_pid;
+    print STDOUT "Sending 'reload' command to OpenXPKI server.\n" unless $opts->{quiet};
     kill HUP => $pid;
-
     return 0;
 }
 
@@ -542,23 +574,23 @@ sub get_pids {
     my $proc = Proc::ProcessTable->new;
     my $result = { 'server' => 0, 'watchdog' => [], 'worker' => [], 'workflow' => [], 'prometheus' => 0 };
     my $pgrp = getpgrp($$); # Process Group of myself
-    for my $p ( @{$proc->table} ) {
+    for my $p ($proc->table->@*) {
         next unless $pgrp == $p->pgrp;
 
         my $cmd = $p->cmndline;
-        if ($cmd =~ / ^ openxpkid .* server /x) {
+        if ($cmd =~ / ^ openxpkid .* server /xi) {
             $result->{server} = $p->pid; next;
         }
-        if ($cmd =~ / ^ openxpkid .* watchdog /x) {
+        if ($cmd =~ / ^ openxpkid .* watchdog /xi) {
             push @{$result->{watchdog}}, $p->pid; next;
         }
-        if ($cmd =~ / ^ openxpkid .* worker /x) {
+        if ($cmd =~ / ^ openxpkid .* worker /xi) {
             push @{$result->{worker}}, $p->pid; next;
         }
-        if ($cmd =~ / ^ openxpkid .* workflow /x) {
+        if ($cmd =~ / ^ openxpkid .* workflow /xi) {
             push @{$result->{workflow}}, $p->pid; next;
         }
-        if ($cmd =~ / ^ openxpkid .* Prometheus /x) {
+        if ($cmd =~ / ^ openxpkid .* Prometheus /xi) {
             $result->{prometheus} = $p->pid; next;
         }
     }
@@ -572,15 +604,12 @@ Get a list of all running workers with pid, time and info
 =cut
 
 sub list_process {
-
     my $proc = Proc::ProcessTable->new;
     my @result;
     my $pgrp = getpgrp($$); # Process Group of myself
-    foreach my $p ( @{$proc->table} ) {
 
-        if ($pgrp != $p->pgrp) {
-            next;
-        }
+    foreach my $p ( @{$proc->table} ) {
+        next unless $pgrp == $p->pgrp;
 
         if (!$p->cmndline) {
             push @result, { 'pid' => $p->pid, 'time' => $p->start, 'info' => '' };
@@ -594,22 +623,28 @@ sub list_process {
     return \@result;
 }
 
+sub __get_pid ($self) {
+    die "Missing system.server.pid_file in config\n" unless $self->cfg->{pidfile};
 
-sub __slurp {
-    my $file = shift;
+    my $pid = __slurp($self->cfg->{pidfile})
+        or die "Unable to read pidfile (".$self->cfg->{pidfile}.")\n";
+
+    return $pid;
+}
+
+sub __slurp :prototype($) ($file) {
     my $content = do {
         local $INPUT_RECORD_SEPARATOR;
         my $HANDLE;
         open $HANDLE, "<", $file or return;
         <$HANDLE>;
     };
+    chomp $content;
     return $content;
 }
 
-
-sub __get_processgroup_pids {
-    # returns a list of PIDs that belong to a given process group
-    my $process_group = shift;
+# returns a list of PIDs that belong to a given process group
+sub __get_processgroup_pids ($process_group) {
     my @result;
 
     my $pt = Proc::ProcessTable->new;
@@ -623,45 +658,19 @@ sub __get_processgroup_pids {
 
 # Take an array ref, array containing process IDs
 # Check which processes are still alive and return them in an array
-sub __still_alive {
-  my $pids = shift;
-  my @alive;
-  my $pid;
+sub __still_alive ($pids) {
+    my @alive;
 
-  foreach $pid (@{$pids}) {
-    unless (kill(0, $pid) == 0) {
-      push @alive, $pid;   # process is still there
+    foreach my $pid ($pids->@*) {
+        unless (kill(0, $pid) == 0) {
+            push @alive, $pid;   # process is still there
+        }
     }
-  }
 
-  return @alive;
+    return @alive;
 }
 
-sub __probe_config {
-
-    my $args = shift;
-
-    $ENV{OPENXPKI_CONF_PATH} = $args->{CONFIG} if($args->{CONFIG});
-
-    require OpenXPKI::Config;
-    my $config = OpenXPKI::Config->new();
-
-    return {
-        PIDFILE  => $config->get('system.server.pid_file') || '',
-        SOCKETFILE => $config->get('system.server.socket_file') || '',
-        TYPE => $config->get('system.server.type') || 'Fork',
-        depend => $config->get_hash('system.version.depend') || undef,
-        license => $config->get('system.license') || '',
-        oxi_config => $config,
-    };
-
-}
-
-
-sub __connect_openxpki_daemon {
-
-    my $socketfile = shift;
-
+sub __connect_openxpki_daemon ($socketfile) {
     # if there is no socket it does not make sense to test the client
     return unless (-e $socketfile);
 
@@ -684,5 +693,153 @@ sub __connect_openxpki_daemon {
     return $client;
 
 }
+__PACKAGE__->meta->make_immutable;
 
-return 1;
+__DATA__
+
+=head1 NAME
+
+openxpkictl - start/stop script for OpenXPKI server
+
+=head1 USAGE
+
+openxpkictl [options] COMMAND
+
+ Commands:
+   start            Start OpenXPKI daemon
+   stop             Stop OpenXPKI daemon
+   reload           Reload the configuration
+   restart          Restart OpenXPKI daemon
+   status           Get OpenXPKI daemon status
+   version          Print the OpenXPKI version and license info
+   terminal         Control terminal process servers (EE feature)
+
+See below for supported options.
+
+=head1 ARGUMENTS
+
+Available commands:
+
+=over 8
+
+=item B<start>
+
+Start the OpenXPKI daemon.
+
+=item B<stop>
+
+Stop the OpenXPKI daemon.
+
+=item B<reload>
+
+Reload the OpenXPKI daemon, re-reading the config repository.
+Note: Some changes need a restart, see the documentation!
+
+=item B<restart>
+
+Restart the OpenXPKI daemon.
+
+=item B<status>
+
+Check the OpenXPKI daemon status.
+
+=item B<version>
+
+Print information on the version and license.
+
+=item B<terminal>
+
+Control the terminal daemons (EE feature).
+
+A subcommand is required. Executing it without subcommand prints a list of
+the available commands.
+
+=back
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help>
+
+Print a brief help message and exits.
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=item B<--config|cfg PATH>
+
+Use PATH to point to the configuration repository (base of yaml tree).
+Defaults to /etc/openxpki/config.d
+
+=item B<--instance|i NAME>
+
+Shortcut to set the config path when running multiple instances using
+the proposed config path layout (/etc/openxpki/I<instance>/config.d).
+
+=item B<--version>
+
+Print program version and exit.
+
+=item B<--debug MODULE:LEVEL>
+
+Set specific module debug level to LEVEL (must be a positive integer).
+Higher values mean more debug output. MODULE must be a module
+specification (e. g. OpenXPKI::Server) and may contain Perl Regular
+expressions.
+
+LEVEL can be specified as a decadic or binary number (e.g. 5 or 0b101).
+LEVEL defaults to 1 if not specified.
+
+If MODULE is omitted the given LEVEL will be set for all modules.
+
+You can add multiple --debug options on one command line.
+
+Examples:
+
+  --debug
+ (equivalent to --debug .*:1)
+
+  --debug OpenXPKI::Server
+  (equivalent to --debug OpenXPKI::Server:1)
+
+  --debug OpenXPKI::Server:100
+  (equivalent to --debug OpenXPKI::Server:100)
+
+  --debug OpenXPKI::Server:10 --debug OpenXPKI::Crypto::.*:20
+
+=item B<--debug MODULE[=BITMASK]>
+
+Show debug messages of MODULE whose level fits into the given BITMASK
+(i.e. "level AND BITMASK == level").
+BITMASK can be specified as a decadic or binary number (e.g. 5 or
+0b101). If not given BITMASK defaults to 1.
+
+=item B<--nocensor>
+
+Turn off censoring in the Debug module.
+
+=item B<--keep-temp-files yes>
+
+Do not delete temporary files.
+B<WARNING>: Files might contain confidential data!
+
+=item B<--no-detach|nd>
+
+Do not fork away the control process - useful to run inside containers
+or from systemd.
+
+=back
+
+=head1 DESCRIPTION
+
+B<openxpkictl> is the start script for the OpenXPKI server process.
+
+=over 8
+
+The openxpkictl script returns a 0 exit value on success, and >0 if  an
+error occurs.
+
+=back
+

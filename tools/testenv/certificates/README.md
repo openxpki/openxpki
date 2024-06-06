@@ -9,7 +9,7 @@ tempdir=$(mktemp -d)
 cp /repo/config/contrib/sampleconfig.sh $tempdir/
 chmod 0755 $tempdir/sampleconfig.sh
 
-perl -pe 's/openxpkictl start/echo "NO! We stop here"\nexit/' -i $tempdir/sampleconfig.sh
+perl -pe 's/openxpkictl start server/echo "NO! We stop here"\nexit/' -i $tempdir/sampleconfig.sh
 perl -pe 's/^(.?DAYS)=.*/$1="25585"/' -i $tempdir/sampleconfig.sh
 
 $tempdir/sampleconfig.sh $tempdir

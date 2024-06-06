@@ -50,7 +50,7 @@ sub start {
 
     $self->__init_server;
 
-    CTX('log')->system->info(sprintf("Server: %s", OpenXPKI::Control::Server::get_version(config => CTX('config'))));
+    CTX('log')->system->info(sprintf("Server: %s", OpenXPKI::Control::Server->new->get_version(config => CTX('config'))));
     CTX('log')->system->info(sprintf("Perl: %s", $^V->normal));
     if (CTX('log')->system->is_debug) {
         CTX('log')->system->debug("Environment:");
@@ -318,7 +318,7 @@ sub sig_term {
 
 sub sig_hup {
     ##! 1: 'start'
-    my $pids = OpenXPKI::Control::Server::get_pids();
+    my $pids = OpenXPKI::Control::Server->get_pids();
 
     CTX('log')->system()->info(sprintf "SIGHUP received - cleanup childs (%01d found)", scalar @{$pids->{worker}});
 

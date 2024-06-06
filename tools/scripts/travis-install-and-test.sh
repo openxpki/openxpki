@@ -95,7 +95,7 @@ sudo ./tools/testenv/mysql-create-schema.sh
 sudo ./tools/testenv/insert-certificates.sh
 
 # Start OpenXPKI (it's in the PATH)
-sudo openxpkictl start || (cat /var/log/openxpki/*; exit 1)
+sudo openxpkictl start server || (cat /var/log/openxpki/*; exit 1)
 
 #
 # QA tests

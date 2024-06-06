@@ -320,7 +320,7 @@ execute show => "/tools-copy/testenv/mysql-create-schema.sh";
 # Start OpenXPKI and insert test certificates
 #
 `mkdir -p /etc/openxpki/local/keys/`;
-execute show => "/usr/local/bin/openxpkictl start";
+execute show => "/usr/local/bin/openxpkictl start server";
 execute show => "/tools-copy/testenv/insert-certificates.sh";
 
 #

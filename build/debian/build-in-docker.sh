@@ -86,7 +86,7 @@ runtest() {
 
     zcat "/usr/share/doc/libopenxpki-perl/examples/schema-mariadb.sql.gz" | mysql -u root openxpki
 
-    /usr/bin/openxpkictl start
+    /usr/bin/openxpkictl start server
 
     openssl req -batch -x509 -newkey rsa:2048 -days 300 -nodes -keyout vault.key -out vault.crt -subj "/CN=Vault"
     openssl req -batch -x509 -newkey rsa:2048 -days 1050 -nodes -keyout signer.key -out signer.crt -subj "/CN=Test CA Signer"

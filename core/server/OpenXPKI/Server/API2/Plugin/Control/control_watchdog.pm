@@ -61,7 +61,7 @@ command "control_watchdog" => {
         return OpenXPKI::Server::Watchdog->terminate;
     }
     if ("status" eq $action) {
-        my $result = OpenXPKI::Control::Server::get_pids;
+        my $result = OpenXPKI::Control::Server->get_pids;
         return {
             pid => $result->{watchdog},
             children => ref $result->{workflow} ? scalar @{$result->{workflow}} : 0
