@@ -28,7 +28,7 @@ use Sys::Hostname;
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
-use OpenXPKI::Control;
+use OpenXPKI::Control::Server;
 use OpenXPKI::Server;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
@@ -361,7 +361,7 @@ sub start_or_reload {
     my %args = @_;
 
     ##! 1: 'start'
-    my $pids = OpenXPKI::Control::get_pids();
+    my $pids = OpenXPKI::Control::Server::get_pids();
 
     # Start watchdog if not running
     if (not scalar @{$pids->{watchdog}}) {
@@ -398,7 +398,7 @@ This will NOT kill the watchdog but tell it to gracefully stop.
 =cut
 sub terminate {
     ##! 1: 'terminate'
-    my $pids = OpenXPKI::Control::get_pids();
+    my $pids = OpenXPKI::Control::Server::get_pids();
 
     if (scalar $pids->{watchdog}) {
         kill 'TERM', @{$pids->{watchdog}};
@@ -429,7 +429,7 @@ sub run {
     CTX('log')->system->info('Watchdog: starting' . (scalar @userinfo ? ' with '.join(',', @userinfo) : ''));
 
     # Check if we already have a watchdog running
-    my $result = OpenXPKI::Control::get_pids();
+    my $result = OpenXPKI::Control::Server::get_pids();
     my $instance_count = scalar @{$result->{watchdog}};
     if ($instance_count >= $self->max_instance_count()) {
         OpenXPKI::Exception->throw(
@@ -578,7 +578,7 @@ sub __main_loop {
             if ($self->interval_status_update &&
                 ((time - $beacon->{last_update}) > $self->interval_status_update )) {
 
-                my $pids = OpenXPKI::Control::get_pids();
+                my $pids = OpenXPKI::Control::Server::get_pids();
                 my $now = time()*1000;
                 foreach my $key ('watchdog','worker','workflow') {
                     my $value = scalar @{$pids->{$key}};

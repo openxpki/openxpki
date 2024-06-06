@@ -62,7 +62,7 @@ command "get_ui_system_status" => {
     }
 
     # Process count
-    my $pids = OpenXPKI::Control::get_pids();
+    my $pids = OpenXPKI::Control::Server::get_pids();
 
     my $config =  CTX('config')->get_hash("system.version");
 

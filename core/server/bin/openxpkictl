@@ -17,7 +17,7 @@ use Feature::Compat::Try;
 
 # Project modules
 use OpenXPKI::Debug;
-use OpenXPKI::Control;
+use OpenXPKI::Control::Server;
 use OpenXPKI::VERSION;
 
 
@@ -75,12 +75,12 @@ my $cmd = shift;
 
 if ($cmd eq 'version') {
 
-    print OpenXPKI::Control::get_version( config_args => $args ) . "\n";
+    print OpenXPKI::Control::Server::get_version( config_args => $args ) . "\n";
     exit 0;
 
 } elsif ($cmd eq 'status') {
 
-    if (OpenXPKI::Control::status( $args )) {
+    if (OpenXPKI::Control::Server::status( $args )) {
         exit 3;
     }
     exit 0;
@@ -134,15 +134,15 @@ if ($cmd eq 'version') {
         }
     }
 
-    exit OpenXPKI::Control::start( $args );
+    exit OpenXPKI::Control::Server::start( $args );
 
 } elsif ($cmd eq 'stop') {
 
-    exit OpenXPKI::Control::stop( $args );
+    exit OpenXPKI::Control::Server::stop( $args );
 
 } elsif ($cmd eq 'reload') {
 
-    exit OpenXPKI::Control::reload( $args );
+    exit OpenXPKI::Control::Server::reload( $args );
 
 } elsif ($cmd eq 'terminal') {
 

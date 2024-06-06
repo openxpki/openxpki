@@ -10,7 +10,7 @@ OpenXPKI::Server::API2::Plugin::Control::reload
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Types;
-use OpenXPKI::Control;
+use OpenXPKI::Control::Server;
 
 =head1 COMMANDS
 
@@ -30,7 +30,7 @@ command "reload" => {
 
     my ($self, $params) = @_;
 
-    OpenXPKI::Control::reload();
+    OpenXPKI::Control::Server::reload();
     return 1;
 
 };

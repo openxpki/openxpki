@@ -15,7 +15,7 @@ OpenXPKI/Base/API/Plugin.pm
 OpenXPKI/Base/API/PluginMetaClassTrait.pm
 OpenXPKI/Base/API/PluginRole.pm
 OpenXPKI/Config.pm
-OpenXPKI/Control.pm
+OpenXPKI/Control/Server.pm
 OpenXPKI/DateTime.pm
 OpenXPKI/Debug.pm
 OpenXPKI/Dumper.pm

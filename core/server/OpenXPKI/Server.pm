@@ -15,7 +15,7 @@ use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Watchdog;
 use OpenXPKI::Server::Notification::Handler;
 use OpenXPKI::Util;
-use OpenXPKI::Control;
+use OpenXPKI::Control::Server;
 
 
 our $stop_soon = 0;
@@ -49,7 +49,7 @@ sub start {
 
     $self->__init_server;
 
-    CTX('log')->system->info(sprintf("Server: %s", OpenXPKI::Control::get_version(config => CTX('config'))));
+    CTX('log')->system->info(sprintf("Server: %s", OpenXPKI::Control::Server::get_version(config => CTX('config'))));
     CTX('log')->system->info(sprintf("Perl: %s", $^V->normal));
     if (CTX('log')->system->is_debug) {
         CTX('log')->system->debug("Environment:");
@@ -305,7 +305,7 @@ sub sig_term {
     }
     $stop_soon = 1;
     # terminate the watchdog
-    # This is obsolete for a "global shutdown" using the OpenXPKI::Control::stop
+    # This is obsolete for a "global shutdown" using the OpenXPKI::Control::Server::stop
     # method but should be kept in case somebody sends a term to the daemon which
     # will stop spawning of new childs but should allow existing ones to finish
     # FIXME - this will cause the watchdog to terminate if you kill a child,
@@ -317,7 +317,7 @@ sub sig_term {
 
 sub sig_hup {
     ##! 1: 'start'
-    my $pids = OpenXPKI::Control::get_pids();
+    my $pids = OpenXPKI::Control::Server::get_pids();
 
     CTX('log')->system()->info(sprintf "SIGHUP received - cleanup childs (%01d found)", scalar @{$pids->{worker}});
 

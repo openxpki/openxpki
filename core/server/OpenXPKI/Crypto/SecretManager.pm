@@ -12,7 +12,7 @@ use Template;
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
-use OpenXPKI::Control;
+use OpenXPKI::Control::Server;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Crypto::VolatileVault;
 use OpenXPKI::Serialization::Simple;
@@ -461,7 +461,7 @@ sub _clear_cache {
         );
         ##! 4: "reload OpenXPKI"
         # Deletes secret objects from child processes
-        OpenXPKI::Control::reload();
+        OpenXPKI::Control::Server::reload();
     }
     else {
         OpenXPKI::Exception->throw (
