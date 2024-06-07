@@ -137,7 +137,7 @@ Reload some parts of the config (sends a HUP to the server pid)
 
 sub cmd_reload ($self) {
     my $pid = $self->__get_pid;
-    print STDOUT "Sending 'reload' command to OpenXPKI server (PID: $pid)\n" unless $self->opts->{quiet};
+    print "Sending 'reload' command to OpenXPKI server (PID: $pid)\n" unless $self->opts->{quiet};
     kill HUP => $pid;
     return 0;
 }
@@ -227,12 +227,11 @@ sub start ($self, $arg) {
 
     # Load the required locations from the config
     my $pidfile  = $self->cfg->{pidfile};
-    my $socketfile = $self->cfg->{socketfile};
-
-    if (not $socketfile) {
-        print STDERR "Missing system.server.socket_file in config\n";
-        return 1;
-    }
+    my $socketfile = $self->cfg->{socketfile}
+        or do {
+            warn "Missing config entry: system.server.socket_file\n";
+            return 1;
+        };
 
     # Test if there is a pid file for the current config
     my $pid;
@@ -244,7 +243,7 @@ sub start ($self, $arg) {
             if ($arg->restart) {
                 $self->stop(pid => $pid, silent => $arg->silent);
             } else {
-                print STDERR "OpenXPKI Server already running. PID: $pid\n";
+                warn "OpenXPKI Server already running. PID: $pid\n";
                 return 0;
             }
         }
@@ -254,29 +253,28 @@ sub start ($self, $arg) {
         my ($Major, $Minor) = ($OpenXPKI::VERSION::VERSION =~ m{\A(\d)\.(\d+)});
         my ($major, $minor) = ($core =~ m{\A(\d)\.(\d+)});
         if ($major != $Major) {
-            print STDERR "Major version of code and config differs - unable to proceed\n";
+            warn "Major version of code and config differs - unable to proceed\n";
             return 1;
         }
         if ($Minor < $minor) {
             # config is set for the coming up major version while this
             # is a development build (odd numbers are development)
             if (($minor - $Minor) == 1 and $Minor % 2) {
-                print STDERR sprintf "Config dependency (%s) matches upcoming release\n",
-                    $core;
+                warn "Config dependency ($core) matches upcoming release\n";
             } else {
-                print STDERR sprintf "Config dependency (%s) not fulfilled by this release (%s)\n",
+                warn sprintf "Config dependency (%s) not fulfilled by this release (%s)\n",
                     $core, $OpenXPKI::VERSION::VERSION;
                 return 1;
             }
         }
     } else {
-        print STDERR "Config entry system.version.depend is not set - unable to check required version!\n";
-        print STDERR "Hint: Add expected minimum version to 'system.version.depend.core'\n";
+        warn "Config entry system.version.depend is not set - unable to check required version!\n";
+        warn "Hint: Add expected minimum version to 'system.version.depend.core'\n";
     }
 
     if (not $arg->silent) {
         my $version = $self->get_version;
-        print STDOUT "Starting $version\n";
+        print "Starting $version\n";
     }
     unlink $pidfile if ($pidfile && -e $pidfile);
 
@@ -294,7 +292,7 @@ sub start ($self, $arg) {
             $server->start;
         };
         if ($EVAL_ERROR) {
-            print STDERR $EVAL_ERROR;
+            warn $EVAL_ERROR;
             return 2;
         }
         return 0;
@@ -321,12 +319,12 @@ sub start ($self, $arg) {
                 if ($redo_count > 5) {
                             ## the first message is part of the informal daemon startup message
                             ## the second message is a real error message
-                    print STDOUT "FAILED.\n" unless $arg->silent;
-                    print STDERR "Could not fork process\n";
+                    print "FAILED.\n" unless $arg->silent;
+                    warn "Could not fork process\n";
                     return 2;
                 }
                         ## this is only an informal message and not an error - so do not use STDERR
-                print STDOUT '.' unless $arg->silent;
+                print '.' unless $arg->silent;
                 sleep 5;
                 $redo_count++;
                 redo FORK;
@@ -335,8 +333,8 @@ sub start ($self, $arg) {
             # other fork error
                 ## the first message is part of the informal daemon startup message
                 ## the second message is a real error message
-            print STDOUT "FAILED.\n" unless $arg->silent;
-            print STDERR "Could not fork process: $ERRNO\n";
+            print "FAILED.\n" unless $arg->silent;
+            warn "Could not fork process: $ERRNO\n";
             return 2;
         }
     } until defined $pid;
@@ -357,19 +355,19 @@ sub start ($self, $arg) {
         {
             ## the first message is part of the informal daemon startup message
             ## the second message is a real error message
-            print STDOUT "FAILED.\n" unless $arg->silent;
-            print STDERR "$msg\n";
+            print "FAILED.\n" unless $arg->silent;
+            warn "$msg\n";
             return 2;
         }
 
         # find out if the server is REALLY running properly
         if ($self->status > 0) {
-            print STDERR "Status check failed\n";
+            warn "Status check failed\n";
             return 2;
         }
 
         ## this is only an informal message and not an error - so do not use STDERR
-        print STDOUT "DONE.\n" unless $arg->silent;
+        print "DONE.\n" unless $arg->silent;
         return 0;
 
     # child here
@@ -448,10 +446,10 @@ sub status ($self, $arg) {
         sleep 2 if $i > 0;
     }
     if (not $client) {
-        print STDERR "OpenXPKI server is not running or does not accept requests.\n" unless $arg->silent;
+        warn "OpenXPKI server is not running or does not accept requests.\n" unless $arg->silent;
         return 3;
     }
-    print STDOUT "OpenXPKI Server is running and accepting requests.\n" unless $arg->silent;
+    print "OpenXPKI Server is running and accepting requests.\n" unless $arg->silent;
     return 0;
 }
 
