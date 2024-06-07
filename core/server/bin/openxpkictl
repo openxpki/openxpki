@@ -150,7 +150,18 @@ if ($command eq 'version') {
         join(', ', map { "$_=$options{$_}" } sort keys %options),
         join(', ', @args)
     );
-    $control->$command;
+    try {
+        my $method = $control->can("cmd_$command");
+        exit $control->$method;
+    }
+    catch ($err) {
+        my $magic = 0xDEADBEEF;
+        if (not blessed $err and $err =~ /$magic/) {
+            say "Command '$command' is not implemented for '$scope'";
+        } else {
+            die $err;
+        }
+    }
 
     exit 0;
 
