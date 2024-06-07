@@ -3,9 +3,6 @@ use OpenXPKI -class;
 
 with 'OpenXPKI::Control::Role';
 
-# BIG FAT WARNING! Do not "use" any system packages in the file header,
-# as this will prevent the OXI::Debug filter from working
-
 =head1 OpenXPKI::Control::Server
 
 This is a static helper class that collects some common methods
