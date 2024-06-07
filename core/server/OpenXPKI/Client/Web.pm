@@ -4,13 +4,14 @@ use OpenXPKI -base => 'Mojolicious';
 # Core modules
 use re qw( regexp_pattern );
 use Module::Load ();
+use POSIX ();
 
 # CPAN modules
 use Mojo::Util qw( url_unescape encode tablify );
 
 # Project modules
 use OpenXPKI::Client::Config;
-
+use OpenXPKI::Util;
 
 my $socketfile = $ENV{OPENXPKI_CLIENT_SOCKETFILE} || '/var/openxpki/openxpki.socket';
 
@@ -118,6 +119,8 @@ L<OpenXPKI::Client::Config>. Used in L<OpenXPKI::Client::Web::Controller>.
 =cut
 sub startup ($self) {
     #my $config = $self->{oxi_config_obj} or die 'Missing parameter "oxi_config_obj" to ' . __PACKAGE__ . '->new()';
+    my $user = $self->{oxi_user};
+    my $group = $self->{oxi_group};
 
     #$self->secrets(['Mojolicious rocks']);
 
@@ -170,14 +173,21 @@ sub startup ($self) {
 
         if ($server->isa('Mojo::Server::Prefork')) {
             $server->on(finish => $on_finish);
+            # Drop privileges (manager process)
+            # (the "wait" event happends after PID file creation)
+            $server->once(wait => sub ($server) { $self->_drop_privileges("Manager $$", $server->pid_file, $user, $group) });
+        } else {
+            $self->log->warn('The OpenXPKI Client will only work properly with Mojolicious server Mojo::Server::Prefork');
         }
+        # } elsif ($server->isa('Mojo::Server::Daemon')) {
+        #     # The following does currently not work
+        #     # (it was proposed by a Mojolicious developer in 2018:
+        #     # https://github.com/mojolicious/mojo/issues/1255#issuecomment-417866464)
+        #     $server->ioloop->on(finish => $on_finish);
+        # }
 
-        elsif ($server->isa('Mojo::Server::Daemon')) {
-            # this does currently not work
-            # (it was proposed by a Mojolicious developer in 2018:
-            # https://github.com/mojolicious/mojo/issues/1255#issuecomment-417866464)
-            $server->ioloop->on(finish => $on_finish);
-        }
+        # Drop privileges (worker processes)
+        Mojo::IOLoop->next_tick(sub { $self->_drop_privileges("Worker $$", $server->pid_file, $user, $group) });
     });
 
     #
@@ -237,6 +247,28 @@ sub helper_oxi_config ($self, $service, $no_config) {
     }
 
     return $configs->{$service};
+}
+
+sub _drop_privileges ($self, $label, $pid_file, $user, $group) {
+    my (undef, $uid, undef, $gid) = OpenXPKI::Util->resolve_user_group($user, $group, 'Mojolicious daemon', 1);
+
+    # change file ownership before dropping privileges!
+    chown $uid, -1, $pid_file if defined $uid;
+    chown -1, $gid, $pid_file if defined $gid;
+
+    # drop privileges
+    my @changes = ();
+    if (defined $uid) {
+        $ENV{USER} = getpwuid($uid);
+        $ENV{HOME} = ((getpwuid($uid))[7]);
+        POSIX::setuid($uid);
+        push @changes, "user = $user";
+    }
+    if (defined $gid) {
+        POSIX::setgid($gid);
+        push @changes, "group = $group";
+    }
+    $self->log->info("$label dropped privileges, new process ownership: " . join(', ', @changes)) if @changes;
 }
 
 sub _load_service_class ($self, $service) {
