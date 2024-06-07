@@ -77,18 +77,18 @@ sub getopt_params ($self, $command) {
     );
 }
 
-sub start ($self, $args = [], $opts = {}) {
+sub start ($self) {
     my %params = ();
 
-    $params{restart} = $opts->{__restart} ? 1 : 0;
-    $params{silent} = $opts->{quiet} ? 1 : 0;
-    $params{foreground} = $opts->{nd} ? 1 : 0;
+    $params{restart} = $self->opts->{__restart} ? 1 : 0;
+    $params{silent} = $self->opts->{quiet} ? 1 : 0;
+    $params{foreground} = $self->opts->{nd} ? 1 : 0;
 
-    if (defined $opts->{debug}) {
-        my @debug = split(m{,}, join(',', $opts->{debug}->@*));
+    if (defined $self->opts->{debug}) {
+        my @debug = split(m{,}, join(',', $self->opts->{debug}->@*));
         $params{debug_level} = {};
         $params{debug_bitmask} = {};
-        $params{debug_nocensor} = 1 if defined $opts->{nocensor};
+        $params{debug_nocensor} = 1 if defined $self->opts->{nocensor};
 
         for my $param (@debug) {
             my ($module, $op, $level) = ($param =~ m{ \A ((?!\d).+?)?([:=])?((0b)?\d+)? \z }xms);
@@ -115,11 +115,11 @@ sub start ($self, $args = [], $opts = {}) {
         }
     }
 
-    if ($opts->{'keep-temp-files'}) {
-        if ($opts->{'keep-temp-files'} eq 'yes') {
+    if ($self->opts->{'keep-temp-files'}) {
+        if ($self->opts->{'keep-temp-files'} eq 'yes') {
             $params{keep_temp} = 1;
         } else {
-            warn sprintf("You need to set --keep-temp-files to 'yes' ('%s' was given) ", $opts->{'keep-temp-files'});
+            warn sprintf("You need to set --keep-temp-files to 'yes' ('%s' was given) ", $self->opts->{'keep-temp-files'});
         }
     }
 
@@ -353,9 +353,9 @@ sub __start ($self, $arg) {
     }
 }
 
-sub stop ($self, $args = [], $opts = {}) {
+sub stop ($self) {
     my %params = ();
-    $params{silent} = $opts->{quiet} ? 1 : 0;
+    $params{silent} = $self->opts->{quiet} ? 1 : 0;
     exit $self->__stop( %params );
 }
 
@@ -440,13 +440,14 @@ sub __stop ($self, $arg) {
     }
 }
 
-sub restart ($self, $args = [], $opts = {}) {
-    $self->start($args, { $opts->%*, __restart => 1 });
+sub restart ($self) {
+    $self->opts->{__restart} = 1;
+    $self->start;
 }
 
-sub status ($self, $args = [], $opts = {}) {
+sub status ($self) {
     my %params = ();
-    $params{silent} = $opts->{quiet} ? 1 : 0;
+    $params{silent} = $self->opts->{quiet} ? 1 : 0;
 
     if ($self->__status(%params) > 0) {
         exit 3;
@@ -531,9 +532,9 @@ Reload some parts of the config (sends a HUP to the server pid)
 
 =cut
 
-sub reload ($self, $args = [], $opts = {}) {
+sub reload ($self) {
     my $pid = $self->__get_pid;
-    print STDOUT "Sending 'reload' command to OpenXPKI server.\n" unless $opts->{quiet};
+    print STDOUT "Sending 'reload' command to OpenXPKI server.\n" unless $self->opts->{quiet};
     kill HUP => $pid;
     return 0;
 }

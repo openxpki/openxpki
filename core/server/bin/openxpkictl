@@ -130,24 +130,26 @@ if ($command eq 'version') {
         push @args, shift;
     }
 
-    # Evaluate command+scope specific options
+    # Evaluate (extract) command+scope specific options
     my %options;
     if (my @getopts = $control->getopt_params($command)) {
         TRACE('GetOptions parameters: ' . Dumper \@getopts);
         GetOptions( \%options, @getopts ) or exit 1;
+        $control->opts(\%options);
     }
 
     # Extract command+scope specific positional args AFTER any --options.
     push @args, @ARGV;
+    $control->args(\@args);
+
+    # Execute command
     TRACE(sprintf 'Calling %s->%s with options (%s) and arguments (%s)',
         $class,
         $command,
         join(', ', map { "$_=$options{$_}" } sort keys %options),
         join(', ', @args)
     );
-
-    # Execute command
-    $control->$command(\@args, \%options);
+    $control->$command;
 
     exit 0;
 

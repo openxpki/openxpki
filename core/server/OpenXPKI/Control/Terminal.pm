@@ -53,9 +53,9 @@ sub getopt_params ($self, $command) {
     return ();
 }
 
-sub start ($self, $args = [], $opts = {}) {
+sub start ($self) {
     # start single terminal
-    if (my $proc_name = $args->[0]) {
+    if (my $proc_name = $self->args->[0]) {
         $self->_assert_valid_proc_name($proc_name);
         my $client = $self->manager->proc($proc_name);
         $client->run;
@@ -69,9 +69,9 @@ sub start ($self, $args = [], $opts = {}) {
     }
 }
 
-sub stop ($self, $args = [], $opts = {}) {
+sub stop ($self) {
     # stop single terminal
-    if (my $proc_name = $args->[0]) {
+    if (my $proc_name = $self->args->[0]) {
         $self->_assert_valid_proc_name($proc_name);
         $self->_stop($proc_name);
 
@@ -99,16 +99,16 @@ sub _assert_valid_proc_name ($self, $name) {
     }
 }
 
-sub reload ($self, $args = [], $opts = {}) {
-    $self->restart($opts, $args);
+sub reload ($self) {
+    $self->restart;
 }
 
-sub restart ($self, $args = [], $opts = {}) {
-    $self->stop($opts, $args);
-    $self->start($opts, $args);
+sub restart ($self) {
+    $self->stop;
+    $self->start;
 }
 
-sub status ($self, $args = [], $opts = {}) {
+sub status ($self) {
     my $maxlen = 0; for ($self->manager->list->@*) { $maxlen = length if length > $maxlen };
 
     for my $proc_name ($self->manager->list->@*) {
