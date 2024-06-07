@@ -126,6 +126,40 @@ sub cmd_start ($self) {
     exit $self->start( %params );
 }
 
+sub cmd_stop ($self) {
+    my %params = ();
+    $params{silent} = $self->opts->{quiet} ? 1 : 0;
+    exit $self->stop( %params );
+}
+
+=head2 cmd_reload
+
+Reload some parts of the config (sends a HUP to the server pid)
+
+=cut
+
+sub cmd_reload ($self) {
+    my $pid = $self->__get_pid;
+    print STDOUT "Sending 'reload' command to OpenXPKI server (PID: $pid)\n" unless $self->opts->{quiet};
+    kill HUP => $pid;
+    return 0;
+}
+
+sub cmd_restart ($self) {
+    $self->opts->{__restart} = 1;
+    $self->cmd_start;
+}
+
+sub cmd_status ($self) {
+    my %params = ();
+    $params{silent} = $self->opts->{quiet} ? 1 : 0;
+
+    if ($self->status(%params) > 0) {
+        exit 3;
+    }
+    exit 0;
+}
+
 =head2 start {CONFIG, SILENT, PID, DEBUG, KEEP_TEMP}
 
 Start the server.
@@ -353,12 +387,6 @@ sub start ($self, $arg) {
     }
 }
 
-sub cmd_stop ($self) {
-    my %params = ();
-    $params{silent} = $self->opts->{quiet} ? 1 : 0;
-    exit $self->stop( %params );
-}
-
 =head2 stop
 
 Stop the server
@@ -440,21 +468,6 @@ sub stop ($self, $arg) {
     }
 }
 
-sub cmd_restart ($self) {
-    $self->opts->{__restart} = 1;
-    $self->cmd_start;
-}
-
-sub cmd_status ($self) {
-    my %params = ();
-    $params{silent} = $self->opts->{quiet} ? 1 : 0;
-
-    if ($self->status(%params) > 0) {
-        exit 3;
-    }
-    exit 0;
-}
-
 =head2 status
 
 Check if the server is running
@@ -524,19 +537,6 @@ sub get_version ($self, $arg) {
         return "OpenXPKI Community Edition v$OpenXPKI::VERSION::VERSION";
     }
 
-}
-
-=head2 cmd_reload
-
-Reload some parts of the config (sends a HUP to the server pid)
-
-=cut
-
-sub cmd_reload ($self) {
-    my $pid = $self->__get_pid;
-    print STDOUT "Sending 'reload' command to OpenXPKI server (PID: $pid)\n" unless $self->opts->{quiet};
-    kill HUP => $pid;
-    return 0;
 }
 
 =head2 get_pids
