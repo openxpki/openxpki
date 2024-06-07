@@ -461,7 +461,7 @@ sub _clear_cache {
         );
         ##! 4: "reload OpenXPKI"
         # Deletes secret objects from child processes
-        OpenXPKI::Control::Server->new->reload;
+        OpenXPKI::Control::Server->new->cmd_reload;
     }
     else {
         OpenXPKI::Exception->throw (

@@ -30,7 +30,7 @@ command "reload" => {
 
     my ($self, $params) = @_;
 
-    OpenXPKI::Control::Server->new->reload;
+    OpenXPKI::Control::Server->new->cmd_reload;
     return 1;
 
 };

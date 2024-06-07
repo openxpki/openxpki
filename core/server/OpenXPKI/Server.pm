@@ -306,7 +306,7 @@ sub sig_term {
     }
     $stop_soon = 1;
     # terminate the watchdog
-    # This is obsolete for a "global shutdown" using the OpenXPKI::Control::Server::stop
+    # This is obsolete for a "global shutdown" using the OpenXPKI::Control::Server->new->stop
     # method but should be kept in case somebody sends a term to the daemon which
     # will stop spawning of new childs but should allow existing ones to finish
     # FIXME - this will cause the watchdog to terminate if you kill a child,

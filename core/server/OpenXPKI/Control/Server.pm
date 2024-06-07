@@ -77,7 +77,7 @@ sub getopt_params ($self, $command) {
     );
 }
 
-sub start ($self) {
+sub cmd_start ($self) {
     my %params = ();
 
     $params{restart} = $self->opts->{__restart} ? 1 : 0;
@@ -123,10 +123,10 @@ sub start ($self) {
         }
     }
 
-    exit $self->__start( %params );
+    exit $self->start( %params );
 }
 
-=head2 __start {CONFIG, SILENT, PID, DEBUG, KEEP_TEMP}
+=head2 start {CONFIG, SILENT, PID, DEBUG, KEEP_TEMP}
 
 Start the server.
 
@@ -158,7 +158,7 @@ or other confidential data!
 =back
 
 =cut
-signature_for __start => (
+signature_for start => (
     method => 1,
     named => [
         silent => 'Bool', { default => 0 },
@@ -170,7 +170,7 @@ signature_for __start => (
         keep_temp => 'Bool', { default => 0 },
     ],
 );
-sub __start ($self, $arg) {
+sub start ($self, $arg) {
 
     $File::Temp::KEEP_ALL = 1 if $arg->keep_temp;
 
@@ -209,9 +209,9 @@ sub __start ($self, $arg) {
 
     # If a pid is given, we just check if the server is there
     if (defined $pid and kill(0, $pid)) {
-        if ($self->__status(silent => 1) == 0) {
+        if ($self->status(silent => 1) == 0) {
             if ($arg->restart) {
-                $self->__stop(pid => $pid, silent => $arg->silent);
+                $self->stop(pid => $pid, silent => $arg->silent);
             } else {
                 print STDERR "OpenXPKI Server already running. PID: $pid\n";
                 return 0;
@@ -332,7 +332,7 @@ sub __start ($self, $arg) {
         }
 
         # find out if the server is REALLY running properly
-        if ($self->__status > 0) {
+        if ($self->status > 0) {
             print STDERR "Status check failed\n";
             return 2;
         }
@@ -353,13 +353,13 @@ sub __start ($self, $arg) {
     }
 }
 
-sub stop ($self) {
+sub cmd_stop ($self) {
     my %params = ();
     $params{silent} = $self->opts->{quiet} ? 1 : 0;
-    exit $self->__stop( %params );
+    exit $self->stop( %params );
 }
 
-=head2 __stop
+=head2 stop
 
 Stop the server
 
@@ -373,14 +373,14 @@ Parameters:
 
 =cut
 
-signature_for __stop => (
+signature_for stop => (
     method => 1,
     named => [
         silent => 'Bool', { default => 0 },
         pid => 'Int', { optional => 1 },
     ],
 );
-sub __stop ($self, $arg) {
+sub stop ($self, $arg) {
     my $pid;
     if (defined $arg->pid) {
         $pid = $arg->pid;
@@ -440,22 +440,22 @@ sub __stop ($self, $arg) {
     }
 }
 
-sub restart ($self) {
+sub cmd_restart ($self) {
     $self->opts->{__restart} = 1;
-    $self->start;
+    $self->cmd_start;
 }
 
-sub status ($self) {
+sub cmd_status ($self) {
     my %params = ();
     $params{silent} = $self->opts->{quiet} ? 1 : 0;
 
-    if ($self->__status(%params) > 0) {
+    if ($self->status(%params) > 0) {
         exit 3;
     }
     exit 0;
 }
 
-=head2 __status
+=head2 status
 
 Check if the server is running
 
@@ -471,13 +471,13 @@ Wait I<sleep> seconds before testing
 
 =cut
 
-signature_for __status => (
+signature_for status => (
     method => 1,
     named => [
         silent => 'Bool', { default => 0 },
     ],
 );
-sub __status ($self, $arg) {
+sub status ($self, $arg) {
     my $socketfile = $self->cfg->{socketfile}
         or die "Missing system.server.socket_file in config";
 
@@ -526,15 +526,15 @@ sub get_version ($self, $arg) {
 
 }
 
-=head2 reload
+=head2 cmd_reload
 
 Reload some parts of the config (sends a HUP to the server pid)
 
 =cut
 
-sub reload ($self) {
+sub cmd_reload ($self) {
     my $pid = $self->__get_pid;
-    print STDOUT "Sending 'reload' command to OpenXPKI server.\n" unless $self->opts->{quiet};
+    print STDOUT "Sending 'reload' command to OpenXPKI server (PID: $pid)\n" unless $self->opts->{quiet};
     kill HUP => $pid;
     return 0;
 }

@@ -53,37 +53,55 @@ sub getopt_params ($self, $command) {
     return ();
 }
 
-sub start ($self) {
+sub cmd_start ($self) {
     # start single terminal
     if (my $proc_name = $self->args->[0]) {
         $self->_assert_valid_proc_name($proc_name);
-        my $client = $self->manager->proc($proc_name);
-        $client->run;
+        $self->start($proc_name);
 
     # start all terminals
     } else {
-        for my $proc_name ($self->manager->list->@*) {
-            my $client = $self->manager->proc($proc_name);
-            $client->run;
-        }
+        $self->start($_) for $self->manager->list->@*;
     }
 }
 
-sub stop ($self) {
+sub cmd_stop ($self) {
     # stop single terminal
     if (my $proc_name = $self->args->[0]) {
         $self->_assert_valid_proc_name($proc_name);
-        $self->_stop($proc_name);
+        $self->stop($proc_name);
 
     # stop all terminals
     } else {
-        for my $proc_name ($self->manager->list->@*) {
-            $self->_stop($proc_name);
-        }
+        $self->stop($_) for $self->manager->list->@*;
     }
 }
 
-sub _stop ($self, $name) {
+sub cmd_reload ($self) {
+    $self->restart;
+}
+
+sub cmd_restart ($self) {
+    $self->stop;
+    $self->start;
+}
+
+sub cmd_status ($self) {
+    my $maxlen = 0; for ($self->manager->list->@*) { $maxlen = length if length > $maxlen };
+
+    for my $proc_name ($self->manager->list->@*) {
+        my $ctrl = $self->manager->controller($proc_name);
+        my $pid = $ctrl->check_server;
+        printf "%-${maxlen}s - %s\n", $proc_name, $pid ? "running ($pid)" : "stopped";
+    }
+}
+
+sub start ($self, $name) {
+    my $client = $self->manager->proc($name);
+    $client->run;
+}
+
+sub stop ($self, $name) {
     my $ctrl = $self->manager->controller($name);
     if ($ctrl->check_server) {
         my $client = $self->manager->proc($name);
@@ -96,25 +114,6 @@ sub _assert_valid_proc_name ($self, $name) {
         say STDERR "Unknown terminal daemon name '$name'.";
         say STDERR "Available names (system.terminal): " . join(', ', $self->manager->list->@*);
         exit 1;
-    }
-}
-
-sub reload ($self) {
-    $self->restart;
-}
-
-sub restart ($self) {
-    $self->stop;
-    $self->start;
-}
-
-sub status ($self) {
-    my $maxlen = 0; for ($self->manager->list->@*) { $maxlen = length if length > $maxlen };
-
-    for my $proc_name ($self->manager->list->@*) {
-        my $ctrl = $self->manager->controller($proc_name);
-        my $pid = $ctrl->check_server;
-        printf "%-${maxlen}s - %s\n", $proc_name, $pid ? "running ($pid)" : "stopped";
     }
 }
 

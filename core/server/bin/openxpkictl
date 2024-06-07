@@ -20,7 +20,8 @@ $OUTPUT_AUTOFLUSH = 1;
 
 sub command_list {
     my @commands = sort
-        grep { $_ ne 'getopt_params' }
+        map { my $cmd = $_; $cmd =~ s/^cmd_//; $cmd }
+        grep { $_ =~ /^cmd_/ }
         OpenXPKI::Control::Role->meta->get_required_method_list;
     push @commands, 'help';
     return @commands;

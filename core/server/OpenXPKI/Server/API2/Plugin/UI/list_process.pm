@@ -26,7 +26,7 @@ Returns informations about all child processes of the server process:
 command "list_process" => {
 } => sub {
     my ($self, $params) = @_;
-    return OpenXPKI::Control::Server::list_process();
+    return OpenXPKI::Control::Server->list_process;
 };
 
 __PACKAGE__->meta->make_immutable;

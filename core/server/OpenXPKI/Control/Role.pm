@@ -3,11 +3,11 @@ use OpenXPKI -role;
 
 requires 'getopt_params';
 
-requires 'start';
-requires 'stop';
-requires 'reload';
-requires 'restart';
-requires 'status';
+requires 'cmd_start';
+requires 'cmd_stop';
+requires 'cmd_reload';
+requires 'cmd_restart';
+requires 'cmd_status';
 
 has config_path => (
     is => 'ro',
