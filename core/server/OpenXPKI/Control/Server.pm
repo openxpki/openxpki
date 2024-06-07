@@ -236,7 +236,7 @@ sub start ($self, $arg) {
 
     # Test if there is a pid file for the current config
     my $pid;
-    $pid = __slurp($pidfile) if -e $pidfile;
+    $pid = $self->slurp($pidfile) if -e $pidfile;
 
     # If a pid is given, we just check if the server is there
     if (defined $pid and kill(0, $pid)) {
@@ -351,7 +351,7 @@ sub start ($self, $arg) {
         } until $kid > 0;
 
         # check if child noticed a startup error
-        my $msg = __slurp($READ_FROM_KID);
+        my $msg = $self->slurp($READ_FROM_KID);
 
         if ($msg && length $msg)
         {
@@ -401,68 +401,17 @@ Parameters:
 signature_for stop => (
     method => 1,
     named => [
-        silent => 'Bool', { default => 0 },
         pid => 'Int', { optional => 1 },
+        silent => 'Bool', { default => 0 },
     ],
 );
 sub stop ($self, $arg) {
-    my $pid;
-    if (defined $arg->pid) {
-        $pid = $arg->pid;
-    } else {
-        $pid = $self->__get_pid;
-    }
-
-    if (kill(0, $pid) == 0) {
-        print STDERR "OpenXPKI Server is not running at PID $pid.\n";
-        return 2;
-    }
-
-    my $process_group = getpgrp($pid);
-
-    print STDOUT "Stopping OpenXPKI\n" unless $arg->silent;
-
-    # get all PIDs which belong to the current process group
-    my @pids = __get_processgroup_pids($process_group);
-    my $attempts = 5;
-    my $process_count;
-
-    # try a number of times to send them SIGTERM
-    while ($attempts-- > 0) {
-        $process_count = scalar @pids;
-        last if ($process_count <= 0);
-        print STDOUT "Stopping gracefully, $process_count (sub)processes remaining...\n" unless $arg->silent;
-        foreach my $p (@pids) {
-            kill(15, $p);
-        }
-        sleep 2;
-        @pids = __still_alive(\@pids);    # find out which ones are still alive
-    }
-
-    # still processes left?
-    # slaughter them with SIGKILL
-    $attempts = 5;
-    while ($attempts-- > 0) {
-        $process_count = scalar @pids;
-        last if ($process_count <= 0);
-        print STDOUT "Killing un-cooperative process the hard way, $process_count (sub)processes remaining...\n" unless $arg->silent;
-        foreach my $p (@pids) {
-            kill(9, $p);
-        }
-        sleep 1;
-        @pids = __still_alive(\@pids);    # find out which ones are still alive
-    }
-
-    @pids = __still_alive(\@pids);    # find out which ones are still alive
-    $process_count = scalar @pids;
-    if ($process_count <= 0) {
-        print STDOUT "DONE.\n" unless $arg->silent;
-        return 0;
-    } else {
-        print STDOUT "FAILED.\n" unless $arg->silent;
-        print STDERR "Could not terminate OpenXPKI process ".join(" ", @pids).".\n";
-        return 2;
-    }
+    my $pid = $arg->pid || $self->__get_pid;
+    $self->stop_process(
+        name => 'OpenXPKI Server',
+        pid => $pid,
+        silent => $arg->silent,
+    );
 }
 
 =head2 status
@@ -624,48 +573,10 @@ sub list_process {
 sub __get_pid ($self) {
     die "Missing system.server.pid_file in config\n" unless $self->cfg->{pidfile};
 
-    my $pid = __slurp($self->cfg->{pidfile})
-        or die "Unable to read pidfile (".$self->cfg->{pidfile}.")\n";
+    my $pid = $self->slurp($self->cfg->{pidfile})
+        or die "Unable to read PID file (".$self->cfg->{pidfile}.")\n";
 
     return $pid;
-}
-
-sub __slurp :prototype($) ($file) {
-    my $content = do {
-        local $INPUT_RECORD_SEPARATOR;
-        my $HANDLE;
-        open $HANDLE, "<", $file or return;
-        <$HANDLE>;
-    };
-    chomp $content;
-    return $content;
-}
-
-# returns a list of PIDs that belong to a given process group
-sub __get_processgroup_pids ($process_group) {
-    my @result;
-
-    my $pt = Proc::ProcessTable->new;
-    foreach my $process (@{$pt->table}) {
-        if (getpgrp($process->pid) == $process_group) {
-            push @result, $process->pid;
-        }
-    }
-    return @result;
-}
-
-# Take an array ref, array containing process IDs
-# Check which processes are still alive and return them in an array
-sub __still_alive ($pids) {
-    my @alive;
-
-    foreach my $pid ($pids->@*) {
-        unless (kill(0, $pid) == 0) {
-            push @alive, $pid;   # process is still there
-        }
-    }
-
-    return @alive;
 }
 
 sub __connect_openxpki_daemon ($socketfile) {
@@ -691,6 +602,7 @@ sub __connect_openxpki_daemon ($socketfile) {
     return $client;
 
 }
+
 __PACKAGE__->meta->make_immutable;
 
 __DATA__
