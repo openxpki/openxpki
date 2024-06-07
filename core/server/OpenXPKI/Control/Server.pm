@@ -436,7 +436,7 @@ signature_for status => (
 );
 sub status ($self, $arg) {
     my $socketfile = $self->cfg->{socketfile}
-        or die "Missing system.server.socket_file in config";
+        or die "Missing config entry: system.server.socket_file\n";
 
     my $client;
     my $i = 4;
@@ -569,7 +569,7 @@ sub list_process {
 }
 
 sub __get_pid ($self) {
-    die "Missing system.server.pid_file in config\n" unless $self->cfg->{pidfile};
+    die "Missing config entry: system.server.pid_file\n" unless $self->cfg->{pidfile};
 
     my $pid = $self->slurp($self->cfg->{pidfile})
         or die "Unable to read PID file (".$self->cfg->{pidfile}.")\n";
