@@ -51,18 +51,14 @@ sub cmd_start ($self) {
         or die "Missing config entry: system.client.pid_file\n";
     my $socket_file = $self->opts->{socket_file} || $self->cfg->{socket_file}
         or die "Missing config entry: system.client.socket_file\n";
-    my $socket_user = $self->opts->{socket_user} || $self->cfg->{socket_user};
-    my $socket_group = $self->opts->{socket_group} || $self->cfg->{socket_group};
+    my $enc_socket_file = url_escape(Mojo::File->new($socket_file));
+    my $socket_user = $self->opts->{socket_user} || $self->cfg->{socket_user} || $user;
+    my $socket_group = $self->opts->{socket_group} || $self->cfg->{socket_group} || $group;
 
-    #
-    # Setup
-    #
     $ENV{MOJO_MODE} = 'production' unless $self->opts->{debug};
 
-    my $enc_path = url_escape(Mojo::File->new($socket_file));
-
     my $daemon = Mojo::Server::Prefork->new(
-        listen => ["http+unix://$enc_path"],
+        listen => ["http+unix://$enc_socket_file"],
         reverse_proxy => 1,
         pid_file => $pid_file,
         cleanup => 0, # don't try to delete PID file (would fail for non-root user and PID file e.g. below /run )
@@ -78,37 +74,12 @@ sub cmd_start ($self) {
         # daemon owner
         oxi_user => $user,
         oxi_group => $group,
+        oxi_socket_user => $socket_user,
+        oxi_socket_group => $socket_group,
         # config object
         #oxi_config_obj => ...,
     });
-
-    #
-    # Start daemon
-    #
-    $daemon->start; # socketfile will be created only after this
-
-    #
-    # Modify socket ownership and permissions
-    #
-    my (undef, $s_uid, undef, $s_gid) = OpenXPKI::Util->resolve_user_group(
-        $socket_user, $socket_group, 'socket', 1
-    );
-    #my $socket_file = $daemon->ioloop->acceptor($daemon->acceptors->[0])->handle->hostpath;
-    chmod 0660, $socket_file;
-    my @changes = ();
-    if (defined $s_uid) {
-        chown $s_uid, -1, $socket_file;
-        push @changes, "user = $socket_user";
-    }
-    if (defined $s_gid) {
-        chown -1, $s_gid, $socket_file;
-        push @changes, "group = $socket_group";
-    }
-    $log->info('Socket ownership set to: ' . join(', ', @changes)) if @changes;
-
-    #
-    # Run event loop, Run!
-    #
+    #$daemon->start; # socketfile will be created only after this
     $daemon->run;
 }
 
