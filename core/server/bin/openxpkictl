@@ -8,9 +8,11 @@ use File::Spec;
 use List::Util qw( any );
 use FindBin qw( $Script );
 use Module::Load ();
+use Module::Metadata;
 
 # CPAN modules
 use Log::Log4perl qw( :easy :no_extra_logdie_message );
+use PPI::Document;
 
 # Project modules
 use OpenXPKI::Control::Role;
@@ -41,7 +43,7 @@ sub show_pod (@args) {
     my $scopes = join "\n", map { '    ' . $_ } sort keys scope_classes->%*;
 
     # inject variables
-    my $pod = delete $args{-oxi_pod} // do { local $/; <DATA> };
+    my $pod = delete $args{-oxi_pod} // get_file_pod(__FILE__);
     $pod =~ s/%%CONTROL_SCRIPT%%/$Script/g;
     $pod =~ s/%%CONTROL_COMMANDS%%/$commands/g;
     $pod =~ s/%%CONTROL_SCOPES%%/$scopes/g;
@@ -49,6 +51,18 @@ sub show_pod (@args) {
     # print formatted POD
     open my $pod_fh, '<', \$pod;
     pod2usage(%args, -input => $pod_fh);
+}
+
+sub get_class_pod ($class) {
+    my $meta = Module::Metadata->new_from_module($class);
+    return get_file_pod($meta->filename);
+}
+
+sub get_file_pod ($filename) {
+    my $doc = PPI::Document->new($filename);
+    my $sub_nodes = $doc->find( sub { $_[1]->isa('PPI::Token::Pod') } );
+    my $pod = join "\n", map { $_->content } $sub_nodes->@*;
+    return $pod || "=head1 USAGE\n\nNo specific help available\n";
 }
 
 # Help
@@ -109,20 +123,23 @@ if ($command eq 'version') {
     exit 0;
 
 } elsif (any { $command eq $_} (command_list) ) {
-    my $scope = shift
-      or LOGDIE("Missing scope after command.\nAvailable scopes: " . join(', ', sort keys scope_classes->%*));
+    my $scope = shift;
+
+    if (not $scope) {
+        if ($opt{help}) {
+            show_pod(-verbose => 1, -oxi_pod => "=head1 USAGE\n\n$Script $command SCOPE\n\nSCOPEs:\n\n%%CONTROL_SCOPES%%\n");
+        } else {
+            LOGDIE("Missing scope after command.\nAvailable scopes: " . join(', ', sort keys scope_classes->%*));
+        }
+    }
+
     my $class = scope_classes->{$scope}
       or LOGDIE("Unknown scope '$scope'.\nAvailable scopes: " . join(', ', sort keys scope_classes->%*));
 
     Module::Load::load($class);
-    my $control = $class->new(%role_attrs);
 
-    if ($command eq 'help') {
-        # load POD from __DATA__ section of target package
-        my $fh;
-        eval '$fh = \*'.$class.'::DATA'; ## no critic (ProhibitStringyEval)
-        my $pod = do { local $/; <$fh> } || "=head1 USAGE\n\nNo specific help available for scope '$scope'";
-        show_pod(-oxi_pod => $pod);
+    if ($opt{help} or $command eq 'help') {
+        show_pod(-verbose => 1, -oxi_pod => get_class_pod($class));
     }
 
     # Extract command+scope specific positional args BEFORE any --options.
@@ -130,6 +147,8 @@ if ($command eq 'version') {
     while (@ARGV and $ARGV[0] !~ /^-/) {
         push @args, shift;
     }
+
+    my $control = $class->new(%role_attrs);
 
     # Evaluate (extract) command+scope specific options
     my %options;
@@ -168,8 +187,6 @@ if ($command eq 'version') {
 } else {
     LOGDIE("Unknown command '$command'.\nAvailable commands: " . join(', ', command_list));
 }
-
-__DATA__
 
 =head1 NAME
 
