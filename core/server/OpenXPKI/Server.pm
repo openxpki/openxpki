@@ -16,6 +16,7 @@ use OpenXPKI::Server::Watchdog;
 use OpenXPKI::Server::Notification::Handler;
 use OpenXPKI::Util;
 use OpenXPKI::Control::Server;
+use OpenXPKI::Service::CLI;
 
 
 our $stop_soon = 0;
