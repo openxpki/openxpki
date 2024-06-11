@@ -457,18 +457,6 @@ sub do_process_request {
              SERIALIZATION => $serializer,
         });
     }
-    elsif ($data eq 'SCEP') {
-        $service = OpenXPKI::Service::SCEP->new({
-            TRANSPORT     => $transport,
-            SERIALIZATION => $serializer,
-        });
-    }
-    elsif ($data eq 'LibSCEP') {
-        $service = OpenXPKI::Service::LibSCEP->new({
-            TRANSPORT     => $transport,
-            SERIALIZATION => $serializer,
-        });
-    }
     elsif ($data eq 'CLI') {
         my $idle_timeout = CTX('config')->get('system.server.service.CLI.idle_timeout');
         my $max_execution_time = CTX('config')->get('system.server.service.CLI.max_execution_time');
