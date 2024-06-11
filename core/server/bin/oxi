@@ -12,6 +12,31 @@ use OpenXPKI::Client::API::Response;
 use OpenXPKI::Client::CLI;
 use OpenXPKI::DTO::Authenticator;
 
+sub handle_error ($err, $debug_details = '') {
+    # a simple plain error message
+    if (not ref $err) {
+        ERROR(OpenXPKI::i18n::i18nTokenizer($err));
+        exit 10;
+    }
+
+    # known special error
+    if (blessed $err) {
+        if ($err->isa('OpenXPKI::DTO::ValidationException')) {
+            ERROR(OpenXPKI::i18n::i18nTokenizer($err->message));
+            exit 10;
+        }
+        if ($err->isa('OpenXPKI::Exception')) {
+            ERROR(OpenXPKI::i18n::i18nTokenizer($err->message)) unless $err->__is_logged;
+            exit 10;
+        }
+    }
+
+    # unknown error
+    ERROR($debug_details) if $debug_details;
+    ERROR(sprintf "Something went wrong (%s)", ref $err);
+    exit 255;
+}
+
 set_language('en_US');
 use Log::Log4perl qw(:easy :no_extra_logdie_message);
 pod2usage( -verbose => 1 ) unless (@ARGV);
@@ -81,9 +106,14 @@ while (@ARGV && substr($ARGV[0],0,1) ne '-') {
 }
 
 # Create GetOption spec from the parameters recorded in the command
-if (my @getopts = $api->getopt_params($command, $subcommand)) {
-    TRACE('GetOptions parameters: ' . Dumper \@getopts);
-    GetOptions( \%params, @getopts ) || exit 1;
+try {
+    if (my @getopts = $api->getopt_params($command, $subcommand)) {
+        TRACE('GetOptions parameters: ' . Dumper \@getopts);
+        GetOptions( \%params, @getopts ) || exit 1;
+    }
+}
+catch ($error) {
+    handle_error($error);
 }
 
 # reserved internal command parameters
@@ -154,8 +184,8 @@ catch ($err) {
 TRACE(Dumper $res);
 
 my $json = JSON::PP->new();
-if ($res->state == 200) {
 
+if ($res->state == 200) {
     my $out = $res->payload;
     if (blessed $out) {
         $out = $out->params();
@@ -174,28 +204,10 @@ if ($res->state == 200) {
     }
     exit 0;
 
+} else {
+    handle_error($res->payload, sprintf("State: %d", $res->state));
 }
 
-# a simple plain error message
-if (not ref $res->payload) {
-    ERROR(OpenXPKI::i18n::i18nTokenizer($res->payload));
-    exit 10;
-}
-
-if (blessed $res->payload) {
-    if ($res->payload->isa('OpenXPKI::DTO::ValidationException')) {
-        ERROR(OpenXPKI::i18n::i18nTokenizer($res->payload->message));
-        exit 10;
-    }
-    if ($res->payload->isa('OpenXPKI::Exception')) {
-        ERROR(OpenXPKI::i18n::i18nTokenizer($res->payload->message))
-            unless $res->payload->__is_logged;
-        exit 10;
-    }
-}
-
-ERROR(sprintf "Something went wrong (%d, %s)", $res->state, ref $res->payload);
-exit 255;
 
 =head1 NAME
 
