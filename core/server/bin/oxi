@@ -176,20 +176,22 @@ if ($res->state == 200) {
 
 }
 
-if (blessed $res->payload and $res->payload->isa('OpenXPKI::DTO::ValidationException')) {
-    ERROR(OpenXPKI::i18n::i18nTokenizer($res->payload->message));
-    exit 10;
-}
-
 # a simple plain error message
-if (ref $res->payload eq '') {
+if (not ref $res->payload) {
     ERROR(OpenXPKI::i18n::i18nTokenizer($res->payload));
     exit 10;
 }
 
-if (blessed $res->payload and $res->payload->isa('OpenXPKI::Exception')) {
-    # We assume that all OpenXPKI::Exceptions are already logged
-    exit 10;
+if (blessed $res->payload) {
+    if ($res->payload->isa('OpenXPKI::DTO::ValidationException')) {
+        ERROR(OpenXPKI::i18n::i18nTokenizer($res->payload->message));
+        exit 10;
+    }
+    if ($res->payload->isa('OpenXPKI::Exception')) {
+        ERROR(OpenXPKI::i18n::i18nTokenizer($res->payload->message))
+            unless $res->payload->__is_logged;
+        exit 10;
+    }
 }
 
 ERROR(sprintf "Something went wrong (%d, %s)", $res->state, ref $res->payload);
@@ -197,7 +199,7 @@ exit 255;
 
 =head1 NAME
 
-oxi - tool for managing OpenXPKI instances and artefacts
+oxi - Manage OpenXPKI instances and artefacts
 
 =head1 USAGE
 

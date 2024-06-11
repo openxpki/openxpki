@@ -12,7 +12,7 @@ use Log::Log4perl;
 use OpenXPKI::i18n qw( i18nGettext );
 use Exception::Class (
     'OpenXPKI::Exception' => {
-        fields => [ 'children', 'params' ],
+        fields => [ 'children', 'params', '__is_logged' ],
     },
     # Validation failed on workflow or api input field
     'OpenXPKI::Exception::InputValidator' => {
@@ -180,9 +180,11 @@ sub throw {
         if (OpenXPKI::Server::Context::hascontext('log')) {
             my $log = OpenXPKI::Server::Context::CTX('log');
             $log->$facility()->$priority( $message );
+            $self->{__is_logged} = 1;
         } else {
             my $log = Log::Log4perl->get_logger('openxpki.'. $facility );
             $log->$priority( $message );
+            $self->{__is_logged} = 1;
         }
     };
 
