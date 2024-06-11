@@ -444,6 +444,15 @@ sub do_process_request {
     ##! 2: "service detector - deserializing data"
     my $data = $serializer->deserialize ($transport->read());
 
+    my $check_service_enabled = sub ($service_name) {
+        if (CTX('config')->get("system.server.service.$service_name.enabled")) {
+            return 1;
+        } else {
+            $transport->write($serializer->serialize("Service '$service_name' is not enabled.\n"));
+            $log->warn("Request to disabled service '$service_name'");
+            return;
+        }
+    };
     ##! 64: "service detector - received type: $data"
 
     # By the way, if you're adding support for a new service here,
@@ -452,12 +461,14 @@ sub do_process_request {
     my $service;
 
     if ($data eq "Default") {
+        $check_service_enabled->($data) or return;
         $service = OpenXPKI::Service::Default->new({
              TRANSPORT     => $transport,
              SERIALIZATION => $serializer,
         });
     }
     elsif ($data eq 'CLI') {
+        $check_service_enabled->($data) or return;
         my $idle_timeout = CTX('config')->get('system.server.service.CLI.idle_timeout');
         my $max_execution_time = CTX('config')->get('system.server.service.CLI.max_execution_time');
 
@@ -471,7 +482,7 @@ sub do_process_request {
     }
     else {
         $transport->write($serializer->serialize("OpenXPKI::Server: Unsupported service.\n"));
-        $log->fatal("Unsupported service.");
+        $log->fatal("Request to unsupported service '$data'");
         return;
     }
 
