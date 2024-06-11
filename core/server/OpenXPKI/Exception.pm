@@ -131,11 +131,11 @@ sub throw {
     $proto->rethrow if ref $proto;
 
     # lazy mode -  message string given as single argument
-    my %args = (@_);
+    my %args;
     if (scalar @_ == 1) {
-        %args = (message => shift );
+        %args = (message => shift);
     } else {
-        %args           = (@_);
+        %args = (@_);
     }
 
     # If an error is given and the error is an OpenXPKI::Exception
