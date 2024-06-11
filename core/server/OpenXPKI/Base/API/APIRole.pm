@@ -502,7 +502,8 @@ signature_for get_command_attributes => (
 );
 sub get_command_attributes ($self, $namespace, $command) {
     $namespace //= ''; # convert undef to empty string (= root namespace)
-    my $package = $self->namespace_commands($namespace)->{ $command };
+    my $package = $self->namespace_commands($namespace)->{ $command }
+        or OpenXPKI::Exception->throw('Unknown API command: ' . $command);
     my $meta = $package->meta;
 
     OpenXPKI::Exception->throw(

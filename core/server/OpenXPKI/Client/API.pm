@@ -119,7 +119,7 @@ It throws a C<OpenXPKI::DTO::ValidationException> object on validation
 errors.
 
 =cut
-# $params - ArrayRef[Moose::Meta::Attribute]
+# $input_params - HashRef[Str]
 sub preprocess_params ($self, $command, $input_params, $plugin) {
     for my $name (keys $input_params->%*) {
         my $val = $input_params->{$name};
