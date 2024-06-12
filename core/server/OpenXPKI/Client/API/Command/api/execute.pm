@@ -16,12 +16,6 @@ Run a bare API command on the server
 
 =cut
 
-sub hint_command ($self, $input_params) {
-    my $actions = $self->run_enquiry('command');
-    $self->log->trace(Dumper $actions->result) if ($self->log->is_trace);
-    return $actions->result || [];
-}
-
 command "execute" => {
     command => { isa => 'Str', label => 'Command', hint => 'hint_command', required => 1 },
 } => sub ($self, $param) {
@@ -37,12 +31,12 @@ command "execute" => {
             $cmd_parameters->{$key} = $payload->{$key};
             delete $payload->{$key};
         } elsif ($api_params->{$key}->{required}) {
-            die "The parameter $key is mandatory for running $command";
+            die "The parameter *$key* is mandatory for running '$command'\n";
         }
     }
 
     if (my @keys = keys %$payload) {
-        die "One or more arguments are not accepted by the API command: " . join(',', @keys);
+        die "One or more arguments are not accepted by the API command: " . join(',', @keys) . "\n";
     }
 
     my $res = $self->run_command($param->command, $cmd_parameters);

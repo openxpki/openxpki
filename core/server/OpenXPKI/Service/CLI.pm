@@ -333,10 +333,10 @@ sub __handle_enquiry {
             ##! 64: $command
             $result = $self->api->command_help($command);
         } else {
-            $result = { result => [ sort keys $self->api->commands->%* ] }
+            $result = { result => [ sort keys $self->api->namespace_commands->%* ] }
         }
     } elsif ($enquiry eq 'realm') {
-        $result = { result => $self->api->get_realm_list };
+        $result = { result => $self->api->autoloader->get_realm_list };
     }
 
     return OpenXPKI::DTO::Message::Response->new(params => $result);

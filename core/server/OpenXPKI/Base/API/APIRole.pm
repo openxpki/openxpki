@@ -466,7 +466,8 @@ sub dispatch ($self, $arg) {
     return $result;
 }
 
-# TODO - might be better part of the bootstrap process to have this cached?
+# TODO Might be better part of the bootstrap process to have this cached?
+# TODO Add $namespace argument (default to '')
 signature_for command_help => (
     method => 1,
     positional => [
@@ -498,7 +499,7 @@ parameters of the given command.
 =cut
 signature_for get_command_attributes => (
     method => 1,
-    positional => [ 'Str', 'Str' ],
+    positional => [ 'Str|Undef', 'Str' ],
 );
 sub get_command_attributes ($self, $namespace, $command) {
     $namespace //= ''; # convert undef to empty string (= root namespace)
