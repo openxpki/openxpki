@@ -254,13 +254,18 @@ export default class OxiSectionFormComponent extends Component {
             // encode ArrayBuffer as Base64 and change field name as a flag
             let encodeValue = (val) => {
                 if (val instanceof ArrayBuffer) {
-                    newName = `_encoded_base64_${newName}`;
-                    return btoa(String.fromCharCode(...new Uint8Array(val)));
+                    newName = `_encoded_base64_${newName}`
+                    let bytes = new Uint8Array(val)
+                    let len = bytes.byteLength
+                    let binary = ''
+                    for (let i = 0; i < len; i++) {
+                        binary += String.fromCharCode(bytes[i])
+                    }
+                    return window.btoa(binary)
+                } else {
+                    return val
                 }
-                else {
-                    return val;
-                }
-            };
+            }
 
             let value = potentialClones[0].clonable
                 ? potentialClones.map(c => encodeValue(c.value))    // array for clonable fields
