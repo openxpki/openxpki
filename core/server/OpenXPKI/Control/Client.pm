@@ -3,6 +3,19 @@ use OpenXPKI -class;
 
 with 'OpenXPKI::Control::Role';
 
+=head1 DESCRIPTION
+
+Control OpenXPKI service handler (web server) processes.
+
+Configuration path: C<system.client>
+
+=head1 OpenXPKI::Control::Client
+
+As the backend of C<openxpkictl COMMAND client> (i.e. the I<client> scope)
+this class implements all methods required by L<OpenXPKI::Control::Role>.
+
+=cut
+
 # CPAN modules
 use Mojo::Server::Prefork;
 use Mojo::Util qw( extract_usage getopt url_escape );
@@ -44,6 +57,7 @@ sub getopt_params ($self, $command) {
     );
 }
 
+# required by OpenXPKI::Control::Role
 sub cmd_start ($self) {
     my $user = $self->opts->{user} || $self->cfg->{user};
     my $group = $self->opts->{group} || $self->cfg->{group};
@@ -83,6 +97,7 @@ sub cmd_start ($self) {
     $daemon->run;
 }
 
+# required by OpenXPKI::Control::Role
 sub cmd_stop ($self) {
     my $pid = $self->__get_pid;
     $self->stop_process(
@@ -91,15 +106,18 @@ sub cmd_stop ($self) {
     );
 }
 
+# required by OpenXPKI::Control::Role
 sub cmd_reload ($self) {
     $self->cmd_restart;
 }
 
+# required by OpenXPKI::Control::Role
 sub cmd_restart ($self) {
     $self->cmd_stop;
     $self->cmd_start;
 }
 
+# required by OpenXPKI::Control::Role
 sub cmd_status ($self) {
     die 0xDEADBEEF;
 }
@@ -114,3 +132,51 @@ sub __get_pid ($self) {
 }
 
 __PACKAGE__->meta->make_immutable;
+
+=head1 OPTIONS
+
+=over
+
+=item B<--user NAME|UID>
+
+=item B<-u NAME|UID>
+
+Target user for the web server (default: current user)
+
+=item B<--group NAME|GID>
+
+=item B<-g NAME|GID>
+
+Target group for the web server (default: current group)
+
+=item B<--socket-file PATH>
+
+=item B<-s PATH>
+
+Path of the socket file (required)
+
+=item B<--socket-user NAME|UID>
+
+Target user for the socket file (default: process user)
+
+=item B<--socket-group NAME|GID>
+
+Target group for the socket file (default: process group)
+
+=item B<--debug>
+
+=item B<-d>
+
+Debug mode, also enables Mojolicious development mode:
+
+=over
+
+=item * treat all requests as if transmitted over HTTPS,
+
+=item * log to screen (ignore Log4perl configuration),
+
+=item * print detailed Mojolicious exceptions.
+
+=back
+
+=back

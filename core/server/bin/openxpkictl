@@ -234,7 +234,7 @@ SCOPEs:
 
 =head1 OPTIONS
 
-=over 8
+=over
 
 =item B<--help>
 
@@ -260,7 +260,7 @@ the proposed config path layout (/etc/openxpki/I<NAME>/config.d).
 
 B<openxpkictl> is the start script for the OpenXPKI server process.
 
-=over 8
+=over
 
 The openxpkictl script returns a 0 exit value on success, and >0 if  an
 error occurs.

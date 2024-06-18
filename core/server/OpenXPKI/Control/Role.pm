@@ -1,7 +1,49 @@
 package OpenXPKI::Control::Role;
 use OpenXPKI -role;
 
+=head1 OpenXPKI::Control::Role
+
+Role that must be consumed by backend classes that provide an C<openxpkictl>
+scope:
+
+=over
+
+=item * L<OpenXPKI::Control::Client>
+
+=item * L<OpenXPKI::Control::Server>
+
+=item * L<OpenXPKI::Control::Terminal>
+
+=back
+
+=head1 REQUIRED METHODS
+
+=head2 getopt_params
+
+Passed parameter: C<$command> I<Str>.
+
+Must return a list of parameters to pass to L<Getopt::Long/GetOptions>.
+
+=cut
 requires 'getopt_params';
+
+=head2 cmd_start
+
+=head2 cmd_stop
+
+=head2 cmd_reload
+
+Should reload the configuration without restart if possible. Otherwise it should
+just call L</cmd_restart>.
+
+=head2 cmd_restart
+
+=head2 cmd_status
+
+Should return the value C<0> if the processes are running, a value C<E<gt> 0>
+otherwise.
+
+=cut
 requires 'cmd_start';
 requires 'cmd_stop';
 requires 'cmd_reload';

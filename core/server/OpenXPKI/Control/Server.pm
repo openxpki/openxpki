@@ -3,31 +3,19 @@ use OpenXPKI -class;
 
 with 'OpenXPKI::Control::Role';
 
+=head1 DESCRIPTION
+
+Control OpenXPKI server processes.
+
+Configuration path: C<system.server>
+
 =head1 OpenXPKI::Control::Server
 
-This is a static helper class that collects some common methods
-to interact with the OpenXPKI system.
+As the backend of C<openxpkictl COMMAND server> (i.e. the I<server> scope)
+this class implements all methods required by L<OpenXPKI::Control::Role>.
 
-Parameters common to all methods:
-
-=over
-
-=item CONFIG
-
-filesystem path to the config git repository
-
-=item SILENT
-
-set to 1 to surpress any output
-
-=back
-
-All methods are static and return 0 on success, 1 on configuration
-errors and 2 on system errors.
-
-All Parameters to methods are optional, if no parameters are given
-the OpenXPKI::Config Layer is intanciated and queried for the needed
-values.
+Furthermore it provides the following methods for use from within the OpenXPKI
+server code:
 
 =cut
 
@@ -77,7 +65,8 @@ has __restart => (
 );
 
 
-sub getopt_params ($self, $command) {
+# required by OpenXPKI::Control::Role
+sub getopt_params ($class, $command) {
     return qw(
         debug=s@
         keep-temp-files=s
@@ -87,6 +76,7 @@ sub getopt_params ($self, $command) {
     );
 }
 
+# required by OpenXPKI::Control::Role
 sub cmd_start ($self) {
     my %params = ();
 
@@ -136,16 +126,12 @@ sub cmd_start ($self) {
     exit $self->start( %params );
 }
 
+# required by OpenXPKI::Control::Role
 sub cmd_stop ($self) {
     exit $self->stop(silent => $self->silent);
 }
 
-=head2 cmd_reload
-
-Reload some parts of the config (sends a HUP to the server pid)
-
-=cut
-
+# required by OpenXPKI::Control::Role
 sub cmd_reload ($self) {
     my $pid = $self->__read_pid_file;
     print "Sending 'reload' command to OpenXPKI server (PID: $pid)\n" unless $self->silent;
@@ -153,43 +139,40 @@ sub cmd_reload ($self) {
     return 0;
 }
 
+# required by OpenXPKI::Control::Role
 sub cmd_restart ($self) {
     $self->__restart(1);
     $self->cmd_start;
 }
 
+# required by OpenXPKI::Control::Role
 sub cmd_status ($self) {
     exit $self->status(silent => $self->silent);
 }
 
-=head2 start {CONFIG, SILENT, PID, DEBUG, KEEP_TEMP}
+=head2 start
 
-Start the server.
+Start the server process.
 
-Parameters:
+B<Named parameters>
 
 =over
 
-=item PID
-Pid to check for a running server
+=item * C<silent> I<Bool> - optional: suppress messages. Default: 0
 
-=item RESTART (0|1)
-Weather to restart a running server
+=item * C<foreground> I<Bool> - optional: do not fork away the control process. Default: 0
 
-=item DEBUG_LEVEL
-hashref: module => level
+=item * C<restart> I<Bool> - optional: restart a running server. Default: 0
 
-=item DEBUG_BITMASK
-hashref: module => bitmask
+=item * C<debug_level> I<HashRef> - optional: C<{ module =E<gt> level }>
 
-=item DEBUG_NOCENSOR (0|1)
-turn of censoring of debug messages
+=item * C<debug_bitmask> I<HashRef> - optional: C<{ module =E<gt> bitmask }>
 
-=item KEEP_TEMP (0|1)
-Weather to not delete temp files
+=item * C<debug_nocensor> I<Bool> - optional: turn of censoring of debug messages. Default: 0
 
-B<!!THIS MIGHT BE A SECURITY RISK !!> as files might contain private keys
-or other confidential data!
+=item * C<keep_temp> I<Bool> - optional: do not delete temporary files. Default: 0
+B<THIS MIGHT BE A SECURITY RISK> as files may contain private keys or other
+confidential data!
 
 =back
 
@@ -389,18 +372,19 @@ sub start ($self, $arg) {
 
 =head2 stop
 
-Stop the server
+Stop the server process.
 
-Parameters:
+B<Named parameters>
 
 =over
 
-=item PID
+=item * C<pid> I<Int> - optional: process ID. Default: read ID from PID file
+
+=item * C<silent> I<Bool> - optional: suppress messages. Default: 0
 
 =back
 
 =cut
-
 signature_for stop => (
     method => 1,
     named => [
@@ -421,18 +405,15 @@ sub stop ($self, $arg) {
 
 Check if the server is running
 
-Parameters:
+B<Named parameters>
 
 =over
 
-=item SLEEP
-
-Wait I<sleep> seconds before testing
+=item * C<silent> I<Bool> - optional: suppress messages. Default: 0
 
 =back
 
 =cut
-
 signature_for status => (
     method => 1,
     named => [
@@ -459,6 +440,20 @@ sub status ($self, $arg) {
     }
 }
 
+=head2 get_version
+
+Return the OpenXPKI version string (incl. EE license if any).
+
+B<Named parameters>
+
+=over
+
+=item * C<config> I<OpenXPKI::Config> - optional: configuration. Default: read
+configuration from disk.
+
+=back
+
+=cut
 signature_for get_version => (
     method => 1,
     named => [
@@ -491,31 +486,36 @@ sub get_version ($self, $arg) {
 
 =head2 get_pids
 
-Get a list of all process belonging to this instance
+Static method that lists OpenXPKI server process IDs belonging to the current
+process group.
 
-Returns a hash with keys:
+Returns a I<HashRef> with the following keys (values are single PID):
 
 =over
 
-=item server
+=item C<server> =E<gt> I<Scalar>
 
-Holding the pid of the main server process.
+PID of the main server process.
 
-=item watchdog
+=item C<watchdog> =E<gt> I<ArrayRef>
 
-List of running watchdog process. Usually this is only a single pid but
-can also have more than one. If empty, the watchdog was either disabled
-or terminated due to too many internal errors.
+Watchdog processes. Usually this is only a single PID but can also have more than
+one. If empty, the watchdog was either disabled or terminated due to too many
+internal errors.
 
-=item worker
+=item C<worker> =E<gt> I<ArrayRef>
 
-List of pids of running session workers (connected to the socket). This
-might also be empty if no process is running.
+Session workers (connected to the socket). This might also be empty if no
+process is running.
 
-=item workflow
+=item C<workflow> =E<gt> I<ArrayRef>
 
-List of pids of all workers currently handling workflows (contains
-watchdog and user initiated requests).
+All workers currently handling workflows (contains both: requests initiated by
+watchdog and by a user).
+
+=item C<prometheus> =E<gt> I<Scalar>
+
+PID of the Prometheus agent.
 
 =back
 
@@ -550,7 +550,15 @@ sub get_pids {
 
 =head2 list_process
 
-Get a list of all running workers with pid, time and info
+Static method that returns an I<ArrayRef> with information about all child
+processes of the server process:
+
+    [
+        {
+            pid => 123, time => 1718098183, info => 'openxpkid (main) server',
+            ...
+        }
+    ]
 
 =cut
 
@@ -609,92 +617,25 @@ sub __connect_openxpki_daemon ($socketfile) {
 
 __PACKAGE__->meta->make_immutable;
 
-__DATA__
+=head1 COMMAND DETAILS
 
-=head1 NAME
+Unless stated otherwise, commands return C<0> on success, C<1> on configuration
+errors and C<2> on system errors.
 
-openxpkictl - start/stop script for OpenXPKI server
+=head2 status
 
-=head1 USAGE
+The exit code of C<status> is C<0> if the server is running, C<3> otherwise.
 
-openxpkictl [options] COMMAND
+=head2 reload
 
- Commands:
-   start            Start OpenXPKI daemon
-   stop             Stop OpenXPKI daemon
-   reload           Reload the configuration
-   restart          Restart OpenXPKI daemon
-   status           Get OpenXPKI daemon status
-   version          Print the OpenXPKI version and license info
-   terminal         Control terminal process servers (EE feature)
+The C<reload> command sends a HUP signal to the server. The server then re-reads
+some configuration items and restarts the worker processes.
 
-See below for supported options.
-
-=head1 ARGUMENTS
-
-Available commands:
-
-=over 8
-
-=item B<start>
-
-Start the OpenXPKI daemon.
-
-=item B<stop>
-
-Stop the OpenXPKI daemon.
-
-=item B<reload>
-
-Reload the OpenXPKI daemon, re-reading the config repository.
-Note: Some changes need a restart, see the documentation!
-
-=item B<restart>
-
-Restart the OpenXPKI daemon.
-
-=item B<status>
-
-Check the OpenXPKI daemon status.
-
-=item B<version>
-
-Print information on the version and license.
-
-=item B<terminal>
-
-Control the terminal daemons (EE feature).
-
-A subcommand is required. Executing it without subcommand prints a list of
-the available commands.
-
-=back
+Note: Some changes need a C<restart>, see the documentation.
 
 =head1 OPTIONS
 
-=over 8
-
-=item B<--help>
-
-Print a brief help message and exits.
-
-=item B<--man>
-
-Prints the manual page and exits.
-
-=item B<--config|cfg PATH>
-
-Use PATH to point to the configuration repository (base of yaml tree).
-Defaults to /etc/openxpki/config.d
-
-=item B<--instance|i NAME>
-
-Shortcut to set the config path when running multiple instances using
-the proposed config path layout (/etc/openxpki/I<instance>/config.d).
-
-=item B<--version>
-
-Print program version and exit.
+=over
 
 =item B<--debug MODULE:LEVEL>
 
@@ -713,7 +654,7 @@ You can add multiple --debug options on one command line.
 Examples:
 
   --debug
- (equivalent to --debug .*:1)
+  (equivalent to --debug .*:1)
 
   --debug OpenXPKI::Server
   (equivalent to --debug OpenXPKI::Server:1)
@@ -741,19 +682,7 @@ B<WARNING>: Files might contain confidential data!
 
 =item B<--no-detach|nd>
 
-Do not fork away the control process - useful to run inside containers
-or from systemd.
+Do not fork away the control process - useful to run the server process inside
+containers or from systemd.
 
 =back
-
-=head1 DESCRIPTION
-
-B<openxpkictl> is the start script for the OpenXPKI server process.
-
-=over 8
-
-The openxpkictl script returns a 0 exit value on success, and >0 if  an
-error occurs.
-
-=back
-

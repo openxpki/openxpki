@@ -3,6 +3,20 @@ use OpenXPKI -class;
 
 with 'OpenXPKI::Control::Role';
 
+=head1 DESCRIPTION
+
+Control internally managed OpenXPKI terminal daemon processes (a feature of
+OpenXPKI Enterprise Edition).
+
+Configuration path: C<system.terminal>
+
+=head1 OpenXPKI::Control::Terminal
+
+As the backend of C<openxpkictl COMMAND terminal> (i.e. the I<terminal> scope)
+this class implements all methods required by L<OpenXPKI::Control::Role>.
+
+=cut
+
 # Core modules
 use List::Util qw( none );
 
@@ -119,18 +133,12 @@ sub _assert_valid_proc_name ($self, $name) {
 
 __PACKAGE__->meta->make_immutable;
 
-__DATA__
+=head1 COMMAND DETAILS
 
-=head1 USAGE
-
-Control the terminal daemons (EE feature).
-
-Per default the "start", "stop" and "restart" commands process all internally
+Per default the C<start>, C<stop> and C<restart> commands process all internally
 managed terminal daemons. To start or stop only one daemon, specify its name
 after the command.
 
-E.g. to start the instance configured below system.terminal.intproc run:
+E.g. to start the instance configured at C<system.terminal.intproc> run:
 
-    %%CONTROL_SCRIPT%% start terminal intproc
-
-=back
+    openxpkictl start terminal intproc
