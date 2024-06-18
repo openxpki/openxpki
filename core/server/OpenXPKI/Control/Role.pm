@@ -19,16 +19,14 @@ has config_path => (
 );
 
 has args => (
-    is => 'rw',
+    is => 'ro',
     isa => 'ArrayRef',
-    lazy => 1,
     default => sub { [] },
 );
 
 has opts => (
-    is => 'rw',
+    is => 'ro',
     isa => 'HashRef',
-    lazy => 1,
     default => sub { {} },
 );
 

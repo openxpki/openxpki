@@ -84,7 +84,9 @@ GetOptions( \%opt, qw(
 Getopt::Long::Configure('no_pass_through');
 
 show_pod(-exitstatus => 0, -verbose => 2) if $opt{man};
-show_pod(-verbose => 1) if $opt{help};
+
+# --help without arguments: show our own POD
+show_pod(-verbose => 1) if ($opt{help} and not @ARGV);
 
 my %role_attrs;
 # $args->{SILENT} = $opt{quiet} ? 1 : 0;
@@ -126,8 +128,12 @@ if ($command eq 'version') {
     my $scope = shift;
 
     if (not $scope) {
+        # --help COMMAND: show brief help with available scopes
         if ($opt{help}) {
-            show_pod(-verbose => 1, -oxi_pod => "=head1 USAGE\n\n$Script $command SCOPE\n\nSCOPEs:\n\n%%CONTROL_SCOPES%%\n");
+            show_pod(
+                -verbose => 1,
+                -oxi_pod => "=head1 USAGE\n\n$Script $command SCOPE [OPTIONS]\n\nSCOPEs:\n\n%%CONTROL_SCOPES%%\n",
+            );
         } else {
             LOGDIE("Missing scope after command.\nAvailable scopes: " . join(', ', sort keys scope_classes->%*));
         }
@@ -139,7 +145,22 @@ if ($command eq 'version') {
     Module::Load::load($class);
 
     if ($opt{help} or $command eq 'help') {
-        show_pod(-verbose => 1, -oxi_pod => get_class_pod($class));
+        # oxi help SCOPE: show scope POD
+        show_pod(
+            -oxi_pod => sprintf(
+                "=head1 USAGE\n\n%s %s %s [OPTIONS]\n\n%s",
+                $Script, $command eq 'help' ? 'COMMAND' : $command, $scope,
+                get_class_pod($class),
+            )
+                ,
+            -verbose => 99, # special value to enable '-sections'
+            -sections => [
+                'USAGE',
+                'DESCRIPTION',
+                $command eq 'help' ? 'COMMAND DETAILS' : "COMMAND DETAILS/$command",
+                'OPTIONS',
+            ],
+        );
     }
 
     # Extract command+scope specific positional args BEFORE any --options.
@@ -148,19 +169,23 @@ if ($command eq 'version') {
         push @args, shift;
     }
 
-    my $control = $class->new(%role_attrs);
-
     # Evaluate (extract) command+scope specific options
     my %options;
-    if (my @getopts = $control->getopt_params($command)) {
+    if (my @getopts = $class->getopt_params($command)) {
         TRACE('GetOptions parameters: ' . Dumper \@getopts);
         GetOptions( \%options, @getopts ) or exit 1;
-        $control->opts(\%options);
     }
 
     # Extract command+scope specific positional args AFTER any --options.
     push @args, @ARGV;
-    $control->args(\@args);
+
+    # Instantiate scope class
+    my $control = $class->new(
+        %role_attrs,
+        scalar keys %options ? (opts => \%options) : (),
+        scalar @args ? (args => \@args) : (),
+    );
+
 
     # Execute command
     TRACE(sprintf 'Calling %s->%s with options (%s) and arguments (%s)',
@@ -171,7 +196,8 @@ if ($command eq 'version') {
     );
     try {
         my $method = $control->can("cmd_$command");
-        exit $control->$method;
+        my $code = $control->$method;
+        exit ($code // 0);
     }
     catch ($err) {
         my $magic = 0xDEADBEEF;

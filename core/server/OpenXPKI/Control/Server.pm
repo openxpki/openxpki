@@ -63,6 +63,19 @@ has cfg => (
     },
 );
 
+has silent => (
+    is => 'rw',
+    isa => 'Bool',
+    lazy => 1,
+    default => sub { shift->opts->{quiet} ? 1 : 0 },
+);
+
+has __restart => (
+    is => 'rw',
+    isa => 'Bool',
+    default => 0,
+);
+
 
 sub getopt_params ($self, $command) {
     return qw(
@@ -77,8 +90,8 @@ sub getopt_params ($self, $command) {
 sub cmd_start ($self) {
     my %params = ();
 
-    $params{restart} = $self->opts->{__restart} ? 1 : 0;
-    $params{silent} = $self->opts->{quiet} ? 1 : 0;
+    $params{restart} = $self->__restart ? 1 : 0;
+    $params{silent} = $self->silent;
     $params{foreground} = $self->opts->{nd} ? 1 : 0;
 
     if (defined $self->opts->{debug}) {
@@ -124,9 +137,7 @@ sub cmd_start ($self) {
 }
 
 sub cmd_stop ($self) {
-    my %params = ();
-    $params{silent} = $self->opts->{quiet} ? 1 : 0;
-    exit $self->stop( %params );
+    exit $self->stop(silent => $self->silent);
 }
 
 =head2 cmd_reload
@@ -136,25 +147,19 @@ Reload some parts of the config (sends a HUP to the server pid)
 =cut
 
 sub cmd_reload ($self) {
-    my $pid = $self->__get_pid;
-    print "Sending 'reload' command to OpenXPKI server (PID: $pid)\n" unless $self->opts->{quiet};
+    my $pid = $self->__read_pid_file;
+    print "Sending 'reload' command to OpenXPKI server (PID: $pid)\n" unless $self->silent;
     kill HUP => $pid;
     return 0;
 }
 
 sub cmd_restart ($self) {
-    $self->opts->{__restart} = 1;
+    $self->__restart(1);
     $self->cmd_start;
 }
 
 sub cmd_status ($self) {
-    my %params = ();
-    $params{silent} = $self->opts->{quiet} ? 1 : 0;
-
-    if ($self->status(%params) > 0) {
-        exit 3;
-    }
-    exit 0;
+    exit $self->status(silent => $self->silent);
 }
 
 =head2 start {CONFIG, SILENT, PID, DEBUG, KEEP_TEMP}
@@ -404,8 +409,8 @@ signature_for stop => (
     ],
 );
 sub stop ($self, $arg) {
-    my $pid = $arg->pid || $self->__get_pid;
-    $self->stop_process(
+    my $pid = $arg->pid || $self->__read_pid_file;
+    return $self->stop_process(
         name => 'OpenXPKI Server',
         pid => $pid,
         silent => $arg->silent,
@@ -448,9 +453,10 @@ sub status ($self, $arg) {
     if (not $client) {
         warn "OpenXPKI server is not running or does not accept requests.\n" unless $arg->silent;
         return 3;
+    } else {
+        print "OpenXPKI Server is running and accepting requests.\n" unless $arg->silent;
+        return 0;
     }
-    print "OpenXPKI Server is running and accepting requests.\n" unless $arg->silent;
-    return 0;
 }
 
 signature_for get_version => (
@@ -568,7 +574,7 @@ sub list_process {
     return \@result;
 }
 
-sub __get_pid ($self) {
+sub __read_pid_file ($self) {
     die "Missing config entry: system.server.pid_file\n" unless $self->cfg->{pidfile};
 
     my $pid = $self->slurp($self->cfg->{pidfile})

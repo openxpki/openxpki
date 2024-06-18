@@ -1,6 +1,8 @@
 package OpenXPKI::Control::Terminal;
 use OpenXPKI -class;
 
+with 'OpenXPKI::Control::Role';
+
 # Core modules
 use List::Util qw( none );
 
@@ -9,8 +11,6 @@ use Log::Log4perl qw( :easy :no_extra_logdie_message );
 
 # Project modules
 use OpenXPKI::Config;
-
-with 'OpenXPKI::Control::Role';
 
 
 has manager => (
@@ -26,7 +26,7 @@ sub BUILD ($self, $args) {
     }
     catch ($err) {
         # we assume it's no EE edition if file does not exist
-        die "This is a feature of OpenXPKI Enterprise Edition\n"
+        die "This feature is not available in OpenXPKI Community Edition\n"
           if $err =~ m{locate OpenXPKI/Server/ProcTerminal\.pm in \@INC};
         # unknown error otherwise
         die $err;
