@@ -229,7 +229,7 @@ sub parse_date_utc {
             day       => $day,
             hour      => $hh,
             minute    => $mm,
-            second    => $ss,
+            second    => int($ss), # support for microseconds in parsed date
             time_zone => $zone,
         ),
         time_zone => 'UTC',
