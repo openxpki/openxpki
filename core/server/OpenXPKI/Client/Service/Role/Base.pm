@@ -753,7 +753,10 @@ sub handle_enrollment_request ($self) {
         } elsif (my $key = $conf->{pickup_attribute}) {
             $workflow = $self->pickup_via_attribute($conf->{workflow}, $key, $self->wf_params->{transaction_id});
         }
-        $self->check_workflow_error($workflow); # only for successful pickup!
+        # only if pickup was done at all and did not die
+        if ($workflow) {
+            $self->check_workflow_error($workflow);
+        }
     }
     catch ($error) {
         if (blessed $error and $error->isa('OpenXPKI::Exception::WorkflowPickupFailed')) {
