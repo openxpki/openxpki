@@ -4,11 +4,8 @@ use Moose;
 extends 'Connector';
 
 use English;
-use DateTime;
 use Data::Dumper;
-use OpenXPKI::DateTime;
 use OpenXPKI::Server::Context qw( CTX );
-
 
 has key => (
     is  => 'ro',
@@ -26,9 +23,7 @@ has encrypt => (
     default => 0,
 );
 
-
-# FIXME - the get* methods are untested
-sub get {
+sub _get_node {
 
     my $self = shift;
     my $args = shift;
@@ -66,6 +61,23 @@ sub get {
 
 }
 
+sub get {
+
+    my $self = shift;
+    my $args = shift;
+    my $params = shift // {};
+
+    my $val = $self->_get_node($args, $params);
+
+    return unless defined $val;
+
+    if (ref $val ne '') {
+        die "requested value is not a scalar";
+    }
+    return $val;
+
+}
+
 sub get_list {
 
     my $self = shift;
@@ -73,7 +85,7 @@ sub get_list {
     my $params = shift // {};
     $params->{try_deserialize} = 'simple';
 
-    my $val = $self->get($args, $params);
+    my $val = $self->_get_node($args, $params);
 
     return unless defined $val;
 
@@ -91,7 +103,7 @@ sub get_hash {
     my $params = shift // {};
     $params->{try_deserialize} = 'simple';
 
-    my $val = $self->get($args, $params);
+    my $val = $self->_get_node($args, $params);
 
     return unless defined $val;
 
@@ -109,7 +121,7 @@ sub get_meta {
     my $params = shift // {};
     $params->{try_deserialize} = 'simple';
 
-    my $val = $self->get($args, $params);
+    my $val = $self->_get_node($args, $params);
 
     return unless defined $val;
 
@@ -193,7 +205,7 @@ OpenXPKI::Connector::DataPool;
 
 =head1 DESCRIPTION
 
-Connector to interact with the datapool, the LOCATION defindes the namespace.
+Connector to interact with the datapool, the LOCATION defines the namespace.
 If you pass additional parameters (e.g. from workflow context) by setting
 { extra => ... } in the control parameter, those values are available in the
 EXTRA hash inside all template operations.
@@ -204,7 +216,7 @@ EXTRA hash inside all template operations.
 
 =item key
 
-Scalar, evaluated using template toolkit.
+Scalar, used as key to find the datapool entry, evaluated using template toolkit.
 
 =item value
 
