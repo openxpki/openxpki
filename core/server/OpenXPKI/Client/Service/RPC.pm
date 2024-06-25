@@ -391,18 +391,22 @@ sub parse_rpc_request_body ($self) {
     my $content_type = $self->request->headers->content_type;
 
     $self->log->trace('HTTP request method: ' . $self->request->method);
-    return unless $self->request->body;
+    $self->log->debug("RPC POST data with Content-Type: $content_type");
 
     #
-    # application/x-www-form-urlencoded - nothing to do
+    # Standard forms are handled by Mojolicious
     #
-    if ($content_type =~ m{\Aapplication/x-www-form-urlencoded}) {
+    if (
+        $content_type =~ m{\Aapplication/x-www-form-urlencoded} or
+        $content_type =~ m{\Amultipart/form-data}
+    ) {
         $self->log->trace("URL encoded payload: " . Dumper $self->request->params->to_hash) if $self->log->is_trace;
         return; # no parsing required: Mojolicious already decoded the request parameters
     }
 
     die $self->new_response( 40083 ) unless $self->config->{input}->{allow_raw_post};
-    $self->log->debug("RPC postdata with Content-Type: $content_type");
+
+    return unless $self->request->body;
 
     my $json_str;
     #
