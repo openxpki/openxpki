@@ -531,7 +531,7 @@ after 'BUILD' => sub ($self, $args) {
 
 =head2 request_param
 
-Returns the value of the given GET parameter.
+Returns the value of the given URL- or POST-parameter.
 
 May be overwritten by the consuming class e.g. to query contents of a JSON request.
 
@@ -545,7 +545,7 @@ B<Parameters>
 
 =cut
 sub request_param ($self, $key) {
-    return $self->request->query_params->param($key);
+    return $self->request->params->param($key);
 }
 
 =head2 handle_request
