@@ -232,7 +232,7 @@ sub start {
             } until $kid > 0;
 
             # check if child noticed a startup error
-            my $msg = __slurp $READ_FROM_KID;
+            my $msg = __slurp($READ_FROM_KID);
 
             if ($msg && length $msg)
             {
