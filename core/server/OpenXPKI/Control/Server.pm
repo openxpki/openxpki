@@ -334,6 +334,7 @@ sub start ($self, $arg) {
         my $kid;
         do {
             $kid = waitpid(-1, WNOHANG);
+            sleep 1 unless $kid > 0;
         } until $kid > 0;
 
         # check if child noticed a startup error
