@@ -20,7 +20,6 @@ server code:
 =cut
 
 # Core modules
-use POSIX ":sys_wait_h";
 use Digest::SHA qw( sha256_base64 );
 use File::Temp;
 
@@ -268,106 +267,40 @@ sub start ($self, $arg) {
 
     # common start procedure for forking and foreground mode
     my $start_server = sub {
+        # SILENT is required to work correctly with start-stop-daemons
+        # during a normal System V init
+        require OpenXPKI::Server;
+        my $server = OpenXPKI::Server->new(
+            SILENT => $arg->silent,
+            TYPE => $self->cfg->{type},
+            NODETACH => $arg->foreground,
+        );
+        $server->start;
+    };
+
+    # foreground mode
+    if ($arg->foreground) {
         eval {
-            # SILENT is required to work correctly with start-stop-daemons
-            # during a normal System V init
-            require OpenXPKI::Server;
-            my $server = OpenXPKI::Server->new(
-                SILENT => $arg->silent,
-                TYPE => $self->cfg->{type},
-                NODETACH => $arg->foreground,
-            );
-            $server->start;
+            $start_server->();
         };
         if ($EVAL_ERROR) {
             warn $EVAL_ERROR;
             return 2;
         }
         return 0;
-    };
 
-    # foreground mode
-    if ($arg->foreground) {
-        return $start_server->();
-    }
-
-    # fork off server launcher
-    my $redo_count = 0;
-    my $READ_FROM_KID;
-
-    # fork server away to background
-    FORK:
-    do {
-        # this open call efectively does a fork and attaches the child's
-        # STDOUT to $READ_FROM_KID, allowing the child to send us data.
-        $pid = open($READ_FROM_KID, "-|");
-        if (not defined $pid) {
-            if ($!{EAGAIN}) {
-            # recoverable fork error
-                if ($redo_count > 5) {
-                            ## the first message is part of the informal daemon startup message
-                            ## the second message is a real error message
-                    print "FAILED.\n" unless $arg->silent;
-                    warn "Could not fork process\n";
-                    return 2;
-                }
-                        ## this is only an informal message and not an error - so do not use STDERR
-                print '.' unless $arg->silent;
-                sleep 5;
-                $redo_count++;
-                redo FORK;
-            }
-
-            # other fork error
-                ## the first message is part of the informal daemon startup message
-                ## the second message is a real error message
-            print "FAILED.\n" unless $arg->silent;
-            warn "Could not fork process: $ERRNO\n";
-            return 2;
-        }
-    } until defined $pid;
-
-    # parent here
-    # child process pid is available in $pid
-    if ($pid) {
-
-        my $kid;
-        do {
-            $kid = waitpid(-1, WNOHANG);
-            sleep 1 unless $kid > 0;
-        } until $kid > 0;
-
-        # check if child noticed a startup error
-        my $msg = $self->slurp($READ_FROM_KID);
-
-        if ($msg && length $msg)
-        {
-            ## the first message is part of the informal daemon startup message
-            ## the second message is a real error message
-            print "FAILED.\n" unless $arg->silent;
-            warn "$msg\n";
-            return 2;
-        }
-
-        # find out if the server is REALLY running properly
-        if ($self->status > 0) {
-            warn "Status check failed\n";
-            return 2;
-        }
-
-        ## this is only an informal message and not an error - so do not use STDERR
-        print "DONE.\n" unless $arg->silent;
-        return 0;
-
-    # child here
-    # parent process pid is available with getppid
+    # background mode
     } else {
-        # everything printed to STDOUT here will be available to the
-        # parent on its $READ_FROM_KID file descriptor
-        $start_server->();
-        close STDOUT;
-        close STDERR;
-        return 0;
+        my $code = $self->fork_launcher($start_server);
+        if ($code == 0) {
+            # find out if the server is REALLY running properly
+            if ($self->status != 0) {
+                warn "Status check failed\n";
+                $code = 2;
+            }
+        }
+        print ($code == 0 ? "DONE.\n" : "FAILED.\n") unless $arg->silent;
+        return $code;
     }
 }
 

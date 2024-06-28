@@ -164,4 +164,69 @@ sub slurp ($self, $file) {
     return $content;
 }
 
+# fork off server launcher
+sub fork_launcher ($self, $starter) {
+    my $pid;
+    my $redo_count = 0;
+    my $child_fh;
+
+    FORK:
+    do {
+        # this open call efectively does a fork and attaches the child's
+        # STDOUT to $child_fh, allowing the child to send us data.
+        $pid = open($child_fh, "-|");
+        if (not defined $pid) {
+            # recoverable fork error
+            if ($!{EAGAIN}) {
+                if ($redo_count > 5) {
+                    warn "Could not fork process\n";
+                    return 2;
+                }
+                sleep 5;
+                $redo_count++;
+                redo FORK;
+            # other fork error
+            } else {
+                warn "Could not fork process: $ERRNO\n";
+                return 2;
+            }
+        }
+    } until defined $pid;
+
+    # PARENT
+    # child process pid is available in $pid
+    if ($pid) {
+        my $kid;
+        # wait for child process to exit (i.e. do a second fork)
+        do {
+            $kid = waitpid(-1, POSIX::WNOHANG);
+            sleep 1 unless $kid > 0;
+        } until $kid > 0;
+
+        # print messages from child process
+        my $msg = <$child_fh>;
+        if ($msg && length $msg) {
+            warn "Child process error: $msg\n";
+            return 2;
+        }
+
+        return 0;
+
+    # CHILD
+    # parent process pid is available with getppid
+    } else {
+        # everything printed to STDOUT here will be available to the
+        # parent on its $child_fh file descriptor
+        eval {
+            $starter->(); # this is expected to fork again
+        };
+        if ($EVAL_ERROR) {
+            print $EVAL_ERROR; # will be sent to parent's $child_fh
+        }
+        close STDOUT;
+        close STDERR;
+        exit 0;
+    }
+}
+
 1;
