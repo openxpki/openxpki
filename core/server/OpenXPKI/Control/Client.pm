@@ -54,6 +54,7 @@ sub getopt_params ($self, $command) {
         socket_file|socket-file|s=s
         socket_user|socket-user=s
         socket_group|socket-group=s
+        nd|no-detach
     );
 }
 
@@ -93,8 +94,28 @@ sub cmd_start ($self) {
         # config object
         #oxi_config_obj => ...,
     });
-    #$daemon->start; # socketfile will be created only after this
-    $daemon->run;
+
+    my $start_client = sub {
+        $daemon->start;
+        $daemon->daemonize unless $self->opts->{nd};
+        $daemon->run;
+    };
+
+    # foreground mode
+    if ($self->opts->{nd}) {
+        try {
+            $start_client->();
+        }
+        catch ($err) {
+            warn $err;
+            return 2;
+        }
+        return 0;
+
+    # background mode
+    } else {
+        return $self->fork_launcher($start_client);
+    }
 }
 
 # required by OpenXPKI::Control::Role
