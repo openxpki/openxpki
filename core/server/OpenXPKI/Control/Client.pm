@@ -121,7 +121,7 @@ sub cmd_start ($self) {
 # required by OpenXPKI::Control::Role
 sub cmd_stop ($self) {
     my $pid = $self->__get_pid;
-    $self->stop_process(
+    return $self->stop_process(
         name => 'OpenXPKI Client',
         pid => $pid,
     );
@@ -129,13 +129,13 @@ sub cmd_stop ($self) {
 
 # required by OpenXPKI::Control::Role
 sub cmd_reload ($self) {
-    $self->cmd_restart;
+    return $self->cmd_restart;
 }
 
 # required by OpenXPKI::Control::Role
 sub cmd_restart ($self) {
     $self->cmd_stop;
-    $self->cmd_start;
+    return $self->cmd_start;
 }
 
 # required by OpenXPKI::Control::Role
