@@ -25,7 +25,8 @@ sub __dispatch_revoke {
     my $class   = shift;
     my $arg     = shift;
 
-    my $config = $main::config;
+    my ($endpoint, $operation) = $main::config->parse_uri;
+    my $config = $main::config->endpoint_config($endpoint);
 
     my $client_ip   = $ENV{REMOTE_ADDR};    # dotted quad
     my $server_name = $ENV{SERVER_NAME};    # ca.company.com
