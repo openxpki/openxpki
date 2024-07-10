@@ -942,7 +942,7 @@ sub handle_login {
                     # Initial step - assemble auth token request and send redirect
                     my $nonce = Data::UUID->new()->create_b64();
                     my $sess_id = $self->has_cipher ?
-                        encode_base64($self->cipher->encrypt($self->session->id)) :
+                        encode_base64($self->cipher->encrypt($self->session->id),'') :
                         $self->session->id;
 
                     # TODO - this is only set if we had a roundtrip before

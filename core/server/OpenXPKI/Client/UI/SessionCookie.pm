@@ -199,7 +199,7 @@ sub _encrypt {
     return '' unless defined $value;
     return $value unless $self->has_cipher;
 
-    return encode_base64($self->cipher->encrypt($value));
+    return encode_base64($self->cipher->encrypt($value),'');
 }
 
 =head2 _decrypt
