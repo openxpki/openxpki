@@ -391,6 +391,16 @@ sub parse_rpc_request_body ($self) {
     my $content_type = $self->request->headers->content_type;
 
     $self->log->trace('HTTP request method: ' . $self->request->method);
+
+    #
+    # Old school ulencoded GET parameters
+    #
+    if ($self->request->method eq 'GET') {
+        $self->log->debug("RPC GET request");
+        $self->log->trace("URL encoded payload: " . Dumper $self->request->params->to_hash) if $self->log->is_trace;
+        return;
+    }
+
     $self->log->debug("RPC POST data with Content-Type: $content_type");
 
     #
