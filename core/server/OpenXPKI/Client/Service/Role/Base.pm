@@ -384,20 +384,25 @@ has is_enrollment => (
     default => 0,
 );
 
-=head3 wf_params
+=head3 default_wf_params
 
-Readonly I<HashRef> with workflow parameters, incl. L</custom_wf_params>, that
-is automatically build.
+Readonly I<HashRef> with default workflow parameters that is build
+automatically.
 
 =cut
-has wf_params => (
+has default_wf_params => (
     is => 'ro',
     isa => 'HashRef',
+    traits => [ 'Hash' ],
     lazy => 1,
     init_arg => undef,
-    builder => '_build_wf_params',
+    builder => '_build_default_wf_params',
+    handles => {
+        default_wf_param => 'get',
+    },
+
 );
-sub _build_wf_params ($self) {
+sub _build_default_wf_params ($self) {
     try {
         my $p = {};
         my $operation = $self->operation;
@@ -452,12 +457,39 @@ sub _build_wf_params ($self) {
             $self->log->debug("Calling context is plain HTTP");
         }
 
+        return $p;
+    }
+    catch ($err) {
+        if (blessed $err and $err->isa('OpenXPKI::Client::Service::Response')) {
+            die $err;
+        } else {
+            $self->log->error("$err"); # stringification
+            die $self->new_response( 50010 );
+        }
+    }
+}
+
+=head3 wf_params
+
+Readonly I<HashRef> with workflow parameters, incl. L</custom_wf_params>, that
+is automatically build.
+
+=cut
+has wf_params => (
+    is => 'ro',
+    isa => 'HashRef',
+    lazy => 1,
+    init_arg => undef,
+    builder => '_build_wf_params',
+);
+sub _build_wf_params ($self) {
+    try {
         # legacy CGI mode
         $self->cgi_set_custom_wf_params if ($ENV{GATEWAY_INTERFACE} and $ENV{REMOTE_ADDR});
 
         # merge custom parameters set by consuming class
-        $p = {
-            $p->%*,
+        my $p = {
+            $self->default_wf_params->%*,
             $self->custom_wf_params->%*,
         };
 
