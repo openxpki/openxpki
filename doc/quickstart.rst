@@ -75,7 +75,7 @@ You can also find the key on the github repository in `package/debian/Release.ke
 
 Add the repository to your source list (bookworm)::
 
-    echo -e "Types: deb\nURIs: https://packages.openxpki.org/v3/bookworm/\nSuites: bookworm\nComponents: release\nSigned-By: /usr/share/keyrings/openxpki.pgp" > /etc/apt/sources.list.d/openxpki.sources
+    echo -e "Types: deb\nURIs: https://packages.openxpki.org/v3/bookworm/\nSuites: bookworm\nComponents: release\nSigned-By: /usr/share/keyrings/openxpki.pgp\nArchitectures: amd64" > /etc/apt/sources.list.d/openxpki.sources
     apt update
 
 Please do not disable the installation of "recommend" packages as this will very
