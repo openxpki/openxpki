@@ -45,7 +45,15 @@ has cfg => (
     },
 );
 
+has silent => (
+    is => 'rw',
+    isa => 'Bool',
+    lazy => 1,
+    default => sub { shift->opts->{quiet} ? 1 : 0 },
+);
 
+
+# required by OpenXPKI::Control::Role
 sub getopt_params ($self, $command) {
     return qw(
         debug|d
@@ -55,6 +63,7 @@ sub getopt_params ($self, $command) {
         socket_user|socket-user=s
         socket_group|socket-group=s
         nd|no-detach
+        quiet
     );
 }
 
@@ -62,13 +71,19 @@ sub getopt_params ($self, $command) {
 sub cmd_start ($self) {
     my $user = $self->opts->{user} || $self->cfg->{user};
     my $group = $self->opts->{group} || $self->cfg->{group};
-    my $pid_file = $self->opts->{pid_file} || $self->cfg->{pid_file}
+    my $pid_file = $self->cfg->{pid_file}
         or die "Missing config entry: system.client.pid_file\n";
     my $socket_file = $self->opts->{socket_file} || $self->cfg->{socket_file}
         or die "Missing config entry: system.client.socket_file\n";
     my $enc_socket_file = url_escape(Mojo::File->new($socket_file));
     my $socket_user = $self->opts->{socket_user} || $self->cfg->{socket_user} || $user;
     my $socket_group = $self->opts->{socket_group} || $self->cfg->{socket_group} || $group;
+
+    my $pid = $self->__get_pid;
+    if (defined $pid and $self->status(silent => 1) == 0) {
+        warn "OpenXPKI Client already running. PID: $pid\n";
+        return 0;
+    }
 
     $ENV{MOJO_MODE} = 'production' unless $self->opts->{debug};
 
@@ -121,10 +136,16 @@ sub cmd_start ($self) {
 # required by OpenXPKI::Control::Role
 sub cmd_stop ($self) {
     my $pid = $self->__get_pid;
-    return $self->stop_process(
+
+    my $code = $self->stop_process(
         name => 'OpenXPKI Client',
         pid => $pid,
+        silent => $self->silent,
     );
+
+    eval { unlink $self->cfg->{pid_file} } if $code == 0;
+
+    return $code;
 }
 
 # required by OpenXPKI::Control::Role
@@ -140,11 +161,56 @@ sub cmd_restart ($self) {
 
 # required by OpenXPKI::Control::Role
 sub cmd_status ($self) {
-    die 0xDEADBEEF;
+    return $self->status(silent => $self->silent);
+}
+
+=head2 status
+
+Check if the client is running
+
+B<Named parameters>
+
+=over
+
+=item * C<silent> I<Bool> - optional: suppress messages. Default: 0
+
+=back
+
+=cut
+signature_for status => (
+    method => 1,
+    named => [
+        silent => 'Bool', { default => 0 },
+    ],
+);
+sub status ($self, $arg) {
+    my $pid = $self->__get_pid;
+    my $alive = defined $pid ? kill(0, $pid) : 0;
+
+    # my $socketfile = $self->cfg->{socketfile}
+    #     or die "Missing config entry: system.server.socket_file\n";
+
+    # my $client;
+    # my $i = 4;
+    # while ($i-- > 0) {
+    #     $client = __connect_openxpki_daemon($socketfile);
+    #     last if $client;
+    #     sleep 2 if $i > 0;
+    # }
+
+    if ($alive) {
+        print "OpenXPKI Client is running.\n" unless $arg->silent;
+        return 0;
+    } else {
+        warn "OpenXPKI client is not running.\n" unless $arg->silent;
+        return 1;
+    }
 }
 
 sub __get_pid ($self) {
     die "Missing config entry: system.client.pid_file\n" unless $self->cfg->{pid_file};
+
+    return unless -e $self->cfg->{pid_file};
 
     my $pid = $self->slurp($self->cfg->{pid_file})
         or die "Unable to read PID file (".$self->cfg->{pid_file}.")\n";

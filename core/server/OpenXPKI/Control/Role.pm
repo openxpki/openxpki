@@ -76,14 +76,18 @@ signature_for stop_process => (
     method => 1,
     named => [
         name => 'Str',
-        pid => 'Int',
+        pid => 'Int|Undef',
         silent => 'Bool', { default => 0 },
     ],
 );
 sub stop_process ($self, $arg) {
+    if (not defined $arg->pid) {
+        printf "%s is not running\n", $arg->name unless $arg->silent;
+        return 0;
+    }
     if (kill(0, $arg->pid) == 0) {
-        printf STDERR "%s is not running under PID %s\n", $arg->name, $arg->pid;
-        return 2;
+        printf "%s is not running under PID %s\n", $arg->name, $arg->pid unless $arg->silent;
+        return 0;
     }
 
     my $process_group = getpgrp($arg->pid);
