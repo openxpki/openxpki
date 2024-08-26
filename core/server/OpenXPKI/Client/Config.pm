@@ -388,7 +388,6 @@ sub endpoint_config {
         # non existing files and other errors are handled inside loader
         $config = $self->__load_config($endpoint);
         $self->_cache->set( $endpoint  => $config );
-        $self->log->debug('added config to cache ' . $endpoint);
     }
 
     $self->language($config->{global}->{default_language} || $self->default->{global}->{default_language} || '');

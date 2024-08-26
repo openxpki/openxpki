@@ -75,7 +75,12 @@ sub index ($self) {
     try {
         $config = $self->oxi_config($service_name, $no_config);
         $config->log->info(sprintf 'Incoming request: %s %s', $self->req->method, $self->url_for);
+    }
+    catch ($error) {
+        die sprintf("Error while loading configuration for service '%s': %s", $service_name, $error);
+    }
 
+    try {
         Module::Load::load($class);
         $service = $class->new(
             service_name => $service_name,
