@@ -76,8 +76,8 @@ sub cmd_start ($self) {
     my $socket_file = $self->opts->{socket_file} || $self->cfg->{socket_file}
         or die "Missing config entry: system.client.socket_file\n";
     my $enc_socket_file = url_escape(Mojo::File->new($socket_file));
-    my $socket_user = $self->opts->{socket_user} || $self->cfg->{socket_user} || $user;
-    my $socket_group = $self->opts->{socket_group} || $self->cfg->{socket_group} || $group;
+    my $socket_user = $self->opts->{socket_user} || $user;
+    my $socket_group = $self->opts->{socket_group} || $group;
 
     my $pid = $self->__get_pid;
     if (defined $pid and $self->status(silent => 1) == 0) {
