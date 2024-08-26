@@ -122,12 +122,12 @@ sub cmd_start ($self) {
         }
     }
 
-    exit $self->start( %params );
+    return $self->start( %params );
 }
 
 # required by OpenXPKI::Control::Role
 sub cmd_stop ($self) {
-    exit $self->stop(silent => $self->silent);
+    return $self->stop(silent => $self->silent);
 }
 
 # required by OpenXPKI::Control::Role
@@ -146,7 +146,7 @@ sub cmd_restart ($self) {
 
 # required by OpenXPKI::Control::Role
 sub cmd_status ($self) {
-    exit $self->status(silent => $self->silent);
+    return $self->status(silent => $self->silent);
 }
 
 =head2 start
