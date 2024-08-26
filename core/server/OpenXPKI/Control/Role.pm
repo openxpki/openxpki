@@ -193,6 +193,8 @@ sub fork_launcher ($self, $starter) {
         }
     } until defined $pid;
 
+    my $error_marker = '$OPENXPKICTL_CLIENT_PROCESS_ERROR$';
+
     # PARENT
     # child process pid is available in $pid
     if ($pid) {
@@ -205,9 +207,13 @@ sub fork_launcher ($self, $starter) {
 
         # print messages from child process
         my $msg = <$child_fh>;
-        if ($msg && length $msg) {
-            warn "Child process error: $msg\n";
-            return 2;
+        if ($msg and length $msg) {
+            if ($msg =~ m/\Q$error_marker\E\s*/) {
+                warn "$msg\n";
+                return 2;
+            } else {
+                print "$msg\n";
+            }
         }
 
         return 0;
@@ -221,7 +227,7 @@ sub fork_launcher ($self, $starter) {
             $starter->(); # this is expected to fork again
         };
         if ($EVAL_ERROR) {
-            print $EVAL_ERROR; # will be sent to parent's $child_fh
+            print "$error_marker $EVAL_ERROR"; # will be sent to parent's $child_fh
         }
         close STDOUT;
         close STDERR;
