@@ -52,6 +52,7 @@ sub import {
     my $moose_class = delete $flags{-class};
     my $moose_exporter = delete $flags{-exporter};
     my $moose_typeconstraints = delete $flags{-typeconstraints};
+    my $moose_strictconstructor = delete $flags{-strictconstructor};
     my $moose_nonmoose = delete $flags{-nonmoose};
     my $moose_role = delete $flags{-role};
     my $plugin = delete $flags{-plugin};
@@ -83,6 +84,7 @@ sub import {
     }
 
     Moose::Util::TypeConstraints->import::into(1) if $moose_typeconstraints;
+    MooseX::StrictConstructor->import::into(1) if $moose_strictconstructor;
 
     # API plugin
     if ($plugin or $client_plugin) {
@@ -190,6 +192,12 @@ This adds C<use Moose> to the list of imports.
     use OpenXPKI qw( -class -typeconstraints );
 
 This adds C<use Moose> and C<Moose::Util::TypeConstraints> to the list of imports.
+
+=head2 Moose class with strict constructor
+
+    use OpenXPKI qw( -class -strictconstructor );
+
+This adds C<use Moose> and C<MooseX::StrictConstructor> to the list of imports.
 
 =head2 Moose exporter class
 
