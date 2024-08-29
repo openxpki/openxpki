@@ -370,7 +370,7 @@ sub execute {
             print $fh "{";
         }
         my $bb = $json->encode([@header, @head]);
-        print $fh '"header":'.$bb.'],{"data":[';
+        print $fh '"header":'.$bb.',"data":[';
 
     } else {
         if ($head) { print $fh $head."\n"; }
