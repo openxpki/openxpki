@@ -1,12 +1,9 @@
 package OpenXPKI::Client::UI;
-use Moose;
-
-use English;
+use OpenXPKI qw( -class -typeconstraints );
 
 # Core modules
 use Encode;
 use JSON qw(encode_json decode_json);
-use Data::Dumper;
 use MIME::Base64;
 use Module::Load ();
 
@@ -17,8 +14,6 @@ use URI::Escape;
 use Log::Log4perl::MDC;
 use LWP::UserAgent;
 use HTTP::Request;
-use Moose::Util::TypeConstraints qw( enum ); # PLEASE NOTE: this enables all warnings via Moose::Exporter
-use Type::Params qw( signature_for );
 
 # Project modules
 use OpenXPKI::Dumper;
@@ -27,11 +22,6 @@ use OpenXPKI::Client;
 use OpenXPKI::Client::UI::Bootstrap;
 use OpenXPKI::Client::UI::Login;
 
-# Feature::Compat::Try should be done last to safely disable warnings
-use Feature::Compat::Try;
-
-# should be done after imports to safely disable warnings in Perl < 5.36
-use experimental 'signatures';
 
 # ref to the cgi frontend session
 has 'session' => (
