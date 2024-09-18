@@ -213,7 +213,6 @@ sub handle_request {
 
     my $self = shift;
     my $req = shift;
-    my $cgi = $req->cgi();
 
     my $page = $req->param('page') || '';
     my $action = $self->__get_action($req);
@@ -248,7 +247,7 @@ sub handle_request {
         my $redirectTo = $authinfo->{logout};
 
         # clear the session before redirecting to make sure we are safe
-        $self->logout_session( $cgi );
+        $self->logout_session;
         $self->log->info('Logout from session');
 
         # now perform the redirect if set
@@ -306,7 +305,7 @@ sub handle_request {
 
     # if the backend session logged out but did not terminate
     # we get the problem that ui is logged in but backend is not
-    $self->logout_session( $cgi ) if ($self->session->param('is_logged_in'));
+    $self->logout_session if ($self->session->param('is_logged_in'));
 
     # try to log in
     return $self->handle_login( { req => $req, reply => $reply } );
@@ -826,7 +825,7 @@ sub handle_login {
             # bad luck - something seems to be really wrong
             } else {
                 $self->log->error('No ENV data to perform SSO Login');
-                $self->logout_session( $cgi );
+                $self->logout_session;
                 $uilogin->init_login_missing_data();
                 return $uilogin;
             }
@@ -854,7 +853,7 @@ sub handle_login {
                 $self->log->trace('Auth result ' . Dumper $reply) if $self->log->is_trace;
             } else {
                 $self->log->error('Certificate missing for X509 Login');
-                $self->logout_session( $cgi );
+                $self->logout_session;
                 $uilogin->init_login_missing_data;
                 return $uilogin;
             }
@@ -924,7 +923,7 @@ sub handle_login {
                     # or able to complete the OIDC login, we use the nonce
                     # in the session to detect a "returning user" and render an
                     # info page instead of doing a redirect
-                    $self->logout_session( $cgi );
+                    $self->logout_session;
                     return $uilogin->init_login_missing_data;
 
                 } else {
@@ -1252,7 +1251,6 @@ If you pass a reference to the CGI handler, the session cookie is updated.
 sub logout_session {
 
     my $self = shift;
-    my $cgi = shift;
 
     $self->log->info("session logout");
     $self->backend->logout;
