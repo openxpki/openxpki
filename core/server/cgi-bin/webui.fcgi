@@ -20,7 +20,6 @@ use Encode;
 # CPAN modules
 use CGI 4.08;
 use CGI::Fast;
-use CGI::Session;
 use JSON;
 use Config::Std;
 use Log::Log4perl::MDC;
@@ -35,6 +34,7 @@ use OpenXPKI::Client::Config;
 use OpenXPKI::Client::UI;
 use OpenXPKI::Client::UI::Request;
 use OpenXPKI::Client::UI::Response;
+use OpenXPKI::Client::UI::Session;
 use OpenXPKI::Client::UI::SessionCookie;
 
 # Feature::Compat::Try should be done last to safely disable warnings
@@ -244,7 +244,7 @@ while (my $cgi = CGI::Fast->new) {
     }
 
     # create CGI session
-    my $session_front = CGI::Session->new(
+    my $session_front = OpenXPKI::Client::UI::Session->new(
         $conf->{session}->{driver},
         $sess_id, # may be undef
         $conf->{session_driver} ? $conf->{session_driver} : { Directory => '/tmp' },

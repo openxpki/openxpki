@@ -8,7 +8,6 @@ use MIME::Base64;
 use Module::Load ();
 
 # CPAN modules
-use CGI::Session;
 use Crypt::JWT qw( encode_jwt decode_jwt );
 use URI::Escape;
 use Log::Log4perl::MDC;
@@ -27,7 +26,7 @@ use OpenXPKI::Client::UI::Login;
 has 'session' => (
     required => 1,
     is => 'rw',
-    isa => 'CGI::Session|Undef',
+    isa => 'OpenXPKI::Client::UI::Session|Undef',
 );
 
 # cipher object to encryt/decrypt protected values
@@ -1055,12 +1054,8 @@ sub _new_frontend_session {
 
     my $self = shift;
 
-    # delete the old instance data
-    $self->session->delete;
-    $self->session->flush;
-
-    # call new() on the existing session object to reuse settings
-    $self->session->new;
+    # create new session object but reuse old settings
+    $self->session($self->session->new_session);
 
     Log::Log4perl::MDC->put('sid', substr($self->session->id,0,4));
     $self->log->debug('New frontend session: ID = '. $self->session->id);

@@ -70,12 +70,12 @@ has 'cipher' => (
 
 =head2 session
 
-I<CGI::Session> instance.
+I<OpenXPKI::Client::UI::Session> instance.
 
 =cut
 has 'session' => (
     is => 'rw',
-    isa => 'CGI::Session',
+    isa => 'OpenXPKI::Client::UI::Session',
     predicate => 'has_session',
 );
 

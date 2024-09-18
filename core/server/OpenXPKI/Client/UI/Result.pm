@@ -316,7 +316,7 @@ has _last_reply => (
 
 has _session => (
     is => 'ro',
-    isa => 'CGI::Session',
+    isa => 'OpenXPKI::Client::UI::Session',
     lazy => 1,
     builder => '_init_session',
 );
@@ -489,7 +489,7 @@ sub __tenant_param {
 
 =head2 session_param
 
-Read or write a CGI session parameter, a shortcut to L<CGI::Session/param>.
+Read or write a session parameter, a shortcut to L<CGI::Session/param>.
 
 Specify only a C<$key> to read a parameter and an additional value to write it.
 

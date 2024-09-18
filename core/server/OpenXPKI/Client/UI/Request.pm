@@ -41,7 +41,7 @@ has cgi => (
 has session => (
     required => 1,
     is => 'rw',
-    isa => 'CGI::Session',
+    isa => 'OpenXPKI::Client::UI::Session',
 );
 
 has log => (

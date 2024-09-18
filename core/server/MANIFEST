@@ -149,6 +149,7 @@ OpenXPKI/Client/UI/Role/OutputField.pm
 OpenXPKI/Client/UI/Role/Pager.pm
 OpenXPKI/Client/UI/Role/QueryCache.pm
 OpenXPKI/Client/UI/Secret.pm
+OpenXPKI/Client/UI/Session.pm
 OpenXPKI/Client/UI/SessionCookie.pm
 OpenXPKI/Client/UI/Source.pm
 OpenXPKI/Client/UI/Users.pm
