@@ -135,20 +135,19 @@ sub set_user { shift->user(OpenXPKI::Client::UI::Response::User->new(@_)) }
 # overrides OpenXPKI::Client::UI::Response::DTORole->is_set()
 sub is_set { 1 }
 
-=head2 get_header_str
+=head2 get_headers
 
-Returns the HTTP header string containing all headers stored via L<add_header>
-plus the session cookie that contains the (encrypted) session id.
+Returns an I<ArrayRef> with key/value tuples of all HTTP headers stored via
+L<add_header> plus the session cookie that contains the (encrypted) session id.
 
 =cut
-sub get_header_str {
+sub get_headers {
     my $self = shift;
-    my $cgi = shift;
 
-    return $cgi->header(
-        @{ $self->headers },
-        -cookie => $self->session_cookie->render,
-    )
+    return [
+        $self->headers->@*,
+        cookie => $self->session_cookie->render,
+    ];
 }
 
 __PACKAGE__->meta->make_immutable;

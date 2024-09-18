@@ -260,11 +260,11 @@ Add one or more HTTP response headers.
 
     $response->add_header(-type => 'application/json; charset=UTF-8');
 
-=head2 get_header_str
+=head2 get_headers
 
-Return the string containing the HTTP headers.
+Returns an I<ArrayRef> with key/value tuples of all HTTP headers.
 
-    print $self->get_header_str($cgi);
+    print $self->get_headers;
 
 =head2 raw_bytes and raw_bytes_callback
 
@@ -302,7 +302,7 @@ has resp => (
         user set_user
         pki_realm
         add_header
-        get_header_str
+        get_headers
         raw_bytes has_raw_bytes raw_bytes_callback has_raw_bytes_callback
     ) ],
 );
@@ -619,7 +619,7 @@ sub render {
 
     # helper to print HTTP headers
     my $print_headers = sub {
-        my $headers = $self->get_header_str($cgi);
+        my $headers = $cgi->header($self->get_headers);
         $self->log->trace("Response headers:\n$headers") if $self->log->is_trace;
         print $headers;
     };
