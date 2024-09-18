@@ -747,15 +747,12 @@ sub init_export {
         $buffer .= "I18N_OPENXPKI_UI_CERT_EXPORT_EXCEEDS_LIMIT"."\n";
     }
 
-    print $self->cgi()->header(
+    $self->add_header(
         -type => 'text/tab-separated-values',
         -expires => "1m",
         -attachment => "workflow export " . DateTime->now()->iso8601() .  ".txt"
     );
-
-    print Encode::encode('UTF-8', i18nTokenizer($buffer));
-    exit;
-
+    $self->raw_bytes( Encode::encode('UTF-8', i18nTokenizer($buffer)) );
 }
 
 =head2 init_pager

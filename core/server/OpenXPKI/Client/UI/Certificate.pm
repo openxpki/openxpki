@@ -422,14 +422,12 @@ sub init_export {
         $buffer .= i18nGettext("I18N_OPENXPKI_UI_CERT_EXPORT_EXCEEDS_LIMIT")."\n";
     }
 
-    print $self->cgi()->header(
+    $self->add_header(
         -type => 'text/tab-separated-values',
         -expires => "1m",
         -attachment => "certificate export " . DateTime->now()->iso8601() .  ".txt"
     );
-    print $buffer;
-    exit;
-
+    $self->raw_bytes($buffer);
 }
 
 =head2 init_pager
@@ -1110,10 +1108,12 @@ sub init_download {
 
     }
 
-    print $self->cgi()->header( -type => $content_type, -expires => "1m", -attachment => $filename );
-    print $output;
-    exit;
-
+    $self->add_header(
+        -type => $content_type,
+        -expires => "1m",
+        -attachment => $filename,
+    );
+    $self->raw_bytes($output);
 }
 
 =head2 init_parse
@@ -1299,8 +1299,6 @@ sub action_search {
 
     my $self = shift;
     my $args = shift;
-
-    $self->log->trace("input params: " . Dumper $self->cgi()->param()) if $self->log->is_trace;
 
     my $query = { entity_only => 1, $self->__tenant_param() };
     my $input = {}; # store the input data the reopen the form later

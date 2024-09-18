@@ -191,10 +191,12 @@ sub init_download {
 
     my $filename = 'crl.'.$format;
 
-    print $self->cgi()->header( -type => $content_type, -expires => "1m", -attachment => $filename );
-    print $data;
-    exit;
-
+    $self->add_header(
+        -type => $content_type,
+        -expires => "1m",
+        -attachment => $filename,
+    );
+    $self->raw_bytes($data);
 }
 
 

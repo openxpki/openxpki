@@ -184,7 +184,6 @@ Handle search requests and display the result as grid
 sub action_search {
     my $self = shift;
     my $args = shift;
-    $self->log->trace("input params: " . Dumper $self->cgi()->param()) if $self->log->is_trace;
 
     # assemble query
     my $query = {};

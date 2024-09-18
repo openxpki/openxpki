@@ -258,13 +258,11 @@ Set the current PKI realm.
 
 Add one or more HTTP response headers.
 
-    $response->add_header(-type => 'application/json; charset=UTF-8');
+    $self->add_header(-type => 'application/json; charset=UTF-8');
 
 =head2 get_headers
 
 Returns an I<ArrayRef> with key/value tuples of all HTTP headers.
-
-    print $self->get_headers;
 
 =head2 raw_bytes and raw_bytes_callback
 
@@ -619,7 +617,7 @@ sub render {
 
     # helper to print HTTP headers
     my $print_headers = sub {
-        my $headers = $cgi->header($self->get_headers);
+        my $headers = $cgi->header($self->get_headers->@*);
         $self->log->trace("Response headers:\n$headers") if $self->log->is_trace;
         print $headers;
     };
