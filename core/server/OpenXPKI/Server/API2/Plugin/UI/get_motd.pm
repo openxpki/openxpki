@@ -39,18 +39,18 @@ command "get_motd" => {
     my $role = $params->has_role ? $params->role : CTX('session')->data->role;
 
     my $datapool;
-    # role is used as DP Key, can also be "_any"
+    # role is used as Datapool key, fallback: query Datapool MOTD entry for "_any"
     for my $r ($role, '_any') {
         $datapool = $self->api->get_data_pool_entry(
             namespace => 'webui.motd',
-            key => $role,
+            key => $r,
             deserialize => 'simple',
         );
+        ##! 16: "Item for role '$r': " . Dumper $datapool
         last if $datapool;
-        ##! 16: "Item for role '$r'": " . Dumper $datapool
     }
 
-    return $datapool;
+    return $datapool->{value};
 };
 
 __PACKAGE__->meta->make_immutable;
