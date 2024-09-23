@@ -1114,7 +1114,7 @@ sub _recreate_frontend_session {
     $self->session->param('initialized', 1);
     $self->session->param('login_timestamp', time);
 
-    # Check for MOTD
+    # Check for MOTD, e.g. { level => 'warn', message => 'Beware!' }
     my $motd = $self->backend->send_receive_command_msg( 'get_motd' );
     if (ref $motd->{PARAMS} eq 'HASH') {
         $self->log->trace('Got MOTD: '. Dumper $motd->{PARAMS} ) if $self->log->is_trace;
