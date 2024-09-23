@@ -1065,10 +1065,10 @@ sub _new_frontend_session {
 sub _recreate_frontend_session {
 
     my $self = shift;
-    my $data = shift;
+    my $session_info = shift; # as returned from API command "get_session_info"
     my $auth_info = shift;
 
-    $self->log->trace('Got session info: '. Dumper $data) if $self->log->is_trace;
+    $self->log->trace('Got session info: '. Dumper $session_info) if $self->log->is_trace;
 
     # fetch redirect from old session before deleting it!
     my %keep = map {
@@ -1087,13 +1087,13 @@ sub _recreate_frontend_session {
     $self->session->param('backend_session_id', $self->backend->get_session_id );
 
     # move userinfo to own node
-    $self->session->param('userinfo', $data->{userinfo} || {});
-    delete $data->{userinfo};
+    $self->session->param('userinfo', $session_info->{userinfo} || {});
+    delete $session_info->{userinfo};
 
     $self->session->param('authinfo', $auth_info);
 
-    $self->session->param('user', $data);
-    $self->session->param('pki_realm', $data->{pki_realm});
+    $self->session->param('user', $session_info);
+    $self->session->param('pki_realm', $session_info->{pki_realm});
     $self->session->param('is_logged_in', 1);
     $self->session->param('initialized', 1);
     $self->session->param('login_timestamp', time);
