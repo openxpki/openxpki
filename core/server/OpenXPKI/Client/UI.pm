@@ -1107,7 +1107,7 @@ sub _recreate_frontend_session {
 
     # menu
     my $reply = $self->backend->send_receive_command_msg( 'get_menu' );
-    $self->_set_menu($self->session, $reply->{PARAMS}) if $reply->{PARAMS};
+    $self->_set_menu($reply->{PARAMS}) if $reply->{PARAMS};
 
     $self->session->flush;
 
@@ -1115,15 +1115,14 @@ sub _recreate_frontend_session {
 
 sub _set_menu {
     my $self = shift;
-    my $session = shift;
     my $menu = shift;
 
     $self->log->trace('Menu ' . Dumper $menu) if $self->log->is_trace;
 
-    $session->param('menu_items', $menu->{main} || []);
+    $self->session->param('menu_items', $menu->{main} || []);
 
     # persist the optional parts of the menu hash (landmark, tasklist, search attribs)
-    $session->param('landmark', $menu->{landmark} || {});
+    $self->session->param('landmark', $menu->{landmark} || {});
     $self->log->trace('Got landmarks: ' . Dumper $menu->{landmark}) if $self->log->is_trace;
 
     # Keepalive pings to endpoint
@@ -1135,7 +1134,7 @@ sub _set_menu {
         } else {
             $ping = { href => $menu->{ping}, timeout => 120000 };
         }
-        $session->param('ping', $ping);
+        $self->session->param('ping', $ping);
     }
 
     # tasklist, wfsearch, certsearch and bulk can have multiple branches
@@ -1147,11 +1146,11 @@ sub _set_menu {
     foreach my $key (qw(tasklist bulk)) {
 
         if (ref $menu->{$key} eq 'ARRAY') {
-            $session->param($key, { 'default' => $menu->{$key} });
+            $self->session->param($key, { 'default' => $menu->{$key} });
         } elsif (ref $menu->{$key} eq 'HASH') {
-            $session->param($key, $menu->{$key} );
+            $self->session->param($key, $menu->{$key} );
         } else {
-            $session->param($key, { 'default' => [] });
+            $self->session->param($key, { 'default' => [] });
         }
         $self->log->trace("Got $key: " . Dumper $menu->{$key}) if $self->log->is_trace;
     }
@@ -1163,21 +1162,21 @@ sub _set_menu {
 
         # plain attributes
         if (ref $menu->{$key} eq 'ARRAY') {
-            $session->param($key, { 'default' => { attributes => $menu->{$key} } } );
+            $self->session->param($key, { 'default' => { attributes => $menu->{$key} } } );
         } elsif (ref $menu->{$key} eq 'HASH') {
-            $session->param($key, $menu->{$key} );
+            $self->session->param($key, $menu->{$key} );
         } else {
             # empty hash is used to disable the search page
-            $session->param($key, {} );
+            $self->session->param($key, {} );
         }
         $self->log->trace("Got $key: " . Dumper $menu->{$key}) if $self->log->is_trace;
     }
 
     foreach my $key (qw(datapool)) {
         if (ref $menu->{$key} eq 'HASH' and $menu->{$key}->{default}) {
-            $session->param($key, $menu->{$key} );
+            $self->session->param($key, $menu->{$key} );
         } else {
-            $session->param($key, { default => {} });
+            $self->session->param($key, { default => {} });
         }
         $self->log->trace("Got $key: " . Dumper $menu->{$key}) if $self->log->is_trace;
     }
@@ -1211,7 +1210,7 @@ sub _set_menu {
         }
         return $result;
     }->();
-    $session->param('certdetails', $certdetails);
+    $self->session->param('certdetails', $certdetails);
 
     # Check syntax of "wfdetails".
     # (the sub{} below allows using "return" instead of nested "if"-structures)
@@ -1231,7 +1230,7 @@ sub _set_menu {
         }
         return $result;
     }->();
-    $session->param('wfdetails', $wfdetails);
+    $self->session->param('wfdetails', $wfdetails);
 }
 
 =head2 logout_session
