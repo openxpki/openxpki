@@ -5,6 +5,7 @@ use OpenXPKI -base => 'Mojolicious';
 use re qw( regexp_pattern );
 use Module::Load ();
 use POSIX ();
+use List::Util qw( first );
 
 # CPAN modules
 use Mojo::Util qw( url_unescape encode tablify );
@@ -301,31 +302,31 @@ sub _drop_privileges ($self, $pid_file, $user, $group, $label) {
     $self->log->info("$label dropped privileges, new process ownership: " . join(', ', @changes)) if @changes;
 }
 
-sub _load_service_class ($self, $service) {
-    my @variants = (
-        sprintf("OpenXPKI::Client::Service::%s", uc $service),
-        sprintf("OpenXPKI::Client::Service::%s", ucfirst $service),
-        sprintf("OpenXPKI::Client::Service::%s", $service),
-    );
+sub _load_service_class ($self, $service_short) {
+    my $prefix = 'OpenXPKI::Client::Service::';
+    my $service = $prefix.$service_short;
 
-    for my $pkg (@variants) {
+    my $service_modules = OpenXPKI::Util->list_modules($prefix);
+    my $pkg = first { lc($service) eq lc($_) } keys $service_modules->%*;
+
+    if ($pkg) {
         try {
-            Module::Load::load($pkg);
+            require $service_modules->{$pkg};
         }
         catch ($err) {
-            next if $err =~ /^Can't locate/;
-            die sprintf 'Could not load class for service "%s": %s', $service, $err;
+            die sprintf 'Could not load class for service "%s": %s', $service_short, $err;
         }
 
         die sprintf 'Class "%s" must consume role OpenXPKI::Client::Service::Role::Info', $pkg
             unless $pkg->DOES('OpenXPKI::Client::Service::Role::Info');
 
-        $self->log->debug(sprintf 'Service "%s": enabled (%s)', $service, $pkg);
+        $self->log->debug(sprintf 'Service "%s": enabled (%s)', $service_short, $pkg);
         return $pkg;
-    }
 
-    $self->log->warn(sprintf 'Service "%s": skipped - no matching class found', $service);
-    return;
+    } else {
+        $self->log->warn(sprintf 'Service "%s": skipped - no matching class found', $service_short);
+        return;
+    }
 }
 
 # from Mojolicious::Command::routes

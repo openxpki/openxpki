@@ -10,8 +10,6 @@ plugins.
 
 # Core modules
 use Module::Load ();
-use File::Spec;
-use IO::Dir 1.03;
 use List::Util qw( any );
 
 # CPAN modules
@@ -21,6 +19,7 @@ use Moose::Util qw( does_role );
 use OpenXPKI::Server::Log;
 use OpenXPKI::Base::API::PluginRole;
 use OpenXPKI::Base::API::Autoloader;
+use OpenXPKI::Util;
 
 =head2 REQUIRED METHODS
 
@@ -234,7 +233,7 @@ sub _build_namespace_commands ($self) {
     my @modules = ();
     my $pkg_map = {};
     try {
-        $pkg_map = _list_modules($self->namespace."::");
+        $pkg_map = OpenXPKI::Util->list_modules($self->namespace.'::', 1);
     }
     catch ($err) {
         OpenXPKI::Exception->throw (
@@ -716,81 +715,6 @@ sub _get_acl_rules {
 
     $self->log->debug("ACL config: command '$command' not allowed") if $self->log->is_debug;
     return;
-}
-
-=head2 _list_modules
-
-Lists all modules below the given namespace.
-
-B<Parameters>
-
-=over
-
-=item * C<$namespace> - Perl namespace (e.g. C<OpenXPKI::Base::API::Plugin>)
-
-=back
-
-=cut
-# Taken from Module::List
-
-sub _list_modules {
-    my ($prefix) = @_;
-
-    my $root_rx = qr/[a-zA-Z_][0-9a-zA-Z_]*/;
-    my $notroot_rx = qr/[0-9a-zA-Z_]+/;
-
-    OpenXPKI::Exception->throw(message => "Bad module name given to _list_modules()", params => { prefix => $prefix })
-        unless (
-            $prefix =~ /\A(?:${root_rx}::(?:${notroot_rx}::)*)?\z/x
-            and $prefix !~ /(?:\A|[^:]::)\.\.?::/
-        );
-
-    my @prefixes = ($prefix);
-    my %seen_prefixes;
-    my %results;
-
-    while(@prefixes) {
-        my $prefix = pop(@prefixes);
-        my @dir_suffix = split(/::/, $prefix);
-        my $module_rx = $prefix eq "" ? $root_rx : $notroot_rx;
-        my $pmc_rx = qr/\A($module_rx)\.pmc\z/;
-        my $pm_rx = qr/\A($module_rx)\.pm\z/;
-        my $dir_rx = $prefix eq "" ? $root_rx : $notroot_rx;
-        $dir_rx = qr/\A$dir_rx\z/;
-        # Reverse @INC so that modules paths listed earlier win (by overwriting
-        # previously found modules in $results{...}.
-        # This is similar to Perl's behaviour when including modules.
-        for my $incdir (reverse @INC) {
-            my $dir = File::Spec->catdir($incdir, @dir_suffix);
-            my $dh = IO::Dir->new($dir) or next;
-            my @entries = $dh->read;
-            $dh->close;
-            # list modules
-            for my $pmish_rx ($pmc_rx, $pm_rx) {
-                for my $entry (@entries) {
-                    if($entry =~ $pmish_rx) {
-                        my $name = $prefix.$1;
-                        $results{$name} = File::Spec->catdir($dir, $entry);
-                    }
-                }
-            }
-            # recurse
-            for my $entry (@entries) {
-                my $dir = File::Spec->catdir($dir, $entry);
-                next unless (
-                    File::Spec->no_upwards($entry)
-                    and $entry =~ $dir_rx
-                    and -d $dir
-                );
-                my $newpfx = $prefix.$entry."::";
-                if (!exists($seen_prefixes{$newpfx})) {
-                    push @prefixes, $newpfx;
-                    $seen_prefixes{$newpfx} = undef;
-                }
-            }
-        }
-    }
-    return \%results;
 }
 
 =head1 ACLs
