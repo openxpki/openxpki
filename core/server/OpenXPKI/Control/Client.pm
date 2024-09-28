@@ -96,6 +96,7 @@ sub cmd_start ($self) {
 
     $daemon->check_pid; # delete any old PID file
 
+    OpenXPKI::Log4perl->init_or_fallback('' , $self->opts->{debug} ? 'TRACE' : 'INFO');
     my $log = OpenXPKI::Log4perl->get_logger('openxpki.client');
 
     $daemon->build_app('OpenXPKI::Client::Web' => {
@@ -265,5 +266,12 @@ Debug mode, also enables Mojolicious development mode:
 =item * print detailed Mojolicious exceptions.
 
 =back
+
+=item B<--no-detach>
+
+=item B<--nd>
+
+Do not fork, i.e. do not send daemon to background. Together with --debug this
+will show all debug messages in the console.
 
 =back

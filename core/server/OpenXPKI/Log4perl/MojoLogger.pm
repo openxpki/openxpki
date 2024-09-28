@@ -92,7 +92,7 @@ sub get_logger {
               is_fatal => sub { shift->is_level('fatal') };
             $patched = 1;
         }
-        $logger = Mojo::Log->new;
+        $logger = Mojo::Log->new; # default level is TRACE
     }
 
     # Save it in global structure
