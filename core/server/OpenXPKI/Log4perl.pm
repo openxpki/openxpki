@@ -108,7 +108,7 @@ sub init_or_fallback {
         "log4perl.rootLogger" => uc($fallback_prio).", SCREEN",
         "log4perl.appender.SCREEN" => "Log::Log4perl::Appender::Screen",
         "log4perl.appender.SCREEN.layout" => "Log::Log4perl::Layout::PatternLayout",
-        "log4perl.appender.SCREEN.layout.ConversionPattern" => "%d [%p] %i %m%n",
+        "log4perl.appender.SCREEN.layout.ConversionPattern" => "%d %p %m [pid=%P|%i]%n",
     } unless($config);
 
     Log::Log4perl->init($config);
