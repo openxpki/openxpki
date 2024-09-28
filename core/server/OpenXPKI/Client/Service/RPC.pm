@@ -22,21 +22,6 @@ use OpenXPKI::i18n qw( i18n_walk );
 # (we avoid Moose::Exporter's import magic because that switches on all warnings again)
 our @EXPORT = qw( cgi_safe_sub ); # provided by OpenXPKI::Client::Service::Role::Base
 
-has json => (
-    is => 'ro',
-    isa => 'Object',
-    init_arg => undef,
-    lazy => 1,
-    default => sub {
-        my $json = JSON::PP->new->utf8;
-        # Use plain scalars as boolean values. The default representation as
-        # JSON::PP::Boolean would cause the values to be serialized later on.
-        # A JSON false would be converted to a trueish scalar "OXJSF1:false".
-        $json->boolean_values(0,1);
-
-        return $json;
-    },
-);
 
 has json_data => (
     is => 'rw',

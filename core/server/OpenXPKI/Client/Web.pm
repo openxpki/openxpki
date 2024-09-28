@@ -144,7 +144,7 @@ sub startup ($self) {
     );
 
     # my $services = $self->oxi_config->list_services;
-    my $services = [ qw( healthcheck est rpc scep ) ];
+    my $services = [ qw( healthcheck est rpc scep webui ) ];
 
     for my $service ($services->@*) {
         # fetch the class that consumes OpenXPKI::Client::Service::Role::Info
@@ -184,7 +184,7 @@ sub startup ($self) {
                 $self->_drop_privileges($server->pid_file, $user, $group, "Manager $$");
             });
         } else {
-            $self->log->warn('The OpenXPKI Client will only work properly with Mojolicious server Mojo::Server::Prefork');
+            $self->log->warn('The OpenXPKI client will only work properly with Mojolicious server Mojo::Server::Prefork');
         }
         # } elsif ($server->isa('Mojo::Server::Daemon')) {
         #     # The following does currently not work
@@ -204,8 +204,14 @@ sub startup ($self) {
         $self->log->trace(sprintf 'Incoming %s request', uc($c->req->url->base->protocol)); # ->protocol: Normalized version of ->scheme
 
         if ($self->mode eq 'development') {
-            $self->log->warn('Development mode: enforce HTTPS');
+            $self->log->warn('Enforce HTTPS because of Mojolicious development mode');
             $c->req->url->base->scheme('https');
+        }
+
+        # unescape header values (for some reason they are url escaped)
+        for my $key ($c->req->headers->names->@*) {
+            my @val = map { url_unescape($_) } $c->req->headers->every_header($key)->@*;
+            $c->req->headers->header($key, @val);
         }
 
         # Inject forwarded Apache ENV into Mojo::Request
@@ -215,10 +221,10 @@ sub startup ($self) {
         my $headers = $c->req->headers->to_hash;
         my $apache_env = {};
         for my $header (sort keys $headers->%*) {
-            if (my ($key) = $header =~ /^X-OpenXPKI-Apache-ENV-(.*)/) {
-                my $val = url_unescape($headers->{$header});
-                $apache_env->{$key} = $val;
-                $self->log->trace("Apache ENV variable received via header: $key");
+            if (my ($env_key) = $header =~ /^X-OpenXPKI-Apache-ENV-(.*)/) {
+                my $val = $headers->{$header};
+                $apache_env->{$env_key} = $val;
+                $self->log->trace("Apache ENV variable received via header: $env_key");
             }
         }
         $c->stash(apache_env => $apache_env);
@@ -230,8 +236,7 @@ sub startup ($self) {
         # which is also valid for "RewriteRule ... url [p]" says: "url is a
         # partial URL for the remote server and cannot include a query string."
         # (https://httpd.apache.org/docs/2.4/mod/mod_proxy.html#proxypass)
-        if (my $query_escaped = $c->req->headers->header('X-OpenXPKI-Apache-QueryString')) {
-            my $query = url_unescape($query_escaped);
+        if (my $query = $c->req->headers->header('X-OpenXPKI-Apache-QueryString')) {
             $c->req->url->query($query);
             $self->log->trace("Apache QUERY_STRING received via header: $query");
         }
@@ -281,7 +286,7 @@ sub _drop_privileges ($self, $pid_file, $user, $group, $label) {
     my (undef, $uid, undef, $gid) = OpenXPKI::Util->resolve_user_group($user, $group, 'Mojolicious daemon', 1);
 
     # ownership already correct - nothing to do
-    return if (POSIX::getuid == $uid and POSIX::getgid == $gid);
+    return if (POSIX::getuid == ($uid//-1) and POSIX::getgid == ($gid//-1));
 
     # change file ownership before dropping privileges!
     chown $uid, -1, $pid_file if defined $uid;

@@ -3,12 +3,12 @@ package MockUI;
 use Moose;
 use namespace::autoclean;
 
-extends 'OpenXPKI::Client::UI';
+extends 'OpenXPKI::Client::Service::WebUI';
 
 use JSON;
 use CGIMock;
 use CGI::Session;
-use OpenXPKI::Client::UI::Request;
+use OpenXPKI::Client::Service::WebUI::Request;
 
 
 has cgi => (
@@ -76,13 +76,13 @@ sub __request {
     open(STDOUT, '>', \$out);
 
     my $result = $self->handle_request(
-        OpenXPKI::Client::UI::Request->new(
-            cgi => $self->cgi,
+        OpenXPKI::Client::Service::WebUI::Request->new(
+            mojo_request => ???
             session => $self->session,
             log => $self->log,
         )
     );
-    $result->render;
+    $result->render; <---- !!
     my $json = $self->json->decode($out);
 
     if (ref $json->{main} and my $fields = $json->{main}->[0]->{content}->{fields}) {

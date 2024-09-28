@@ -590,8 +590,9 @@ See send_command_msg.
 =head2 init_session
 
 Initialize session. If the named argument SESSION_ID exists, this session
-is re-opened. If it can not be loaded, and expcetion is thrown. If you don't
+is re-opened. If it can not be loaded, and exception is thrown. If you don't
 pass a session id, a new session is created.
+
 If you want to create a new session if the existing one is no longer
 available, pass NEW_ON_FAIL with a true value as extra argument.
 

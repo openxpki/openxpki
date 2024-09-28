@@ -43,6 +43,7 @@ use List::Util qw( any );
 use Crypt::PKCS10;
 use Log::Log4perl qw( :nowarn );
 use Mojo::Message::Request;
+use Mojo::Util qw( url_unescape );
 
 # Project modules
 use OpenXPKI::Exception;
@@ -109,8 +110,8 @@ The consuming class needs to implement the following methods:
 
 =head3 prepare
 
-Do service specific checks and preparations before the request / operation
-handling as defined in L</op_handlers> starts.
+Might contain checks and preparations common to all service operations before
+the request handling starts (as defined in L</op_handlers>).
 
 Must set the L</operation> attribute.
 
@@ -133,7 +134,7 @@ B<Parameters>
 =head3 send_response
 
 Convert the L<OpenXPKI::Client::Service::Response> object into a service
-specific HTTP response and send it to the HTTP client via the Mojolicious
+specific HTTP response and send it to the browser via the Mojolicious
 controller.
 
     sub send_response ($self, $c, $response) {
@@ -148,6 +149,20 @@ controller.
         }
     }
 
+Please note that the following attributes of the response object are automatically
+injected into the Mojolicious response (i.e. C<$c-E<gt>resp>) before C<send_response>
+is called:
+
+=over
+
+=item * L<$response-E<gt>extra_headers|OpenXPKI::Client::Service::Response/extra_headers>
+
+=item * L<$response-E<gt>http_status_code|OpenXPKI::Client::Service::Response/http_status_code>
+
+=item * L<$response-E<gt>http_status_message|OpenXPKI::Client::Service::Response/http_status_message>
+
+=back
+
 B<Parameters>
 
 =over
@@ -160,7 +175,7 @@ B<Parameters>
 
 =head3 op_handlers
 
-Defines the mapping between requested operation and the handler methods.
+Define the mapping between requested operation and the handler methods.
 
 Must return an I<ArrayRef> where the odd items are either an operation name
 (I<Str>) or a list of operation names (I<ArrayRef>) and the even items are
@@ -252,7 +267,7 @@ has remote_address => (
     required => 1,
 );
 
-=head3 remote_address
+=head3 request
 
 L<Mojo::Message::Request> object encapsulating the request.
 
@@ -523,6 +538,34 @@ has custom_wf_params => (
     },
 );
 
+=head3 json
+
+Helper to uniformly access an instance of L<JSON:PP> with the following configuration:
+
+=over
+
+=item * UTF-8 enabled
+
+=item * Use plain scalars as boolean values (when decoding a JSON string)
+
+=back
+
+=cut
+has json => (
+    is => 'ro',
+    isa => 'Object',
+    init_arg => undef,
+    lazy => 1,
+    default => sub {
+        my $json = JSON::PP->new->utf8;
+        # Use plain scalars as boolean values. The default representation as
+        # JSON::PP::Boolean would cause the values to be serialized later on.
+        # A JSON false would be converted to a trueish scalar "OXJSF1:false".
+        $json->boolean_values(0,1);
+        return $json;
+    },
+);
+
 =head1 METHODS
 
 =cut
@@ -628,7 +671,6 @@ sub handle_request ($self) {
 
     $self->log->debug('Status: ' . $response->http_status_line);
     $self->log->error($response->error_message) if $response->has_error;
-    $self->log->trace('Response: ' . Dumper $response) if $self->log->is_trace;
 
     return $response;
 }
@@ -1223,7 +1265,6 @@ sub cgi_safe_sub :prototype($&) ($self, $handler_sub) {
     }
 
     $self->log->debug('HTTP status: [' . $response->http_status_line . ']');
-    $self->log->trace(Dumper $response) if $self->log->is_trace;
     $self->log->error($response->error_message) if $response->has_error;
 
     return $response;

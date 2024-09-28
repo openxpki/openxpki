@@ -416,7 +416,7 @@ has log_level => (
 =item * I<log_class> (optional) - A regex: only show log messages originating
 from Perl packages matching this value.
 
-E.g. C<log_class =E<gt> qr/^OpenXPKI::Client::UI/> to show messages from all
+E.g. C<log_class =E<gt> qr/^OpenXPKI::Client::Service::WebUI/> to show messages from all
 packages below this namespace. Default: qr/^/ (= all packages)
 
 =cut

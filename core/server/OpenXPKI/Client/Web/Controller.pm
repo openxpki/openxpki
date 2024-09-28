@@ -67,7 +67,8 @@ sub index ($self) {
     my $class = $self->stash('service_class') or die "Missing parameter 'service_class' in Mojolicious stash";
     my $service_name = $self->stash('service_name') or die "Missing parameter 'service_class' in Mojolicious stash";
     my $no_config = $self->stash('no_config');
-    my $endpoint = $self->stash('endpoint') or die "Missing parameter 'endpoint' in Mojolicious stash";
+    my $endpoint = $self->stash('endpoint'); # may be an empty string
+    die "Missing parameter 'endpoint' in Mojolicious stash" unless defined $endpoint;
 
     # load and instantiate service class
     my $service;
@@ -134,6 +135,8 @@ sub index ($self) {
     # HTTP response
     $self->log->debug("Request handling (3/3): send response");
     $service->send_response($self, $response);
+
+    $service->cleanup if $service->can('cleanup');
 }
 
 1;

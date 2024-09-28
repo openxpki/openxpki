@@ -107,7 +107,7 @@ Error response with predefined plus custom error message:
 
 =head2 result
 
-Service specific result I<Str> or I<HashRef>.
+Service specific result I<Str>, I<HashRef> or I<Object>.
 
     OpenXPKI::Client::Service::Response->new(
         result => json_encode(...),
@@ -116,7 +116,7 @@ Service specific result I<Str> or I<HashRef>.
 =cut
 has result => (
     is => 'rw',
-    isa => 'Str|HashRef',
+    isa => 'Str|HashRef|Object',
     lazy => 1,
     default => '',
     predicate => 'has_result',
@@ -139,6 +139,10 @@ has extra_headers => (
     isa => 'HashRef',
     lazy => 1,
     default => sub { {} },
+    traits => ['Hash'],
+    handles => {
+        add_header => 'set',
+    }
 );
 
 =head2 error
@@ -334,6 +338,25 @@ sub __build_http_status_line ($self) {
     );
 }
 
+=head2 redirect_url
+
+Extra HTTP headers to be added (I<HashRef>).
+
+    OpenXPKI::Client::Service::Response->new(
+        ...
+        redirect_url => 'https://www.openxpki.org',
+    );
+
+=cut
+has redirect_url => (
+    is => 'rw',
+    isa => 'HashRef',
+    lazy => 1,
+    default => sub { {} },
+    traits => ['Hash'],
+    predicate => 'is_redirect',
+);
+
 =head2 state
 
 Readonly workflow C<state> I<Str>, automatically set if L</workflow> was set.
@@ -440,7 +463,7 @@ it will be translated:
 
 around BUILDARGS => sub ($orig, $class, @args) {
     # shortcut: only scalar error code or code+message
-    if (scalar @args < 3 and not blessed $args[0] and $args[0] =~ /^\A\d+\z/) {
+    if (scalar 0 < @args < 3 and not blessed $args[0] and $args[0] =~ /^\A\d+\z/) {
         @args = (
             error => $args[0],
             $args[1] ? (error_message => $args[1]) : (),
@@ -579,14 +602,14 @@ sub add_debug_headers ($self) {
     my $workflow = $self->workflow or return;
 
     if ($workflow->{id}) {
-        $self->extra_headers->{'X-OpenXPKI-Workflow-Id'} = $workflow->{id};
+        $self->add_header('X-OpenXPKI-Workflow-Id' => $workflow->{id});
     }
     if ($self->has_transaction_id) {
         my $tid = $self->transaction_id;
         # this should usually be a hexadecimal string but to avoid any surprise
         # we check this here and encoded if needed.
         $tid = Encode::encode("MIME-B", $tid) if $tid =~ m{\W};
-        $self->extra_headers->{'X-OpenXPKI-Transaction-Id'} = $tid;
+        $self->add_header('X-OpenXPKI-Transaction-Id' => $tid);
     }
     if (my $error = $workflow->{context}->{error_code}) {
         # header must not be any longer than 76 chars in total
@@ -594,10 +617,56 @@ sub add_debug_headers ($self) {
         # use mime encode if header is non-us-ascii, 42 chars plus tags is the
         # maximum to stay below 76 chars (starts to wrap otherwise)
         $error = Encode::encode("MIME-B", substr($error,0,42)) if $error =~ m{\W};
-        $self->extra_headers->{'X-OpenXPKI-Error'} = $error;
+        $self->add_header('X-OpenXPKI-Error' => $error);
     }
+}
+
+=head2 redirect_to
+
+HTTP redirect to the given URL.
+
+    $response->redirect_to('https://www.openxpki.org');
+
+B<Parameters>
+
+=over
+
+=item * I<Str> C<$target> - URL
+
+=back
+
+=cut
+sub redirect_to ($self, $target) {
+    $self->redirect_url($target);
+    $self->http_status_code(302);
 }
 
 __PACKAGE__->meta->make_immutable;
 
- __END__;
+=pod
+
+=head2 add_header
+
+Sets the given HTTP header.
+
+    $response->add_header('content-type' => 'text/plain');
+
+B<Parameters>
+
+=over
+
+=item * I<Str> C<$name> - header name.
+
+=item * I<Str> C<$value> - header value.
+
+=back
+
+=cut
+### add_header() is an accessor for "extra_headers" (see attribute above)
+
+=head2 is_redirect
+
+Returns TRUE if L</redirect_to> was called, FALSE otherwise.
+
+=cut
+### is_redirect() is an accessor for "redirect_url" (see attribute above)

@@ -698,7 +698,7 @@ export default class OxiContentService extends Service {
         }
 
         // Breadcrumb may be suppressed by setting empty workflow label.
-        // See OpenXPKI::Client::UI::Workflow->__get_breadcrumb()
+        // See OpenXPKI::Client::Service::WebUI::Workflow->__get_breadcrumb()
         let suppressBreadcrumb = (Object.keys(page).length == 0) || (bc.suppress??0 == 1)
         if (suppressBreadcrumb) debug('#setBreadcrumbs(): server sent empty hash - suppressing new breadcrumb')
 

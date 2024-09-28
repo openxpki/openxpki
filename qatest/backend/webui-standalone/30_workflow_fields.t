@@ -11,7 +11,7 @@ use File::Temp qw( tempdir );
 use Test::Deep ':v1';
 use CGI::Session;
 
-#use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Client::UI::Workflow'} = 100;
+#use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Client::Service::WebUI::Workflow'} = 100;
 
 # Project modules
 use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
@@ -187,7 +187,7 @@ sub make_wf_config {
 sub ui_client {
     my ($oxitest) = @_;
 
-    require_ok( 'OpenXPKI::Client::UI' );
+    require_ok( 'OpenXPKI::Client::Service::WebUI' );
 
     my $session = CGI::Session->new(undef, undef, { Directory => $SESSION_DIR });
 
@@ -300,7 +300,7 @@ my $oxitest = OpenXPKI::Test->new(
     also_init => "crypto_layer",
     add_config => $wf_defs,
     # log_level => 'TRACE',
-    # log_class => qr/^OpenXPKI::Client::UI::Request/,
+    # log_class => qr/^OpenXPKI::Client::Service::WebUI::Request/,
 );
 
 # test dependent initializations
