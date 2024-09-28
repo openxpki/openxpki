@@ -35,7 +35,7 @@ has cfg => (
         # require OpenXPKI::Config;
         # my $config = OpenXPKI::Config->new;
         return {
-            user => 'openxpki',
+            user => 'www-data',
             group => 'openxpki',
             pid_file => '/run/openxpki-client.pid',
             socket_file => '/var/openxpki/openxpki-client.socket',
