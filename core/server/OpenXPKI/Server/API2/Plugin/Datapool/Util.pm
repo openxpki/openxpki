@@ -355,7 +355,6 @@ sub rekey_realm_encryption_key ($self, $key_id, $safe_id) {
 
     if ('p7:'.$safe_id eq $result->{encryption_key}) {
         CTX('log')->system()->warn(sprintf('Rekey request with target equal current token (Token: %s, Key: %s)', $safe_id, $key_id));
-        return;
     }
 
     # store the old key as backup - as we do not set force this can crash on an old backup
