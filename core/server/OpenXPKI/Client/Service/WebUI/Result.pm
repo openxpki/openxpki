@@ -12,8 +12,6 @@ use Encode;
 use HTML::Entities;
 use JSON;
 use Data::UUID;
-use Crypt::JWT qw( encode_jwt );
-use Crypt::PRNG;
 
 # Project modules
 use OpenXPKI::Serialization::Simple;
@@ -21,39 +19,6 @@ use OpenXPKI::Client::Service::WebUI::Response;
 
 
 # REQUIRED
-
-has client => (
-    required => 1,
-    is => 'ro',
-    isa => 'OpenXPKI::Client::Service::WebUI',
-    reader => '_client',
-    handles => [ qw(
-        persist_response
-        fetch_response
-    ) ],
-);
-
-# PRIVATE
-
-=head2 log
-
-L<Log::Log4perl::Logger> or L<OpenXPKI::Log4perl::MojoLogger>.
-
-=cut
-
-has log => (
-    is => 'ro',
-    isa => 'Object',
-    init_arg => undef,
-    lazy => 1,
-    default => sub ($self) { return $self->_client->log },
-);
-
-=head2 ui_response
-
-L<OpenXPKI::Client::Service::WebUI::Response> object encapsulation the UI response.
-
-=cut
 
 =pod
 
@@ -119,17 +84,35 @@ B<Parameters>
 
 =cut
 
-has _ui_request => (
-    is => 'rw',
-    isa => 'OpenXPKI::Client::Service::WebUI::Request',
-    init_arg => undef,
-    lazy => 1,
-    default => sub ($self) { return $self->_client->_ui_request },
+has client => (
+    required => 1,
+    is => 'ro',
+    isa => 'OpenXPKI::Client::Service::WebUI',
+    reader => '_client',
     handles => [ qw(
+        persist_response
+        fetch_response
         param
         multi_param
         secure_param
+        encrypt_jwt
     ) ],
+);
+
+# PRIVATE
+
+=head2 log
+
+L<Log::Log4perl::Logger> or L<OpenXPKI::Log4perl::MojoLogger>.
+
+=cut
+
+has log => (
+    is => 'ro',
+    isa => 'Object',
+    init_arg => undef,
+    lazy => 1,
+    default => sub ($self) { return $self->_client->log },
 );
 
 =pod
@@ -775,30 +758,6 @@ sub transate_sql_wildcards  {
     return $val;
 }
 
-# encrypt given data
-sub _encrypt_jwt {
-    my ($self, $value) = @_;
-
-    my $key = $self->session_param('jwt_encryption_key');
-    if (not $key) {
-        $key = Crypt::PRNG::random_bytes(32);
-        $self->session_param('jwt_encryption_key', $key);
-    }
-
-    my $token = encode_jwt(
-        payload => $value,
-        enc => 'A256CBC-HS512',
-        alg => 'PBES2-HS512+A256KW', # uses "HMAC-SHA512" as the PRF and "AES256-WRAP" for the encryption scheme
-        key => $key, # can be any length for PBES2-HS512+A256KW
-        extra_headers => {
-            p2c => 8000, # PBES2 iteration count
-            p2s => 32,   # PBES2 salt length
-        },
-    );
-
-    return $token;
-}
-
 =head2 secure_call
 
 Encrypt the given page and parameters using a JWT.
@@ -826,8 +785,7 @@ signature_for secure_call => (
     ],
 );
 sub secure_call ($self, $arg) {
-
-    my $token = $self->_encrypt_jwt({
+    my $token = $self->encrypt_jwt({
         page => $arg->page,
         secure_param => $arg->secure_param // {},
     });

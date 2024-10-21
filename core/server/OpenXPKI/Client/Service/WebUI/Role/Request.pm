@@ -1,16 +1,22 @@
-package OpenXPKI::Client::Service::WebUI::Request;
-use OpenXPKI -class;
+package OpenXPKI::Client::Service::WebUI::Role::Request;
+use OpenXPKI -role;
 use namespace::autoclean;
+
+requires 'request';
+requires 'session';
+requires 'log';
+requires 'decrypt_jwt';
+requires 'json';
 
 =head1 NAME
 
-OpenXPKI::Client::Service::WebUI::Request
+OpenXPKI::Client::Service::WebUI::Role::Request
 
 =head1 DESCRIPTION
 
-This class is used to hold the input data received as from the webserver
-and provides a transparent interface to the application to retrieve
-parameter values regardless which transport format was used.
+Extends the L<OpenXPKI::Client::Service::Role::Request> role with methods to query
+request parameters (browser request data) regardless of the transport format
+that was used.
 
 If the data was POSTed as JSON blob, the parameters are already expanded
 with the values in the I<cache> hash. If data was sent via HTTP GET or POST
@@ -25,40 +31,15 @@ use Carp qw( confess );
 use OpenXPKI::Dumper;
 use List::Util qw( first );
 
-# CPAN modules
-use JSON;
-use Log::Log4perl;
-use Crypt::JWT qw( decode_jwt );
 
-=head3 mojo_request
+use constant PREFIX_BASE64 => '_encoded_base64_';
+use constant PREFIX_JWT => '_encrypted_jwt_';
 
-L<Mojo::Message::Request> object encapsulating the request.
-
-=cut
-has mojo_request => (
-    is => 'ro',
-    isa => 'Mojo::Message::Request',
-    required => 1,
-    handles => [qw( method )],
-);
-
-has session => (
-    required => 1,
-    is => 'rw',
-    isa => 'OpenXPKI::Client::Service::WebUI::Session',
-);
-
-has log => (
-    required => 1,
-    is => 'ro',
-    isa => 'Object', # Log::Log4perl::Logger or OpenXPKI::Log4perl::MojoLogger
-);
-
-# cache (and secure_cache) work as follows:
+# _param_cache (and _secure_param_cache) work as follows:
 # All GET/POST parameter keys are inserted as $key => undef. The undefined value
 # indicates that the parameter exists but was not yet queried / decoded.
 # Data passed via JSON is directly inserted as $key => $value.
-has cache => (
+has _param_cache => (
     is => 'rw',
     isa => 'HashRef',
     traits => ['Hash'],
@@ -66,55 +47,42 @@ has cache => (
 );
 
 # parameters from a secure JWT
-has secure_cache => (
+has _secure_param_cache => (
     is => 'rw',
     isa => 'HashRef',
     traits => ['Hash'],
     default => sub { {} },
 );
 
-has id => (
-    is => 'ro',
-    isa => 'Str',
-    lazy => 1,
-    default => sub { my $id="".shift; $id =~ s/.*\(0x([^\)]+)\)/$1/; $id },
-);
-
-has _prefix_base64 => (
-    is => 'ro',
-    isa => 'Str',
-    default => '_encoded_base64_',
-);
-
-has _prefix_jwt => (
-    is => 'ro',
-    isa => 'Str',
-    default => '_encrypted_jwt_',
-);
-
 =head1 METHODS
 
 =cut
 
-sub BUILD {
-    my $self = shift;
-
+# Around modifier with fallback BUILD method:
+# "around 'BUILD'" complains if there is no BUILD method in the inheritance
+# chain of the consuming class. So we define an empty fallback method.
+# If the consuming class defines an own BUILD method it will overwrite ours.
+# The "around" modifier will work in any case.
+# Please note that "around 'build'" is only allowed in roles.
+# https://metacpan.org/dist/Moose/view/lib/Moose/Manual/Construction.pod#BUILD-and-parent-classes
+sub BUILD {}
+after 'BUILD' => sub ($self, $args) {
     #
     # Preset all keys in the cache (for JSON data, also set the values)
     #
 
     # store keys from GET/POST params
-    for my $key ($self->mojo_request->params->names->@*) {
-        $self->cache->{$key} = undef; # we do not yet query/cache the value but make the key known
-        $self->_check_param_encoding($key);
-        $self->log->trace(sprintf('Request parameter: %s = %s', $key, join(',', $self->mojo_request->every_param($key)->@*))) if $self->log->is_trace;
+    for my $key ($self->request->params->names->@*) {
+        $self->_param_cache->{$key} = undef; # we do not yet query/cache the value but make the key known
+        $self->_flag_encoded_value($key);
+        $self->log->trace(sprintf('Request parameter: %s = %s', $key, join(',', $self->request->every_param($key)->@*))) if $self->log->is_trace;
     }
 
     # store keys and values from JSON POST data
-    if (($self->mojo_request->headers->content_type // '') eq 'application/json') {
+    if (($self->request->headers->content_type // '') eq 'application/json') {
         $self->log->debug('Incoming POST data in JSON format (application/json)');
 
-        my $data = decode_json( $self->mojo_request->body );
+        my $data = $self->json->decode( $self->request->body );
         # Resolve stringified depth-one-hashes - turn parameters like
         #   key{one} = 34
         #   key{two} = 56
@@ -130,25 +98,22 @@ sub BUILD {
 
         $self->add_params($data->%*);
     }
-}
+};
 
 # Check if parameter key hints an encoded value (Base64 or JWT): insert the
 # sanitized key name into the cache so the "exists" check in _params() or
 # _secure_params() will succeed.
-sub _check_param_encoding {
-    my $self = shift;
-    my $key = shift;
-
-    my $prefix_b64 = $self->_prefix_base64;
-    my $prefix_jwt = $self->_prefix_jwt;
+sub _flag_encoded_value ($self, $key) {
+    my $prefix_b64 = PREFIX_BASE64;
+    my $prefix_jwt = PREFIX_JWT;
 
     # Base64 encoded binary data
     if (my ($k) = $key =~ /^$prefix_b64(.*)/) {
-        $self->cache->{$k} = undef;
+        $self->_param_cache->{$k} = undef;
     }
     # JWT encrypted data
     elsif (my ($sk) = $key =~ /^$prefix_jwt(.*)/) {
-        $self->secure_cache->{$sk} = undef;
+        $self->_secure_param_cache->{$sk} = undef;
     }
 }
 
@@ -158,9 +123,9 @@ sub add_params {
 
     for my $key (keys %params) {
         # normalize all values to ArrayRef because _param() expects this
-        $self->cache->{$key} = (ref $params{$key} eq 'ARRAY' ? $params{$key} : [ $params{$key} ]);
+        $self->_param_cache->{$key} = (ref $params{$key} eq 'ARRAY' ? $params{$key} : [ $params{$key} ]);
         # check key name for "encoded"/"encrypted" flag
-        $self->_check_param_encoding($key);
+        $self->_flag_encoded_value($key);
     }
 }
 
@@ -170,9 +135,9 @@ sub add_secure_params {
 
     for my $key (keys %params) {
         # normalize all values to ArrayRef because _param() expects this
-        $self->secure_cache->{$key} = (ref $params{$key} eq 'ARRAY' ? $params{$key} : [ $params{$key} ]);
+        $self->_secure_param_cache->{$key} = (ref $params{$key} eq 'ARRAY' ? $params{$key} : [ $params{$key} ]);
         # check key name for "encoded"/"encrypted" flag
-        $self->_check_param_encoding($key);
+        $self->_flag_encoded_value($key);
     }
 }
 
@@ -184,10 +149,7 @@ To get all values of a multi-valued parameter use L</multi_param>.
 
 =cut
 
-sub param {
-    my $self = shift;
-    my $key = shift;
-
+sub param ($self, $key) {
     confess 'param() must be called in scalar context' if wantarray; # die
     confess 'param() expects a single key (string) as argument' if (not $key or ref $key); # die
 
@@ -208,10 +170,7 @@ Can only be used in list context.
 
 =cut
 
-sub multi_param {
-    my $self = shift;
-    my $key = shift;
-
+sub multi_param ($self, $key) {
     confess 'multi_param() must be called in list context' unless wantarray; # die
     confess 'multi_param() expects a single key (string) as argument' if (not $key or ref $key); # die
 
@@ -239,10 +198,7 @@ B<Parameters>
 
 =cut
 
-sub secure_param {
-    my $self = shift;
-    my $key = shift;
-
+sub secure_param ($self, $key) {
     confess 'secure_param() must be called in scalar context' if wantarray; # die
     confess 'secure_param() expects a single key (string) as argument' if (not $key or ref $key); # die
 
@@ -256,20 +212,11 @@ sub secure_param {
     }
 }
 
-# Returns the value of the given URL- or POST-parameter.
-# May be overwritten by the consuming class e.g. to query contents of a JSON request.
-sub _request_param ($self, $key) {
-    return $self->mojo_request->params->param($key);
-}
-
-sub _params {
-    my $self = shift;
-    my $key = shift;
-
+sub _params ($self, $key) {
     my $msg = sprintf "Param request for '%s': ", $key;
 
     # try key without trailing array indicator if it does not exist
-    if ($key =~ m{\[\]\z} && !exists $self->cache->{$key}) {
+    if ($key =~ m{\[\]\z} && !exists $self->_param_cache->{$key}) {
         $key = substr($key,0,-2);
         $msg.= "strip array markers, new key '$key', ";
     }
@@ -280,55 +227,51 @@ sub _params {
     }
 
     # valid key?
-    return unless exists $self->cache->{$key};
+    return unless exists $self->_param_cache->{$key};
 
     # cache miss - query parameter
-    unless (defined $self->cache->{$key}) {
-        my $prefix_b64 = $self->_prefix_base64;
+    unless (defined $self->_param_cache->{$key}) {
+        my $prefix_b64 = PREFIX_BASE64;
         my @queries = (
             # Try CGI parameters (and strip leading/trailing whitespaces)
             sub {
-                return map { my $v = $_; $v =~ s/ ^\s+ | \s+$ //gx; $v } $self->mojo_request->every_param($key)->@*
+                return map { my $v = $_; $v =~ s/ ^\s+ | \s+$ //gx; $v } $self->request->every_param($key)->@*
             },
             # Try Base64 encoded parameter from JSON input
             sub {
-                return map { decode_base64($_) } $self->_get_cache($prefix_b64.$key)
+                return map { decode_base64($_) } $self->_get_param_cache($prefix_b64.$key)
             },
             # Try Base64 encoded CGI parameters
             sub {
-                return map { decode_base64($_) } $self->mojo_request->every_param($prefix_b64.$key)->@*
+                return map { decode_base64($_) } $self->request->every_param($prefix_b64.$key)->@*
             },
         );
         for my $query (@queries) {
             my @values = $query->();
             if (scalar @values) {
-                $self->cache->{$key} = \@values;
+                $self->_param_cache->{$key} = \@values;
                 last;
             }
         }
-        $self->log->trace($msg . 'not in cache. Query result: (' . join(', ', $self->_get_cache($key)) . ')') if $self->log->is_trace;
+        $self->log->trace($msg . 'not in cache. Query result: (' . join(', ', $self->_get_param_cache($key)) . ')') if $self->log->is_trace;
     }
     else {
         $self->log->trace($msg . 'return from cache');
     }
 
-    return $self->_get_cache($key); # list
+    return $self->_get_param_cache($key); # list
 }
 
-sub _secure_params {
-    my $self = shift;
-    my $key = shift;
-
+sub _secure_params ($self, $key) {
     my $msg = sprintf "Secure param request for '%s': ", $key;
 
     # valid key?
-    return unless exists $self->secure_cache->{$key};
+    return unless exists $self->_secure_param_cache->{$key};
 
     # cache miss - query parameter
-    unless (defined $self->secure_cache->{$key}) {
+    unless (defined $self->_secure_param_cache->{$key}) {
         # Decrypt JWT
-        my $prefix_jwt = $self->_prefix_jwt;
-        my @values = map { $self->_decrypt_jwt($_) } $self->_get_cache($prefix_jwt.$key);
+        my @values = map { $self->decrypt_jwt($_) } $self->_get_param_cache(PREFIX_JWT.$key);
         $self->add_secure_params($key => \@values) if scalar @values;
         $self->log->trace($msg . 'not in cache. Query result: (' . join(', ', @values) . ')') if $self->log->is_trace;
     }
@@ -336,40 +279,18 @@ sub _secure_params {
         $self->log->trace($msg . 'return from cache');
     }
 
-    return $self->_get_secure_cache($key); # list
+    return $self->_get_secure_param_cache($key); # list
 }
 
 # Returns a list of values for a parameter (may be a single value or an empty list)
-sub _get_cache {
-    my $self = shift;
-    my $key = shift;
-    return @{ $self->cache->{$key} // [] }
+sub _get_param_cache ($self, $key) {
+    return @{ $self->_param_cache->{$key} // [] }
 }
 
 # Returns a list of values for a secure parameter (may be a single value or an empty list)
-sub _get_secure_cache {
-    my $self = shift;
-    my $key = shift;
-    return @{ $self->secure_cache->{$key} // [] }
+sub _get_secure_param_cache ($self, $key) {
+    return @{ $self->_secure_param_cache->{$key} // [] }
 }
 
-sub _decrypt_jwt {
+1;
 
-    my $self = shift;
-    my $token = shift;
-
-    return unless $token;
-
-    my $jwt_key = $self->session->param('jwt_encryption_key');
-    unless ($jwt_key) {
-        $self->log->debug("JWT encrypted parameter received but client session contains no decryption key");
-        return;
-    }
-
-    my $decrypted = decode_jwt(token => $token, key => $jwt_key);
-
-    return $decrypted;
-
-}
-
-__PACKAGE__->meta->make_immutable;

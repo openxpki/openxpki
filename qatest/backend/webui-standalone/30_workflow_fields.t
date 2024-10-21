@@ -300,7 +300,7 @@ my $oxitest = OpenXPKI::Test->new(
     also_init => "crypto_layer",
     add_config => $wf_defs,
     # log_level => 'TRACE',
-    # log_class => qr/^OpenXPKI::Client::Service::WebUI::Request/,
+    # log_class => qr/^OpenXPKI::Client::Service::WebUI/,
 );
 
 # test dependent initializations

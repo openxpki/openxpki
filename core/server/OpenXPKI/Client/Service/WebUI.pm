@@ -4,6 +4,7 @@ use OpenXPKI qw( -class -typeconstraints );
 with qw(
     OpenXPKI::Client::Service::Role::Info
     OpenXPKI::Client::Service::Role::Base
+    OpenXPKI::Client::Service::WebUI::Role::Request
 );
 
 # Core modules
@@ -15,11 +16,12 @@ use Digest::SHA qw(sha1_base64);
 
 # CPAN modules
 use Crypt::JWT qw( encode_jwt decode_jwt );
-use URI::Escape;
+use Crypt::CBC;
+use Crypt::PRNG;
+use List::MoreUtils qw( firstidx );
 use Log::Log4perl::MDC;
 use LWP::UserAgent;
-use Crypt::CBC;
-use List::MoreUtils qw( firstidx );
+use URI::Escape;
 
 # Project modules
 use OpenXPKI::Dumper;
@@ -27,7 +29,6 @@ use OpenXPKI::Template;
 use OpenXPKI::Client;
 use OpenXPKI::Client::Service::WebUI::Bootstrap;
 use OpenXPKI::Client::Service::WebUI::Login;
-use OpenXPKI::Client::Service::WebUI::Request;
 use OpenXPKI::Client::Service::WebUI::Response;
 use OpenXPKI::Client::Service::WebUI::Result;
 use OpenXPKI::Client::Service::WebUI::Session;
@@ -72,6 +73,7 @@ sub _build_session_cookie ($self) {
 }
 
 # frontend session
+sub session; # "stub" subroutine to satisfy OpenXPKI::Client::Service::WebUI::Role::Base; will be overwritten by attribute accessor later on
 has session => (
     init_arg => undef,
     is => 'rw', # "rw" as it may be refreshed
@@ -320,20 +322,6 @@ has response => (
 );
 
 # PRIVATE ATTRIBUTES
-
-has _ui_request => (
-    init_arg => undef,
-    is => 'ro',
-    isa => 'OpenXPKI::Client::Service::WebUI::Request',
-    lazy => 1,
-    default => sub ($self) {
-        return OpenXPKI::Client::Service::WebUI::Request->new(
-            mojo_request => $self->request,
-            log => $self->log,
-            session => $self->session,
-        );
-    },
-);
 
 # Response structure (JSON or some raw bytes) and HTTP headers
 has _ui_response => (
@@ -662,7 +650,7 @@ sub handle ($self) {
 }
 
 sub handle_ui_request ($self) {
-    my $page = $self->_ui_request->param('page') || '';
+    my $page = $self->param('page') || '';
     my $action = $self->_get_action;
 
     $self->log->debug('Incoming request: ' . join(', ', $page ? "page '$page'" : (), $action ? "action '$action'" : ()));
@@ -722,7 +710,7 @@ sub handle_ui_request ($self) {
 
     # Only handle requests if we have an open channel (unless it's the bootstrap page)
     if ( $reply->{SERVICE_MSG} eq 'SERVICE_READY' or $page =~ /^bootstrap!(.+)/) {
-        return $self->handle_page($page || 'home', $action);
+        return $self->handle_call($page || 'home', $action);
     }
 
     # if the backend session logged out but did not terminate
@@ -766,7 +754,7 @@ sub _load_class ($self, $arg) {
     if ($class eq 'encrypted') {
         # as the token has non-word characters the above regex does not contain the full payload
         # we therefore read the payload directly from call stripping the class name
-        my $decrypted = $self->_ui_request->_decrypt_jwt($remainder) or return;
+        my $decrypted = $self->decrypt_jwt($remainder) or return;
         if ($decrypted->{page}) {
             $self->log->debug("Encrypted request with page " . $decrypted->{page});
             ($class, $method) = ($decrypted->{page} =~ /\A (\w+)\!? (\w+)? \z/xms);
@@ -777,7 +765,7 @@ sub _load_class ($self, $arg) {
         my $secure_params = $decrypted->{secure_param} // {};
         $self->log->debug("Encrypted request to $class / $method");
         $self->log->trace("Secure params: " . Dumper $secure_params) if ($self->log->is_trace and keys $secure_params->%*);
-        $self->_ui_request->add_secure_params($secure_params->%*);
+        $self->add_secure_params($secure_params->%*);
     }
     else {
         ($method, $param_raw) = ($remainder =~ /\A (\w+)? \!?(.*) \z/xms);
@@ -788,8 +776,8 @@ sub _load_class ($self, $arg) {
                 my $val = shift @parts // '';
                 $params->{$key} = Encode::decode("UTF-8", uri_unescape($val));
             }
-            $self->log->trace("Found extra params: " . Dumper $params) if $self->log->is_trace;
-            $self->_ui_request->add_params($params->%*);
+            $self->log->trace("Extra params appended to page call: " . Dumper $params) if $self->log->is_trace;
+            $self->add_params($params->%*);
         }
     }
 
@@ -855,10 +843,10 @@ error. If the parameter is empty or not set an empty string is returned.
 
 sub _get_action ($self) {
     my $rtoken_session = $self->session->param('rtoken') || '';
-    my $rtoken_request = $self->_ui_request->param('_rtoken') || '';
+    my $rtoken_request = $self->param('_rtoken') || '';
 
     # check XSRF token
-    if (my $action = $self->_ui_request->param('action')) {
+    if (my $action = $self->param('action')) {
         if ($rtoken_request && ($rtoken_request eq $rtoken_session)) {
             $self->log->debug("Action '$action': valid request");
             return $action;
@@ -890,15 +878,14 @@ sub _jwt_signature ($self, $data, $jws) {
     }, key=> $pkey, auto_iat => 1, alg=>'ES256');
 }
 
-signature_for handle_page => (
+signature_for handle_call => (
     method => 1,
     positional => [
         'Str',
         'Str', { optional => 1 },
     ],
 );
-sub handle_page ($self, $page, $action) {
-    # Set action or page - args always wins over CGI.
+sub handle_call ($self, $page, $action) {
     # Action is only valid within a post request
     my $result;
     my @page_method_args;
@@ -961,7 +948,7 @@ sub handle_login ($self, $reply) {
     # Login works in three steps realm -> auth stack -> credentials
 
     my $session = $self->session;
-    my $page = $self->_ui_request->param('page') || '';
+    my $page = $self->param('page') || '';
 
     # this is the incoming logout action
     if ($page eq 'logout') {
@@ -981,14 +968,14 @@ sub handle_login ($self, $reply) {
     $self->log->info("Not logged in. Doing auth. page = '$page', action = '$action'");
 
     # Special handling for pki_realm and stack params
-    if ($action eq 'login!realm' && $self->_ui_request->param('pki_realm')) {
-        $self->session->param('pki_realm', scalar $self->_ui_request->param('pki_realm'));
+    if ($action eq 'login!realm' && $self->param('pki_realm')) {
+        $self->session->param('pki_realm', scalar $self->param('pki_realm'));
         $self->session->param('auth_stack', undef);
-        $self->log->debug('set realm in session: ' . $self->_ui_request->param('pki_realm') );
+        $self->log->debug('set realm in session: ' . $self->param('pki_realm') );
     }
-    if($action eq 'login!stack' && $self->_ui_request->param('auth_stack')) {
-        $self->session->param('auth_stack', scalar $self->_ui_request->param('auth_stack'));
-        $self->log->debug('set auth_stack in session: ' . $self->_ui_request->param('auth_stack') );
+    if($action eq 'login!stack' && $self->param('auth_stack')) {
+        $self->session->param('auth_stack', scalar $self->param('auth_stack'));
+        $self->log->debug('set auth_stack in session: ' . $self->param('auth_stack') );
     }
 
     # ENV always overrides session, keep this after the above block to prevent
@@ -1016,7 +1003,7 @@ sub handle_login ($self, $reply) {
         if (my $loginpage = $self->login_page) {
 
             $self->log->debug("Store page request in session for later redirect: $page");
-            return $self->handle_page($loginpage);
+            return $self->handle_call($loginpage);
 
         } elsif (my $loginurl = $self->login_url) {
 
@@ -1281,7 +1268,7 @@ sub handle_login ($self, $reply) {
                     stack =>   $auth_stack,
                 });
 
-                if (my $code = $self->_ui_request->param('code')) {
+                if (my $code = $self->param('code')) {
 
                     # Step 2 - user was redirected from IdP
                     $self->log->debug("OIDC Login (2/3) - redeem auth code $code");
@@ -1358,7 +1345,7 @@ sub handle_login ($self, $reply) {
                     ('username','password');
 
                 foreach my $field (@fields) {
-                    my $val = $self->_ui_request->param($field);
+                    my $val = $self->param($field);
                     next unless ($val);
                     $data->{$field} = $val;
                 }
@@ -1713,7 +1700,7 @@ sub _persist_status {
 sub _fetch_status {
     my $self = shift;
 
-    my $session_key = $self->_ui_request->param('_status_id');
+    my $session_key = $self->param('_status_id');
     return unless $session_key;
 
     my $status = $self->session->param($session_key);
@@ -1772,6 +1759,58 @@ sub fetch_response ($self, $id) {
         return;
     }
     return $response;
+}
+
+=head2 encrypt_jwt
+
+Encrypt the given data into a JWT using the encryption key stored in session
+parameter C<jwt_encryption_key> (key will be set to random value if it does not
+exist yet).
+
+=cut
+
+# required by OpenXPKI::Client::Service::WebUI::Result
+sub encrypt_jwt ($self, $value) {
+    my $key = $self->session->param('jwt_encryption_key');
+    if (not $key) {
+        $key = Crypt::PRNG::random_bytes(32);
+        $self->session->param('jwt_encryption_key', $key);
+    }
+
+    my $token = encode_jwt(
+        payload => $value,
+        enc => 'A256CBC-HS512',
+        alg => 'PBES2-HS512+A256KW', # uses "HMAC-SHA512" as the PRF and "AES256-WRAP" for the encryption scheme
+        key => $key, # can be any length for PBES2-HS512+A256KW
+        extra_headers => {
+            p2c => 8000, # PBES2 iteration count
+            p2s => 32,   # PBES2 salt length
+        },
+    );
+
+    return $token;
+}
+
+=head2 decrypt_jwt
+
+Decrypt the given JWT using the encryption key stored in session parameter
+C<jwt_encryption_key>.
+
+=cut
+
+# required by OpenXPKI::Client::Service::WebUI::Role::Request
+sub decrypt_jwt ($self, $token) {
+    return unless $token;
+
+    my $jwt_key = $self->session->param('jwt_encryption_key');
+    unless ($jwt_key) {
+        $self->log->debug("JWT encrypted parameter received but client session contains no decryption key");
+        return;
+    }
+
+    my $decrypted = decode_jwt(token => $token, key => $jwt_key);
+
+    return $decrypted;
 }
 
 __PACKAGE__->meta->make_immutable;

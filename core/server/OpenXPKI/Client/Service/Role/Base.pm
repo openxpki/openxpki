@@ -69,6 +69,7 @@ Internal name of the service that the class implements. Used e.g.
 =back
 
 =cut
+sub service_name; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
 has service_name => (
     is => 'ro',
     isa => 'Str',
@@ -93,6 +94,7 @@ L</handle_property_request>.
 B<Needs to be set by the consuming class, most likely in its L</prepare> method.>
 
 =cut
+sub operation; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
 has operation => (
     is => 'rw',
     isa => 'Str',
@@ -239,6 +241,7 @@ the consuming service class does not need to care about setting them.
 An instance of L<OpenXPKI::Client::Config>.
 
 =cut
+sub config_obj; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
 has config_obj => (
     is => 'ro',
     isa => 'OpenXPKI::Client::Config',
@@ -250,6 +253,7 @@ has config_obj => (
 I<HashRef> containing the Apache environment variables (NOT the shell environment).
 
 =cut
+sub apache_env; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
 has apache_env => (
     is => 'ro',
     isa => 'HashRef',
@@ -261,6 +265,7 @@ has apache_env => (
 IP address of the client that sent the request.
 
 =cut
+sub remote_address; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
 has remote_address => (
     is => 'ro',
     isa => 'Str',
@@ -272,6 +277,7 @@ has remote_address => (
 L<Mojo::Message::Request> object encapsulating the request.
 
 =cut
+sub request; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
 has request => (
     is => 'ro',
     isa => 'Mojo::Message::Request',
@@ -284,6 +290,7 @@ has request => (
 The endpoint I<Str> extracted from the URL.
 
 =cut
+sub endpoint; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
 has endpoint => (
     is => 'ro',
     isa => 'Str',
@@ -316,6 +323,7 @@ L<HashRef> containing the endpoint configuration as returned by
 L<OpenXPKI::Client::Config/endpoint_config>.
 
 =cut
+sub config; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
 has config => (
     is => 'rw',
     isa => 'HashRef',
@@ -347,6 +355,7 @@ A logger object, per default set
 C<OpenXPKI::Log4perl-E<gt>get_logger('openxpki.client.' . $self-E<gt>service_name)>.
 
 =cut
+sub log; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
 has log => (
     is => 'rw',
     isa => duck_type( [qw(
@@ -364,6 +373,7 @@ An instance of L<OpenXPKI::Client::Simple> initialized with the current
 endpoint configuration.
 
 =cut
+sub backend; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
 has backend => (
     is => 'rw',
     isa => 'Object|Undef',
@@ -551,6 +561,7 @@ Helper to uniformly access an instance of L<JSON:PP> with the following configur
 =back
 
 =cut
+sub json; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
 has json => (
     is => 'ro',
     isa => 'Object',
@@ -1303,5 +1314,3 @@ sub cgi_headers ($self, $headers) {
 }
 
 1;
-
-__END__;
