@@ -163,7 +163,7 @@ sub __load_handler
 
     $self->{PKI_REALM}->{$realm}->{HANDLER}->{$handler} = $class->new( "auth.handler.$handler" );
 
-    CTX('log')->auth()->info('Loaded auth handler ' . $handler);
+    CTX('log')->auth->debug("Loaded auth handler $handler");
 
     ##! 4: "end"
     return 1;
