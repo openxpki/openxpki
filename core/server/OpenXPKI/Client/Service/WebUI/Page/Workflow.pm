@@ -1174,10 +1174,10 @@ sub __delegate_call {
 
     # Three forms of "uihandle" are supported:
     # - shortcut: Profile::render_subject_form
-    # - standard: OpenXPKI::Client::Service::WebUI::Page::Workflow::Handle::Profile::render_subject_form
+    # - standard: OpenXPKI::Client::Service::WebUI::Page::Workflow::Renderer::Profile::render_subject_form
     # - legacy:   OpenXPKI::Client::UI::Handle::Profile::render_subject_form
     my @prefixes = qw(
-        OpenXPKI::Client::Service::WebUI::Page::Workflow::Handle::
+        OpenXPKI::Client::Service::WebUI::Page::Workflow::Renderer::
         OpenXPKI::Client::UI::Handle::
     );
     my $rel_class = $class;

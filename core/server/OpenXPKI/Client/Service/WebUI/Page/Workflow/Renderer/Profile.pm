@@ -1,4 +1,4 @@
-package OpenXPKI::Client::Service::WebUI::Page::Workflow::Handle::Profile;
+package OpenXPKI::Client::Service::WebUI::Page::Workflow::Renderer::Profile;
 use Moose;
 
 use English;
@@ -122,7 +122,7 @@ sub render_subject_form {
 
     my %extra;
     # Parameters given in config via:
-    #   uihandle: OpenXPKI::Client::Service::WebUI::Page::Workflow::Handle::Profile::render_subject_form!mode!renewal
+    #   uihandle: OpenXPKI::Client::Service::WebUI::Page::Workflow::Renderer::Profile::render_subject_form!mode!renewal
     if ($param) {
         my @param = split /!/, $param;
         # TODO Legacy format, section only

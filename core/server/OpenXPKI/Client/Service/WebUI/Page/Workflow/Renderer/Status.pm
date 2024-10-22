@@ -1,4 +1,4 @@
-package OpenXPKI::Client::Service::WebUI::Page::Workflow::Handle::Status;
+package OpenXPKI::Client::Service::WebUI::Page::Workflow::Renderer::Status;
 use Moose;
 
 use Data::Dumper;
