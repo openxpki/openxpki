@@ -21,7 +21,7 @@ sub init_index {
 
     # render title + empty search form
     $self->set_page(
-        label => 'I18N_OPENXPKI_UI_USER_TITLE'
+        label => 'I18N_OPENXPKI_UI_USER_TITLE',
         breadcrumb => {
             is_root => 1,
             label => 'I18N_OPENXPKI_UI_USER_SEARCH_LABEL',
