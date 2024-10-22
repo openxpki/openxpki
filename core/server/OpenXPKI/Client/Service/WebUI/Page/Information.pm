@@ -6,25 +6,8 @@ extends 'OpenXPKI::Client::Service::WebUI::Page';
 use Data::Dumper;
 
 sub BUILD {
-
     my $self = shift;
     $self->page->label('I18N_OPENXPKI_UI_HOME_WELCOME_HEAD');
-}
-
-
-=head2 init_index
-
-Not used yet, redirect to home screen
-
-=cut
-sub init_index {
-
-    my $self = shift;
-    my $args = shift;
-
-    $self->redirect->to('home!index');
-
-    return $self;
 }
 
 =head2 init_issuer
@@ -84,62 +67,6 @@ sub init_issuer {
     });
 
     return $self;
-}
-
-=head2 init_policy
-
-Show policy documents, not implemented yet
-
-=cut
-sub init_policy {
-
-    my $self = shift;
-    my $args = shift;
-
-    $self->set_page(
-        label => 'Policy documents',
-        description => '',
-    );
-
-    $self->main->add_section({
-        type => 'text',
-        content => {
-            description => 'tbd',
-        }
-    });
-}
-
-
-=head2 init_process
-
-Moved to workflow + Handle in OpenXPKI::Client::Service::WebUI::Page::Workflow::Handle::Status
-
-=cut
-sub init_process {
-
-    my $self = shift;
-    my $args = shift;
-
-    $self->main->add_section({
-        type => 'text',
-        content => {
-            description => 'This was moved to a workflow, please update your uicontrol files to workflow!index!wf_type!status_process',
-        }
-    });
-}
-
-
-sub init_status {
-
-    my $self = shift;
-    my $args = shift;
-
-    $self->main->add_section({
-        type => 'text',
-        content => {
-            description => 'This was moved to a workflow, please update your uicontrol files to workflow!index!wf_type!status_system',
-        }
-    });
 }
 
 __PACKAGE__->meta->make_immutable;
