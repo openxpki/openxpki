@@ -237,7 +237,6 @@ sub action_search {
     # store search query in session for paging etc...
     my $queryid = $self->__save_query({
         pagename => 'users',
-        id => $queryid,
         count => $result_count,
         query => $query,
         input => $input,
