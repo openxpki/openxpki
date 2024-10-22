@@ -273,7 +273,7 @@ has ui_response => (
     isa => 'OpenXPKI::Client::Service::WebUI::Response',
     init_arg => undef,
     lazy => 1,
-    default => sub ($self) { return $self->_client->_ui_response },
+    default => sub ($self) { return $self->_client->ui_response },
     handles => [ qw(
         redirect
         confined_response has_confined_response

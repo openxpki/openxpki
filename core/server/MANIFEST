@@ -144,6 +144,8 @@ OpenXPKI/Client/Service/WebUI/Response/Sections.pm
 OpenXPKI/Client/Service/WebUI/Response/Status.pm
 OpenXPKI/Client/Service/WebUI/Response/User.pm
 OpenXPKI/Client/Service/WebUI/Result.pm
+OpenXPKI/Client/Service/WebUI/Role/Handler/Login.pm
+OpenXPKI/Client/Service/WebUI/Role/Handler/Page.pm
 OpenXPKI/Client/Service/WebUI/Role/OutputField.pm
 OpenXPKI/Client/Service/WebUI/Role/Pager.pm
 OpenXPKI/Client/Service/WebUI/Role/QueryCache.pm
