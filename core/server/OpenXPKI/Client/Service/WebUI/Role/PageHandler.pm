@@ -38,9 +38,9 @@ sub handle_action ($self, $action_str) {
             $page->$method();
             # Follow internal redirect to an init_* method
             if (my $target = $page->internal_redirect_target) {
-                my ($view_str, @method_args) = $target->@*;
+                my ($view_str, $method_args) = $target->@*;
                 $self->log->trace("Internal redirect to: $view_str") if $self->log->is_trace;
-                $page = $self->handle_view($view_str, \@method_args, $page->status);
+                $page = $self->handle_view($view_str, $method_args, $page->status);
             }
         } else {
             $self->ui_response->status->error('I18N_OPENXPKI_UI_ACTION_NOT_FOUND');
@@ -59,7 +59,7 @@ signature_for handle_view => (
     method => 1,
     positional => [
         'Str',
-        'ArrayRef' => { default => [] },
+        'HashRef' => { default => {} },
         'OpenXPKI::Client::Service::WebUI::Response::Status' => { optional => 1 },
     ],
 );
@@ -67,7 +67,6 @@ sub handle_view ($self, $view_str, $args, $forced_status = undef) {
     # Special page requests
     $view_str = 'home!welcome' if $view_str eq 'welcome';
 
-    my @method_args = $args->@*;
     my $page;
 
     my $redirects = 0;
@@ -86,14 +85,14 @@ sub handle_view ($self, $view_str, $args, $forced_status = undef) {
 
             # Call handler
             $self->log->debug("Calling method: $method()");
-            $page->$method(@method_args);
+            $page->$method($args);
 
             # Carry over status to next page upon internal redirection
             $forced_status = $page->status if $page->status;
 
             # Follow internal redirect to another init_* method
             if (my $target = $page->internal_redirect_target) {
-                ($view_str, @method_args) = $target->@*;
+                ($view_str, $args) = $target->@*;
                 $self->log->trace("Internal redirect to: $view_str") if $self->log->is_trace;
             } else {
                 $view_str = undef;

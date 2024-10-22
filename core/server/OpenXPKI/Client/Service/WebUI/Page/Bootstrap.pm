@@ -10,7 +10,7 @@ use Digest::SHA;
 use OpenXPKI::i18n qw( get_language );
 
 
-sub init_structure ($self) {
+sub init_structure ($self, $args) {
     my $user = $self->session_param('user') || undef;
 
     # create CSRF token

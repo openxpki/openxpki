@@ -3,7 +3,11 @@ use OpenXPKI -class;
 
 extends 'OpenXPKI::Client::Service::WebUI::Page';
 
-with 'OpenXPKI::Client::Service::WebUI::PageRole::OutputField';
+with qw(
+    OpenXPKI::Client::Service::WebUI::PageRole::OutputField
+    OpenXPKI::Client::Service::WebUI::PageRole::Pager
+    OpenXPKI::Client::Service::WebUI::PageRole::QueryCache
+);
 
 # Core modules
 use DateTime;
@@ -153,9 +157,198 @@ time of creation. A brief description is given at the end of this document.
 
 =head1 UI methods
 
-Please see L<OpenXPKI::Client::Service::WebUI::Page::Workflow::Init> and L<OpenXPKI::Client::Service::WebUI::Page::Workflow::Action>.
+=head2 init_mine
+
+Filter workflows where the current user is the creator, similar to workflow
+search.
+
+=cut
+
+sub init_mine ($self, $args) {
+    $self->set_page(
+        label => 'I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE',
+        description => 'I18N_OPENXPKI_UI_MY_WORKFLOW_DESCRIPTION',
+    );
+
+    my $tasklist = $self->session_param('tasklist')->{mine};
+
+    my $default = {
+        query => {
+            attribute => { 'creator' => $self->session_param('user')->{name} },
+            order => 'workflow_id',
+            reverse => 1,
+        },
+        actions => [{
+            page => 'workflow!info!wf_id!{serial}',
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
+            icon => 'view',
+            target => 'popup',
+        }]
+    };
+
+    if (!$tasklist || ref $tasklist ne 'ARRAY') {
+        $self->__render_task_list($default);
+    } else {
+        foreach my $item (@$tasklist) {
+            if ($item->{query}) {
+                $item->{query} = { %{$default->{query}}, %{$item->{query}} };
+            } else {
+                $item->{query} = $default->{query};
+            }
+            $item->{actions} = $default->{actions} unless($item->{actions});
+
+            $self->__render_task_list($item);
+        }
+    }
+
+    return $self;
+
+}
+
+=head2 init_task
+
+Outstanding tasks, filter definitions are read from the uicontrol file
+
+=cut
+
+sub init_task ($self, $args) {
+    $self->page->label('I18N_OPENXPKI_UI_WORKFLOW_OUTSTANDING_TASKS_LABEL');
+
+    my $tasklist = $self->session_param('tasklist')->{default};
+
+    if (!@$tasklist) {
+        return $self->redirect->to('home');
+    }
+
+    $self->log->trace( "got tasklist: " . Dumper $tasklist) if $self->log->is_trace;
+
+    foreach my $item (@$tasklist) {
+        $self->__render_task_list($item);
+    }
+
+    return $self;
+}
 
 =head1 Internal methods
+
+=head2 __render_task_list
+
+Expects a hash that defines a workflow query and output rules for a
+tasklist as defined in the uicontrol section.
+
+=cut
+
+sub __render_task_list {
+
+    my $self = shift;
+    my $item = shift;
+
+    my $query = $item->{query};
+    my $limit = 25;
+
+    $query = { $self->__tenant_param(), %$query } unless($query->{tenant});
+
+    if ($query->{limit}) {
+        $limit = $query->{limit};
+        delete $query->{limit};
+    }
+
+    if (!$query->{order}) {
+        $query->{order} = 'workflow_id';
+        if (!defined $query->{reverse}) {
+            $query->{reverse} = 1;
+        }
+    }
+
+    my @cols;
+    if ($item->{cols}) {
+        @cols = @{$item->{cols}};
+    } else {
+        @cols = (
+            { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL', field => 'workflow_id', sortkey => 'workflow_id' },
+            { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL', field => 'workflow_last_update', sortkey => 'workflow_last_update' },
+            { label => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL', field => 'workflow_label' },
+            { label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL', field => 'workflow_state' },
+        );
+    }
+
+    my $actions = $item->{actions} // [{ page => 'redirect!workflow!load!wf_id!{serial}', icon => 'view' }];
+
+    # create the header from the columns spec
+    my ($header, $column, $rattrib) = $self->__render_list_spec( \@cols );
+
+    if ($rattrib) {
+        $query->{return_attributes} = $rattrib;
+    }
+
+    $self->log->trace( "columns : " . Dumper $column) if $self->log->is_trace;
+
+    my $search_result = $self->send_command_v2( 'search_workflow_instances', { limit => $limit, %$query } );
+
+    # empty message
+    my $empty = $item->{ifempty} || 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL';
+
+    my $pager;
+    my @data;
+    # No results
+    if (!@$search_result) {
+
+        return if ($empty eq 'hide');
+
+    } else {
+
+        @data = $self->__render_result_list( $search_result, $column );
+
+        $self->log->trace( "dumper result: " . Dumper @data) if $self->log->is_trace;
+
+        if ($limit == scalar @$search_result) {
+            my %count_query = %{$query};
+            delete $count_query{order};
+            delete $count_query{reverse};
+
+            my $result_count= $self->send_command_v2( 'search_workflow_instances_count', \%count_query  );
+
+            my $pager_args = OpenXPKI::Util::filter_hash($item->{pager}, qw(limit pagesizes pagersize));
+
+            my $cache = {
+                pagename => 'workflow',
+                query => $query,
+                count => $result_count,
+                column => $column,
+                pager_args => $pager_args,
+            };
+
+            my $queryid = $self->__save_query($cache);
+
+            $pager = $self->__build_pager(
+                pagename => 'workflow',
+                id => $queryid,
+                query => $query,
+                count => $result_count,
+                limit => $limit,
+                %$pager_args,
+            );
+        }
+
+    }
+
+    $self->main->add_section({
+        type => 'grid',
+        className => 'workflow',
+        content => {
+            label => $item->{label},
+            description => $item->{description},
+            actions => $actions,
+            columns => $header,
+            data => \@data,
+            pager => $pager,
+            empty => $empty,
+
+        }
+    });
+
+    return \@data
+}
 
 =head2 __render_from_workflow ( { wf_id, wf_info, wf_action }  )
 
@@ -1740,6 +1933,21 @@ sub __render_workflow_action_body {
             }
         }) if scalar @fielddesc;
     }
+}
+
+sub __page_label {
+
+    my $self = shift;
+    my $wf_info = shift;
+    my $additional = shift;
+
+    return sprintf(
+        "#%01d - %s%s",
+        $wf_info->{workflow}->{id},
+        ($wf_info->{workflow}->{title} || $wf_info->{workflow}->{label} || $wf_info->{workflow}->{type}),
+        $additional ? ": $additional" : "",
+    );
+
 }
 
 __PACKAGE__->meta->make_immutable;

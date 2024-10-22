@@ -359,16 +359,22 @@ has _internal_redirect_target => (
 
 =head2 internal_redirect
 
-Internal redirection from an C<action_*> method to a page (C<init_*> method).
-
-From within an C<action_*> method you may do this:
+Internal redirection from an action (C<action_*>) or view (C<init_*>) to another
+view (C<init_*>).
 
     return $self->internal_redirect('home!welcome' => { name => "OpenXPKI" });
 
 =cut
-sub internal_redirect {
-    my $self = shift;
-    $self->_internal_redirect_target([ @_ ]);
+
+signature_for internal_redirect => (
+    method => 1,
+    positional => [
+        'Str',
+        'HashRef' => { default => {} },
+    ],
+);
+sub internal_redirect ($self, $call, $args) {
+    $self->_internal_redirect_target([$call, $args]);
     return $self;
 }
 
