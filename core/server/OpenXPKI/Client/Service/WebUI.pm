@@ -584,8 +584,8 @@ sub op_handlers {
             # default mime-type
             $self->response->add_header('content-type' => 'application/json; charset=UTF-8');
 
-            my $ui_response = $self->handle_ui_request; # isa OpenXPKI::Client::Service::WebUI::Page
-            $self->response->result($ui_response);
+            my $page = $self->handle_ui_request; # isa OpenXPKI::Client::Service::WebUI::Page
+            $self->response->result($page);
             return $self->response;
         },
     ];
@@ -661,7 +661,12 @@ sub handle_ui_request ($self) {
 
     # Only handle requests if we have an open channel (unless it's the bootstrap page)
     if ( $reply->{SERVICE_MSG} eq 'SERVICE_READY' or $page =~ /^bootstrap!(.+)/) {
-        return $self->handle_page($page || 'home', $action); # from OpenXPKI::Client::Service::WebUI::Role::Page
+        if ($action) {
+            # Action is only valid within a post request
+            return $self->handle_action($action); # from OpenXPKI::Client::Service::WebUI::Role::Page
+        } else {
+            return $self->handle_view($page || 'home'); # from OpenXPKI::Client::Service::WebUI::Role::Page
+        }
     }
 
     # if the backend session logged out but did not terminate
@@ -669,7 +674,7 @@ sub handle_ui_request ($self) {
     $self->logout_session if $self->session->param('is_logged_in');
 
     # try to log in
-    return $self->handle_login($reply, $action); # from OpenXPKI::Client::Service::WebUI::Role::Login
+    return $self->handle_login($page || '', $action, $reply); # from OpenXPKI::Client::Service::WebUI::Role::Login
 
 }
 

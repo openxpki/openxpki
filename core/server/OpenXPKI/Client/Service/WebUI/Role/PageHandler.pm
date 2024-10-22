@@ -19,19 +19,14 @@ use URI::Escape;
 # Project modules
 use OpenXPKI::Client::Service::WebUI::Page::Bootstrap;
 
-
-signature_for handle_page => (
+signature_for handle_action => (
     method => 1,
     positional => [
         'Str',
-        'Str', { optional => 1 },
     ],
 );
-sub handle_page ($self, $page_str, $action_str) {
-    # Action is only valid within a post request
+sub handle_action ($self, $action_str) {
     my $page;
-    my @page_method_args;
-    my $redirected_from;
 
     if ($action_str) {
         $self->log->info("Handle action '$action_str'");
@@ -43,56 +38,71 @@ sub handle_page ($self, $page_str, $action_str) {
             $page->$method();
             # Follow internal redirect to an init_* method
             if (my $target = $page->internal_redirect_target) {
-                ($page_str, @page_method_args) = $target->@*;
-                $redirected_from = $page;
-                $self->log->trace("Internal redirect to: $page_str") if $self->log->is_trace;
+                my ($view_str, @method_args) = $target->@*;
+                $self->log->trace("Internal redirect to: $view_str") if $self->log->is_trace;
+                $page = $self->handle_view($view_str, \@method_args, $page->status);
             }
         } else {
             $self->ui_response->status->error('I18N_OPENXPKI_UI_ACTION_NOT_FOUND');
         }
     }
 
-    die "'page' is not set" unless $page_str;
-
     # Render a page only if there is no action or object instantiation failed
-    if (not $page or $redirected_from) {
-        # Special page requests
-        $page_str = 'home!welcome' if $page_str eq 'welcome';
-
-        my $redirects = 0;
-        while ($page_str) {
-            die "Too many internal redirects" if $redirects++ > 10;
-
-            $self->log->info("Handle page '$page_str'");
-            my $method;
-            ($page, $method) = $self->_load_page_class(call => $page_str);
-
-            if ($page) {
-                if ($redirected_from) {
-                    $page->status($redirected_from->status);
-                    $redirected_from = undef;
-                }
-
-                # Call handler
-                $self->log->debug("Calling method: $method()");
-                $page->$method(@page_method_args);
-
-                # Follow internal redirect to another init_* method
-                if (my $target = $page->internal_redirect_target) {
-                    ($page_str, @page_method_args) = $target->@*;
-                    $self->log->trace("Internal redirect to: $page_str") if $self->log->is_trace;
-                } else {
-                    $page_str = undef;
-                }
-
-            } else {
-                $page = OpenXPKI::Client::Service::WebUI::Page::Bootstrap->new(client => $self)->page_not_found;
-            }
-
-        }
-    }
+    $page //= $self->handle_view('home!welcome');
 
     Log::Log4perl::MDC->put('wfid', undef);
+
+    return $page;
+}
+
+signature_for handle_view => (
+    method => 1,
+    positional => [
+        'Str',
+        'ArrayRef' => { default => [] },
+        'OpenXPKI::Client::Service::WebUI::Response::Status' => { optional => 1 },
+    ],
+);
+sub handle_view ($self, $view_str, $args, $forced_status = undef) {
+    # Special page requests
+    $view_str = 'home!welcome' if $view_str eq 'welcome';
+
+    my @method_args = $args->@*;
+    my $page;
+
+    my $redirects = 0;
+    while ($view_str) {
+        die "Too many internal redirects" if $redirects++ > 10;
+
+        $self->log->info("Handle page '$view_str'");
+        my $method;
+        ($page, $method) = $self->_load_page_class(call => $view_str);
+
+        if ($page) {
+            if ($forced_status) {
+                $page->status($forced_status);
+                $forced_status = undef;
+            }
+
+            # Call handler
+            $self->log->debug("Calling method: $method()");
+            $page->$method(@method_args);
+
+            # Carry over status to next page upon internal redirection
+            $forced_status = $page->status if $page->status;
+
+            # Follow internal redirect to another init_* method
+            if (my $target = $page->internal_redirect_target) {
+                ($view_str, @method_args) = $target->@*;
+                $self->log->trace("Internal redirect to: $view_str") if $self->log->is_trace;
+            } else {
+                $view_str = undef;
+            }
+
+        } else {
+            $page = OpenXPKI::Client::Service::WebUI::Page::Bootstrap->new(client => $self)->page_not_found;
+        }
+    }
 
     return $page;
 }

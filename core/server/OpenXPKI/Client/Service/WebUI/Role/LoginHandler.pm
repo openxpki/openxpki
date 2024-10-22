@@ -13,7 +13,7 @@ requires 'auth';
 requires 'has_auth';
 
 requires 'param';
-requires 'handle_page';
+requires 'handle_view';
 requires 'logout_session';
 requires 'new_frontend_session';
 
@@ -83,16 +83,15 @@ sub _build_realm_path_map ($self) {
 signature_for handle_login => (
     method => 1,
     positional => [
-        'HashRef', 'Str',
+        'Str', 'Str', 'HashRef',
     ],
 );
-sub handle_login ($self, $reply, $action) {
+sub handle_login ($self, $page, $action, $reply) {
     my $uilogin = OpenXPKI::Client::Service::WebUI::Page::Login->new(client => $self);
 
     # Login works in three steps realm -> auth stack -> credentials
 
     my $session = $self->session;
-    my $page = $self->param('page') || '';
 
     # incoming logout command
     if ($page eq 'logout') {
@@ -143,8 +142,7 @@ sub handle_login ($self, $reply, $action) {
         # Link to an internal method using the class!method
         if (my $loginpage = $self->login_page) {
 
-            $self->log->debug("Store page request in session for later redirect: $page");
-            return $self->handle_page($loginpage);
+            return $self->handle_view($loginpage);
 
         } elsif (my $loginurl = $self->login_url) {
 
@@ -160,7 +158,7 @@ sub handle_login ($self, $reply, $action) {
         } else {
 
             # This is not an ember request so we need to redirect
-            # back to the ember page - try if the session has a baseurl
+            # back to the ember page - check if the session has a baseurl
             my $url = $self->session->param('baseurl');
             # if not, get the path from the referer
             if (not $url and (($self->request->headers->referrer//'') =~ m{https?://[^/]+(/[\w/]*[\w])/?}i)) {
