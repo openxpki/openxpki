@@ -1,9 +1,7 @@
 package OpenXPKI::Client::Service::WebUI::Page::Crl;
-use Moose;
+use OpenXPKI -class;
 
 extends 'OpenXPKI::Client::Service::WebUI::Page';
-
-use Data::Dumper;
 
 =head2 init_index
 
@@ -11,11 +9,7 @@ Default shows the data including download options of the latest CRL for all
 Issuers.
 
 =cut
-sub init_index {
-
-    my $self = shift;
-    my $args = shift;
-
+sub init_index ($self, $args) {
     $self->set_page(
         label => 'I18N_OPENXPKI_UI_CRL_CURRENT_LISTS',
     );
@@ -66,8 +60,6 @@ sub init_index {
 
         }
     }
-
-    return $self;
 }
 
 =head2 init_list
@@ -75,11 +67,7 @@ sub init_index {
 List all CRLs for a given issuer, latest first.
 
 =cut
-sub init_list {
-
-    my $self = shift;
-    my $args = shift;
-
+sub init_list ($self, $args) {
     my $crl_list = $self->send_command_v2( 'get_crl_list' , {
         issuer_identifier => scalar $self->param('issuer'),
     });
@@ -131,16 +119,10 @@ sub init_list {
             }]
         },
     });
-
-    return $self;
 }
 
 
-sub init_detail {
-
-    my $self = shift;
-    my $args = shift;
-
+sub init_detail ($self, $args) {
     my $crl_key = $self->param('crl_key');
 
     my $crl_hash = $self->send_command_v2( 'get_crl', {
@@ -164,15 +146,10 @@ sub init_detail {
             data => \@fields,
         }
     });
-
 }
 
 
-sub init_download {
-
-    my $self = shift;
-    my $args = shift;
-
+sub init_download ($self, $args) {
     my $cert_identifier = $self->param('identifier');
     my $format = $self->param('format');
     my $crl_key = $self->param('crl_key');
@@ -196,16 +173,11 @@ sub init_download {
 }
 
 
-sub __print_detail {
-
-    my $self = shift;
-    my $crl_hash = shift;
-    my $issuer_info = shift;
-
+sub __print_detail ($self, $crl_hash, $issuer_info = undef) {
     $issuer_info = $self->send_command_v2( 'get_cert' , {
         format => 'DBINFO',
         identifier => $crl_hash->{'issuer_identifier'}
-    }) unless($issuer_info);
+    }) unless $issuer_info;
 
     my @fields = (
         { label => 'I18N_OPENXPKI_UI_CRL_SERIAL', value => $crl_hash->{'crl_number'} },
@@ -231,7 +203,6 @@ sub __print_detail {
     };
 
     return @fields;
-
 }
 
 __PACKAGE__->meta->make_immutable;

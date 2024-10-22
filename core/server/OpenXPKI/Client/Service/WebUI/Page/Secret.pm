@@ -1,13 +1,9 @@
 package OpenXPKI::Client::Service::WebUI::Page::Secret;
-use Moose;
+use OpenXPKI -class;
 
 extends 'OpenXPKI::Client::Service::WebUI::Page';
 
-use Data::Dumper;
-
-sub init_index {
-    my ($self, $args) = @_;
-
+sub init_index ($self, $args) {
     my $secrets  = $self->send_command_v2("get_secrets");
     return unless defined $secrets;
 
@@ -53,9 +49,7 @@ sub init_index {
     });
 }
 
-sub init_manage {
-    my ($self, $args) = @_;
-
+sub init_manage ($self, $args) {
     my $secret = $self->param('id');
 
     if (not $secret) {
@@ -91,13 +85,9 @@ sub init_manage {
             'name' => 'id', 'type' => 'hidden', value => $secret,
         );
     }
-
-    return $self;
 }
 
-sub init_clear {
-    my ($self, $args) = @_;
-
+sub init_clear ($self, $args) {
     my $secret = $self->param('id');
     my $status = $self->send_command_v2("clear_secret", {secret => $secret});
 
@@ -108,13 +98,9 @@ sub init_clear {
         $self->status->success('I18N_OPENXPKI_UI_SECRET_STATUS_CLEAR_FAILED');
         $self->redirect->to('secret!index');
     }
-
-    return $self;
 }
 
-sub action_unlock {
-    my ($self, $args) = @_;
-
+sub action_unlock ($self) {
     my $phrase = $self->param('phrase');
     my $secret = $self->param('id');
     my $msg = $self->send_command_v2( "set_secret_part", { secret => $secret, value => $phrase });
@@ -129,8 +115,6 @@ sub action_unlock {
         $self->status->error('I18N_OPENXPKI_UI_SECRET_STATUS_UNLOCK_FAILED');
         $self->redirect->to('secret!index');
     }
-
-    return $self;
 }
 
 __PACKAGE__->meta->make_immutable;

@@ -1,8 +1,7 @@
 package OpenXPKI::Client::Service::WebUI::Page::Bulk;
-use Moose;
+use OpenXPKI -class;
 
 use Template;
-use Data::Dumper;
 use Date::Parse;
 
 extends 'OpenXPKI::Client::Service::WebUI::Page::Workflow';
@@ -14,11 +13,7 @@ Inherits from workflow, offers methods for workflow bulk processing.
 
 =cut
 
-sub init_index {
-
-    my $self = shift;
-    my $args = shift;
-
+sub init_index ($self, $args = {}) {
     $self->set_page(
         label => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_TITLE',
         description => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_DESCRIPTION',
@@ -70,11 +65,7 @@ sub init_index {
     return $self;
 }
 
-sub action_result {
-
-    my $self = shift;
-    my $args = shift;
-
+sub action_result ($self) {
     my $queryid = $self->param('formid');
 
     # Read query pattern and list info from persisted data
@@ -135,7 +126,7 @@ sub action_result {
     # No results founds
     if (!$result_count) {
         $self->status->error('I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES');
-        return $self->init_index();
+        return $self->init_index;
     }
 
     my @buttons;

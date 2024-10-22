@@ -1,13 +1,7 @@
 package OpenXPKI::Client::Service::WebUI::Page::Login;
-use Moose;
+use OpenXPKI -class;
 
 extends 'OpenXPKI::Client::Service::WebUI::Page';
-
-use Data::Dumper;
-use Type::Params qw( signature_for );
-
-# should be done after imports to safely disable warnings in Perl < 5.36
-use experimental 'signatures';
 
 =head2 init_realm_cards
 
@@ -52,11 +46,7 @@ sub init_realm_cards ($self, $realms, $as_list) {
     return $self;
 }
 
-sub init_auth_stack {
-
-    my $self = shift;
-    my $stacks = shift;
-
+sub init_auth_stack ($self, $stacks) {
     my @stacks = sort { lc($a->{label}) cmp lc($b->{label}) } @{$stacks};
 
     $self->set_page(
@@ -88,16 +78,11 @@ sub init_auth_stack {
                 data => \@stackdesc
         }});
     }
-
-    return $self;
 }
 
-sub init_login_passwd {
-
-    my $self = shift;
+sub init_login_passwd ($self, $args) {
     # expect a hash with fields (array of fields)and strings for label, description, button
     # if no fields are given, the default is to show username and password
-    my $args = shift;
 
     $args->{field} = [
         { name => 'username', label => 'I18N_OPENXPKI_UI_LOGIN_USERNAME', type => 'text' },
@@ -114,17 +99,9 @@ sub init_login_passwd {
         buttons => [{ label => 'I18N_OPENXPKI_UI_LOGIN_ABORT_BUTTON', page => 'logout', format => 'failure' }],
     );
     $form->add_field(%{ $_ }) for @{ $args->{field} };
-
-    return $self;
-
 }
 
-
-sub init_login_missing_data {
-
-    my $self = shift;
-    my $args = shift;
-
+sub init_login_missing_data ($self) {
     $self->page->label('I18N_OPENXPKI_UI_LOGIN_NO_DATA_HEAD');
 
     $self->main->add_section({
@@ -134,16 +111,9 @@ sub init_login_missing_data {
             description => 'I18N_OPENXPKI_UI_LOGIN_NO_DATA_PAGE'
         }
     });
-
-    return $self;
 }
 
-
-sub init_logout {
-
-    my $self = shift;
-    my $args = shift;
-
+sub init_logout ($self, $args = {}) {
     $self->page->label('I18N_OPENXPKI_UI_HOME_LOGOUT_HEAD');
 
     $self->main->add_section({
@@ -153,18 +123,10 @@ sub init_logout {
             description => 'I18N_OPENXPKI_UI_HOME_LOGOUT_PAGE'
         }
     });
-
-    return $self;
 }
 
-
-sub init_index {
-
-    my $self = shift;
-
+sub init_index ($self, $args = {}) {
     $self->redirect->to('redirect!welcome');
-
-    return $self;
 }
 
 __PACKAGE__->meta->make_immutable;

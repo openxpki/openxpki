@@ -1,29 +1,19 @@
 package OpenXPKI::Client::Service::WebUI::Page::Home;
-use Moose;
+use OpenXPKI -class;
 
 extends 'OpenXPKI::Client::Service::WebUI::Page';
 
-use Template;
-use Data::Dumper;
-
-
-sub BUILD {
-
-    my $self = shift;
+sub BUILD ($self, $args) {
     $self->page->label('I18N_OPENXPKI_UI_HOME_WELCOME_HEAD');
 }
 
-sub init_welcome {
-
-    my $self = shift;
-    my $args = shift;
-
+sub init_welcome ($self, $args) {
     # check for redirect
     my $redirect = $self->session_param('redirect') || '';
     $self->session_param('redirect','');
     if ($redirect =~ /welcome/) {
         # redirect to myself causes the UI to loop
-        $redirect = "";
+        $redirect = '';
     }
 
     if ($redirect) {
@@ -39,15 +29,9 @@ sub init_welcome {
             $self->init_index();
         }
     }
-
-    return $self;
 }
 
-sub init_index {
-
-    my $self = shift;
-    my $args = shift;
-
+sub init_index ($self, $args = {}) {
     $self->main->add_section({
         type => 'text',
         content => {
@@ -55,8 +39,6 @@ sub init_index {
             description => 'I18N_OPENXPKI_UI_WELCOME_PAGE'
         }
     });
-
-    return $self;
 }
 
 =head2 init_task
@@ -65,11 +47,8 @@ Redirect to workflow!task
 
 =cut
 
-sub init_task {
-
-    my $self = shift;
+sub init_task ($self, $args) {
     $self->redirect->to('workflow!task');
-
 }
 
 __PACKAGE__->meta->make_immutable;

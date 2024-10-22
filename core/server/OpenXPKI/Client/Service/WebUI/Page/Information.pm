@@ -1,12 +1,9 @@
 package OpenXPKI::Client::Service::WebUI::Page::Information;
-use Moose;
+use OpenXPKI -class;
 
 extends 'OpenXPKI::Client::Service::WebUI::Page';
 
-use Data::Dumper;
-
-sub BUILD {
-    my $self = shift;
+sub BUILD ($self, $args) {
     $self->page->label('I18N_OPENXPKI_UI_HOME_WELCOME_HEAD');
 }
 
@@ -17,11 +14,7 @@ token status (online, offline, expired). Each item is linked to cert_info
 popup.
 
 =cut
-sub init_issuer {
-
-    my $self = shift;
-    my $args = shift;
-
+sub init_issuer ($self, $args) {
     my $issuers = $self->send_command_v2( 'get_ca_list' );
     $self->log->trace("result: " . Dumper $issuers) if $self->log->is_trace;
 
@@ -65,8 +58,6 @@ sub init_issuer {
             empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
         }
     });
-
-    return $self;
 }
 
 __PACKAGE__->meta->make_immutable;

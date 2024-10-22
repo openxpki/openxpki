@@ -9,9 +9,7 @@ extends 'OpenXPKI::Client::Service::WebUI::Page';
 Return the data persisted with L<OpenXPKI::Client::Service::WebUI::Page/persist_response>.
 
 =cut
-sub init_fetch {
-    my $self = shift;
-
+sub init_fetch ($self, $args) {
     my $response = $self->param('id');
     my $data = $self->fetch_response( $response );
 
@@ -91,3 +89,5 @@ sub init_fetch {
         );
     }
 }
+
+__PACKAGE__->meta->make_immutable;

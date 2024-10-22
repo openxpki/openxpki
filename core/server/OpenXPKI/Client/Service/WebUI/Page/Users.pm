@@ -1,5 +1,5 @@
 package OpenXPKI::Client::Service::WebUI::Page::Users;
-use Moose;
+use OpenXPKI -class;
 
 extends 'OpenXPKI::Client::Service::WebUI::Page';
 with qw(
@@ -7,18 +7,12 @@ with qw(
     OpenXPKI::Client::Service::WebUI::PageRole::Pager
 );
 
-use Data::Dumper;
-
-
 =head2 init_index
 
 Default shows the search form as well as a paged table that contains all users
 
 =cut
-sub init_index {
-    my $self = shift;
-    my $args = shift;
-
+sub init_index ($self, $args) {
     # render title + empty search form
     $self->set_page(
         label => 'I18N_OPENXPKI_UI_USER_TITLE',
@@ -56,7 +50,6 @@ sub init_index {
     my $query_result = $self->send_command_v2(search_users => $query);
     my @result = $self->__render_result_list($query_result);
     $self->__render_result_table($queryid, $querymeta, \@result, 25, 0);
-    return $self;
 }
 
 =head2 init_result
@@ -64,11 +57,7 @@ sub init_index {
 Load the result of a query, based on a query id and paging information
 
 =cut
-sub init_result {
-
-    my $self = shift;
-    my $args = shift;
-
+sub init_result ($self, $args) {
     my $queryid = $self->param('id');
     my $limit = $self->param('limit') || 25;
 
@@ -110,11 +99,9 @@ sub init_result {
         },
     );
 
-    my @result = $self->__render_result_list( $query_result);
-    $self->log->trace( "dumper result: " . Dumper @result) if $self->log->is_trace;
-    $self->__render_result_table($queryid, $result, \@result,$limit,$startat);
-    return $self;
-
+    my @result = $self->__render_result_list($query_result);
+    $self->log->trace("Users: " . Dumper @result) if $self->log->is_trace;
+    $self->__render_result_table($queryid, $result, \@result, $limit, $startat);
 }
 
 
@@ -125,11 +112,7 @@ partial result.
 
 =cut
 
-sub init_pager {
-
-    my $self = shift;
-    my $args = shift;
-
+sub init_pager ($self, $args) {
     my $queryid = $self->param('id');
 
     # Load query from session
@@ -166,14 +149,10 @@ sub init_pager {
 
     my @result = $self->__render_result_list( $query_result );
 
-    $self->log->trace( "dumper result: " . Dumper @result) if $self->log->is_trace;
+    $self->log->trace("Users: " . Dumper @result) if $self->log->is_trace;
 
     $self->confined_response({ data => \@result });
-
-    return $self;
 }
-
-
 
 =head2 action_search
 
@@ -181,10 +160,7 @@ Handle search requests and display the result as grid
 
 =cut
 
-sub action_search {
-    my $self = shift;
-    my $args = shift;
-
+sub action_search ($self) {
     # assemble query
     my $query = {};
     my $input = {}; # store the input data the reopen the form later
@@ -210,7 +186,6 @@ sub action_search {
             $verbose->{$key} = $val;
         }
     }
-
 
     my @criteria;
     foreach my $item ((
@@ -244,9 +219,6 @@ sub action_search {
     });
     # after handling the search: redirect to result page
     $self->redirect->to('users!result!id!'.$queryid);
-
-    return $self;
-
 }
 
 =head2 __render_result_list
@@ -254,11 +226,9 @@ sub action_search {
 Helper to render the output result list from a sql query result.
 
 =cut
-sub __render_result_list {
-    my $self = shift;
-    my $query_result = shift;
+sub __render_result_list ($self, $query_result) {
     my @result;
-    foreach my $user (@{$query_result}) {
+    foreach my $user ($query_result->@*) {
         push @result, [
             $user->{'username'},
             $user->{'mail'},
@@ -274,15 +244,9 @@ sub __render_result_list {
 Helper to render the result table.
 
 Takes four arguments: the stored result object, the entries to display, limit and startat (for paging)
-=cut
-sub __render_result_table {
-    my $self = shift;
-    my $queryid = shift;
-    my $result = shift;
-    my $entries = shift;
-    my $limit = shift;
-    my $startat = shift;
 
+=cut
+sub __render_result_table ($self, $queryid, $result, $entries, $limit, $startat) {
     # columns of the result table
     my @columns=[
         { sTitle => "I18N_OPENXPKI_UI_USER_USERNAME" },
@@ -326,16 +290,12 @@ sub __render_result_table {
     });
 }
 
-
 =head2 render_search_form
 
 Renders the search form
 
 =cut
-sub render_search_form {
-    my $self = shift;
-    my $args = shift;
-
+sub render_search_form ($self, $args = {}) {
     # add search form to current page
     my $form = $self->main->add_form(
         action => 'users!search',
@@ -358,8 +318,6 @@ sub render_search_form {
             { label=> 'I18N_OPENXPKI_UI_USER_ROLE_RAOP',value=> 'RA Operator'},
         ],
     );
-
-    return $self;
 }
 
 =head2 init_search
@@ -367,11 +325,7 @@ sub render_search_form {
     displays a raw search page with possibly preset search fields
 
 =cut
-sub init_search {
-
-    my $self = shift;
-    my $args = shift;
-
+sub init_search ($self, $args) {
     $self->page->label('I18N_OPENXPKI_UI_USER_SEARCH_LABEL');
     # check if there are any preset values for the search fields
     my $preset;
@@ -381,7 +335,6 @@ sub init_search {
     }
 
     $self->render_search_form({ preset => $preset });
-    return $self;
 }
 
 __PACKAGE__->meta->make_immutable;

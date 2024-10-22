@@ -1,5 +1,5 @@
 package OpenXPKI::Client::Service::WebUI::Page::Certificate;
-use Moose;
+use OpenXPKI -class;
 
 extends 'OpenXPKI::Client::Service::WebUI::Page';
 with qw(
@@ -8,7 +8,6 @@ with qw(
 );
 
 # Core modules
-use Data::Dumper;
 use Math::BigInt;
 
 # CPAN modules
@@ -20,7 +19,6 @@ use HTML::Entities;
 use OpenXPKI::DN;
 use OpenXPKI::i18n qw( i18nGettext );
 use OpenXPKI::Serialization::Simple;
-use OpenXPKI::Util;
 
 has __default_grid_head => (
     is => 'rw',
@@ -74,23 +72,13 @@ has __validity_options => (
     ]; }
 );
 
-
-sub BUILD {
-    my $self = shift;
-}
-
 =head2 init_search
 
 Render the search form
 #TODO - preset parameters
 
 =cut
-sub init_search {
-
-    my $self = shift;
-    my $args = shift;
-
-
+sub init_search ($self, $args = {}) {
     my $opts = $self->session_param('certsearch');
     if (!exists $opts->{default}) {
         return $self->redirect->to('home');
@@ -214,8 +202,6 @@ sub init_search {
             ]
         }
     });
-
-    return $self;
 }
 
 =head2 init_result
@@ -223,11 +209,7 @@ sub init_search {
 Load the result of a query, based on a query id and paging information
 
 =cut
-sub init_result {
-
-    my $self = shift;
-    my $args = shift;
-
+sub init_result ($self, $args) {
     my $queryid = $self->param('id');
     my $limit = $self->param('limit') || 25;
 
@@ -324,9 +306,6 @@ sub init_result {
             ]
         }
     });
-
-    return $self;
-
 }
 
 
@@ -335,11 +314,7 @@ sub init_result {
 Like init_result but send the data as CSV download, default limit is 500!
 
 =cut
-sub init_export {
-
-    my $self = shift;
-    my $args = shift;
-
+sub init_export ($self, $args) {
     my $queryid = $self->param('id');
 
     my $limit = $self->param('limit') || 500;
@@ -437,11 +412,7 @@ partial result.
 
 =cut
 
-sub init_pager {
-
-    my $self = shift;
-    my $args = shift;
-
+sub init_pager ($self, $args) {
     my $queryid = $self->param('id');
 
     # Load query from session
@@ -484,19 +455,14 @@ sub init_pager {
     $self->log->trace( "dumper result: " . Dumper @result) if $self->log->is_trace;
 
     $self->confined_response({ data => \@result });
-
-    return $self;
 }
+
 =head2 init_mine
 
 my certificates view, finds certificates based on the current logged in userid
 
 =cut
-sub init_mine {
-
-    my $self = shift;
-    my $args = shift;
-
+sub init_mine ($self, $args) {
     my $limit = $self->param('limit') || 25;
 
     # Safety rule
@@ -571,9 +537,6 @@ sub init_mine {
             pager => $pager,
         }
     });
-
-    return $self;
-
 }
 
 =head2 init_detail
@@ -584,11 +547,7 @@ be shown in a modal popup.
 
 =cut
 
-sub init_detail {
-
-    my $self = shift;
-    my $args = shift;
-
+sub init_detail ($self, $args = {}) {
     my $cert_identifier = $self->param('identifier');
 
     # empty submission
@@ -855,7 +814,6 @@ sub init_detail {
             data => \@fields,
         }},
     );
-
 }
 
 =head2 init_text
@@ -864,11 +822,7 @@ Show the PEM block as text in a popup
 
 =cut
 
-sub init_text {
-
-    my $self = shift;
-    my $args = shift;
-
+sub init_text ($self, $args) {
     my $cert_identifier = $self->param('identifier');
 
     my $format = uc($self->param('format') || '');
@@ -894,10 +848,6 @@ sub init_text {
             description => '<pre>'  . $pem . '</pre>',
         }},
     );
-
-    return $self;
-
-
 }
 
 =head2 init_chain
@@ -907,11 +857,7 @@ options for PEM/DER or browser install for each item of the chain.
 
 =cut
 
-sub init_chain {
-
-    my $self = shift;
-    my $args = shift;
-
+sub init_chain ($self, $args) {
     my $cert_identifier = $self->param('identifier');
 
     my $chain = $self->send_command_v2 ( "get_chain", { start_with => $cert_identifier, format => 'DBINFO', 'keeproot' => 1 });
@@ -947,9 +893,6 @@ sub init_chain {
             }},
         );
     }
-
-    return $self;
-
 }
 
 =head2 init_related
@@ -958,12 +901,7 @@ Show information related to the certificate, renders a key/value table with
 a list of related workflows, owner, and metadata
 
 =cut
-sub init_related {
-
-
-    my $self = shift;
-    my $args = shift;
-
+sub init_related ($self, $args) {
     my $cert_identifier = $self->param('identifier');
 
     my $cert = $self->send_command_v2( 'get_cert', {
@@ -1025,9 +963,6 @@ sub init_related {
             empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
         }
     });
-    return $self;
-
-
 }
 
 =head2 init_download
@@ -1036,11 +971,7 @@ Handle download requests, required the cert_identifier and the expected format.
 Redirects to init_detail if no format is given.
 
 =cut
-sub init_download {
-
-    my $self = shift;
-    my $args = shift;
-
+sub init_download ($self, $args) {
     my $cert_identifier = $self->param('identifier');
     my $format = $self->param('format');
 
@@ -1123,11 +1054,7 @@ not implemented
 receive a PEM encoded x509/pkcs10/pkcs7 block and output information.
 
 =cut
-sub init_parse {
-
-    my $self = shift;
-    my $args = shift;
-
+sub init_parse ($self, $args) {
     my $pem = $self->param('body');
 
     my @fields = ({
@@ -1143,9 +1070,6 @@ sub init_parse {
             data => \@fields,
         }},
     );
-
-    return $self;
-
 }
 
 =head2 action_autocomplete
@@ -1154,11 +1078,7 @@ Handle searches via autocomplete, shows only entity certificates
 
 =cut
 
-sub action_autocomplete {
-
-    my $self = shift;
-    my $args = shift;
-
+sub action_autocomplete ($self) {
     my $term = $self->param('cert_identifier') || '';
     my $params = $self->fetch_autocomplete_params; # from OpenXPKI::Client::Service::WebUI::Page
 
@@ -1216,9 +1136,6 @@ sub action_autocomplete {
     $self->log->trace( "search result: " . Dumper \@result) if $self->log->is_trace;
 
     $self->confined_response(\@result);
-
-    return $self;
-
 }
 
 =head2 action_find
@@ -1227,11 +1144,7 @@ Handle search requests for a single certificate by its identifier
 
 =cut
 
-sub action_find {
-
-    my $self = shift;
-    my $args = shift;
-
+sub action_find ($self) {
     my $cert_identifier = $self->param('cert_identifier');
     if ($cert_identifier) {
         my $cert = $self->send_command_v2( 'get_cert', {  identifier => $cert_identifier, format => 'DBINFO' });
@@ -1286,7 +1199,6 @@ sub action_find {
     }
 
     $self->redirect->to('certificate!detail!identifier!'.$cert_identifier);
-
 }
 
 =head2 action_search
@@ -1295,11 +1207,7 @@ Handle search requests and display the result as grid
 
 =cut
 
-sub action_search {
-
-    my $self = shift;
-    my $args = shift;
-
+sub action_search ($self) {
     my $query = { entity_only => 1, $self->__tenant_param() };
     my $input = {}; # store the input data the reopen the form later
     my $verbose = {};
@@ -1398,9 +1306,7 @@ sub action_search {
 
     my $result_count = $self->send_command_v2( 'search_cert_count', $query  );
 
-    if (not defined $result_count) {
-        return $self;
-    }
+    return unless defined $result_count;
 
     # No results founds
     if (!$result_count) {
@@ -1479,9 +1385,6 @@ sub action_search {
     });
 
     $self->redirect->to('certificate!result!id!'.$queryid);
-
-    return $self;
-
 }
 
 =head2 __render_result_list
@@ -1490,12 +1393,7 @@ Helper to render the output result list from a sql query result.
 
 
 =cut
-sub __render_result_list {
-
-    my $self = shift;
-    my $search_result = shift;
-    my $colums = shift;
-
+sub __render_result_list ($self, $search_result, $colums) {
     my @result;
     foreach my $item (@{$search_result}) {
 
@@ -1519,7 +1417,6 @@ sub __render_result_list {
     }
 
     return @result;
-
 }
 
 
@@ -1529,11 +1426,7 @@ Create array to pass to UI from specification in config file
 
 =cut
 
-sub __render_list_spec {
-
-    my $self = shift;
-    my $cols = shift;
-
+sub __render_list_spec ($self, $cols) {
     my @header;
     my @column;
     my @attrib;
@@ -1576,10 +1469,7 @@ sub __render_list_spec {
     return ( \@header, \@column, \@attrib );
 }
 
-sub __prepare_dn_for_display {
-
-    my $self = shift;
-    my $dn = shift;
+sub __prepare_dn_for_display ($self, $dn) {
     my @dn = OpenXPKI::DN->new( $dn )->get_rdns();
     for (my $ii=1; $ii < @dn; $ii++ ) {
         $dn[$ii-1] .= ',';
