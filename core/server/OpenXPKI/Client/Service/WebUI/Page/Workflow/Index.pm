@@ -79,12 +79,6 @@ Non scalar values are serialized before they are submitted.
 The name of the workflow action that should be executed with the input
 parameters.
 
-=item wf_handler
-
-Can hold the full name of a method which is called to handle the current
-request instead of running the generic handler. See the __delegate_call
-method for details.
-
 =back
 
 If there are errors, an error message is send back to the browser, if the
@@ -98,11 +92,6 @@ sub action_index ($self) {
     my $wf_args = $self->__resolve_wf_token or return $self;
 
     $self->log->trace("wf args from token: " . Dumper $wf_args) if $self->log->is_trace;
-
-    # check for delegation
-    if ($wf_args->{wf_handler}) {
-        return $self->__delegate_call($wf_args->{wf_handler});
-    }
 
     my %wf_param;
     if ($wf_args->{wf_fields}) {
