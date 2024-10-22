@@ -1,4 +1,4 @@
-package OpenXPKI::Client::Service::WebUI::Role::Pager;
+package OpenXPKI::Client::Service::WebUI::PageRole::Pager;
 use Moose::Role;
 
 # requires qw( );

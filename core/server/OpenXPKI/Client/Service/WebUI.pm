@@ -4,9 +4,9 @@ use OpenXPKI qw( -class -typeconstraints );
 with qw(
     OpenXPKI::Client::Service::Role::Info
     OpenXPKI::Client::Service::Role::Base
-    OpenXPKI::Client::Service::WebUI::Role::Request
-    OpenXPKI::Client::Service::WebUI::Role::Handler::Page
-    OpenXPKI::Client::Service::WebUI::Role::Handler::Login
+    OpenXPKI::Client::Service::WebUI::Role::RequestParams
+    OpenXPKI::Client::Service::WebUI::Role::PageHandler
+    OpenXPKI::Client::Service::WebUI::Role::LoginHandler
 );
 
 # Core modules
@@ -24,7 +24,7 @@ use LWP::UserAgent;
 # Project modules
 use OpenXPKI::Client;
 use OpenXPKI::Client::Service::WebUI::Response;
-use OpenXPKI::Client::Service::WebUI::Result;
+use OpenXPKI::Client::Service::WebUI::Page;
 use OpenXPKI::Client::Service::WebUI::Session;
 use OpenXPKI::Client::Service::WebUI::SessionCookie;
 use OpenXPKI::i18n qw( i18n_walk );
@@ -520,7 +520,7 @@ EOF
         }
     }
 
-    my $page = $response->result; # OpenXPKI::Client::Service::WebUI::Result
+    my $page = $response->result; # OpenXPKI::Client::Service::WebUI::Page
     my $ui_resp = $page->ui_response; # OpenXPKI::Client::Service::WebUI::Response
 
     $c->res->cookies($self->session_cookie->as_mojo_cookies($self->session)->@*);
@@ -584,7 +584,7 @@ sub op_handlers {
             # default mime-type
             $self->response->add_header('content-type' => 'application/json; charset=UTF-8');
 
-            my $ui_response = $self->handle_ui_request; # isa OpenXPKI::Client::Service::WebUI::Result
+            my $ui_response = $self->handle_ui_request; # isa OpenXPKI::Client::Service::WebUI::Page
             $self->response->result($ui_response);
             return $self->response;
         },
@@ -611,7 +611,7 @@ sub handle_ui_request ($self) {
             $self->log->warn("Invalid redirect target found - aborting");
         }
         $self->log->debug("Redirect to: $goto");
-        my $result = OpenXPKI::Client::Service::WebUI::Result->new(client => $self);
+        my $result = OpenXPKI::Client::Service::WebUI::Page->new(client => $self);
         $result->redirect->to($goto);
         return $result;
     }
@@ -633,7 +633,7 @@ sub handle_ui_request ($self) {
         # now perform the redirect if set
         if ($redirectTo) {
             $self->log->debug("External redirect on logout to: $redirectTo");
-            my $result = OpenXPKI::Client::Service::WebUI::Result->new(client => $self);
+            my $result = OpenXPKI::Client::Service::WebUI::Page->new(client => $self);
             $result->redirect->to($redirectTo);
             return $result;
         }
@@ -653,12 +653,12 @@ sub handle_ui_request ($self) {
 
     if ( $reply->{SERVICE_MSG} eq 'ERROR' ) {
         $self->log->debug('Got error from server');
-        return OpenXPKI::Client::Service::WebUI::Result->new(client => $self)->set_status_from_error_reply($reply);
+        return OpenXPKI::Client::Service::WebUI::Page->new(client => $self)->set_status_from_error_reply($reply);
     }
 
     # Only handle requests if we have an open channel (unless it's the bootstrap page)
     if ( $reply->{SERVICE_MSG} eq 'SERVICE_READY' or $page =~ /^bootstrap!(.+)/) {
-        return $self->handle_page($page || 'home', $action); # from OpenXPKI::Client::Service::WebUI::Role::Handler::Page
+        return $self->handle_page($page || 'home', $action); # from OpenXPKI::Client::Service::WebUI::Role::Page
     }
 
     # if the backend session logged out but did not terminate
@@ -666,7 +666,7 @@ sub handle_ui_request ($self) {
     $self->logout_session if $self->session->param('is_logged_in');
 
     # try to log in
-    return $self->handle_login($reply, $action); # from OpenXPKI::Client::Service::WebUI::Role::Handler::Login
+    return $self->handle_login($reply, $action); # from OpenXPKI::Client::Service::WebUI::Role::Login
 
 }
 
@@ -836,7 +836,7 @@ Persist the given response data to retrieve it after an HTTP roundtrip.
 Used to break out of the JavaScript app for downloads or to reroute result
 pages.
 
-Returns the page call URI for L<OpenXPKI::Client::Service::WebUI::Cache/init_fetch>.
+Returns the page call URI for L<OpenXPKI::Client::Service::WebUI::Page::Cache/init_fetch>.
 
 =cut
 
@@ -876,7 +876,7 @@ exist yet).
 
 =cut
 
-# required by OpenXPKI::Client::Service::WebUI::Result
+# required by OpenXPKI::Client::Service::WebUI::Page
 sub encrypt_jwt ($self, $value) {
     my $key = $self->session->param('jwt_encryption_key');
     if (not $key) {

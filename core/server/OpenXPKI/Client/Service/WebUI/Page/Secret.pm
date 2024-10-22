@@ -1,7 +1,7 @@
-package OpenXPKI::Client::Service::WebUI::Secret;
+package OpenXPKI::Client::Service::WebUI::Page::Secret;
 use Moose;
 
-extends 'OpenXPKI::Client::Service::WebUI::Result';
+extends 'OpenXPKI::Client::Service::WebUI::Page';
 
 use Data::Dumper;
 

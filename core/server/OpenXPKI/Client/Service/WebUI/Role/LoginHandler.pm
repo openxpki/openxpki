@@ -1,4 +1,4 @@
-package OpenXPKI::Client::Service::WebUI::Role::Handler::Login;
+package OpenXPKI::Client::Service::WebUI::Role::LoginHandler;
 use OpenXPKI -role;
 use namespace::autoclean;
 
@@ -24,7 +24,7 @@ use Encode;
 use Crypt::JWT qw( encode_jwt decode_jwt );
 
 # Project modules
-use OpenXPKI::Client::Service::WebUI::Login;
+use OpenXPKI::Client::Service::WebUI::Page::Login;
 use OpenXPKI::Template;
 use OpenXPKI::Dumper;
 
@@ -87,7 +87,7 @@ signature_for handle_login => (
     ],
 );
 sub handle_login ($self, $reply, $action) {
-    my $uilogin = OpenXPKI::Client::Service::WebUI::Login->new(client => $self);
+    my $uilogin = OpenXPKI::Client::Service::WebUI::Page::Login->new(client => $self);
 
     # Login works in three steps realm -> auth stack -> credentials
 

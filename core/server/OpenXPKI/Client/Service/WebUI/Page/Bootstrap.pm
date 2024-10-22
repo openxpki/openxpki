@@ -1,7 +1,7 @@
-package OpenXPKI::Client::Service::WebUI::Bootstrap;
+package OpenXPKI::Client::Service::WebUI::Page::Bootstrap;
 use OpenXPKI -class;
 
-extends 'OpenXPKI::Client::Service::WebUI::Result';
+extends 'OpenXPKI::Client::Service::WebUI::Page';
 
 # Core modules
 use Digest::SHA;

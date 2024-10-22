@@ -1,4 +1,4 @@
-package OpenXPKI::Client::Service::WebUI::Role::Handler::Page;
+package OpenXPKI::Client::Service::WebUI::Role::PageHandler;
 use OpenXPKI -role;
 use namespace::autoclean;
 
@@ -17,7 +17,7 @@ use Log::Log4perl::MDC;
 use URI::Escape;
 
 # Project modules
-use OpenXPKI::Client::Service::WebUI::Bootstrap;
+use OpenXPKI::Client::Service::WebUI::Page::Bootstrap;
 
 
 signature_for handle_page => (
@@ -69,7 +69,7 @@ sub handle_page ($self, $page, $action) {
             $result->$method(@page_method_args);
 
         } else {
-            $result = OpenXPKI::Client::Service::WebUI::Bootstrap->new(client => $self)->page_not_found;
+            $result = OpenXPKI::Client::Service::WebUI::Page::Bootstrap->new(client => $self)->page_not_found;
         }
     }
 
@@ -144,21 +144,21 @@ sub _load_class ($self, $arg) {
     # action!...
     if ($arg->is_action) {
         @variants = (
-            sprintf("OpenXPKI::Client::Service::WebUI::%s::Action::%s", ucfirst($class), ucfirst($method)),
-            sprintf("OpenXPKI::Client::Service::WebUI::%s::%s", ucfirst($class), $fullmethod),
-            sprintf("OpenXPKI::Client::Service::WebUI::%s::%s", ucfirst($class), ucfirst($method)),
-            sprintf("OpenXPKI::Client::Service::WebUI::%s::Action", ucfirst($class)),
-            sprintf("OpenXPKI::Client::Service::WebUI::%s", ucfirst($class)),
+            sprintf("OpenXPKI::Client::Service::WebUI::Page::%s::Action::%s", ucfirst($class), ucfirst($method)),
+            sprintf("OpenXPKI::Client::Service::WebUI::Page::%s::%s", ucfirst($class), $fullmethod),
+            sprintf("OpenXPKI::Client::Service::WebUI::Page::%s::%s", ucfirst($class), ucfirst($method)),
+            sprintf("OpenXPKI::Client::Service::WebUI::Page::%s::Action", ucfirst($class)),
+            sprintf("OpenXPKI::Client::Service::WebUI::Page::%s", ucfirst($class)),
         );
     }
     # init!...
     else {
         @variants = (
-            sprintf("OpenXPKI::Client::Service::WebUI::%s::Init::%s", ucfirst($class), ucfirst($method)),
-            sprintf("OpenXPKI::Client::Service::WebUI::%s::%s", ucfirst($class), $fullmethod),
-            sprintf("OpenXPKI::Client::Service::WebUI::%s::%s", ucfirst($class), ucfirst($method)),
-            sprintf("OpenXPKI::Client::Service::WebUI::%s::Init", ucfirst($class)),
-            sprintf("OpenXPKI::Client::Service::WebUI::%s", ucfirst($class)),
+            sprintf("OpenXPKI::Client::Service::WebUI::Page::%s::Init::%s", ucfirst($class), ucfirst($method)),
+            sprintf("OpenXPKI::Client::Service::WebUI::Page::%s::%s", ucfirst($class), $fullmethod),
+            sprintf("OpenXPKI::Client::Service::WebUI::Page::%s::%s", ucfirst($class), ucfirst($method)),
+            sprintf("OpenXPKI::Client::Service::WebUI::Page::%s::Init", ucfirst($class)),
+            sprintf("OpenXPKI::Client::Service::WebUI::Page::%s", ucfirst($class)),
         );
     }
 
@@ -172,8 +172,8 @@ sub _load_class ($self, $arg) {
             die $err;
         }
 
-        die "Package $pkg must inherit from OpenXPKI::Client::Service::WebUI::Result"
-            unless $pkg->isa('OpenXPKI::Client::Service::WebUI::Result');
+        die "Package $pkg must inherit from OpenXPKI::Client::Service::WebUI::Page"
+            unless $pkg->isa('OpenXPKI::Client::Service::WebUI::Page');
 
         my $obj = $pkg->new(client => $self);
 

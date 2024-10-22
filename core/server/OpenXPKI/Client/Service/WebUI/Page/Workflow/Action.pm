@@ -1,8 +1,8 @@
-package OpenXPKI::Client::Service::WebUI::Workflow::Action;
+package OpenXPKI::Client::Service::WebUI::Page::Workflow::Action;
 use Moose;
 
-extends 'OpenXPKI::Client::Service::WebUI::Workflow';
-with 'OpenXPKI::Client::Service::WebUI::Role::QueryCache';
+extends 'OpenXPKI::Client::Service::WebUI::Page::Workflow';
+with 'OpenXPKI::Client::Service::WebUI::PageRole::QueryCache';
 
 # Core modules
 use Data::Dumper;
@@ -34,8 +34,8 @@ The generic action is the default when sending a workflow generated form back
 to the server. You need to setup the handler from the rendering step, direct
 posting is not allowed. The cgi environment must present the key I<wf_token>
 which is a reference to a session based config hash. The config can be created
-using L<OpenXPKI::Client::Service::WebUI::Result/__wf_token_extra_param> or
-L<OpenXPKI::Client::Service::WebUI::Result/__wf_token_field>, recognized keys are:
+using L<OpenXPKI::Client::Service::WebUI::Page/__wf_token_extra_param> or
+L<OpenXPKI::Client::Service::WebUI::Page/__wf_token_field>, recognized keys are:
 
 =over
 
@@ -669,7 +669,7 @@ sub __check_for_validation_error {
 Returns a I<HashRef> with field names and their values.
 
 The given list determines the accepted input fields, values originate from
-the request and are queried via L<OpenXPKI::Client::Service::WebUI::Result/multi_param>.
+the request and are queried via L<OpenXPKI::Client::Service::WebUI::Page/multi_param>.
 
 There is a special treatment for dependent fields: they are not part of the
 $fields list but extracted from C<$field-E<gt>{options}-E<gt>[x]-E<gt>{dependants}>
@@ -680,7 +680,7 @@ B<Positional parameters>
 =over
 
 =item * C<$fields> I<ArrayRef> - list of field specifications as returned by
-L<OpenXPKI::Client::Service::WebUI::Workflow/__render_input_field>
+L<OpenXPKI::Client::Service::WebUI::Page::Workflow/__render_input_field>
 
 =back
 
@@ -768,7 +768,7 @@ B<Positional parameters>
 =over
 
 =item * C<$field> I<HashRef> - field specification as returned by
-L<OpenXPKI::Client::Service::WebUI::Workflow/__render_input_field>.
+L<OpenXPKI::Client::Service::WebUI::Page::Workflow/__render_input_field>.
 
 =item * C<$option> I<Str> - value of the the option whose dependants shall be
 returned. Optional.

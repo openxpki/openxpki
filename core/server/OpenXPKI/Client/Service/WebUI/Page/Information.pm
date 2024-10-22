@@ -1,7 +1,7 @@
-package OpenXPKI::Client::Service::WebUI::Information;
+package OpenXPKI::Client::Service::WebUI::Page::Information;
 use Moose;
 
-extends 'OpenXPKI::Client::Service::WebUI::Result';
+extends 'OpenXPKI::Client::Service::WebUI::Page';
 
 use Data::Dumper;
 
@@ -112,7 +112,7 @@ sub init_policy {
 
 =head2 init_process
 
-Moved to workflow + Handle in OpenXPKI::Client::Service::WebUI::Handle::Status
+Moved to workflow + Handle in OpenXPKI::Client::Service::WebUI::Page::Workflow::Handle::Status
 
 =cut
 sub init_process {

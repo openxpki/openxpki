@@ -1,4 +1,4 @@
-package OpenXPKI::Client::Service::WebUI::Role::Request;
+package OpenXPKI::Client::Service::WebUI::Role::RequestParams;
 use OpenXPKI -role;
 use namespace::autoclean;
 

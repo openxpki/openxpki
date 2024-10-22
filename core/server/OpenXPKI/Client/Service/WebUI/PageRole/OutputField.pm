@@ -1,4 +1,4 @@
-package OpenXPKI::Client::Service::WebUI::Role::OutputField;
+package OpenXPKI::Client::Service::WebUI::PageRole::OutputField;
 use Moose::Role;
 
 requires qw( log serializer send_command_v2 persist_response _client );

@@ -1,7 +1,7 @@
-package OpenXPKI::Client::Service::WebUI::Login;
+package OpenXPKI::Client::Service::WebUI::Page::Login;
 use Moose;
 
-extends 'OpenXPKI::Client::Service::WebUI::Result';
+extends 'OpenXPKI::Client::Service::WebUI::Page';
 
 use Data::Dumper;
 use Type::Params qw( signature_for );

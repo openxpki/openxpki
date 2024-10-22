@@ -1,14 +1,14 @@
-package OpenXPKI::Client::Service::WebUI::Bulk;
+package OpenXPKI::Client::Service::WebUI::Page::Bulk;
 use Moose;
 
 use Template;
 use Data::Dumper;
 use Date::Parse;
 
-extends 'OpenXPKI::Client::Service::WebUI::Workflow';
-with 'OpenXPKI::Client::Service::WebUI::Role::QueryCache';
+extends 'OpenXPKI::Client::Service::WebUI::Page::Workflow';
+with 'OpenXPKI::Client::Service::WebUI::PageRole::QueryCache';
 
-=head1 OpenXPKI::Client::Service::WebUI::Bulk
+=head1 OpenXPKI::Client::Service::WebUI::Page::Bulk
 
 Inherits from workflow, offers methods for workflow bulk processing.
 

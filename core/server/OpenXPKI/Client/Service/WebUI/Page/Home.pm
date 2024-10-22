@@ -1,7 +1,7 @@
-package OpenXPKI::Client::Service::WebUI::Home;
+package OpenXPKI::Client::Service::WebUI::Page::Home;
 use Moose;
 
-extends 'OpenXPKI::Client::Service::WebUI::Result';
+extends 'OpenXPKI::Client::Service::WebUI::Page';
 
 use Template;
 use Data::Dumper;

@@ -11,7 +11,7 @@ use File::Temp qw( tempdir );
 use Test::Deep ':v1';
 use CGI::Session;
 
-#use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Client::Service::WebUI::Workflow'} = 100;
+#use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Client::Service::WebUI::Page::Workflow'} = 100;
 
 # Project modules
 use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";

@@ -1,7 +1,7 @@
-package OpenXPKI::Client::Service::WebUI::Crl;
+package OpenXPKI::Client::Service::WebUI::Page::Crl;
 use Moose;
 
-extends 'OpenXPKI::Client::Service::WebUI::Result';
+extends 'OpenXPKI::Client::Service::WebUI::Page';
 
 use Data::Dumper;
 

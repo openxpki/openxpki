@@ -1,4 +1,4 @@
-package OpenXPKI::Client::Service::WebUI::Role::QueryCache;
+package OpenXPKI::Client::Service::WebUI::PageRole::QueryCache;
 use Moose::Role;
 
 requires qw( session_param __generate_uid status);

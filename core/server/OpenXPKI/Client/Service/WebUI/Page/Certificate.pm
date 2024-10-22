@@ -1,10 +1,10 @@
-package OpenXPKI::Client::Service::WebUI::Certificate;
+package OpenXPKI::Client::Service::WebUI::Page::Certificate;
 use Moose;
 
-extends 'OpenXPKI::Client::Service::WebUI::Result';
+extends 'OpenXPKI::Client::Service::WebUI::Page';
 with qw(
-    OpenXPKI::Client::Service::WebUI::Role::QueryCache
-    OpenXPKI::Client::Service::WebUI::Role::Pager
+    OpenXPKI::Client::Service::WebUI::PageRole::QueryCache
+    OpenXPKI::Client::Service::WebUI::PageRole::Pager
 );
 
 # Core modules
@@ -1160,7 +1160,7 @@ sub action_autocomplete {
     my $args = shift;
 
     my $term = $self->param('cert_identifier') || '';
-    my $params = $self->fetch_autocomplete_params; # from OpenXPKI::Client::Service::WebUI::Result
+    my $params = $self->fetch_autocomplete_params; # from OpenXPKI::Client::Service::WebUI::Page
 
     $self->log->trace( "autocomplete query: $term") if $self->log->is_trace;
 

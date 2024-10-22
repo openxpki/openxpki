@@ -1,11 +1,11 @@
-package OpenXPKI::Client::Service::WebUI::Source;
+package OpenXPKI::Client::Service::WebUI::Page::Source;
 use Moose;
 
-extends 'OpenXPKI::Client::Service::WebUI::Result';
+extends 'OpenXPKI::Client::Service::WebUI::Page';
 
 =head1 NAME
 
-OpenXPKI::Client::Service::WebUI::Source - load content from disk and output it.
+OpenXPKI::Client::Service::WebUI::Page::Source - load content from disk and output it.
 
 =head1 DESCRIPTION
 

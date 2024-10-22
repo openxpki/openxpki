@@ -1,12 +1,12 @@
-package OpenXPKI::Client::Service::WebUI::Cache;
+package OpenXPKI::Client::Service::WebUI::Page::Cache;
 use OpenXPKI -class;
 
-extends 'OpenXPKI::Client::Service::WebUI::Result';
+extends 'OpenXPKI::Client::Service::WebUI::Page';
 
 
 =head2 init_fetch
 
-Return the data persisted with L<OpenXPKI::Client::Service::WebUI::Result/persist_response>.
+Return the data persisted with L<OpenXPKI::Client::Service::WebUI::Page/persist_response>.
 
 =cut
 sub init_fetch {

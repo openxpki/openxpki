@@ -1,10 +1,10 @@
-package OpenXPKI::Client::Service::WebUI::Workflow::Init;
+package OpenXPKI::Client::Service::WebUI::Page::Workflow::Init;
 use Moose;
 
-extends 'OpenXPKI::Client::Service::WebUI::Workflow';
+extends 'OpenXPKI::Client::Service::WebUI::Page::Workflow';
 with qw(
-    OpenXPKI::Client::Service::WebUI::Role::QueryCache
-    OpenXPKI::Client::Service::WebUI::Role::Pager
+    OpenXPKI::Client::Service::WebUI::PageRole::QueryCache
+    OpenXPKI::Client::Service::WebUI::PageRole::Pager
 );
 
 # Core modules

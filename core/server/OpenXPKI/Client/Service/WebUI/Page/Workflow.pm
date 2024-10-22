@@ -1,9 +1,9 @@
-package OpenXPKI::Client::Service::WebUI::Workflow;
+package OpenXPKI::Client::Service::WebUI::Page::Workflow;
 use OpenXPKI -class;
 
-extends 'OpenXPKI::Client::Service::WebUI::Result';
+extends 'OpenXPKI::Client::Service::WebUI::Page';
 
-with 'OpenXPKI::Client::Service::WebUI::Role::OutputField';
+with 'OpenXPKI::Client::Service::WebUI::PageRole::OutputField';
 
 # Core modules
 use DateTime;
@@ -140,7 +140,7 @@ has __proc_state_i18n => (
     } },
 );
 
-=head1 OpenXPKI::Client::Service::WebUI::Workflow
+=head1 OpenXPKI::Client::Service::WebUI::Page::Workflow
 
 Generic UI handler class to render a workflow into gui elements.
 It first present a description of the workflow generated from the initial
@@ -153,7 +153,7 @@ time of creation. A brief description is given at the end of this document.
 
 =head1 UI methods
 
-Please see L<OpenXPKI::Client::Service::WebUI::Workflow::Init> and L<OpenXPKI::Client::Service::WebUI::Workflow::Action>.
+Please see L<OpenXPKI::Client::Service::WebUI::Page::Workflow::Init> and L<OpenXPKI::Client::Service::WebUI::Page::Workflow::Action>.
 
 =head1 Internal methods
 
@@ -981,17 +981,16 @@ sub __delegate_call {
 
     # Three forms of "uihandle" are supported:
     # - shortcut: Profile::render_subject_form
-    # - standard: OpenXPKI::Client::Service::WebUI::Handle::Profile::render_subject_form
+    # - standard: OpenXPKI::Client::Service::WebUI::Page::Workflow::Handle::Profile::render_subject_form
     # - legacy:   OpenXPKI::Client::UI::Handle::Profile::render_subject_form
-    my $rel_class = $class;
-    if ($rel_class =~ /^OpenXPKI::Client(::Service)?::UI::Handle::/) {
-        $rel_class =~ s/^OpenXPKI::Client(::Service)?::UI::Handle:://;
-    }
-
-    my @variants = (
-        sprintf("OpenXPKI::Client::Service::WebUI::Handle::%s", $rel_class),
-        sprintf("OpenXPKI::Client::UI::Handle::%s", $rel_class),
+    my @prefixes = qw(
+        OpenXPKI::Client::Service::WebUI::Page::Workflow::Handle::
+        OpenXPKI::Client::UI::Handle::
     );
+    my $rel_class = $class;
+    $rel_class =~ s/^\Q$_\E// for @prefixes;
+
+    my @variants = map { $_ . $rel_class } @prefixes;
     for my $pkg (@variants) {
         $self->log->trace("Trying to load UI handler module $pkg") if $self->log->is_trace;
         try {
@@ -1238,7 +1237,7 @@ sub __render_fields {
         my $name = $field->{name} || '';
         $field->{value} //= ($wf_info->{workflow}->{context}->{$name} // '');
 
-        my $item = $self->render_output_field( # from OpenXPKI::Client::Service::WebUI::Role::OutputField
+        my $item = $self->render_output_field( # from OpenXPKI::Client::Service::WebUI::PageRole::OutputField
             field => $field,
             # additional custom field render methods
             handlers => {

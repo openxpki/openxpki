@@ -1,4 +1,4 @@
-package OpenXPKI::Client::Service::WebUI::Result;
+package OpenXPKI::Client::Service::WebUI::Page;
 use OpenXPKI qw( -class -typeconstraints );
 use namespace::autoclean;
 

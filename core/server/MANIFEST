@@ -117,17 +117,27 @@ OpenXPKI/Client/Web/Controller.pm
 
 # WebUI
 OpenXPKI/Client/Service/WebUI.pm
-OpenXPKI/Client/Service/WebUI/Bootstrap.pm
-OpenXPKI/Client/Service/WebUI/Bulk.pm
-OpenXPKI/Client/Service/WebUI/Cache.pm
-OpenXPKI/Client/Service/WebUI/Certificate.pm
-OpenXPKI/Client/Service/WebUI/Crl.pm
-OpenXPKI/Client/Service/WebUI/Handle/Profile.pm
-OpenXPKI/Client/Service/WebUI/Handle/Report.pm
-OpenXPKI/Client/Service/WebUI/Handle/Status.pm
-OpenXPKI/Client/Service/WebUI/Home.pm
-OpenXPKI/Client/Service/WebUI/Information.pm
-OpenXPKI/Client/Service/WebUI/Login.pm
+OpenXPKI/Client/Service/WebUI/Page.pm
+OpenXPKI/Client/Service/WebUI/Page/Bootstrap.pm
+OpenXPKI/Client/Service/WebUI/Page/Bulk.pm
+OpenXPKI/Client/Service/WebUI/Page/Cache.pm
+OpenXPKI/Client/Service/WebUI/Page/Certificate.pm
+OpenXPKI/Client/Service/WebUI/Page/Crl.pm
+OpenXPKI/Client/Service/WebUI/Page/Home.pm
+OpenXPKI/Client/Service/WebUI/Page/Information.pm
+OpenXPKI/Client/Service/WebUI/Page/Login.pm
+OpenXPKI/Client/Service/WebUI/Page/Secret.pm
+OpenXPKI/Client/Service/WebUI/Page/Source.pm
+OpenXPKI/Client/Service/WebUI/Page/Users.pm
+OpenXPKI/Client/Service/WebUI/Page/Workflow.pm
+OpenXPKI/Client/Service/WebUI/Page/Workflow/Action.pm
+OpenXPKI/Client/Service/WebUI/Page/Workflow/Init.pm
+OpenXPKI/Client/Service/WebUI/Page/Workflow/Handle/Profile.pm
+OpenXPKI/Client/Service/WebUI/Page/Workflow/Handle/Report.pm
+OpenXPKI/Client/Service/WebUI/Page/Workflow/Handle/Status.pm
+OpenXPKI/Client/Service/WebUI/PageRole/OutputField.pm
+OpenXPKI/Client/Service/WebUI/PageRole/Pager.pm
+OpenXPKI/Client/Service/WebUI/PageRole/QueryCache.pm
 OpenXPKI/Client/Service/WebUI/Response.pm
 OpenXPKI/Client/Service/WebUI/Response/Button.pm
 OpenXPKI/Client/Service/WebUI/Response/DTO.pm
@@ -143,21 +153,11 @@ OpenXPKI/Client/Service/WebUI/Response/SectionRole.pm
 OpenXPKI/Client/Service/WebUI/Response/Sections.pm
 OpenXPKI/Client/Service/WebUI/Response/Status.pm
 OpenXPKI/Client/Service/WebUI/Response/User.pm
-OpenXPKI/Client/Service/WebUI/Result.pm
-OpenXPKI/Client/Service/WebUI/Role/Handler/Login.pm
-OpenXPKI/Client/Service/WebUI/Role/Handler/Page.pm
-OpenXPKI/Client/Service/WebUI/Role/OutputField.pm
-OpenXPKI/Client/Service/WebUI/Role/Pager.pm
-OpenXPKI/Client/Service/WebUI/Role/QueryCache.pm
-OpenXPKI/Client/Service/WebUI/Role/Request.pm
-OpenXPKI/Client/Service/WebUI/Secret.pm
+OpenXPKI/Client/Service/WebUI/Role/LoginHandler.pm
+OpenXPKI/Client/Service/WebUI/Role/PageHandler.pm
+OpenXPKI/Client/Service/WebUI/Role/RequestParams.pm
 OpenXPKI/Client/Service/WebUI/Session.pm
 OpenXPKI/Client/Service/WebUI/SessionCookie.pm
-OpenXPKI/Client/Service/WebUI/Source.pm
-OpenXPKI/Client/Service/WebUI/Users.pm
-OpenXPKI/Client/Service/WebUI/Workflow.pm
-OpenXPKI/Client/Service/WebUI/Workflow/Action.pm
-OpenXPKI/Client/Service/WebUI/Workflow/Init.pm
 
 ## Config Layers
 OpenXPKI/Config/Backend.pm

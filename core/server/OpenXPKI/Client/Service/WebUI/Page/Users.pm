@@ -1,10 +1,10 @@
-package OpenXPKI::Client::Service::WebUI::Users;
+package OpenXPKI::Client::Service::WebUI::Page::Users;
 use Moose;
 
-extends 'OpenXPKI::Client::Service::WebUI::Result';
+extends 'OpenXPKI::Client::Service::WebUI::Page';
 with qw(
-    OpenXPKI::Client::Service::WebUI::Role::QueryCache
-    OpenXPKI::Client::Service::WebUI::Role::Pager
+    OpenXPKI::Client::Service::WebUI::PageRole::QueryCache
+    OpenXPKI::Client::Service::WebUI::PageRole::Pager
 );
 
 use Data::Dumper;
