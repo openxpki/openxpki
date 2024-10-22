@@ -603,6 +603,13 @@ sub handle_ui_request ($self) {
 
     $self->log->debug('Incoming request: ' . join(', ', $page ? "page '$page'" : (), $action ? "action '$action'" : ()));
 
+    # shortcut to create new pure Page object for redirecting or error status
+    my $new_page = sub ($cb) {
+        my $page = OpenXPKI::Client::Service::WebUI::Page->new(client => $self);
+        $cb->($page);
+        return $page;
+    };
+
     # Check for goto redirection first
     if ($action =~ /^redirect!(.+)/  || $page =~ /^redirect!(.+)/) {
         my $goto = $1;
@@ -611,9 +618,7 @@ sub handle_ui_request ($self) {
             $self->log->warn("Invalid redirect target found - aborting");
         }
         $self->log->debug("Redirect to: $goto");
-        my $result = OpenXPKI::Client::Service::WebUI::Page->new(client => $self);
-        $result->redirect->to($goto);
-        return $result;
+        return $new_page->(sub { shift->redirect->to($goto) });
     }
 
     # Handle logout / session restart
@@ -624,18 +629,16 @@ sub handle_ui_request ($self) {
         # For SSO Logins the session might hold an external link
         # to logout from the SSO provider
         my $authinfo = $self->session->param('authinfo') || {};
-        my $redirectTo = $authinfo->{logout};
+        my $goto = $authinfo->{logout};
 
         # clear the session before redirecting to make sure we are safe
         $self->logout_session;
         $self->log->info('Logout from session');
 
         # now perform the redirect if set
-        if ($redirectTo) {
-            $self->log->debug("External redirect on logout to: $redirectTo");
-            my $result = OpenXPKI::Client::Service::WebUI::Page->new(client => $self);
-            $result->redirect->to($redirectTo);
-            return $result;
+        if ($goto) {
+            $self->log->debug("External redirect on logout to: $goto");
+            return $new_page->(sub { shift->redirect->to($goto) });
         }
 
     }
@@ -653,7 +656,7 @@ sub handle_ui_request ($self) {
 
     if ( $reply->{SERVICE_MSG} eq 'ERROR' ) {
         $self->log->debug('Got error from server');
-        return OpenXPKI::Client::Service::WebUI::Page->new(client => $self)->set_status_from_error_reply($reply);
+        return $new_page->(sub { shift->set_status_from_error_reply($reply) });
     }
 
     # Only handle requests if we have an open channel (unless it's the bootstrap page)
