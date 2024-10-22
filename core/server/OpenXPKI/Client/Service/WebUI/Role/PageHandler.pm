@@ -27,58 +27,77 @@ signature_for handle_page => (
         'Str', { optional => 1 },
     ],
 );
-sub handle_page ($self, $page, $action) {
+sub handle_page ($self, $page_str, $action_str) {
     # Action is only valid within a post request
-    my $result;
+    my $page;
     my @page_method_args;
     my $redirected_from;
 
-    if ($action) {
-        $self->log->info("Handle action '$action'");
+    if ($action_str) {
+        $self->log->info("Handle action '$action_str'");
         my $method;
-        ($result, $method) = $self->_load_class(call => $action, is_action => 1);
+        ($page, $method) = $self->_load_page_class(call => $action_str, is_action => 1);
 
-        if ($result) {
+        if ($page) {
             $self->log->debug("Calling method: $method()");
-            $result->$method();
-            # Follow an internal redirect to an init_* method
-            if (my $target = $result->internal_redirect_target) {
-                ($page, @page_method_args) = $target->@*;
-                $redirected_from = $result;
-                $self->log->trace("Internal redirect to: $page") if $self->log->is_trace;
+            $page->$method();
+            # Follow internal redirect to an init_* method
+            if (my $target = $page->internal_redirect_target) {
+                ($page_str, @page_method_args) = $target->@*;
+                $redirected_from = $page;
+                $self->log->trace("Internal redirect to: $page_str") if $self->log->is_trace;
             }
         } else {
             $self->ui_response->status->error('I18N_OPENXPKI_UI_ACTION_NOT_FOUND');
         }
     }
 
-    die "'page' is not set" unless $page;
+    die "'page' is not set" unless $page_str;
 
     # Render a page only if there is no action or object instantiation failed
-    if (not $result or $redirected_from) {
+    if (not $page or $redirected_from) {
         # Special page requests
-        $page = 'home!welcome' if $page eq 'welcome';
+        $page_str = 'home!welcome' if $page_str eq 'welcome';
 
-        $self->log->info("Handle page '$page'");
-        my $method;
-        ($result, $method) = $self->_load_class(call => $page);
+        my $redirects = 0;
+        while ($page_str) {
+            die "Too many internal redirects" if $redirects++ > 10;
 
-        if ($result) {
-            $self->log->debug("Calling method: $method()");
-            $result->status($redirected_from->status) if $redirected_from;
-            $result->$method(@page_method_args);
+            $self->log->info("Handle page '$page_str'");
+            my $method;
+            ($page, $method) = $self->_load_page_class(call => $page_str);
 
-        } else {
-            $result = OpenXPKI::Client::Service::WebUI::Page::Bootstrap->new(client => $self)->page_not_found;
+            if ($page) {
+                if ($redirected_from) {
+                    $page->status($redirected_from->status);
+                    $redirected_from = undef;
+                }
+
+                # Call handler
+                $self->log->debug("Calling method: $method()");
+                $page->$method(@page_method_args);
+
+                # Follow internal redirect to another init_* method
+                if (my $target = $page->internal_redirect_target) {
+                    ($page_str, @page_method_args) = $target->@*;
+                    $self->log->trace("Internal redirect to: $page_str") if $self->log->is_trace;
+                } else {
+                    $page_str = undef;
+                }
+
+            } else {
+                $page = OpenXPKI::Client::Service::WebUI::Page::Bootstrap->new(client => $self)->page_not_found;
+            }
+
         }
     }
 
     Log::Log4perl::MDC->put('wfid', undef);
 
-    return $result;
+    return $page;
 }
 
-=head2 _load_class
+=head2 _load_page_class
 
 Expect the page/action string and a reference to the cgi object
 Extracts the expected class and method name and extra params encoded in
@@ -88,14 +107,14 @@ array). On error, both elements in the array are set to undef.
 
 =cut
 
-signature_for _load_class => (
+signature_for _load_page_class => (
     method => 1,
     named => [
         call => 'Str',
         is_action  => 'Bool', { default => 0 },
     ],
 );
-sub _load_class ($self, $arg) {
+sub _load_page_class ($self, $arg) {
     $self->log->debug("Trying to load class for call: " . $arg->call);
 
     my ($class, $remainder) = ($arg->call =~ /\A (\w+)\!? (.*) \z/xms);
