@@ -22,7 +22,7 @@ use OpenXPKI::Client::Service::WebUI::Response;
 
 =pod
 
-=head1 REQUEST RELATED METHODS
+=head1 REQUEST PARAMETERS
 
 =head2 param
 
@@ -82,47 +82,55 @@ B<Parameters>
 
 =back
 
+=head1 RESPONSE
+
+=head2 generate_uid
+
+Generate a random uid (RFC 3548 URL and filename safe base64)
+
+=head2 persist_response
+
+Persist the given response data to retrieve it after an HTTP roundtrip.
+Used to break out of the JavaScript app for downloads or to reroute result
+pages.
+
+Returns the page call URI for L<OpenXPKI::Client::Service::WebUI::Page::Cache/init_fetch>.
+
+=head2 fetch_response
+
+Get the data for the persisted response.
+
+=head2 encrypt_jwt
+
+Encrypt the given data into a JWT using the encryption key stored in session
+parameter C<jwt_encryption_key> (key will be set to random value if it does not
+exist yet).
+
 =cut
 
+# "stub" subroutines to satisfy "requires" method checks of other consumed roles
 has client => (
     required => 1,
     is => 'ro',
     isa => 'OpenXPKI::Client::Service::WebUI',
     handles => [ qw(
-        persist_response
-        fetch_response
         param
         multi_param
         secure_param
+        persist_response
+        fetch_response
         encrypt_jwt
+        generate_uid
     ) ],
 );
 
-# PRIVATE
-
-=head2 log
-
-L<Log::Log4perl::Logger> or L<OpenXPKI::Log4perl::MojoLogger>.
-
-=cut
-
-has log => (
-    is => 'ro',
-    isa => 'Object',
-    init_arg => undef,
-    lazy => 1,
-    default => sub ($self) { return $self->client->log },
-);
-
 =pod
-
-=head1 JSON RESPONSE
 
 =head2 ui_response
 
 L<OpenXPKI::Client::Service::WebUI::Response> object encapsulating the JSON response.
 
-=head1 RESPONSE RELATED ATTRIBUTES AND METHODS
+=head2 JSON RESPONSE
 
 Most of the following methods are accessors to attributes of
 L<OpenXPKI::Client::Service::WebUI::Response>. They can also be called without arguments to
@@ -135,21 +143,21 @@ The DTOs have a C<resolve> method which recursively builds a I<HashRef> from
 the encapsulated data. The I<HashRef> gets converted to JSON
 (in L</_render_body_to_str>) and is sent to the web UI.
 
-=head2 redirect
+=head3 redirect
 
 Enforce a client side redirect to the given page:
 
     $self->redirect->to('workflow!search');
     $self->redirect->external('https://...');
 
-=head2 confined_response
+=head3 confined_response
 
 Enforce response to a confined request, i.e. and autocomplete query. Returns
 an arbitrary JSON structure to the web UI.
 
     $self->confined_response([1,2,3]);
 
-=head2 main
+=head3 main
 
 Set the structure of the main contents.
 
@@ -158,13 +166,13 @@ Set the structure of the main contents.
 
 C<add_form> receives constructor parameters for L<OpenXPKI::Client::Service::WebUI::Response::Section::Form>.
 
-=head2 language
+=head3 language
 
 Set the language.
 
     $self->language('de');
 
-=head2 menu
+=head3 menu
 
 Set the menu structure.
 
@@ -175,7 +183,7 @@ Set the menu structure.
         label => 'I18N_OPENXPKI_UI_CLEAR_LOGIN',
     });
 
-=head2 on_exception
+=head3 on_exception
 
 Add an exception handler for HTTP codes.
 
@@ -184,7 +192,7 @@ Add an exception handler for HTTP codes.
         redirect => $target,
     );
 
-=head2 page and set_page
+=head3 page and set_page
 
 Set page related information.
 
@@ -201,13 +209,13 @@ Set page related information.
         description => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_DESCRIPTION',
     );
 
-=head2 ping
+=head3 ping
 
 Configure keepalive ping to an endpoint.
 
     $self->ping({ href => '...', timeout => 30 }); # timeout is in milliseconds
 
-=head2 refresh and set_refresh
+=head3 refresh and set_refresh
 
 Configure a periodic page refresh timer.
 
@@ -220,13 +228,13 @@ Configure a periodic page refresh timer.
         timeout => 30,
     );
 
-=head2 rtoken
+=head3 rtoken
 
 Set the request token.
 
     $self->rtoken($rtoken);
 
-=head2 status
+=head3 status
 
 Set status or error message.
 
@@ -235,13 +243,13 @@ Set status or error message.
     $self->status->warn('...');
     $self->status->error('...');
 
-=head2 tenant
+=head3 tenant
 
 Set the tenant.
 
     $self->tenant($tenant);
 
-=head2 user and set_user
+=head3 user and set_user
 
 Set user related information.
 
@@ -259,7 +267,7 @@ Set user related information.
     # set several attributes at once
     $self->set_user(%{ $user });
 
-=head2 pki_realm
+=head3 pki_realm
 
 Set the current PKI realm.
 
@@ -291,35 +299,47 @@ has ui_response => (
     ) ],
 );
 
-=head1 JSON RESPONSE
-
-=head2 raw_bytes
+=head3 raw_bytes
 
 Raw byte string to be sent back.
 
 Should be set via L</attachment>.
 
 =cut
-has 'raw_bytes' => (
+has raw_bytes => (
     is => 'rw',
     isa => 'Str',
     predicate => 'has_raw_bytes',
 );
 
-=head2 raw_bytes_callback
+=head3 raw_bytes_callback
 
 Callback that passes chunks of raw bytes to a given subroutine.
 
 Should be set via L</attachment>.
 
 =cut
-has 'raw_bytes_callback' => (
+has raw_bytes_callback => (
     is => 'rw',
     isa => 'CodeRef',
     predicate => 'has_raw_bytes_callback',
 );
 
-# Internal attributes
+=head1 OTHER ATTRIBUTES
+
+=head2 log
+
+L<Log::Log4perl::Logger> or L<OpenXPKI::Log4perl::MojoLogger>.
+
+=cut
+
+has log => (
+    is => 'ro',
+    isa => 'Object',
+    init_arg => undef,
+    lazy => 1,
+    default => sub ($self) { return $self->client->log },
+);
 
 has last_reply => (
     is => 'rw',
@@ -340,6 +360,8 @@ has serializer => (
     lazy => 1,
     default => sub { OpenXPKI::Serialization::Simple->new },
 );
+
+# PRIVATE
 
 # Redirection (from an action_* method) to an init_* method that may live
 # in another class.
@@ -628,19 +650,6 @@ sub purge_wf_token {
     return $self;
 }
 
-=head2 generate_uid
-
-Generate a random uid (RFC 3548 URL and filename safe base64)
-
-=cut
-sub generate_uid {
-    my $self = shift;
-    my $uid = sha1_base64(time.rand().$$);
-    ## RFC 3548 URL and filename safe base64
-    $uid =~ tr/+\//-_/;
-    return $uid;
-}
-
 =head2 build_attribute_subquery
 
 Expects an attribtue query definition hash (from uicontrol), returns arrayref
@@ -917,8 +926,6 @@ sub fetch_autocomplete_params {
 Specify an attachment (file download).
 
 B<NOTE>: This will override any GUI data previously set for a JSON response.
-
-=back
 
     $self->attachment(
         mimetype => 'application/x-pkcs7-crl',
