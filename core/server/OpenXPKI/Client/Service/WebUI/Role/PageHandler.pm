@@ -2,7 +2,6 @@ package OpenXPKI::Client::Service::WebUI::Role::PageHandler;
 use OpenXPKI -role;
 use namespace::autoclean;
 
-requires 'ui_response';
 requires 'log';
 requires 'decrypt_jwt';
 requires 'add_params';
@@ -27,6 +26,7 @@ signature_for handle_action => (
 );
 sub handle_action ($self, $action_str) {
     my $page;
+    my $error;
 
     if ($action_str) {
         $self->log->info("Handle action '$action_str'");
@@ -43,12 +43,13 @@ sub handle_action ($self, $action_str) {
                 $page = $self->handle_view($view_str, $method_args, $page->status);
             }
         } else {
-            $self->ui_response->status->error('I18N_OPENXPKI_UI_ACTION_NOT_FOUND');
+            $error = 'I18N_OPENXPKI_UI_ACTION_NOT_FOUND';
         }
     }
 
     # Render a page only if there is no action or object instantiation failed
     $page //= $self->handle_view('home!welcome');
+    $page->status->error($error) if $error;
 
     Log::Log4perl::MDC->put('wfid', undef);
 
