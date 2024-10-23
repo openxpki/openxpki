@@ -52,7 +52,7 @@ sub init_export ($self, $args) {
 
     $self->log->trace( "search cache: " . Dumper $search_result) if $self->log->is_trace;
 
-    my $header = $cache->{header} || $self->__default_grid_head;
+    my $header = $cache->{header} || $self->default_grid_head;
 
     my @head;
     my @cols;
@@ -69,9 +69,9 @@ sub init_export ($self, $args) {
 
     my $buffer = join("\t", @head)."\n";
 
-    my $body = $cache->{column} || $self->__default_grid_row;
+    my $body = $cache->{column} || $self->default_grid_row;
 
-    my @lines = $self->__render_result_list( $search_result, $body );
+    my @lines = $self->render_result_list( $search_result, $body );
     my $colcnt = scalar @head - 1;
     foreach my $line (@lines) {
         my @t = @{$line};

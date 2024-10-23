@@ -19,7 +19,7 @@ sub action_bulk ($self) {
     my $wf_token = $self->param('wf_token') || '';
 
     # token contains the name of the action to do and extra params
-    my $wf_args = $self->__resolve_wf_token() or return $self;
+    my $wf_args = $self->resolve_wf_token() or return $self;
     if (!$wf_args->{wf_action}) {
         $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_HANDLE_WITHOUT_ACTION!');
         return $self;
@@ -82,9 +82,9 @@ sub action_bulk ($self) {
         $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_HAS_FAILED_ITEMS_STATUS');
 
         my @failed_id = keys %{$errors};
-        my $failed_result = $self->send_command_v2( 'search_workflow_instances', { id => \@failed_id, $self->__tenant_param() } );
+        my $failed_result = $self->send_command_v2( 'search_workflow_instances', { id => \@failed_id, $self->tenant_param() } );
 
-        my @result_failed = $self->__render_result_list( $failed_result, $self->__default_grid_row );
+        my @result_failed = $self->render_result_list( $failed_result, $self->default_grid_row );
 
         # push the error to the result
         my $pos_serial = 4;
@@ -96,7 +96,7 @@ sub action_bulk ($self) {
 
         $self->log->trace('Mangled failed result: '. Dumper \@result_failed) if $self->log->is_trace;
 
-        my @fault_head = @{$self->__default_grid_head};
+        my @fault_head = @{$self->default_grid_head};
         $fault_head[$pos_state] = { sTitle => 'Error' };
 
         $self->main->add_section({
@@ -122,7 +122,7 @@ sub action_bulk ($self) {
 
     if (@success) {
 
-        my @result_done = $self->__render_result_list( \@success, $self->__default_grid_row );
+        my @result_done = $self->render_result_list( \@success, $self->default_grid_row );
 
         $self->main->add_section({
             type => 'grid',
@@ -138,7 +138,7 @@ sub action_bulk ($self) {
                     icon => 'view',
                     target => 'popup',
                 }],
-                columns => $self->__default_grid_head,
+                columns => $self->default_grid_head,
                 data => \@result_done,
                 empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
             }

@@ -48,7 +48,7 @@ has 'large' => (
     documentation => 'isLarge',
 );
 
-# TODO: Not used as of 2022-10-18. We keep it for future testing purposes. Set in OpenXPKI::Client::Service::WebUI::Page::Workflow->__render_from_workflow()
+# TODO: Not used as of 2022-10-18. We keep it for future testing purposes. Set in OpenXPKI::Client::Service::WebUI::Page::Workflow->render_from_workflow()
 has 'canonical_uri' => (
     is => 'rw',
     isa => 'Str',

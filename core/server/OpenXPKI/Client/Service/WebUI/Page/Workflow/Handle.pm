@@ -14,7 +14,7 @@ the workflow and action to be set in the wf_token info.
 
 sub action_handle ($self) {
     my $wf_info;
-    my $wf_args = $self->__resolve_wf_token or return;
+    my $wf_args = $self->resolve_wf_token or return;
 
     if (not $wf_args->{wf_id}) {
         $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_HANDLE_WITHOUT_ID');
@@ -61,7 +61,7 @@ sub action_handle ($self) {
         });
     }
 
-    $self->__render_from_workflow({ wf_info => $wf_info });
+    $self->render_from_workflow({ wf_info => $wf_info });
 
     return;
 }

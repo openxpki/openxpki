@@ -13,7 +13,7 @@ the action to choose with C<wf_action>. If the selected action does not require
 any input parameters (has no fields) and does not have an ui override set, the
 action is executed immediately and the resulting state is used. Otherwise,
 the selected action is preset and the current state is passed to the
-__render_from_workflow method.
+render_from_workflow method.
 
 =cut
 
@@ -24,7 +24,7 @@ sub action_select ($self) {
     # can be either token or id
     my $wf_id = $self->param('wf_id');
     if (not $wf_id) {
-        my $wf_args = $self->__resolve_wf_token or return;
+        my $wf_args = $self->resolve_wf_token or return;
         $wf_id = $wf_args->{wf_id};
         if (!$wf_id) {
             $self->log->error('No workflow id given');
@@ -65,14 +65,14 @@ sub action_select ($self) {
             ui_info => 1
         });
 
-        $args->{wf_action} = $self->__get_next_auto_action($wf_info);
+        $args->{wf_action} = $self->get_next_auto_action($wf_info);
     } else {
         $args->{wf_action} = $wf_action;
     }
 
     $args->{wf_info} = $wf_info;
 
-    $self->__render_from_workflow( $args );
+    $self->render_from_workflow( $args );
 }
 
 __PACKAGE__->meta->make_immutable;

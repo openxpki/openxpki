@@ -53,7 +53,7 @@ sub init_index ($self, $args = {}) {
             );
         }
 
-        my $id = $self->__generate_uid();
+        my $id = $self->generate_uid;
         $self->session_param('bulk_'.$id, $bulk );
         $form->add_field(
             name => 'formid',
@@ -81,7 +81,7 @@ sub action_result ($self) {
 
     my $attributes = $spec->{attributes};
 
-    my $attr = $self->__build_attribute_subquery( $spec->{attributes} );
+    my $attr = $self->build_attribute_subquery( $spec->{attributes} );
 
     if ($self->param('wf_creator')) {
         $attr->{'creator'} = ~~$self->param('wf_creator');
@@ -144,10 +144,10 @@ sub action_result ($self) {
             $action = $btn{action};
         }
 
-        my $selection_field = $self->__generate_uid(); # name of input field that will hold IDs of selected rows
+        my $selection_field = $self->generate_uid; # name of input field that will hold IDs of selected rows
         $btn{selection} = $selection_field;
 
-        my $token = $self->__wf_token_extra_param( undef, {
+        my $token = $self->wf_token_extra_param( undef, {
             wf_action => $action,
             ($btn{params} ? (params => $btn{params}) :()),
             ($btn{async} ? (async => 1) :()),

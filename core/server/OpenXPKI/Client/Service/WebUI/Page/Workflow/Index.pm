@@ -35,9 +35,9 @@ sub init_index ($self, $args) {
     }
 
     # Pass the initial activity so we get the form right away
-    my $wf_action = $self->__get_next_auto_action($wf_info);
+    my $wf_action = $self->get_next_auto_action($wf_info);
 
-    $self->__render_from_workflow({ wf_info => $wf_info, wf_action => $wf_action });
+    $self->render_from_workflow({ wf_info => $wf_info, wf_action => $wf_action });
     return $self;
 
 }
@@ -48,7 +48,7 @@ sub init_index ($self, $args) {
 
 If you pass I<wf_type>, a new workflow instance of this type is created,
 the inital action is executed and the resulting state is passed to
-__render_from_workflow.
+render_from_workflow.
 
 =head3 generic action
 
@@ -56,8 +56,8 @@ The generic action is the default when sending a workflow generated form back
 to the server. You need to setup the handler from the rendering step, direct
 posting is not allowed. The cgi environment must present the key I<wf_token>
 which is a reference to a session based config hash. The config can be created
-using L<OpenXPKI::Client::Service::WebUI::Page/__wf_token_extra_param> or
-L<OpenXPKI::Client::Service::WebUI::Page/__wf_token_field>, recognized keys are:
+using L<OpenXPKI::Client::Service::WebUI::Page/wf_token_extra_param> or
+L<OpenXPKI::Client::Service::WebUI::Page/wf_token_field>, recognized keys are:
 
 =over
 
@@ -83,13 +83,13 @@ parameters.
 
 If there are errors, an error message is send back to the browser, if the
 workflow execution succeeds, the new workflow state is rendered using
-__render_from_workflow.
+render_from_workflow.
 
 =cut
 
 sub action_index ($self) {
     my $wf_info;
-    my $wf_args = $self->__resolve_wf_token or return $self;
+    my $wf_args = $self->resolve_wf_token or return $self;
 
     $self->log->trace("wf args from token: " . Dumper $wf_args) if $self->log->is_trace;
 
@@ -131,13 +131,13 @@ sub action_index ($self) {
 
         $self->log->trace("wf info after execute: " . Dumper $wf_info ) if $self->log->is_trace;
         # purge the workflow token
-        $self->__purge_wf_token;
+        $self->purge_wf_token;
 
     } elsif ($wf_args->{wf_type}) {
 
         $wf_info = $self->send_command_v2( 'create_workflow_instance', {
             workflow => $wf_args->{wf_type}, params => \%wf_param, ui_info => 1,
-            $self->__tenant_param(),
+            $self->tenant_param(),
         });
         if (!$wf_info) {
 
@@ -157,7 +157,7 @@ sub action_index ($self) {
         $self->log->info(sprintf "Create new workflow %s, got id #%s",  $wf_args->{wf_type}, $wf_info->{workflow}->{id} );
 
         # purge the workflow token
-        $self->__purge_wf_token;
+        $self->purge_wf_token;
 
         # always redirect after create to have the url pointing to the created workflow
         # do not redirect for "one shot workflows" or workflows already in a final state
@@ -182,7 +182,7 @@ sub action_index ($self) {
         $wf_action = $wf_info->{state}->{autoselect};
         $self->log->debug("Autoselect set: $wf_action");
     } else {
-        $wf_action = $self->__get_next_auto_action($wf_info);
+        $wf_action = $self->get_next_auto_action($wf_info);
     }
 
     # If we call the token action from within a result list we want
@@ -198,9 +198,9 @@ sub action_index ($self) {
     }
 
     if ($wf_action) {
-        $self->__render_from_workflow({ wf_info => $wf_info, wf_action => $wf_action });
+        $self->render_from_workflow({ wf_info => $wf_info, wf_action => $wf_action });
     } else {
-        $self->__render_from_workflow({ wf_info => $wf_info });
+        $self->render_from_workflow({ wf_info => $wf_info });
     }
 
     return $self;
@@ -218,7 +218,7 @@ set to render the errors in the form view. Returns undef otherwise.
 sub __check_for_validation_error {
 
     my $self = shift;
-    my $reply = $self->_last_reply();
+    my $reply = $self->last_reply();
     if ($reply->{'ERROR'}->{CLASS} eq 'OpenXPKI::Exception::InputValidator' &&
         $reply->{'ERROR'}->{ERRORS}) {
         my $validator_msg = $reply->{'ERROR'}->{LABEL};
@@ -253,7 +253,7 @@ B<Positional parameters>
 =over
 
 =item * C<$fields> I<ArrayRef> - list of field specifications as returned by
-L<OpenXPKI::Client::Service::WebUI::Page::Workflow/__render_input_field>
+L<OpenXPKI::Client::Service::WebUI::Page::Workflow/render_input_field>
 
 =back
 
@@ -341,7 +341,7 @@ B<Positional parameters>
 =over
 
 =item * C<$field> I<HashRef> - field specification as returned by
-L<OpenXPKI::Client::Service::WebUI::Page::Workflow/__render_input_field>.
+L<OpenXPKI::Client::Service::WebUI::Page::Workflow/render_input_field>.
 
 =item * C<$option> I<Str> - value of the the option whose dependants shall be
 returned. Optional.

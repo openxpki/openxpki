@@ -44,9 +44,9 @@ sub init_pager ($self, $args) {
     my $search_result = $self->send_command_v2(search_workflow_instances => $query);
     $self->log->trace( "search result: " . Dumper $search_result) if $self->log->is_trace;
 
-    my $body = $cache->{column} || $self->__default_grid_row;
+    my $body = $cache->{column} || $self->default_grid_row;
 
-    my @result = $self->__render_result_list( $search_result, $body );
+    my @result = $self->render_result_list( $search_result, $body );
     $self->log->trace( "dumper result: " . Dumper @result) if $self->log->is_trace;
 
     $self->confined_response({ data => \@result });

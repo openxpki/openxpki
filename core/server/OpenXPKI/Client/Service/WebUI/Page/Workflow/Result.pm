@@ -77,13 +77,13 @@ sub init_result ($self, $args) {
         startat => $query->{start},
     );
 
-    my $body = $cache->{column} || $self->__default_grid_row;
+    my $body = $cache->{column} || $self->default_grid_row;
 
-    my @lines = $self->__render_result_list( $search_result, $body );
+    my @lines = $self->render_result_list( $search_result, $body );
 
     $self->log->trace( "dumper result: " . Dumper \@lines) if $self->log->is_trace;
 
-    my $header = $cache->{header} || $self->__default_grid_head;
+    my $header = $cache->{header} || $self->default_grid_head;
 
     # buttons - from result (used in bulk) or default
     my @buttons;
@@ -106,7 +106,7 @@ sub init_result ($self, $args) {
             format => 'failure'};
 
         push @buttons, { label => 'I18N_OPENXPKI_UI_SEARCH_EXPORT_RESULT',
-            href => $self->_client->script_url . '?page=workflow!export!id!'.$queryid,
+            href => $self->client->script_url . '?page=workflow!export!id!'.$queryid,
             target => '_blank',
             format => 'optional'
             };

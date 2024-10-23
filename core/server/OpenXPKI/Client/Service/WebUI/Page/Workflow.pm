@@ -27,7 +27,7 @@ use OpenXPKI::Dumper;
 my $template_cache = Cache::LRU->new( size => 256 );
 
 
-has __default_grid_head => (
+has default_grid_head => (
     is => 'rw',
     isa => 'ArrayRef',
     lazy => 1,
@@ -42,7 +42,7 @@ has __default_grid_head => (
     ]; }
 );
 
-has __default_grid_row => (
+has default_grid_row => (
     is => 'rw',
     isa => 'ArrayRef',
     lazy => 1,
@@ -55,51 +55,7 @@ has __default_grid_row => (
     ]; }
 );
 
-has __default_wfdetails => (
-    is => 'rw',
-    isa => 'ArrayRef',
-    lazy => 1,
-    default => sub { return [
-        {
-            label => 'I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL',
-            field => 'id',
-            link => {
-                page => 'workflow!load!wf_id![% id %]',
-                target => 'top',
-            },
-        },
-        {
-            label => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL',
-            field => 'type',
-        },
-        {
-            label => 'I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL',
-            field => 'creator',
-        },
-        {
-            label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL',
-            template => "[% IF state == 'SUCCESS' %]<b>Success</b>[% ELSE %][% state %][% END %]",
-            format => "raw",
-        },
-        {
-            label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL',
-            field => 'proc_state',
-        },
-    ] },
-);
-
-has __validity_options => (
-    is => 'rw',
-    isa => 'ArrayRef',
-    lazy => 1,
-    default => sub { return [
-        { value => 'last_update_before', label => 'I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_BEFORE_LABEL' },
-        { value => 'last_update_after', label => 'I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_AFTER_LABEL' },
-
-    ];}
-);
-
-has __proc_state_i18n => (
+has proc_state_i18n => (
     is => 'ro', isa => 'HashRef', lazy => 1, init_arg => undef,
     default => sub { return {
         # label = short label
@@ -238,15 +194,11 @@ tasklist as defined in the uicontrol section.
 
 =cut
 
-sub __render_task_list {
-
-    my $self = shift;
-    my $item = shift;
-
+sub __render_task_list ($self, $item) {
     my $query = $item->{query};
     my $limit = 25;
 
-    $query = { $self->__tenant_param(), %$query } unless($query->{tenant});
+    $query = { $self->tenant_param(), %$query } unless($query->{tenant});
 
     if ($query->{limit}) {
         $limit = $query->{limit};
@@ -275,7 +227,7 @@ sub __render_task_list {
     my $actions = $item->{actions} // [{ page => 'redirect!workflow!load!wf_id!{serial}', icon => 'view' }];
 
     # create the header from the columns spec
-    my ($header, $column, $rattrib) = $self->__render_list_spec( \@cols );
+    my ($header, $column, $rattrib) = $self->render_list_spec( \@cols );
 
     if ($rattrib) {
         $query->{return_attributes} = $rattrib;
@@ -297,7 +249,7 @@ sub __render_task_list {
 
     } else {
 
-        @data = $self->__render_result_list( $search_result, $column );
+        @data = $self->render_result_list( $search_result, $column );
 
         $self->log->trace( "dumper result: " . Dumper @data) if $self->log->is_trace;
 
@@ -350,7 +302,7 @@ sub __render_task_list {
     return \@data
 }
 
-=head2 __render_from_workflow ( { wf_id, wf_info, wf_action }  )
+=head2 render_from_workflow ( { wf_id, wf_info, wf_action }  )
 
 Internal method that renders the ui components from the current workflow state.
 The info about the current workflow can be passed as a workflow info hash as
@@ -393,7 +345,7 @@ action level gets called only if the action is selected by above means.
 
 =cut
 
-sub __render_from_workflow {
+sub render_from_workflow {
 
     my $self = shift;
     my $args = shift;
@@ -452,7 +404,7 @@ sub __render_from_workflow {
             # this is evaluated to show the context in the exception case below
             @handles = @{$wf_info->{handles}};
             # this is added to the button list at the end of the page
-            @buttons_handle = @{$self->__get_global_action_handles($wf_info)};
+            @buttons_handle = $self->get_global_action_handles($wf_info)->@*;
         }
 
         # same page head for all proc states
@@ -460,7 +412,7 @@ sub __render_from_workflow {
         my $wf_action_info = $wf_info->{activity}->{ $wf_action };
 
         $self->set_page(
-            label => $self->__get_proc_state_label($wf_proc_state), # reuse labels from init_info popup
+            label => $self->get_proc_state_label($wf_proc_state), # reuse labels from init_info popup
             breadcrumb => $self->__get_breadcrumb($wf_info, $wf_info->{state}->{label}),
             description => $irregular{$wf_proc_state},
             css_class => 'workflow workflow-proc-state workflow-proc-'.$wf_proc_state,
@@ -525,7 +477,7 @@ sub __render_from_workflow {
 
             # if there are output rules defined, we add them now
             if ( $wf_info->{state}->{output} ) {
-                push @fields, @{$self->__render_fields( $wf_info, $view )};
+                push @fields, @{$self->render_fields( $wf_info, $view )};
             }
 
         # if the workflow is currently runnig, show info without buttons
@@ -584,7 +536,7 @@ sub __render_from_workflow {
 
             # if there are output rules defined, we add them now
             if ( $wf_info->{state}->{output} ) {
-                push @fields, @{$self->__render_fields( $wf_info, $view )};
+                push @fields, @{$self->render_fields( $wf_info, $view )};
             }
 
             # if we come here from a failed action the status is set already
@@ -661,7 +613,7 @@ sub __render_from_workflow {
             $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILED');
         }
 
-        my $fields = $self->__render_fields( $wf_info, $view );
+        my $fields = $self->render_fields( $wf_info, $view );
 
         $self->log->trace('Field data ' . Dumper $fields) if $self->log->is_trace;
 
@@ -779,6 +731,59 @@ sub __render_from_workflow {
     return $self;
 }
 
+=head2 __delegate_call
+
+Used to delegate the rendering to another class, requires the method
+to dispatch to as string (class + method using the :: notation) and
+a ref to the args to be passed. If called from within an action, the
+name of the action is passed as additonal parameter.
+
+=cut
+
+sub __delegate_call {
+
+    my $self = shift;
+    my $call = shift;
+    my $args = shift;
+    my $wf_action = shift || '';
+
+    my ($class, $method, undef, $param) = $call =~ /([\w\:\_]+)::([\w\_]+)(!([!\w]+))?/;
+
+    # Three forms of "uihandle" are supported:
+    # - shortcut: Profile::render_subject_form
+    # - standard: OpenXPKI::Client::Service::WebUI::Page::Workflow::Renderer::Profile::render_subject_form
+    # - legacy:   OpenXPKI::Client::UI::Handle::Profile::render_subject_form
+    my @prefixes = qw(
+        OpenXPKI::Client::Service::WebUI::Page::Workflow::Renderer::
+        OpenXPKI::Client::UI::Handle::
+    );
+    my $rel_class = $class;
+    $rel_class =~ s/^\Q$_\E// for @prefixes;
+
+    my @variants = map { $_ . $rel_class } @prefixes;
+    for my $pkg (@variants) {
+        $self->log->trace("Trying to load UI handler module $pkg") if $self->log->is_trace;
+        try {
+            Module::Load::load($pkg);
+            $self->log->debug("Delegate rendering to $pkg->$method");
+        }
+        catch ($err) {
+            next if $err =~ /^Can't locate/;
+            die $err;
+        }
+
+        # call method on delegation class
+        if ($param) {
+            $pkg->$method( $self, $args, $wf_action, $param );
+        } else {
+            $pkg->$method( $self, $args, $wf_action );
+        }
+        return $self;
+    }
+
+    die "Could not find UI handler class matching uihandle = $rel_class";
+}
+
 =head2 __get_action_buttons
 
 For states having multiple actions, this helper renders a set of buttons to
@@ -861,7 +866,7 @@ sub __get_action_buttons {
     return \@buttons;
 }
 
-sub __get_form_buttons {
+sub get_form_buttons {
 
     my $self = shift;
     my $wf_info = shift;
@@ -892,7 +897,7 @@ sub __get_form_buttons {
     }
 
     if ($wf_info->{handles} && ref $wf_info->{handles} eq 'ARRAY' && (grep /fail/, @{$wf_info->{handles}})) {
-        my $token = $self->__wf_token_extra_param( $wf_info, { wf_handle => 'fail' } );
+        my $token = $self->wf_token_extra_param( $wf_info, { wf_handle => 'fail' } );
         push @buttons, {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON',
             action => "workflow!handle!${token}",
@@ -909,8 +914,7 @@ sub __get_form_buttons {
     return \@buttons;
 }
 
-
-sub __get_global_action_handles {
+sub get_global_action_handles {
 
     my $self = shift;
     my $wf_info = shift;
@@ -923,7 +927,7 @@ sub __get_global_action_handles {
     $self->log->debug('Adding global actions ' . join('/', @handles));
 
     if (grep /\A wakeup \Z/x, @handles) {
-        my $token = $self->__wf_token_extra_param( $wf_info, { wf_handle => 'wakeup' } );
+        my $token = $self->wf_token_extra_param( $wf_info, { wf_handle => 'wakeup' } );
         push @buttons, {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_WAKEUP_BUTTON',
             action => "workflow!handle!${token}",
@@ -932,7 +936,7 @@ sub __get_global_action_handles {
     }
 
     if (grep /\A resume \Z/x, @handles) {
-        my $token = $self->__wf_token_extra_param( $wf_info, { wf_handle => 'resume' } );
+        my $token = $self->wf_token_extra_param( $wf_info, { wf_handle => 'resume' } );
         push @buttons, {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESUME_BUTTON',
             action => "workflow!handle!${token}",
@@ -941,7 +945,7 @@ sub __get_global_action_handles {
     }
 
     if (grep /\A reset \Z/x, @handles) {
-        my $token = $self->__wf_token_extra_param( $wf_info, { wf_handle => 'reset' } );
+        my $token = $self->wf_token_extra_param( $wf_info, { wf_handle => 'reset' } );
         push @buttons, {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESET_BUTTON',
             action => "workflow!handle!${token}",
@@ -956,7 +960,7 @@ sub __get_global_action_handles {
     }
 
     if (grep /\A fail \Z/x, @handles) {
-        my $token = $self->__wf_token_extra_param( $wf_info, { wf_handle => 'fail' } );
+        my $token = $self->wf_token_extra_param( $wf_info, { wf_handle => 'fail' } );
         push @buttons, {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON',
             action => "workflow!handle!${token}",
@@ -971,7 +975,7 @@ sub __get_global_action_handles {
     }
 
     if (grep /\A archive \Z/x, @handles) {
-        my $token = $self->__wf_token_extra_param( $wf_info, { wf_handle => 'archive' } );
+        my $token = $self->wf_token_extra_param( $wf_info, { wf_handle => 'archive' } );
         push @buttons, {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_BUTTON',
             action => "workflow!handle!${token}",
@@ -987,7 +991,7 @@ sub __get_global_action_handles {
     return \@buttons;
 }
 
-sub __get_next_auto_action {
+sub get_next_auto_action {
 
     my $self = shift;
     my $wf_info = shift;
@@ -1021,9 +1025,7 @@ sub __get_next_auto_action {
 
 }
 
-
-
-=head2 __render_input_field
+=head2 render_input_field
 
 Render the UI code for a input field from the server sided definition.
 Does translation of labels and mangles values for multi-valued componentes.
@@ -1036,13 +1038,13 @@ The first returned item is always the one corresponding to the workflow field.
 
 =cut
 
-sub __render_input_field {
+sub render_input_field {
 
     my $self = shift;
     my $field = shift;
     my $value = shift;
 
-    die "__render_input_field() must be called in list context: it may return more than one field definition\n"
+    die "render_input_field() must be called in list context: it may return more than one field definition\n"
       unless wantarray;
 
     my $name = $field->{name};
@@ -1155,59 +1157,7 @@ sub __render_input_field {
 
 }
 
-=head2 __delegate_call
-
-Used to delegate the rendering to another class, requires the method
-to dispatch to as string (class + method using the :: notation) and
-a ref to the args to be passed. If called from within an action, the
-name of the action is passed as additonal parameter.
-
-=cut
-sub __delegate_call {
-
-    my $self = shift;
-    my $call = shift;
-    my $args = shift;
-    my $wf_action = shift || '';
-
-    my ($class, $method, undef, $param) = $call =~ /([\w\:\_]+)::([\w\_]+)(!([!\w]+))?/;
-
-    # Three forms of "uihandle" are supported:
-    # - shortcut: Profile::render_subject_form
-    # - standard: OpenXPKI::Client::Service::WebUI::Page::Workflow::Renderer::Profile::render_subject_form
-    # - legacy:   OpenXPKI::Client::UI::Handle::Profile::render_subject_form
-    my @prefixes = qw(
-        OpenXPKI::Client::Service::WebUI::Page::Workflow::Renderer::
-        OpenXPKI::Client::UI::Handle::
-    );
-    my $rel_class = $class;
-    $rel_class =~ s/^\Q$_\E// for @prefixes;
-
-    my @variants = map { $_ . $rel_class } @prefixes;
-    for my $pkg (@variants) {
-        $self->log->trace("Trying to load UI handler module $pkg") if $self->log->is_trace;
-        try {
-            Module::Load::load($pkg);
-            $self->log->debug("Delegate rendering to $pkg->$method");
-        }
-        catch ($err) {
-            next if $err =~ /^Can't locate/;
-            die $err;
-        }
-
-        # call method on delegation class
-        if ($param) {
-            $pkg->$method( $self, $args, $wf_action, $param );
-        } else {
-            $pkg->$method( $self, $args, $wf_action );
-        }
-        return $self;
-    }
-
-    die "Could not find UI handler class matching uihandle = $rel_class";
-}
-
-=head2 __render_result_list
+=head2 render_result_list
 
 Helper to render the output result list from a sql query result.
 adds exception/paused label to the state column and status class based on
@@ -1215,7 +1165,7 @@ proc and wf state.
 
 =cut
 
-sub __render_result_list {
+sub render_result_list {
 
     my $self = shift;
     my $search_result = shift;
@@ -1285,7 +1235,7 @@ sub __render_result_list {
                     my $proc_state = $wf_item->{'workflow_proc_state'};
 
                     if (grep /\A $proc_state \Z/x, qw( exception pause retry_exceeded failed )) {
-                        $state .= sprintf(" (%s)", $self->__get_proc_state_label($proc_state));
+                        $state .= sprintf(" (%s)", $self->get_proc_state_label($proc_state));
                     };
                     push @line, $state;
                 } else {
@@ -1298,7 +1248,7 @@ sub __render_result_list {
             } elsif ($colsrc eq 'attribute') {
                 push @line, $wf_item->{ $col->{field} }
             } elsif ($col->{field} eq 'creator') {
-                push @line, $self->__render_creator_tooltip($wf_item->{creator}, $col);
+                push @line, $self->render_creator_tooltip($wf_item->{creator}, $col);
             } else {
                 # hu ?
             }
@@ -1322,13 +1272,13 @@ sub __render_result_list {
 
 }
 
-=head2 __render_list_spec
+=head2 render_list_spec
 
 Create array to pass to UI from specification in config file
 
 =cut
 
-sub __render_list_spec {
+sub render_list_spec {
 
     my $self = shift;
     my $cols = shift;
@@ -1382,11 +1332,11 @@ sub __render_list_spec {
     return ( \@header, \@column, [ keys(%attrib) ] );
 }
 
-=head2 __render_fields
+=head2 render_fields
 
 =cut
 
-sub __render_fields {
+sub render_fields {
 
     my $self = shift;
     my $wf_info = shift;
@@ -1577,103 +1527,7 @@ sub __render_field_cert_info {
     return 1;
 }
 
-=head2 __render_workflow_info
-
-Render the technical info of a workflow (state, proc_state, etc). Expects a
-wf_info structure and optional a wfdetail_config, will fallback to the
-default display if this is not given.
-
-=cut
-
-sub __render_workflow_info {
-
-    my $self = shift;
-    my $wf_info = shift;
-    my $wfdetails_config = shift || [];
-
-    $wfdetails_config = $self->__default_wfdetails
-        unless (@$wfdetails_config);
-
-    my $wfdetails_info;
-    # if needed, fetch enhanced info incl. workflow attributes
-    if (
-        # if given info hash doesn't contain attribute data...
-        not($wf_info->{workflow}->{attribute}) and (
-            # ...but default wfdetails reference attribute.*
-               grep { ($_->{field}//'') =~              / attribute\. /msx } @$wfdetails_config
-            or grep { ($_->{template}//'') =~           / attribute\. /msx } @$wfdetails_config
-            or grep { (($_->{link}//{})->{page}//'') =~ / attribute\. /msx } @$wfdetails_config
-            or grep { ($_->{field}//'') =~              / \Acreator /msx } @$wfdetails_config
-        )
-    ) {
-        $wfdetails_info = $self->send_command_v2( 'get_workflow_info',  {
-            id => $wf_info->{workflow}->{id},
-            with_attributes => 1,
-        })->{workflow};
-    }
-    else {
-        $wfdetails_info = $wf_info->{workflow};
-    }
-
-    # assemble infos
-    my @data;
-    for my $cfg (@$wfdetails_config) {
-        my $value;
-
-        my $field = $cfg->{field} // '';
-        if ($field eq 'creator') {
-            # we enforce tooltip, if you need something else use a template on attribute.creator
-            if ($wfdetails_info->{attribute}->{creator} =~ m{certid:([\w-]+)}) {
-                $cfg->{format} = 'link';
-                # for a link the tooltip is on the top level and the value is a
-                # scalar so we need to remap this
-                $value = $self->__render_creator_tooltip($wfdetails_info->{attribute}->{creator}, $cfg);
-                $value->{label} = $value->{value};
-                $value->{page} = 'certificate!detail!identifier!'.$1;
-            } else {
-                $cfg->{format} = 'tooltip';
-                $value = $self->__render_creator_tooltip($wfdetails_info->{attribute}->{creator}, $cfg);
-            }
-        } elsif ($cfg->{template}) {
-            $value = $self->send_command_v2( render_template => {
-                template => $cfg->{template},
-                params => $wfdetails_info,
-            });
-        } elsif ($field =~ m{\A attribute\.(\S+) }xi) {
-            $value = $wfdetails_info->{attribute}->{$1} // '-';
-        } elsif ($field =~ m{\A context\.(\S+) }xi) {
-            $value = $wfdetails_info->{context}->{$1} // '-';
-        } elsif ($field eq 'proc_state') {
-            $value = $self->__get_proc_state_label($wfdetails_info->{$field});
-        } elsif ($field) {
-            $value = $wfdetails_info->{$field} // '-';
-        }
-
-        # if it's a link: render URL template ("page")
-        if ($cfg->{link}) {
-            $value = {
-                label => $value,
-                page => $self->send_command_v2( render_template => {
-                    template => $cfg->{link}->{page},
-                    params => $wfdetails_info,
-                }),
-                target => $cfg->{link}->{target} || 'popup',
-            }
-        }
-
-        push @data, {
-            label => $cfg->{label} // '',
-            value => $value,
-            format => $cfg->{link} ? 'link' : ($cfg->{format} || 'text'),
-            $cfg->{tooltip} ? ( tooltip => $cfg->{tooltip} ) : (),
-        };
-    }
-
-    return \@data;
-
-}
-
-=head2 __render_creator_tooltip
+=head2 render_creator_tooltip
 
 Expects the userid of a creator and the field definition.
 
@@ -1696,7 +1550,7 @@ namespace tag or not.
 
 =cut
 
-sub __render_creator_tooltip {
+sub render_creator_tooltip {
 
     my $self = shift;
     my $creator = shift;
@@ -1710,7 +1564,7 @@ sub __render_creator_tooltip {
         # and bound to the user session to avoid information leakage in
         # case the template binds to the users role/permissions
         $cacheid = Digest::SHA->new()
-            ->add($self->_session->id())
+            ->add($self->session->id)
             ->add($field->{yaml_template} // $field->{template} // '')
             ->add($creator//'')->hexdigest;
 
@@ -1756,14 +1610,29 @@ sub __render_creator_tooltip {
 
 }
 
-sub __get_proc_state_label {
+sub get_proc_state_label {
     my ($self, $proc_state) = @_;
-    return $proc_state ? $self->__proc_state_i18n->{$proc_state}->{label} : '-';
+    return $proc_state ? $self->proc_state_i18n->{$proc_state}->{label} : '-';
 }
 
-sub __get_proc_state_desc {
+sub get_proc_state_desc {
     my ($self, $proc_state) = @_;
-    return $proc_state ? $self->__proc_state_i18n->{$proc_state}->{desc} : '-';
+    return $proc_state ? $self->proc_state_i18n->{$proc_state}->{desc} : '-';
+}
+
+sub page_label {
+
+    my $self = shift;
+    my $wf_info = shift;
+    my $additional = shift;
+
+    return sprintf(
+        "#%01d - %s%s",
+        $wf_info->{workflow}->{id},
+        ($wf_info->{workflow}->{title} || $wf_info->{workflow}->{label} || $wf_info->{workflow}->{type}),
+        $additional ? ": $additional" : "",
+    );
+
 }
 
 # FIXME this should be moved to a seperate file/class
@@ -1884,7 +1753,7 @@ sub __render_workflow_action_body {
             $val = undef;
         }
 
-        my ($item, @more_items) = $self->__render_input_field( $field, $val );
+        my ($item, @more_items) = $self->render_input_field( $field, $val );
         next unless ($item);
 
         push @fields, $item;
@@ -1905,8 +1774,8 @@ sub __render_workflow_action_body {
             content => {
                 label => '',
                 description => '',
-                data => $self->__render_fields( $wf_info, $view ),
-                buttons => $self->__get_form_buttons( $wf_info ),
+                data => $self->render_fields( $wf_info, $view ),
+                buttons => $self->get_form_buttons( $wf_info ),
         }});
 
     } else {
@@ -1915,10 +1784,10 @@ sub __render_workflow_action_body {
             #label => $wf_action_info->{label},
             #description => $wf_action_info->{description},
             submit_label => $wf_action_info->{button} || 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
-            buttons => $self->__get_form_buttons( $wf_info ),
+            buttons => $self->get_form_buttons( $wf_info ),
         );
         # record the workflow info in the session
-        push @fields, $self->__wf_token_field( $wf_info, {
+        push @fields, $self->wf_token_field( $wf_info, {
             wf_action => $wf_action,
             wf_fields => \@fields,
         });
@@ -1933,21 +1802,6 @@ sub __render_workflow_action_body {
             }
         }) if scalar @fielddesc;
     }
-}
-
-sub __page_label {
-
-    my $self = shift;
-    my $wf_info = shift;
-    my $additional = shift;
-
-    return sprintf(
-        "#%01d - %s%s",
-        $wf_info->{workflow}->{id},
-        ($wf_info->{workflow}->{title} || $wf_info->{workflow}->{label} || $wf_info->{workflow}->{type}),
-        $additional ? ": $additional" : "",
-    );
-
 }
 
 __PACKAGE__->meta->make_immutable;

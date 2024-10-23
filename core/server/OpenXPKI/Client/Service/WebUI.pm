@@ -805,7 +805,7 @@ sub _persist_status {
     my $self = shift;
     my $status = shift;
 
-    my $session_key = $self->_generate_uid;
+    my $session_key = $self->generate_uid;
     $self->session->param($session_key, $status);
     $self->session->expire($session_key, 15);
 
@@ -825,12 +825,12 @@ sub _fetch_status {
     return $status;
 }
 
-=head2 _generate_uid
+=head2 generate_uid
 
 Generate a random uid (RFC 3548 URL and filename safe base64)
 
 =cut
-sub _generate_uid {
+sub generate_uid {
     my $self = shift;
     my $uid = sha1_base64(time.rand.$$);
     ## RFC 3548 URL and filename safe base64
@@ -851,7 +851,7 @@ Returns the page call URI for L<OpenXPKI::Client::Service::WebUI::Page::Cache/in
 sub persist_response ($self, $data, $expire = '+5m') {
     die "Attempt to persist empty response data" unless $data;
 
-    my $id = $self->_generate_uid;
+    my $id = $self->generate_uid;
     $self->log->debug('persist response ' . $id);
 
     $self->session->param('response_'.$id, $data );

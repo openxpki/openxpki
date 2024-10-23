@@ -25,7 +25,7 @@ sub init_start ($self, $args) {
         workflow => $wf_type,
         params => $self->secure_param('wf_params') // {},
         ui_info => 1,
-        $self->__tenant_param(),
+        $self->tenant_param(),
     });
 
     if (!$wf_info) {
@@ -53,7 +53,7 @@ sub init_start ($self, $args) {
 
     } else {
         # one shot workflow
-        $self->__render_from_workflow({ wf_info => $wf_info });
+        $self->render_from_workflow({ wf_info => $wf_info });
     }
 
     return $self;

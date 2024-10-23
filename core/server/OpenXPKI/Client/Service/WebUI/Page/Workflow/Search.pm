@@ -8,6 +8,18 @@ with 'OpenXPKI::Client::Service::WebUI::PageRole::QueryCache';
 use OpenXPKI::DateTime;
 use OpenXPKI::i18n qw( i18nGettext );
 
+
+has __validity_options => (
+    is => 'rw',
+    isa => 'ArrayRef',
+    lazy => 1,
+    default => sub { return [
+        { value => 'last_update_before', label => 'I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_BEFORE_LABEL' },
+        { value => 'last_update_after', label => 'I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_AFTER_LABEL' },
+
+    ];}
+);
+
 =head1 UI Methods
 
 =head2 init_search
@@ -59,13 +71,13 @@ sub init_search ($self, $args) {
     #
     my @wf_types = sort { lc($a->{'label'}) cmp lc($b->{'label'}) }
       map { { 'label' => i18nGettext($workflows->{$_}->{label}), 'value' => $_ } }
-      keys %{$workflows};
+      keys $workflows->%*;
 
     my $proc_states = [
         sort { lc($a->{label}) cmp lc($b->{label}) }
-        map { { 'label' => i18nGettext($self->__get_proc_state_label($_)), 'value' => $_ } }
+        map { { 'label' => i18nGettext($self->get_proc_state_label($_)), 'value' => $_ } }
         grep { $_ ne 'running' }
-        keys %{ $self->__proc_state_i18n }
+        keys $self->proc_state_i18n->%*
     ];
 
     my $form = $self->main->add_form(
@@ -168,7 +180,7 @@ search form and displays the matches as a grid.
 =cut
 
 sub action_search ($self) {
-    my $query = { $self->__tenant_param };
+    my $query = { $self->tenant_param };
     my $verbose = {};
     my $input;
 
@@ -187,7 +199,7 @@ sub action_search ($self) {
     if (my $proc_state = $self->param('wf_proc_state')) {
         $query->{proc_state} = $proc_state;
         $input->{wf_proc_state} = $proc_state;
-        $verbose->{wf_proc_state} = $self->__get_proc_state_label($proc_state);
+        $verbose->{wf_proc_state} = $self->get_proc_state_label($proc_state);
     }
 
     if (my $last_update_before = $self->param('last_update_before')) {
@@ -204,7 +216,7 @@ sub action_search ($self) {
 
     # Read the query pattern for extra attributes from the session
     my $spec = $self->session_param('wfsearch')->{default};
-    my $attr = $self->__build_attribute_subquery( $spec->{attributes} );
+    my $attr = $self->build_attribute_subquery( $spec->{attributes} );
 
     if (my $wf_creator = $self->param('wf_creator')) {
         $input->{wf_creator} = $wf_creator;
@@ -213,17 +225,17 @@ sub action_search ($self) {
     }
 
     if ($attr) {
-        $input->{attributes} = $self->__build_attribute_preset(  $spec->{attributes} );
+        $input->{attributes} = $self->build_attribute_preset(  $spec->{attributes} );
         $query->{attribute} = $attr;
     }
 
     # check if there is a custom column set defined
     my ($header,  $body, $rattrib);
     if ($spec->{cols} && ref $spec->{cols} eq 'ARRAY') {
-        ($header, $body, $rattrib) = $self->__render_list_spec( $spec->{cols} );
+        ($header, $body, $rattrib) = $self->render_list_spec( $spec->{cols} );
     } else {
-        $body = $self->__default_grid_row;
-        $header = $self->__default_grid_head;
+        $body = $self->default_grid_row;
+        $header = $self->default_grid_head;
     }
 
     $query->{return_attributes} = $rattrib if ($rattrib);

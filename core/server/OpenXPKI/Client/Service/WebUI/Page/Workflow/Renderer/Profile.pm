@@ -27,7 +27,7 @@ sub render_profile_select {
 
     # fetch field definition for subject styles (used for all sub selects aka. dependants)
     my $style_field = first { $_->{name} eq 'cert_subject_style' } $wf_info->{activity}->{$wf_action}->{field}->@*;
-    my ($style_item, @more_style_items) = $self->__render_input_field({
+    my ($style_item, @more_style_items) = $self->render_input_field({
         $style_field->%*,
         required => 1,          # backward compatibility: overwrite legacy config "required: 0"
         placeholder => undef,   # backward compatibility: overwrite legacy empty " " placeholder now that we preselect the first (default) style
@@ -42,7 +42,7 @@ sub render_profile_select {
         next if 'cert_subject_style' eq $name;
 
         # get field definition
-        my ($item, @more_items) = $self->__render_input_field($field, $context->{$name});
+        my ($item, @more_items) = $self->render_input_field($field, $context->{$name});
         next unless ($item);
 
         if ('cert_profile' eq $name) {
@@ -84,7 +84,7 @@ sub render_profile_select {
     }
 
     # record the workflow info in the session
-    push @fields, $self->__wf_token_field($wf_info, {
+    push @fields, $self->wf_token_field($wf_info, {
         wf_action => $wf_action,
         wf_fields => \@fields,
     });
@@ -223,10 +223,10 @@ sub render_subject_form {
         }
 
         # web UI field spec
-        my ($item, @more_items) = $self->__render_input_field($field, $values->{$name});
+        my ($item, @more_items) = $self->render_input_field($field, $values->{$name});
         next unless $item;
 
-        # renewal policy - after __render_input_field() because value might get overridden
+        # renewal policy - after render_input_field() because value might get overridden
         if ($is_renewal) {
             if ($field->{renew} eq 'clear') {
                 $item->{value} = undef;
@@ -241,7 +241,7 @@ sub render_subject_form {
     }
 
     # record the workflow info in the session
-    push @fields, $self->__wf_token_field($wf_info, {
+    push @fields, $self->wf_token_field($wf_info, {
         wf_action => $wf_action,
         wf_fields => \@fields, # search tag: #wf_fields_with_sub_items
     });
@@ -249,7 +249,7 @@ sub render_subject_form {
     my $form = $self->main->add_form(
         action => 'workflow',
         submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
-        buttons => $self->__get_form_buttons( $wf_info ),
+        buttons => $self->get_form_buttons( $wf_info ),
     );
     $form->add_field(%{ $_ }) for @fields;
 
@@ -290,7 +290,7 @@ sub render_key_select {
         next if 'key_gen_params' eq $name;
 
         # get field definition
-        my ($item, @more_items) = $self->__render_input_field($field);
+        my ($item, @more_items) = $self->render_input_field($field);
         next unless $item;
 
         if ($name eq 'key_alg') {
@@ -308,7 +308,7 @@ sub render_key_select {
                 # add dependent select fields for parameters
                 #
                 if ($key_gen_params_field) {
-                    # NOTE that we do not call __render_input_field() for "key_gen_params", i.e.
+                    # NOTE that we do not call render_input_field() for "key_gen_params", i.e.
                     # we do not read the field spec from the configuration.
                     # This is because the single "virtual" field "key_gen_params" is expanded
                     # into multiple <select> fields for each parameter.
@@ -365,7 +365,7 @@ sub render_key_select {
     }
 
     # record the workflow info in the session
-    push @fields, $self->__wf_token_field($wf_info, {
+    push @fields, $self->wf_token_field($wf_info, {
         wf_action => $wf_action,
         wf_fields => \@fields, # search tag: #wf_fields_with_sub_items
     });
@@ -429,12 +429,12 @@ sub render_server_password {
         } else {
             $value = $context->{$field->{name}};
         }
-        my @items = $self->__render_input_field( $field, $value );
+        my @items = $self->render_input_field( $field, $value );
         push @fields, @items;
     }
 
     # record the workflow info in the session
-    push @fields, $self->__wf_token_field($wf_info, {
+    push @fields, $self->wf_token_field($wf_info, {
         wf_action =>  $wf_action,
         wf_fields => \@fields,
         cert_profile => $context->{cert_profile}

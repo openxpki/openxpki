@@ -3,14 +3,14 @@ use OpenXPKI -role;
 
 requires qw(
     session_param
-    __generate_uid
+    generate_uid
     status
 );
 
 
 sub __save_query {
     my $self = shift;
-    my $id = (ref $_[0] ne 'HASH') ? shift : $self->__generate_uid;
+    my $id = (ref $_[0] ne 'HASH') ? shift : $self->generate_uid;
     my $query = shift;
 
     die "Query data HashRef must contain 'pagename' key" unless $query->{pagename};

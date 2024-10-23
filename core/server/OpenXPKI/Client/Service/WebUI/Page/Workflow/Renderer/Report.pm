@@ -41,7 +41,7 @@ sub render_report_list {
                 { sTitle => "_fetchid" },
             ],
             actions => [{
-                href => $self->_client->script_url . "?page=$fetchid!idx!{_fetchid}",
+                href => $self->client->script_url . "?page=$fetchid!idx!{_fetchid}",
                 label => '',
                 icon => 'view',
             }],

@@ -27,7 +27,7 @@ sub init_context ($self, $args) {
     }
 
     $self->set_page(
-        label => $self->__page_label($wf_info, 'I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL'),
+        label => $self->page_label($wf_info, 'I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL'),
         large => 1,
     );
 
@@ -35,7 +35,7 @@ sub init_context ($self, $args) {
         type => 'keyvalue',
         content => {
             label => '',
-            data => $self->__render_fields( $wf_info, 'context'),
+            data => $self->render_fields( $wf_info, 'context'),
         },
     });
 

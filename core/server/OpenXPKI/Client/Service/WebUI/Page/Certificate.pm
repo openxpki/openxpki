@@ -299,7 +299,7 @@ sub init_result ($self, $args) {
                   format => 'failure'
                 },
                 { label => 'I18N_OPENXPKI_UI_SEARCH_EXPORT_RESULT',
-                  href => $self->_client->script_url . '?page=certificate!export!id!'.$queryid,
+                  href => $self->client->script_url . '?page=certificate!export!id!'.$queryid,
                   target => '_blank',
                   format => 'optional'
                 },
@@ -477,7 +477,7 @@ sub init_mine ($self, $args) {
         },
         order => 'notbefore',
         reverse => 1,
-        $self->__tenant_param(),
+        $self->tenant_param(),
     };
 
     $self->log->trace( "search query: " . Dumper $query) if $self->log->is_trace;
@@ -709,7 +709,7 @@ sub init_detail ($self, $args = {}) {
         my $cert_attrs = $self->send_command_v2( get_cert_attributes => {
                 identifier => $cert_identifier,
                 attribute => 'meta_%',
-                $self->__tenant_param() }, 1);
+                $self->tenant_param() }, 1);
         return unless $cert_attrs;
         my @metadata_lines;
 
@@ -737,7 +737,7 @@ sub init_detail ($self, $args = {}) {
     # for i18n parser I18N_OPENXPKI_CERT_ISSUED CRL_ISSUANCE_PENDING I18N_OPENXPKI_CERT_REVOKED I18N_OPENXPKI_CERT_EXPIRED
 
     # was in info, bullet list for downloads
-    my $base =  $self->_client->script_url . "?page=certificate!download!identifier!$cert_identifier!format!";
+    my $base =  $self->client->script_url . "?page=certificate!download!identifier!$cert_identifier!format!";
     push @fields, { label => 'I18N_OPENXPKI_UI_DOWNLOAD_LABEL', value => [
         { page => "${base}pem", label => 'I18N_OPENXPKI_UI_DOWNLOAD_PEM',  format => 'extlink' },
         { page => "${base}der", label => 'I18N_OPENXPKI_UI_DOWNLOAD_DER', format => 'extlink' },
@@ -794,7 +794,7 @@ sub init_detail ($self, $args = {}) {
         ($self->send_command_v2 ( "get_cert_attributes", {
             identifier => $cert_identifier,
             attribute => "system_workflow%",
-            $self->__tenant_param()
+            $self->tenant_param()
         }))) {
         push @fields, {
             label => 'I18N_OPENXPKI_UI_CERT_RELATED_LABEL',
@@ -867,7 +867,7 @@ sub init_chain ($self, $args) {
     );
 
     # Download links
-    my $base =  $self->_client->script_url . "?page=certificate!download!identifier!%s!format!%s";
+    my $base =  $self->client->script_url . "?page=certificate!download!identifier!%s!format!%s";
     my $pattern = '<li><a href="'.$base.'" target="_blank">%s</a></li>';
 
     foreach my $cert (@{$chain->{certificates}}) {
@@ -926,7 +926,7 @@ sub init_related ($self, $args) {
     my @result;
     if (scalar @wfid) {
         my $cert_workflows = $self->send_command_v2( 'search_workflow_instances', {
-            id => \@wfid, check_acl => 1, $self->__tenant_param() });
+            id => \@wfid, check_acl => 1, $self->tenant_param() });
         $self->log->trace("workflow results" . Dumper $cert_workflows) if $self->log->is_trace;
 
         my $workflow_labels = $self->send_command_v2( 'get_workflow_instance_types');
@@ -1120,7 +1120,7 @@ sub action_autocomplete ($self) {
             status => 'ISSUED',
             entity_only => 1,
             %$params,
-            $self->__tenant_param(),
+            $self->tenant_param(),
         });
 
         foreach my $item (@{$search_result}) {
@@ -1168,7 +1168,7 @@ sub action_find ($self) {
             return_columns => 'identifier',
             cert_serial => $serial,
             entity_only => 1,
-            $self->__tenant_param(),
+            $self->tenant_param(),
         });
         if (!$search_result || @{$search_result} == 0) {
             $self->status->error('I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_NO_SUCH_SERIAL');
@@ -1184,7 +1184,7 @@ sub action_find ($self) {
             my $queryid = $self->__save_query({
                 pagename => 'certificate',
                 count => scalar @{$search_result},
-                query => { cert_serial => $serial, entity_only => 1, $self->__tenant_param() },
+                query => { cert_serial => $serial, entity_only => 1, $self->tenant_param() },
                 input => { cert_serial => scalar $self->param('cert_serial') },
                 header => $self->__default_grid_head,
                 column => $self->__default_grid_row,
@@ -1208,7 +1208,7 @@ Handle search requests and display the result as grid
 =cut
 
 sub action_search ($self) {
-    my $query = { entity_only => 1, $self->__tenant_param() };
+    my $query = { entity_only => 1, $self->tenant_param() };
     my $input = {}; # store the input data the reopen the form later
     my $verbose = {};
     foreach my $key (qw(subject issuer_dn)) {
@@ -1272,10 +1272,10 @@ sub action_search ($self) {
 
     # Read the query pattern for extra attributes from the session
     my $spec = $self->session_param('certsearch')->{default};
-    my $attr = $self->__build_attribute_subquery( $spec->{attributes} );
+    my $attr = $self->build_attribute_subquery( $spec->{attributes} );
 
     if ($attr) {
-        $input->{attributes} = $self->__build_attribute_preset( $spec->{attributes} );
+        $input->{attributes} = $self->build_attribute_preset( $spec->{attributes} );
     }
 
     # Add san search to attributes

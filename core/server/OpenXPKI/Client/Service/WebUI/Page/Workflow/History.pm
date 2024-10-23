@@ -20,7 +20,7 @@ sub init_history ($self, $args) {
     }, { nostatus  => 1 });
 
     $self->set_page(
-        label => $self->__page_label($wf_info, 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_TITLE'),
+        label => $self->page_label($wf_info, 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_TITLE'),
         description => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_DESCRIPTION',
         large => 1,
     );

@@ -352,7 +352,7 @@ sub render_token_status {
 
     delete $wf_info->{state}->{uihandle};
 
-    $self->__render_from_workflow({ wf_info => $wf_info });
+    $self->render_from_workflow({ wf_info => $wf_info });
 
     # we fetch the list of tokens to display from the context
     # this allows a user to configure this

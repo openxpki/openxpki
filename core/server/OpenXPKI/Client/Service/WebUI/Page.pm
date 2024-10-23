@@ -88,7 +88,6 @@ has client => (
     required => 1,
     is => 'ro',
     isa => 'OpenXPKI::Client::Service::WebUI',
-    reader => '_client',
     handles => [ qw(
         persist_response
         fetch_response
@@ -112,7 +111,7 @@ has log => (
     isa => 'Object',
     init_arg => undef,
     lazy => 1,
-    default => sub ($self) { return $self->_client->log },
+    default => sub ($self) { return $self->client->log },
 );
 
 =pod
@@ -273,7 +272,7 @@ has ui_response => (
     isa => 'OpenXPKI::Client::Service::WebUI::Response',
     init_arg => undef,
     lazy => 1,
-    default => sub ($self) { return $self->_client->ui_response },
+    default => sub ($self) { return $self->client->ui_response },
     handles => [ qw(
         redirect
         confined_response has_confined_response
@@ -322,17 +321,17 @@ has 'raw_bytes_callback' => (
 
 # Internal attributes
 
-has _last_reply => (
+has last_reply => (
     is => 'rw',
     isa => 'HashRef',
 );
 
-has _session => (
+has session => (
     is => 'ro',
     isa => 'OpenXPKI::Client::Service::WebUI::Session',
     init_arg => undef,
     lazy => 1,
-    default => sub ($self) { $self->_client->session },
+    default => sub ($self) { $self->client->session },
 );
 
 has serializer => (
@@ -412,17 +411,17 @@ sub send_command_v2 {
         $flags = { nostatus => 1 };
     }
 
-    my $backend = $self->_client->backend;
+    my $backend = $self->client->backend;
     my $reply = $backend->send_receive_service_msg(
         'COMMAND' => {
             COMMAND => $command,
             PARAMS => $params,
             API => 2,
             TIMEOUT => ($flags->{timeout} || 0),
-            REQUEST_ID => $self->_client->request->request_id,
+            REQUEST_ID => $self->client->request->request_id,
         }
     );
-    $self->_last_reply( $reply );
+    $self->last_reply( $reply );
 
     $self->log->trace("Raw backend reply to '$command': ". Dumper $reply) if $self->log->is_trace;
 
@@ -476,10 +475,10 @@ sub set_status_from_error_reply {
 # Reads the query parameter "_tenant" and returns a list (tenant => $tenant) to
 # be directly included in any API call that supports the parameter "tenant".
 # Returns an empty list if no tenant is set.
-sub __tenant_param {
+sub tenant_param {
     my $self = shift;
 
-    confess '__tenant_param() must be called in list context' unless wantarray; # die
+    confess 'tenant_param() must be called in list context' unless wantarray; # die
 
     my $tenant = $self->param('_tenant');
     return (tenant => $tenant) if ($tenant);
@@ -505,7 +504,7 @@ B<Parameters>
 =cut
 sub session_param {
     my $self = shift;
-    return $self->_session->param(@_);
+    return $self->session->param(@_);
 }
 
 sub __wf_token_id {
@@ -519,7 +518,7 @@ sub __wf_token_id {
         $wf_args->{wf_type} = $wf_info->{workflow}->{type};
         $wf_args->{wf_last_update} = $wf_info->{workflow}->{last_update};
     }
-    my $id = $self->__generate_uid();
+    my $id = $self->generate_uid;
     $self->log->debug("save wf_token: $id");
     $self->log->trace('token content = ' . Dumper $wf_args) if $self->log->is_trace;
     $self->session_param($id, $wf_args);
@@ -527,7 +526,7 @@ sub __wf_token_id {
     return $id;
 }
 
-=head2 __wf_token_field( wf_info, more_args )
+=head2 wf_token_field( wf_info, more_args )
 
 Create a workflow token that represents a C<HashRef> with data from the given
 workflow info and additional arguments.
@@ -549,7 +548,7 @@ Returns a I<HashRef> with the definiton of a hidden field named C<"wf_info">
 which can be directly pushed onto the field list.
 
 =cut
-sub __wf_token_field {
+sub wf_token_field {
 
     my $self = shift;
     my $wf_info = shift;
@@ -563,7 +562,7 @@ sub __wf_token_field {
     };
 }
 
-=head2 __wf_token_extra_param( wf_info, more_args )
+=head2 wf_token_extra_param( wf_info, more_args )
 
 Create a workflow token that represents a C<HashRef> with data from the given
 workflow info and additional arguments.
@@ -584,7 +583,7 @@ L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info>
 Returns a string C<"wf_token!$token"> which can be added to e.g. a button action.
 
 =cut
-sub __wf_token_extra_param {
+sub wf_token_extra_param {
 
     my $self = shift;
     my $wf_info = shift;
@@ -594,13 +593,13 @@ sub __wf_token_extra_param {
     return "wf_token!${id}";
 }
 
-=head2 __resolve_wf_token( wf_token )
+=head2 resolve_wf_token( wf_token )
 
 Return the C<HashRef> that was associated with the given token via
-L<__wf_token_extra_param> or L<__wf_token_field>.
+L<wf_token_extra_param> or L<wf_token_field>.
 
 =cut
-sub __resolve_wf_token {
+sub resolve_wf_token {
     my $self = shift;
 
     my $id = $self->param('wf_token');
@@ -616,28 +615,28 @@ sub __resolve_wf_token {
     return $wf_args;
 }
 
-=head2 __purge_wf_token
+=head2 purge_wf_token
 
 Purge the C<HashRef> associated with the current token from the session.
 
 =cut
-sub __purge_wf_token {
+sub purge_wf_token {
     my $self = shift;
 
     my $id = $self->param('wf_token');
 
     $self->log->debug("purge wf_token: $id");
-    $self->_session->clear($id);
+    $self->session->clear($id);
 
     return $self;
 }
 
-=head2 __generate_uid
+=head2 generate_uid
 
 Generate a random uid (RFC 3548 URL and filename safe base64)
 
 =cut
-sub __generate_uid {
+sub generate_uid {
     my $self = shift;
     my $uid = sha1_base64(time.rand().$$);
     ## RFC 3548 URL and filename safe base64
@@ -645,13 +644,13 @@ sub __generate_uid {
     return $uid;
 }
 
-=head2 __build_attribute_subquery
+=head2 build_attribute_subquery
 
 Expects an attribtue query definition hash (from uicontrol), returns arrayref
 to be used as attribute subquery in certificate and workflow search.
 
 =cut
-sub __build_attribute_subquery {
+sub build_attribute_subquery {
 
     my $self = shift;
     my $attributes = shift;
@@ -714,13 +713,13 @@ sub __build_attribute_subquery {
 
 }
 
-=head2 __build_attribute_preset
+=head2 build_attribute_preset
 
 Expects an attribtue query definition hash (from uicontrol), returns arrayref
 to be used as preset when reloading the search form
 
 =cut
-sub __build_attribute_preset {
+sub build_attribute_preset {
 
     my $self = shift;
     my $attributes = shift;
@@ -977,7 +976,7 @@ sub attachment ($self, $arg) {
     die "attachment(): one of 'bytes' or 'bytes_callback' must be given"
         unless (defined $arg->bytes or $arg->bytes_callback);
 
-    $self->_client->response->add_header(
+    $self->client->response->add_header(
         'content-type' => $arg->mimetype,
         'content-disposition' => sprintf('attachment; filename="%s"', $arg->filename),
         $arg->expires ? ('expires' => '1m') : (),

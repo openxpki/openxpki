@@ -16,7 +16,7 @@ sub init_structure ($self, $args) {
     # create CSRF token
     if (!$self->session_param('rtoken')) {
         $self->log->debug('Generate rtoken');
-        $self->session_param('rtoken', Digest::SHA::sha1_hex($$ . $self->_session->id . rand(2**32)));
+        $self->session_param('rtoken', Digest::SHA::sha1_hex($$ . $self->session->id . rand(2**32)));
     }
     $self->rtoken($self->session_param('rtoken'));
 
@@ -43,7 +43,7 @@ sub init_structure ($self, $args) {
     $baseurl =~ s{\w+://[^/]+}{};
 
     $self->session_param('baseurl',  $baseurl );
-    $self->_session->flush;
+    $self->session->flush;
     $self->log->debug("Base URL from referrer: " . $baseurl);
 
     if ($self->session_param('is_logged_in') and $user) {
