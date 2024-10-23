@@ -108,11 +108,13 @@ sub handle_view ($self, $view_str, $args, $forced_status = undef) {
 
 =head2 _load_page_class
 
-Expect the page/action string and a reference to the cgi object
 Extracts the expected class and method name and extra params encoded in
-the given parameter and tries to instantiate the class. On success, the
-class instance and the extracted method name is returned (two element
-array). On error, both elements in the array are set to undef.
+the given parameter and tries to instantiate the class.
+
+On success, the class instance and the extracted method name is returned (two
+element list).
+
+On error C<undef> is returned.
 
 =cut
 
@@ -203,9 +205,11 @@ sub _load_page_class ($self, $arg) {
         die "Package $pkg must inherit from OpenXPKI::Client::Service::WebUI::Page"
             unless $pkg->isa('OpenXPKI::Client::Service::WebUI::Page');
 
-        my $obj = $pkg->new(client => $self);
-
-        return ($obj, $fullmethod) if $obj->can($fullmethod);
+        # check class if method exists (faster than checking the instantiated object)
+        if ($pkg->can($fullmethod)) {
+            my $obj = $pkg->new(client => $self);
+            return ($obj, $fullmethod);
+        }
     }
 
     $self->log->error(sprintf(
