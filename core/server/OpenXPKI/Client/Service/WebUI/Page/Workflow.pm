@@ -1168,7 +1168,7 @@ proc and wf state.
 sub render_result_list {
 
     my $self = shift;
-    my $search_result = shift;
+    my $search_result = shift // [];
     my $colums = shift;
 
     $self->log->trace("search result " . Dumper $search_result) if $self->log->is_trace;
@@ -1177,7 +1177,7 @@ sub render_result_list {
 
     my $wf_labels = $self->send_command_v2( 'get_workflow_instance_types' );
 
-    foreach my $wf_item (@{$search_result}) {
+    foreach my $wf_item ($search_result->@*) {
 
         my @line;
         my ($wf_info, $context, $attrib);
