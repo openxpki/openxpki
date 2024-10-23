@@ -1,22 +1,23 @@
 package OpenXPKI::Client::Service::WebUI::PageRole::OutputField;
-use Moose::Role;
+use OpenXPKI -role;
 
-requires qw( log serializer send_command_v2 persist_response _client );
+requires qw(
+    log
+    serializer
+    send_command_v2
+    persist_response
+    _client
+);
 
 # Core modules
 use DateTime;
-use Data::Dumper;
 
 # CPAN modules
 use MIME::Base64;
-use Type::Params qw( signature_for );
 
 # Project modules
 use OpenXPKI::Dumper;
 use OpenXPKI::Serialization::Simple;
-
-# should be done after imports to safely disable warnings in Perl < 5.36
-use experimental 'signatures';
 
 
 =head2 render_output_field

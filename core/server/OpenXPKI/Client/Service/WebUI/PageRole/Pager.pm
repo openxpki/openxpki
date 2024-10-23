@@ -1,14 +1,8 @@
 package OpenXPKI::Client::Service::WebUI::PageRole::Pager;
-use Moose::Role;
-
-# requires qw( );
+use OpenXPKI -role;
 
 # CPAN modules
-use Type::Params qw( signature_for );
 use Types::Standard;
-
-# should be done after imports to safely disable warnings in Perl < 5.36
-use experimental 'signatures';
 
 
 =head2 __build_pager

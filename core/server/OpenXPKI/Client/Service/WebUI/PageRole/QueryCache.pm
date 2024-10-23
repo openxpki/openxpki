@@ -1,10 +1,11 @@
 package OpenXPKI::Client::Service::WebUI::PageRole::QueryCache;
-use Moose::Role;
+use OpenXPKI -role;
 
-requires qw( session_param __generate_uid status);
-
-# Project modules
-use OpenXPKI::Exception;
+requires qw(
+    session_param
+    __generate_uid
+    status
+);
 
 
 sub __save_query {
