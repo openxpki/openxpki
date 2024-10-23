@@ -547,16 +547,14 @@ sub handle_login ($self, $page, $action, $reply) {
     }
 
     if ( $reply->{SERVICE_MSG} eq 'ERROR') {
-
-        $self->log->trace('Server Error Msg: '. Dumper $reply) if $self->log->is_trace;
+        $self->log->trace('Server error: '. Dumper $reply) if $self->log->is_trace;
 
         # Failure here is likely a wrong password
+        my $msg = $reply->{'ERROR'} && $reply->{'ERROR'}->{CLASS} eq 'OpenXPKI::Exception::Authentication'
+            ? $reply->{'ERROR'}->{LABEL}
+            : $uilogin->message_from_error_reply($reply);
 
-        if ($reply->{'ERROR'} && $reply->{'ERROR'}->{CLASS} eq 'OpenXPKI::Exception::Authentication') {
-            $uilogin->status->error($reply->{'ERROR'}->{LABEL});
-        } else {
-            $uilogin->set_status_from_error_reply($reply);
-        }
+        $uilogin->status->error($msg);
         return $uilogin;
     }
 

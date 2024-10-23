@@ -656,7 +656,7 @@ sub handle_ui_request ($self) {
 
     if ( $reply->{SERVICE_MSG} eq 'ERROR' ) {
         $self->log->debug('Got error from server');
-        return $new_page->(sub { shift->set_status_from_error_reply($reply) });
+        return $new_page->(sub ($p) { $p->status->error($p->message_from_error_reply($reply)) });
     }
 
     # Only handle requests if we have an open channel (unless it's the bootstrap page)

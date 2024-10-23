@@ -421,24 +421,22 @@ sub send_command_v2 {
             REQUEST_ID => $self->client->request->request_id,
         }
     );
-    $self->last_reply( $reply );
+    $self->last_reply($reply);
 
     $self->log->trace("Raw backend reply to '$command': ". Dumper $reply) if $self->log->is_trace;
 
     if ( $reply->{SERVICE_MSG} ne 'COMMAND' ) {
-        $self->log->error("command $command failed ($reply->{SERVICE_MSG})");
-        $self->log->trace("command reply ". Dumper $reply) if $self->log->is_trace;
-        if (!$flags->{nostatus}) {
-            $self->set_status_from_error_reply( $reply );
-        }
-        return undef;
+        $self->log->error("Command '$command' failed ($reply->{SERVICE_MSG})");
+        $self->log->trace("Command reply = ". Dumper $reply) if $self->log->is_trace;
+        $self->status->error($self->message_from_error_reply($reply)) unless $flags->{nostatus};
+        return;
     }
 
     return $reply->{PARAMS};
 
 }
 
-sub set_status_from_error_reply {
+sub message_from_error_reply {
 
     my $self = shift;
     my $reply = shift;
@@ -467,9 +465,8 @@ sub set_status_from_error_reply {
     } else {
         $self->log->trace(Dumper $reply) if $self->log->is_trace;
     }
-    $self->status->error($message);
 
-    return $self;
+    return $message;
 }
 
 # Reads the query parameter "_tenant" and returns a list (tenant => $tenant) to
