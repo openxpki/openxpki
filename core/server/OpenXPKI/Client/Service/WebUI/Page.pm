@@ -18,13 +18,27 @@ use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Client::Service::WebUI::Response;
 
 
-# REQUIRED
-
 =pod
 
-=head1 REQUEST PARAMETERS
+=head1 METHODS
 
-=head2 param
+=head2 log
+
+L<Log::Log4perl::Logger> or L<OpenXPKI::Log4perl::MojoLogger>.
+
+=cut
+
+has log => (
+    is => 'ro',
+    isa => 'Object',
+    init_arg => undef,
+    lazy => 1,
+    default => sub ($self) { return $self->client->log },
+);
+
+=head2 REQUEST PARAMETERS
+
+=head3 param
 
 Returns a single input parameter value, i.e.
 
@@ -51,7 +65,7 @@ B<Parameters>
 
 =back
 
-=head2 secure_param
+=head3 secure_param
 
 Returns an input parameter that was encrypted via JWT and can thus be trusted.
 
@@ -69,7 +83,7 @@ B<Parameters>
 
 =back
 
-=head2 multi_param
+=head3 multi_param
 
 Returns a list with an input parameters' values (multi-value field, most
 likely a clonable field).
@@ -82,30 +96,6 @@ B<Parameters>
 
 =back
 
-=head1 RESPONSE
-
-=head2 generate_uid
-
-Generate a random uid (RFC 3548 URL and filename safe base64)
-
-=head2 persist_response
-
-Persist the given response data to retrieve it after an HTTP roundtrip.
-Used to break out of the JavaScript app for downloads or to reroute result
-pages.
-
-Returns the page call URI for L<OpenXPKI::Client::Service::WebUI::Page::Cache/init_fetch>.
-
-=head2 fetch_response
-
-Get the data for the persisted response.
-
-=head2 encrypt_jwt
-
-Encrypt the given data into a JWT using the encryption key stored in session
-parameter C<jwt_encryption_key> (key will be set to random value if it does not
-exist yet).
-
 =cut
 
 # "stub" subroutines to satisfy "requires" method checks of other consumed roles
@@ -117,8 +107,6 @@ has client => (
         param
         multi_param
         secure_param
-        persist_response
-        fetch_response
         encrypt_jwt
         generate_uid
     ) ],
@@ -126,11 +114,11 @@ has client => (
 
 =pod
 
-=head2 ui_response
+=head2 JSON RESPONSE
+
+=head3 ui_response
 
 L<OpenXPKI::Client::Service::WebUI::Response> object encapsulating the JSON response.
-
-=head2 JSON RESPONSE
 
 Most of the following methods are accessors to attributes of
 L<OpenXPKI::Client::Service::WebUI::Response>. They can also be called without arguments to
@@ -325,22 +313,6 @@ has raw_bytes_callback => (
     predicate => 'has_raw_bytes_callback',
 );
 
-=head1 OTHER ATTRIBUTES
-
-=head2 log
-
-L<Log::Log4perl::Logger> or L<OpenXPKI::Log4perl::MojoLogger>.
-
-=cut
-
-has log => (
-    is => 'ro',
-    isa => 'Object',
-    init_arg => undef,
-    lazy => 1,
-    default => sub ($self) { return $self->client->log },
-);
-
 has last_reply => (
     is => 'rw',
     isa => 'HashRef',
@@ -374,11 +346,9 @@ has _internal_redirect_target => (
     init_arg => undef,
 );
 
-=head1 METHODS
+=head2 REDIRECT AND URL HELPERS
 
-=cut
-
-=head2 internal_redirect
+=head3 internal_redirect
 
 Internal redirection from an action (C<action_*>) or view (C<init_*>) to another
 view (C<init_*>).
@@ -397,6 +367,273 @@ signature_for internal_redirect => (
 sub internal_redirect ($self, $call, $args) {
     $self->_internal_redirect_target([$call, $args]);
     return $self;
+}
+
+=head3 attachment
+
+Specify an attachment (file download).
+
+B<NOTE>: This will override any GUI data previously set for a JSON response.
+
+    $self->attachment(
+        mimetype => 'application/x-pkcs7-crl',
+        filename => 'crl.pem',
+        expires => '1m',
+        bytes => $data,
+    );
+
+    # or with a callback for "streaming" output:
+
+    $self->attachment(
+        mimetype => 'application/x-pkcs7-crl',
+        filename => 'crl.pem',
+        expires => '1m',
+        bytes_callback => sub {
+            my $consume = shift;
+            open (my $fh, '<', $source) || die "Unable to open '$source': $!";
+            while (my $line = <$fh>) { $consume->($line) }
+            close $fh;
+        },
+    );
+
+B<Named parameters>
+
+=over
+
+=item * I<Str> C<mimetype> - value for L<Content-Type> header
+
+=item * I<Str> C<filename> - L<Content-Disposition> will be set to C<attachment; filename="$filename">
+
+=item * I<Str> C<bytes> - file data as raw byte string
+
+=item * I<CodeRef> C<bytes_callback> - handler subroutine that will receive an
+"output" subroutine and must pass raw bytes to it (e.g. in chunks).
+
+=item * I<Str> C<expires> - optional: value for L<Expires> header
+
+=back
+
+=cut
+signature_for attachment => (
+    method => 1,
+    named => [
+        mimetype => 'Str',
+        filename => 'Str',
+        bytes => 'Str', { optional => 1 },
+        bytes_callback => 'CodeRef', { optional => 1 },
+        expires => 'Str', { optional => 1 },
+    ],
+);
+sub attachment ($self, $arg) {
+    die "attachment(): one of 'bytes' or 'bytes_callback' must be given"
+        unless (defined $arg->bytes or $arg->bytes_callback);
+
+    $self->client->response->add_header(
+        'content-type' => $arg->mimetype,
+        'content-disposition' => sprintf('attachment; filename="%s"', $arg->filename),
+        $arg->expires ? ('expires' => '1m') : (),
+    );
+
+    $self->raw_bytes($arg->bytes) if (defined $arg->bytes);
+    $self->raw_bytes_callback($arg->bytes_callback) if $arg->bytes_callback;
+}
+
+=head3 call_persisted_response
+
+Persist the given response data to retrieve it after an HTTP roundtrip.
+Used to break out of the JavaScript app for downloads.
+
+Returns the page call URI that will result in a call to
+L<OpenXPKI::Client::Service::WebUI::Page::Cache/init_fetch>.
+
+=cut
+
+sub call_persisted_response ($self, $data, $expire = '+5m') {
+    die "Attempt to persist empty response data" unless $data;
+
+    my $id = $self->generate_uid;
+    $self->log->debug('persist response ' . $id);
+
+    $self->session->param('response_'.$id, $data );
+    $self->session->expire('response_'.$id, $expire) if $expire;
+
+    return "cache!fetch!id!$id";
+}
+
+=head3 fetch_response
+
+Get the data for the persisted response.
+
+=cut
+
+sub fetch_response ($self, $id) {
+    $self->log->debug('fetch response ' . $id);
+    my $response = $self->session->param('response_'.$id);
+    if (not $response) {
+        $self->log->error( "persisted response with id '$id' does not exist" );
+        return;
+    }
+    return $response;
+}
+
+=head3 call_encrypted
+
+Encrypt the given page and parameters using a JWT.
+
+Returns the page call URI consisting of the pseudo page named C<encrypted> and
+the JWT as single parameter that will be decoded in
+L<OpenXPKI::Client::Service::WebUI::Role::PageHandler/_load_page_class>.
+
+B<Named parameters>
+
+=over
+
+=item * I<Str> C<page> - page to call.
+
+=item * I<HashRef> C<secure_param> - additional secure parameters that will be available via L</secure_param>.
+
+=back
+
+=cut
+
+signature_for call_encrypted => (
+    method => 1,
+    named => [
+        page => 'Str',
+        secure_param  => 'HashRef | Undef', { default => {} },
+    ],
+);
+sub call_encrypted ($self, $arg) {
+    my $token = $self->encrypt_jwt({
+        page => $arg->page,
+        secure_param => $arg->secure_param // {},
+    });
+
+    return "encrypted!${token}";
+}
+
+=head3 wf_token_extra_param( wf_info, more_args )
+
+Create a workflow token that represents a C<HashRef> with data from the given
+workflow info and additional arguments.
+
+The generated C<HashRef> will be stored in the session.
+
+B<Parameters>
+
+=over
+
+=item * C<$wf_info> I<HashRef> - workflow info as returned by API command
+L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info>. Optional
+
+=item * C<$more_args> I<HashRef> - additional parameters to store. Optional
+
+=back
+
+Returns a string C<"wf_token!$token"> which can be added to e.g. a button action.
+
+=cut
+sub wf_token_extra_param {
+
+    my $self = shift;
+    my $wf_info = shift;
+    my $more_args = shift;
+
+    my $id = $self->__wf_token_id($wf_info, $more_args);
+    return "wf_token!${id}";
+}
+
+=head3 resolve_wf_token( wf_token )
+
+Return the C<HashRef> that was associated with the given token via
+L<wf_token_extra_param> or L<wf_token_field>.
+
+=cut
+sub resolve_wf_token {
+    my $self = shift;
+
+    my $id = $self->param('wf_token');
+    if (not $id) {
+        $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_ACTION_WITHOUT_TOKEN!');
+        return;
+    }
+
+    $self->log->debug("load wf_token: $id");
+    my $wf_args = $self->session_param($id);
+    $self->log->trace('token content = ' . Dumper $wf_args) if $self->log->is_trace;
+
+    return $wf_args;
+}
+
+=head3 purge_wf_token
+
+Purge the C<HashRef> associated with the current token from the session.
+
+=cut
+sub purge_wf_token {
+    my $self = shift;
+
+    my $id = $self->param('wf_token');
+
+    $self->log->debug("purge wf_token: $id");
+    $self->session->clear($id);
+
+    return $self;
+}
+
+=head3 wf_token_field( wf_info, more_args )
+
+Create a workflow token that represents a C<HashRef> with data from the given
+workflow info and additional arguments.
+
+The generated C<HashRef> will be stored in the session.
+
+B<Parameters>
+
+=over
+
+=item * C<$wf_info> I<HashRef> - workflow info as returned by API command
+L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info>. Optional
+
+=item * C<$more_args> I<HashRef> - additional parameters to store. Optional
+
+=back
+
+Returns a I<HashRef> with the definiton of a hidden field named C<"wf_info">
+which can be directly pushed onto the field list.
+
+=cut
+sub wf_token_field {
+
+    my $self = shift;
+    my $wf_info = shift;
+    my $more_args = shift;
+
+    my $id = $self->__wf_token_id($wf_info, $more_args);
+    return {
+        name => 'wf_token',
+        type => 'hidden',
+        value => $id,
+    };
+}
+
+sub __wf_token_id {
+
+    my $self = shift;
+    my $wf_info = shift;
+    my $wf_args = shift // {};
+
+    if (ref $wf_info) {
+        $wf_args->{wf_id} = $wf_info->{workflow}->{id};
+        $wf_args->{wf_type} = $wf_info->{workflow}->{type};
+        $wf_args->{wf_last_update} = $wf_info->{workflow}->{last_update};
+    }
+    my $id = $self->generate_uid;
+    $self->log->debug("save wf_token: $id");
+    $self->log->trace('token content = ' . Dumper $wf_args) if $self->log->is_trace;
+    $self->session_param($id, $wf_args);
+
+    return $id;
 }
 
 =head2 send_command_v2
@@ -526,130 +763,6 @@ sub session_param {
     return $self->session->param(@_);
 }
 
-sub __wf_token_id {
-
-    my $self = shift;
-    my $wf_info = shift;
-    my $wf_args = shift // {};
-
-    if (ref $wf_info) {
-        $wf_args->{wf_id} = $wf_info->{workflow}->{id};
-        $wf_args->{wf_type} = $wf_info->{workflow}->{type};
-        $wf_args->{wf_last_update} = $wf_info->{workflow}->{last_update};
-    }
-    my $id = $self->generate_uid;
-    $self->log->debug("save wf_token: $id");
-    $self->log->trace('token content = ' . Dumper $wf_args) if $self->log->is_trace;
-    $self->session_param($id, $wf_args);
-
-    return $id;
-}
-
-=head2 wf_token_field( wf_info, more_args )
-
-Create a workflow token that represents a C<HashRef> with data from the given
-workflow info and additional arguments.
-
-The generated C<HashRef> will be stored in the session.
-
-B<Parameters>
-
-=over
-
-=item * C<$wf_info> I<HashRef> - workflow info as returned by API command
-L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info>. Optional
-
-=item * C<$more_args> I<HashRef> - additional parameters to store. Optional
-
-=back
-
-Returns a I<HashRef> with the definiton of a hidden field named C<"wf_info">
-which can be directly pushed onto the field list.
-
-=cut
-sub wf_token_field {
-
-    my $self = shift;
-    my $wf_info = shift;
-    my $more_args = shift;
-
-    my $id = $self->__wf_token_id($wf_info, $more_args);
-    return {
-        name => 'wf_token',
-        type => 'hidden',
-        value => $id,
-    };
-}
-
-=head2 wf_token_extra_param( wf_info, more_args )
-
-Create a workflow token that represents a C<HashRef> with data from the given
-workflow info and additional arguments.
-
-The generated C<HashRef> will be stored in the session.
-
-B<Parameters>
-
-=over
-
-=item * C<$wf_info> I<HashRef> - workflow info as returned by API command
-L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info>. Optional
-
-=item * C<$more_args> I<HashRef> - additional parameters to store. Optional
-
-=back
-
-Returns a string C<"wf_token!$token"> which can be added to e.g. a button action.
-
-=cut
-sub wf_token_extra_param {
-
-    my $self = shift;
-    my $wf_info = shift;
-    my $more_args = shift;
-
-    my $id = $self->__wf_token_id($wf_info, $more_args);
-    return "wf_token!${id}";
-}
-
-=head2 resolve_wf_token( wf_token )
-
-Return the C<HashRef> that was associated with the given token via
-L<wf_token_extra_param> or L<wf_token_field>.
-
-=cut
-sub resolve_wf_token {
-    my $self = shift;
-
-    my $id = $self->param('wf_token');
-    if (not $id) {
-        $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_ACTION_WITHOUT_TOKEN!');
-        return;
-    }
-
-    $self->log->debug("load wf_token: $id");
-    my $wf_args = $self->session_param($id);
-    $self->log->trace('token content = ' . Dumper $wf_args) if $self->log->is_trace;
-
-    return $wf_args;
-}
-
-=head2 purge_wf_token
-
-Purge the C<HashRef> associated with the current token from the session.
-
-=cut
-sub purge_wf_token {
-    my $self = shift;
-
-    my $id = $self->param('wf_token');
-
-    $self->log->debug("purge wf_token: $id");
-    $self->session->clear($id);
-
-    return $self;
-}
-
 =head2 build_attribute_subquery
 
 Expects an attribtue query definition hash (from uicontrol), returns arrayref
@@ -748,63 +861,7 @@ sub build_attribute_preset {
 
 }
 
-
-=head2 transate_sql_wildcards
-
-Replace "literal" wildcards asterisk and question mark by percent and
-underscore for SQL queries.
-
-=cut
-
-sub transate_sql_wildcards  {
-
-    my $self = shift;
-    my $val = shift;
-
-    return $val if (ref $val);
-
-    $val =~ s/\*/%/g;
-    $val =~ s/\?/_/g;
-
-    return $val;
-}
-
-=head2 secure_call
-
-Encrypt the given page and parameters using a JWT.
-
-Returns a string consisting of the pseudo page named C<encrypted> and the JWT
-as single parameter.
-
-B<Named parameters>
-
-=over
-
-=item * I<Str> C<page> - page to call.
-
-=item * I<HashRef> C<secure_param> - additional secure parameters that will be available via L</secure_param>.
-
-=back
-
-=cut
-
-signature_for secure_call => (
-    method => 1,
-    named => [
-        page => 'Str',
-        secure_param  => 'HashRef | Undef', { default => {} },
-    ],
-);
-sub secure_call ($self, $arg) {
-    my $token = $self->encrypt_jwt({
-        page => $arg->page,
-        secure_param => $arg->secure_param // {},
-    });
-
-    return "encrypted!${token}";
-}
-
-=head2 make_autocomplete_query
+=head2 build_autocomplete_query
 
 Create the autocomplete config for a UI text field from the given autocomplete
 workflow field configuration C<$ac_config>.
@@ -840,7 +897,7 @@ B<Parameters>
 
 =cut
 
-sub make_autocomplete_query {
+sub build_autocomplete_query {
 
     my $self = shift;
     my $ac_config = shift;
@@ -921,72 +978,36 @@ sub fetch_autocomplete_params {
     return \%params;
 }
 
-=head2 attachment
+=head2 transate_sql_wildcards
 
-Specify an attachment (file download).
-
-B<NOTE>: This will override any GUI data previously set for a JSON response.
-
-    $self->attachment(
-        mimetype => 'application/x-pkcs7-crl',
-        filename => 'crl.pem',
-        expires => '1m',
-        bytes => $data,
-    );
-
-    # or with a callback for "streaming" output:
-
-    $self->attachment(
-        mimetype => 'application/x-pkcs7-crl',
-        filename => 'crl.pem',
-        expires => '1m',
-        bytes_callback => sub {
-            my $consume = shift;
-            open (my $fh, '<', $source) || die "Unable to open '$source': $!";
-            while (my $line = <$fh>) { $consume->($line) }
-            close $fh;
-        },
-    );
-
-B<Named parameters>
-
-=over
-
-=item * I<Str> C<mimetype> - value for L<Content-Type> header
-
-=item * I<Str> C<filename> - L<Content-Disposition> will be set to C<attachment; filename="$filename">
-
-=item * I<Str> C<bytes> - file data as raw byte string
-
-=item * I<CodeRef> C<bytes_callback> - handler subroutine that will receive an
-"output" subroutine and must pass raw bytes to it (e.g. in chunks).
-
-=item * I<Str> C<expires> - optional: value for L<Expires> header
-
-=back
+Replace "literal" wildcards asterisk and question mark by percent and
+underscore for SQL queries.
 
 =cut
-signature_for attachment => (
-    method => 1,
-    named => [
-        mimetype => 'Str',
-        filename => 'Str',
-        bytes => 'Str', { optional => 1 },
-        bytes_callback => 'CodeRef', { optional => 1 },
-        expires => 'Str', { optional => 1 },
-    ],
-);
-sub attachment ($self, $arg) {
-    die "attachment(): one of 'bytes' or 'bytes_callback' must be given"
-        unless (defined $arg->bytes or $arg->bytes_callback);
 
-    $self->client->response->add_header(
-        'content-type' => $arg->mimetype,
-        'content-disposition' => sprintf('attachment; filename="%s"', $arg->filename),
-        $arg->expires ? ('expires' => '1m') : (),
-    );
+sub transate_sql_wildcards  {
 
-    $self->raw_bytes($arg->bytes) if (defined $arg->bytes);
-    $self->raw_bytes_callback($arg->bytes_callback) if $arg->bytes_callback;
+    my $self = shift;
+    my $val = shift;
+
+    return $val if (ref $val);
+
+    $val =~ s/\*/%/g;
+    $val =~ s/\?/_/g;
+
+    return $val;
 }
+
 __PACKAGE__->meta->make_immutable;
+
+=pod
+
+=head2 generate_uid
+
+Generate a random uid (RFC 3548 URL and filename safe base64)
+
+=head2 encrypt_jwt
+
+Encrypt the given data into a JWT using the encryption key stored in session
+parameter C<jwt_encryption_key> (key will be set to random value if it does not
+exist yet).

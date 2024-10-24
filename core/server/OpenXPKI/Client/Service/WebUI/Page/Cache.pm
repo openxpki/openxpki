@@ -6,7 +6,7 @@ extends 'OpenXPKI::Client::Service::WebUI::Page';
 
 =head2 init_fetch
 
-Return the data persisted with L<OpenXPKI::Client::Service::WebUI::Page/persist_response>.
+Return the data persisted with L<OpenXPKI::Client::Service::WebUI::Page/call_persisted_response>.
 
 =cut
 sub init_fetch ($self, $args) {

@@ -109,11 +109,11 @@ sub handle_view ($self, $view_str, $args, $forced_status = undef) {
 
 =head2 _load_page_class
 
-Extracts the expected class and method name and extra params encoded in
-the given parameter and tries to instantiate the class.
+Extracts the class and method name and extra parameters encoded in the given
+call string and tries to instantiate the class.
 
-On success, the class instance and the extracted method name is returned (two
-element list).
+On success, the corresponding class instance and the extracted method name is
+returned (two element list).
 
 On error C<undef> is returned.
 

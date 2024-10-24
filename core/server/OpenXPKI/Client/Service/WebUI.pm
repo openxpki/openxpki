@@ -557,7 +557,7 @@ EOF
 
         # redirect to downloads / page pages
         } elsif (my $body = $self->ui_response_to_json($ui_resp)) {
-            $url = $self->persist_response( { data => $body } );
+            $url = $page->call_persisted_response( { data => $body } );
         }
 
         $self->log->debug("Raw redirect target: $url");
@@ -836,44 +836,6 @@ sub generate_uid {
     ## RFC 3548 URL and filename safe base64
     $uid =~ tr/+\//-_/;
     return $uid;
-}
-
-=head2 persist_response
-
-Persist the given response data to retrieve it after an HTTP roundtrip.
-Used to break out of the JavaScript app for downloads or to reroute result
-pages.
-
-Returns the page call URI for L<OpenXPKI::Client::Service::WebUI::Page::Cache/init_fetch>.
-
-=cut
-
-sub persist_response ($self, $data, $expire = '+5m') {
-    die "Attempt to persist empty response data" unless $data;
-
-    my $id = $self->generate_uid;
-    $self->log->debug('persist response ' . $id);
-
-    $self->session->param('response_'.$id, $data );
-    $self->session->expire('response_'.$id, $expire) if $expire;
-
-    return "cache!fetch!id!$id";
-}
-
-=head2 fetch_response
-
-Get the data for the persisted response.
-
-=cut
-
-sub fetch_response ($self, $id) {
-    $self->log->debug('fetch response ' . $id);
-    my $response = $self->session->param('response_'.$id);
-    if (not $response) {
-        $self->log->error( "persisted response with id '$id' does not exist" );
-        return;
-    }
-    return $response;
 }
 
 =head2 encrypt_jwt

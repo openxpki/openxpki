@@ -764,7 +764,7 @@ sub init_detail ($self, $args = {}) {
             foreach my $item (@{$reply->{workflow}}) {
                 my $page;
                 if ($item->{autorun} || $item->{param}) {
-                    $page = $self->secure_call(
+                    $page = $self->call_encrypted(
                         page => 'workflow!' . ($item->{autorun} ? 'start' : 'index'),
                         secure_param => {
                             wf_type => $item->{workflow},

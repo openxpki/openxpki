@@ -1117,7 +1117,7 @@ sub render_input_field {
     # option 'autocomplete'
     if (my $ac = $item->{autocomplete}) {
         delete $item->{autocomplete};
-        my ($ac_query, $enc_field) = $self->make_autocomplete_query($ac);
+        my ($ac_query, $enc_field) = $self->build_autocomplete_query($ac);
         $item->{autocomplete_query} = $ac_query; # "autocomplete_query" to distinguish it from the config param
         push @all_items, $enc_field if $enc_field; # additional field definitio
     }

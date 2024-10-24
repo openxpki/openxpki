@@ -5,7 +5,7 @@ requires qw(
     log
     serializer
     send_command_v2
-    persist_response
+    call_persisted_response
     client
 );
 
@@ -304,7 +304,7 @@ sub __render_download {
 
     # we have an external source so we need a link
     if ($vv->{source}) {
-         my $target = $self->persist_response({
+         my $target = $self->call_persisted_response({
             source => $vv->{source},
             attachment =>  $vv->{filename},
             mime => $vv->{mime}

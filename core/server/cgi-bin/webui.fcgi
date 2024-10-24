@@ -125,7 +125,7 @@ EOF
 
         # redirect to downloads / page pages
         } elsif (my $body = $ui->ui_response_to_json($ui_resp)) {
-            $url = $ui->persist_response( { data => $body } );
+            $url = $page->call_persisted_response( { data => $body } );
         }
 
         $ui->log->debug("Raw redirect target: $url");
