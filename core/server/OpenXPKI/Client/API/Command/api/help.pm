@@ -9,7 +9,7 @@ command_setup
 
 OpenXPKI::Client::API::Command::api::help
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Show the argument list for the given command.
 

@@ -34,25 +34,9 @@ sub _load_directory {
 
 OpenXPKI::CLI::Command::acme
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Handle account registrations for the NICE ACME backend.
-
-=head1 USAGE
-
-Feed me!
-
-=head2 Subcommands
-
-=over
-
-=item list
-
-=item show
-
-=item create
-
-=back
 
 =cut
 

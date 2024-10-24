@@ -5,27 +5,9 @@ use OpenXPKI -role;
 
 OpenXPKI::CLI::Command::datapool
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
-Manage datapool items
-
-=head1 USAGE
-
-Feed me!
-
-=head2 Subcommands
-
-=over
-
-=item list
-
-=item show
-
-=item create
-
-=item delete
-
-=back
+Manage datapool items.
 
 =cut
 

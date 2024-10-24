@@ -10,7 +10,7 @@ command_setup
 
 OpenXPKI::Client::API::Command::acme::show
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Show an account entry from the datapool.
 

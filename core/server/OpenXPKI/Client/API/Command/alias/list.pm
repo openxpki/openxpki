@@ -12,7 +12,7 @@ use List::Util 'any';
 
 OpenXPKI::Client::API::Command::alias::list
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 List (non-token) alias entries
 

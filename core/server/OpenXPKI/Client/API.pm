@@ -8,6 +8,7 @@ sub namespace { 'OpenXPKI::Client::API::Command' }
 
 # Core modules
 use List::Util qw( any none );
+use Pod::Usage qw( pod2usage );
 
 # CPAN modules
 use Pod::Find qw(pod_where);
@@ -22,24 +23,38 @@ use OpenXPKI::Client::API::Util;
 
 OpenXPKI::Client::API
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
-Root class that provides an API to access the commands defined below
-C<OpenXPKI::Client::API::Command>. The constuctor of the API does not
-take any arguments.
+Root class that provides an API to access the commands defined in the namespace
+C<OpenXPKI::Client::API::Command::*>.
 
 The API is structured into commands and subcommands.
 
-The result of any dispatch is a C<OpenXPKI::Client::API::Response>
+The result of any dispatch is a L<OpenXPKI::Client::API::Response>
 instance.
 
-=head1 Methods
+=head1 ATTRIBUTES
 
-=head2 Commands
+=head2 script_name
 
-Find the available commands by iterating over all perl modules found
-directly below C<OpenXPKI::Client::API::Command>. Return value is a
-hash ref with the names as key and the description (extracted from POD)
+Name of the Perl script for token replacement in L</show_pod>. Required.
+
+=cut
+
+has script_name => (
+    required => 1,
+    is => 'ro',
+    isa => 'Str',
+);
+
+=head1 METHODS
+
+=head2 commands
+
+Lists available API commands by iterating over all Perl modules found directly
+in the namespace C<OpenXPKI::Client::API::Command::*>.
+
+Returns a I<HashRef> with the names as key and the description (extracted from POD)
 as value.
 
 =cut
@@ -53,11 +68,11 @@ has commands => (
 
 sub _build_commands ($self) {
     my %commands = map {
-        my $pod = $self->getpod($_, 'SYNOPSIS');
+        my $pod = $self->get_pod_text($_, 'DESCRIPTION');
         $pod =~ s{\A[^\n]*\n\s+(.+?)[\s\n]*\z}{$1}ms;
         $pod =~ s{[\s\n]*\z}{}ms;
-        (substr($_,32) => $pod);
-    } map { $self->namespace . '::' . $_ } $self->rel_namespaces->@*;
+        ($_ => $pod);
+    } $self->rel_namespaces->@*;
 
     return \%commands;
 }
@@ -65,7 +80,7 @@ sub _build_commands ($self) {
 has log => (
     is => 'ro',
     isa => 'Log::Log4perl::Logger',
-    default => sub { return Log::Log4perl->get_logger(); },
+    default => sub { Log::Log4perl->get_logger; },
     lazy => 1,
 );
 
@@ -81,6 +96,7 @@ my %internal_command_attributes = (
     payload => { isa => 'ArrayRef[Str]' },
     positional_args => { isa => 'ArrayRef[Str]' }
 );
+
 
 sub BUILD ($self, $args) {
     # add these attributes to all API commands
@@ -115,7 +131,7 @@ A hook called by L<OpenXPKI::Base::API::APIRole/dispatch>.
 It converts minuses to underscores in parameter names and processes the C<hint>
 parameter attribute.
 
-It throws a C<OpenXPKI::DTO::ValidationException> object on validation
+Throws a C<OpenXPKI::DTO::ValidationException> object on validation
 errors.
 
 =cut
@@ -147,47 +163,14 @@ sub preprocess_params ($self, $command, $input_params, $plugin) {
     }
 }
 
-=head2 getpod I<package> I<section>
+=head2 subcommands (I<$command>)
 
-Extract the POD documentation found at I<section> from the given I<package>.
-Section defaults to I<USAGE> if not given, uses pod_where to find the file
-to read the POD from. Returns plain text by applying Pod::POM::View::Text
-
-=cut
-
-sub getpod ($self, $package, $section = 'USAGE') {
-    my $path = pod_where({-inc => 1}, ($package));
-
-    return "no documentation available" unless($path);
-    # Code copied from API2 pod handler, should be unified
-    my $pom = Pod::POM->new;
-    my $tree = $pom->parse_file($path)
-        or return "ERROR: ".$pom->error();
-
-    my @heading_blocks = grep { $_->title eq $section } $tree->head1;
-    return "ERROR: Missing section $section in $path" unless scalar @heading_blocks;
-
-    # need to add subsections ?
-    my $pod = Pod::POM::View::Text->print($heading_blocks[0]->content);
-    $pod =~ s/\s+$//m;
-    return $pod;
-
-    # FIXME Code after return
-    my @cmd_blocks = grep { $_->title eq $package } $heading_blocks[0]->head2;
-    return "ERROR: No description found for '$package' in $path" unless scalar @cmd_blocks;
-
-    return Pod::POM::View::Text->print($cmd_blocks[0]->content);
-
-}
-
-=head2 subcommands I<command>
-
-Find the available subcommands for the given I<command> by iterating
+Find the available subcommands for the given I<$command> by iterating
 over all perl modules found in the constructed namespace. Return
 value is a hash ref with the names as key and the description
 (extracted from POD) as value.
 
-Will die if the command can not be found in the I<commands> list.
+Will die if the command is unknown.
 
 =cut
 
@@ -197,7 +180,7 @@ sub subcommands ($self, $command) {
     }
     my @subcmd = keys $self->namespace_commands($command)->%*;
     my %subcmd = map {
-        my $pod = $self->getpod($self->namespace . "::${command}::${_}", 'SYNOPSIS');
+        my $pod = $self->get_pod_text(join('::', $command, $_), 'DESCRIPTION');
         $pod =~ s{\A[^\n]*\n\s+(.+?)[\s\n]*\z}{$1}ms;
         $pod =~ s{[\s\n]*\z}{}ms;
         ($_ => $pod);
@@ -205,64 +188,176 @@ sub subcommands ($self, $command) {
     return \%subcmd;
 }
 
-=head2 help I<command> [I<subcommand>]
+=head2 get_pod_nodes (I<$rel_package_or_path>, I<$section>)
 
-Runs C<getpod> on the package name constructed from the given arguments.
+Extract the POD documentation found at I<$section> from the given
+I<$rel_package_or_path> (or all POD if I<$section> is omitted).
 
-If a I<subcommand> is given, evaluates the parameter specification and
-renders a description on the parameters.
+I<$rel_package_or_path> is either a file path or the the last part of the
+package name consisting of command or command+C<::>+subcommand, e.g. C<acme> or
+C<acme::create>.
+
+Uses L<POD::Find/pod_where> to find the file to read the POD from.
+
+Returns a list of POD nodes.
 
 =cut
 
-sub help ($self, $command = '', $subcommand = '', @) {
-    unless ($command) {
-        my $pod = "Available commands:";
-        my $commands = $self->commands;
-        $pod .= sprintf "%12s: %s\n", $_, $commands->{$_} for sort keys $commands->%*;
-        return $pod;
+sub get_pod_nodes ($self, $rel_package_or_path, $section = undef) {
+    my $path;
+    if (-f $rel_package_or_path) {
+        $path = $rel_package_or_path;
+    } else {
+        $path = pod_where({-inc => 1}, join('::', $self->namespace, $rel_package_or_path))
+            or return "no documentation available";
     }
 
-    LOGDIE("Invalid characters in command") unless($command =~ m{\A\w+\z});
-    # TODO - select right sections and enhance formatting
-    unless ($subcommand) {
-        my $pod = $self->getpod($self->namespace . "::${command}", 'SYNOPSIS');
-        $pod .= "\n\nAvailable subcommands:\n";
-        my $subcmds = $self->subcommands($command);
-        $pod .= sprintf "%12s: %s\n", $_, $subcmds->{$_} for sort keys $subcmds->%*;
-        return $pod;
+    # Code copied from API2 pod handler, should be unified
+    my $pom = Pod::POM->new;
+    my $tree = $pom->parse_file($path) or return "ERROR: ".$pom->error;
+
+    my @heading_blocks = $tree->head1;
+
+    # filter headings if $section was set
+    if ($section) {
+        @heading_blocks = grep { $_->title eq $section } @heading_blocks;
+        return "ERROR: Missing section '$section' in $path" unless @heading_blocks;
     }
 
-    LOGDIE("Invalid characters in subcommand") unless($subcommand =~ m{\A\w+\z});
-    my $pod = $self->getpod($self->namespace . "::${command}::${subcommand}", 'SYNOPSIS');
+    return (@heading_blocks);
+}
 
-    # Generate parameter help from spec
-    # Might be useful to write POD and parse to text to have unified layout
-    try {
-        # list of Moose::Meta::Attribute
-        if (my @spec = $self->get_command_attributes($command, $subcommand)->@*) {
-            $pod .= "\n\nParameters:\n";
-            for my $param (@spec) {
-                next if exists $internal_command_attributes{$param->name};
-                $pod .= sprintf('  - %s: %s', OpenXPKI::Client::API::Util::to_cli_field($param->name), $param->label);
-                $pod .= ', ' . $self->openapi_type($param);
-                $pod .= ', required' if $param->is_required;
-                $pod .= ', hint' if $param->has_hint;
-                $pod .= ', default: '.$param->default if $param->has_default;
-                $pod .= "\n    " . $param->description if $param->has_description;
-                $pod .= "\n";
-            };
-        }
-    }
-    catch ($err) {
-        $self->log->warn("Error fetching parameter list for command '$command.$subcommand': $err");
-    }
+=head2 get_pod (I<$rel_package_or_path>, I<$section>)
 
+Extract the POD documentation found at I<$section> from the given
+I<$rel_package_or_path> (or all POD if I<$section> is omitted).
+
+I<$rel_package_or_path> is either a file path or the the last part of the
+package name consisting of command or command+C<::>+subcommand, e.g. C<acme> or
+C<acme::create>.
+
+Returns a POD string.
+
+=cut
+
+sub get_pod ($self, $rel_package_or_path, $section = undef) {
+    return join '', $self->get_pod_nodes($rel_package_or_path, $section);
+}
+
+=head2 get_pod_text (I<$rel_package_or_path>, I<$section>)
+
+Extract the POD documentation found at I<$section> from the given
+I<$rel_package_or_path>.
+
+I<$rel_package_or_path> is either a file path or the the last part of the
+package name consisting of command or command+C<::>+subcommand, e.g. C<acme> or
+C<acme::create>.
+
+Converts the POD section contents (without heading) to plain text via
+L<Pod::POM::View::Text>.
+
+=cut
+
+sub get_pod_text ($self, $rel_package_or_path, $section) {
+    # need to add subsections ?
+    my @nodes = $self->get_pod_nodes($rel_package_or_path, $section);
+    my $pod = join "\n\n", map { Pod::POM::View::Text->print($_->content) } @nodes;
+    $pod =~ s/\s+$//m;
     return $pod;
 }
 
-=head2 getopt_params I<command> [I<subcommand>]
+=head2 show_pod
 
-Return the parameters required to run C<Getopt::Long/GetOptions>.
+Thin wrapper around L<POD::Usage/pod2usage> that replaces special tokens:
+
+=over
+
+=item C<%%SCRIPT%%>
+
+The Perl script name.
+
+=item C<%%COMMANDS%%>
+
+A POD formatted list of available commands and their description.
+
+=back
+
+Per default these sections are shown:
+
+    USAGE
+    SYNOPSIS
+    DESCRIPTION
+    COMMANDS
+    SUBCOMMANDS
+    PARAMETERS
+    OPTIONS
+
+All arguments are passed to L<pod2usage|POD::Usage/pod2usage>.
+
+=cut
+
+sub show_pod ($self, @args) {
+    my %args = @args;
+    my $pod = delete $args{-oxi_pod} or die "show_pod(): missing parameter -oxi_pod";
+
+    # inject variables
+    my $script = $self->script_name;
+    $pod =~ s/%%SCRIPT%%/$script/g;
+
+    if ($pod =~ /%%COMMANDS%%/) {
+        my $pod_cmd = "=over\n\n";
+        my $cmds = $self->commands;
+        for my $cmd (sort keys $cmds->%*) {
+            $pod_cmd.= sprintf "=item %s\n\n%s\n\n", $cmd, $cmds->{$cmd};
+        }
+        $pod_cmd.= "=back\n\n";
+        $pod =~ s/%%COMMANDS%%/$pod_cmd/g;
+    }
+
+    # print formatted POD
+    open my $pod_fh, '<', \$pod;
+    pod2usage(
+        -input => $pod_fh,
+        -verbose => 99,
+        -sections => 'USAGE|SYNOPSIS|DESCRIPTION|COMMANDS|SUBCOMMANDS|PARAMETERS|OPTIONS',
+        %args,
+    ); # calls exit()
+}
+
+sub get_attribute_details ($self, $cmd, $subcmd) {
+    my $attrs = {};
+    try {
+        # list of Moose::Meta::Attribute
+        for my $param ($self->get_command_attributes($cmd, $subcmd)->@*) {
+            next if exists $internal_command_attributes{$param->name};
+            # name
+            my $name = OpenXPKI::Client::API::Util::to_cli_field($param->name);
+            # specification
+            my $spec = $self->openapi_type($param);
+            $spec.= ', required' if $param->is_required;
+            $spec.= ', hint' if $param->has_hint;
+            $spec.= sprintf(', default: "%s"', $param->default) if $param->has_default;
+            # description
+            my $desc = $param->label;
+            $desc.= " - " . $param->description if $param->has_description;
+
+            $attrs->{$name} = {
+                spec => $spec,
+                desc => $desc,
+            }
+        }
+    }
+    catch ($err) {
+        $self->log->warn("Error fetching parameter list for command '$cmd.$subcmd': $err");
+    }
+    return $attrs;
+}
+
+=head2 getopt_params (I<$command>, I<$subcommand>)
+
+Return the parameters required to run L<Getopt::Long/GetOptions>.
+
+I<$subcommand> may be omitted.
 
 =cut
 

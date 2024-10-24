@@ -13,7 +13,7 @@ use OpenXPKI::Crypt::X509;
 
 OpenXPKI::Client::API::Command::token::add
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Add a new generation of a crytographic token.
 

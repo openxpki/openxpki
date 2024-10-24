@@ -11,29 +11,9 @@ use OpenXPKI::DTO::ValidationException;
 
 OpenXPKI::Client::API::Command::alias
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
-Show and handle OpenXPKI alias configuarion
-
-=head1 USAGE
-
-Feed me!
-
-=head2 Subcommands
-
-=over
-
-=item show
-
-=item add
-
-=item create
-
-=item list
-
-=item remove
-
-=back
+Show and handle alias configuration.
 
 =cut
 

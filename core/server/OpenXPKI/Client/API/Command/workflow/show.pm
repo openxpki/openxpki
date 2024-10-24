@@ -10,7 +10,7 @@ command_setup
 
 OpenXPKI::Client::API::Command::workflow::show
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Show information on an existing workflow
 

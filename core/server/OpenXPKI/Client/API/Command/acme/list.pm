@@ -10,7 +10,7 @@ command_setup
 
 OpenXPKI::Client::API::Command::acme::list
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 List all ACME account entries from the datapool.
 

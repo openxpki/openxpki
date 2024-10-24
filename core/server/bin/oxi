@@ -1,16 +1,90 @@
 #!/usr/bin/env perl
 use OpenXPKI;
 
+# Core modules
+use FindBin qw( $Script );
 use Getopt::Long;
-use Pod::Usage;
+use Module::Metadata;
 use JSON::PP;
+
+# CPAN modules
+use PPI::Document;
 use YAML;
 
+# Project modules
 use OpenXPKI::i18n qw(set_language);
 use OpenXPKI::Client::API;
 use OpenXPKI::Client::API::Response;
 use OpenXPKI::Client::CLI;
 use OpenXPKI::DTO::Authenticator;
+
+=head2 show_help I<command> [I<subcommand>]
+
+Runs C<get_pod_text> on the package name constructed from the given arguments.
+
+If a I<subcommand> is given, evaluates the parameter specification and
+renders a description on the parameters.
+
+=cut
+
+signature_for show_help => (
+    named => [
+        api => 'OpenXPKI::Client::API',
+        command => 'Str',
+        subcommand => 'Str', { default => '' },
+        short => 'Bool', { default => 0 },
+    ],
+);
+sub show_help ($arg) {
+    my $api = $arg->api;
+    my $cmd = $arg->command;
+    my $subcmd = $arg->subcommand // '';
+    my $subcmd_var = $arg->subcommand || '[SUBCOMMAND]';
+
+    LOGDIE("Invalid characters in command") unless $cmd =~ m{\A\w*\z};
+    LOGDIE("Invalid characters in subcommand") unless $subcmd =~ m{\A\w*\z};
+
+    my $pod;
+    $pod.= "=head1 USAGE\n\n%%SCRIPT%% $cmd $subcmd_var [OPTIONS] PARAMETERS\n\n" unless $arg->short;
+
+    #
+    # COMMAND help
+    #
+    # TODO - select right sections and enhance formatting
+    unless ($subcmd) {
+        $pod.= $api->get_pod($cmd, 'DESCRIPTION') unless $arg->short;
+
+        $pod.= "\n\n=head1 SUBCOMMANDS\n\n=over\n\n";
+        my $subcmds = $api->subcommands($cmd);
+        for my $subcmd (sort keys $subcmds->%*) {
+            $pod.= sprintf "=item %s\n\n%s\n\n", $subcmd, $subcmds->{$subcmd};
+        }
+        $pod.= "=back\n\n";
+
+        $api->show_pod(-oxi_pod => $pod);
+    }
+
+    #
+    # SUBCOMMAND help
+    #
+    $pod.= $api->get_pod("${cmd}::$subcmd", 'DESCRIPTION');
+
+    my $attrs = $api->get_attribute_details($cmd, $subcmd);
+    if (scalar keys $attrs->%*) {
+        $pod.= "\n\n=head1 PARAMETERS\n\n=over\n\n";
+        for my $name (sort keys $attrs->%*) {
+            $pod.= sprintf(
+                "=item --%s (%s)\n\n%s\n\n",
+                $name, $attrs->{$name}->{spec}, $attrs->{$name}->{desc},
+            );
+        };
+        $pod.= "=back\n\n";
+    }
+
+    $pod.= $api->get_pod(__FILE__, 'OPTIONS');
+
+    $api->show_pod(-oxi_pod => $pod);
+}
 
 sub handle_error ($err, $debug_details = '') {
     # a simple plain error message
@@ -39,12 +113,15 @@ sub handle_error ($err, $debug_details = '') {
 
 set_language('en_US');
 use Log::Log4perl qw(:easy :no_extra_logdie_message);
-pod2usage( -verbose => 1 ) unless (@ARGV);
 
 my $verbose = 0;
 my %opt = ('verbose' => \$verbose);
+
+# pass_through: anything unknown, ambiguous or invalid will be passed through to @ARGV
 Getopt::Long::Configure('pass_through','bundling');
+
 GetOptions( \%opt, ('verbose|v+','json','json-pretty','auth-key|k=s','auth-config|c=s','no-caop','help'));
+
 Getopt::Long::Configure('no_pass_through');
 
 my $l4p_level;
@@ -62,36 +139,44 @@ if ($verbose > 2) {
 }
 Log::Log4perl->easy_init({ level => $l4p_level, layout => $l4p_layout });
 
-my $api = OpenXPKI::Client::API->new(enable_acls => 0);
+my $api = OpenXPKI::Client::API->new(
+    enable_acls => 0,
+    script_name => $Script,
+);
+
+# Help
+$api->show_pod(
+    -msg => "Missing command. Use --help for more details.\n",
+    -oxi_pod => $api->get_pod(__FILE__),
+    -sections => 'COMMANDS',
+) unless (@ARGV or $opt{help});
+
+my $command = ($opt{help} ? 'help' : shift) // '';
 
 # help is also avail via flag for subcommands
-if ($opt{help} && @ARGV) {
-    say $api->help(@ARGV);
-    exit 0;
-}
-
-# Get list of commands
-my $command = shift;
 if ($command eq 'help') {
-
     if (@ARGV) {
-        say $api->help(@ARGV);
-        exit 0;
+        my $cmd = $ARGV[0];
+        my $subcmd = $ARGV[1];
+        show_help(
+            api => $api,
+            command => $cmd,
+            defined $subcmd ? (subcommand => $subcmd) : (),
+        );
+    } else {
+        $api->show_pod(-oxi_pod => join('', $api->get_pod_nodes(__FILE__)));
     }
-
-    say "oxi COMMAND [SUBCOMMAND] [OPTIONS] ARGUMENTS";
-    say "";
-    say $api->help;
-    exit 0;
 }
 
 my $subcommand = shift;
 # List subcommands for command
 if (not $subcommand) {
-    say "oxi $command [SUBCOMMAND] [OPTIONS] ARGUMENTS";
-    say "";
-    say $api->help($command);
-    exit 0;
+    say "Missing subcommand.\n";
+    show_help(
+        api => $api,
+        command => $command,
+        short => 1,
+    );
 }
 
 # we have command and subcommand so lets handle parameters and dispatch
@@ -211,56 +296,57 @@ if ($res->state == 200) {
 
 =head1 NAME
 
-oxi - Manage OpenXPKI instances and artefacts
+%%SCRIPT%% - Manage OpenXPKI instances and artefacts
 
-=head1 USAGE
+=head1 SYNOPSIS
 
-oxi COMMAND [SUBCOMMAND] [OPTIONS] PARAMETER
+Manage OpenXPKI instances and artefacts:
 
-Type C<help> to get the list of available commands.
+    %%SCRIPT%% COMMAND [SUBCOMMAND] [OPTIONS] PARAMETERS
 
-Type the name of any command to get available subcommands.
+Show detailed help on a command or subcommand:
 
-Type C<help E<lt>commandE<gt> [E<lt>subcommandE<gt>]> for detailed help
-on a command or subcommand.
+    %%SCRIPT%% help COMMAND [SUBCOMMAND]
+    %%SCRIPT%% COMMAND [SUBCOMMAND] --help
 
-=head2 Global Options
+=head1 COMMANDS
+
+%%COMMANDS%%
+
+=head1 OPTIONS
 
 =over
 
-=item verbose|v
+=item --help
 
-raise loglevel to INFO, DEBUG (-vv) or TRACE (-vvv)
+Show help on a command or subcommand.
 
-=item json
+=item --verbose|-v
 
-print output data as compact JSON structure
+Raise loglevel to INFO, DEBUG (-vv) or TRACE (-vvv).
 
-=item json-pretty
+=item --json
 
-print output data as formated JSON structure
+Print output data as compact JSON structure.
 
-=item auth-config|c
+=item --json-pretty
 
-path to a config file to read the authentication details from
+Print output data as formated JSON structure.
 
-=item auth-key|k
+=item --auth-config|-c
 
-path to the login key to run command as ca operator
+Path to a config file to read the authentication details from.
 
-the default location is ~/.oxi/client.key
+=item --auth-key|-k
 
-=item no-caop
+Path to the login key to run command as CA operator.
 
-do not authenticate as ca operator and use the default user binding
-even if a ca operator key was autodetected.
+Default location: ~/.oxi/client.key
 
-=item realm
+=item --no-caop
 
-realm to run the command against, also used for authentication when
-not in ca operator mode.
-
-This option is not available on global commands.
+Do not authenticate as CA operator and use the default user binding even if a CA
+operator key was autodetected.
 
 =back
 

@@ -10,7 +10,7 @@ command_setup
 
 OpenXPKI::Client::API::Command::api::execute
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Run a bare API command on the server
 

@@ -5,25 +5,9 @@ use OpenXPKI -role;
 
 OpenXPKI::CLI::Command::config
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
-Show and handle OpenXPKI system configuarion
-
-=head1 USAGE
-
-Feed me!
-
-=head2 Subcommands
-
-=over
-
-=item show
-
-=item verify
-
-=item smtptest
-
-=back
+Show and handle system configuration.
 
 =cut
 

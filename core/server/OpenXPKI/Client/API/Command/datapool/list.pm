@@ -10,7 +10,7 @@ command_setup
 
 OpenXPKI::Client::API::Command::datapool::list
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 List datapool keys/items for a given namespace
 

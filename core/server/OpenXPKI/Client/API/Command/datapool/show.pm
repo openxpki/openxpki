@@ -10,7 +10,7 @@ command_setup
 
 OpenXPKI::Client::API::Command::datapool::show
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Show a datapool entry, without any extra options prints the raw content
 as blob, add the I<deserialize> and I<decrpty> flag to get the actual

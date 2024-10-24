@@ -10,7 +10,7 @@ command_setup
 
 OpenXPKI::Client::API::Command::config::show
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Show information of the (running) OpenXPKI configuration
 

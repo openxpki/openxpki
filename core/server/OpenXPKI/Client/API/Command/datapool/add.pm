@@ -10,7 +10,7 @@ command_setup
 
 OpenXPKI::Client::API::Command::datapool::add
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Add a new value to the datapool
 

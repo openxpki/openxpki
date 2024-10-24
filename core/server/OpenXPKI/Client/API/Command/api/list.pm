@@ -9,7 +9,7 @@ command_setup
 
 OpenXPKI::Client::API::Command::api::list
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Show the list of available commands
 

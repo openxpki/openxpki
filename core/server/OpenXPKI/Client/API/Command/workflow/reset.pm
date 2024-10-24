@@ -10,7 +10,7 @@ command_setup
 
 OpenXPKI::Client::API::Command::workflow::reset
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Manually reset a hanging workflow, see I<reset_workflow> for details.
 

@@ -13,7 +13,7 @@ use OpenXPKI::Crypt::X509;
 
 OpenXPKI::Client::API::Command::alias::add
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Add a new (non-token) alias.
 

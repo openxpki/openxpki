@@ -13,7 +13,7 @@ use OpenXPKI::Serialization::Simple;
 
 OpenXPKI::Client::API::Command::token::update
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Add a new generation of a crytographic token.
 

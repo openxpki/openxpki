@@ -10,7 +10,7 @@ command_setup
 
 OpenXPKI::Client::API::Command::acme::create
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Register a new ACME account with an external CA and write the
 registration information to the datapool.
