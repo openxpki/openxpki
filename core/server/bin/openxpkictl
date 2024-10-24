@@ -39,14 +39,18 @@ sub scope_classes {
 
 sub show_pod (@args) {
     my %args = @args;
-    my $commands = join "\n", map { '    ' . $_ } command_list;
-    my $scopes = join "\n", map { '    ' . $_ } sort keys scope_classes->%*;
+    my $pod = delete $args{-oxi_pod} // get_file_pod(__FILE__);
 
     # inject variables
-    my $pod = delete $args{-oxi_pod} // get_file_pod(__FILE__);
     $pod =~ s/%%CONTROL_SCRIPT%%/$Script/g;
-    $pod =~ s/%%CONTROL_COMMANDS%%/$commands/g;
-    $pod =~ s/%%CONTROL_SCOPES%%/$scopes/g;
+    if ($pod =~ /%%CONTROL_SCOPES%%/) {
+        my $scopes = join "\n", map { '    ' . $_ } sort keys scope_classes->%*;
+        $pod =~ s/%%CONTROL_SCOPES%%/$scopes/g;
+    }
+    if ($pod =~ /%%CONTROL_COMMANDS%%/) {
+        my $commands = join "\n", map { '    ' . $_ } command_list;
+        $pod =~ s/%%CONTROL_COMMANDS%%/$commands/g;
+    }
 
     # print formatted POD
     open my $pod_fh, '<', \$pod;
@@ -238,16 +242,17 @@ SCOPEs:
 
 =item B<--help>
 
-Show brief help
+Show brief help.
 
 =item B<--man>
 
-Show manual page
+Show manual page.
 
 =item B<--config|c PATH>
 
 Use the configuration repository (base of yaml tree) below PATH.
-Defaults to /etc/openxpki/config.d
+
+Default: /etc/openxpki/config.d
 
 =item B<--instance|i NAME>
 
