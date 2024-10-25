@@ -44,7 +44,7 @@ Then to use it:
 
     my $api = OpenXPKI::Server::API2->new(
         acl_rule_accessor => sub { CTX('config')->get('acl.rules.' . CTX('session')->data->role ) },
-        log => OpenXPKI::Server::Log->new(CONFIG => '')->system,
+        log => OpenXPKI::Server::Log->new(use_current_config => 1)->system,
     );
     printf "Available commands in root namespace: %s\n", join(", ", keys $api->namespace_commands->%*);
 

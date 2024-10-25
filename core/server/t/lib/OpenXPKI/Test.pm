@@ -903,8 +903,8 @@ sub init_server {
     OpenXPKI::Server::Context::reset();
     OpenXPKI::Server::Init::reset();
 
-    # init log object (and force it to NOT reinitialize Log4perl)
-    OpenXPKI::Server::Context::setcontext({ log => OpenXPKI::Server::Log->new(CONFIG => undef) })
+    # init log object
+    OpenXPKI::Server::Context::setcontext({ log => OpenXPKI::Server::Log->new(use_current_config => 1) })
         unless OpenXPKI::Server::Context::hascontext("log"); # may already be set if multiple instances of OpenXPKI::Test are created
 
     # init basic CTX objects: all those we do not explicitely skip
@@ -1170,8 +1170,7 @@ sub _build_dbi {
 
     #Log::Log4perl->easy_init($OFF);
     return OpenXPKI::Server::Database->new(
-        # "CONFIG => undef" prevents OpenXPKI::Server::Log from re-initializing Log4perl
-        log => OpenXPKI::Server::Log->new(CONFIG => undef)->system,
+        log => OpenXPKI::Server::Log->new(use_current_config => 1)->system,
         db_params => $self->db_conf,
     );
 }

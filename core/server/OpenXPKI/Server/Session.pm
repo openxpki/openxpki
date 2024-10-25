@@ -42,7 +42,7 @@ Or if you want to specify config and logger explicitely:
         ->new(
             type => "Database",
             config => { dbi => $dbi },
-            log => OpenXPKI::Server::Log->new,
+            log => OpenXPKI::Server::Log->new(use_current_config => 1),
         )
         ->create;
     ...
@@ -62,7 +62,9 @@ has log => (
     isa => 'Log::Log4perl::Logger',
     lazy => 1,
     default => sub {
-        my $log = OpenXPKI::Server::Context::hascontext('log') ? CTX('log') : OpenXPKI::Server::Log->new(CONFIG => undef);
+        my $log = OpenXPKI::Server::Context::hascontext('log')
+            ? CTX('log')
+            : OpenXPKI::Server::Log->new(use_current_config => 1);
         return $log->application,
     },
 );

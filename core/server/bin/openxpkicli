@@ -255,7 +255,7 @@ if($params{instance}){
     debug("using default socket %s \n", $params{socketfile});
 }
 
-OpenXPKI::Log4perl::init_or_fallback('' , $params{debug} ? 'DEBUG' : 'WARN');
+OpenXPKI::Log4perl->init_screen_logger($params{debug} ? 'DEBUG' : 'WARN');
 
 debug(sprintf("Socketfile: %s", $params{socketfile}));
 

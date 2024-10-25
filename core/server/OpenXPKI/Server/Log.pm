@@ -1,34 +1,61 @@
 package OpenXPKI::Server::Log;
+use OpenXPKI -class;
 
-use Moose;
-
-=head1 Name
+=head1 NAME
 
 OpenXPKI::Server::Log - logging implementation for OpenXPKI
 
-=head1 Description
+=head1 DESCRIPTION
 
-This is the logging layer of OpenXPKI. Mainly we use Log::Log4perl.
-The important difference is that we replace the original DBI appender
-with our own appender which can handle some funny details of some
-special databases. Additionally our log function do some special
-things to meet our requirements.
+This is the logging layer of OpenXPKI, a wrapper around L<Log::Log4perl>.
 
-=head1 Functions
+One important enhancement is that we replace the original DBI appender with our
+own appender which can handle some funny details of some special databases.
 
 =cut
 
-use English;
-
-use OpenXPKI::Log4perl;
+# CPAN modules
 use Log::Log4perl::Level;
 use Log::Log4perl::MDC;
-use OpenXPKI::Exception;
 
-has 'CONFIG' => (
-    isa     => 'Str|ScalarRef|Undef',
-    is      => 'ro',
+# Project modules
+use OpenXPKI::Log4perl;
+
+=head1 ATTRIBUTES
+
+=head2 config
+
+Either
+
+=over
+
+=item * a path to the L<Log::Log4perl> configuration file or
+
+=item * a reference to a scalar holding the Log4perl configuration string.
+
+=back
+
+=cut
+
+has 'config' => (
+    isa => 'Str|ScalarRef|Undef',
+    is => 'ro',
     default => '/etc/openxpki/log.conf',
+    predicate => 'has_config',
+);
+
+=head2 use_current_config
+
+Set this to C<1> to either use an already initialized Log4perl (i.e. the
+currently active configuration) or create a fallback screen only logger using
+L<Log::Log4perl/easy_init>.
+
+=cut
+
+has 'use_current_config' => (
+    isa => 'Bool',
+    is => 'ro',
+    default => 0,
 );
 
 for my $name (qw( application auth system workflow deprecated )) {
@@ -41,7 +68,7 @@ for my $name (qw( application auth system workflow deprecated )) {
 }
 
 # alias for "application"
-has app => (
+has 'app' => (
     is => 'ro',
     isa => 'Log::Log4perl::Logger',
     init_arg => undef,
@@ -51,7 +78,7 @@ has app => (
 
 =head2 Constructor
 
-The constructor only accepts the named parameter C<CONFIG> which can either be
+The constructor only accepts the named parameter C<config> which can either be
 
 =over
 
@@ -59,24 +86,23 @@ The constructor only accepts the named parameter C<CONFIG> which can either be
 
 =item * a reference to a scalar holding the Log4perl configuration string or
 
-=item * undef to either use an already initialized Log4perl or create a screen
-only logger using L<Log::Log4perl/easy_init>
+=item * C<undef> to either use an already initialized Log4perl or create a
+screen only logger using L<Log::Log4perl/easy_init>
 
 =back
 
 =cut
 
-sub BUILD {
-    my $self = shift;
-
-    my $config = $self->CONFIG();
-
+sub BUILD ($self, $args) {
     # caller explicitely asked to NOT use config: try reusing Log4perl
-    return if not(defined $config) and Log::Log4perl->initialized;
-
-    # CONFIG was provided
-    OpenXPKI::Log4perl->init_or_fallback( $config );
+    if ($self->use_current_config and Log::Log4perl->initialized) {
+        return;
+    } else {
+        OpenXPKI::Log4perl->init_or_fallback($self->config);
+    }
 }
+
+=head1 METHODS
 
 =head2 audit
 
@@ -190,8 +216,9 @@ for my $prio (qw/ debug info warn error fatal trace /) {
     *{$prio} = sub {
         my ( $self, $message, $facility ) = @_;
 
-        if (!$facility ||
-            $facility !~ m{ \A (?:application|auth|audit|system|workflow) \z }xms) {
+        if (not $facility or
+            $facility !~ m{ \A (?:application|auth|audit|system|workflow) \z }xms
+        ) {
             $facility = 'system';
         }
         $self->$facility()->$prio($message);

@@ -96,7 +96,7 @@ sub cmd_start ($self) {
 
     $daemon->check_pid; # delete any old PID file
 
-    OpenXPKI::Log4perl->init_or_fallback('' , $self->opts->{debug} ? 'TRACE' : 'INFO');
+    OpenXPKI::Log4perl->init_screen_logger($self->opts->{debug} ? 'TRACE' : 'INFO');
     my $log = OpenXPKI::Log4perl->get_logger('openxpki.client');
 
     $daemon->build_app('OpenXPKI::Client::Web' => {

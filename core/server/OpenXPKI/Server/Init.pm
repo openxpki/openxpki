@@ -432,7 +432,7 @@ sub get_log {
     ## init logging
     ##! 64: 'before Log->new'
 
-    my $log = OpenXPKI::Server::Log->new (CONFIG => $config_file);
+    my $log = OpenXPKI::Server::Log->new (config => $config_file);
 
     ##! 64: 'log during get_log: ' . $log
 

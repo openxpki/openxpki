@@ -1,4 +1,5 @@
 package OpenXPKI::Log4perl;
+use OpenXPKI;
 
 # Core modules
 use List::Util qw( none );
@@ -10,6 +11,7 @@ use Log::Log4perl::Level;
 # Project modules
 use OpenXPKI::Log4perl::MojoLogger;
 
+our $spec_added = 0;
 our $default_facility;
 
 =head1 NAME
@@ -58,66 +60,86 @@ B<Parameters:>
 
 =item * C<$config>
 
-configuration: file path, ScalarRef, HashRef or empty string
-
-=item * C<$fallback_prio>
-
-log priority (level) to use for output to STDERR if there is a problem with
-the given config (optional, default: WARN)
+Log4perl configuration: file path, ScalarRef, HashRef. (optional, default: log
+to STDERR via L</init_screen_logger>).
 
 =back
 
-If the first parameter is undef or the config file is not found, the
-constructor will print a warning message. So if you are fine with the default
-screen logger, pass an empty string as C<$config> and, optionally, the desired
-log level as C<$fallback_prio>.
+If the first parameter is undef or the config file is not found a warning
+message will be logged.
 
 =cut
 
-sub init_or_fallback {
-    my ($class, @args) = @_;
-    # if someone called ::init instead of ->init, $class contains the first
-    # argument instead of the class name
+sub init_or_fallback ($class, @args) {
+    # if someone calls us with :: instead of ->, $class contains first argument instead of class name
     unshift(@args, $class) if $class ne __PACKAGE__;
 
-    _add_patternlayout_spec();
-
     my $config = shift @args;
-    my $fallback_prio = shift(@args) // "WARN";
-
     my @warnings = ();
+
+    _add_patternlayout_spec();
 
     # Error checks
     if ($config) { # config is set and not empty
         if (not ref $config) {
             if (not -f $config) {
-                push @warnings, "Log4perl configuration file $config not found";
+                push @warnings, "Log4perl configuration file '$config' not found";
                 $config = undef;
             }
         } elsif (ref $config ne 'SCALAR' and ref $config ne 'HASH') {
             push @warnings, "Unsupported format for Log4perl configuration (expected: filename, ScalarRef or HashRef)";
             $config = undef;
         }
-    } elsif (not defined $config) {
+    } else {
         # if not initialized: complain and init screen logger
         push @warnings, "Initializing Log4perl in fallback mode (output to STDERR)";
     }
 
-    # Fallback default
-    $config = {
-        "log4perl.rootLogger" => uc($fallback_prio).", SCREEN",
-        "log4perl.appender.SCREEN" => "Log::Log4perl::Appender::Screen",
-        "log4perl.appender.SCREEN.layout" => "Log::Log4perl::Layout::PatternLayout",
-        "log4perl.appender.SCREEN.layout.ConversionPattern" => "%d %p %m [pid=%P|%i]%n",
-    } unless($config);
+    if ($config) {
+        Log::Log4perl->init($config);
+    } else {
+        $class->init_screen_logger;
+    }
+    Log::Log4perl->get_logger('')->warn($_) for @warnings;
+}
+
+=head2 init_screen_logger
+
+Initialize Log4perl with a basic screen logger configuration.
+
+B<Parameters:>
+
+=over
+
+=item * C<$prio>
+
+log priority (level) to use for output to STDERR (optional, default: WARN)
+
+=back
+
+=cut
+
+sub init_screen_logger ($class, @args) {
+    # if someone calls us with :: instead of ->, $class contains first argument instead of class name
+    unshift(@args, $class) if $class ne __PACKAGE__;
+
+    my $prio = shift(@args) // 'WARN';
+
+    _add_patternlayout_spec();
+
+    my $config = {
+        'log4perl.rootLogger' => uc($prio).', SCREEN',
+        'log4perl.appender.SCREEN' => 'Log::Log4perl::Appender::Screen',
+        'log4perl.appender.SCREEN.layout' => 'Log::Log4perl::Layout::PatternLayout',
+        'log4perl.appender.SCREEN.layout.ConversionPattern' => '%d %p %m [pid=%P|%i]%n',
+    };
 
     Log::Log4perl->init($config);
-    Log::Log4perl->get_logger('')->warn($_) for @warnings;
-
 }
 
 # Add custom PatternLayout placeholder %i which shows all MDC variables
 sub _add_patternlayout_spec {
+    return if $spec_added;
     Log::Log4perl::Layout::PatternLayout::add_global_cspec('i', sub {
         my $layout = shift;
         my @order = qw( pid user role sid rid wftype wfid scepid pki_realm );
@@ -140,6 +162,7 @@ sub _add_patternlayout_spec {
         # present the result
         return join("|", map { $_.'='.$mdc->{$_} } @keys_ordered);
     });
+    $spec_added = 1;
 }
 
 sub get_logger {
