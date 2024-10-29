@@ -37,8 +37,8 @@ has cfg => (
         return {
             user => 'www-data',
             group => 'openxpki',
-            pid_file => '/run/openxpki-client.pid',
-            socket_file => '/var/openxpki/openxpki-client.socket',
+            pid_file => '/run/openxpki-clientd.pid',
+            socket_file => '/var/openxpki/openxpki-clientd.socket',
             #stderr => '/var/log/openxpki/client-stderr.log',
             #socket_owner => 'apache',
         };
