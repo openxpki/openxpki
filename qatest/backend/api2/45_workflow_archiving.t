@@ -27,7 +27,8 @@ try {
     # plan tests => 14; WE CANNOT PLAN tests as there is a while loop that sends commands (which are tests)
 }
 catch {
-    plan skip_all => "persister 'Archiver' no available";
+    plan skip_all => "persister 'Archiver' (EE code) not available" if $err =~ /^Can't locate/;
+    die $err;
 };
 
 

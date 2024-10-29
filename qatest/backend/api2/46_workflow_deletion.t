@@ -25,7 +25,8 @@ try {
     plan tests => 3;
 }
 catch {
-    plan skip_all => "persister 'Archiver' no available";
+    plan skip_all => "persister 'Archiver' (EE code) not available" if $err =~ /^Can't locate/;
+    die $err;
 };
 
 

@@ -21,8 +21,8 @@ try {
     require OpenXPKI::Server::ProcTerminal;
 }
 catch ($err) {
-    die $err unless $err =~ /^Can't locate/;
-    plan skip_all => "OpenXPKI::Server::ProcTerminal (EE code) not available";
+    plan skip_all => "OpenXPKI::Server::ProcTerminal (EE code) not available" if $err =~ /^Can't locate/;
+    die $err;
 };
 
 my $tempdir = File::Temp::tempdir(CLEANUP => 1);

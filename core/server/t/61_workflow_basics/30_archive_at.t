@@ -28,7 +28,8 @@ try {
     plan tests => 8;
 }
 catch ($err) {
-    plan skip_all => "persister 'Archiver' no available";
+    plan skip_all => "persister 'Archiver' (EE code) not available" if $err =~ /^Can't locate/;
+    die $err;
 }
 
 sub archive_at_ok($$$) {
