@@ -106,6 +106,7 @@ If no L<cipher> has been set the session ID will be stored unencrypted.
 =item * C<oxi-login-timestamp> - "last login" timestamp
 
 =item * C<oxi-extid>
+
 =back
 
 =cut

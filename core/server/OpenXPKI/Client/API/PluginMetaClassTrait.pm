@@ -13,7 +13,7 @@ OpenXPKI::Client::API::PluginMetaClassTrait - Moose metaclass role (aka.
 
 B<Not intended for direct use> - this is part of the internal API magic.
 
-=METHODS
+=head1 METHODS
 
 =head2 set_command_behaviour
 
