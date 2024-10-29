@@ -5,10 +5,12 @@ extends 'Connector::Builtin::Memory';
 
 use Storable qw(freeze);
 use Config::Merge;
-use YAML;
+use YAML::PP;
 use Data::Dumper;
 use Digest::SHA qw(sha256_hex);
 
+# use our own YAML loader
+Config::Merge->register_loader('OpenXPKI::Config::Loader::YAML');
 
 has 'checksum' => (
     is => 'rw',
@@ -38,10 +40,13 @@ sub _build_config {
 
     my $config;
     if (-f $self->LOCATION && $self->LOCATION =~ /.yaml$/) {
-        $config = YAML::LoadFile( $self->LOCATION );
+        $config = YAML::PP->new->load_file($self->LOCATION);
     } else {
         # Skip the realm.tpl directory
-        my $cm    = Config::Merge->new( path => $self->LOCATION, skip => qr/realm\.tpl/ );
+        my $cm = Config::Merge->new(
+            path => $self->LOCATION,
+            skip => qr/realm\.tpl/,
+        );
         $config = $cm->();
     }
     return $self->cm2tree($config);

@@ -175,6 +175,7 @@ OpenXPKI/Client/Service/WebUI/SessionCookie.pm
 ## Config Layers
 OpenXPKI/Config/Backend.pm
 OpenXPKI/Config/Loader.pm
+OpenXPKI/Config/Loader/YAML.pm
 OpenXPKI/Config/Lint/Dummy.pm
 OpenXPKI/Config/Lint/RealmRole.pm
 OpenXPKI/Config/Lint/Role.pm

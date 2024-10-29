@@ -36,7 +36,7 @@ sub archive_at_ok($$$) {
 
     subtest $testname => sub {
         my $workflow_type = "TESTWORKFLOW".int(rand(2**32));
-
+        my $wf = "realm.alpha.workflow.def.$workflow_type";
         #
         # Setup test context
         #
@@ -44,11 +44,11 @@ sub archive_at_ok($$$) {
             with => [ qw( TestRealms ) ],
             also_init => "workflow_factory",
             add_config => {
-                "realm.alpha.workflow.persister.Archiver" =>
-                    "class: OpenXPKI::Server::Workflow::Persister::Archiver\n" .
-                    ($config->{persister} // ""),
+                "realm.alpha.workflow.persister.Archiver" => "
+                    class: OpenXPKI::Server::Workflow::Persister::Archiver
+                    " . ($config->{persister} // ""),
 
-                "realm.alpha.workflow.def.$workflow_type" => "
+                "$wf" => "
                     acl:
                         MyFairyKing:
                             creator: any
@@ -61,24 +61,29 @@ sub archive_at_ok($$$) {
                             action: noop > SUCCESS
                             autorun: 1
 
-                        SUCCESS:
+                        SUCCESS: {}
 
                     action:
                         noop:
                             class: OpenXPKI::Server::Workflow::Activity::Noop
+                        step1:
+                            class: OpenXPKI::Server::Workflow::Activity::Noop
                 ",
 
-                "realm.alpha.workflow.def.$workflow_type.head" =>
-                    "prefix: testwf\n" .
-                    "persister: Archiver\n" .
-                    ($config->{wf_head} // ""),
+                "$wf.head" => "
+                    prefix: testwf
+                    persister: Archiver
+                    " . ($config->{wf_head} // ""),
 
-                "realm.alpha.workflow.def.$workflow_type.state.SUCCESS" =>
-                    ($config->{wf_state_success} // ""),
+                # overwrite "SUCCESS" state
+                $config->{wf_state_success}
+                    ? ("$wf.state.SUCCESS" => $config->{wf_state_success})
+                    : (),
 
-                "realm.alpha.workflow.def.$workflow_type.action.step1" =>
-                    ($config->{wf_action_step1} // "class: OpenXPKI::Server::Workflow::Activity::Noop"),
-
+                # overwrite "step1" action
+                $config->{wf_action_step1}
+                    ? ("$wf.action.step1" => $config->{wf_action_step1})
+                    : (),
             },
         );
 
@@ -119,11 +124,11 @@ sub archive_at_ok($$$) {
 
 my $epoch = time() + 30;
 my %archive_at_tests = (
-    'time period' => '+000000000030',
+    'time period' => '"+000000000030"',
     'epoch (timestamp)' => $epoch,
 );
 
-for my $input_type (keys %archive_at_tests) {
+for my $input_type (sort keys %archive_at_tests) {
     my $archive_at = $archive_at_tests{$input_type};
     # persister config
     archive_at_ok "setting 'archive_at' in persister ($input_type)" =>

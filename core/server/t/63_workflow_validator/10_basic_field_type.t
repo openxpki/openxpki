@@ -5,13 +5,13 @@ use utf8;
 
 # Core modules
 use FindBin qw( $Bin );
-use YAML::Tiny;
 use File::Temp qw( tempfile );
 
 # CPAN modules
 use Test::More;
 use Test::Deep ':v1';
 use Test::Exception;
+use YAML::PP;
 
 #use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Workflow::Validator::BasicFieldType.*'} = 32;
 
@@ -36,7 +36,7 @@ sub create_test {
 
     ($FIELD_NAME) = keys %$field_def;
 
-    my $cfg = YAML::Tiny->read_string("
+    my $cfg = YAML::PP->new->load_string("
         head:
             prefix: $WF_TYPE
             persister: OpenXPKI
@@ -54,7 +54,7 @@ sub create_test {
                 input:
                     - $FIELD_NAME
         field: {}
-    ")->[0];
+    ");
 
     $cfg->{field} = $field_def;
 
@@ -116,7 +116,7 @@ sub test_field_with($$) {
     my $oxitest = create_test($cfg); # sets $WF_TYPE
     $oxitest->session->data->role('User');
 
-    my $cfg_str = YAML::Tiny->new(values %$cfg)->write_string();
+    my $cfg_str = YAML::PP->new->dump_string(values %$cfg);
     $cfg_str =~ s/^---\s+//m;
     $cfg_str =~ s/^\s+//g;
     $cfg_str = join ", ", split /\n/, $cfg_str;

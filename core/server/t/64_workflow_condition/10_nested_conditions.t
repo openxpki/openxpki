@@ -5,12 +5,12 @@ use utf8;
 
 # Core modules
 use FindBin qw( $Bin );
-use YAML::Tiny;
 
 # CPAN modules
 use Test::More;
 use Test::Deep ':v1';
 use Test::Exception;
+use YAML::PP;
 
 # Project modules
 use lib "$Bin/../lib";
@@ -27,7 +27,7 @@ my $WF_TYPE = "testwf".int(rand(2**32)); # workflow type
 sub create_test {
     my ($cond_def) = @_;
 
-    my $cfg = YAML::Tiny->read_string("
+    my $cfg = YAML::PP->new->load_string("
         head:
             prefix: $WF_TYPE
             persister: Null
@@ -43,7 +43,7 @@ sub create_test {
             testit:
                 class: OpenXPKI::Server::Workflow::Activity::Noop
         condition: {}
-    ")->[0];
+    ");
 
     $cfg->{condition} = $cond_def;
 
@@ -69,8 +69,7 @@ sub test ($$) {
     my $cfg_str = $config->{condition};
     my $test_sub = $config->{check};
     my $throws = $config->{throws};
-
-    my $cfg = YAML::Tiny->read_string($cfg_str)->[0];
+    my $cfg = YAML::PP->new->load_string($cfg_str);
     my $oxitest;
 
     subtest $testname => sub {

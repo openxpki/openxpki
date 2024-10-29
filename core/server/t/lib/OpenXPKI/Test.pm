@@ -153,7 +153,7 @@ use MIME::Base64;
 use Moose::Util;
 use Moose::Meta::Class;
 use Digest::SHA;
-use YAML::Tiny;
+use YAML::PP;
 use Test::More;
 use Test::Deep::NoTest qw( eq_deeply bag ); # use eq_deeply() without beeing in a test
 use Import::Into;
@@ -833,7 +833,7 @@ sub init_user_config {
         my $val = $self->user_config->{$_};
         # support config given as YAML string
         if (ref $val eq '') {
-            $val = YAML::Tiny->read_string($val)->[0];
+            $val = YAML::PP->new->load_string($val);
         }
         $self->add_conf($_ => $val);
     }

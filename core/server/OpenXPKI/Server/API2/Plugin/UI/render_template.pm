@@ -7,7 +7,7 @@ OpenXPKI::Server::API2::Plugin::UI::render_template
 
 =cut
 
-use YAML::Loader;
+use YAML::PP;
 use Data::Dumper;
 
 # Project modules
@@ -16,8 +16,6 @@ use OpenXPKI::Types;
 use OpenXPKI::Template;
 use OpenXPKI::Debug;
 
-# Feature::Compat::Try should be done last to safely disable warnings
-use Feature::Compat::Try;
 
 =head1 COMMANDS
 
@@ -110,7 +108,7 @@ command "render_yaml_template" => {
     my $doc;
     my $value;
     try {
-        $value = YAML::Loader->new->load($result);
+        $value = YAML::PP->new->load_string($result);
     }
     catch ($err) {
         OpenXPKI::Exception->throw(

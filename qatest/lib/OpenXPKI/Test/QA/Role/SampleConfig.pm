@@ -10,16 +10,14 @@ to include the complete sample configuration from `config/config.d`
 
 # Core modules
 use English;
-
-# CPAN modules
+use Cwd qw( abs_path );
 use Test::More;
 use File::Find;
 use File::Spec;
-use Cwd qw( abs_path );
 use FindBin qw( $Bin );
 
-# Project modules
-use YAML::Tiny;
+# CPAN modules
+use YAML::PP;
 
 
 requires "testenv_root";
@@ -223,7 +221,7 @@ sub _yaml2perl {
         $dir =~ s/\/*$//; # strip trailing slash
 
         # slurp
-        my $yaml = YAML::Tiny->read($filepath);
+        my $yaml = YAML::PP->new->load_file($filepath);
 
         # assemble relative path
         my @relpath = File::Spec->splitdir($dir);

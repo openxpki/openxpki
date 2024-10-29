@@ -11,7 +11,7 @@ use POSIX ":sys_wait_h";
 use Errno;
 use File::Spec;
 use File::Basename;
-use YAML;
+use YAML::PP;
 use MIME::Base64;
 use Crypt::X509;
 use JSON; # early use of JSON avoids "Subroutine JSON::PP::Boolean::(++ redefined at /usr/share/perl/5.28/overload.pm line 48"
@@ -1704,7 +1704,7 @@ if ($cmd eq 'initdb') {
                 $hash = $hash->{$item};
             }
         }
-        print Dump $hash;
+        print YAML::PP->new->dump_string($hash);
     }
 
     if ($ret == 0) {

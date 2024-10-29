@@ -246,7 +246,7 @@ WriteMakefile(
         'Type::Tiny'                    => '2.000001',
         'URI::Escape'                   => 0,           # should be part of the core modules but who knows
         'Workflow'                      => '1.60',
-        'YAML::Tiny'                    => '1.69',
+        'YAML::PP'                      => '0.38.0',
     },
     'test' => {
         'TESTS' => 't/*/*.t',

@@ -12,7 +12,7 @@ use File::Spec;
 
 # CPAN modules
 use Moose::Util::TypeConstraints; # PLEASE NOTE: this enables all warnings via Moose::Exporter
-use YAML::Tiny 1.69;
+use YAML::PP;
 use Test::More;
 use Test::Exception;
 use Test::Deep::NoTest qw( eq_deeply bag ); # use eq_deeply() without beeing in a test
@@ -96,7 +96,7 @@ sub write_yaml {
 
     $self->_make_parent_dir($filepath);
     note "  writing $filepath";
-    $self->write_str($filepath, YAML::Tiny->new($data)->write_string);
+    $self->write_str($filepath, YAML::PP->new->dump_string($data));
 }
 
 sub add_config {
