@@ -22,9 +22,9 @@ userinfo:
 error_popup:
   header: "Application Error"
   message:
-    server: "The server did not return the expected data.<br>Maybe your authentication session has expired or there is an internal error.<br>HTTP code: {code}"
-    network: "The server connection seems to be lost:<br>\"{reason}\""
-    client: "There was an error while processing the data received from the server:<br>\"{reason}\""
+    server: "The webserver did not return the expected data.<br>Possible causes: OpenXPKI client is not running; authentication session has expired; an internal error.<br>HTTP code: {code}"
+    network: "The webserver connection seems to be lost:<br>\"{reason}\""
+    client: "There was an error while processing the data received from the webserver:<br>\"{reason}\""
   reload: "Reload application"
 
 pagination:
