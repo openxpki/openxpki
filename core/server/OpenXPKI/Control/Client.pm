@@ -56,7 +56,7 @@ has silent => (
 # required by OpenXPKI::Control::Role
 sub getopt_params ($self, $command) {
     return qw(
-        debug|d
+        dev|d
         user|u=s
         group|g=s
         socket_file|socket-file|s=s
@@ -85,7 +85,17 @@ sub cmd_start ($self) {
         return 0;
     }
 
-    $ENV{MOJO_MODE} = 'production' unless $self->opts->{debug};
+    my $force_screen_logging = 0;
+    if ($self->opts->{dev}) {
+        $ENV{MOJO_MODE} = 'development';
+        $force_screen_logging = 1 if $self->opts->{nd};
+    } else {
+        $ENV{MOJO_MODE} = 'production';
+    }
+
+    my $log = OpenXPKI::Log4perl->get_logger('openxpki.client');
+
+    $log->info('Foreground development mode: logging to console (Log4perl config will be ignored)') if $force_screen_logging;
 
     my $daemon = Mojo::Server::Prefork->new(
         listen => ["http+unix://$enc_socket_file"],
@@ -96,17 +106,15 @@ sub cmd_start ($self) {
 
     $daemon->check_pid; # delete any old PID file
 
-    OpenXPKI::Log4perl->init_screen_logger($self->opts->{debug} ? 'TRACE' : 'INFO');
-    my $log = OpenXPKI::Log4perl->get_logger('openxpki.client');
-
     $daemon->build_app('OpenXPKI::Client::Web' => {
-        # "root" client logger
+        # Mojo attribute: pass the client root logger
         log => $log,
         # daemon owner
         oxi_user => $user,
         oxi_group => $group,
         oxi_socket_user => $socket_user,
         oxi_socket_group => $socket_group,
+        oxi_skip_log_init => $force_screen_logging,
         # config object
         #oxi_config_obj => ...,
     });
@@ -251,11 +259,11 @@ Target user for the socket file (default: process user)
 
 Target group for the socket file (default: process group)
 
-=item B<--debug>
+=item B<--dev>
 
 =item B<-d>
 
-Debug mode, also enables Mojolicious development mode:
+Development mode:
 
 =over
 
@@ -271,7 +279,7 @@ Debug mode, also enables Mojolicious development mode:
 
 =item B<--nd>
 
-Do not fork, i.e. do not send daemon to background. Together with --debug this
-will show all debug messages in the console.
+Do not fork, i.e. do not send daemon to background. Together with --dev this
+will show all messages in the console.
 
 =back

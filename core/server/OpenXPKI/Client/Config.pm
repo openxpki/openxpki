@@ -96,11 +96,24 @@ construction, defaults to I</etc/openxpki> when not read from ENV
 
 # the service specific path
 has 'basepath' => (
-    required => 0,
     is => 'ro',
     isa => 'Str',
     lazy => 1,
     builder => '__init_basepath'
+);
+
+=head3 skip_log_init
+
+Set this to C<1> to skip initialization of L<Log4perl>. This is useful if the
+application e.g. runs in debug mode and a screen output has already been
+configured.
+
+=cut
+
+has 'skip_log_init' => (
+    is => 'ro',
+    isa => 'Str',
+    default => 0,
 );
 
 =head3 logger
@@ -257,9 +270,9 @@ sub BUILD {
     set_locale_prefix($config->{global}->{locale_directory}) if $config->{global}->{locale_directory};
     $self->language($config->{global}->{default_language}) if $config->{global}->{default_language};
 
-    $self->__init_log4perl;
+    $self->__init_log4perl unless $self->skip_log_init;
 
-    $self->log->debug(sprintf("Config for service '%s' loaded", $self->service));
+    $self->log->debug(sprintf("Configuration for service '%s' loaded", $self->service));
     $self->log->trace('Global config: ' . Dumper $config ) if $self->log->is_trace;
 
 }

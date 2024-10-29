@@ -1,13 +1,10 @@
 package OpenXPKI::Log4perl::MojoLogger;
-use Moose;
-use MooseX::NonMoose;
-use feature 'state';
+use OpenXPKI qw( -class -nonmoose );
 
 extends 'Mojo::EventEmitter';
 
 use Log::Log4perl;
 use Mojo::Util qw( monkey_patch );
-use Mojo::Log;
 
 our $LOGGERS_BY_NAME = {};
 
@@ -41,74 +38,34 @@ has max_history_size => (
 );
 
 
-# create log methods which will emit "message" events
-{
-    no strict 'refs';
-    for my $method (
-      qw{ trace
-          debug
-          info
-          warn
-          error
-          fatal
-          logwarn
-          logdie
-          error_warn
-          error_die
-          logcarp
-          logcluck
-          logcroak
-          logconfess
-        } ) {
-
-        *{ __PACKAGE__ . "::$method" } = sub { shift->emit( message => ($method, @_) ) }; # handled in _message() below
-    }
-}
-
 sub get_logger {
     my ($class, $category) = @_;
 
     # Have we created it previously?
     return $LOGGERS_BY_NAME->{$category} if exists $LOGGERS_BY_NAME->{$category};
 
-    my $logger;
-
-    # Mojolicious "production" mode (or legacy use): use our Mojo::Log compatible logger
-    if (not exists $ENV{MOJO_MODE} or ($ENV{MOJO_MODE}//'') eq 'production') {
-        $logger = $class->new( category => $category );
-
-    # Mojolicious "development" mode: use a modified Mojolicious screen logger until we will have a
-    # unified Log4perl config for all services and a mechanism to output log messages of the root category ('')
-    } else {
-        state $patched = 0;
-        if (not $patched) {
-            # make Mojo::Log compatible to Log::Log4perl::Logger
-            monkey_patch 'Mojo::Log',
-              is_trace => sub { shift->is_level('trace') },
-              is_debug => sub { shift->is_level('debug') },
-              is_info =>  sub { shift->is_level('info') },
-              is_warn =>  sub { shift->is_level('warn') },
-              is_error => sub { shift->is_level('error') },
-              is_fatal => sub { shift->is_level('fatal') };
-            $patched = 1;
-        }
-        $logger = Mojo::Log->new; # default level is TRACE
-    }
-
-    # Save it in global structure
-    $LOGGERS_BY_NAME->{$category} = $logger;
+    # Use our Mojo::Log compatible logger
+    my $logger = $class->new( category => $category );
+    $LOGGERS_BY_NAME->{$category} = $logger; # save it in global structure
 
     return $logger;
 }
 
-sub BUILD {
-    my $self = shift;
-
-    $self->on( message => \&_message );
+# create log methods which will emit "message" events
+for my $method ( qw{
+    fatal error warn info debug trace
+    logdie logwarn error_die error_warn
+    logconfess logcroak logcluck logcarp
+} ) {
+    monkey_patch __PACKAGE__, $method => sub { shift->emit( message => ($method, @_) ) }
 }
 
-sub _message {
-    my ($self, $method, @message) = @_;
+sub BUILD ($self, $args) {
+    # consume "message" events
+    $self->on( message => $self->can('_message') );
+}
+
+sub _message ($self, $method, @message) {
     my $depth = 3;
     local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + $depth;
 
@@ -144,8 +101,7 @@ sub is_warn  { shift->_logger->is_warn  }
 sub is_error { shift->_logger->is_error }
 sub is_fatal { shift->_logger->is_fatal }
 
-sub is_level {
-    my ($self, $level) = @_;
+sub is_level ($self, $level = undef) {
     return 0 unless $level;
 
     if ($level =~ m/^(?:trace|debug|info|warn|error|fatal)$/o) {
@@ -157,9 +113,7 @@ sub is_level {
     }
 }
 
-sub level {
-    my ($self, $level) = @_;
-
+sub level ($self, $level = undef) {
     require Log::Log4perl::Level;
     if ($level) {
         return $self->_logger->level( Log::Log4perl::Level::to_priority(uc $level) );
@@ -170,8 +124,6 @@ sub level {
 }
 
 __PACKAGE__->meta->make_immutable;
-
-__END__
 
 =head1 NAME
 

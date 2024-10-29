@@ -7,6 +7,7 @@ use List::Util qw( none );
 # CPAN modules
 use Log::Log4perl;
 use Log::Log4perl::Level;
+use Log::Log4perl::Logger;
 
 # Project modules
 use OpenXPKI::Log4perl::MojoLogger;
@@ -95,9 +96,12 @@ sub init_or_fallback ($class, @args) {
         push @warnings, "Initializing Log4perl in fallback mode (output to STDERR)";
     }
 
+    # use config if given
     if ($config) {
+        Log::Log4perl::Logger->reset; # avoid re-initialization warning
         Log::Log4perl->init($config);
-    } else {
+    # or fall back on screen logger unless there is a running config
+    } elsif (not Log::Log4perl->initialized) {
         $class->init_screen_logger;
     }
     Log::Log4perl->get_logger('')->warn($_) for @warnings;
@@ -127,11 +131,17 @@ sub init_screen_logger ($class, @args) {
 
     _add_patternlayout_spec();
 
+    Log::Log4perl::Logger->reset if Log::Log4perl->initialized; # avoid re-initialization warning
+
+    my $pattern = (uc($prio) eq 'DEBUG' or uc($prio) eq 'TRACE')
+        ? '%d %p{3} %m [%i{with_pid}]%n'
+        : '%m%n';
+
     my $config = {
         'log4perl.rootLogger' => uc($prio).', SCREEN',
         'log4perl.appender.SCREEN' => 'Log::Log4perl::Appender::Screen',
         'log4perl.appender.SCREEN.layout' => 'Log::Log4perl::Layout::PatternLayout',
-        'log4perl.appender.SCREEN.layout.ConversionPattern' => '%d %p %m [pid=%P|%i]%n',
+        'log4perl.appender.SCREEN.layout.ConversionPattern' => $pattern,
     };
 
     Log::Log4perl->init($config);
@@ -142,7 +152,7 @@ sub _add_patternlayout_spec {
     return if $spec_added;
     Log::Log4perl::Layout::PatternLayout::add_global_cspec('i', sub {
         my $layout = shift;
-        my @order = qw( pid user role sid rid wftype wfid scepid pki_realm );
+        my @order = qw( pid user role sid ssid rid endpoint wftype wfid scepid pki_realm );
         my @hide = qw( command_id );
         my $mdc = Log::Log4perl::MDC->get_context;
         $mdc->{pid} = $$ if ($layout->{curlies}//'') eq 'with_pid';
@@ -158,7 +168,7 @@ sub _add_patternlayout_spec {
             push @keys_ordered, delete($filtered{$k}) if $filtered{$k};
         }
         # Add remaining existing keys (those we did not list in @order)
-        push @keys_ordered, keys(%filtered);
+        push @keys_ordered, sort keys(%filtered);
         # present the result
         return join("|", map { $_.'='.$mdc->{$_} } @keys_ordered);
     });

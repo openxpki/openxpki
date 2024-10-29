@@ -17,6 +17,7 @@ use PPI::Document;
 # Project modules
 use OpenXPKI::Control::Role;
 use OpenXPKI::Control::Server;
+use OpenXPKI::Log4perl;
 
 $OUTPUT_AUTOFLUSH = 1;
 
@@ -92,31 +93,29 @@ show_pod(-exitstatus => 0, -verbose => 2) if $opt{man};
 # --help without arguments: show our own POD
 show_pod(-verbose => 1) if ($opt{help} and not @ARGV);
 
-my %role_attrs;
+#
+# Log4perl
+#
+my $l4p_level = 'ERROR';
+if ($verbosity == 1) {
+    $l4p_level = 'INFO';
+} elsif ($verbosity == 2) {
+    $l4p_level = 'DEBUG';
+} elsif ($verbosity > 2) {
+    $l4p_level = 'TRACE';
+}
+OpenXPKI::Log4perl->init_screen_logger($l4p_level);
+
+#
+# Attributes defined by OpenXPKI::Control::Role
+#
+my %role_attrs = ();
 # $args->{SILENT} = $opt{quiet} ? 1 : 0;
 if ($opt{config}) {
     $role_attrs{config_path} = File::Spec->rel2abs($opt{config});
 } elsif ($opt{instance}) {
     $role_attrs{config_path} = sprintf '/etc/openxpki/%s/config.d/', $opt{instance};
 }
-
-#
-# Log4perl
-#
-my $l4p_level;
-my $l4p_layout = '%m%n';
-if ($verbosity > 2) {
-    $l4p_level = $TRACE;
-    $l4p_layout = '%l %F:%L %m%n';
-} elsif ($verbosity == 2) {
-    $l4p_level = $DEBUG;
-    $l4p_layout = '%m%n';
-} elsif ($verbosity == 1) {
-    $l4p_level = $INFO;
-} else {
-    $l4p_level = $ERROR;
-}
-Log::Log4perl->easy_init({ level => $l4p_level, layout => $l4p_layout });
 
 #
 # Command processing
@@ -258,6 +257,18 @@ Default: /etc/openxpki/config.d
 
 Shortcut to set the config path when running multiple instances using
 the proposed config path layout (/etc/openxpki/I<NAME>/config.d).
+
+=item B<--verbose|v>
+
+Enable verbose logging. May be specified multiple times to increase verbosity.
+
+This will be mapped to L<Log4perl> log levels, i.e.:
+
+    -v     INFO
+    -vv    DEBUG
+    -vvv   TRACE
+
+Default log level is ERROR.
 
 =back
 

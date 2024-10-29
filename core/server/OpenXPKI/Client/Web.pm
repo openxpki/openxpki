@@ -125,6 +125,10 @@ sub startup ($self) {
     my $socket_user = $self->{oxi_socket_user};
     my $socket_group = $self->{oxi_socket_group};
 
+    # we use the stash to store the flag because $self in helper_oxi_config()
+    # refers to an OpenXPKI::Client::Web::Controller instance
+    $self->defaults('skip_log_init' => 1) if $self->{oxi_skip_log_init};
+
     #$self->secrets(['Mojolicious rocks']);
 
     $self->exception_format('txt') unless 'development' eq $self->mode;
@@ -255,6 +259,7 @@ sub helper_oxi_config ($self, $service, $no_config) {
         $configs->{$service} = OpenXPKI::Client::Config->new(
             service => $service,
             $no_config ? ( default => {} ) : (),
+            $self->stash('skip_log_init') ? (skip_log_init => 1) : (),
         );
     }
 
