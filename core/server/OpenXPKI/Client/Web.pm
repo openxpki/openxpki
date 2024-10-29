@@ -208,7 +208,7 @@ sub startup ($self) {
         $self->log->trace(sprintf 'Incoming %s request', uc($c->req->url->base->protocol)); # ->protocol: Normalized version of ->scheme
 
         if ($self->mode eq 'development') {
-            $self->log->warn('Enforce HTTPS because of Mojolicious development mode');
+            $self->log->debug('Enforce HTTPS because of Mojolicious development mode');
             $c->req->url->base->scheme('https');
         }
 
@@ -255,7 +255,7 @@ sub helper_oxi_config ($self, $service, $no_config) {
     die "No service specified in call to helper 'oxi_config'" unless $service;
 
     unless ($configs->{$service}) {
-        $self->log->debug("Load configuration for service '$service'");
+        $self->log->trace("Load configuration for service '$service'");
         $configs->{$service} = OpenXPKI::Client::Config->new(
             service => $service,
             $no_config ? ( default => {} ) : (),
@@ -284,7 +284,7 @@ sub _chown_socket ($self, $socket_file, $user, $group) {
         chown -1, $s_gid, $socket_file;
         push @changes, "group = $group";
     }
-    $self->log->info('Socket ownership set to: ' . join(', ', @changes)) if @changes;
+    $self->log->debug(sprintf('Ownership of socket file "%s" set to: %s', $socket_file, join(', ', @changes))) if @changes;
 }
 
 sub _drop_privileges ($self, $pid_file, $user, $group, $label) {
@@ -309,7 +309,7 @@ sub _drop_privileges ($self, $pid_file, $user, $group, $label) {
         POSIX::setgid($gid);
         push @changes, "group = $group";
     }
-    $self->log->info("$label dropped privileges, new process ownership: " . join(', ', @changes)) if @changes;
+    $self->log->debug("$label dropped privileges, new process ownership: " . join(', ', @changes)) if @changes;
 }
 
 sub _load_service_class ($self, $service_short) {

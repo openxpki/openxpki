@@ -183,12 +183,12 @@ sub _init_backend ($self, $client) {
     # logging stuff only
     if ($old_id) {
         if ($id eq $old_id) {
-            $self->log->info("Backend session resumed, ID = $id");
+            $self->log->debug("Backend session resumed, ID = $id");
         } else {
-            $self->log->info("Backend session newly created, ID = $id (re-init failed for old ID $old_id)");
+            $self->log->debug("Backend session newly created, ID = $id (re-init failed for old ID $old_id)");
         }
     } else {
-        $self->log->info("Backend session newly created, ID = $id");
+        $self->log->debug("Backend session newly created, ID = $id");
     }
     $self->session->param('backend_session_id', $id);
 

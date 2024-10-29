@@ -68,17 +68,17 @@ sub retrieve {
     my $datastr = $self->SUPER::retrieve($sid);
 
     if (!$datastr) {
-        $log->debug("Session retrieve $sid (was empty)");
+        $log->trace("Retrieve session $sid (was empty)");
         return '';
     }
 
-    $log->debug("Session retrieve $sid");
+    $log->trace("Retrieve session $sid");
 
     if ($self->{_crypt}) {
         $datastr = $self->{_crypt}->decrypt( decode_base64($datastr) );
     }
 
-    $log->trace($datastr) if ($log->is_trace);
+    $log->trace($datastr) if $log->is_trace;
 
     return $datastr;
 }
@@ -119,10 +119,10 @@ sub store {
 
     if ( $rc ) {
         $action_sth = $dbh->prepare_cached("UPDATE ".$self->{TableName}." SET ".$self->{DataColName}." = ?, modified = ?, ip_address = ? WHERE ".$self->{IdColName}." = ?", undef, 3);
-        $log->debug("Session store $sid (update)");
+        $log->debug("Store session $sid (update)");
     } else {
         $action_sth = $dbh->prepare_cached("INSERT INTO ".$self->{TableName}." (".$self->{DataColName}.", modified,  ip_address, ".$self->{IdColName}.", created) VALUES(?, ?, ?, ?, ?)", undef, 3);
-        $log->debug("Session store $sid (create)");
+        $log->debug("Store session $sid (create)");
         push @args, time();
     }
 

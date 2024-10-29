@@ -75,7 +75,7 @@ sub index ($self) {
     my $config;
     try {
         $config = $self->oxi_config($service_name, $no_config);
-        $config->log->info(sprintf 'Incoming request: %s %s', $self->req->method, $self->url_for);
+        $config->log->info(sprintf 'Incoming %s request: %s %s', uc($self->req->url->base->scheme), $self->req->method, $self->url_for);
     }
     catch ($error) {
         die sprintf("Error while loading configuration for service '%s': %s", $service_name, $error);
@@ -102,7 +102,7 @@ sub index ($self) {
     $self->app->log($config->log);
     $self->stash('mojo.log' => undef); # reset DefaultHelper "log" (i.e. $self->log) which accesses stash "mojo.log"
 
-    $self->log->debug("Service class $class instantiated");
+    $self->log->trace("Service class $class instantiated");
 
     # preparations and checks
     $self->log->debug("Request handling (1/3): preparations and checks");
