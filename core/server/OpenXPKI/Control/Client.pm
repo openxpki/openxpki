@@ -59,6 +59,7 @@ sub getopt_params ($self, $command) {
         dev|d
         user|u=s
         group|g=s
+        pid_file|pid-file|p=s
         socket_file|socket-file|s=s
         socket_user|socket-user=s
         socket_group|socket-group=s
@@ -71,7 +72,7 @@ sub getopt_params ($self, $command) {
 sub cmd_start ($self) {
     my $user = $self->opts->{user} || $self->cfg->{user};
     my $group = $self->opts->{group} || $self->cfg->{group};
-    my $pid_file = $self->cfg->{pid_file}
+    my $pid_file = $self->opts->{pid_file} || $self->cfg->{pid_file}
         or die "Missing config entry: system.client.pid_file\n";
     my $socket_file = $self->opts->{socket_file} || $self->cfg->{socket_file}
         or die "Missing config entry: system.client.socket_file\n";
@@ -244,6 +245,12 @@ Target user for the web server (default: current user)
 =item B<-g NAME|GID>
 
 Target group for the web server (default: current group)
+
+=item B<--pid-file PATH>
+
+=item B<-p PATH>
+
+Path of the PID file (required)
 
 =item B<--socket-file PATH>
 
