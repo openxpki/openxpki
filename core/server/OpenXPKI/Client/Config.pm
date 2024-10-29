@@ -457,8 +457,8 @@ sub __load_config {
 sub __init_log4perl {
     my $self = shift;
 
-    # if no logger section was found we use the log settings from global
-    # if those are also missing this falls back to a SCREEN appender
+    # If no logger section was found we use the log settings from global.
+    # If those are also missing then init_or_fallback() falls back to screen output.
     return OpenXPKI::Log4perl->init_or_fallback( $self->default->{global}->{log_config} )
       unless $self->default->{logger};
 
