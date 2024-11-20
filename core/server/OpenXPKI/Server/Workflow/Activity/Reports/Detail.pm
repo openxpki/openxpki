@@ -716,15 +716,15 @@ Your activity definition:
     generate_report:
         class: OpenXPKI::Server::Workflow::Activity::Reports::Detail
         param:
-            target_umask: 0644
+            target_umask: "0644"
             _map_target_filename: "expiry report [% USE date(format='%Y-%m-%dT%H:%M:%S') %][% date.format( context.valid_at ) %].csv"
             target_dir: /tmp
             report_config: expiry
 
 Content of report/expiry.yaml inside realms config directory:
 
-   cutoff_notafter: +000060
-   include_expired: -000030
+   cutoff_notafter: "+000060"
+   include_expired: "-000030"
 
    cols:
      - head: Requestor eMail
