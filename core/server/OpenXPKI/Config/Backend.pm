@@ -5,9 +5,9 @@ extends 'Connector::Builtin::Memory';
 
 use Storable qw(freeze);
 use Config::Merge;
-use YAML::PP;
 use Data::Dumper;
 use Digest::SHA qw(sha256_hex);
+use OpenXPKI::Config::Loader::YAML;
 
 # use our own YAML loader
 Config::Merge->register_loader('OpenXPKI::Config::Loader::YAML');
@@ -40,7 +40,7 @@ sub _build_config {
 
     my $config;
     if (-f $self->LOCATION && $self->LOCATION =~ /.yaml$/) {
-        $config = YAML::PP->new->load_file($self->LOCATION);
+        $config = OpenXPKI::Config::Loader::YAML->load($self->LOCATION);
     } else {
         # Skip the realm.tpl directory
         my $cm = Config::Merge->new(
