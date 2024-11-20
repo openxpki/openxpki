@@ -14,8 +14,6 @@ use Mojo::Util qw( url_unescape encode tablify );
 use OpenXPKI::Client::Config;
 use OpenXPKI::Util;
 
-my $socketfile = $ENV{OPENXPKI_CLIENT_SOCKETFILE} || '/var/openxpki/openxpki.socket';
-
 =head1 NAME
 
 OpenXPKI::Client::Web - Mojolicious application: entry point for HTTP request handling
