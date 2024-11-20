@@ -1,7 +1,5 @@
 package OpenXPKI::Config::Loader::YAML;
 use OpenXPKI;
-use strict;
-use warnings;
 
 # CPAN modules
 use YAML::PP;
