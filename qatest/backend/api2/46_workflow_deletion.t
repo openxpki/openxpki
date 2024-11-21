@@ -13,7 +13,7 @@ use FindBin qw( $Bin );
 use Test::More;
 use Test::Deep ':v1';
 use Test::Exception;
-use Try::Tiny;
+use Feature::Compat::Try;
 
 # Project modules
 use lib $Bin, "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
@@ -24,10 +24,10 @@ try {
     require OpenXPKI::Server::Workflow::Persister::Archiver;
     plan tests => 3;
 }
-catch {
+catch ($err) {
     plan skip_all => "persister 'Archiver' (EE code) not available" if $err =~ /^Can't locate/;
     die $err;
-};
+}
 
 
 my $wf_type = "testworkflow".int(rand(2**32));
