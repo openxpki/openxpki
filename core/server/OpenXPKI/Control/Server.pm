@@ -41,8 +41,8 @@ has cfg => (
         my $config = OpenXPKI::Config->new;
 
         return {
-            pidfile => $config->get('system.server.pid_file') || '',
-            socketfile => $config->get('system.server.socket_file') || '',
+            pid_file => $config->get('system.server.pid_file') || '',
+            socket_file => $config->get('system.server.socket_file') || '',
             type => $config->get('system.server.type') || 'Fork',
             depend => $config->get_hash('system.version.depend') || undef,
             license => $config->get('system.license') || '',
@@ -213,16 +213,14 @@ sub start ($self, $arg) {
     $OpenXPKI::Debug::NOCENSOR = 1 if $arg->debug_nocensor;
 
     # Load the required locations from the config
-    my $pidfile  = $self->cfg->{pidfile};
-    my $socketfile = $self->cfg->{socketfile}
+    my $socket_file = $self->cfg->{socket_file}
         or do {
             warn "Missing config entry: system.server.socket_file\n";
             return 1;
         };
 
     # Test if there is a pid file for the current config
-    my $pid;
-    $pid = $self->slurp($pidfile) if -e $pidfile;
+    my $pid = $self->__read_pid_file;
 
     # If a pid is given, we just check if the server is there
     if (defined $pid and kill(0, $pid)) {
@@ -263,7 +261,9 @@ sub start ($self, $arg) {
         my $version = $self->get_version;
         print "Starting $version\n";
     }
-    unlink $pidfile if ($pidfile && -e $pidfile);
+
+    my $pid_file  = $self->cfg->{pid_file};
+    unlink $pid_file if ($pid_file && -e $pid_file);
 
     # common start procedure for forking and foreground mode
     my $start_server = sub {
@@ -355,13 +355,13 @@ signature_for status => (
     ],
 );
 sub status ($self, $arg) {
-    my $socketfile = $self->cfg->{socketfile}
+    my $socket_file = $self->cfg->{socket_file}
         or die "Missing config entry: system.server.socket_file\n";
 
     my $client;
     my $i = 4;
     while ($i-- > 0) {
-        $client = __connect_openxpki_daemon($socketfile);
+        $client = __connect_openxpki_daemon($socket_file);
         last if $client;
         sleep 2 if $i > 0;
     }
@@ -517,17 +517,13 @@ sub list_process {
 }
 
 sub __read_pid_file ($self) {
-    die "Missing config entry: system.server.pid_file\n" unless $self->cfg->{pidfile};
-
-    my $pid = $self->slurp($self->cfg->{pidfile})
-        or die "Unable to read PID file (".$self->cfg->{pidfile}.")\n";
-
-    return $pid;
+    die "Missing config entry: system.server.pid_file\n" unless $self->cfg->{pid_file};
+    return $self->slurp_if_exists($self->cfg->{pid_file});
 }
 
-sub __connect_openxpki_daemon ($socketfile) {
+sub __connect_openxpki_daemon ($socket_file) {
     # if there is no socket it does not make sense to test the client
-    return unless (-e $socketfile);
+    return unless (-e $socket_file);
 
     my $client;
     eval {
@@ -536,7 +532,7 @@ sub __connect_openxpki_daemon ($socketfile) {
         require OpenXPKI::Client;
         # this only creates the class but does not fire up the socket!
         my $cc= OpenXPKI::Client->new({
-            SOCKETFILE => $socketfile,
+            SOCKETFILE => $socket_file,
         });
 
         # try to talk to the daemon

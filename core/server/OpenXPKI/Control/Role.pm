@@ -72,6 +72,26 @@ has opts => (
     default => sub { {} },
 );
 
+=head1 METHODS
+
+=head2 stop_process
+
+Stop the given process and all subprocesses (i.e. processes belonging to the
+same process group).
+
+B<Named parameters>
+
+=over
+
+=item * C<name> I<Str> - process description (for output messages)
+
+=item * C<pid> I<Int> - process ID (may be C<undef> so no checks are neccessary in advance)
+
+=item * C<silent> I<Bool> - set to C<1> to suppress messages
+
+=back
+
+=cut
 signature_for stop_process => (
     method => 1,
     named => [
@@ -110,7 +130,7 @@ sub stop_process ($self, $arg) {
     while ($attempts-- > 0) {
         $process_count = scalar @pids;
         last if ($process_count <= 0);
-        print "Stopping gracefully, $process_count (sub)processes remaining...\n" unless $arg->silent;
+        say "Stopping gracefully, $process_count (sub)processes remaining..." unless $arg->silent;
         foreach my $p (@pids) {
             kill(15, $p);
         }
@@ -124,7 +144,7 @@ sub stop_process ($self, $arg) {
     while ($attempts-- > 0) {
         $process_count = scalar @pids;
         last if ($process_count <= 0);
-        print "Killing un-cooperative process the hard way, $process_count (sub)processes remaining...\n" unless $arg->silent;
+        say "Killing un-cooperative process the hard way, $process_count (sub)processes remaining..." unless $arg->silent;
         foreach my $p (@pids) {
             kill(9, $p);
         }
@@ -135,20 +155,13 @@ sub stop_process ($self, $arg) {
     @pids = $self->__filter_alive(\@pids);
     $process_count = scalar @pids;
     if ($process_count <= 0) {
-        print "DONE.\n" unless $arg->silent;
+        say "DONE." unless $arg->silent;
         return 0;
     } else {
-        print "FAILED.\n" unless $arg->silent;
+        say "FAILED." unless $arg->silent;
         warn "Could not terminate: ".join(" ", @pids).".\n";
         return 2;
     }
-}
-
-# returns a list of PIDs that belong to a given process group
-sub __get_processgroup_pids ($self, $process_group) {
-    my @result;
-
-    return @result;
 }
 
 # Take an array ref, array containing process IDs
@@ -157,18 +170,60 @@ sub __filter_alive ($self, $pids) {
     return grep { kill(0, $_) != 0 } $pids->@*;
 }
 
-sub slurp ($self, $file) {
+=head2 slurp_if_exists
+
+Return the contents of the given file as a string. Trailing spaces are removed.
+
+If the file does not exist an C<undef> value is returned. In case of other
+errors (e.g. unreadable file) an error is thrown.
+
+B<Parameters>
+
+=over
+
+=item * C<$file> I<Str> - file path
+
+=back
+
+=cut
+signature_for slurp_if_exists => (
+    method => 1,
+    positional => [ 'Str' ],
+);
+sub slurp_if_exists ($self, $file) {
+    return unless -e $file;
+
     my $content = do {
         local $INPUT_RECORD_SEPARATOR;
         my $fh;
-        open $fh, '<', $file or return;
+        open $fh, '<', $file or die "Unable to open $file: $!";
         <$fh>;
     };
     chomp $content;
     return $content;
 }
 
-# fork off server launcher
+=head2 fork_launcher
+
+Fork off the server launcher code.
+
+Tries to fork a child process (which is expected to do a second fork to launch
+the actual daemon) and listens to the child's output. Errors from the child
+process are printed to STDERR and other output to STDOUT.
+
+B<Parameters>
+
+=over
+
+=item * C<$starter> I<CodeRef> - code that runs the daemon launcher
+
+=back
+
+=cut
+signature_for fork_launcher => (
+    method => 1,
+    positional => [ 'CodeRef' ],
+);
 sub fork_launcher ($self, $starter) {
     my $pid;
     my $redo_count = 0;
@@ -203,7 +258,8 @@ sub fork_launcher ($self, $starter) {
     # child process pid is available in $pid
     if ($pid) {
         my $kid;
-        # wait for child process to exit (i.e. do a second fork)
+        # wait for child process to exit (which happens either if Net::Server's
+        # launcher code exits after forking the actual daemon or if it dies)
         do {
             $kid = waitpid(-1, POSIX::WNOHANG);
             sleep 1 unless $kid > 0;

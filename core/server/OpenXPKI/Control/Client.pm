@@ -219,13 +219,7 @@ sub status ($self, $arg) {
 
 sub __get_pid ($self) {
     die "Missing config entry: system.client.pid_file\n" unless $self->cfg->{pid_file};
-
-    return unless -e $self->cfg->{pid_file};
-
-    my $pid = $self->slurp($self->cfg->{pid_file})
-        or die "Unable to read PID file (".$self->cfg->{pid_file}.")\n";
-
-    return $pid;
+    return $self->slurp_if_exists($self->cfg->{pid_file});
 }
 
 __PACKAGE__->meta->make_immutable;
