@@ -1,5 +1,8 @@
 package OpenXPKI::Util;
-use OpenXPKI;
+use strict;
+use warnings;
+use English;
+use feature 'state';
 
 # Core modules
 use MIME::Base64;
