@@ -28,6 +28,9 @@ OpenXPKI - Base module to reduce boilerlate code in our packages.
     # Moose role
     use OpenXPKI -role;
 
+    # Class::Std class
+    use OpenXPKI -class_std;
+
     # API plugin
     use OpenXPKI -plugin;
 
@@ -55,6 +58,7 @@ sub import {
     my $moose_strictconstructor = delete $flags{-strictconstructor};
     my $moose_nonmoose = delete $flags{-nonmoose};
     my $moose_role = delete $flags{-role};
+    my $class_std = delete $flags{-class_std};
     my $plugin = delete $flags{-plugin};
     my $client_plugin = delete $flags{-client_plugin};
     my $types = delete $flags{-types};
@@ -82,6 +86,8 @@ sub import {
         strict->import::into(1);
         warnings->import::into(1);
     }
+
+    Class::Std->import::into(1) if $class_std;
 
     Moose::Util::TypeConstraints->import::into(1) if $moose_typeconstraints;
     MooseX::StrictConstructor->import::into(1) if $moose_strictconstructor;
@@ -141,8 +147,6 @@ sub import {
 When using this package various pragmas and modules are imported into the
 calling package via L<Import::Into>.
 
-=head2 Plain Perl package/class
-
     use OpenXPKI;
 
 This is equivalent to adding the following imports to the calling package:
@@ -175,53 +179,103 @@ This is equivalent to adding the following imports to the calling package:
     use OpenXPKI::Exception;
     use OpenXPKI::Util;
 
+Various options allow to import additional modules:
+
 =head2 Perl class with inheritance
 
     use OpenXPKI -base => 'Net::Server::MultiType';
 
-adds C<use base qw( Net::Server::MultiType )> to the list of imports.
+additionally adds the imports
+
+    use base qw( Net::Server::MultiType );
 
 =head2 Moose class
 
     use OpenXPKI -class;
 
-This adds C<use Moose> to the list of imports.
+additionally adds the imports
+
+    use Moose;
 
 =head2 Moose class with type constraints
 
     use OpenXPKI qw( -class -typeconstraints );
 
-This adds C<use Moose> and C<Moose::Util::TypeConstraints> to the list of imports.
+additionally adds the imports
+
+    use Moose;
+    use Moose::Util::TypeConstraints;
 
 =head2 Moose class with strict constructor
 
     use OpenXPKI qw( -class -strictconstructor );
 
-This adds C<use Moose> and C<MooseX::StrictConstructor> to the list of imports.
+additionally adds the imports
+
+    use Moose;
+    use MooseX::StrictConstructor;
 
 =head2 Moose exporter class
 
     use OpenXPKI qw( -class -exporter );
 
-This adds C<use Moose> and C<use MooseX::Exporter> to the list of imports.
+additionally adds the imports
+
+    use Moose;
+    use MooseX::Exporter;
 
 =head2 Moose class extending a non-Moose class
 
     use OpenXPKI qw( -class -nonmoose );
 
-This adds C<use Moose> and C<use MooseX::NonMoose> to the list of imports.
+additionally adds the imports
+
+    use Moose;
+    use MooseX::NonMoose;
 
 =head2 Moose role
 
     use OpenXPKI -role;
 
-This adds C<use Moose::Role> to the list of imports.
+additionally adds the imports
+
+    use Moose::Role;
 
 =head2 Moose exporter role
 
     use OpenXPKI qw( -role -exporter );
 
-This adds C<use Moose::Role> and C<use MooseX::Exporter> to the list of imports.
+additionally adds the imports
+
+    use Moose::Role;
+    use MooseX::Exporter;
+
+=head2 C<Class::Std> class
+
+    use OpenXPKI -class_std;
+
+additionally adds the imports
+
+    use Class::Std;
+
+=head2 API plugin
+
+    use OpenXPKI -plugin;
+
+additionally adds the imports
+
+    use Moose;
+    use OpenXPKI::Base::API::Plugin;
+
+=head2 Client API plugin
+
+    use OpenXPKI -client_plugin;
+
+additionally adds the imports
+
+    use Moose;
+    use OpenXPKI::Base::API::Plugin;
+    use OpenXPKI::Client::API::Plugin;
 
 =head2 Imports
 
