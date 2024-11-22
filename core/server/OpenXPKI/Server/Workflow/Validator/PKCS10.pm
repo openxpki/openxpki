@@ -51,10 +51,9 @@ sub _validate {
         $error = $EVAL_ERROR if($EVAL_ERROR);
     }
 
-    $error =~ s/\s*$// if (defined $error);
-
     if (!$decoded) {
-        CTX('log')->application()->error("Invalid PKCS#10 request ($error)");
+        CTX('log')->application()->error("Invalid PKCS#10 request");
+        CTX('log')->application()->trace($error);
         validation_error("I18N_OPENXPKI_UI_VALIDATOR_PKCS10_PARSE_ERROR");
     }
 
@@ -130,4 +129,3 @@ requests and validates the PKCS10 part.
 It does B<not> make any signature checks on the PKCS7 structure!
 
 =back
-
