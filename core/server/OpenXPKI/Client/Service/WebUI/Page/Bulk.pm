@@ -109,10 +109,10 @@ sub action_result ($self) {
     # check if there is a custom column set defined
     my ($header,  $body, $rattrib);
     if ($spec->{cols} && ref $spec->{cols} eq 'ARRAY') {
-        ($header, $body, $rattrib) = $self->__render_list_spec( $spec->{cols} );
+        ($header, $body, $rattrib) = $self->render_list_spec( $spec->{cols} );
     } else {
-         $body = $self->__default_grid_row;
-         $header = $self->__default_grid_head;
+         $body = $self->default_grid_row;
+         $header = $self->default_grid_head;
     }
 
     if ($rattrib) {
