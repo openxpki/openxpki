@@ -257,7 +257,14 @@ while (my $cgi = CGI::Fast->new("")) {
             }
         }
 
-        return $client->handle;
+        # custom HTTP headers from config
+        $client->response->add_header($_ => $client->config->{header}->{$_}) for keys $client->config->{header}->%*;
+        # default mime-type
+        $client->response->add_header('content-type' => 'application/json; charset=UTF-8');
+
+        my $page = $client->handle_ui_request; # isa OpenXPKI::Client::Service::WebUI::Page
+        $client->response->result($page);
+        return $client->response;
     }); # cgi_safe_sub
 
     send_response($cgi, $client, $response);
