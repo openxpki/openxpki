@@ -433,7 +433,7 @@ sub issueCRL {
         if (defined $param->{max_revocation_id} && $param->{max_revocation_id} =~ m{\d+}) {
             OpenXPKI::Exception->throw(
                 message => 'Requested max_revocation_id is larger as local sequence!',
-                params { requested => $param->{max_revocation_id}, max => $max_revocation_id }
+                params => { requested => $param->{max_revocation_id}, max => $max_revocation_id }
             ) if ($param->{max_revocation_id} > $max_revocation_id);
             ##! 64: 'set max_revocation_id from activity'
             $max_revocation_id = $param->{max_revocation_id};
