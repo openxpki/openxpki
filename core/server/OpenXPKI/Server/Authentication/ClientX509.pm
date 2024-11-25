@@ -6,7 +6,7 @@ extends 'OpenXPKI::Server::Authentication::X509';
 use DateTime;
 
 use OpenXPKI::Server::Context qw( CTX );
-
+use OpenXPKI::Server::Authentication::Handle;
 
 sub handleInput {
 
