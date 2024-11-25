@@ -387,10 +387,12 @@ sub __build_envelope_signed_data {
     };
 
     my $aa = $si->{authenticatedAttributes}->{aaSet} || $si->{authenticatedAttributes}->{aaSequence};
-    my $attrib = $mapattrib->($aa) if ($aa);
+    my $attrib;
+    $attrib = $mapattrib->($aa) if ($aa);
 
     my $ua = $si->{unauthenticatedAttributes}->{uaSet} || $si->{unauthenticatedAttributes}->{uaSequence};
-    my $uattrib = $mapattrib->($ua) if ($ua);
+    my $uattrib;
+    $uattrib = $mapattrib->($ua) if ($ua);
 
     return {
         digest_alg => $oids{$digest_oid} || $digest_oid,
