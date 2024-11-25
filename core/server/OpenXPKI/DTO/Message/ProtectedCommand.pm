@@ -1,6 +1,6 @@
 package OpenXPKI::DTO::Message::ProtectedCommand;
+use OpenXPKI -class;
 
-use Moose;
 with 'OpenXPKI::DTO::Message';
 # Do NOT inherit from Command as this will undermine the security logic!
 
@@ -22,5 +22,4 @@ has command => (
     required => 1,
 );
 
-
-1;
+__PACKAGE__->meta->make_immutable;

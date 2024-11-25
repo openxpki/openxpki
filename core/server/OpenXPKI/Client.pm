@@ -1,23 +1,19 @@
 package OpenXPKI::Client;
-use Moose;
-
-use English;
+use OpenXPKI -class;
 
 use Carp;
 use Socket;
 
 use Sys::SigAction qw( sig_alarm set_sig_handler );
 
-use OpenXPKI::Exception;
 use OpenXPKI::Transport::Simple;
 use OpenXPKI::Serialization::Simple;
 eval { use OpenXPKI::Serialization::JSON; };
 eval { use OpenXPKI::Serialization::Fast; };
 
+
 $OUTPUT_AUTOFLUSH = 1;
 
-# use Smart::Comments;
-use Data::Dumper;
 
 has socketfile => (
     is      => 'ro',
@@ -508,12 +504,6 @@ __END__
 =head1 NAME
 
 OpenXPKI::Client - OpenXPKI Client base library
-
-
-=head1 VERSION
-
-This document describes OpenXPKI::Client version 0.0.1
-
 
 =head1 SYNOPSIS
 

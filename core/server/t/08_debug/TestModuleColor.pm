@@ -1,11 +1,8 @@
 package TestModuleColor;
-
-use strict;
-use warnings;
+use OpenXPKI -class_std;
 
 use OpenXPKI::Debug 'TestModuleColor';
 $OpenXPKI::Debug::USE_COLOR = 1;
-use Class::Std;
 
 sub START {
     ##! 1: 'loglevel 1'

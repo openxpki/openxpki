@@ -1,5 +1,6 @@
 package OpenXPKI::Test::QA::Role::Workflows::CertParams;
-use Moose;
+use OpenXPKI -class;
+
 =head1 NAME
 
 OpenXPKI::Test::QA::Role::Workflows::CertParams - data container for certificate

@@ -1,22 +1,15 @@
-## OpenXPKI::Debug
-## Written 2006 by Michail Bachmann and Michael Bell for the OpenXPKI project
-## - censoring added 2006 by Alexander Klink for the OpenXPKI project
-## - eval'ing of debug code 2007 by Alexander Klink and Martin Bartosch
-##   for the OpenXPKI project
-## (C) Copyright 2007 by The OpenXPKI Project
+package OpenXPKI::Debug;
+use strict;
+use warnings;
 
-## BIG FAT WARNING: This class works using so called compile time filters
-# The decission weather to apply debugging to a class or not is made based
+## WARNING: This class works using so called compile time filters.
+# The decision whether to apply debugging to a class or not is made based
 # on the %BITMASK and %LEVEL hashes at the time the module is included for
 # the first time.
 # In turn, if you load a module before you set up the %BITMASK / %LEVEL hashes,
 # the module will not be decorated with debug output!
-# The fastest way to ruin the story is "use" in the head of your start scripts.
-
-use strict;
-use warnings;
-
-package OpenXPKI::Debug;
+# The fastest way to ruin the story is to "use" a module e.g. in start scripts
+# before %BITMASK / %LEVEL are set.
 
 use POSIX ();
 use English;

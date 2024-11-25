@@ -1,20 +1,9 @@
-## OpenXPKI::Crypto::Backend::API
-## Written 2006 by Michael Bell for the OpenXPKI project
-## Converted to use Class::Std and OpenXPKI::Crypto::API
-## 2006 by Alexander Klink for the OpenXPKI project
-## (C) Copyright 2006 by The OpenXPKI Project
 package OpenXPKI::Crypto::Backend::API;
+use OpenXPKI -class_std;
+
 use base qw( OpenXPKI::Crypto::API );
 
-use strict;
-use warnings;
-
-use Class::Std;
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
-use English;
-#use Smart::Comments;
 
 ## scalar value:
 ##     - 0 means the parameter is optional

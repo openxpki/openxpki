@@ -1,5 +1,7 @@
 package OpenXPKI::Test::QA::Role::Workflows;
-use Moose::Role;
+use OpenXPKI -role;
+
+requires 'also_init';
 
 =head1 NAME
 
@@ -17,10 +19,6 @@ use OpenXPKI::Server::Context;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Test::QA::Role::Workflows::CertParams;
 use OpenXPKI::Test::QA::Role::Workflows::Instance;
-
-
-requires 'also_init';
-
 
 #
 # Attributes

@@ -1,5 +1,5 @@
 package OpenXPKI::Server::Database::Driver::MySQL;
-use Moose;
+use OpenXPKI -class;
 
 with qw(
     OpenXPKI::Server::Database::Role::SequenceEmulation
@@ -15,7 +15,6 @@ OpenXPKI::Server::Database::Driver::MySQL
 =cut
 
 use DBI qw(:sql_types);
-use OpenXPKI::Exception;
 
 ################################################################################
 # required by OpenXPKI::Server::Database::Role::Driver

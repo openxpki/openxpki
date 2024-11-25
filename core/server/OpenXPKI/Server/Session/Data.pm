@@ -1,20 +1,14 @@
 package OpenXPKI::Server::Session::Data;
-use Moose;
+use OpenXPKI -class;
 
 # CPAN modules
 use Data::UUID;
 use Digest::SHA qw( sha1_hex );
 use JSON;
-use Type::Params qw( signature_for );
 
 # Project modules
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Types;
-
-# should be done after imports to safely disable warnings in Perl < 5.36
-use experimental 'signatures';
 
 =head1 NAME
 

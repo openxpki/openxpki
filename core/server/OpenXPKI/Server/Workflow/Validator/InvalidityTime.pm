@@ -1,15 +1,13 @@
 package OpenXPKI::Server::Workflow::Validator::InvalidityTime;
+use OpenXPKI -class;
 
-use Moose;
 extends 'OpenXPKI::Server::Workflow::Validator';
 
-use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
-
 use Workflow::Exception qw( validation_error );
-
 use DateTime;
+
+use OpenXPKI::Server::Context qw( CTX );
+
 
 sub _preset_args {
     return [ qw(invalidity_time cert_identifier) ];

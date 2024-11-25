@@ -1,28 +1,17 @@
 package OpenXPKI::Service::Default;
+use OpenXPKI -class_std;
 
 use base qw( OpenXPKI::Service );
 
-use strict;
-use warnings;
-use English;
 use List::Util qw( first );
-
-use Class::Std;
-
 use Sys::SigAction qw( sig_alarm set_sig_handler );
-
-use Data::Dumper;
-
-## used modules
+use Log::Log4perl::MDC;
+use Data::UUID;
 
 use OpenXPKI::i18n qw(set_language);
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Server;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
-use Log::Log4perl::MDC;
-use Data::UUID;
 
 
 my %state_of :ATTR;     # the current state of the service

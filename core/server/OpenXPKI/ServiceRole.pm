@@ -1,11 +1,7 @@
 # TODO - to be renamed to "Service" after refactoring of all childs
 package OpenXPKI::ServiceRole;
+use OpenXPKI -role;
 
-use strict;
-use warnings;
-use English;
-
-use Moose::Role;
 use OpenXPKI::Server::Context qw( CTX );
 
 

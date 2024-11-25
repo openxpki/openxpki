@@ -1,7 +1,7 @@
 package OpenXPKI::Server::Session::Driver::File;
+use OpenXPKI -class;
 
-use Moose;
-with "OpenXPKI::Server::Session::DriverRole";
+with 'OpenXPKI::Server::Session::DriverRole';
 
 =head1 NAME
 
@@ -16,14 +16,11 @@ available methods.
 =cut
 
 # Core modules
-use English;
 use Fcntl qw( :DEFAULT );
 use File::Find;
 
 # Project modules
 use OpenXPKI::Server::Init;
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 
 ################################################################################
 # Attributes

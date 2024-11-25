@@ -1,18 +1,7 @@
-## OpenXPKI::Crypto::CLI
-## Written 2006 by Alexander Klink for the OpenXPKI project
-## largely based on the (former) code of OpenXPKI::Crypto::Backend::
-## OpenSSL::CLI by Michael Bell for the OpenXPKI project, 2005-2006
-## (C) Copyright 2005-2006 by The OpenXPKI Project
 package OpenXPKI::Crypto::CLI;
+use OpenXPKI -class_std;
 
-use strict;
-use warnings;
-use English;
-use Class::Std;
-
-use OpenXPKI::Debug;
 use OpenXPKI::FileUtils;
-use OpenXPKI::Exception;
 use OpenXPKI::Server::Context;
 use Proc::SafeExec;
 use Log::Log4perl qw(:easy);

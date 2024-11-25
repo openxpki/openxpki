@@ -1,8 +1,6 @@
 package OpenXPKI::Client::Service::WebUI::Page::Workflow::Renderer::Status;
-use Moose;
+use OpenXPKI -class;
 
-use Data::Dumper;
-use English;
 use OpenXPKI::DateTime;
 use OpenXPKI::Serialization::Simple;
 

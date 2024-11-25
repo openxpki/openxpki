@@ -1,10 +1,7 @@
 package OpenXPKI::Client::Service::WebUI::Page::Workflow::Renderer::Profile;
-use Moose;
-
-use English;
+use OpenXPKI -class;
 
 # Core modules
-use Data::Dumper;
 use List::Util qw( any first );
 
 # Project modules

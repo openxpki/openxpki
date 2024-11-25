@@ -1,8 +1,6 @@
 package OpenXPKI::Random;
-use Moose;
+use OpenXPKI -class;
 
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use MIME::Base64;
 
@@ -145,13 +143,13 @@ sub _get_regular_random {
         });
     }
 
-    sysopen RND, $socket, O_RDONLY;
+    sysopen my $RND, $socket, O_RDONLY;
 
     my $rand = '';
     my $numread = 0;
     my $buf;
     while ($numread < $length) {
-        my $read = sysread RND, $buf, $length - $numread;
+        my $read = sysread $RND, $buf, $length - $numread;
         next unless $read;
         OpenXPKI::Exception->throw (
             message => "Error while reading from $socket. $!"

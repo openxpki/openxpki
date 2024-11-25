@@ -1,27 +1,17 @@
 package OpenXPKI::Server::API2::Plugin::Token::Util;
-use Moose;
+use OpenXPKI -class;
 
 =head1 NAME
 
 OpenXPKI::Server::API2::Plugin::Token::Util - Some utility functions for token
 related API methods
 
-=head1 METHODS
-
 =cut
 
 # Project modules
-use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 
-# CPAN modules
-use Type::Params qw( signature_for );
-
-# Feature::Compat::Try should be done last to safely disable warnings
-use Feature::Compat::Try;
-
-# should be done after imports to safely disable warnings in Perl < 5.36
-use experimental 'signatures';
+=head1 METHODS
 
 =head2 is_token_usable
 

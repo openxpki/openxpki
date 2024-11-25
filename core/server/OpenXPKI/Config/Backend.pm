@@ -1,11 +1,10 @@
 package OpenXPKI::Config::Backend;
+use OpenXPKI -class;
 
-use Moose;
 extends 'Connector::Builtin::Memory';
 
 use Storable qw(freeze);
 use Config::Merge;
-use Data::Dumper;
 use Digest::SHA qw(sha256_hex);
 use OpenXPKI::Config::Loader::YAML;
 

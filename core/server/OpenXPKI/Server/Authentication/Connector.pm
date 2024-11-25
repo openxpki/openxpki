@@ -1,15 +1,10 @@
 package OpenXPKI::Server::Authentication::Connector;
+use OpenXPKI qw( -class -typeconstraints );
 
-use Moose;
 extends 'OpenXPKI::Server::Authentication::Base';
 
-use English;
-
-use OpenXPKI::Debug;
 use OpenXPKI::Server::Authentication::Handle;
 use OpenXPKI::Server::Context qw( CTX );
-
-use Moose::Util::TypeConstraints; # PLEASE NOTE: this enables all warnings via Moose::Exporter
 
 
 has '+role' => (

@@ -1,19 +1,10 @@
-## OpenXPKI::Crypto::Backend::OpenSSL
-## Written 2005 by Michael Bell for the OpenXPKI project
-## Rewritten 2006 by Julia Dubenskaya for the OpenXPKI project
-## (C) Copyright 2005-2006 by The OpenXPKI Project
 package OpenXPKI::Crypto::Backend::OpenSSL;
-use base qw( OpenXPKI::Crypto::Toolkit );
+use OpenXPKI -class_std;
 
-use strict;
-use warnings;
-use English;
+use base qw( OpenXPKI::Crypto::Toolkit );
 
 use OpenXPKI::Crypto::Backend::OpenSSL::Config;
 use OpenXPKI::Server::Context qw( CTX );
-
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 
 my %config_of :ATTR; # the Config object
 

@@ -1,12 +1,9 @@
 package OpenXPKI::Server::Workflow::Role::Publish;
-
-use Moose::Role;
-
-use strict;
-use English;
-use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI -role;
 
 requires '__get_targets_from_profile';
+
+use OpenXPKI::Server::Context qw( CTX );
 
 
 sub __fetch_targets {

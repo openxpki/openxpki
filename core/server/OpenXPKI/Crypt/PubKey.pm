@@ -1,8 +1,6 @@
 package OpenXPKI::Crypt::PubKey;
+use OpenXPKI -class;
 
-use Moose;
-
-use English;
 use Digest::SHA qw( sha1_hex );
 use MIME::Base64;
 

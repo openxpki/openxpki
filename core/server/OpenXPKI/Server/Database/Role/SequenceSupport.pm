@@ -1,6 +1,5 @@
 package OpenXPKI::Server::Database::Role::SequenceSupport;
-
-use Moose::Role;
+use OpenXPKI -role;
 
 =head1 Name
 

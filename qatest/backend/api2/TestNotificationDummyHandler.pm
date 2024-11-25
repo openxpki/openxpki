@@ -1,14 +1,10 @@
 package TestNotificationDummyHandler;
+use OpenXPKI -class;
 
-use Moose;
 extends 'OpenXPKI::Server::Notification::Base';
-
-use English;
 
 use DateTime;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 
 our $RESULT;
 

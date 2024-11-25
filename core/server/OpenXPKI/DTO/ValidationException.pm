@@ -1,8 +1,7 @@
 package OpenXPKI::DTO::ValidationException;
+use OpenXPKI -class;
 
 # TODO - merge with OpenXPKI::Exception
-
-use Moose;
 
 use OpenXPKI::Client::API::Util;
 

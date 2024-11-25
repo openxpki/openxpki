@@ -1,22 +1,13 @@
 package OpenXPKI::Server::Session;
-use Moose;
+use OpenXPKI -class;
 
 # Core modules
-use Scalar::Util qw( blessed );
 use Module::Load ();
 
-# CPAN modules
-use Type::Params qw( signature_for );
-
 # Project modules
-use OpenXPKI::Exception;
 use OpenXPKI::Server::Session::Data;
-use OpenXPKI::Debug;
 use OpenXPKI::Server::Log;
 use OpenXPKI::Server::Context qw( CTX );
-
-# should be done after imports to safely disable warnings in Perl < 5.36
-use experimental 'signatures';
 
 =head1 NAME
 

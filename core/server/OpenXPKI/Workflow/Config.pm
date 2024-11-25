@@ -1,16 +1,13 @@
 package OpenXPKI::Workflow::Config;
-use Moose;
+use OpenXPKI -class;
 
 # Core modules
-use Data::Dumper;
 use List::Util qw( any );
 
 # CPAN modules
 use Workflow 1.39;
 
 # Project modules
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 
 

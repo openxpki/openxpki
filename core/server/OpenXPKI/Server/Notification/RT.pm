@@ -1,17 +1,13 @@
 package OpenXPKI::Server::Notification::RT;
+use OpenXPKI -class;
 
-use Moose;
 extends 'OpenXPKI::Server::Notification::Base';
 
 ## SMTP Notifier using RT::Client::REST to connect to a
 ## RT RequestTracker ticket system
 
-use English;
-
 use DateTime;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 
 use RT::Client::REST;

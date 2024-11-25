@@ -1,5 +1,5 @@
 package OpenXPKI::Server::Database::Driver::SQLite;
-use Moose;
+use OpenXPKI -class;
 
 with qw(
     OpenXPKI::Server::Database::Role::SequenceEmulation
@@ -13,8 +13,6 @@ with qw(
 OpenXPKI::Server::Database::Driver::SQLite - Driver for SQLite databases
 
 =cut
-
-use OpenXPKI::Exception;
 
 ################################################################################
 # required by OpenXPKI::Server::Database::Role::Driver

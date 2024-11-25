@@ -1,6 +1,7 @@
 package OpenXPKI::Server::Session::Driver::Database;
-use Moose;
-with "OpenXPKI::Server::Session::DriverRole";
+use OpenXPKI -class;
+
+with 'OpenXPKI::Server::Session::DriverRole';
 
 =head1 NAME
 
@@ -42,8 +43,6 @@ available methods.
 
 # Project modules
 use OpenXPKI::Server::Init;
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Database;
 

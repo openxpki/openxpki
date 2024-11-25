@@ -1,5 +1,5 @@
 package OpenXPKI::Server::Database::Query;
-use Moose;
+use OpenXPKI -class;
 
 =head1 Name
 
@@ -7,8 +7,6 @@ OpenXPKI::Server::Database::Query - Container for SQL query string and bind
 parameters
 
 =cut
-
-use OpenXPKI::Debug;
 
 ################################################################################
 # Attributes

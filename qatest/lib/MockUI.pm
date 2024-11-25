@@ -1,14 +1,15 @@
 package MockUI;
+use OpenXPKI -class;
 
-use Moose;
 use namespace::autoclean;
 
 extends 'OpenXPKI::Client::Service::WebUI';
 
 use JSON;
-use CGIMock;
 use CGI::Session;
+
 use OpenXPKI::Client::Service::WebUI::Request;
+use CGIMock;
 
 
 has cgi => (

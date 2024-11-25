@@ -1,10 +1,8 @@
 package OpenXPKI::Connector::DataPool;
+use OpenXPKI -class;
 
-use Moose;
 extends 'Connector';
 
-use English;
-use Data::Dumper;
 use OpenXPKI::Server::Context qw( CTX );
 
 has key => (

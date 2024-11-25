@@ -1,11 +1,9 @@
 package OpenXPKI::Crypt::CRL;
+use OpenXPKI -class;
 
-use Moose;
 with 'OpenXPKI::Role::RevocationReasonCode';
 
 # some code imported from Crypt::X509::CRL
-
-use English;
 
 use Convert::ASN1;
 use MIME::Base64;

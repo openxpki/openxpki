@@ -1,14 +1,6 @@
 ## OpenXPKI::FileUtils
 package OpenXPKI::FileUtils;
-
-use strict;
-use warnings;
-use English;
-
-use Class::Std;
-
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
+use OpenXPKI -class_std;
 
 use File::Spec;
 use File::Temp;

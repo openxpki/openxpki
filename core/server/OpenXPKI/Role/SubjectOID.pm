@@ -1,6 +1,5 @@
 package OpenXPKI::Role::SubjectOID;
-
-use Moose::Role;
+use OpenXPKI -role;
 
 has subject_oid_map => (
     is => 'rw',

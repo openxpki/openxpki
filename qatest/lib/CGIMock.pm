@@ -1,10 +1,9 @@
 package CGIMock;
+use OpenXPKI -class;
 
-use Moose;
 use namespace::autoclean;
 
 # Core modules
-use Data::Dumper;
 use Carp qw( cluck confess );
 
 has data => (

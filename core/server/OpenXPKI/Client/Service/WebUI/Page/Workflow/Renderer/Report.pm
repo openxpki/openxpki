@@ -1,8 +1,5 @@
 package OpenXPKI::Client::Service::WebUI::Page::Workflow::Renderer::Report;
-
-use Moose;
-use Data::Dumper;
-use English;
+use OpenXPKI -class;
 
 sub render_report_list {
 

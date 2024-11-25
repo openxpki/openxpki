@@ -1,9 +1,8 @@
 package OpenXPKI::Server::Authentication::Anonymous;
+use OpenXPKI -class;
 
-use Moose;
 extends 'OpenXPKI::Server::Authentication::Base';
 
-use OpenXPKI::Debug;
 use OpenXPKI::Server::Authentication::Handle;
 
 has user => (

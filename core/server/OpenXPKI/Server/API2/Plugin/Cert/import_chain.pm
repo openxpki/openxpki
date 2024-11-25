@@ -8,13 +8,9 @@ OpenXPKI::Server::API2::Plugin::Cert::import_chain
 =cut
 
 # Project modules
-use OpenXPKI::Exception;
 use OpenXPKI::Crypt::X509;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Types;
-
-# Feature::Compat::Try should be done last to safely disable warnings
-use Feature::Compat::Try;
 
 =head1 COMMANDS
 

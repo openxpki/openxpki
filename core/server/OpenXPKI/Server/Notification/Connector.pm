@@ -1,18 +1,13 @@
 package OpenXPKI::Server::Notification::Connector;
+use OpenXPKI -class;
 
-use Moose;
 extends 'OpenXPKI::Server::Notification::Base';
 
-use English;
-
-use Data::Dumper;
 use JSON;
 use YAML::PP;
 use DateTime;
 use Module::Load ();
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 
 has 'backend' => (
     is => 'ro',

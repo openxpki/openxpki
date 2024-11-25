@@ -1,5 +1,9 @@
 package OpenXPKI::Test::Role::TestRealms;
-use Moose::Role;
+use OpenXPKI -role;
+
+requires 'config_writer';
+requires 'password_hash';
+requires 'testenv_root';
 
 =head1 NAME
 
@@ -17,19 +21,6 @@ Applying this role performs the following actions:
 =item * set C<CTX('session')-E<gt>data-E<gt>pki_realm> to I<alpha>
 
 =back
-
-=cut
-
-# Core modules
-
-# CPAN modules
-
-# Project modules
-
-requires "config_writer";
-requires "password_hash";
-requires "testenv_root";
-
 
 =head1 CONSTRUCTOR PARAMETERS
 

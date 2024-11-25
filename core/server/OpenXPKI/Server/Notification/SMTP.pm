@@ -1,6 +1,6 @@
 package OpenXPKI::Server::Notification::SMTP;
+use OpenXPKI -class;
 
-use Moose;
 extends 'OpenXPKI::Server::Notification::Base';
 
 =head1 NAME
@@ -152,12 +152,8 @@ certificate_p12_file (PKCS12 support requires Crypt::SMIME 0.17!).
 
 =cut
 
-use English;
-
 use DateTime;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use OpenXPKI::FileUtils;
 use OpenXPKI::Serialization::Simple;
 

@@ -1,9 +1,6 @@
 package OpenXPKI::Crypt::ECDH;
+use OpenXPKI -class;
 
-use Moose;
-
-use Data::Dumper;
-use English;
 use Crypt::PK::ECC;
 use Digest::SHA qw( sha1_hex );
 use MIME::Base64;

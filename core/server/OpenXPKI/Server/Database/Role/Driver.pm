@@ -1,5 +1,5 @@
 package OpenXPKI::Server::Database::Role::Driver;
-use Moose::Role;
+use OpenXPKI -role;
 
 =head1 NAME
 
@@ -69,10 +69,13 @@ requires 'do_sql_replacements';
 =head1 SYNOPSIS
 
     package OpenXPKI::Server::Database::Driver::MyDB2;
-    use Moose;
-    with 'OpenXPKI::Server::Database::Role::SequenceSupport';
-    with 'OpenXPKI::Server::Database::Role::MergeEmulation';
-    with 'OpenXPKI::Server::Database::Role::Driver';
+    use OpenXPKI -class;
+
+    with qw(
+        OpenXPKI::Server::Database::Role::SequenceSupport
+        OpenXPKI::Server::Database::Role::MergeEmulation
+        OpenXPKI::Server::Database::Role::Driver
+    );
 
     # required by OpenXPKI::Server::Database::Role::Driver
     sub dbi_driver { 'DB2' }           # DBI compliant driver name

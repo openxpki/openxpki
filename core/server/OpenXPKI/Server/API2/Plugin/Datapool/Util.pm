@@ -1,31 +1,17 @@
 package OpenXPKI::Server::API2::Plugin::Datapool::Util;
-use Moose::Role;
+use OpenXPKI -role;
 
 =head1 NAME
 
 OpenXPKI::Server::API2::Plugin::Datapool::Util - Base role for datapool
 related plugins that provides some utility methods
 
-=head1 METHODS
-
 =cut
 
-# Core modules
-
-# CPAN modules
-use Type::Params qw( signature_for );
-
 # Project modules
-use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 
-# Feature::Compat::Try should be done last to safely disable warnings
-use Feature::Compat::Try;
-
-# should be done after imports to safely disable warnings in Perl < 5.36
-use experimental 'signatures';
-
-=head1 DESCRIPTION
+=head1 METHODS
 
 =head2 assert_current_pki_realm_within_workflow
 

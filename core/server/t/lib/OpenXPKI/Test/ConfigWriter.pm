@@ -1,5 +1,6 @@
 package OpenXPKI::Test::ConfigWriter;
-use Moose;
+use OpenXPKI qw( -class -typeconstraints );
+
 =head1 NAME
 
 OpenXPKI::Test::ConfigWriter - Create test configuration files (YAML)
@@ -11,7 +12,6 @@ use File::Path qw(make_path);
 use File::Spec;
 
 # CPAN modules
-use Moose::Util::TypeConstraints; # PLEASE NOTE: this enables all warnings via Moose::Exporter
 use YAML::PP;
 use Test::More;
 use Test::Exception;

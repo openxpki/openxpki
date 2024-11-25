@@ -1,18 +1,17 @@
 package OpenXPKI::Template::Plugin::Utils;
+use OpenXPKI qw( -class -nonmoose );
 
-use Moose;
-use MooseX::NonMoose;
 extends 'Template::Plugin';
+
+use MIME::Base64;
+use Digest::SHA;
 
 use JSON;
 use Template::Plugin;
-use MIME::Base64;
-use Digest::SHA;
-use Data::Dumper;
-use OpenXPKI::DN;
-use OpenXPKI::Util;
 use Crypt::PK::RSA;
 use Crypt::PK::ECC;
+
+use OpenXPKI::DN;
 
 =head1 OpenXPKI::Template::Plugin::Utils
 

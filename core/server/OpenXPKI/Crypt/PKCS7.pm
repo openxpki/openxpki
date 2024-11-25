@@ -1,13 +1,11 @@
 package OpenXPKI::Crypt::PKCS7;
+use OpenXPKI -class;
 
-use Moose;
 with 'OpenXPKI::Role::IssuerSerial';
 
-use English;
 use MIME::Base64;
 use Convert::ASN1 ':tag';
 use Exporter qw( import );
-use OpenXPKI::Debug;
 use OpenXPKI::Crypt::DN;
 use OpenXPKI::Crypt::X509;
 

@@ -1,7 +1,5 @@
 package OpenXPKI::Client::Service::WebUI::Response::SectionRole;
-use Moose::Role;
-
-use Moose::Util::TypeConstraints qw( enum ); # PLEASE NOTE: this enables all warnings via Moose::Exporter
+use OpenXPKI qw( -role -typeconstraints );
 
 has 'type' => (
     is => 'rw',

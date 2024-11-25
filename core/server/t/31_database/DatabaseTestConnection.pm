@@ -1,5 +1,5 @@
 package DatabaseTestConnection;
-use Moose;
+use OpenXPKI -class;
 
 use Test::More;
 

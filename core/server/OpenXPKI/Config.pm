@@ -1,15 +1,12 @@
 package OpenXPKI::Config;
-use Moose;
+use OpenXPKI -class;
 
-use English;
 use Digest::SHA qw(sha1_hex);
 use Log::Log4perl;
 use Sys::Hostname;
 use Module::Load ();
 
 use OpenXPKI::Config::Backend;
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 
 # Make sure the underlying connector is recent

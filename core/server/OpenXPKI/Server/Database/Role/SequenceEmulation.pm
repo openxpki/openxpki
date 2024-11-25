@@ -1,6 +1,5 @@
 package OpenXPKI::Server::Database::Role::SequenceEmulation;
-
-use Moose::Role;
+use OpenXPKI -role;
 
 =head1 Name
 

@@ -1,16 +1,7 @@
-## OpenXPKI::Crypto::Tool::CreateJavaKeystore::API
-## Written 2006 by Alexander Klink for the OpenXPKI project
-## (C) Copyright 2006 by The OpenXPKI Project
-
-use strict;
-use warnings;
-
 package OpenXPKI::Crypto::Tool::CreateJavaKeystore::API;
-use base qw(OpenXPKI::Crypto::API);
+use OpenXPKI -class_std;
 
-use Class::Std;
-use English;
-use OpenXPKI::Debug;
+use base qw(OpenXPKI::Crypto::API);
 
 ## scalar value:
 ##     - 0 means the parameter is optional

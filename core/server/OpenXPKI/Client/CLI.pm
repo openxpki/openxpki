@@ -1,12 +1,11 @@
 package OpenXPKI::Client::CLI;
+use OpenXPKI -class;
 
-use Moose;
 extends 'OpenXPKI::Client';
 with 'OpenXPKI::Role::Logger';
 
 use Crypt::JWT qw(encode_jwt);
 use Crypt::PK::ECC;
-use Data::Dumper;
 
 use OpenXPKI::DTO::Message;
 

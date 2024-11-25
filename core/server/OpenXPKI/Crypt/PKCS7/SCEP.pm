@@ -1,17 +1,14 @@
 package OpenXPKI::Crypt::PKCS7::SCEP;
+use OpenXPKI -class;
 
-use Moose;
 with 'OpenXPKI::Role::IssuerSerial';
 
-use English;
 use MIME::Base64;
 use Convert::ASN1 ':tag';
 use Crypt::CBC;
 use Crypt::Digest qw( digest_data );
 
-use OpenXPKI::Debug;
 use OpenXPKI::Random;
-use OpenXPKI::Exception;
 use OpenXPKI::Crypt::PKCS10;
 use OpenXPKI::Crypt::X509;
 use OpenXPKI::Crypt::PKCS7 qw(encode_tag decode_tag find_oid);
@@ -301,7 +298,7 @@ around BUILDARGS => sub {
         # unambigous related to the expected data
         if ($request =~ m{\AM([[:print:]]|\s)+\z}) {
             ##! 64: 'base64 request without boundaries, decoding...'
-            $request = decode_base64($request);            
+            $request = decode_base64($request);
         }
         my $outer = OpenXPKI::Crypt::PKCS7->new($request);
         ##! 128: $outer->parsed()

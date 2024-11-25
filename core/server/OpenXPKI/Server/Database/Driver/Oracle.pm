@@ -1,5 +1,5 @@
 package OpenXPKI::Server::Database::Driver::Oracle;
-use Moose;
+use OpenXPKI -class;
 
 with qw(
     OpenXPKI::Server::Database::Role::SequenceSupport

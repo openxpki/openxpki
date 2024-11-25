@@ -1,6 +1,6 @@
 package OpenXPKI::Config::Lint::Dummy;
+use OpenXPKI -class;
 
-use Moose;
 with 'OpenXPKI::Config::Lint::RealmRole';
 
 sub lint_realm {
@@ -12,8 +12,6 @@ sub lint_realm {
 }
 
 __PACKAGE__->meta->make_immutable;
-
-__END__;
 
 =head1 NAME
 

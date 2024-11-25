@@ -1,5 +1,5 @@
 package OpenXPKI::Server::API2::Plugin::Cert::DateCondition;
-use Moose;
+use OpenXPKI -class;
 
 =head1 NAME
 

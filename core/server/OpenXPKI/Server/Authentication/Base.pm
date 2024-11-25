@@ -1,13 +1,8 @@
 package OpenXPKI::Server::Authentication::Base;
+use OpenXPKI -class;
 
-use strict;
-use warnings;
-use Moose;
-
-use Data::Dumper;
 use OpenXPKI::DateTime;
 use Digest::SHA qw(sha256_hex);
-use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 
 has role => (

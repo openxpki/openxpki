@@ -1,19 +1,18 @@
 package OpenXPKI::Server::Workflow::Validator::WFHash;
+use OpenXPKI -class;
 
-use Moose;
 extends 'OpenXPKI::Server::Workflow::Validator';
 
-use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
-
 use Workflow::Exception qw( configuration_error validation_error );
+
+use OpenXPKI::Server::Context qw( CTX );
+
 
 sub _validate {
     my ( $self, $wf, $key ) = @_;
 
 
-    validation_error('No key given') unless($key);  
+    validation_error('No key given') unless($key);
 
     my $hash_name = $self->param('hash_name');
 
@@ -48,7 +47,7 @@ OpenXPKI::Server::Workflow::Validator::WFHash
   validate_reason_code:
     class: OpenXPKI::Server::Workflow::Validator::WFHash
     param:
-       hash_name: hash_to_check 
+       hash_name: hash_to_check
 
   arg:
     - $key_to_check

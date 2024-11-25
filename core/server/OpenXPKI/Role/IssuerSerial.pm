@@ -1,6 +1,5 @@
 package OpenXPKI::Role::IssuerSerial;
-
-use Moose::Role;
+use OpenXPKI -role;
 
 use OpenXPKI::Crypt::DN;
 

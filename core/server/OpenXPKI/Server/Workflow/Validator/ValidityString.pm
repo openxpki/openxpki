@@ -1,14 +1,13 @@
 package OpenXPKI::Server::Workflow::Validator::ValidityString;
+use OpenXPKI -class;
 
-use Moose;
 extends 'OpenXPKI::Server::Workflow::Validator';
+
+use Workflow::Exception qw( validation_error configuration_error );
 
 use OpenXPKI::DateTime;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 
-use Workflow::Exception qw( validation_error configuration_error );
 
 sub _validate {
 

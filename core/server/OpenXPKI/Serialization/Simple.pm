@@ -1,6 +1,5 @@
 package OpenXPKI::Serialization::Simple;
-
-use Moose;
+use OpenXPKI -class;
 
 =head1 NAME
 
@@ -8,10 +7,6 @@ OpenXPKI::Serialization::Simple
 
 =cut
 
-use English;
-
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use OpenXPKI::Serialization::JSON;
 use OpenXPKI::Serialization::Legacy;
 use MIME::Base64;

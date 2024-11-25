@@ -1,9 +1,8 @@
 package OpenXPKI::Server::Authentication::Command;
+use OpenXPKI -class;
 
-use Moose;
 extends 'OpenXPKI::Server::Authentication::Base';
 
-use OpenXPKI::Debug;
 use Proc::SafeExec;
 use OpenXPKI::Template;
 use OpenXPKI::Server::Authentication::Handle;

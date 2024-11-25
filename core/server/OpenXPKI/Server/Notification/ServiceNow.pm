@@ -1,17 +1,13 @@
 package OpenXPKI::Server::Notification::ServiceNow;
+use OpenXPKI -class;
 
-use Moose;
 extends 'OpenXPKI::Server::Notification::Base';
 
 ## Notifier for the ServiceNow Ticket System
 ## using their public SOAP API via SOAP::Lite
 
-use English;
-
 use DateTime;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 
 use SOAP::Lite on_fault => sub {

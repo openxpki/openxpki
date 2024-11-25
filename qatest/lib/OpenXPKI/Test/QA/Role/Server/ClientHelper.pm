@@ -1,5 +1,6 @@
 package OpenXPKI::Test::QA::Role::Server::ClientHelper;
-use Moose;
+use OpenXPKI -class;
+
 =head1 NAME
 
 OpenXPKI::Test::QA::Role::Server::ClientHelper - Helper functions to test
@@ -34,13 +35,8 @@ Alternatively to continue an existing session:
 use Test::More;
 use Test::Exception;
 
-# CPAN modules
-
 # Project modules
 use OpenXPKI::Client;
-
-# Feature::Compat::Try should be done last to safely disable warnings
-use Feature::Compat::Try;
 
 =head1 METHODS
 

@@ -1,5 +1,6 @@
 package OpenXPKI::Test::CertHelper::Database;
-use Moose;
+use OpenXPKI -class;
+
 =head1 NAME
 
 OpenXPKI::Test::CertHelper::Database - Test helper that contains raw

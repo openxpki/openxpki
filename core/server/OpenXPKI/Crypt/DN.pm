@@ -1,6 +1,6 @@
 package OpenXPKI::Crypt::DN;
+use OpenXPKI -class;
 
-use Moose;
 with 'OpenXPKI::Role::SubjectOID';
 
 use OpenXPKI::DN;

@@ -1,9 +1,8 @@
 package OpenXPKI::Connector::FakeValidity;
+use OpenXPKI -class;
 
-use Moose;
 extends 'Connector';
 
-use English;
 use DateTime;
 use OpenXPKI::DateTime;
 use OpenXPKI::Server::Context qw( CTX );

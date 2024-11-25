@@ -1,5 +1,5 @@
 package OpenXPKI::Crypto::SecretManager;
-use Moose;
+use OpenXPKI -class;
 
 # Core modules
 use Digest::SHA qw(sha256_hex sha1_base64);
@@ -10,16 +10,11 @@ use Crypt::PK::ECC;
 use Template;
 
 # Project modules
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Control::Server;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Crypto::VolatileVault;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::FileUtils;
-
-# Feature::Compat::Try should be done last to safely disable warnings
-use Feature::Compat::Try;
 
 =head1 NAME
 

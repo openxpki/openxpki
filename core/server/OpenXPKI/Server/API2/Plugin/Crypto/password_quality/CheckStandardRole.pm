@@ -1,4 +1,11 @@
 package OpenXPKI::Server::API2::Plugin::Crypto::password_quality::CheckStandardRole;
+use OpenXPKI -role;
+
+requires 'register_check';
+requires 'password';
+requires 'enable';
+requires 'disable';
+requires 'password_length';
 
 =head1 NAME
 
@@ -19,18 +26,9 @@ L<OpenXPKI::Server::API2::Plugin::Crypto::password_quality>.
 
 =cut
 
-use Moose::Role;
-
 # Project modules
-use OpenXPKI::Debug;
 use OpenXPKI::Server::API2::Plugin::Crypto::password_quality::TopPasswords;
 
-
-requires 'register_check';
-requires 'password';
-requires 'enable';
-requires 'disable';
-requires 'password_length';
 
 has max_len => (
     is => 'rw',

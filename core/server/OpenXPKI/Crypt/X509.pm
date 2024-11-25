@@ -1,7 +1,5 @@
 package OpenXPKI::Crypt::X509;
-use Moose;
-
-use English;
+use OpenXPKI -class;
 
 use OpenXPKI::DN;
 use Digest::SHA qw(sha1_base64 sha1_hex);

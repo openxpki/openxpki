@@ -1,6 +1,5 @@
 package OpenXPKI::Client::Service::WebUI::Response::DTORole;
-
-use Moose::Role;
+use OpenXPKI -role;
 
 # Core modules
 use List::Util qw( any );
@@ -32,7 +31,8 @@ Nested hash structures as output may be defined using slashes C<I> as
 delimiter. A trailing slash is a shortcut and means: append the attribute name.
 
     package Example;
-    use Moose;
+    use OpenXPKI -class;
+
     with 'OpenXPKI::Client::Service::WebUI::Response::DTORole';
 
     has 'descr' => (is => 'rw', isa => 'Str', documentation => 'description');

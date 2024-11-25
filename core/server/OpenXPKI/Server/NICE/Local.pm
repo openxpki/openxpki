@@ -1,6 +1,6 @@
 package OpenXPKI::Server::NICE::Local;
+use OpenXPKI -class;
 
-use Moose;
 extends 'OpenXPKI::Server::NICE';
 with qw(
     OpenXPKI::Server::NICE::Role::KeyGenerationLocal
@@ -8,10 +8,6 @@ with qw(
     OpenXPKI::Server::NICE::Role::RevokeCertificate
 );
 
-use English;
-
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Crypto::Profile::Certificate;
 use OpenXPKI::Crypto::Profile::CRL;
 use OpenXPKI::Crypt::X509;

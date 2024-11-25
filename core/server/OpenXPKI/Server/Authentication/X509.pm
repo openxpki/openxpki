@@ -1,12 +1,8 @@
 package OpenXPKI::Server::Authentication::X509;
+use OpenXPKI -class;
 
-use Moose;
 extends 'OpenXPKI::Server::Authentication::Base';
 
-use English;
-
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Crypt::X509;
 use MIME::Base64;

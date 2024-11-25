@@ -1,15 +1,7 @@
-## OpenXPKI::Crypto::Tool::CreateJavaKeystore::CLI
-## Written 2006 by Alexander Klink for the OpenXPKI project
-## (C) Copyright 2006 by The OpenXPKI Project
 package OpenXPKI::Crypto::Tool::CreateJavaKeystore::CLI;
+use OpenXPKI -class_std;
+
 use base qw( OpenXPKI::Crypto::CLI );
-
-use strict;
-use warnings;
-use English;
-use Class::Std;
-
-use OpenXPKI::Debug;
 
 sub error_ispresent {
     my $self = shift;
@@ -23,8 +15,8 @@ sub error_ispresent {
         return 0;
     }
 }
+
 1;
-__END__
 
 =head1 Name
 

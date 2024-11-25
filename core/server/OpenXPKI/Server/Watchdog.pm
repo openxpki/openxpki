@@ -1,5 +1,5 @@
 package OpenXPKI::Server::Watchdog;
-use Moose;
+use OpenXPKI -class;
 
 
 =head1 NAME
@@ -18,25 +18,16 @@ The namespace is I<system.watchdog>. The properties are:
 
 =cut
 
-# Core modules
-use English;
-
 # CPAN modules
 use Log::Log4perl::MDC;
 use Sys::Hostname;
 
 # Project modules
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Control::Server;
 use OpenXPKI::Server;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::DateTime;
-use OpenXPKI::Util;
-
-# Feature::Compat::Try should be done last to safely disable warnings
-use Feature::Compat::Try;
 
 
 our $TERMINATE = 0;

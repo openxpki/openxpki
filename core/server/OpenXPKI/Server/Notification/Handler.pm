@@ -1,6 +1,5 @@
 package OpenXPKI::Server::Notification::Handler;
-
-use Moose;
+use OpenXPKI -class;
 
 =head1 NAME
 
@@ -20,13 +19,9 @@ Execute the notifcations for MESSAGE and.
 
 =cut
 
-use English;
-
 use Module::Load ();
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 
 

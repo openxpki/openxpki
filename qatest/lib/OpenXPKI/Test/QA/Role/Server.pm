@@ -1,5 +1,5 @@
 package OpenXPKI::Test::QA::Role::Server;
-use Moose::Role;
+use OpenXPKI -role;
 
 =head1 NAME
 
@@ -42,9 +42,6 @@ use Proc::Daemon;
 use OpenXPKI::Control::Server;
 use OpenXPKI::Server;
 use OpenXPKI::Test::QA::Role::Server::ClientHelper;
-
-# Feature::Compat::Try should be done last to safely disable warnings
-use Feature::Compat::Try;
 
 
 requires "testenv_root";

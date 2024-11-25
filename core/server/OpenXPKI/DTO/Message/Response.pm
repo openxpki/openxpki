@@ -1,6 +1,6 @@
 package OpenXPKI::DTO::Message::Response;
+use OpenXPKI -class;
 
-use Moose;
 with 'OpenXPKI::DTO::Message';
 
 has result => (
@@ -10,4 +10,4 @@ has result => (
     default => sub { shift->params()->{result} }
 );
 
-1;
+__PACKAGE__->meta->make_immutable;

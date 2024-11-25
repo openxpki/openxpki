@@ -1,14 +1,13 @@
 package OpenXPKI::Server::Workflow::Validator::CommonNameLength;
+use OpenXPKI -class;
 
-use Moose;
 extends 'OpenXPKI::Server::Workflow::Validator';
 
 use Workflow::Exception qw( validation_error );
-use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Debug;
-use OpenXPKI::Serialization::Simple;
-use English;
 use Template;
+
+use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Serialization::Simple;
 
 
 sub _validate {

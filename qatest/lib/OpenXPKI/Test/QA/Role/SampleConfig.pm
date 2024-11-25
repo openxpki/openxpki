@@ -1,5 +1,7 @@
 package OpenXPKI::Test::QA::Role::SampleConfig;
-use Moose::Role;
+use OpenXPKI -role;
+
+requires 'testenv_root';
 
 =head1 NAME
 
@@ -9,7 +11,6 @@ to include the complete sample configuration from `config/config.d`
 =cut
 
 # Core modules
-use English;
 use Cwd qw( abs_path );
 use Test::More;
 use File::Find;
@@ -18,9 +19,6 @@ use FindBin qw( $Bin );
 
 # CPAN modules
 use YAML::PP;
-
-
-requires "testenv_root";
 
 =head1 DESCRIPTION
 

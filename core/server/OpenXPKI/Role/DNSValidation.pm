@@ -1,6 +1,5 @@
 package OpenXPKI::Role::DNSValidation;
-
-use Moose::Role;
+use OpenXPKI -role;
 
 use Net::DNS;
 

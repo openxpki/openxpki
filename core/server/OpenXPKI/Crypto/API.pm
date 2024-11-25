@@ -1,18 +1,7 @@
-## OpenXPKI::Crypto::API.pm
-## Written 2006 by Alexander Klink for the OpenXPKI project
-## (C) Copyright 2006 by The OpenXPKI Project
-
 package OpenXPKI::Crypto::API;
+use OpenXPKI -class_std;
 
-use strict;
-use warnings;
-use English;
-
-use Class::Std;
 use Module::Load ();
-
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 
 # The instance of the corresponding Backend/Tool class
 my %instance_of       :ATTR( :get<instance> );
