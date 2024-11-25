@@ -141,7 +141,7 @@ sub as_mojo_cookies ($self, $session) {
             name => 'oxi-extid',
             value => Data::UUID->new->create_b64,
             samesite => 'Lax',
-            secure => 1,
+            secure => (($self->request->is_secure and not $self->insecure) ? 1 : 0),
             httponly => 1,
         );
     }
