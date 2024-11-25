@@ -222,7 +222,7 @@ additionally adds the imports
 additionally adds the imports
 
     use Moose;
-    use MooseX::Exporter;
+    use Moose::Exporter;
 
 =head2 Moose class extending a non-Moose class
 
