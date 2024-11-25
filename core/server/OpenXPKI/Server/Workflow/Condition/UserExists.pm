@@ -1,12 +1,11 @@
 package OpenXPKI::Server::Workflow::Condition::UserExists;
+use OpenXPKI;
 
-use strict;
-use warnings;
 use base qw( OpenXPKI::Server::Workflow::Condition );
+
 use OpenXPKI::Server::Context qw( CTX );
 use Workflow::Exception qw( condition_error );
-use OpenXPKI::Debug;
-use English;
+
 
 sub _evaluate
 {

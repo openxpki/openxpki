@@ -1,12 +1,10 @@
 
 package OpenXPKI::Server::Workflow::Activity::Tools::StringToArray;
+use OpenXPKI;
 
-use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use Workflow::Exception qw(configuration_error);
 use OpenXPKI::Serialization::Simple;
 

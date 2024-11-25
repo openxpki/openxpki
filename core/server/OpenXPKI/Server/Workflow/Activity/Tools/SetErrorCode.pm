@@ -1,15 +1,9 @@
-# OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode
-# Written by Alexander Klink for the OpenXPKI project 2006
-# Copyright (c) 2006 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode;
+use OpenXPKI;
 
-use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 
 sub execute {
     ##! 1: 'execute'

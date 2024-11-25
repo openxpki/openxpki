@@ -1,10 +1,11 @@
 package OpenXPKI::Server::Workflow::Condition::NICE::UsableTokenForValidity;
+use OpenXPKI;
 
-use strict;
-use warnings;
-use OpenXPKI::Server::Context qw( CTX );
 use base qw( OpenXPKI::Server::Workflow::Condition );
+
+use OpenXPKI::Server::Context qw( CTX );
 use Workflow::Exception qw( condition_error configuration_error );
+
 
 sub _evaluate {
 

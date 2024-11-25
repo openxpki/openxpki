@@ -1,7 +1,5 @@
-use strict;
-use warnings;
-
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::create_pkcs12;
+use OpenXPKI;
 
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 

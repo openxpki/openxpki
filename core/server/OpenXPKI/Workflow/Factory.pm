@@ -1,24 +1,16 @@
 package OpenXPKI::Workflow::Factory;
+use OpenXPKI;
 
-use strict;
-use warnings;
+use base qw( Workflow::Factory );
 
 use Workflow 1.36;
-use base qw( Workflow::Factory );
-use English;
-use Scalar::Util qw( blessed );
-use Type::Params qw( signature_for );
 
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Workflow;
 use OpenXPKI::Workflow::Context;
 use OpenXPKI::Workflow::Field;
 use Workflow::Exception qw( configuration_error workflow_error );
 
-# should be done after imports to safely disable warnings in Perl < 5.36
-use experimental 'signatures';
 
 sub new {
     my $class = ref $_[0] || $_[0];

@@ -1,13 +1,11 @@
 package OpenXPKI::Server::Workflow::Persister::Null;
+use OpenXPKI;
 
-use strict;
 use base qw( Workflow::Persister );
-use English;
 
-use OpenXPKI::Debug;
 use OpenXPKI::Random;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
+
 
 sub init {
     my $self = shift;

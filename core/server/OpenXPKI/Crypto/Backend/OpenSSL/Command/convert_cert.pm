@@ -1,15 +1,5 @@
-## OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_cert
-## Written 2005 by Michael Bell for the OpenXPKI project
-## Rewritten 2006 by Julia Dubenskaya for the OpenXPKI project
-## Enhanced to convert an array of certificates to PKCS#7
-## 2006 by Alexander Klink for the OpenXPKI project
-## (C) Copyright 2005-2006 by The OpenXPKI Project
-
-use strict;
-use warnings;
-
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_cert;
-use OpenXPKI::Debug;
+use OpenXPKI;
 
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 

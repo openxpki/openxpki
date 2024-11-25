@@ -1,10 +1,6 @@
 
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_pkcs8;
-
-use strict;
-use warnings;
-
-use OpenXPKI::Debug;
+use OpenXPKI;
 
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 
@@ -34,7 +30,7 @@ sub get_command
         $engine = $self->{ENGINE}->get_engine();
     }
 
-    
+
 
     ## check parameters
 

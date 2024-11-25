@@ -1,15 +1,9 @@
-# OpenXPKI::Server::Workflow::Activity::NICE::FetchCertificate
-# Written by Oliver Welter for the OpenXPKI Project 2011
-# Copyright (c) 2011 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Activity::NICE::FetchCertificate;
+use OpenXPKI;
 
-use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 
 use OpenXPKI::Server::NICE::Factory;

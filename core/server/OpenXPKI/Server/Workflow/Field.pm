@@ -1,6 +1,6 @@
 package OpenXPKI::Server::Workflow::Field;
+use OpenXPKI;
 
-use strict;
 use base qw( Workflow::Action::InputField );
 
 sub init {

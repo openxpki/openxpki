@@ -1,13 +1,12 @@
 package OpenXPKI::Server::API2::Plugin::Api::Util::PodPOMView;
+use OpenXPKI;
 
-use strict;
-use warnings;
+use parent qw( Pod::POM::View::Text );
 
 #
 # This package slightly changes the formatting of Pod::POM::View::Text
 # to output PODs as text.
 #
-use parent qw( Pod::POM::View::Text );
 
 sub view_item { my $out = shift->SUPER::view_item(@_); $out =~ s/^(\s+)\* /$1/; return $out }
 

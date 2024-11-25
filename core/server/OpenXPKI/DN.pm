@@ -1,12 +1,8 @@
 package OpenXPKI::DN;
-
-use strict;
-use warnings;
+use OpenXPKI;
 
 use Memoize;
 use Text::CSV_XS;
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 
 
 # OpenSSL style attribute name mapping

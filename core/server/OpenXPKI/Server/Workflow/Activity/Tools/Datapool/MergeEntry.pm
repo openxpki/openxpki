@@ -1,19 +1,17 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::Datapool::MergeEntry;
+use OpenXPKI;
 
-use strict;
-use English;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
-use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
-use OpenXPKI::DateTime;
+# CPAN modules
 use DateTime;
 use Template;
 use Workflow::Exception qw( workflow_error configuration_error );
 
-# Feature::Compat::Try should be done last to safely disable warnings
-use Feature::Compat::Try;
+# Project modules
+use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::DateTime;
+
 
 sub execute {
     ##! 1: 'start'
@@ -90,11 +88,11 @@ sub execute {
 1;
 __END__
 
-=head1 Name
+=head1 NAME
 
 OpenXPKI::Server::Workflow::Activity::Tools::Datapool::MergeEntry
 
-=head1 Description
+=head1 DESCRIPTION
 
 Merges incoming data into into an array existing in the datapool.
 
@@ -109,7 +107,7 @@ first level of keys. Items with a value of "undef" will be removed.
 The expiration_date as well as the encryption status is carried over
 from the original item.
 
-=head1 Configuration
+=head1 CONFIGURATION
 
 =head2 Parameters
 

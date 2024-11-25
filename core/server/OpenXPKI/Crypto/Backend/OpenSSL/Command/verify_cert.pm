@@ -1,13 +1,6 @@
-## OpenXPKI::Crypto::Backend::OpenSSL::Command::verify_cert
-## Written 2006 by Alexander Klink for the OpenXPKI project
-## (C) Copyright 2006 by The OpenXPKI Project
-
-use strict;
-use warnings;
-
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::verify_cert;
+use OpenXPKI;
 
-use OpenXPKI::Debug;
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 
 sub get_command

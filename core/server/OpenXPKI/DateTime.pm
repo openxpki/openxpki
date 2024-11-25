@@ -1,15 +1,5 @@
-# OpenXPKI::DateTime.pm
-# Written by Martin Bartosch for the OpenXPKI project
-# Copyright (C) 2005-2006 by The OpenXPKI Project
-
-use strict;
-use warnings;
-
 package OpenXPKI::DateTime;
-
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
-use English;
+use OpenXPKI;
 
 use DateTime;
 use Date::Parse;

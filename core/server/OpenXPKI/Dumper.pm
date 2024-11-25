@@ -1,8 +1,5 @@
 package OpenXPKI::Dumper;
-use strict;
-use warnings;
-
-use Data::Dumper;
+use OpenXPKI;
 
 use Exporter 'import';
 our @EXPORT = qw(SDumper);

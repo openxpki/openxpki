@@ -1,20 +1,12 @@
-# OpenXPKI::Server::Workflow::Activity::Tools::RenderSubject
-# Written by Oliver Welterfor the OpenXPKI Project 2013
-# Copyright (c) 2013 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Activity::Tools::RenderSubject;
-
-use strict;
-
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
-use OpenXPKI::Serialization::Simple;
-use OpenXPKI::Server::Context qw( CTX );
-use English;
-use Template;
-use Data::Dumper;
+use OpenXPKI;
 
 use base qw( OpenXPKI::Server::Workflow::Activity );
+
+use OpenXPKI::Serialization::Simple;
+use OpenXPKI::Server::Context qw( CTX );
+use Template;
+
 
 sub execute {
     my $self     = shift;

@@ -1,12 +1,11 @@
 package OpenXPKI::Server::Workflow::Activity::User::LoadUserData;
+use OpenXPKI;
 
-use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
+
 
 sub execute {
     my ($self, $workflow) = @_;

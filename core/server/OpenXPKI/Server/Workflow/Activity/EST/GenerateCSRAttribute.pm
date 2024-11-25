@@ -1,12 +1,10 @@
 package OpenXPKI::Server::Workflow::Activity::EST::GenerateCSRAttribute;
-
-use warnings;
-use strict;
-use OpenXPKI::Debug;
-use OpenXPKI::Server::Context qw( CTX );
-use MIME::Base64 qw(encode_base64);
+use OpenXPKI;
 
 use base qw( OpenXPKI::Server::Workflow::Activity );
+
+use OpenXPKI::Server::Context qw( CTX );
+use MIME::Base64 qw(encode_base64);
 
 sub execute {
 

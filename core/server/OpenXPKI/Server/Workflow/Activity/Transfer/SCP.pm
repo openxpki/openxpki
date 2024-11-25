@@ -1,13 +1,9 @@
 package OpenXPKI::Server::Workflow::Activity::Transfer::SCP;
+use OpenXPKI;
 
-
-use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
-use English;
 use OpenXPKI::Serialization::Simple;
 use File::Temp;
 use Proc::SafeExec;

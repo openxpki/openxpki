@@ -1,16 +1,11 @@
 package OpenXPKI::Crypto::TokenManager;
-use strict;
-use warnings;
+use OpenXPKI;
 
 # Core modules
 use Carp;
-use Data::Dumper;
-use English;
 use Module::Load ();
 
 # Project modules
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Crypto::SecretManager;
 

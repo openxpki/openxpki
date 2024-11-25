@@ -1,7 +1,6 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::ParsePKCS10;
+use OpenXPKI;
 
-use strict;
-use English;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
 use Crypt::PKCS10;
@@ -10,8 +9,6 @@ use MIME::Base64;
 use Template;
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use OpenXPKI::Crypt::DN;
 use OpenXPKI::Serialization::Simple;
 use Workflow::Exception qw(configuration_error workflow_error);

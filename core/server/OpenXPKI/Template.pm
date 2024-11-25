@@ -1,13 +1,9 @@
 package OpenXPKI::Template;
-
-use strict;
-use warnings;
+use OpenXPKI;
 
 use base qw( Template );
 
-use OpenXPKI::Debug;
 use OpenXPKI::FileUtils;
-use OpenXPKI::Exception;
 use OpenXPKI::Serialization::Simple;
 #use OpenXPKI::Server::Context qw( CTX );
 

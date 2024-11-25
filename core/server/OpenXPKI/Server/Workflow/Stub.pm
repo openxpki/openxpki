@@ -1,8 +1,6 @@
 # This is a stub class we use to load historic workflows
 package OpenXPKI::Server::Workflow::Stub;
-
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
+use OpenXPKI;
 
 sub new {
     my $that = shift;

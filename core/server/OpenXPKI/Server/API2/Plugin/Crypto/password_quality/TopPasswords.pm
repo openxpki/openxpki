@@ -1,6 +1,5 @@
 package OpenXPKI::Server::API2::Plugin::Crypto::password_quality::TopPasswords;
-use strict;
-use warnings;
+use OpenXPKI;
 
 # Core modules
 use MIME::Base64;

@@ -1,15 +1,11 @@
-# OpenXPKI::Server::Workflow::Condition::Connector::IsValue
-# Written by Oliver Welter for the OpenXPKI Project 2012
-# Copyright (c) 2012 by The OpenXPKI Project
 package OpenXPKI::Server::Workflow::Condition::Connector::IsValue;
+use OpenXPKI;
 
-use strict;
-use warnings;
 use base qw( OpenXPKI::Server::Workflow::Condition );
+
 use Workflow::Exception qw( condition_error configuration_error );
 use OpenXPKI::Server::Context qw( CTX );
 
-use OpenXPKI::Debug;
 
 sub _evaluate
 {

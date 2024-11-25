@@ -1,9 +1,5 @@
-## OpenXPKI::Crypto::Backend::OpenSSL::Command::create_pkey
-
-use strict;
-use warnings;
-
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::create_pkey;
+use OpenXPKI;
 
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 

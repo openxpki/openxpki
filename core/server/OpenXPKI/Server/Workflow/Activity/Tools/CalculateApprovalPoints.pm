@@ -1,12 +1,9 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::CalculateApprovalPoints;
+use OpenXPKI;
 
-use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
-use English;
 use OpenXPKI::Serialization::Simple;
 
 

@@ -1,18 +1,7 @@
-## OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_verify
-## Written 2005 by Michael Bell for the OpenXPKI project
-## Rewritten 2006 by Julia Dubenskaya for the OpenXPKI project
-## changes for CHAIN passing by Alexander Klink for the OpenXPKI
-## project 2006.
-## (C) Copyright 2005-2006 by The OpenXPKI Project
-
-use strict;
-use warnings;
-
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_verify;
+use OpenXPKI;
 
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
-
-use Data::Dumper;
 
 sub get_command
 {

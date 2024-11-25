@@ -1,12 +1,11 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::ValidateChallengePassword;
+use OpenXPKI;
 
-use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Template;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
+
 
 sub execute {
     ##! 1: 'execute'

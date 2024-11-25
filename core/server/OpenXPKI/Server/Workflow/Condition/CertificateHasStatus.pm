@@ -1,17 +1,11 @@
-# OpenXPKI::Server::Workflow::Condition::CertificateHasStatus
-# Written by Oliver Welter for the OpenXPKI project 2012
-# Copyright (c) 2012 by The OpenXPKI Project
 package OpenXPKI::Server::Workflow::Condition::CertificateHasStatus;
+use OpenXPKI;
 
-use strict;
-use warnings;
 use base qw( OpenXPKI::Server::Workflow::Condition );
+
 use Workflow::Exception qw( condition_error configuration_error );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Serialization::Simple;
-use OpenXPKI::Debug;
-use English;
-use OpenXPKI::Exception;
 
 
 sub _evaluate {

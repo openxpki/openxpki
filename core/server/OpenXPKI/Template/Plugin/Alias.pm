@@ -1,4 +1,7 @@
 package OpenXPKI::Template::Plugin::Alias;
+use OpenXPKI;
+
+use base qw( Template::Plugin );
 
 =head1 OpenXPKI::Template::Plugin::Alias
 
@@ -21,16 +24,8 @@ Will result in
 
 =cut
 
-use strict;
-use warnings;
-use base qw( Template::Plugin );
-use Template::Plugin;
-
-
 use DateTime;
 use OpenXPKI::DateTime;
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
 

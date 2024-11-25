@@ -143,7 +143,6 @@ B<before> you use C<OpenXPKI::Test>:
 =cut
 
 # Core modules
-use Data::Dumper;
 use File::Path qw( remove_tree );
 use File::Temp qw( tempdir );
 use Module::Load ();

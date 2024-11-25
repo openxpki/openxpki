@@ -1,7 +1,5 @@
-use strict;
-use warnings;
-
 package OpenXPKI::Crypto::Backend::OpenSSL::Engine::LunaGem;
+use OpenXPKI;
 
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Engine);
 

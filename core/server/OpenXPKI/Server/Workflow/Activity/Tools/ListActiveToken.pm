@@ -1,14 +1,9 @@
-# OpenXPKI::Server::Workflow::Activity::Tools::ListActiveToken
-# Copyright (c) 2015 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Activity::Tools::ListActiveToken;
+use OpenXPKI;
 
-use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use Workflow::Exception qw(configuration_error workflow_error);
 

@@ -1,11 +1,9 @@
 package OpenXPKI::Server::Workflow::Activity;
+use OpenXPKI;
 
-use strict;
 use base qw( Workflow::Action );
 
-use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
 use OpenXPKI::Server::Workflow::Pause;
 use OpenXPKI::Server::Workflow::Helpers;
 use OpenXPKI::Server::Workflow::Field; # Workflow::Action calls $class->new() without require'ing the module first

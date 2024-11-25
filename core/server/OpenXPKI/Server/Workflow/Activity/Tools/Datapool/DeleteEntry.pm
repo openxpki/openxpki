@@ -1,16 +1,9 @@
-# OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry
-# Written by Scott Hardin for the OpenXPKI project 2010
-# Copyright (c) 2010 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Activity::Tools::Datapool::DeleteEntry;
+use OpenXPKI;
 
-use strict;
-use English;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::DateTime;
 use DateTime;

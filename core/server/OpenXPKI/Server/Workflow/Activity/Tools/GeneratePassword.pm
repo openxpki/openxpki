@@ -1,15 +1,9 @@
-# OpenXPKI::Server::Workflow::Activity::Tools:GeneratePassword:
-# Written by Martin Bartosch for the OpenXPKI project 2009
-# Copyright (c) 2009 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Activity::Tools::GeneratePassword;
+use OpenXPKI;
 
-use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use Workflow::Exception qw( configuration_error );
 

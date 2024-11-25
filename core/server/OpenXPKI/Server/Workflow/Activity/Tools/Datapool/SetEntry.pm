@@ -1,19 +1,17 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry;
+use OpenXPKI;
 
-use strict;
-use English;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
-use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
-use OpenXPKI::DateTime;
+# CPAN modules
 use DateTime;
 use Template;
 use Workflow::Exception qw( workflow_error configuration_error );
 
-# Feature::Compat::Try should be done last to safely disable warnings
-use Feature::Compat::Try;
+# Project modules
+use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::DateTime;
+
 
 sub execute {
     ##! 1: 'start'

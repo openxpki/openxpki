@@ -1,9 +1,5 @@
 package OpenXPKI::Server::Workflow::Condition::Evaluate;
-
-use warnings;
-use strict;
-use English;
-use v5.14.0;
+use OpenXPKI;
 
 use parent qw( Workflow::Condition );
 

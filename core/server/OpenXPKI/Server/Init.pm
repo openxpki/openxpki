@@ -1,10 +1,7 @@
 package OpenXPKI::Server::Init;
-
-use strict;
-use warnings;
+use OpenXPKI;
 
 # Core modules
-use English;
 use Errno;
 use File::Spec;
 
@@ -12,10 +9,7 @@ use File::Spec;
 use Log::Log4perl;
 
 # Project modules
-use OpenXPKI::Debug;
 use OpenXPKI::i18n qw(set_language set_locale_prefix);
-use OpenXPKI::Exception;
-
 use OpenXPKI::Config;
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::VolatileVault;
@@ -30,8 +24,6 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Bedroom;
 use OpenXPKI::Metrics;
-
-use Feature::Compat::Try; # should be done after other imports to safely disable warnings
 
 # define an array of hash refs mapping the task id to the corresponding
 # init code. the order of the array elements is also the default execution

@@ -1,9 +1,8 @@
 package OpenXPKI::Server::Workflow::Validator::Regex;
+use OpenXPKI;
 
-use strict;
-use warnings;
 use base qw( Workflow::Validator );
-use OpenXPKI::Debug;
+
 use OpenXPKI::Server::Context qw( CTX );
 use Workflow::Exception qw( validation_error );
 use OpenXPKI::Serialization::Simple;

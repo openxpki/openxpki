@@ -1,6 +1,7 @@
-# OpenXPKI::Crypto::Profile::Certificate.pm
-# Written 2005 by Michael Bell for the OpenXPKI project
-# Copyright (C) 2005-2006 by The OpenXPKI Project
+package OpenXPKI::Crypto::Profile::Certificate;
+use OpenXPKI;
+
+use base qw(OpenXPKI::Crypto::Profile::Base);
 
 =head1 Name
 
@@ -8,23 +9,11 @@ OpenXPKI::Crypto::Profile::Certificate - cryptographic profile for certifcates.
 
 =cut
 
-use strict;
-use warnings;
-
-package OpenXPKI::Crypto::Profile::Certificate;
-
-use base qw(OpenXPKI::Crypto::Profile::Base);
-
 use OpenXPKI::Server::Context qw( CTX );
 
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::DateTime;
-use English;
 
 use DateTime;
-# use Smart::Comments;
-
 
 =head2 new ( { CA, ID, [CACERTIFICATE] } )
 

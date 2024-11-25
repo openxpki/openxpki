@@ -1,11 +1,7 @@
 package OpenXPKI::Server::Workflow::Helpers;
-
-use strict;
-use warnings;
-use English;
+use OpenXPKI;
 
 use Workflow::Exception qw( configuration_error );
-
 
 =head2 get_service_config_path
 

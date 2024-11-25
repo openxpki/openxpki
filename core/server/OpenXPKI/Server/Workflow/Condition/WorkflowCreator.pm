@@ -1,15 +1,10 @@
-# OpenXPKI::Server::Workflow::Condition::WorkflowCreator
-# Written by Alexander Klink for the OpenXPKI project 2007
-# Copyright (c) 2007 by The OpenXPKI Project
 package OpenXPKI::Server::Workflow::Condition::WorkflowCreator;
+use OpenXPKI;
 
-use strict;
-use warnings;
 use base qw( Workflow::Condition );
 use OpenXPKI::Server::Context qw( CTX );
 use Workflow::Exception qw( condition_error );
-use OpenXPKI::Debug;
-use English;
+
 
 sub evaluate
 {

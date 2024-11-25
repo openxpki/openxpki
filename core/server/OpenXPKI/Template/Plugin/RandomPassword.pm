@@ -1,14 +1,10 @@
 package OpenXPKI::Template::Plugin::RandomPassword;
+use OpenXPKI;
 
-use strict;
-use warnings;
 use base qw( Template::Plugin );
-use Template::Plugin;
 
 use OpenXPKI::Random;
 use OpenXPKI::Password;
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use Digest::SHA;
 use MIME::Base64;
 

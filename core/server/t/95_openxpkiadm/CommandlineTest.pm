@@ -1,6 +1,7 @@
 package CommandlineTest;
-use strict;
-use warnings;
+use OpenXPKI;
+
+use base qw( Exporter );
 
 # Core modules
 use File::Temp qw( tempfile );
@@ -13,8 +14,6 @@ use Cwd;
 use Test::More;
 use Test::Deep ':v1';
 
-
-use base qw( Exporter );
 
 our @EXPORT = qw(
     openxpkiadm_test

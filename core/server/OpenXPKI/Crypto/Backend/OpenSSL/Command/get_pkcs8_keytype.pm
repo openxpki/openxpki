@@ -1,14 +1,7 @@
-## OpenXPKI::Crypto::Backend::OpenSSL::Command::get_pkcs8_keytype
-## Written 2006 by Alexander Klink for the OpenXPKI project
-## (C) Copyright 2006 by The OpenXPKI Project
-
-use strict;
-use warnings;
-
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::get_pkcs8_keytype;
+use OpenXPKI;
 
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
-use OpenXPKI::Debug;
 
 sub get_command
 {

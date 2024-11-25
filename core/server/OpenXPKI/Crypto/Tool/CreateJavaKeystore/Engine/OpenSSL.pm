@@ -1,17 +1,9 @@
-## OpenXPKI::Crypto::Tool::CreateJavaKeystore::Engine::OpenSSL.pm
-## Written 2006 by Alexander Klink for the OpenXPKI project
-## Copyright (C) 2006 by the OpenXPKI Project
-# TODO: create dummy engine instead of using Backend engine
-
-use strict;
-use warnings;
-
 package OpenXPKI::Crypto::Tool::CreateJavaKeystore::Engine::OpenSSL;
+use OpenXPKI;
 
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Engine);
 
 1;
-__END__
 
 =head1 Name
 

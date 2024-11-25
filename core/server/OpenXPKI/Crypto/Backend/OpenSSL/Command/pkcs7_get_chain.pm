@@ -1,17 +1,8 @@
-## OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_get_chain
-## Written 2005 by Michael Bell for the OpenXPKI project
-## Rewritten 2006 by Julia Dubenskaya for the OpenXPKI project
-## Refactoring by Oliver Welter 2013 for the OpenXPKI project
-## (C) Copyright 2005-2013 by The OpenXPKI Project
-
-use strict;
-use warnings;
-
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_get_chain;
+use OpenXPKI;
 
-use OpenXPKI::Debug;
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
-use English;
+
 use OpenXPKI::FileUtils;
 use OpenXPKI::Crypt::X509;
 

@@ -1,26 +1,19 @@
+package OpenXPKI::Crypto::Profile::CSR;
+use OpenXPKI;
+
+use base qw(OpenXPKI::Crypto::Profile::Base);
+
 =head1 Name
 
 OpenXPKI::Crypto::Profile::CSR - cryptographic profile for certifcate requests
 
 =cut
 
-use strict;
-use warnings;
-
-package OpenXPKI::Crypto::Profile::CSR;
-
-use base qw(OpenXPKI::Crypto::Profile::Base);
-
 use OpenXPKI::Server::Context qw( CTX );
 
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::DateTime;
-use English;
 
 use DateTime;
-# use Smart::Comments;
-
 
 =head2 new ( { ID } )
 

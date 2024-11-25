@@ -1,14 +1,8 @@
 package OpenXPKI::Serialization::JSON;
-
-use strict;
-use warnings;
+use OpenXPKI;
 
 use JSON;
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
-use English;
 use Log::Log4perl;
-use Data::Dumper;
 
 sub new
 {

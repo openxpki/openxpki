@@ -1,4 +1,7 @@
 package OpenXPKI::Template::Plugin::Profile;
+use OpenXPKI;
+
+use base qw( Template::Plugin );
 
 =head1 OpenXPKI::Template::Plugin::Profile
 
@@ -20,13 +23,6 @@ Will output the verbose label of the referenced profile.
 
 =cut
 
-use strict;
-use warnings;
-use base qw( Template::Plugin );
-use Template::Plugin;
-
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
 

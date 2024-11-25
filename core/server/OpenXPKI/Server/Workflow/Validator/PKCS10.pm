@@ -1,15 +1,14 @@
 package OpenXPKI::Server::Workflow::Validator::PKCS10;
+use OpenXPKI;
 
-use strict;
-use warnings;
 use base qw( OpenXPKI::Server::Workflow::Validator );
+
 use Workflow::Exception qw( validation_error );
 use Crypt::PKCS10 2.000;
 use MIME::Base64;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Debug;
 use OpenXPKI::Crypt::PKCS7;
-use English;
+
 
 sub _validate {
 

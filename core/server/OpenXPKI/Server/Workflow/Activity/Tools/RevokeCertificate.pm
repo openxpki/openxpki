@@ -1,19 +1,12 @@
-# OpenXPKI::Server::Workflow::Activity::Tools::RevokeCertificate
-#
-# Copyright (c) 2012 by The OpenXPKI Project
-#
-
 package OpenXPKI::Server::Workflow::Activity::Tools::RevokeCertificate;
+use OpenXPKI;
 
-use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::DateTime;
-use Data::Dumper;
+
 
 sub execute {
     my $self = shift;

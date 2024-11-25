@@ -1,7 +1,6 @@
 package OpenXPKI::Server::Workflow::Activity::Noop;
+use OpenXPKI;
 
-use warnings;
-use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
 sub execute {

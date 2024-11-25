@@ -1,22 +1,11 @@
-## OpenXPKI::Crypto::Backend::OpenSSL::Config
-## Written 2005 and 2006 by Julia Dubenskaya and Michael Bell for the OpenXPKI project
-## Improved 2011 by Martin Bartosch for the OpenXPKI project
-## (C) Copyright 2005-2011 by The OpenXPKI Project
-
-use strict;
-use warnings;
-
 package OpenXPKI::Crypto::Backend::OpenSSL::Config;
+use OpenXPKI;
 
 use OpenXPKI::Server::Context qw( CTX );
 
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::DN;
 use OpenXPKI::DateTime;
-use English;
 use OpenXPKI::FileUtils;
-
 
 sub new
 {

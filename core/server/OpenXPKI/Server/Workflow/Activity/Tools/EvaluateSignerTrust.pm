@@ -1,14 +1,10 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::EvaluateSignerTrust;
-
-use strict;
-use warnings;
+use OpenXPKI;
 
 use base qw( OpenXPKI::Server::Workflow::Activity );
+
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Crypt::X509;
-use English;
 
 sub execute {
     ##! 16: 'start'

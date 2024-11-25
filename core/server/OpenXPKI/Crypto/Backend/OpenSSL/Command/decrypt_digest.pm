@@ -1,9 +1,5 @@
-## OpenXPKI::Crypto::Backend::OpenSSL::Command::decrypt_digest
-
-use strict;
-use warnings;
-
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::decrypt_digest;
+use OpenXPKI;
 
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 

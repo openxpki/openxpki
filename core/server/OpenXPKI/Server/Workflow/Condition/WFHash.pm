@@ -1,13 +1,12 @@
 package OpenXPKI::Server::Workflow::Condition::WFHash;
+use OpenXPKI;
 
-use strict;
-use warnings;
 use base qw( OpenXPKI::Server::Workflow::Condition );
+
 use OpenXPKI::Server::Context qw( CTX );
 use Workflow::Exception qw( condition_error configuration_error );
 use OpenXPKI::Server::Workflow::WFObject::WFHash;
-use OpenXPKI::Debug;
-use English;
+
 
 sub _evaluate {
 

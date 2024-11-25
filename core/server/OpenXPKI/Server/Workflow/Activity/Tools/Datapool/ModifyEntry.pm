@@ -1,14 +1,11 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::Datapool::ModifyEntry;
+use OpenXPKI;
 
-use strict;
-use English;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
 use Workflow::Exception qw( configuration_error );
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use OpenXPKI::DateTime;
 use DateTime;
 use Template;
