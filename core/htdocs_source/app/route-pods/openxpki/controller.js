@@ -136,7 +136,8 @@ export default class OpenXpkiController extends Controller {
     async copyWorkflowIdToClipboard(/*event*/) {
         // target = DOM element where the temporary textarea will be appended,
         // to stay within a focus trap, like in a modal.
-        copy(this.model.top.page.workflow_id, { target: this.tempCopyElement })
+        // Conversion from number to string is required because copy() checks the type.
+        copy(this.model.top.page.workflow_id+'', { target: this.tempCopyElement })
 
         /* eslint-disable-next-line no-console */
         console.info("Contents copied to clipboard")
