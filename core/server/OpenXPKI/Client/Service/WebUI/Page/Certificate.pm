@@ -119,7 +119,7 @@ sub init_search ($self, $args = {}) {
     if ($args->{preset}) {
         $preset = $args->{preset};
     } elsif (my $queryid = $self->param('query')) {
-        my $result = $self->__load_query(certificate => $queryid);
+        my $result = $self->load_query(certificate => $queryid);
         $preset = $result->{input};
     } else {
         foreach my $key (('subject','san')) {
@@ -219,7 +219,7 @@ sub init_result ($self, $args) {
     if ($limit > 500) {  $limit = 500; }
 
     # Load query from session
-    my $cache = $self->__load_query(certificate => $queryid)
+    my $cache = $self->load_query(certificate => $queryid)
         or return $self->init_search();
 
     # Add limits
@@ -325,7 +325,7 @@ sub init_export ($self, $args) {
 
 
     # Load query from session
-    my $result = $self->__load_query(certificate => $queryid)
+    my $result = $self->load_query(certificate => $queryid)
         or return $self->init_search();
 
     # Add limits
@@ -416,7 +416,7 @@ sub init_pager ($self, $args) {
     my $queryid = $self->param('id');
 
     # Load query from session
-    my $result = $self->__load_query(certificate => $queryid)
+    my $result = $self->load_query(certificate => $queryid)
         or return $self->init_search();
 
     # will be removed once inline paging works
@@ -498,7 +498,7 @@ sub init_mine ($self, $args) {
             count => $result_count,
             query => $query,
         };
-        my $queryid = $self->__save_query($_query);
+        my $queryid = $self->save_query($_query);
 
         $pager = $self->__build_pager(
             pagename => 'certificate',
@@ -1181,7 +1181,7 @@ sub action_find ($self) {
             # found more than one item with serial
             # this is a legal use case when using external CAs
             my $spec = $self->session_param('certsearch')->{default};
-            my $queryid = $self->__save_query({
+            my $queryid = $self->save_query({
                 pagename => 'certificate',
                 count => scalar @{$search_result},
                 query => { cert_serial => $serial, entity_only => 1, $self->tenant_param() },
@@ -1373,7 +1373,7 @@ sub action_search ($self) {
         push @criteria, sprintf '<nobr><b>%s:</b> <i>%s</i></nobr>', $key, join(", ", @{$sorted->{$key}});
     }
 
-    my $queryid = $self->__save_query({
+    my $queryid = $self->save_query({
         pagename => 'certificate',
         count => $result_count,
         query => $query,

@@ -33,7 +33,7 @@ sub init_index ($self, $args) {
         input => {},
         criteria => [],
     };
-    my $queryid = $self->__save_query($querymeta);
+    my $queryid = $self->save_query($querymeta);
 
     # construct query that fetches the first 25 users
     my $query={};
@@ -67,7 +67,7 @@ sub init_result ($self, $args) {
     if ($limit > 500) {  $limit = 500; }
 
     # Load query from session
-    my $result = $self->__load_query(users => $queryid)
+    my $result = $self->load_query(users => $queryid)
         or return $self->render_search_form();
 
     # Add limits
@@ -116,7 +116,7 @@ sub init_pager ($self, $args) {
     my $queryid = $self->param('id');
 
     # Load query from session
-    my $result = $self->__load_query(users => $queryid)
+    my $result = $self->load_query(users => $queryid)
         or return $self->render_search_form();
 
     # will be removed once inline paging works
@@ -210,7 +210,7 @@ sub action_search ($self) {
         return $self->render_search_form({ preset => $input });
     }
     # store search query in session for paging etc...
-    my $queryid = $self->__save_query({
+    my $queryid = $self->save_query({
         pagename => 'users',
         count => $result_count,
         query => $query,
@@ -330,7 +330,7 @@ sub init_search ($self, $args) {
     # check if there are any preset values for the search fields
     my $preset;
     if (my $queryid = $self->param('query')) {
-        my $result = $self->__load_query(users => $queryid);
+        my $result = $self->load_query(users => $queryid);
         $preset = $result->{input};
     }
 

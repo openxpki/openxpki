@@ -19,7 +19,7 @@ sub init_pager ($self, $args) {
     my $queryid = $self->param('id');
 
     # Load query from session
-    my $cache = $self->__load_query(workflow => $queryid)
+    my $cache = $self->load_query(workflow => $queryid)
         or return $self->internal_redirect('workflow!search');
 
     my $startat = $self->param('startat');

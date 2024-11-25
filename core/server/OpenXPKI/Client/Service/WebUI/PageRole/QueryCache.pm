@@ -8,7 +8,7 @@ requires qw(
 );
 
 
-sub __save_query {
+sub save_query {
     my $self = shift;
     my $id = (ref $_[0] ne 'HASH') ? shift : $self->generate_uid;
     my $query = shift;
@@ -24,10 +24,10 @@ sub __save_query {
     return $id;
 }
 
-sub __load_query {
+sub load_query {
     my $self = shift;
-    my $pagename = shift or die "No 'pagename' given to __load_query()";
-    my $id = shift or die "No 'id' given to __load_query()";
+    my $pagename = shift or die "No 'pagename' given to load_query()";
+    my $id = shift or die "No 'id' given to load_query()";
 
     # load query from session
     my $result = $self->session_param("query_${id}");

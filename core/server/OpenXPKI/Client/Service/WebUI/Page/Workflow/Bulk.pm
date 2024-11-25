@@ -146,7 +146,7 @@ sub action_bulk ($self) {
     }
 
     # persist the selected ids and add button to recheck the status
-    my $queryid = $self->__save_query({
+    my $queryid = $self->save_query({
         pagename => 'workflow',
         count => scalar @serials,
         query => { id => \@serials },

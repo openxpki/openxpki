@@ -273,7 +273,7 @@ sub action_search ($self) {
         push @criteria, sprintf '<nobr><b>%s:</b> <i>%s</i></nobr>', $item->{label}, $val;
     }
 
-    my $queryid = $self->__save_query({
+    my $queryid = $self->save_query({
         pagename => 'workflow',
         count => $result_count,
         query => $query,
@@ -294,7 +294,7 @@ sub __wf_search_presets {
     my $preset;
 
     if (my $queryid = $self->param('query')) {
-        my $result = $self->__load_query(workflow => $queryid);
+        my $result = $self->load_query(workflow => $queryid);
         $preset = $result->{input} if $result;
 
     } else {

@@ -171,7 +171,7 @@ sub action_result ($self) {
         page => 'bulk!index',
     };
 
-    $self->__save_query($queryid => {
+    $self->save_query($queryid => {
         pagename => 'workflow',
         'count' => $result_count,
         'query' => $query,

@@ -31,7 +31,7 @@ sub init_export ($self, $args) {
     if ($limit > 500) { $limit = 500; }
 
     # Load query from session
-    my $cache = $self->__load_query(workflow => $queryid)
+    my $cache = $self->load_query(workflow => $queryid)
         or return $self->internal_redirect('workflow!search');
 
     # Add limits

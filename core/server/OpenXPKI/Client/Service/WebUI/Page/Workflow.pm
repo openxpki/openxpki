@@ -270,7 +270,7 @@ sub __render_task_list ($self, $item) {
                 pager_args => $pager_args,
             };
 
-            my $queryid = $self->__save_query($cache);
+            my $queryid = $self->save_query($cache);
 
             $pager = $self->__build_pager(
                 pagename => 'workflow',
