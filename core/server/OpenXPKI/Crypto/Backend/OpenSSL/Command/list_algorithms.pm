@@ -87,8 +87,7 @@ sub get_result
     $alg = $self->{ALG};
     $param = $self->{PARAM};
 
-    my $key = "";
-    foreach $key (keys(%{$supported_algs})) {
+    foreach my $key (keys(%{$supported_algs})) {
         if ( !exists($standard_algs{$key}) ) {
             my $lc_key = lc($key);
             if ( $result !~ m{ ${lc_key}\W }xms ) {
