@@ -1,7 +1,7 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry;
 use OpenXPKI;
 
-use base qw( OpenXPKI::Server::Workflow::Activity );
+use parent qw( OpenXPKI::Server::Workflow::Activity );
 
 # CPAN modules
 use DateTime;

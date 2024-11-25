@@ -1,7 +1,7 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::CertificateExportArchive;
 use OpenXPKI;
 
-use base qw( OpenXPKI::Server::Workflow::Activity );
+use parent qw( OpenXPKI::Server::Workflow::Activity );
 
 use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
 use OpenXPKI::Server::Context qw( CTX );

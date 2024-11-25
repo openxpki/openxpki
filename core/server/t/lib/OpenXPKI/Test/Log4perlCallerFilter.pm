@@ -1,7 +1,7 @@
 package OpenXPKI::Test::Log4perlCallerFilter;
 use OpenXPKI;
 
-use base qw( Log::Log4perl::Filter );
+use parent qw( Log::Log4perl::Filter );
 
 sub new {
     my ($class, %options) = @_;

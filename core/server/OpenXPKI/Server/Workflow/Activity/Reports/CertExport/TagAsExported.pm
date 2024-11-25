@@ -5,6 +5,6 @@ use OpenXPKI;
 # configs having the old unsupported export workflow installed
 # which was the default in old default installs
 
-use base qw( OpenXPKI::Server::Workflow::Activity );
+use parent qw( OpenXPKI::Server::Workflow::Activity );
 
 1;

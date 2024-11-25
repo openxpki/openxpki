@@ -1,7 +1,7 @@
 package OpenXPKI::Server::Workflow::Condition::WorkflowCreator;
 use OpenXPKI;
 
-use base qw( Workflow::Condition );
+use parent qw( Workflow::Condition );
 use OpenXPKI::Server::Context qw( CTX );
 use Workflow::Exception qw( condition_error );
 

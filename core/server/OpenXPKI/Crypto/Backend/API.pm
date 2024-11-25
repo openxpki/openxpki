@@ -1,7 +1,7 @@
 package OpenXPKI::Crypto::Backend::API;
 use OpenXPKI -class_std;
 
-use base qw( OpenXPKI::Crypto::API );
+use parent qw( OpenXPKI::Crypto::API );
 
 use OpenXPKI::Server::Context qw( CTX );
 

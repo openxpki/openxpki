@@ -1,7 +1,7 @@
 package OpenXPKI::Workflow::Factory;
 use OpenXPKI;
 
-use base qw( Workflow::Factory );
+use parent qw( Workflow::Factory );
 
 use Workflow 1.36;
 

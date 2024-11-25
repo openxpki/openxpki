@@ -628,7 +628,7 @@ definition to extend this class.
   use warnings;
 
   package MyWFModuleTest;
-  use base qw( OpenXPKI::Test::QA::More );
+  use parent qw( OpenXPKI::Test::QA::More );
 
   # object attributes
   my %myattrs : ATTR;

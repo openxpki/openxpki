@@ -1,7 +1,7 @@
 package OpenXPKI::Server::Workflow::Condition::ValidateRuleset;
 use OpenXPKI;
 
-use base qw( OpenXPKI::Server::Workflow::Condition );
+use parent qw( OpenXPKI::Server::Workflow::Condition );
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Workflow::Helpers;

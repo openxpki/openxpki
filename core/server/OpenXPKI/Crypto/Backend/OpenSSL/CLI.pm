@@ -1,7 +1,7 @@
 package OpenXPKI::Crypto::Backend::OpenSSL::CLI;
 use OpenXPKI -class_std;
 
-use base qw( OpenXPKI::Crypto::CLI );
+use parent qw( OpenXPKI::Crypto::CLI );
 
 my %config_of :ATTR( :init_arg<CONFIG> ); # the config object
 

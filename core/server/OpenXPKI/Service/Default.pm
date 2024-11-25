@@ -1,7 +1,7 @@
 package OpenXPKI::Service::Default;
 use OpenXPKI -class_std;
 
-use base qw( OpenXPKI::Service );
+use parent qw( OpenXPKI::Service );
 
 use List::Util qw( first );
 use Sys::SigAction qw( sig_alarm set_sig_handler );

@@ -1,7 +1,7 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::CalculateRequestHMAC;
 use OpenXPKI;
 
-use base qw( OpenXPKI::Server::Workflow::Activity );
+use parent qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
 use MIME::Base64 qw(decode_base64);

@@ -1,7 +1,7 @@
 package OpenXPKI::Crypto::Backend::OpenSSL::Engine::nCipher;
 use OpenXPKI;
 
-use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Engine);
+use parent qw(OpenXPKI::Crypto::Backend::OpenSSL::Engine);
 
 ## This driver supports nCipher nShield HSMs using HWCRHK keys that are
 ## preloaded using 'with-nfast pause' or 'preload pause'.

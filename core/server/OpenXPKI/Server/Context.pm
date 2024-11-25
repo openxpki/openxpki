@@ -1,7 +1,7 @@
 package OpenXPKI::Server::Context;
 use OpenXPKI;
 
-use base qw( Exporter );
+use parent qw( Exporter );
 
 use Storable qw(dclone);
 

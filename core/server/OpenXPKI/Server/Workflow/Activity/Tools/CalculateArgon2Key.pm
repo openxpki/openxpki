@@ -1,7 +1,7 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::CalculateArgon2Key;
 use OpenXPKI;
 
-use base qw( OpenXPKI::Server::Workflow::Activity );
+use parent qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Password;

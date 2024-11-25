@@ -1,7 +1,7 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::UpdateContextHash;
 use OpenXPKI;
 
-use base qw( OpenXPKI::Server::Workflow::Activity );
+use parent qw( OpenXPKI::Server::Workflow::Activity );
 
 use Workflow::Exception qw( configuration_error );
 

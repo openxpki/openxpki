@@ -187,7 +187,7 @@ Various options allow to import additional modules:
 
 additionally adds the imports
 
-    use base qw( Net::Server::MultiType );
+    use parent qw( Net::Server::MultiType );
 
 =head2 Moose class
 

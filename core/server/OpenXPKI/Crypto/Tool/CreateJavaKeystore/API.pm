@@ -1,7 +1,7 @@
 package OpenXPKI::Crypto::Tool::CreateJavaKeystore::API;
 use OpenXPKI -class_std;
 
-use base qw(OpenXPKI::Crypto::API);
+use parent qw(OpenXPKI::Crypto::API);
 
 ## scalar value:
 ##     - 0 means the parameter is optional

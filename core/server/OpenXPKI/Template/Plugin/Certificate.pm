@@ -1,7 +1,7 @@
 package OpenXPKI::Template::Plugin::Certificate;
 use OpenXPKI;
 
-use base qw( Template::Plugin );
+use parent qw( Template::Plugin );
 
 =head1 OpenXPKI::Template::Plugin::Certificate
 

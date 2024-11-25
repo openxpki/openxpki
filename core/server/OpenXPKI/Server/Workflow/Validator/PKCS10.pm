@@ -1,7 +1,7 @@
 package OpenXPKI::Server::Workflow::Validator::PKCS10;
 use OpenXPKI;
 
-use base qw( OpenXPKI::Server::Workflow::Validator );
+use parent qw( OpenXPKI::Server::Workflow::Validator );
 
 use Workflow::Exception qw( validation_error );
 use Crypt::PKCS10 2.000;

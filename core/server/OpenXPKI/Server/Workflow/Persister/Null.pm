@@ -1,7 +1,7 @@
 package OpenXPKI::Server::Workflow::Persister::Null;
 use OpenXPKI;
 
-use base qw( Workflow::Persister );
+use parent qw( Workflow::Persister );
 
 use OpenXPKI::Random;
 use OpenXPKI::Server::Context qw( CTX );

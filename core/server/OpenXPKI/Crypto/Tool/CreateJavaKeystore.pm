@@ -1,7 +1,7 @@
 package OpenXPKI::Crypto::Tool::CreateJavaKeystore;
 use OpenXPKI -class_std;
 
-use base qw( OpenXPKI::Crypto::Toolkit );
+use parent qw( OpenXPKI::Crypto::Toolkit );
 
 1;
 

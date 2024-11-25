@@ -1,7 +1,7 @@
 package OpenXPKI::Crypto::Tool::CreateJavaKeystore::Engine::OpenSSL;
 use OpenXPKI;
 
-use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Engine);
+use parent qw(OpenXPKI::Crypto::Backend::OpenSSL::Engine);
 
 1;
 

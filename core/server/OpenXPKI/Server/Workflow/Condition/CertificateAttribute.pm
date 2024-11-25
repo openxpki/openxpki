@@ -1,7 +1,7 @@
 package OpenXPKI::Server::Workflow::Condition::CertificateAttribute;
 use OpenXPKI;
 
-use base qw( OpenXPKI::Server::Workflow::Condition::CertificateHasAttribute );
+use parent qw( OpenXPKI::Server::Workflow::Condition::CertificateHasAttribute );
 
 use Workflow::Exception qw( condition_error configuration_error );
 use OpenXPKI::Server::Context qw( CTX );

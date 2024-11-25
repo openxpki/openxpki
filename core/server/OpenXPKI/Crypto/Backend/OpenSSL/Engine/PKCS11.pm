@@ -1,7 +1,7 @@
 package OpenXPKI::Crypto::Backend::OpenSSL::Engine::PKCS11;
 use OpenXPKI;
 
-use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Engine);
+use parent qw(OpenXPKI::Crypto::Backend::OpenSSL::Engine);
 
 use OpenXPKI::Server::Context qw( CTX );
 

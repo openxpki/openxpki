@@ -1,7 +1,7 @@
 package OpenXPKI::Template::Plugin::RandomPassword;
 use OpenXPKI;
 
-use base qw( Template::Plugin );
+use parent qw( Template::Plugin );
 
 use OpenXPKI::Random;
 use OpenXPKI::Password;

@@ -1,7 +1,7 @@
 package OpenXPKI::Server::Workflow::WFObject::WFArray;
 use OpenXPKI;
 
-use base qw( OpenXPKI::Server::Workflow::WFObject );
+use parent qw( OpenXPKI::Server::Workflow::WFObject );
 
 use Carp qw( confess );
 

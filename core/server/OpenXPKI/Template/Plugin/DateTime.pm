@@ -1,7 +1,7 @@
 package OpenXPKI::Template::Plugin::DateTime;
 use OpenXPKI;
 
-use base qw( Template::Plugin );
+use parent qw( Template::Plugin );
 
 =head1 OpenXPKI::Template::Plugin::DateTime
 

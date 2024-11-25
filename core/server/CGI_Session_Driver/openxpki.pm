@@ -8,7 +8,7 @@ use Data::Dumper;
 use MIME::Base64;
 use Crypt::CBC;
 use Digest::SHA qw(hmac_sha256_hex);
-use base 'CGI::Session::Driver::DBI';
+use parent qw( CGI::Session::Driver::DBI );
 
 sub init {
 

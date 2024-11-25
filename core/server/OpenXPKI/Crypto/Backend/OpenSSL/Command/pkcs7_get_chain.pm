@@ -1,7 +1,7 @@
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_get_chain;
 use OpenXPKI;
 
-use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
+use parent qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 
 use OpenXPKI::FileUtils;
 use OpenXPKI::Crypt::X509;

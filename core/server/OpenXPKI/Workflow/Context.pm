@@ -1,7 +1,7 @@
 package OpenXPKI::Workflow::Context;
 use OpenXPKI;
 
-use base qw( Workflow::Context );
+use parent qw( Workflow::Context );
 
 use Workflow 1.39;
 

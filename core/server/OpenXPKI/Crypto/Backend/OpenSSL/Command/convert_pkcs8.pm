@@ -2,7 +2,7 @@
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_pkcs8;
 use OpenXPKI;
 
-use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
+use parent qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 
 sub get_command
 {

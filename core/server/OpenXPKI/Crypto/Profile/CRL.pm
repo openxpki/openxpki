@@ -1,7 +1,7 @@
 package OpenXPKI::Crypto::Profile::CRL;
 use OpenXPKI;
 
-use base qw(OpenXPKI::Crypto::Profile::Base);
+use parent qw(OpenXPKI::Crypto::Profile::Base);
 
 =head1 Name
 

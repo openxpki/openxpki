@@ -1,7 +1,7 @@
 package OpenXPKI::Server::Workflow::Activity;
 use OpenXPKI;
 
-use base qw( Workflow::Action );
+use parent qw( Workflow::Action );
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Workflow::Pause;

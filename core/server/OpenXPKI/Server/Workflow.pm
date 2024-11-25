@@ -1,7 +1,7 @@
 package OpenXPKI::Server::Workflow;
 use OpenXPKI;
 
-use base qw( Workflow );
+use parent qw( Workflow );
 
 # Core modules
 use Carp qw( croak carp );

@@ -1,7 +1,7 @@
 package OpenXPKI::Crypto::Tool::CreateJavaKeystore::CLI;
 use OpenXPKI -class_std;
 
-use base qw( OpenXPKI::Crypto::CLI );
+use parent qw( OpenXPKI::Crypto::CLI );
 
 sub error_ispresent {
     my $self = shift;

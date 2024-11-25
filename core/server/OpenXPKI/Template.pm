@@ -1,7 +1,7 @@
 package OpenXPKI::Template;
 use OpenXPKI;
 
-use base qw( Template );
+use parent qw( Template );
 
 use OpenXPKI::FileUtils;
 use OpenXPKI::Serialization::Simple;

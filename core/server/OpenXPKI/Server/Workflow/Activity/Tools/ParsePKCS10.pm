@@ -1,7 +1,7 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::ParsePKCS10;
 use OpenXPKI;
 
-use base qw( OpenXPKI::Server::Workflow::Activity );
+use parent qw( OpenXPKI::Server::Workflow::Activity );
 
 use Crypt::PKCS10;
 use Digest::SHA qw(sha1_hex);

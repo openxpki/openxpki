@@ -1,7 +1,7 @@
 package OpenXPKI::Server::Workflow::Persister::NoHistory;
 use OpenXPKI;
 
-use base qw( OpenXPKI::Server::Workflow::Persister::DBI );
+use parent qw( OpenXPKI::Server::Workflow::Persister::DBI );
 
 
 sub create_history {

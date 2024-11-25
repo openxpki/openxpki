@@ -1,7 +1,7 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::BuildPKCS7CertList;
 use OpenXPKI;
 
-use base qw( OpenXPKI::Server::Workflow::Activity );
+use parent qw( OpenXPKI::Server::Workflow::Activity );
 
 use MIME::Base64;
 use OpenXPKI::Server::Context qw( CTX );

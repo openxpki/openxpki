@@ -1,7 +1,7 @@
 package OpenXPKI::Server::Workflow::Validator::Connector;
 use OpenXPKI;
 
-use base qw( OpenXPKI::Server::Workflow::Validator );
+use parent qw( OpenXPKI::Server::Workflow::Validator );
 
 use OpenXPKI::Server::Context qw( CTX );
 use Workflow::Exception qw( validation_error configuration_error );

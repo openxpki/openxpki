@@ -1,7 +1,7 @@
 package OpenXPKI::Server::Workflow::Condition::IsWrappedRequest;
 use OpenXPKI;
 
-use base qw( OpenXPKI::Server::Workflow::Condition );
+use parent qw( OpenXPKI::Server::Workflow::Condition );
 
 use Convert::ASN1 ':tag';
 use Crypt::PKCS10;

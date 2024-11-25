@@ -1,7 +1,7 @@
 package OpenXPKI::Server::Workflow::Field;
 use OpenXPKI;
 
-use base qw( Workflow::Action::InputField );
+use parent qw( Workflow::Action::InputField );
 
 sub init {
     my ( $self, $params ) = @_;

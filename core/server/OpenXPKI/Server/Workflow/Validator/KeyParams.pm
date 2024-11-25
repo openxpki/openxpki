@@ -1,7 +1,7 @@
 package OpenXPKI::Server::Workflow::Validator::KeyParams;
 use OpenXPKI;
 
-use base qw( OpenXPKI::Server::Workflow::Validator );
+use parent qw( OpenXPKI::Server::Workflow::Validator );
 
 use Crypt::PKCS10;
 use OpenXPKI::Server::Context qw( CTX );

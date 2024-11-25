@@ -1,7 +1,7 @@
 package OpenXPKI::Crypto::Backend::OpenSSL;
 use OpenXPKI -class_std;
 
-use base qw( OpenXPKI::Crypto::Toolkit );
+use parent qw( OpenXPKI::Crypto::Toolkit );
 
 use OpenXPKI::Crypto::Backend::OpenSSL::Config;
 use OpenXPKI::Server::Context qw( CTX );

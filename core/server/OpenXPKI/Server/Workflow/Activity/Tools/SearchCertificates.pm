@@ -2,7 +2,7 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::SearchCertificates;
 use OpenXPKI;
 
-use base qw( OpenXPKI::Server::Workflow::Activity );
+use parent qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::DN;

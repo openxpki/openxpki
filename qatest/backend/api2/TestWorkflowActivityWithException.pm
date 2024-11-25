@@ -1,7 +1,7 @@
 package TestWorkflowActivityWithException;
 use OpenXPKI;
 
-use base qw( OpenXPKI::Server::Workflow::Activity );
+use parent qw( OpenXPKI::Server::Workflow::Activity );
 
 sub execute {
     my ($self, $workflow) = @_;

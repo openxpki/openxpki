@@ -1,7 +1,7 @@
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::asn1_genconf;
 use OpenXPKI;
 
-use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
+use parent qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 
 sub get_command
 {

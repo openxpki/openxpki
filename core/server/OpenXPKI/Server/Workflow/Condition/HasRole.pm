@@ -1,7 +1,7 @@
 package OpenXPKI::Server::Workflow::Condition::HasRole;
 use OpenXPKI;
 
-use base qw( Workflow::Condition );
+use parent qw( Workflow::Condition );
 
 use Workflow::Exception qw( condition_error configuration_error );
 use OpenXPKI::Server::Context qw( CTX );

@@ -1,7 +1,7 @@
 package OpenXPKI::Server::Workflow::Validator::CertSubject;
 use OpenXPKI;
 
-use base qw( Workflow::Validator );
+use parent qw( Workflow::Validator );
 
 use Workflow::Exception qw( validation_error );
 use OpenXPKI::Server::Context qw( CTX );

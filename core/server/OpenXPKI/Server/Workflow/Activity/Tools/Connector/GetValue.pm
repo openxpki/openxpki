@@ -1,7 +1,7 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::Connector::GetValue;
 use OpenXPKI;
 
-use base qw( OpenXPKI::Server::Workflow::Activity );
+use parent qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Serialization::Simple;

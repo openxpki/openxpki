@@ -1,7 +1,7 @@
 package CommandlineTest;
 use OpenXPKI;
 
-use base qw( Exporter );
+use parent qw( Exporter );
 
 # Core modules
 use File::Temp qw( tempfile );
