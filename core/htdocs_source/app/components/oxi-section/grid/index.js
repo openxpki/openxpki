@@ -288,7 +288,8 @@ export default class OxiSectionGridComponent extends Component {
     // (de-)select all rows
     @action
     selectAll() {
-        this.rawData.forEach(i => emSet(i, "checked", !this.allChecked)) // FIXME turn rawData into object that extends Base and use @tracked properties instead of emSet()
+        const wasAllChecked = this.allChecked;
+        this.rawData.forEach(i => emSet(i, "checked", !wasAllChecked)) // FIXME turn rawData into object that extends Base and use @tracked properties instead of emSet()
         this.rawData = this.rawData // eslint-disable-line no-self-assign -- trigger Ember update
         this.updateButtonState()
     }
