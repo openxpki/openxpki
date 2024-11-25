@@ -12,6 +12,7 @@ use OpenXPKI::Server::NICE::Factory;
 sub execute {
     my $self     = shift;
     my $workflow = shift;
+    my $context    = $workflow->context();
 
     ##! 32: 'context: ' . Dumper(  $workflow->context() )
 
