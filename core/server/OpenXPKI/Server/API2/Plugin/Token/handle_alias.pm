@@ -8,8 +8,6 @@ OpenXPKI::Server::API2::Plugin::Token::handle_alias
 =cut
 
 # Project modules
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Types;
 

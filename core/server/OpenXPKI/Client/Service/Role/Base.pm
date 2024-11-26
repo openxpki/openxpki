@@ -46,7 +46,6 @@ use Mojo::Message::Request;
 use Mojo::Util qw( url_unescape );
 
 # Project modules
-use OpenXPKI::Exception;
 use OpenXPKI::Client::Simple;
 use OpenXPKI::Client::Service::Response;
 use OpenXPKI::Log4perl;

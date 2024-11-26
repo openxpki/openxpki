@@ -15,12 +15,9 @@ OpenXPKI::Server::API2::Plugin::Cert::search_cert
 use Regexp::Common;
 
 # Project modules
-use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
 use OpenXPKI::Server::Database::Legacy;
 use OpenXPKI::Server::API2::Plugin::Cert::DateCondition;
-use OpenXPKI::Util;
 
 has 'return_columns_default' => (
     isa => 'ArrayRef',
