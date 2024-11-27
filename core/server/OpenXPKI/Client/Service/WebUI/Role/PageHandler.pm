@@ -96,11 +96,12 @@ sub handle_view ($self, $view_str, $args, $forced_status = undef) {
                 ($view_str, $args) = $target->@*;
                 $self->log->trace("Internal redirect to: $view_str") if $self->log->is_trace;
             } else {
-                $view_str = undef;
+                last;
             }
 
         } else {
             $page = OpenXPKI::Client::Service::WebUI::Page::Bootstrap->new(client => $self)->page_not_found;
+            last;
         }
     }
 
@@ -214,7 +215,7 @@ sub _load_page_class ($self, $arg) {
     }
 
     $self->log->error(sprintf(
-        'Could not find any handler class OpenXPKI::Client::Service::WebUI::%s::* containing %s()',
+        'Could not find any handler class OpenXPKI::Client::Service::WebUI::Page::%s::* containing %s()',
         ucfirst($class),
         $fullmethod
     ));
