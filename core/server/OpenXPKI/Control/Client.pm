@@ -45,8 +45,17 @@ has cfg => (
 has silent => (
     is => 'rw',
     isa => 'Bool',
+    init_arg => undef,
     lazy => 1,
     default => sub { shift->opts->{quiet} ? 1 : 0 },
+);
+
+has foreground => (
+    is => 'rw',
+    isa => 'Bool',
+    init_arg => undef,
+    lazy => 1,
+    default => sub { shift->opts->{nd} ? 1 : 0 },
 );
 
 
@@ -89,7 +98,7 @@ sub cmd_start ($self) {
     my $force_screen_logging = 0;
     if ($self->opts->{dev}) {
         $ENV{MOJO_MODE} = 'development';
-        $force_screen_logging = 1 if $self->opts->{nd};
+        $force_screen_logging = 1 if $self->foreground;
     } else {
         $ENV{MOJO_MODE} = 'production';
     }
@@ -122,12 +131,12 @@ sub cmd_start ($self) {
 
     my $start_client = sub {
         $daemon->start;
-        $daemon->daemonize unless $self->opts->{nd};
+        $daemon->daemonize unless $self->foreground;
         $daemon->run;
     };
 
     # foreground mode
-    if ($self->opts->{nd}) {
+    if ($self->foreground) {
         try {
             $start_client->();
         }
