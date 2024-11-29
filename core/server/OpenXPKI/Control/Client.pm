@@ -35,12 +35,9 @@ has cfg => (
         # require OpenXPKI::Config;
         # my $config = OpenXPKI::Config->new;
         return {
-            user => 'www-data',
-            group => 'openxpki',
             pid_file => '/run/openxpki-clientd.pid',
             socket_file => '/var/openxpki/openxpki-clientd.socket',
             #stderr => '/var/log/openxpki/client-stderr.log',
-            #socket_owner => 'apache',
         };
     },
 );
@@ -72,13 +69,16 @@ sub getopt_params ($self, $command) {
 sub cmd_start ($self) {
     my $user = $self->opts->{user} || $self->cfg->{user};
     my $group = $self->opts->{group} || $self->cfg->{group};
+
     my $pid_file = $self->opts->{pid_file} || $self->cfg->{pid_file}
         or die "Missing config entry: system.client.pid_file\n";
+
     my $socket_file = $self->opts->{socket_file} || $self->cfg->{socket_file}
         or die "Missing config entry: system.client.socket_file\n";
     my $enc_socket_file = url_escape(Mojo::File->new($socket_file));
-    my $socket_user = $self->opts->{socket_user} || $user;
-    my $socket_group = $self->opts->{socket_group} || $group;
+
+    my $socket_user = $self->opts->{socket_user} || $self->cfg->{socket_user} || $user;
+    my $socket_group = $self->opts->{socket_group} || $self->cfg->{socket_group} || $group;
 
     my $pid = $self->__get_pid;
     if (defined $pid and $self->status(silent => 1) == 0) {
@@ -111,10 +111,10 @@ sub cmd_start ($self) {
         # Mojo attribute: pass the client root logger
         log => $log,
         # daemon owner
-        oxi_user => $user,
-        oxi_group => $group,
-        oxi_socket_user => $socket_user,
-        oxi_socket_group => $socket_group,
+        oxi_user => $user, # might be undef
+        oxi_group => $group, # might be undef
+        oxi_socket_user => $socket_user, # might be undef
+        oxi_socket_group => $socket_group, # might be undef
         oxi_skip_log_init => $force_screen_logging,
         # config object
         #oxi_config_obj => ...,
@@ -232,13 +232,13 @@ __PACKAGE__->meta->make_immutable;
 
 =item B<-u NAME|UID>
 
-Target user for the web server (default: current user)
+Target user for the web server process (default: current user)
 
 =item B<--group NAME|GID>
 
 =item B<-g NAME|GID>
 
-Target group for the web server (default: current group)
+Target group for the web server process (default: current group)
 
 =item B<--pid-file PATH>
 
@@ -254,11 +254,11 @@ Path of the socket file (required)
 
 =item B<--socket-user NAME|UID>
 
-Target user for the socket file (default: process user)
+Target user for the socket file (default: same as --user or current user)
 
 =item B<--socket-group NAME|GID>
 
-Target group for the socket file (default: process group)
+Target group for the socket file (default: same as --group or current group)
 
 =item B<--dev>
 

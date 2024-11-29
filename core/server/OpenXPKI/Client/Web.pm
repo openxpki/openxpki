@@ -289,7 +289,13 @@ sub _drop_privileges ($self, $pid_file, $user, $group, $label) {
     my (undef, $uid, undef, $gid) = OpenXPKI::Util->resolve_user_group($user, $group, 'Mojolicious daemon', 1);
 
     # ownership already correct - nothing to do
-    return if (POSIX::getuid == ($uid//-1) and POSIX::getgid == ($gid//-1));
+    if (
+        (not $uid or POSIX::getuid == $uid) and
+        (not $gid or POSIX::getgid == $gid)
+    ) {
+        $self->log->debug("$label: no need to drop privileges (no user/group specified or already matching)");
+        return;
+    }
 
     # change file ownership before dropping privileges!
     chown $uid, -1, $pid_file if defined $uid;
