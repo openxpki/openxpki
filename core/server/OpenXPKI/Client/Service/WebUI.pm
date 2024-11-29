@@ -431,9 +431,8 @@ sub prepare ($self, $c) {
         if ('index' eq $realm) {
             $self->log->debug('Special path "index" - showing realm selection page');
 
-            # Enforce new session to get rid of selected realm etc.
             $self->session->flush;
-            $self->backend->detach;
+            $self->backend->detach; # enforce new backend session to get rid of selected realm etc.
         }
 
         # If the session has no realm set, try to get a realm from the map

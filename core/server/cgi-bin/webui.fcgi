@@ -215,10 +215,8 @@ while (my $cgi = CGI::Fast->new("")) {
             if ('index' eq $script_realm) {
                 $log->debug('Special path detected - showing realm selection page');
 
-                # Enforce new session to get rid of selected realm etc.
-                # FIXME -- really flush?
                 $session_front->flush;
-                $backend_client->detach;
+                $backend_client->detach; # enforce new backend session to get rid of selected realm etc.
             }
 
             # If the session has no realm set, try to get a realm from the map
