@@ -76,8 +76,8 @@ has opts => (
 
 =head2 stop_process
 
-Stop the given process and all subprocesses (i.e. processes belonging to the
-same process group).
+Stop all subprocesses of the given process (i.e. processes belonging to the same
+process group) and finally the parent process itself.
 
 B<Named parameters>
 
@@ -115,46 +115,17 @@ sub stop_process ($self, $arg) {
     say 'Stopping '.$arg->name unless $arg->silent;
 
     # get all PIDs which belong to the current process group
-    my @pids;
     my $pt = Proc::ProcessTable->new;
-    for my $process (@{$pt->table}) {
-        if (getpgrp($process->pid) == $process_group) {
-            push @pids, $process->pid;
-        }
-    }
+    my @child_pids =
+        grep { $_ != $arg->pid and getpgrp($_) == $process_group }
+        map { $_->pid }
+        @{$pt->table};
 
-    my $process_count;
+    $self->__stop_em(label => 'subprocesses', pids => \@child_pids, silent => $arg->silent);
+    $self->__stop_em(label => 'main process', pids => [ $arg->pid ], silent => $arg->silent);
 
-    # try to send them SIGTERM
-    my $attempts = 5;
-    while ($attempts-- > 0) {
-        $process_count = scalar @pids;
-        last if ($process_count <= 0);
-        say "Stopping gracefully, $process_count (sub)processes remaining..." unless $arg->silent;
-        foreach my $p (@pids) {
-            kill(15, $p);
-        }
-        sleep 2;
-        @pids = $self->__filter_alive(\@pids);
-    }
-
-    # still processes left?
-    # slaughter them with SIGKILL
-    $attempts = 5;
-    while ($attempts-- > 0) {
-        $process_count = scalar @pids;
-        last if ($process_count <= 0);
-        say "Killing un-cooperative process the hard way, $process_count (sub)processes remaining..." unless $arg->silent;
-        foreach my $p (@pids) {
-            kill(9, $p);
-        }
-        sleep 1;
-        @pids = $self->__filter_alive(\@pids);
-    }
-
-    @pids = $self->__filter_alive(\@pids);
-    $process_count = scalar @pids;
-    if ($process_count <= 0) {
+    my @pids = $self->__filter_alive($arg->pid, @child_pids);
+   if (scalar @pids <= 0) {
         say "DONE." unless $arg->silent;
         return 0;
     } else {
@@ -164,10 +135,48 @@ sub stop_process ($self, $arg) {
     }
 }
 
+signature_for __stop_em => (
+    method => 1,
+    named => [
+        pids => 'ArrayRef',
+        label => 'Str',
+        silent => 'Bool', { default => 0 },
+    ],
+);
+sub __stop_em ($self, $arg) {
+    my @pids = $arg->pids->@*;
+    my $total = scalar @pids;
+
+    # try to send them SIGTERM
+    my $attempts = 10;
+    while ($attempts-- > 0) {
+        @pids = $self->__filter_alive(@pids);
+        my $count = scalar @pids;
+        last if ($count <= 0);
+        printf("Stopping %s gracefully (SIGTERM)%s\n", $arg->label, $total > 1 ? ", $count remaining..." : '')
+            unless $arg->silent;
+        kill(15, $_) for @pids;
+        sleep 1;
+    }
+
+    # still processes left?
+    # slaughter them with SIGKILL
+    $attempts = 5;
+    while ($attempts-- > 0) {
+        @pids = $self->__filter_alive(@pids);
+        my $count = scalar @pids;
+        last if ($count <= 0);
+        printf("Killing un-cooperative %s (SIGKILL)%s\n", $arg->label, $total > 1 ? ", $count remaining..." : '')
+            unless $arg->silent;
+        kill(9, $_) for @pids;
+        sleep 1;
+    }
+}
+
 # Take an array ref, array containing process IDs
 # Check which processes are still alive and return them in an array
-sub __filter_alive ($self, $pids) {
-    return grep { kill(0, $_) != 0 } $pids->@*;
+sub __filter_alive ($self, @pids) {
+    return grep { kill(0, $_) != 0 } @pids;
 }
 
 =head2 slurp_if_exists
