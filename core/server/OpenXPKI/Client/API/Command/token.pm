@@ -3,6 +3,7 @@ use OpenXPKI -role;
 
 # Core modules
 use List::Util qw( none );
+use File::Basename;
 
 =head1 NAME
 
