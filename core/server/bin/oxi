@@ -9,7 +9,7 @@ use JSON::PP;
 
 # CPAN modules
 use PPI::Document;
-use YAML;
+use YAML::PP;
 
 # Project modules
 use OpenXPKI::i18n qw(set_language);
@@ -285,7 +285,8 @@ if ($res->state == 200) {
     } elsif ($opt{'json'}) {
         print $json->encode($out);
     } else {
-        print YAML::Dump $out;
+        my $ypp = YAML::PP->new;
+        print $ypp->dump_string($out);
     }
     exit 0;
 
