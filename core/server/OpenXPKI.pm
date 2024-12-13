@@ -114,8 +114,10 @@ sub import {
     feature->unimport::out_of(1, qw(
         indirect
         multidimensional
-        bareword_filehandles
     ));
+    feature->unimport::out_of(1, qw(
+        bareword_filehandles
+    )) if "$]" > 5.036;
 
     # Core modules
     Data::Dumper->import::into(1);
@@ -164,7 +166,7 @@ This is equivalent to adding the following imports to the calling package:
     use feature "state";
     no feature "indirect";
     no feature "multidimensional";
-    no feature "bareword_filehandles";
+    no feature "bareword_filehandles"; # only if Perl version >= 5.36.0
 
     # Core modules
     use Data::Dumper;
