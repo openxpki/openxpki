@@ -122,6 +122,7 @@ sub startup ($self) {
     my $group = $self->{oxi_group};
     my $socket_user = $self->{oxi_socket_user};
     my $socket_group = $self->{oxi_socket_group};
+    my $socket_mode = $self->{oxi_socket_mode};
 
     # we use the stash to store the flag because $self in helper_oxi_config()
     # refers to an OpenXPKI::Client::Web::Controller instance
@@ -181,8 +182,13 @@ sub startup ($self) {
             # Drop privileges (manager process)
             # (the "wait" event happends after PID file creation)
             $server->once(wait => sub ($server) {
-                my $socket_file = $server->ioloop->acceptor($server->acceptors->[0])->handle->hostpath;
-                $self->_chown_socket($socket_file, $socket_user, $socket_group);
+                # set owner/mode on AF_UNIX domain sockets
+                my $socket = $server->ioloop->acceptor($server->acceptors->[0])->handle;
+                if ($socket->isa('IO::Socket::UNIX')) {
+                    my $socket_file = $socket->hostpath;
+                    $self->_chown_socket($socket_file, $socket_user, $socket_group, $socket_mode);
+                }
+                # drop process privileges
                 $self->_drop_privileges($server->pid_file, $user, $group, "Manager $$");
             });
         } else {
@@ -264,25 +270,27 @@ sub helper_oxi_config ($self, $service, $no_config) {
     return $configs->{$service};
 }
 
-sub _chown_socket ($self, $socket_file, $user, $group) {
-    #
-    # Modify socket ownership and permissions
-    #
+sub _chown_socket ($self, $file, $user, $group, $mode) {
+    # Modify socket permissions
+    if ($mode) {
+        chmod $mode, $file;
+        $self->log->debug(sprintf('Permissions of socket file "%s" set to: %s', $file, $mode));
+    }
+
+    # Modify socket ownership
     my (undef, $s_uid, undef, $s_gid) = OpenXPKI::Util->resolve_user_group(
         $user, $group, 'socket', 1
     );
-    #my $socket_file = $daemon->ioloop->acceptor($daemon->acceptors->[0])->handle->hostpath;
-    chmod 0660, $socket_file;
     my @changes = ();
     if (defined $s_uid) {
-        chown $s_uid, -1, $socket_file;
+        chown $s_uid, -1, $file;
         push @changes, "user = $user";
     }
     if (defined $s_gid) {
-        chown -1, $s_gid, $socket_file;
+        chown -1, $s_gid, $file;
         push @changes, "group = $group";
     }
-    $self->log->debug(sprintf('Ownership of socket file "%s" set to: %s', $socket_file, join(', ', @changes))) if @changes;
+    $self->log->debug(sprintf('Ownership of socket file "%s" set to: %s', $file, join(', ', @changes))) if @changes;
 }
 
 sub _drop_privileges ($self, $pid_file, $user, $group, $label) {

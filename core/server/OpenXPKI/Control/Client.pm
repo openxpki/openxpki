@@ -18,7 +18,7 @@ this class implements all methods required by L<OpenXPKI::Control::Role>.
 
 # CPAN modules
 use Mojo::Server::Prefork;
-use Mojo::Util qw( extract_usage getopt url_escape );
+use Mojo::Util qw( extract_usage getopt url_escape monkey_patch );
 use Mojo::File;
 
 # Project modules
@@ -69,6 +69,8 @@ sub getopt_params ($self, $command) {
         socket_file|socket-file|s=s
         socket_user|socket-user=s
         socket_group|socket-group=s
+        socket_mode|socket-mode=s
+        systemd
         nd|no-detach
         quiet
     );
@@ -76,19 +78,6 @@ sub getopt_params ($self, $command) {
 
 # required by OpenXPKI::Control::Role
 sub cmd_start ($self) {
-    my $user = $self->opts->{user} || $self->cfg->{user};
-    my $group = $self->opts->{group} || $self->cfg->{group};
-
-    my $pid_file = $self->opts->{pid_file} || $self->cfg->{pid_file}
-        or die "Missing config entry: system.client.pid_file\n";
-
-    my $socket_file = $self->opts->{socket_file} || $self->cfg->{socket_file}
-        or die "Missing config entry: system.client.socket_file\n";
-    my $enc_socket_file = url_escape(Mojo::File->new($socket_file));
-
-    my $socket_user = $self->opts->{socket_user} || $self->cfg->{socket_user} || $user;
-    my $socket_group = $self->opts->{socket_group} || $self->cfg->{socket_group} || $group;
-
     my $pid = $self->__get_pid;
     if (defined $pid and $self->status(silent => 1) == 0) {
         warn "OpenXPKI Client already running. PID: $pid\n";
@@ -106,24 +95,68 @@ sub cmd_start ($self) {
     my $log = OpenXPKI::Log4perl->get_logger('openxpki.client');
 
     $log->info('Foreground development mode: logging to console (Log4perl config will be ignored)') if $force_screen_logging;
+    $log->trace('ENV = ' . Dumper \%ENV) if $log->is_trace;
+
+    my $user = $self->opts->{user} || $self->cfg->{user};
+    my $group = $self->opts->{group} || $self->cfg->{group};
+    my $systemd_mode = $self->opts->{systemd};
+
+    my %server_params;  # parameters passed to Mojo::Server::Prefork
+    my %web_params;     # parameters passed to OpenXPKI::Client::Web
+
+    # systemd provided socket file descriptors
+    if ($systemd_mode) {
+        $log->info('systemd mode: use existing socket (read from LISTEN_FDS); skip PID file creation');
+        die "LISTEN_PID is not set but required in systemd mode\n" unless $ENV{LISTEN_PID};
+        die "LISTEN_FDS is not set but required in systemd mode\n" unless $ENV{LISTEN_FDS};
+        die "LISTEN_PID contains different process ID: $ENV{LISTEN_PID} != $$\n" unless $ENV{LISTEN_PID} eq $$;
+
+        %server_params = (
+            listen => [
+                map { $log->warn('READLINK = ' . readlink("/proc/self/fd/$_")); sprintf 'http+unix://%s?fd=%i', $self->__file_url_from_fd($_), $_ }
+                map { $_+2 }
+                1..$ENV{LISTEN_FDS}
+            ],
+        );
+
+    # manually configured sockets
+    } else {
+        my $pid_file = $self->opts->{pid_file} || $self->cfg->{pid_file}
+            or die "Missing config entry: system.client.pid_file\n";
+        my $socket_file = $self->opts->{socket_file} || $self->cfg->{socket_file}
+            or die "Missing config entry: system.client.socket_file\n";
+
+        %server_params = (
+            pid_file => $pid_file,
+            listen => [ sprintf 'http+unix://%s', $self->__file_url($socket_file) ],
+        );
+
+        # each parameter might be undef:
+        %web_params = (
+            oxi_socket_user => $self->opts->{socket_user} || $self->cfg->{socket_user} || $user,
+            oxi_socket_group => $self->opts->{socket_group} || $self->cfg->{socket_group} || $group,
+            oxi_socket_mode => $self->opts->{socket_mode} || $self->cfg->{socket_mode},
+        );
+    }
+
+    # prevent the server from creating a PID file
+    monkey_patch 'Mojo::Server::Prefork', ensure_pid_file => sub { } if $systemd_mode;
 
     my $daemon = Mojo::Server::Prefork->new(
-        listen => ["http+unix://$enc_socket_file"],
+        %server_params,
         reverse_proxy => 1,
-        pid_file => $pid_file,
         cleanup => 0, # don't try to delete PID file (would fail for non-root user and PID file e.g. below /run )
     );
 
     $daemon->check_pid; # delete any old PID file
 
     $daemon->build_app('OpenXPKI::Client::Web' => {
+        %web_params,
         # Mojo attribute: pass the client root logger
         log => $log,
         # daemon owner
         oxi_user => $user, # might be undef
         oxi_group => $group, # might be undef
-        oxi_socket_user => $socket_user, # might be undef
-        oxi_socket_group => $socket_group, # might be undef
         oxi_skip_log_init => $force_screen_logging,
         # config object
         #oxi_config_obj => ...,
@@ -231,6 +264,37 @@ sub __get_pid ($self) {
     return $self->slurp_if_exists($self->cfg->{pid_file});
 }
 
+sub __file_url ($self, $path) {
+    return url_escape(Mojo::File->new($path));
+}
+
+sub __file_url_from_fd ($self, $fd) {
+    my $path = readlink("/proc/self/fd/$fd") or die "Could not resolve file descriptor '$fd'";
+
+    if (not $path =~ /^\//) {
+        if ($path =~ /^socket:\[(\d+)\]$/) {
+            $path = $self->__socket_path_from_inode($1) or die "Could not resolve inode '$1' into socket path";
+        } else {
+            die "Cannot handle file descriptor $fd: $path";
+        }
+    }
+
+    return $self->__file_url($path);
+}
+
+sub __socket_path_from_inode ($self, $inode) {
+    open my $fh, '<', '/proc/self/net/unix' or die "Cannot open /proc/self/net/unix: $!";
+    <$fh>; # skip header
+    while (my $line = <$fh>) {
+        chomp $line;
+        my @fields = split /\s+/, $line;
+        if ($inode == $fields[6]) {
+            return $fields[7] // '';
+        }
+    }
+    return '';
+}
+
 __PACKAGE__->meta->make_immutable;
 
 =head1 OPTIONS
@@ -249,17 +313,33 @@ Target user for the web server process (default: current user)
 
 Target group for the web server process (default: current group)
 
+=item B<--systemd>
+
+systemd mode:
+
+=over
+
+=item * use existing AF_UNIX domain socket file (provided as a file descriptor
+no. by systemd via ENV variable LISTEN_FDS) and
+
+=item * do not create a PID file.
+
+=back
+
+In this mode the options C<--pid-file>, C<--socket-file>, C<--socket-user>,
+C<--socket-group> and C<--socket-mode> will be ignored.
+
 =item B<--pid-file PATH>
 
 =item B<-p PATH>
 
-Path of the PID file (required)
+Path of the PID file (required unless C<--systemd> is used)
 
 =item B<--socket-file PATH>
 
 =item B<-s PATH>
 
-Path of the socket file (required)
+Path of the socket file (required unless C<--systemd> is used)
 
 =item B<--socket-user NAME|UID>
 
@@ -268,6 +348,11 @@ Target user for the socket file (default: same as --user or current user)
 =item B<--socket-group NAME|GID>
 
 Target group for the socket file (default: same as --group or current group)
+
+=item B<--socket-mode OCTAL_MODE>
+
+Permissions for the socket file (default: use umask upon creation or keep
+current permissions if socket file already exists)
 
 =item B<--dev>
 
