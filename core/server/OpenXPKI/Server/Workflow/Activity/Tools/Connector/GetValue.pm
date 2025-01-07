@@ -12,6 +12,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
+use Workflow::Exception qw( configuration_error workflow_error );
 
 use Template;
 
@@ -34,6 +35,8 @@ sub execute {
 
     my $delimiter = $self->param('delimiter') || '\.';
 
+    my $target_key = $self->param('target_key');
+
     if ($delimiter eq '.') { $delimiter = '\.'; }
 
     my @path;
@@ -55,13 +58,12 @@ sub execute {
         }
 
     } else {
-        OpenXPKI::Exception->throw( message =>
-            'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CONNECTOR_GET_VALUE_NO_PATH'
-        );
+        configuration_error('Unable to compose a valid path');
     }
 
     CTX('log')->application()->debug("Calling Connector::GetValue in mode $mode with path " . join('|', @path));
 
+    my $retval;
 
     my $config = CTX('config');
     if ($mode eq 'map') {
@@ -71,9 +73,8 @@ sub execute {
 
         ##! 16: 'Result from connector ' . Dumper $hash
 
-        OpenXPKI::Exception->throw( message =>
-            'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CONNECTOR_GET_VALUE_NO_MAP'
-        ) unless ($map);
+        configuration_error('You must define an attrmap when using map mode')
+            unless ($map);
 
         my %attrmap;
         if (ref $map eq 'HASH') {
@@ -84,7 +85,13 @@ sub execute {
         ##! 32: 'Attrmap: ' . Dumper \%attrmap
         foreach my $key (keys %attrmap) {
             ##! 32: 'Add item key: ' . $key .' - Value: ' . $hash->{$attrmap{$key}}
-            $context->param( $key => $hash->{$attrmap{$key}});
+            $retval->{$key} = $hash->{$attrmap{$key}};
+        }
+
+        if ($target_key) {
+            $context->param( { $target_key => $retval } );
+        } else {
+            $context->param( $retval );
         }
 
     } elsif ($mode eq 'hash') {
@@ -93,17 +100,19 @@ sub execute {
         foreach my $key (keys %{$hash}) {
             if ($key =~ /^(wf_|workflow_|creator|_)/) { next; }
             ##! 32: 'Add item key: ' . $key .' - Value: ' . $hash->{$key};
-            $context->param( $key, $hash->{$key});
+            $retval->{$key} = $hash->{$key};
+        }
+
+        if ($target_key) {
+            $context->param( { $target_key => $retval } );
+        } else {
+            $context->param( $retval );
         }
 
     } else {
 
-        my $retval;
-        my $target_key = $self->param('target_key');
-
-        OpenXPKI::Exception->throw( message =>
-            'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CONNECTOR_GET_VALUE_NO_TARGET_KEY'
-        ) unless ($target_key);
+        configuration_error('You must set target_key when using an array mode')
+            unless ($target_key);
 
         if ($mode eq 'array') {
 
@@ -122,9 +131,7 @@ sub execute {
             my $target_key = $self->param('target_key');
             $retval = $config->get( \@path );
 
-            OpenXPKI::Exception->throw( message =>
-                'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CONNECTOR_GET_VALUE_VALUE_NOT_A_SCALAR'
-            ) if (ref $retval);
+            workflow_error('Connector result was not a scalar') if (ref $retval);
 
             # Fall back to default
             if ( not defined $retval ) {
@@ -132,14 +139,12 @@ sub execute {
             }
 
         } else {
-            OpenXPKI::Exception->throw( message =>
-                'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CONNECTOR_GET_VALUE_UNKNOWN_MODE'
-            );
+            configuration_error('Unknown mode given to GetValue');
         }
 
-        $context->param( { $target_key => $retval });
-
     }
+
+    $context->param( { $target_key => $retval }) if ($target_key);
 
     return 1;
 
@@ -198,7 +203,10 @@ Mandatory in mode = map, defines the mapping rules in the format:
 =item target_key
 
 The name of the context parameter to which the result should be written.
-Mandatory when mode is array or scalar.
+Mandatory when mode is I<array> or I<scalar>.
+
+When set with I<hash> or I<map>, the values are not merged directly into
+the context but put as hash structure below I<target_key>
 
 =item default_value
 
