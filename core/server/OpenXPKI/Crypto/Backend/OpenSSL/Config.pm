@@ -363,7 +363,7 @@ sub __get_ca
     $config .= "default_startdate = "
         . OpenXPKI::DateTime::convert_date(
         {
-        OUTFORMAT => 'openssltime',
+        OUTFORMAT => ($notbefore->year > 2049 ? 'generalizedtime' : 'openssltime'),
         DATE      => $notbefore,
         })
         . "\n";
@@ -373,7 +373,7 @@ sub __get_ca
     $config .= "default_enddate = "
         . OpenXPKI::DateTime::convert_date(
         {
-        OUTFORMAT => 'openssltime',
+        OUTFORMAT => ($notafter->year > 2049 ? 'generalizedtime' : 'openssltime'),
         DATE      => $notafter,
         })
         . "\n";
