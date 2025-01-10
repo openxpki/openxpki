@@ -32,7 +32,8 @@ sub _validate {
     my $cert_subject = CTX('api2')->render_subject_from_template(
         profile => $profile,
         style   => $style,
-        vars    => $subject_parts
+        vars    => $subject_parts,
+        sanitize => 1
     );
 
     ##! 32: "Subject $cert_subject"

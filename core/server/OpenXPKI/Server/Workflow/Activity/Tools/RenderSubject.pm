@@ -63,7 +63,8 @@ sub execute {
     my $cert_subject = CTX('api2')->render_subject_from_template(
         profile => $profile,
         style   => $style,
-        vars    => $subject_vars
+        vars    => $subject_vars,
+        sanitize => 1
     );
 
     if (!$cert_subject) {
