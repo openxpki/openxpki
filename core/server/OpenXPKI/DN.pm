@@ -211,12 +211,11 @@ sub __get_parsed_rfc_2253
 
     while ($string)
     {
-    my $rdn;
+        my $rdn;
         ($rdn, $string) = $self->__get_next_rdn ($string);
-    if (defined $rdn && $rdn ne "") {
-        push(@result, $rdn);
-    }
-
+        if (defined $rdn && $rdn ne "") {
+            push(@result, $rdn);
+        }
         $string = substr ($string, 1) if ($string); ## remove seperator
     }
 
@@ -233,6 +232,7 @@ sub __get_next_rdn
     while ($string)
     {
         ($type, $value, $string) = $self->__get_attribute ($string);
+        $value =~ s{\s+\z}{};
         $result->[scalar @{$result}] = [ $type, $value ];
         last if (substr ($string, 0, 1) eq ","); ## stop at ,
         if (length ($string) > 1)
