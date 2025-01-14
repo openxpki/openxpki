@@ -273,18 +273,18 @@ sub _build_client {
 
     if ($reply->{SERVICE_MSG} eq 'GET_AUTHENTICATION_STACK') {
         my $auth = $self->auth();
+        my $stacks = $reply->{PARAMS}->{AUTHENTICATION_STACKS};
 
         my $auth_stack;
         # Option 1: No Auth stack in config - we are screwed
-        if (!$auth->{stack}) {
-            $log->fatal("Found more than one auth stack but no stack is specified");
-            $log->trace("Stacks found:" . join(" ", keys %{$reply->{PARAMS}->{AUTHENTICATION_STACKS}}));
-            die "No auth stack specified";
-
+        if (not $auth->{stack}) {
+            $log->fatal("Server offers more than one auth stack but no stack was configured");
+            $log->trace("Server offers:" . join(', ', keys $stacks->%*));
+            die "No auth stack configured";
         }
 
         # Option 2: Single Auth stack in config - take it
-        if (!ref $auth->{stack}) {
+        if (not ref $auth->{stack}) {
             $auth_stack = $auth->{stack};
 
         # Option 3: Mutliple Auth stacks in config
@@ -294,45 +294,45 @@ sub _build_client {
         # type "x509" requires SSL_CLIENT_CERT
         # type "passwd" is always selected
         } else {
-            my $stacks = $reply->{PARAMS}->{AUTHENTICATION_STACKS};
-            foreach my $stack (@{$auth->{stack}}) {
-                if (!$stacks->{$stack}) {
-                    $log->debug("Auth stack $stack in config is not offered by server");
+            foreach my $stack ($auth->{stack}->@*) {
+                if (not $stacks->{$stack}) {
+                    $log->debug("Configured auth stack '$stack' is not offered by server");
                     next;
                 }
                 my $stack_type = $stacks->{$stack}->{type} || 'passwd';
                 if ($stack_type eq 'passwd') {
-                    $log->debug("Selecting $stack / passwd");
+                    $log->debug("Selecting '$stack' / passwd");
                     $auth_stack = $stack;
                     last;
                 } elsif ($stack_type eq 'client') {
-                    if (!$ENV{REMOTE_USER} && !$ENV{'OPENXPKI_USER'}) {
-                        $log->debug("Skipping $stack / client");
-                        next;
+                    if ($ENV{REMOTE_USER} or $ENV{'OPENXPKI_USER'}) {
+                        $log->debug("Selecting '$stack' / client");
+                        $auth_stack = $stack;
+                        last;
                     }
-                    $log->debug("Selecting $stack / client");
-                    $auth_stack = $stack;
-                    last;
+                    $log->debug("Skipping '$stack' / client");
+                    next;
                 } elsif ($stack_type eq 'x509') {
-                    if (!$ENV{SSL_CLIENT_CERT}) {
-                        $log->debug("Skipping $stack / x509");
-                        next;
+                    if ($ENV{SSL_CLIENT_CERT}) {
+                        $log->debug("Selecting '$stack' / x509");
+                        $auth_stack = $stack;
+                        last;
                     }
-                    $log->debug("Selecting $stack / x509");
-                    $auth_stack = $stack;
-                    last;
+                    $log->debug("Skipping '$stack' / x509");
+                    next;
                 } else {
-                    $log->debug("Skipping $stack / unknown type $stack_type");
+                    $log->debug("Skipping '$stack' / unknown type '$stack_type'");
                 }
             }
-            # failed to select a stack (might be better to use the first or last one as a default?)
+            # failed to select a stack
+            # TODO might be better to use the first or last auth stack as a default?
             if (!$auth_stack) {
-                $log->fatal("Mutliple auth stacks given but none matches the prepreqs");
-                die "No auth stack could be selected specified";
+                $log->fatal("Multiple auth stacks given but none has matching prereqs");
+                die "No auth stack could be selected";
             }
         }
 
-        $log->debug("Selecting auth stack ". $auth_stack);
+        $log->debug("Selecting auth stack '$auth_stack'");
         # we send the stack without params which will either return a session
         # for anonymous stacks or the required parameter list.
 
