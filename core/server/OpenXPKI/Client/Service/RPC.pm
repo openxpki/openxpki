@@ -152,7 +152,7 @@ sub prepare ($self, $c) {
 sub send_response ($self, $c, $response) {
     if ($self->use_status_codes) {
         if ($response->is_pending) {
-            $c->res->headers->add('-retry-after' => $response->retry_after);
+            $c->res->headers->add('Retry-After' => $response->retry_after);
         }
     } else {
         $c->res->code('200');

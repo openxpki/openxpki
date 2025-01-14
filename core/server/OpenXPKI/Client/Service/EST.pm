@@ -55,7 +55,7 @@ sub send_response ($self, $c, $response) {
         return $c->render(text => $response->error_message."\n");
 
     } elsif ($response->is_pending) {
-        $c->res->headers->add('-retry-after' => $response->retry_after);
+        $c->res->headers->add('Retry-After' => $response->retry_after);
         return $c->render(text => $response->http_status_message."\n");
 
     } elsif (not $response->has_result) {
