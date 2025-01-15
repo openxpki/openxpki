@@ -14,7 +14,7 @@ use Mojo::Util qw( url_unescape encode tablify );
 use OpenXPKI::Client::Config;
 use OpenXPKI::Util;
 
-# List of webserver ENV vars that will be read from the X-OpenXPKI-Apache-ENV-*
+# List of webserver ENV vars that will be read from the X-ReverseProxy-ENV-*
 # HTTP headers (if transmitted).
 #
 # ATTENTION!
@@ -117,7 +117,7 @@ parameter C<service_name> are automatically set for every route.
 =item Inject ENV
 
 Register a Mojolicious C<before_dispatch> hook that will inject ENV variables
-sent via C<X-OpenXPKI-Apache-ENV-*> HTTP headers.
+sent via C<X-ReverseProxy-ENV-*> HTTP headers.
 
 =item Helper C<oxi_config>
 
@@ -217,7 +217,7 @@ sub startup ($self) {
     });
 
     #
-    # Inject query string and Apache ENV from our custom HTTP headers
+    # Inject query string and reverse proxy ENV from our custom HTTP headers
     #
     $self->hook(before_dispatch => sub ($c) { # Mojolicious request dispatch hook
         $self->log->trace(sprintf 'Incoming %s request', uc($c->req->url->base->protocol)); # ->protocol: Normalized version of ->scheme
@@ -233,14 +233,14 @@ sub startup ($self) {
             $c->req->headers->header($key, @val);
         }
 
-        # Inject forwarded Apache ENV into Mojo::Request
-        $self->log->error("Missing header X-OpenXPKI-Apache-ENVSET - Apache setup seems to be incomplete")
-            unless $c->req->headers->header('X-OpenXPKI-Apache-ENVSET');
+        # inject forwarded reverse proxy ENV into Mojo::Request
+        $self->log->error("Missing header X-ReverseProxy-ENVSET - Reverse proxy setup seems to be incomplete")
+            unless $c->req->headers->header('X-ReverseProxy-ENVSET');
 
         my $headers = $c->req->headers->to_hash;
         my $apache_env = {};
         for my $header (sort keys $headers->%*) {
-            if (my ($env_key) = $header =~ /^X-OpenXPKI-Apache-ENV-(.*)/) {
+            if (my ($env_key) = $header =~ /^X-ReverseProxy-ENV-(.*)/) {
                 if (not any { $env_key eq $_ } @webserver_env_vars) {
                     $self->log->debug("Ignoring unknown ENV variable received via header '$header'");
                     next;
@@ -251,14 +251,14 @@ sub startup ($self) {
         }
         $c->stash(apache_env => $apache_env);
 
-        # Inject query parameters forwarded by Apache into Mojo::Request.
+        # Inject query parameters forwarded by reverse proxy into Mojo::Request.
         # NOTE:
-        # We need this workaround because Apache cannot forward the
+        # We need this workaround because Apache reverse proxy cannot forward
         # QUERY_STRING to the backend server. The "proxy_pass" documentation
         # which is also valid for "RewriteRule ... url [p]" says: "url is a
         # partial URL for the remote server and cannot include a query string."
         # (https://httpd.apache.org/docs/2.4/mod/mod_proxy.html#proxypass)
-        if (my $query = $c->req->headers->header('X-OpenXPKI-Apache-QueryString')) {
+        if (my $query = $c->req->headers->header('X-ReverseProxy-QueryString')) {
             $c->req->url->query($query);
             $self->log->trace("Apache QUERY_STRING received via header: $query");
         }
