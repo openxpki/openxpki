@@ -52,9 +52,19 @@ sub _validate {
         $error = $EVAL_ERROR if $EVAL_ERROR;
     }
 
-    if (!$decoded) {
-        CTX('log')->application()->error("Invalid PKCS#10 request");
-        CTX('log')->application()->trace($error);
+    if (not $decoded) {
+        my $large_error_msg = ($error and length $error > 100);
+        CTX('log')->application->error(
+            "Invalid PKCS#10 request"
+            . (($large_error_msg and not CTX('log')->application->is_trace) ? ' (large error message: for details set log4perl.category.openxpki.application to TRACE)' : '')
+        );
+        # In case of ASN1 parsing errors the error message is a large call stack
+        # which we do not want to have in the application logs at ERROR level.
+        if ($large_error_msg) {
+            CTX('log')->application->trace($error);
+        } else {
+            CTX('log')->application->error($error);
+        }
         validation_error("I18N_OPENXPKI_UI_VALIDATOR_PKCS10_PARSE_ERROR");
     }
 
