@@ -5,7 +5,7 @@ use OpenXPKI -base => 'Mojolicious';
 use re qw( regexp_pattern );
 use Module::Load ();
 use POSIX ();
-use List::Util qw( first );
+use List::Util qw( first any );
 
 # CPAN modules
 use Mojo::Util qw( url_unescape encode tablify );
@@ -13,6 +13,17 @@ use Mojo::Util qw( url_unescape encode tablify );
 # Project modules
 use OpenXPKI::Client::Config;
 use OpenXPKI::Util;
+
+# List of webserver ENV vars that will be read from the X-OpenXPKI-Apache-ENV-*
+# HTTP headers (if transmitted).
+#
+# ATTENTION!
+# All relating HTTP headers must be deleted as an early step in the web server
+# configuration to prevent injection from the user's browser.
+my @webserver_env_vars = qw(
+    SSL_CLIENT_S_DN
+    SSL_CLIENT_CERT
+);
 
 =head1 NAME
 
@@ -230,8 +241,11 @@ sub startup ($self) {
         my $apache_env = {};
         for my $header (sort keys $headers->%*) {
             if (my ($env_key) = $header =~ /^X-OpenXPKI-Apache-ENV-(.*)/) {
-                my $val = $headers->{$header};
-                $apache_env->{$env_key} = $val;
+                if (not any { $env_key eq $_ } @webserver_env_vars) {
+                    $self->log->debug("Ignoring unknown ENV variable received via header '$header'");
+                    next;
+                };
+                $apache_env->{$env_key} = $headers->{$header};
                 $self->log->trace("Apache ENV variable received via header: $env_key");
             }
         }
