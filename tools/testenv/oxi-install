@@ -187,6 +187,13 @@ if [ $COPY_EE_CODE -eq 1 ]; then
     if [ -d $OXI_EE_SOURCE_DIR/usr ]; then
         echo -e "- synchronize EE /usr files"
         rsync -a $OXI_EE_SOURCE_DIR/usr/ /usr/ >$LOG 2>&1
+
+        echo "   - replacements in systemd units: apache -> www-data; /usr/bin -> /usr/local/bin"
+        find /usr/lib/systemd/system/ -name 'openxpki*' | \
+            xargs perl -pe 's{(User|Group)=apache}{$1=www-data}g; s{/usr/bin/openxpkictl}{/usr/local/bin/openxpkictl}g;' -i >$LOG 2>&1
+
+        echo "   - reload systemd"
+        systemctl daemon-reload
     fi
 fi
 
