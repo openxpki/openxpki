@@ -286,6 +286,7 @@ sub _build_client {
         # Option 2: Single Auth stack in config - take it
         if (not ref $auth->{stack}) {
             $auth_stack = $auth->{stack};
+            $log->debug("Auth stack: selecting '$auth_stack'");
 
         # Option 3: Mutliple Auth stacks in config
         # check type against current env for prereqs
@@ -301,27 +302,27 @@ sub _build_client {
                 }
                 my $stack_type = $stacks->{$stack}->{type} || 'passwd';
                 if ($stack_type eq 'passwd') {
-                    $log->debug("Selecting '$stack' / passwd");
+                    $log->debug("Auth stack: selecting '$stack' / passwd");
                     $auth_stack = $stack;
                     last;
                 } elsif ($stack_type eq 'client') {
                     if ($ENV{REMOTE_USER} or $ENV{'OPENXPKI_USER'}) {
-                        $log->debug("Selecting '$stack' / client");
+                        $log->debug("Auth stack: selecting '$stack' / client");
                         $auth_stack = $stack;
                         last;
                     }
-                    $log->debug("Skipping '$stack' / client");
+                    $log->debug("Auth stack: skipping '$stack' / client");
                     next;
                 } elsif ($stack_type eq 'x509') {
                     if ($ENV{SSL_CLIENT_CERT}) {
-                        $log->debug("Selecting '$stack' / x509");
+                        $log->debug("Auth stack: selecting '$stack' / x509");
                         $auth_stack = $stack;
                         last;
                     }
-                    $log->debug("Skipping '$stack' / x509");
+                    $log->debug("Auth stack: skipping '$stack' / x509");
                     next;
                 } else {
-                    $log->debug("Skipping '$stack' / unknown type '$stack_type'");
+                    $log->debug("Auth stack: skipping '$stack' / unknown type '$stack_type'");
                 }
             }
             # failed to select a stack
@@ -332,7 +333,6 @@ sub _build_client {
             }
         }
 
-        $log->debug("Selecting auth stack '$auth_stack'");
         # we send the stack without params which will either return a session
         # for anonymous stacks or the required parameter list.
 
@@ -340,7 +340,7 @@ sub _build_client {
             AUTHENTICATION_STACK => $auth_stack,
         });
         $self->last_reply( $reply );
-        $log->trace("Auth stack request ". Dumper $reply) if $log->is_trace;
+        $log->trace("Auth stack request: ". Dumper $reply) if $log->is_trace;
     }
 
     # FIXME / TODO - most of this code is duplicated in the WebUI Login code
