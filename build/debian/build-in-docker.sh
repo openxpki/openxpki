@@ -40,16 +40,16 @@ fetchgit() {
     cd /tmp
 
     git config --global --add safe.directory /openxpki
+    git config --global --add safe.directory /openxpki/.git
     # code repo including git repo with a checkedout branch must be mounted at /openxpki
-    # we clone the currently checked out branch from the mountpoint to /tmp
-    mybranch=$(git -C /openxpki rev-parse --abbrev-ref HEAD)
-    git clone /openxpki --branch "$mybranch" --single-branch
+    # git clone --single-branch takes the current active branch
+    GIT_CLONE_OPT=""
+    if [ $OPENXPKI_BUILD_TAG ]; then
+        GIT_CLONE_OPT="--branch $OPENXPKI_BUILD_TAG"
+    fi
+    git clone /openxpki $GIT_CLONE_OPT --single-branch
 
     cd openxpki
-
-    if [ $OPENXPKI_BUILD_TAG ]; then
-        git checkout $OPENXPKI_BUILD_TAG
-    fi
 
     git submodule init
     git submodule update --checkout
