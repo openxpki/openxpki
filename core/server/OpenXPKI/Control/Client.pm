@@ -47,7 +47,7 @@ has silent => (
     isa => 'Bool',
     init_arg => undef,
     lazy => 1,
-    default => sub { shift->opts->{quiet} ? 1 : 0 },
+    default => sub { $_[0]->opts->{quiet} ? 1 : 0 },
 );
 
 has foreground => (
@@ -55,9 +55,16 @@ has foreground => (
     isa => 'Bool',
     init_arg => undef,
     lazy => 1,
-    default => sub { shift->opts->{nd} ? 1 : 0 },
+    default => sub { $_[0]->systemd_mode || $_[0]->opts->{nd} ? 1 : 0 },
 );
 
+has systemd_mode => (
+    is => 'rw',
+    isa => 'Bool',
+    init_arg => undef,
+    lazy => 1,
+    default => sub { $_[0]->opts->{systemd} ? 1 : 0 },
+);
 
 # required by OpenXPKI::Control::Role
 sub getopt_params ($self, $command) {
@@ -99,13 +106,12 @@ sub cmd_start ($self) {
 
     my $user = $self->opts->{user} || $self->cfg->{user};
     my $group = $self->opts->{group} || $self->cfg->{group};
-    my $systemd_mode = $self->opts->{systemd};
 
     my %server_params;  # parameters passed to Mojo::Server::Prefork
     my %web_params;     # parameters passed to OpenXPKI::Client::Web
 
     # systemd provided socket file descriptors
-    if ($systemd_mode) {
+    if ($self->systemd_mode) {
         $log->info('systemd mode: use existing socket (read from LISTEN_FDS); skip PID file creation');
         die "LISTEN_PID is not set but required in systemd mode\n" unless $ENV{LISTEN_PID};
         die "LISTEN_FDS is not set but required in systemd mode\n" unless $ENV{LISTEN_FDS};
@@ -140,7 +146,7 @@ sub cmd_start ($self) {
     }
 
     # prevent the server from creating a PID file
-    monkey_patch 'Mojo::Server::Prefork', ensure_pid_file => sub { } if $systemd_mode;
+    monkey_patch 'Mojo::Server::Prefork', ensure_pid_file => sub { } if $self->systemd_mode;
 
     my $daemon = Mojo::Server::Prefork->new(
         %server_params,
@@ -320,9 +326,11 @@ systemd mode:
 =over
 
 =item * use existing AF_UNIX domain socket file (provided as a file descriptor
-no. by systemd via ENV variable LISTEN_FDS) and
+no. by systemd via ENV variable LISTEN_FDS),
 
-=item * do not create a PID file.
+=item * do not create a PID file,
+
+=item * do not fork, i.e. do not send daemon to background (= C<--no-detach>).
 
 =back
 
