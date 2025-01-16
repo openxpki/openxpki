@@ -220,6 +220,8 @@ sub startup ($self) {
     # Inject query string and reverse proxy ENV from our custom HTTP headers
     #
     $self->hook(before_dispatch => sub ($c) { # Mojolicious request dispatch hook
+        Log::Log4perl::MDC->put('rid', $c->req->request_id);
+
         $self->log->trace(sprintf 'Incoming %s request', uc($c->req->url->base->protocol)); # ->protocol: Normalized version of ->scheme
 
         if ($self->mode eq 'development') {

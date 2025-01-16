@@ -156,7 +156,7 @@ has 'logconf' => (
         recreate_check_interval => 120,
         filename    => '/var/log/openxpki/%s.log',
         layout      => 'Log::Log4perl::Layout::PatternLayout',
-        'layout.ConversionPattern' => '%d %p{3} %m []%n',
+        'layout.ConversionPattern' => '%d %p{3} %m [MDC]%n',
         syswrite    => 1,
         utf8        => 1
     }}
@@ -476,13 +476,11 @@ sub __init_log4perl {
     $conf->{filename} = sprintf($conf->{filename}, $self->service);
 
     # add the MDC part to the conversion pattern in case it is not set (empty [] in string)
-    if ($conf->{'layout.ConversionPattern'} && $conf->{'layout.ConversionPattern'} =~ m{\[\]}) {
-        if ($self->service eq 'webui') {
-            $conf->{'layout.ConversionPattern'} =~ s{\[\]}{[pid=%P|sid=%X{sid}]};
-        } elsif($loglevel =~ m{DEBUG|TRACE}) {
-            $conf->{'layout.ConversionPattern'} =~ s{\[\]}{[pid=%P|%i]};
+    if ($conf->{'layout.ConversionPattern'}) {
+        if($loglevel =~ m{DEBUG|TRACE}) {
+            $conf->{'layout.ConversionPattern'} =~ s{\[MDC\]}{[%i{verbose}]}g;
         } else {
-            $conf->{'layout.ConversionPattern'} =~ s{\[\]}{[pid=%P|ep=%X{endpoint}]};
+            $conf->{'layout.ConversionPattern'} =~ s{\[MDC\]}{[%i]}g;
         }
     }
 

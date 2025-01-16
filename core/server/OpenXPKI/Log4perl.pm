@@ -134,7 +134,7 @@ sub init_screen_logger ($class, @args) {
     Log::Log4perl::Logger->reset if Log::Log4perl->initialized; # avoid re-initialization warning
 
     my $pattern = (uc($prio) eq 'DEBUG' or uc($prio) eq 'TRACE')
-        ? '%d %p{3} %m [%i{with_pid}]%n'
+        ? '%d %p{3} %m [%i{verbose}]%n'
         : '%m%n';
 
     my $config = {
@@ -152,13 +152,27 @@ sub _add_patternlayout_spec {
     return if $spec_added;
     Log::Log4perl::Layout::PatternLayout::add_global_cspec('i', sub {
         my $layout = shift;
-        my @order = qw( pid user role sid ssid rid endpoint wftype wfid scepid pki_realm );
-        my @hide = qw( command_id );
+        my %names = (
+            endpoint => 'ep',
+            wftype => 'wf',
+            pki_realm => 'realm',
+        );
+        my @order = qw( rid user role sid ssid endpoint wftype wfid scepid pki_realm pid );
+        my %hide = ( command_id => 1 );
         my $mdc = Log::Log4perl::MDC->get_context;
-        $mdc->{pid} = $$ if ($layout->{curlies}//'') eq 'with_pid';
+
+        if (($layout->{curlies}//'') eq 'verbose') {
+            $mdc->{pid} = $$;
+        } else {
+            # hide everything but endpoint and sid in non-verbose mode
+            $hide{$_} = 1 for keys $mdc->%*;
+            $hide{endpoint} = 0;
+            $hide{sid} = 0;
+        }
+
         my %filtered = (
             map { $_ => $_ }
-            grep { my $k = $_; none { $k eq $_ } @hide }
+            grep { not $hide{$_} }
             grep { defined $mdc->{$_} }
             sort keys $mdc->%*
         );
@@ -170,7 +184,7 @@ sub _add_patternlayout_spec {
         # Add remaining existing keys (those we did not list in @order)
         push @keys_ordered, sort keys(%filtered);
         # present the result
-        return join("|", map { $_.'='.$mdc->{$_} } @keys_ordered);
+        return join("|", map { sprintf '%s=%s', $names{$_}//$_, $mdc->{$_} } @keys_ordered);
     });
     $spec_added = 1;
 }
