@@ -177,8 +177,7 @@ sub _add_patternlayout_spec {
 
 sub get_logger {
     my ($class, @args) = @_;
-    # if someone called ::get_logger() instead of ->get_logger(), $class contains the first
-    # argument instead of the class name
+    # if someone calls us with :: instead of ->, $class contains first argument instead of class name
     unshift (@args, $class) if $class ne __PACKAGE__;
 
     @args = ($default_facility) if (not scalar @args and $default_facility);
@@ -187,8 +186,7 @@ sub get_logger {
 
 sub set_default_facility {
     my ($class, @args) = @_;
-    # if someone called ::get_logger() instead of ->get_logger(), $class contains the first
-    # argument instead of the class name
+    # if someone calls us with :: instead of ->, $class contains first argument instead of class name
     unshift (@args, $class) if $class ne __PACKAGE__;
 
     my $default = $args[0] or return;
