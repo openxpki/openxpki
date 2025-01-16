@@ -113,7 +113,6 @@ sub _build_session ($self) {
         }
     }
 
-    Log::Log4perl::MDC->remove;
     if ($id) {
         Log::Log4perl::MDC->put('sid', substr($id,0,4));
         $self->log->debug("Previous frontend session ID read from cookie = $id");
