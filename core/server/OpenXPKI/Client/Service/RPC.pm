@@ -94,8 +94,8 @@ sub prepare ($self, $c) {
     #
     # Gather data from TLS session
     if ($self->request->is_secure) {
-        my $auth_dn = $self->apache_env->{SSL_CLIENT_S_DN};
-        my $auth_pem = $self->apache_env->{SSL_CLIENT_CERT};
+        my $auth_dn = $self->webserver_env->{SSL_CLIENT_S_DN};
+        my $auth_pem = $self->webserver_env->{SSL_CLIENT_CERT};
 
         # TODO tls_client_dn / tls_client_cert always have the same value as signer_dn / signer_cert
         if (defined $auth_dn) {
@@ -105,11 +105,11 @@ sub prepare ($self, $c) {
                 $self->add_wf_param(tls_client_cert => $auth_pem) if $self->config_env_keys->{tls_client_cert};
                 if (
                     ($self->config_env_keys->{signer_chain} or $self->config_env_keys->{tls_client_chain})
-                    and $self->apache_env->{SSL_CLIENT_CERT_CHAIN_0}
+                    and $self->webserver_env->{SSL_CLIENT_CERT_CHAIN_0}
                 ) {
                     my @chain;
                     for (my $cc=0; $cc<=3; $cc++)   {
-                        my $chaincert = $self->apache_env->{'SSL_CLIENT_CERT_CHAIN_' . $cc};
+                        my $chaincert = $self->webserver_env->{'SSL_CLIENT_CERT_CHAIN_' . $cc};
                         last unless $chaincert;
                         push @chain, $chaincert;
                     }
@@ -254,8 +254,8 @@ sub cgi_set_custom_wf_params ($self) {
 
     # Gather data from TLS session
     if ($self->request->is_secure) {
-        my $auth_dn = $self->apache_env->{SSL_CLIENT_S_DN};
-        my $auth_pem = $self->apache_env->{SSL_CLIENT_CERT};
+        my $auth_dn = $self->webserver_env->{SSL_CLIENT_S_DN};
+        my $auth_pem = $self->webserver_env->{SSL_CLIENT_CERT};
 
         # TODO tls_client_dn / tls_client_cert always have the same value as signer_dn / signer_cert
         if (defined $auth_dn) {
@@ -265,11 +265,11 @@ sub cgi_set_custom_wf_params ($self) {
                 $self->add_wf_param(tls_client_cert => $auth_pem) if $self->config_env_keys->{tls_client_cert};
                 if (
                     ($self->config_env_keys->{signer_chain} or $self->config_env_keys->{tls_client_chain})
-                    and $self->apache_env->{SSL_CLIENT_CERT_CHAIN_0}
+                    and $self->webserver_env->{SSL_CLIENT_CERT_CHAIN_0}
                 ) {
                     my @chain;
                     for (my $cc=0; $cc<=3; $cc++)   {
-                        my $chaincert = $self->apache_env->{'SSL_CLIENT_CERT_CHAIN_' . $cc};
+                        my $chaincert = $self->webserver_env->{'SSL_CLIENT_CERT_CHAIN_' . $cc};
                         last unless $chaincert;
                         push @chain, $chaincert;
                     }

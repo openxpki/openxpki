@@ -217,7 +217,7 @@ sub startup ($self) {
     });
 
     #
-    # Inject query string and reverse proxy ENV from our custom HTTP headers
+    # Inject query string and webserver ENV from our custom HTTP headers
     #
     $self->hook(before_dispatch => sub ($c) { # Mojolicious request dispatch hook
         Log::Log4perl::MDC->remove;
@@ -236,25 +236,25 @@ sub startup ($self) {
             $c->req->headers->header($key, @val);
         }
 
-        # inject forwarded reverse proxy ENV into Mojo::Request
+        # inject forwarded webserver ENV into Mojo::Request
         $self->log->error("Missing header X-ReverseProxy-ENVSET - Reverse proxy setup seems to be incomplete")
             unless $c->req->headers->header('X-ReverseProxy-ENVSET');
 
         my $headers = $c->req->headers->to_hash;
-        my $apache_env = {};
+        my $webserver_env = {};
         for my $header (sort keys $headers->%*) {
             if (my ($env_key) = $header =~ /^X-ReverseProxy-ENV-(.*)/) {
                 if (not any { $env_key eq $_ } @webserver_env_vars) {
                     $self->log->debug("Ignoring unknown ENV variable received via header '$header'");
                     next;
                 };
-                $apache_env->{$env_key} = $headers->{$header};
-                $self->log->trace("Apache ENV variable received via header: $env_key");
+                $webserver_env->{$env_key} = $headers->{$header};
+                $self->log->trace("Webserver ENV variable received via header: $env_key");
             }
         }
-        $c->stash(apache_env => $apache_env);
+        $c->stash(webserver_env => $webserver_env);
 
-        # Inject query parameters forwarded by reverse proxy into Mojo::Request.
+        # Inject query parameters forwarded by webserver into Mojo::Request.
         # NOTE:
         # We need this workaround because Apache reverse proxy cannot forward
         # QUERY_STRING to the backend server. The "proxy_pass" documentation
@@ -263,7 +263,7 @@ sub startup ($self) {
         # (https://httpd.apache.org/docs/2.4/mod/mod_proxy.html#proxypass)
         if (my $query = $c->req->headers->header('X-ReverseProxy-QueryString')) {
             $c->req->url->query($query);
-            $self->log->trace("Apache QUERY_STRING received via header: $query");
+            $self->log->trace("Webserver QUERY_STRING received via header: $query");
         }
     });
 }
