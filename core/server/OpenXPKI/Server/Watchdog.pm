@@ -521,7 +521,7 @@ sub __main_loop {
         config => CTX('config')->checksum,
         uptime => $BASETIME,
         node => hostname,
-        last_update => time,
+        last_update => 0,
     };
     while (not $TERMINATE) {
         ##! 64: 'Watchdog: do loop'
