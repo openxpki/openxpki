@@ -348,9 +348,10 @@ sub __get_ca
         'certificate = '.$self->{ENGINE}->get_certfile(),
         'private_key = '.$self->{ENGINE}->get_keyfile);
 
+    # Valdities after 2050-01-01 must be encoded as generalized time
     if (my $notbefore = $self->{PROFILE}->get_notbefore()) {
         my $startdate = OpenXPKI::DateTime::convert_date({
-            OUTFORMAT => 'openssltime',
+            OUTFORMAT => ($notbefore->year > 2049 ? 'generalizedtime' : 'openssltime'),
             DATE      => $notbefore
         });
         push @config, 'default_startdate = '.$startdate;
@@ -358,7 +359,7 @@ sub __get_ca
 
     if (my $notafter = $self->{PROFILE}->get_notafter()) {
         my $enddate = OpenXPKI::DateTime::convert_date({
-            OUTFORMAT => 'openssltime',
+            OUTFORMAT => ($notafter->year > 2049 ? 'generalizedtime' : 'openssltime'),
             DATE      => $notafter,
         });
         push @config, 'default_enddate = '.$enddate;

@@ -257,6 +257,7 @@ Possible output formats:
   iso8601:     ISO 8601 formatted date (YYYY-MM-DDTHH:MM:SS), default
   epoch:       seconds since the epoch
   openssltime: time format used in OpenSSL index files (YYMMDDHHMMSSZ)
+    Note: this can NOT be used for dates >2050 as cert validity!
   generalizedtime: time format used in OpenSSL index files (YYYYMMDDHHMMSSZ)
   terse:       terse time format (YYYYMMDDHHMMSS)
   printable:   human readable ISO-like time format (YYYY-MM-DD HH:MM:SS)
