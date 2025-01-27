@@ -426,7 +426,7 @@ sub _init_api {
     # TODO - define ACL handling in void context
     #my $enable_acls = not CTX('config')->get(['api','acl','disabled']);
     return OpenXPKI::Server::API2->new(
-        enable_protection => 1,
+        disable_protection => 0,
         enable_acls => 0, #$enable_acls,
         #acl_rule_accessor => sub { CTX('config')->get_hash(['api','acl', CTX('session')->data->role]) },
         log => CTX('log')->system,

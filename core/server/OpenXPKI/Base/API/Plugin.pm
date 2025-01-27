@@ -169,7 +169,7 @@ sub command {
 
 Define a protected API command. All parameters are equivalent to L</command>.
 
-Commands are only protected if L<OpenXPKI::Base::API::APIRole/enable_protection> is
+Commands are protected unless L<OpenXPKI::Base::API::APIRole/disable_protection> is
 set to TRUE. In this case they can only be called by passing
 C<protected_call =E<gt> 1> to L<OpenXPKI::Base::API::APIRole/dispatch>.
 

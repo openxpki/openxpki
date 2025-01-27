@@ -121,9 +121,9 @@ has enable_acls => (
     default => 1,
 );
 
-=head2 enable_protection
+=head2 disable_protection
 
-Optional: set to TRUE to enable protection of commands.
+Optional: set to TRUE to disable protection of protected commands.
 
 Protected commands are defined via L<C<protected_command()>|OpenXPKI::Base::API::Plugin/protected_command>
 and must then be called by passing C<protected_call =E<gt> 1> to L</dispatch>.
@@ -133,7 +133,7 @@ Default: FALSE
 Can only be set via constructor.
 
 =cut
-has enable_protection => (
+has disable_protection => (
     is => 'ro',
     isa => 'Bool',
     default => 0,
@@ -386,7 +386,7 @@ B<Named parameters>
 =item * C<params> - Parameter hash
 
 =item * C<protected_call> - Optional: must be set to TRUE to call a protected
-command while L</enable_protection> is TRUE
+command while L</disable_protection> is not TRUE
 
 =back
 
@@ -420,7 +420,7 @@ sub dispatch ($self, $arg) {
         );
 
     # Protected command?
-    if ($self->enable_protection and $package->meta->is_protected($command) and not $arg->protected_call) {
+    if (not $self->disable_protection and $package->meta->is_protected($command) and not $arg->protected_call) {
         OpenXPKI::Exception->throw(
             message => "Forbidden call to protected API command",
             params => { namespace => $rel_ns, command => $command, caller => sprintf("%s:%s", ($self->my_caller())[1,2]) }
