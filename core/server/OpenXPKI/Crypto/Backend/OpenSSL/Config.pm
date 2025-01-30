@@ -439,7 +439,7 @@ sub __get_extensions
                     push @aia, "$type;URI:$http";
                 }
             }
-            push @config, "authorityInfoAccess = $critical", join(",", @aia);
+            push @config, "authorityInfoAccess = $critical" . join(",", @aia);
         }
         elsif ($name eq "authority_key_identifier")
         {
@@ -449,7 +449,7 @@ sub __get_extensions
                 push @aik, 'issuer:always' if ($param eq "issuer");
                 push @aik, 'keyid:always'  if ($param eq "keyid");
             }
-            push @config, "authorityKeyIdentifier = $critical", join(",", @aik);
+            push @config, "authorityKeyIdentifier = $critical" . join(",", @aik);
         }
         elsif ($name eq "basic_constraints")
         {
@@ -470,13 +470,13 @@ sub __get_extensions
                     push @basicc, sprintf('pathlen:%01d', $pair->[1]);
                 }
             }
-            push @config, "basicConstraints = $critical", join(",", @basicc);
+            push @config, "basicConstraints = $critical" . join(",", @basicc);
         }
         elsif ($name eq "cdp")
         {
 
-            push @config, "crlDistributionPoints = $critical\@cdp";
-            @sections = ('','[ cdp ]');
+            push @config, "crlDistributionPoints = $critical\@cdp_section";
+            push @sections, ('','[cdp_section]');
             my $i = 0;
             foreach my $cdp (@{$profile->get_extension("cdp")})
             {
@@ -529,7 +529,7 @@ sub __get_extensions
                 ##! 32: 'sections: ' . Dumper \@psection
                 ##! 32: 'notices: ' . Dumper \@notices
 
-                push @config, "certificatePolicies = $critical".join(",",@policies),'';
+                push @config, "certificatePolicies = $critical" . join(",",@policies),'';
                 push @sections, '# Policies', @psection, '';
                 push @sections, '# Notices', @notices, '';
             }
@@ -715,6 +715,9 @@ sub __get_extensions
 
     # the list always has the section head as element
     return unless(@config > 1);
+
+    # Append the extra sections
+    push @config, @sections;
 
     ##! 16: "extensions ::= ".join("\n",@config)
 
