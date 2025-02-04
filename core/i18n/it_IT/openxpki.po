@@ -606,10 +606,6 @@ msgstr ""
 "Ulteriori informazioni utili a spiegare il motivo della richiesta di revoca."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_DATAPOOL_ACME_ACCOUNT_LABEL"
-msgstr "Risultati Ricerca Certificati"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_DATAPOOL_ACME_REGISTRATION_LABEL"
 msgstr "Risultati Ricerca Certificati"
 
@@ -649,6 +645,10 @@ msgstr "mostra le liste di revoca precedenti"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DATAPOOL_EXPIRES_BEFORE"
 msgstr "mostra le liste di revoca precedenti"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_INVENTORY_LABEL"
+msgstr "Nome utente"
 
 # Remove?
 #, fuzzy
@@ -715,6 +715,10 @@ msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr ""
 "Con la Revoca ritardata, puoi programmare la revoca di un certificato in una "
 "data futura."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DIGEST"
+msgstr "Sì"
 
 # Remove?
 #, fuzzy
@@ -1149,27 +1153,24 @@ msgid "I18N_OPENXPKI_UI_INVALID_TOKEN"
 msgstr "Numero di serie del certificato"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_INVENTORY"
+msgstr "Indirizzo IP"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_INVENTORY_UPDATE"
+msgstr "mostra le liste di revoca precedenti"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_ISSUERS_LIST"
 msgstr "Emissione Lista Revoche (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ITEMCNT"
+msgstr "mostra le liste di revoca precedenti"
 
 # Remove?
 msgid "I18N_OPENXPKI_UI_KEY"
 msgstr "Chiave"
-
-msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM"
-msgstr "Parametri della Chiave"
-
-msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_CURVE_NAME"
-msgstr "Nome della Curva"
-
-msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_ENC_ALG"
-msgstr "Cifratura"
-
-msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_KEY_LENGTH"
-msgstr "Lunghezza della Chiave"
-
-msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_PARAMSET"
-msgstr "Parametri"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_KEYSTORE_ALIAS_CONTAINS_INVALID_CHARACTERS"
@@ -3345,6 +3346,22 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVAL_REPORTS_LABEL"
 msgstr "Approvazioni"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_BULKDATA_DESC"
+msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_BULKDATA_LABEL"
+msgstr "Algoritmo Chiave"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_BULKDATA_PLACEHOLDER"
+msgstr "CSR Type"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_BULKDATA_TOOLTIP"
+msgstr " "
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_ALIAS_LABEL"
 msgstr "Metodo Cifratura Chiave"
 
@@ -3765,6 +3782,20 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_TOOLTIP"
 msgstr "Imposta questo campo solo se sei ben consapevole delle implicazioni!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVENTORY_DESC"
+msgstr "Nome del punto di utilizzo SCEP che riceve questa richiesta."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVENTORY_LABEL"
+msgstr "Commento"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVENTORY_TOOLTIP"
+msgstr ""
+"Usa l’icona del calendario oppure inserisci una data in formato MM.GG.AAAA. "
+"Inserisci 0 per usare il valore di default"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_DESC"
@@ -5762,8 +5793,27 @@ msgstr "Sì"
 #~ msgid "I18N_OPENXPKI_UI_CUST"
 #~ msgstr "Chiave"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_DATAPOOL_ACME_ACCOUNT_LABEL"
+#~ msgstr "Risultati Ricerca Certificati"
+
 #~ msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
 #~ msgstr "Il valore date/time inserito non è stato convalidato."
+
+#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM"
+#~ msgstr "Parametri della Chiave"
+
+#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_CURVE_NAME"
+#~ msgstr "Nome della Curva"
+
+#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_ENC_ALG"
+#~ msgstr "Cifratura"
+
+#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_KEY_LENGTH"
+#~ msgstr "Lunghezza della Chiave"
+
+#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_PARAMSET"
+#~ msgstr "Parametri"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD"

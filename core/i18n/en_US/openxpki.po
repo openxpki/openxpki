@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2024-05-21 14:33+0200\n"
+"PO-Revision-Date: 2025-02-04 16:08+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -486,9 +486,6 @@ msgstr "unspecified / other reason"
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
 msgstr "This is just a prefix"
 
-msgid "I18N_OPENXPKI_UI_DATAPOOL_ACME_ACCOUNT_LABEL"
-msgstr "ACME Account Information (NICE)"
-
 msgid "I18N_OPENXPKI_UI_DATAPOOL_ACME_REGISTRATION_LABEL"
 msgstr "ACME Account Registrations (Endpoints)"
 
@@ -515,6 +512,10 @@ msgstr "Expires after"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_EXPIRES_BEFORE"
 msgstr "Expires before"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_INVENTORY_LABEL"
+msgstr "Message of the Day"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_KEY"
 msgstr "Entry"
@@ -564,6 +565,9 @@ msgstr "Value"
 
 msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr "Delayed revocation requested."
+
+msgid "I18N_OPENXPKI_UI_DIGEST"
+msgstr "Digest"
 
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_FAIL"
 msgstr "fail"
@@ -887,27 +891,21 @@ msgstr "Invalid Profile"
 msgid "I18N_OPENXPKI_UI_INVALID_TOKEN"
 msgstr "The provided token is not valid."
 
+msgid "I18N_OPENXPKI_UI_INVENTORY"
+msgstr "Inventory"
+
+msgid "I18N_OPENXPKI_UI_INVENTORY_UPDATE"
+msgstr "Inventory Update"
+
 msgid "I18N_OPENXPKI_UI_ISSUERS_LIST"
 msgstr " Issuing certificates of this realm"
+
+msgid "I18N_OPENXPKI_UI_ITEMCNT"
+msgstr "Items"
 
 # Remove?
 msgid "I18N_OPENXPKI_UI_KEY"
 msgstr "Key"
-
-msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM"
-msgstr "Key Parameters"
-
-msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_CURVE_NAME"
-msgstr "Curve Name"
-
-msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_ENC_ALG"
-msgstr "Encryption"
-
-msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_KEY_LENGTH"
-msgstr "Key Length"
-
-msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_PARAMSET"
-msgstr "Parameters"
 
 msgid "I18N_OPENXPKI_UI_KEYSTORE_ALIAS_CONTAINS_INVALID_CHARACTERS"
 msgstr "Alias does contain characters other than a-z A-Z 0-9 - _ ."
@@ -2718,6 +2716,18 @@ msgstr "Failed Approval Rules"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVAL_REPORTS_LABEL"
 msgstr "Executed Approval Rules"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_BULKDATA_DESC"
+msgstr "Input data as defined by the field specification. "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_BULKDATA_LABEL"
+msgstr "Bulkdata"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_BULKDATA_PLACEHOLDER"
+msgstr ""
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_BULKDATA_TOOLTIP"
+msgstr ""
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_ALIAS_LABEL"
 msgstr "CA Alias"
 
@@ -2885,7 +2895,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHAIN_LABEL"
 msgstr "Chain Certificates"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHAIN_PLACEHOLDER"
-msgstr "~"
+msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHAIN_TOOLTIP"
 msgstr ""
@@ -3072,6 +3082,15 @@ msgstr "usually not required, use the selector on the right or type a datetime"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_TOOLTIP"
 msgstr "set this only if you know the implication!"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVENTORY_DESC"
+msgstr "Type of inventory to use."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVENTORY_LABEL"
+msgstr "Inventory"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVENTORY_TOOLTIP"
+msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_DESC"
 msgstr ""
@@ -4813,8 +4832,26 @@ msgstr "Yes"
 #~ msgid "I18N_OPENXPKI_UI_CUST"
 #~ msgstr "Yes"
 
+#~ msgid "I18N_OPENXPKI_UI_DATAPOOL_ACME_ACCOUNT_LABEL"
+#~ msgstr "ACME Account Information (NICE)"
+
 #~ msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
 #~ msgstr "The entered date/time could not be validated."
+
+#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM"
+#~ msgstr "Key Parameters"
+
+#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_CURVE_NAME"
+#~ msgstr "Curve Name"
+
+#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_ENC_ALG"
+#~ msgstr "Encryption"
+
+#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_KEY_LENGTH"
+#~ msgstr "Key Length"
+
+#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_PARAMSET"
+#~ msgstr "Parameters"
 
 #~ msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD"
 #~ msgstr "Encryption Password"

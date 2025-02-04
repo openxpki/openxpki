@@ -512,10 +512,6 @@ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
 msgstr "指定您希望吊销证书的原因。"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_DATAPOOL_ACME_ACCOUNT_LABEL"
-msgstr "您的搜索查询结果"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_DATAPOOL_ACME_REGISTRATION_LABEL"
 msgstr "您的搜索查询结果"
 
@@ -555,6 +551,10 @@ msgstr "最后更新"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DATAPOOL_EXPIRES_BEFORE"
 msgstr "最后更新"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_INVENTORY_LABEL"
+msgstr "用户名"
 
 # Remove?
 #, fuzzy
@@ -616,6 +616,11 @@ msgstr "密钥"
 
 msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr "已请求延迟吊销。"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DIGEST"
+msgstr "是"
 
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_FAIL"
 msgstr "失败"
@@ -955,27 +960,24 @@ msgstr "无效配置文件"
 msgid "I18N_OPENXPKI_UI_INVALID_TOKEN"
 msgstr "无效配置文件"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_INVENTORY"
+msgstr "有关可用配置文件的信息"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_INVENTORY_UPDATE"
+msgstr "下次更新/过期"
+
 msgid "I18N_OPENXPKI_UI_ISSUERS_LIST"
 msgstr "颁发此域的证书"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ITEMCNT"
+msgstr "项目"
 
 # Remove?
 msgid "I18N_OPENXPKI_UI_KEY"
 msgstr "密钥"
-
-msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM"
-msgstr "密钥参数"
-
-msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_CURVE_NAME"
-msgstr "曲线名称"
-
-msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_ENC_ALG"
-msgstr "加密"
-
-msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_KEY_LENGTH"
-msgstr "密钥长度"
-
-msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_PARAMSET"
-msgstr "参数"
 
 msgid "I18N_OPENXPKI_UI_KEYSTORE_ALIAS_CONTAINS_INVALID_CHARACTERS"
 msgstr "别名包含 a-z A-Z 0-9 - _ 之外的字符。"
@@ -2933,6 +2935,22 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVAL_REPORTS_LABEL"
 msgstr "批准"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_BULKDATA_DESC"
+msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_BULKDATA_LABEL"
+msgstr "密钥算法"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_BULKDATA_PLACEHOLDER"
+msgstr "~"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_BULKDATA_TOOLTIP"
+msgstr "将所需的链证书复制为连接的PEM或PKCS7捆绑包"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_ALIAS_LABEL"
 msgstr "密钥加密方式"
 
@@ -3306,6 +3324,19 @@ msgstr "通常不需要，请使用右侧的选择器或输入日期时间"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_TOOLTIP"
 msgstr "仅当您知道含义时才设置此值！"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVENTORY_DESC"
+msgstr "接收此请求的SCEP端点的名称。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVENTORY_LABEL"
+msgstr "实体名称"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVENTORY_TOOLTIP"
+msgstr ""
+"使用日历图标或以MM.DD.YYYY格式输入日期，键入0以使用默认值。 日期为UTC时区！"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_DESC"
@@ -5078,8 +5109,27 @@ msgstr "是"
 #~ msgid "I18N_OPENXPKI_UI_CUST"
 #~ msgstr "是"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_DATAPOOL_ACME_ACCOUNT_LABEL"
+#~ msgstr "您的搜索查询结果"
+
 #~ msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
 #~ msgstr "输入的日期/时间无法验证。"
+
+#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM"
+#~ msgstr "密钥参数"
+
+#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_CURVE_NAME"
+#~ msgstr "曲线名称"
+
+#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_ENC_ALG"
+#~ msgstr "加密"
+
+#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_KEY_LENGTH"
+#~ msgstr "密钥长度"
+
+#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_PARAMSET"
+#~ msgstr "参数"
 
 #~ msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD"
 #~ msgstr "加密密码"

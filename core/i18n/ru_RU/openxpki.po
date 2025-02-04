@@ -611,10 +611,6 @@ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_DATAPOOL_ACME_ACCOUNT_LABEL"
-msgstr "Выпуск списка отзыва сертификатов (CRL)"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_DATAPOOL_ACME_REGISTRATION_LABEL"
 msgstr "Выпуск списка отзыва сертификатов (CRL)"
 
@@ -649,6 +645,10 @@ msgstr "Действителен"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DATAPOOL_EXPIRES_BEFORE"
 msgstr "Действителен"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_INVENTORY_LABEL"
+msgstr "Профиль пользователя"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DATAPOOL_KEY"
@@ -709,6 +709,10 @@ msgstr "Имя учетной записи"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr "Технологические процессы отзыва сертификатов"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DIGEST"
+msgstr "Имя учетной записи"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_FAIL"
@@ -1134,34 +1138,24 @@ msgid "I18N_OPENXPKI_UI_INVALID_TOKEN"
 msgstr "Изменить профиль сертификата "
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_INVENTORY"
+msgstr "Профиль пользователя"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_INVENTORY_UPDATE"
+msgstr "Действителен"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_ISSUERS_LIST"
 msgstr "Технологические процессы выдачи новых списков отзыва"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_ITEMCNT"
+msgstr "Комментарий"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_KEY"
 msgstr "Имя учетной записи"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM"
-msgstr "Имя учетной записи"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_CURVE_NAME"
-msgstr "Имя учетной записи"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_ENC_ALG"
-msgstr "Имя Вашей учетной записи в информационной системе, например aivanov"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_KEY_LENGTH"
-msgstr "SPKAC-строка пуста."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_PARAMSET"
-msgstr ""
-"Произошло обращение к несуществующей функциональности сервера OpenXPKI. "
-"Идентификатор функциональности -  __METHOD_NAME__."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_KEYSTORE_ALIAS_CONTAINS_INVALID_CHARACTERS"
@@ -3553,6 +3547,27 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVAL_REPORTS_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_BULKDATA_DESC"
+msgstr ""
+"Используйте данный профиль сертификата только если Вы отчетливо "
+"представляете себе необходимую структуру имени субъекта сертификата, хорошо "
+"знаете компоненты этой структуры и соглашения об использовании имен в Вашей "
+"части инфраструктуры открытых ключей. Данный профиль позволяет использовать "
+"также произвольный набор альтернативных имен."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_BULKDATA_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_BULKDATA_PLACEHOLDER"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_BULKDATA_TOOLTIP"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_ALIAS_LABEL"
 msgstr "Дочерние технологические процессы"
 
@@ -4037,6 +4052,22 @@ msgstr "SPKAC-строка пуста."
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_TOOLTIP"
 msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVENTORY_DESC"
+msgstr ""
+"Для использования данного профиля сертификата достаточно ввести Ваше имя, "
+"имя Вашей учетной записи и адрес электронной почты. Это простейший профиль "
+"пользователя, который следует использовать, если нет особых требований к "
+"сертифкату. В противном случае следует использовать расширенный профиль."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVENTORY_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVENTORY_TOOLTIP"
+msgstr "Родительский технологический процесс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_DESC"
@@ -6188,8 +6219,34 @@ msgstr "Имя учетной записи"
 #~ msgstr "Имя учетной записи"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_DATAPOOL_ACME_ACCOUNT_LABEL"
+#~ msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
 #~ msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM"
+#~ msgstr "Имя учетной записи"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_CURVE_NAME"
+#~ msgstr "Имя учетной записи"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_ENC_ALG"
+#~ msgstr "Имя Вашей учетной записи в информационной системе, например aivanov"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_KEY_LENGTH"
+#~ msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_PARAMSET"
+#~ msgstr ""
+#~ "Произошло обращение к несуществующей функциональности сервера OpenXPKI. "
+#~ "Идентификатор функциональности -  __METHOD_NAME__."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD"
