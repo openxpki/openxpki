@@ -359,11 +359,22 @@ sub __get_ca
     $config .= "certificate       = ".$self->{ENGINE}->get_certfile()."\n";
     $config .= "private_key       = ".$self->{ENGINE}->get_keyfile."\n";
 
+    # Cutoff for the validity periods, as per RFC5280 "Validity":
+    # https://datatracker.ietf.org/doc/html/rfc5280#section-4.1.2.5
+    my $validity_cutoff = DateTime->new(
+        year  => 2050,
+        month => 1,
+        day   => 1,
+        hour  => 0,
+        minute => 0,
+        second => 0,
+    );
+
     if (my $notbefore = $self->{PROFILE}->get_notbefore()) {
     $config .= "default_startdate = "
         . OpenXPKI::DateTime::convert_date(
         {
-        OUTFORMAT => 'openssltime',
+        OUTFORMAT => $notbefore < $validity_cutoff ? 'openssltime' : 'generalizedtime',
         DATE      => $notbefore,
         })
         . "\n";
@@ -373,7 +384,7 @@ sub __get_ca
     $config .= "default_enddate = "
         . OpenXPKI::DateTime::convert_date(
         {
-        OUTFORMAT => 'openssltime',
+        OUTFORMAT => $notafter < $validity_cutoff ? 'openssltime' : 'generalizedtime',
         DATE      => $notafter,
         })
         . "\n";
