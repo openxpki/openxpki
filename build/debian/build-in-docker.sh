@@ -30,7 +30,7 @@ makerepo() {
         xargs -L1 --no-run-if-empty reprepro $CONFDIR --basedir /repository includedeb bookworm;
 
     # Add the apt config
-    echo -e "Types: deb\nURIs: $SOURCE\nSuites: bookworm\nComponents: release\nSigned-By: /usr/share/keyrings/openxpki.pgp" > /repository/openxpki.sources
+    echo -e "Types: deb\nURIs: $SOURCE\nSuites: bookworm\nComponents: release\nSigned-By: /usr/share/keyrings/openxpki.pgp\nArchitectures: amd64" > /repository/openxpki.sources
     gpg --export --armor > /repository/Release.key
 
 }
