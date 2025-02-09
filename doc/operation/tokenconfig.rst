@@ -5,7 +5,7 @@ Crypto Token Configuration
 Overview
 --------
 
-A cypto token is an entity used to do cryptographic operations. OpenXPKI
+A crypto token is an entity used to do cryptographic operations. OpenXPKI
 organizes those tokens using groups and generations. A default system
 has four groups:
 
@@ -32,7 +32,7 @@ Root Certificate
 ^^^^^^^^^^^^^^^^
 
 For production systems it is usual to have the Issuing CA under a
-Root CA and manage the Root CA on a offline system. As OpenXPKI needs
+Root CA and manage the Root CA on an offline system. As OpenXPKI needs
 the full chain of a certificate, you need to import the root certificate
 first::
 
@@ -47,7 +47,7 @@ can now import the issuing certificate::
     openxpkiadm certificate import  --file ca-signer-1.crt \
         --realm democa --token certsign
 
-This will import the certificate and also create a so called alias to
+This will import the certificate and also create a so-called alias to
 mark this certificate as issuing token. With the default config, the key
 file is expected to be at /etc/openxpki/ca/democa/ca-signer-1.pem.
 
