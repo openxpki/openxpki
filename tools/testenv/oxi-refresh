@@ -74,6 +74,9 @@ OPTIONS
     --full
         Overwrite /etc/openxpki with modified sample config.
         (Re-)create database and import certificates.
+
+    --tenant
+        Activate Tenant support for user "raop".
 __HELP
 
 trap '_exit $?' EXIT
@@ -84,6 +87,7 @@ set -e
 #
 IS_RESTART=1
 IS_FULLCONFIG=0
+TENANT_SUPPORT=0
 oxi_install_params=()
 # Bash string manipulation: use # to strip text off $@ and see if string still equals original $@
 [[ "${@#--no-restart}" != "$@" ]] && IS_RESTART=0
@@ -92,6 +96,7 @@ oxi_install_params=()
 [[ "${@#--no-i18n}" != "$@" ]]    && oxi_install_params+=(--no-i18n)
 [[ "${@#--no-compile}" != "$@" ]] && oxi_install_params+=(--no-compile)
 [[ "${@#--no-ee}" != "$@" ]]      && oxi_install_params+=(--no-ee)
+[[ "${@#--tenant}" != "$@" ]]     && TENANT_SUPPORT=1
 
 echo "[$([ "$IS_FULLCONFIG" -eq 1 ] && echo "X" || echo " ")] Recreate DB and certs, wipe config"
 echo "[$([ "$IS_RESTART" -eq 1 ] && echo "X" || echo " ")] Restart OpenXPKI & Apache"
@@ -166,7 +171,9 @@ if [ $test_auth_exists -eq 0 ]; then
 fi
 
 # add "tenant: { type: Base }" to "RA Operator"
-#sed -zri 's/(RA Operator[^\n]+\n([\t ]+[^\n]+\n)+)/\1    tenant:\n        type: Base\n/' /etc/openxpki/config.d/realm/democa/auth/roles.yaml
+if [ $TENANT_SUPPORT -eq 1 ]; then
+    sed -zri 's/(RA Operator[^\n]+\n([\t ]+[^\n]+\n)+)/\1    tenant:\n        type: Base\n/' /etc/openxpki/config.d/realm/democa/auth/roles.yaml
+fi
 
 # remove probably existing TestAccounts
 sed -zri 's/(TestAccounts:\n([\t ]+[^\n]+\n|\n)+)//' /etc/openxpki/config.d/realm.tpl/auth/handler.yaml
