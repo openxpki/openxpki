@@ -1,4 +1,4 @@
-FROM docker.io/library/node:iron-bookworm-slim
+FROM docker.io/library/node:23-bookworm-slim
 
 ARG NPM_CUSTOM_REGISTRY
 ARG OXI_NODE_MODULES_OWNER=root
@@ -23,8 +23,8 @@ RUN test -n "$NPM_CUSTOM_REGISTRY" \
   || echo "\nNo custom npm registry set (or it did not respond)\n"
 
 # update npm and install pnpm
-RUN npm install -g npm@9.8.1 \
-  && npm install -g pnpm@8.14.1 \
+RUN npm install -g npm@11.1.0 \
+  && npm install -g pnpm@10.4.1 \
   && pnpm config set auto-install-peers true
 
 # Create build dir
