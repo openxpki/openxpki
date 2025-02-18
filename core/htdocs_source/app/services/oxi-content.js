@@ -6,7 +6,6 @@ import { isArray } from '@ember/array'
 import { action, set as emSet } from '@ember/object'
 import { debug } from '@ember/debug'
 import { guidFor } from '@ember/object/internals'
-import fetch from 'fetch'
 import Page from 'openxpki/data/page'
 
 /**

@@ -1,7 +1,6 @@
 import Service from '@ember/service'
 import { tracked } from '@glimmer/tracking'
 import ENV from 'openxpki/config/environment'
-import fetch from 'fetch'
 import yaml from 'js-yaml'
 
 /**

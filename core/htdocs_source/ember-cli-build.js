@@ -114,9 +114,11 @@ module.exports = function(defaults) {
   return require('@embroider/compat').compatBuild(app, Webpack, {
     staticAddonTestSupportTrees: true,
     staticAddonTrees: true,
-    staticHelpers: true,
-    staticModifiers: true,
-    staticComponents: true,
+    staticInvokables: true,
+    /* The setting 'staticEmberSource' will default to true in the next version
+       of Embroider and can't be turned off. To prepare for this you should set
+       'staticEmberSource: true' in your Embroider config. */
+    staticEmberSource: true,
     // splitAtRoutes: ['route.name'], // can also be a RegExp
 
     // packagerOptions: {
@@ -125,4 +127,6 @@ module.exports = function(defaults) {
     //   publicAssetURL: 'assets/', // use relative URL (without `{rootURL}/`) so that the old /openxpki/ backend path works
     // },
   });
+
+  // return app.toTree();
 };

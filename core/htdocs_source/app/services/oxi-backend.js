@@ -1,6 +1,5 @@
 import Service from '@ember/service';
 import { service } from '@ember/service';
-import fetch from 'fetch';
 import ENV from 'openxpki/config/environment';
 //import { assert, optional, enums } from 'superstruct';
 
