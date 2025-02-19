@@ -17,8 +17,14 @@ import { service } from '@ember/service'
 
 export default class ApplicationController extends Controller {
     @service('oxi-content') content
+    @service('intl') intl
 
     @tracked restricted_width = true
+
+    constructor() {
+        super(...arguments)
+        this.intl.setLocale(['en-us']);
+    }
 
     @action toggleWidth() {
         this.restricted_width = !this.restricted_width
