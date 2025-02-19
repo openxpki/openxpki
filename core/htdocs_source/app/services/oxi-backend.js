@@ -9,8 +9,6 @@ import ENV from 'openxpki/config/environment';
  * @module service/oxi-backend
  */
 export default class OxiBackendService extends Service {
-    @service('intl') intl;
-
     request({ url, method = 'GET', headers = {}, data, contentType }) {
         // type validation
         //assert(method, enums(['GET', 'POST']));
