@@ -326,17 +326,17 @@ sub _drop_privileges ($self, $pid_file, $user, $group, $label) {
     chown $uid, -1, $pid_file if defined $uid;
     chown -1, $gid, $pid_file if defined $gid;
 
-    # drop privileges
+    # drop privileges - group first!
     my @changes = ();
+    if (defined $gid) {
+        POSIX::setgid($gid);
+        push @changes, "group = $group";
+    }
     if (defined $uid) {
         $ENV{USER} = getpwuid($uid);
         $ENV{HOME} = ((getpwuid($uid))[7]);
         POSIX::setuid($uid);
         push @changes, "user = $user";
-    }
-    if (defined $gid) {
-        POSIX::setgid($gid);
-        push @changes, "group = $group";
     }
     $self->log->debug("$label dropped privileges, new process ownership: " . join(', ', @changes)) if @changes;
 }

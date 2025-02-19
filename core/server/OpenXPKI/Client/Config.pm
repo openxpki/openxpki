@@ -131,7 +131,10 @@ has 'log' => (
     )] ),
     init_arg => undef,
     lazy => 1,
-    default => sub ($self) { OpenXPKI::Log4perl->get_logger($self->log_facility) },
+    default => sub ($self) {
+        OpenXPKI::Log4perl->set_default_facility($self->log_facility);
+        return OpenXPKI::Log4perl->get_logger();
+    },
 );
 
 =head3 logconf

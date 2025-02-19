@@ -364,7 +364,7 @@ has log => (
     lazy => 1,
     builder => '_build_log',
 );
-sub _build_log ($self) { $self->config_obj->log }
+sub _build_log ($self) { OpenXPKI::Log4perl->get_logger }
 
 =head3 backend
 
@@ -589,7 +589,7 @@ has json => (
 sub BUILD {}
 after 'BUILD' => sub ($self, $args) {
     Log::Log4perl::MDC->put('endpoint', $self->endpoint);
-    OpenXPKI::Log4perl->set_default_facility($self->config_obj->log_facility);
+    OpenXPKI::Log4perl->set_default_facility( $self->service_name.'.'.$self->endpoint );
 };
 
 =head2 request_param
