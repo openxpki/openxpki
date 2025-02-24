@@ -519,10 +519,28 @@ export default class OxiContentService extends Service {
     @action
     setFocus() {
         this.#willSetFocusOnNextRunLoop = false
-
-        if (this.#focusFavourite && !this.#focusFavourite.element) this.#focusFavourite = null
-        if (this.#focusFavourite && !this.isElementVisible(this.#focusFavourite.element)) this.#focusFavourite = null
         if (!this.#focusFavourite) return
+
+        if (!this.#focusFavourite.element) {
+            debug('NOT setting focus as favourite element does not exist (anymore?)')
+            this.#focusFavourite = null
+            return
+        }
+        if (!this.isElementVisible(this.#focusFavourite.element)) {
+            /*
+              This is a workaround for cases where the originally created
+              element [1] gets replaced (hidden) e.g. by a Javascript module.
+              By sending our own "oxi-focus" event we allow the original elemen
+              to redirect the focus even if it is invisible itself.
+
+              [1]: the one that receives {{on-init @setFocusInfo true}} from
+              OxiSection::Form::Field::xxx via "...attributes" and thus fires
+              setFocusInfo(element, true) with itself as the first argument
+            */
+            debug('Trying to set focus via custom event "oxi-focus" as favourite element is not visible')
+            this.#focusFavourite.element.dispatchEvent(new Event("oxi-focus"))
+            return
+        }
 
         debug('Setting focus to current favourite element')
         this.#focusFavourite.element.focus()

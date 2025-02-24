@@ -2,6 +2,7 @@ import Component from '@glimmer/component'
 import { action } from "@ember/object"
 import { debug } from '@ember/debug'
 import SlimSelect from 'slimselect'
+import Choices from 'choices.js'
 
 /**
  * Shows a drop-down list of options.
@@ -33,6 +34,7 @@ import SlimSelect from 'slimselect'
 export default class OxiSelectComponent extends Component {
     cssClasses
     selectTarget = null // only for @inline
+    #choicesObj = null
 
     constructor() {
         super(...arguments)
@@ -46,6 +48,12 @@ export default class OxiSelectComponent extends Component {
         this.selectTarget = element
     }
 
+    @action
+    focussed(element) {
+        // "redirect" focus to the dynamically created Choices.js object
+        if (this.#choicesObj) this.#choicesObj.containerOuter.element.focus()
+    }
+
     // initially trigger the onChange event to handle the case
     // when the calling code has no "current selection" defined.
     @action
@@ -56,6 +64,31 @@ export default class OxiSelectComponent extends Component {
                 settings: {
                     contentLocation: this.selectTarget,
                 }
+            })
+        }
+        else {
+            this.#choicesObj = new Choices(element, {
+                classNames: {
+                    containerOuter: ['choices', 'form-control'],
+                    containerInner: [],
+                    list: ['choices__list', 'text-truncate'],
+                    activeState: ['is-active', 'shadow'],
+                },
+                noChoicesText: 'No choices to choose from',
+                searchEnabled: (this.args.list?.length || 0) > 5,
+                searchResultLimit: 10,
+                searchFields: [ 'label' ],
+                shouldSort: false,
+                itemSelectText: '',
+                callbackOnInit: function () {
+                    this.dropdown.element.addEventListener(
+                        'keydown', (event) => {
+                            // prevent form submit
+                            if (event.keyCode === 13) event.stopPropagation()
+                        },
+                        false,
+                    )
+                },
             })
         }
         if (this.args.onInsert) this.args.onInsert(element)

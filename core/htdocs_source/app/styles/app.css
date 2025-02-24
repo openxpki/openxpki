@@ -4,6 +4,7 @@
 PLEASE NOTE: CSS imports for Node.js modules are done in /ember-cli-build.js .
 */
 @import url("bootstrap-v5-tweaks.css");
+@import url("choices-js-tweaks.css");
 @import url("glyphicons.css");
 
 /******************************************************************************
@@ -456,8 +457,9 @@ form div.required label.col-form-label {
 }
 
 /* Input fields */
-div.required input:not(:checked),
+div.required input:not(:checked):not(.choices__input),
 div.required select,
+div.required .choices, /* Choices.js */
 div.required textarea {
   background-color:#fff3c2 !important;
   border:1px solid #444;
@@ -465,12 +467,14 @@ div.required textarea {
 
 div.required input.form-control[disabled] ,
 div.required select.form-control[disabled],
+div.required .choices:has(select.form-control[disabled]), /* Choices.js */
 div.required textarea.form-control[disabled] {
   border:1px solid #ccc;
 }
 
 div.optional input,
 div.optional select,
+div.optional .choices, /* Choices.js */
 div.optional textarea {
   border:1px #888 dashed;
 }

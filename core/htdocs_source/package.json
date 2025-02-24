@@ -47,6 +47,7 @@
     "bootstrap": "^5.3.3",
     "broccoli-funnel": "^3.0.8",
     "caniuse-lite": "^1.0.30001700",
+    "choices.js": "^11.0.3",
     "concurrently": "^9.1.2",
     "copy-text-to-clipboard": "^3.2.0",
     "detect-browser": "^5.3.0",

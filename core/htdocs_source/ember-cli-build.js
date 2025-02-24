@@ -102,6 +102,14 @@ module.exports = function(defaults) {
     ]
   });
 
+  // Choices.js
+  app.import('node_modules/choices.js/public/assets/styles/choices.css');
+  app.import('node_modules/choices.js/public/assets/scripts/choices.js', {
+    using: [
+      { transformation: 'amd', as: 'choices.js' }
+    ]
+  });
+
   // Bootstrap
   app.import('node_modules/bootstrap/dist/css/bootstrap.css');
 
