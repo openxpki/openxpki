@@ -224,21 +224,27 @@ certificate and register it as SCEP RA token::
         --file scep.crt --key scep.pem
 
 **Note**: Each realm needs his own SCEP token so you need to run this command
-any realm that provides an SCEP service. It is possible to use the same SCEP
-token in multiple realms.
+for any realm that provides an SCEP service. It is possible to use the same
+SCEP token in multiple realms.
 
 Setup SCEP Endpoint
 ^^^^^^^^^^^^^^^^^^^
 
 The SCEP setup is already included in the core distribution and example
-configuration. The package installs a wrapper script and creates a suitable alias
-redirecting all requests to ``http://host/scep/<any value>`` to the wrapper.
-While the default config found at ``/etc/openxpki/scep/default.conf`` maps all
-requests, you need make sure the used URL path maps to an endpoint policy file
-in the backend. The demo configuration contains one with the name ``generic``
-so for a testdrive call ``http://host/scep/generic``.
+configuration. The package installs a wrapper script and creates a suitable
+alias redirecting all requests to ``http://yourhost/scep/<any value>`` to
+the wrapper.
 
-The system supports getcacert, getcert, getcacaps, getnextca and enroll/renew - the
+It is currently mandatory to define a global loglevel in the default config
+found at ``/etc/openxpki/scep/default.conf``.
+
+To create a useable SCEP configuration, you must add a definition file that
+describes the properties of the SCEP endpoint. The example repo provides a
+well documented ``endpoint.conf-template`` and a single endpoint named
+``generic`` which is ready to use for a test drive using the URL
+``http://yourhost/scep/generic``.
+
+The system supports GetCACert, GetCert, GetCACaps, GetNextCa and Enroll/Renew - the
 shipped workflow is configured to allow enrollment with password or signer on behalf.
 The password (and all other policy settings) can be found in the file
 ``config.d/realm/democa/scep/generic.yaml``, the default is 'SecretChallenge'.
