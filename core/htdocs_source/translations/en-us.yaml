@@ -48,6 +48,7 @@ component:
     date_format: "m/d/Y h:i K" # see https://flatpickr.js.org/formatting/
   oxifield_select:
     custom_value: "Custom"
+    default_placeholder: "…"
   oxifield_cert_identifier:
     no_matches: "No matches found"
   oxifield_textarea:

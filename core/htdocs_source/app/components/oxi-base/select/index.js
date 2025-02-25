@@ -14,6 +14,7 @@ import Choices from 'choices.js'
  *   @onChange={{myFunc}}
  *   @onInsert={{otherFunc}}
  *   @inline={{true}}
+ *   @placeholder="Please choose"
  * />
  * ```
  *
@@ -41,6 +42,14 @@ export default class OxiSelectComponent extends Component {
         this.cssClasses = (this.args.inline)
             ? 'oxi-inline-select'
             : 'form-select text-truncate'
+    }
+
+    get placeholder() {
+        let label = this.args.placeholder ?? null
+        // convert empty to non-empty string so Choice.js will recognize placeholder
+        // (but respect null/undefined = no placeholder)
+        if (label === "") label = '…'
+        return label
     }
 
     @action
@@ -80,6 +89,7 @@ export default class OxiSelectComponent extends Component {
                 searchFields: [ 'label' ],
                 shouldSort: false,
                 itemSelectText: '',
+                placeholder: !!(this.args.placeholder ?? null),
                 callbackOnInit: function () {
                     this.dropdown.element.addEventListener(
                         'keydown', (event) => {

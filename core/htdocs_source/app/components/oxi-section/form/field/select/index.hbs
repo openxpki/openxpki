@@ -20,9 +20,10 @@
             />
         {{else}}
             <OxiBase::Select
-                @list={{this.options}}
+                @list={{@content.options}}
                 @selected={{this.sanitizedValue}}
                 @onChange={{this.optionSelected}}
+                @placeholder={{this.placeholder}}
                 required={{not @content.is_optional}}
                 {{on-init @setFocusInfo true}}
             />
@@ -39,9 +40,10 @@
     </div>
 {{else}}
     <OxiBase::Select
-        @list={{this.options}}
+        @list={{@content.options}}
         @selected={{this.sanitizedValue}}
         @onChange={{this.optionSelected}}
+        @placeholder={{this.placeholder}}
         required={{not @content.is_optional}}
         {{on-init @setFocusInfo true}}
     />

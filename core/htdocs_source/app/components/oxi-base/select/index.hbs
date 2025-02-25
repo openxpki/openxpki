@@ -8,6 +8,7 @@ components' use of {{on-init @onInsert ...}} would not work.
 <select
     ...attributes
     class={{this.cssClasses}}
+    data-placeholder={{this.placeholder}}
     {{on "oxi-focus" this.focussed}}
     {{on "change" this.listChanged}}
     {{on-init this.startup}}
