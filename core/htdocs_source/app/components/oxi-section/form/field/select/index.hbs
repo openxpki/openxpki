@@ -21,7 +21,7 @@
         {{else}}
             <OxiBase::Select
                 @list={{@content.options}}
-                @selected={{this.sanitizedValue}}
+                @selected={{@content.value}}
                 @onChange={{this.optionSelected}}
                 @placeholder={{this.placeholder}}
                 required={{not @content.is_optional}}
@@ -41,7 +41,7 @@
 {{else}}
     <OxiBase::Select
         @list={{@content.options}}
-        @selected={{this.sanitizedValue}}
+        @selected={{@content.value}}
         @onChange={{this.optionSelected}}
         @placeholder={{this.placeholder}}
         required={{not @content.is_optional}}

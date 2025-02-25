@@ -39,18 +39,6 @@ export default class OxiFieldSelectComponent extends Component {
         }
     }
 
-    // no computed value - no need to refresh later on
-    // (and making it computed causes strange side effects when optionSelected() is triggered)
-    get sanitizedValue() {
-        var value = this.args.content.value;
-        if (typeof value === "string" || typeof value === "number") return value;
-
-        var options = this.args.content.options;
-        let result = options[0] ? (options[0].value || "") : "";
-        debug(`oxifield-select (${this.args.content.name}): sanitizedValue ("${this.args.content.value}" -> "${result}")`);
-        return result;
-    }
-
     @action
     optionSelected(value) {
         debug("oxifield-select (" + this.args.content.name + "): optionSelected(" + value + ")");
