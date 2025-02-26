@@ -230,25 +230,22 @@ sub startup ($self) {
             $c->req->url->base->scheme('https');
         }
 
-        # unescape header values (for some reason they are url escaped)
-        for my $key ($c->req->headers->names->@*) {
-            my @val = map { url_unescape($_) } $c->req->headers->every_header($key)->@*;
-            $c->req->headers->header($key, @val);
-        }
-
-        # inject forwarded webserver ENV into Mojo::Request
         $self->log->error("Missing header X-ReverseProxy-ENVSET - Reverse proxy setup seems to be incomplete")
             unless $c->req->headers->header('X-ReverseProxy-ENVSET');
 
-        my $headers = $c->req->headers->to_hash;
         my $webserver_env = {};
-        for my $header (sort keys $headers->%*) {
-            if (my ($env_key) = $header =~ /^X-ReverseProxy-ENV-(.*)/) {
+        for my $key ($c->req->headers->names->@*) {
+            # unescape header values (for some reason they are url escaped)
+            my @val = map { url_unescape($_) } $c->req->headers->every_header($key)->@*;
+            $c->req->headers->header($key, @val);
+
+            # inject forwarded webserver ENV into Mojo::Request
+            if (my ($env_key) = $key =~ /^X-ReverseProxy-ENV-(.*)/) {
                 if (not any { $env_key eq $_ } @webserver_env_vars) {
-                    $self->log->debug("Ignoring unknown ENV variable received via header '$header'");
+                    $self->log->debug("Ignoring unknown ENV variable received via header '$key'");
                     next;
                 };
-                $webserver_env->{$env_key} = $headers->{$header};
+                $webserver_env->{$env_key} = $c->req->headers->header($key); # retrieve value as string (= let Mojo::Headers do the join)
                 $self->log->trace("Webserver ENV variable received via header: $env_key");
             }
         }
