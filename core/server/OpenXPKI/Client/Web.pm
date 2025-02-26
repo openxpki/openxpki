@@ -236,17 +236,13 @@ sub startup ($self) {
 
         my $webserver_env = {};
         for my $key ($c->req->headers->names->@*) {
-            # unescape header values (for some reason they are url escaped)
-            my @val = map { url_unescape($_) } $c->req->headers->every_header($key)->@*;
-            $c->req->headers->header($key, @val);
-
             # inject forwarded webserver ENV into Mojo::Request
             if (my ($env_key) = $key =~ /^X-ReverseProxy-ENV-(.*)/) {
                 if (not any { $env_key eq $_ } @webserver_env_vars) {
                     $self->log->debug("Ignoring unknown ENV variable received via header '$key'");
                     next;
                 };
-                $webserver_env->{$env_key} = decode_base64(join ', ', @val); # "join ', ', @val" is equivalent to $c->req->headers->header($key));
+                $webserver_env->{$env_key} = decode_base64($c->req->headers->header($key));
                 $self->log->trace("Webserver ENV variable received via header: $env_key");
             }
         }
