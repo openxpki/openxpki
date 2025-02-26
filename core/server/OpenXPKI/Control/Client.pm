@@ -119,7 +119,7 @@ sub cmd_start ($self) {
 
         %server_params = (
             listen => [
-                map { $log->warn('READLINK = ' . readlink("/proc/self/fd/$_")); sprintf 'http+unix://%s?fd=%i', $self->__file_url_from_fd($_), $_ }
+                map { sprintf 'http+unix://%s?fd=%i', $self->__file_url_from_fd($_), $_ }
                 map { $_+2 }
                 1..$ENV{LISTEN_FDS}
             ],
