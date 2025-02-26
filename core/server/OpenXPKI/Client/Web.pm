@@ -6,6 +6,7 @@ use re qw( regexp_pattern );
 use Module::Load ();
 use POSIX ();
 use List::Util qw( first any );
+use MIME::Base64 qw( decode_base64 );
 
 # CPAN modules
 use Mojo::Util qw( url_unescape encode tablify );
@@ -245,7 +246,7 @@ sub startup ($self) {
                     $self->log->debug("Ignoring unknown ENV variable received via header '$key'");
                     next;
                 };
-                $webserver_env->{$env_key} = $c->req->headers->header($key); # retrieve value as string (= let Mojo::Headers do the join)
+                $webserver_env->{$env_key} = decode_base64(join ', ', @val); # "join ', ', @val" is equivalent to $c->req->headers->header($key));
                 $self->log->trace("Webserver ENV variable received via header: $env_key");
             }
         }
@@ -258,7 +259,8 @@ sub startup ($self) {
         # which is also valid for "RewriteRule ... url [p]" says: "url is a
         # partial URL for the remote server and cannot include a query string."
         # (https://httpd.apache.org/docs/2.4/mod/mod_proxy.html#proxypass)
-        if (my $query = $c->req->headers->header('X-ReverseProxy-QueryString')) {
+        if (my $query_b64 = $c->req->headers->header('X-ReverseProxy-QueryString')) {
+            my $query = decode_base64($query_b64);
             $c->req->url->query($query);
             $self->log->trace("Webserver QUERY_STRING received via header: $query");
         }
