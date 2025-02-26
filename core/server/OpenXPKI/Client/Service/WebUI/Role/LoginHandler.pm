@@ -19,6 +19,7 @@ requires 'new_frontend_session';
 
 # Core modules
 use Encode;
+use MIME::Base64 qw( encode_base64 );
 
 # CPAN modules
 use Crypt::JWT qw( encode_jwt decode_jwt );
