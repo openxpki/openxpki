@@ -105,7 +105,7 @@ Now install the OpenXPKI core package, session driver and the translation packag
 use the openxpkiadm command to verify if the system was installed correctly::
 
     openxpkiadm version
-    Version (core): 3.28.0
+    Version (core): 3.32.0
 
 Now, create an empty database and assign a database user::
 
@@ -120,8 +120,8 @@ Now, create an empty database and assign a database user::
        debug: 0
        type: MariaDB
        name: openxpki
-       host: localhost
-       port: 3306
+       #host: localhost
+       #port: 3306
        user: openxpki
        passwd: openxpki
 
