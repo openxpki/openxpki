@@ -6,6 +6,7 @@ use Module::Load ();
 
 # Project modules
 use OpenXPKI::Log4perl;
+use OpenXPKI::i18n qw( set_language set_locale_prefix);
 
 =head1 NAME
 
@@ -73,9 +74,17 @@ sub index ($self) {
     # load and instantiate service class
     my $service;
     my $config;
+    my %backend;
     try {
-        $config = $self->oxi_config($service_name, $no_config);
-        $config->log->info(sprintf 'Incoming %s request: %s %s', uc($self->req->url->base->scheme), $self->req->method, $self->url_for);
+        # FIXME - send 404 for unknown endpoints
+        $config = $self->oxi_service_config($service_name, $endpoint)
+            || die "No configuration found for this service";
+        # for the WebUI we create a reusable backend instance via the factory
+        # FIXME we need to rework the O:C:Simple to make it reusable too
+        if ($service_name eq 'webui') {
+            %backend = ( backend => $self->oxi_backend() );
+            $self->log->info('Adding backend for webui in '.$$);
+        }
     }
     catch ($error) {
         die sprintf("Error while loading configuration for service '%s': %s", $service_name, $error);
@@ -85,11 +94,12 @@ sub index ($self) {
         Module::Load::load($class);
         $service = $class->new(
             service_name => $service_name,
-            config_obj => $config,
+            config => $config,
             webserver_env => $self->stash('webserver_env'),
             remote_address => $self->tx->remote_address,
             request => $self->req,
             endpoint => $endpoint,
+            %backend
         );
         die "Service class $class does not consume role OpenXPKI::Client::Service::Role::Base"
           unless $service->DOES('OpenXPKI::Client::Service::Role::Base');
@@ -98,10 +108,20 @@ sub index ($self) {
         die sprintf("Error loading service class '%s': %s", $class, $error);
     }
 
-    # replace Mojolicious logger by our own
-    $self->app->log($config->log);
+    # Setup locale if defined
+    if (my $prefix = ($config->get('locale.prefix') // $config->get('global.locale_directory'))) {
+        $self->log->trace('Set locale prefix to '.$prefix);
+        set_locale_prefix($prefix);
+    }
+    if (my $language = ($config->get('locale.language') // $config->get('global.default_language'))) {
+        $self->log->trace('Set language to '.$language);
+        set_language($language);
+    }
+
+    # @todo: is this still required?
     $self->stash('mojo.log' => undef); # reset DefaultHelper "log" (i.e. $self->log) which accesses stash "mojo.log"
 
+    $self->log->info(sprintf 'Incoming %s request: %s %s', uc($self->req->url->base->scheme), $self->req->method, $self->url_for);
     $self->log->trace("Service class $class instantiated");
 
     # preparations and checks

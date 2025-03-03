@@ -5,6 +5,7 @@ use Digest::SHA qw(sha1_hex);
 use Log::Log4perl;
 use Sys::Hostname;
 use Module::Load ();
+use List::Util qw(any);
 
 use OpenXPKI::Config::Backend;
 use OpenXPKI::Server::Context qw( CTX );
@@ -22,6 +23,13 @@ has '+BASECONNECTOR' => (
         my $self = shift;
         return $self->backend();
     },
+);
+
+has 'config_dir' => (
+    is => 'ro',
+    isa => 'Str',
+    lazy => 1,
+    default => '/etc/openxpki/config.d',
 );
 
 has backend => (
@@ -119,13 +127,6 @@ sub BUILD {
 
 }
 
-has 'config_dir' => (
-    is => 'ro',
-    isa => 'Str',
-    lazy => 1,
-    default => '/etc/openxpki/config.d',
-);
-
 before '_route_call' => sub {
 
     my $self = shift;
@@ -138,16 +139,16 @@ before '_route_call' => sub {
         $location = @{$path}[0];
         ##! 8: 'Location was array - shifted: ' . Dumper $location
     } else {
-        $location = $path;
+        ($location) = split('\.', $path, 2);
     }
 
-    ##! 16: "_route_call interception on $location "
+    ##! 16: "_route_call interception on $location was ($path)"
     # system or realm acces - no prefix
-    if ( substr ($location, 0, 6) eq 'system' || substr($location, 0, 5) eq 'realm' || substr($location, 0, 8) eq 'endpoint') {
+    if ( any { $_ eq  $location } ('system', 'realm', 'endpoint')) {
         ##! 16: "_route_call: system or explicit realm value, reset connector offsets"
         $self->PREFIX('');
-    } elsif (substr($location, 0, 11) eq "credentials" && $self->credential_backend()) {
-        ##! 16: "_route_call: request for credential"
+    } elsif ( $location eq "credentials" && $self->credential_backend()) {
+        ##! 16: "_route_call: request for credentials"
         $self->PREFIX('');
     } else {
         my $session = CTX('session');
@@ -172,18 +173,15 @@ sub checksum {
 
 sub get_version {
     my $self = shift;
-    CTX('log')->deprecated->error('Call to get_version in config layer');
-    return '';
+    die 'Call to get_version in config layer';
 }
 
 sub get_head_version {
-    CTX('log')->deprecated->error('Call to get_head_version in config layer');
+    die 'Call to get_head_version in config layer';
 }
 
 sub update_head {
-    my $self = shift;
-    CTX('log')->deprecated->error('Call to update_head in config layer');
-    return '';
+    die 'Call to update_head in config layer';
 }
 
 sub get_scalar_as_list {

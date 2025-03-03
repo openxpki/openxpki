@@ -36,7 +36,7 @@ sub prepare ($self, $c) {
 
     if ($self->request->is_secure) {
         # what we expect -> noop
-    } elsif ($self->config->{global}->{insecure}) {
+    } elsif ($self->config->get('global.insecure')) {
         # RFC demands TLS for EST but we might have a SSL proxy in front
         $self->log->debug("EST request via insecure connection (plain HTTP) - allowed via configuration");
     } else {
@@ -64,9 +64,10 @@ sub send_response ($self, $c, $response) {
 
     } else {
         # Default is base64 encoding, but we can turn on binary
-        my $is_binary = $self->config->{output}->{encoding}//'' eq 'binary';
+        my $is_binary = $self->config->get('output.encoding')//'' eq 'binary';
         my $data = $is_binary ? decode_base64($response->result) : $response->result;
         $c->res->headers->add('content-transfer-encoding' => ($is_binary ? 'binary' : 'base64'));
+        $data =~ s/(.{1,64})/$1\n/g if ($self->config->get('output.wrap'));
         return $c->render(data => $data);
     }
 }
@@ -162,7 +163,7 @@ sub handle_revocation_request ($self) {
         return $self->new_response( 40002 );
     }
 
-    my $workflow_type = $self->config->{simplerevoke}->{workflow} || 'certificate_revoke';
+    my $workflow_type = $self->config->get('simplerevoke.workflow') || 'certificate_revoke';
 
     my $response = $self->new_response(
         workflow => $self->run_workflow(type => $workflow_type, params => $param)

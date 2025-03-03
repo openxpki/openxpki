@@ -24,22 +24,32 @@ use Mojo::File;
 # Project modules
 use OpenXPKI::Util;
 use OpenXPKI::Log4perl;
-
+use OpenXPKI::Client::Service::Config;
 
 has cfg => (
     is => 'rw',
     isa => 'HashRef',
     lazy => 1,
     default => sub ($self) {
-        # $ENV{OPENXPKI_CONF_PATH} = $self->config_path if $self->has_config_path;
-        # require OpenXPKI::Config;
-        # my $config = OpenXPKI::Config->new;
         return {
             pid_file => '/run/openxpki-clientd.pid',
             socket_file => '/var/openxpki/openxpki-clientd.socket',
-            #stderr => '/var/log/openxpki/client-stderr.log',
+            %{$self->config()->get_hash('system.server')}
         };
-    },
+    }
+);
+
+has config => (
+    is => 'ro',
+    isa => 'Connector',
+    lazy => 1,
+    default => sub ($self) {
+        return OpenXPKI::Client::Service::Config->new( config_dir => $self->config_path() );
+    }
+);
+
+has '+config_path' => (
+    default => '/etc/openxpki/frontend.d',
 );
 
 has silent => (
@@ -74,10 +84,11 @@ sub getopt_params ($self, $command) {
         group|g=s
         pid_file|pid-file|p=s
         socket_file|socket-file|s=s
-        socket_user|socket-user=s
+        socket_owner|socket-owner=s
         socket_group|socket-group=s
         socket_mode|socket-mode=s
         systemd
+        workers=i
         nd|no-detach
         quiet
     );
@@ -139,10 +150,15 @@ sub cmd_start ($self) {
 
         # each parameter might be undef:
         %web_params = (
-            oxi_socket_user => $self->opts->{socket_user} || $self->cfg->{socket_user} || $user,
+            oxi_socket_owner => $self->opts->{socket_owner} || $self->cfg->{socket_owner} || $user,
             oxi_socket_group => $self->opts->{socket_group} || $self->cfg->{socket_group} || $group,
             oxi_socket_mode => $self->opts->{socket_mode} || $self->cfg->{socket_mode},
         );
+    }
+
+    if (my $workers = ($self->opts->{workers} || $self->cfg->{prefork}->{workers})) {
+        $server_params{workers} = $workers;
+        $log->debug(sprintf('setting worker count to %01d', $workers));
     }
 
     # prevent the server from creating a PID file
@@ -165,7 +181,7 @@ sub cmd_start ($self) {
         oxi_group => $group, # might be undef
         oxi_skip_log_init => $force_screen_logging,
         # config object
-        #oxi_config_obj => ...,
+        oxi_config_obj => $self->config(),
     });
 
     my $start_client = sub {
@@ -334,7 +350,7 @@ no. by systemd via ENV variable LISTEN_FDS),
 
 =back
 
-In this mode the options C<--pid-file>, C<--socket-file>, C<--socket-user>,
+In this mode the options C<--pid-file>, C<--socket-file>, C<--socket-owner>,
 C<--socket-group> and C<--socket-mode> will be ignored.
 
 =item B<--pid-file PATH>
@@ -349,7 +365,7 @@ Path of the PID file (required unless C<--systemd> is used)
 
 Path of the socket file (required unless C<--systemd> is used)
 
-=item B<--socket-user NAME|UID>
+=item B<--socket-owner NAME|UID>
 
 Target user for the socket file (default: same as --user or current user)
 

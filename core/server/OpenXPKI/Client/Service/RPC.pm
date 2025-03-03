@@ -9,6 +9,7 @@ with qw(
 # Core modules
 use Exporter qw( import );
 use JSON::PP;
+use List::Util qw(any);
 
 # CPAN modules
 use Crypt::JWT qw( decode_jwt );
@@ -16,7 +17,7 @@ use Crypt::JWT qw( decode_jwt );
 # Project modules
 use OpenXPKI::Client::Service::Response;
 use OpenXPKI::Serialization::Simple;
-use OpenXPKI::i18n qw( i18n_walk );
+use OpenXPKI::i18n qw( i18n_walk get_language );
 
 # Symbols to export by default
 # (we avoid Moose::Exporter's import magic because that switches on all warnings again)
@@ -57,7 +58,7 @@ has use_status_codes => (
     isa => 'Bool',
     lazy => 1,
     init_arg => undef,
-    default => sub ($self) { $self->config->{output}->{use_http_status_codes} ? 1 : 0 },
+    default => sub ($self) { $self->config->get('output.use_http_status_codes') ? 1 : 0 },
 );
 
 has openapi_mode => (
@@ -132,9 +133,7 @@ sub prepare ($self, $c) {
     # Only parameters which are whitelisted in the config are mapped!
     # This is crucial to prevent injection of server-only parameters
     # like the autoapprove flag...
-    if ($self->config->{$self->operation}->{param}) {
-        my @keys;
-        @keys = split /\s*,\s*/, $self->config->{$self->operation}->{param};
+    if (my @keys = $self->config->get_list([$self->operation,'input'])) {
         foreach my $key (@keys) {
             my $val = $self->request_param($key);
             next unless (defined $val);
@@ -188,13 +187,14 @@ sub send_response ($self, $c, $response) {
                 error => {
                     code => $response->error,
                     message => $response->error_message,
-                    $response->has_error_details ? (data => $response->error_details) : (),
+                    $response->has_error_details ?
+                        (data => (get_language() ? i18n_walk($response->error_details) : $response->error_details)) : (),
                 }
             };
 
         } else {
             # run i18n tokenzier on output if a language is set
-            $data = $self->config_obj->language ? i18n_walk($response->result) : $response->result;
+            $data = get_language() ? i18n_walk($response->result) : $response->result;
             # wrap in "result" hash item
             if (not $self->openapi_mode) {
                 $data = {
@@ -237,9 +237,7 @@ sub cgi_set_custom_wf_params ($self) {
     # Only parameters which are whitelisted in the config are mapped!
     # This is crucial to prevent injection of server-only parameters
     # like the autoapprove flag...
-    if ($self->config->{$self->operation}->{param}) {
-        my @keys;
-        @keys = split /\s*,\s*/, $self->config->{$self->operation}->{param};
+    if (my @keys = $self->get_list_from_legacy_config([$self->operation,'param'])) {
         foreach my $key (@keys) {
             my $val = $self->request_param($key);
             next unless (defined $val);
@@ -332,10 +330,8 @@ around new_response => sub ($orig, $self, @args) {
             ));
 
             # Add context parameters to the response if requested
-            if (my $output = $self->config->{$self->operation}->{output}) {
-                my @keys = split /\s*,\s*/, $output;
+            if (my @keys = $self->get_list_from_legacy_config([$self->operation,'output'])) {
                 $self->log->debug(sprintf 'Configured output keys for operation "%s": %s', $self->operation, join(', ', @keys));
-
                 for my $key (@keys) {
                     my $val = $wf->{context}->{$key};
                     next unless defined $val;
@@ -399,7 +395,7 @@ sub parse_rpc_request_body ($self) {
         return; # no parsing required: Mojolicious already decoded the request parameters
     }
 
-    die $self->new_response( 40083 ) unless $self->config->{input}->{allow_raw_post};
+    die $self->new_response( 40083 ) unless $self->config->get('input.allow_raw_post');
 
     return unless $self->request->body;
 
@@ -408,7 +404,10 @@ sub parse_rpc_request_body ($self) {
     # application/jose
     #
     if ($content_type =~ m{\Aapplication/jose}) {
-        die $self->new_response( 40087 ) unless $self->config->{jose};
+
+        # exist does not work here as the section is currently empty/undef
+        die $self->new_response( 40087 )
+            unless (any { $_ eq 'jose' } $self->config->get_keys());
 
         # The cert_identifier used to sign the token must be set as kid
         # First run - set ignore_signature to just get the header with the kid
@@ -474,7 +473,10 @@ sub parse_rpc_request_body ($self) {
     # application/pkcs7
     #
     } elsif ($content_type =~ m{\Aapplication/pkcs7}) {
-        die $self->new_response( 40091 ) unless $self->config->{pkcs7};
+
+        # exist does not work here as the section is currently empty/undef
+        die $self->new_response( 40091 )
+            unless (any { $_ eq 'pkcs7' } $self->config->get_keys());
 
         $self->pkcs7($self->request->body);
 
@@ -517,7 +519,7 @@ sub parse_rpc_request_body ($self) {
 
     # TODO - evaluate security implications regarding blessed objects
     # and consider to filter out serialized objects for security reasons
-    $self->json->max_depth( $self->config->{input}->{parse_depth} || 5 );
+    $self->json->max_depth( $self->config->get('input.parse_depth') || 5 );
 
     # decode JSON
     try {
@@ -533,7 +535,7 @@ sub parse_rpc_request_body ($self) {
 }
 
 sub handle_rpc_request ($self) {
-    my $conf = $self->config->{$self->operation}
+    my $conf = $self->config->get_hash($self->operation)
         or die $self->new_response( 40480 => sprintf 'RPC method "%s" not found', $self->operation );
 
     # "workflow" is required even though with "execute_action" we don't need it.
@@ -659,7 +661,7 @@ sub openapi_spec {
         openapi => "3.0.0",
         info => {
             title => "OpenXPKI RPC API",
-            $conf->{openapi} ? ($conf->{openapi}->%*) : (),
+            %{$conf->get_hash('openapi')//{}}
         },
         servers => [ { url => $openapi_server_url, description => "OpenXPKI server" } ],
         paths => $paths,
@@ -720,25 +722,31 @@ sub openapi_spec {
             $openapi_spec->{info}->{version} = $server_version->{config}->{api} || 'unknown';
         }
 
-        for my $method (sort keys %$conf) {
+        for my $method (sort $conf->get_keys()) {
             next if $method =~ /^[a-z]/; # small letters means: no RPC method but a config group
-            my $wf_type = $conf->{$method}->{workflow}
+            my $wf_type = $conf->get([$method, 'workflow'])
               or die "Missing parameter 'workflow' in RPC method '$method'\n";
-            my $in = $conf->{$method}->{param} || '';
-            my $out = $conf->{$method}->{output} || '';
-            my $action = $conf->{$method}->{execute_action};
 
-            my $pickup_workflow = $conf->{$method}->{pickup_workflow};
-            my $pickup_input = $conf->{$method}->{pickup};
+            my @in = $conf->get_list([$method,'input']);
+            if (!@in) {
+                # legacy config uses atrribute "param"
+                @in = $self->get_list_from_legacy_config([$method, 'param']);
+            }
+
+            my @out = $self->get_list_from_legacy_config([$method, 'output']);
+            my $action = $conf->get([$method, 'execute_action']);
+
+            my $pickup_workflow = $conf->get([$method, 'pickup_workflow']);
+            my @pickup_input = $self->get_list_from_legacy_config([$method, 'pickup']);
 
             my $method_spec = $client->run_command('get_rpc_openapi_spec', {
                 rpc_method => $method,
                 workflow => $wf_type,
                 ($action ? (action => $action) : ()),
-                input => [ split /\s*,\s*/, $in ],
-                output => [ split /\s*,\s*/, $out ],
+                input => \@in,
+                output => \@out,
                 $pickup_workflow ? (pickup_workflow => $pickup_workflow) : (),
-                $pickup_input ? (pickup_input => [ split /\s*,\s*/, $pickup_input ]) : (),
+                @pickup_input ? (pickup_input => \@pickup_input) : (),
             });
 
             my $responses = {

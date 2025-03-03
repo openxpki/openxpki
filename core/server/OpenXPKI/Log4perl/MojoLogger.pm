@@ -41,6 +41,9 @@ has max_history_size => (
 sub get_logger {
     my ($class, $category) = @_;
 
+    # todo - check why we get requests without category
+    $category //= 'fallback';
+
     # Have we created it previously?
     return $LOGGERS_BY_NAME->{$category} if exists $LOGGERS_BY_NAME->{$category};
 

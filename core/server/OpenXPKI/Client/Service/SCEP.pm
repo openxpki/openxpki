@@ -178,7 +178,7 @@ sub op_handlers {
                     signer_cert => $self->signer,
                 );
                 # Load URL paramters if defined by config
-                my $conf = $self->config->{'PKIOperation'};
+                my $conf = $self->config->get_hash('PKIOperation');
                 if ($conf->{param}) {
                     my @keys =
                         grep { $_ ne "operation" and $_ ne "message" }
@@ -238,7 +238,7 @@ sub cgi_set_custom_wf_params ($self) {
             signer_cert => $self->signer,
         );
         # Load URL paramters if defined by config
-        my $conf = $self->config->{'PKIOperation'};
+        my $conf = $self->config->get_hash('PKIOperation');
         if ($conf->{param}) {
             my $extra;
             my @extra_params;
@@ -333,7 +333,7 @@ sub generate_pkcs7_response ($self, $response) {
         return $self->backend->run_command('scep_generate_pending_response', \%params);
 
     } else {
-        $params{chain} = $self->config->{output}->{chain} || 'chain';
+        $params{chain} = $self->config->get('output.chain') || 'chain';
         return $self->backend->run_command('scep_generate_cert_response', {
             %params,
             identifier => $response->result,

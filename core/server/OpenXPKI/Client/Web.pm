@@ -132,7 +132,7 @@ sub startup ($self) {
     #my $config = $self->{oxi_config_obj} or die 'Missing parameter "oxi_config_obj" to ' . __PACKAGE__ . '->new()';
     my $user = $self->{oxi_user};
     my $group = $self->{oxi_group};
-    my $socket_user = $self->{oxi_socket_user};
+    my $socket_owner = $self->{oxi_socket_owner};
     my $socket_group = $self->{oxi_socket_group};
     my $socket_mode = $self->{oxi_socket_mode};
 
@@ -145,7 +145,49 @@ sub startup ($self) {
     $self->exception_format('txt') unless 'development' eq $self->mode;
 
     # Helpers
-    $self->helper(oxi_config => $self->can('helper_oxi_config'));
+    $self->helper(oxi_service_config => sub ($sf, $service, $endpoint) {
+        my $cfg = $self->{oxi_config_obj}->endpoint_config($service, $endpoint);
+        return $cfg if ($service eq 'webui');
+
+        # Request for non existing endpoint / service
+        # must be handled by the caller
+        return unless(defined $cfg);
+
+        # FIXME: needs refactoring (see also Web::Controller)
+        # To create the backend socket for all non WebUI workers the old
+        # Client class expects the socket location in global->socket of
+        # the endpoint config but we want to have this a global value now
+        # Until this is reworked we inject the value from the system config
+        my $socket = $self->{oxi_config_obj}->get('system.backend.socket');
+        $socket ||= '/var/openxpki/openxpki.socket';
+        $cfg->set('global.socket', $socket);
+        return $cfg;
+    });
+
+    $self->helper(oxi_system_config => sub ($sf) {
+        return $self->{oxi_config_obj}->get_wrapper('system');
+    });
+
+    $self->helper(oxi_backend => sub ($sf) {
+        state $client;
+        state $pid //= $PID;
+        # in case the process was forked with an active handle we want a fresh one
+        # this should not happen but we want to be on the safe side....
+        if ($pid != $PID) {
+            $client = undef;
+            $pid = $PID;
+            $self->log->warn('Fork detected with active client handle');
+        }
+
+        $self->log->debug('creating new socket connection for pid '.$PID) unless($client);
+
+        $client //= OpenXPKI::Client->new({
+            SOCKETFILE => $self->{oxi_config_obj}->get('system.backend.socket') || '/var/openxpki/openxpki.socket',
+            TIMEOUT => $self->{oxi_config_obj}->get('system.backend.timeout') || 30,
+        });
+        return $client;
+    });
+
 
     #
     # Routes
@@ -158,10 +200,8 @@ sub startup ($self) {
         action => 'index',
     );
 
-    # my $services = $self->oxi_config->list_services;
-    my $services = [ qw( healthcheck est rpc scep webui ) ];
-
-    for my $service ($services->@*) {
+    my @services = $self->{oxi_config_obj}->get_keys('service');
+    for my $service (@services) {
         # fetch the class that consumes OpenXPKI::Client::Service::Role::Info
         my $class = $self->_load_service_class($service) or next;
         # inject "service_name" into stash, but only for this route
@@ -198,7 +238,7 @@ sub startup ($self) {
                 my $socket = $server->ioloop->acceptor($server->acceptors->[0])->handle;
                 if ($socket->isa('IO::Socket::UNIX')) {
                     my $socket_file = $socket->hostpath;
-                    $self->_chown_socket($socket_file, $socket_user, $socket_group, $socket_mode);
+                    $self->_chown_socket($socket_file, $socket_owner, $socket_group, $socket_mode);
                 }
                 # drop process privileges
                 $self->_drop_privileges($server->pid_file, $user, $group, "Manager $$");
@@ -206,6 +246,7 @@ sub startup ($self) {
         } else {
             $self->log->warn('The OpenXPKI client will only work properly with Mojolicious server Mojo::Server::Prefork');
         }
+
         # } elsif ($server->isa('Mojo::Server::Daemon')) {
         #     # The following does currently not work
         #     # (it was proposed by a Mojolicious developer in 2018:
@@ -265,21 +306,10 @@ sub startup ($self) {
 
 # We implement the config helper to be able to cache configurations across
 # multiple requests.
-sub helper_oxi_config ($self, $service, $no_config) {
-    state $configs = {}; # cache config object accross requests
+sub helper_oxi_config ($self, $service, $endpoint) {
 
-    die "No service specified in call to helper 'oxi_config'" unless $service;
-
-    unless ($configs->{$service}) {
-        $self->log->trace("Load configuration for service '$service'");
-        $configs->{$service} = OpenXPKI::Client::Config->new(
-            service => $service,
-            $no_config ? ( default => {} ) : (),
-            $self->stash('skip_log_init') ? (skip_log_init => 1) : (),
-        );
-    }
-
-    return $configs->{$service};
+    # this is the instance of the config connector
+    return $self->{oxi_config_obj}->get_hash(['endpoint',$service, $endpoint]);
 }
 
 sub _chown_socket ($self, $file, $user, $group, $mode) {

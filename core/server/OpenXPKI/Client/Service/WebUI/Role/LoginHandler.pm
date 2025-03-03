@@ -35,7 +35,7 @@ has login_page => (
     is => 'ro',
     isa => 'Str',
     lazy => 1,
-    default => sub ($self) { $self->config->{global}->{loginpage} // '' },
+    default => sub ($self) { $self->config->get('login.page') || $self->config->get('global.loginpage') // '' },
 );
 
 has login_url => (
@@ -43,7 +43,7 @@ has login_url => (
     is => 'ro',
     isa => 'Str',
     lazy => 1,
-    default => sub ($self) { $self->config->{global}->{loginurl} // '' },
+    default => sub ($self) { $self->config->get('login.url') || $self->config->get('global.loginurl') // '' },
 );
 
 # Only if realm_mode=path: a map of realms to URL paths
@@ -64,8 +64,12 @@ has realm_path_map => (
 sub _build_realm_path_map ($self) {
     my $map = {};
     my $path = $self->url_path->clone->trailing_slash(1);
-    for my $url_alias (keys $self->config->{realm}->%*) {
-        my ($realm, $stack) = split (/\s*;\s*/, $self->config->{realm}->{$url_alias});
+
+    my $realm_map = $self->config->get_hash('realm.map');
+    # legacy config
+    $realm_map //= $self->config->get_hash('realm');
+    for my $url_alias (keys $realm_map->%*) {
+        my ($realm, $stack) = split (/\s*;\s*/, $realm_map->{$url_alias});
         $path->parts->[-1] = $url_alias;
         $map->{$realm} //= [];
         push $map->{$realm}->@*, {

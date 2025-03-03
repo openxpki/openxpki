@@ -123,15 +123,17 @@ sub _build_session ($self) {
     #
     # Frontend session
     #
+    my $session_config = $self->config->get_hash('session.params'); # new format
+    $session_config //= $self->config->get_hash('session_driver'); # old format
+    $session_config //= { Directory => '/tmp' }; # default for file driver
+
     my $session = OpenXPKI::Client::Service::WebUI::Session->new(
-        $self->config->{session}->{driver},
+        $self->config->get('session.driver')//undef,
         $id, # may be undef
-        $self->config->{session_driver}
-            ? $self->config->{session_driver}
-            : { Directory => '/tmp' },
+        $session_config
     );
-    $session->expire($self->config->{session}->{timeout})
-        if defined $self->config->{session}->{timeout};
+    $session->expire($self->config->get('session.timeout'))
+        if $self->config->exists('session.timeout');
 
     Log::Log4perl::MDC->put('sid', substr($session->id,0,4));
     $self->log->debug(
@@ -205,7 +207,7 @@ has realm_mode => (
         fixed
     )]),
     lazy => 1,
-    default => sub ($self) { $self->config->{global}->{realm_mode} || 'select' },
+    default => sub ($self) { $self->config->get('realm.mode') || $self->config->get('global.realm_mode') || 'select' },
 );
 
 has realm_layout => (
@@ -216,15 +218,7 @@ has realm_layout => (
         list
     )]),
     lazy => 1,
-    default => sub ($self) { $self->config->{global}->{realm_layout} || 'card' },
-);
-
-has socket_path => (
-    init_arg => undef,
-    is => 'ro',
-    isa => 'Str',
-    lazy => 1,
-    default => sub ($self) { $self->config->{global}->{'socket'} },
+    default => sub ($self) { $self->config->get('realm.layout') || $self->config->get('global.realm_layout') || 'card' },
 );
 
 has script_url => (
@@ -232,7 +226,7 @@ has script_url => (
     is => 'ro',
     isa => 'Str',
     lazy => 1,
-    default => sub ($self) { $self->config->{global}->{scripturl} },
+    default => sub ($self) { $self->config->get('global.scripturl') // '/cgi-bin/webui.fcgi' },
 );
 
 has static_dir => (
@@ -240,7 +234,7 @@ has static_dir => (
     is => 'ro',
     isa => 'Str',
     lazy => 1,
-    default => sub ($self) { $self->config->{global}->{staticdir} || '/var/www' },
+    default => sub ($self) { $self->config->get('global.staticdir') || '/var/www' },
 );
 
 sub url_path; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
@@ -290,26 +284,10 @@ has ui_response => (
 
 sub BUILD ($self, $args) {
     # Config - set defaults
-    $self->config->{global}->{socket} ||= '/var/openxpki/openxpki.socket';
-    $self->config->{global}->{scripturl} ||= '/cgi-bin/webui.fcgi';
 
-    # Config - legacy config compatibility
-    if ($self->config->{global}->{session_path} || defined $self->config->{global}->{ip_match} || $self->config->{global}->{session_timeout}) {
-        if ($self->config->{session}) {
-            $self->log->error('Session parameters found both in [global] and [session] - ignoring [global]');
-        } else {
-            $self->log->warn('Session parameters in [global] are deprecated, please use [session]');
-            $self->config->{session} = {
-                'ip_match' => $self->config->{global}->{ip_match} || 0,
-                'timeout' => $self->config->{global}->{session_timeout} || undef,
-            };
-            $self->config->{session_driver} = { Directory => ( $self->config->{global}->{session_path} || '/tmp') };
-        }
-    }
-
-    if (($self->config->{session}->{driver}//'') eq 'openxpki') {
-        $self->log->warn("Builtin session driver is deprecated and will be removed with next release!");
-    }
+    # legacy config in global is no longer supported
+    die "Session setup in global section is no longer supported"
+        if ($self->config->exists('global.session_path'));
 
     $self->log->trace('Request cookies: ' . ($self->request->headers->cookie // '(none)')) if $self->log->is_trace;
 
@@ -318,17 +296,18 @@ sub BUILD ($self, $args) {
         $self->cipher($cipher);
     }
 
-    if (my $key = $self->config->{auth}->{'sign.key'}) {
+    # to be reworked
+    if (my $key = $self->config->get(['auth','sign.key'])) {
         my $pk = decode_base64($key);
         $self->auth(\$pk);
     }
 
     # set AUTH stack
-    if ($self->config->{login} && $self->config->{login}->{stack}) {
-        $self->request->env->{OPENXPKI_AUTH_STACK} = $self->config->{login}->{stack};
+    if (my $stack = $self->config->get('login.stack')) {
+        $self->request->env->{OPENXPKI_AUTH_STACK} = $stack;
     }
 
-    if ($self->config->{session}->{ip_match}) {
+    if ($self->config->get('session.ip_match')) {
         $CGI::Session::IP_MATCH = 1;
     }
 
@@ -351,19 +330,17 @@ sub BUILD ($self, $args) {
 sub _get_cipher ($self) {
     # Sets the Crypt::CBC cipher to use for cookie encryption if session.cookey
     # config entry is defined.
-    my $key = $self->config->{session}->{cookie} || $self->config->{session}->{cookey} || '';
+    my $key = $self->config->get('session.cookey') || $self->config->get('session.cookie');
     # Fingerprint: a list of ENV variables, added to the cookie passphrase,
     # binds the cookie encyption to the system environment.
     # Even though Crypt::CBC will run a hash on the passphrase we still use
     # sha256 here to preprocess the input data one by one to keep the memory
     # footprint as small as possible.
-    if (my $fingerprint = $self->config->{session}->{fingerprint}) {
-        chomp $fingerprint;
-        $self->log->trace("Fingerprint for cookie encryption = '$fingerprint'");
+    if (my @fingerprint = $self->get_list_from_legacy_config('session.fingerprint')) {
+        $self->log->trace('Fingerprint for cookie encryption = ' . join(', ', @fingerprint));
         my $sha = Digest::SHA->new('sha256');
         $sha->add($key) if $key;
-        my @env_vars = split /\W+/, $fingerprint;
-        map { $sha->add($self->request->env->{$_}) if $self->request->env->{$_} } @env_vars;
+        map { $sha->add($self->request->env->{$_}) if $self->request->env->{$_} } @fingerprint;
         $key = $sha->digest;
     }
     return unless $key;
@@ -395,27 +372,12 @@ sub prepare ($self, $c) {
     $self->operation('default');
 
     #
-    # Backend (server communication)
-    #
-    try {
-        my $backend = OpenXPKI::Client->new({
-            SOCKETFILE => $self->config->{global}->{socket}
-        });
-        $backend->send_receive_service_msg('PING');
-        $self->backend($backend);
-    }
-    catch ($err) {
-        $self->log->error("Error creating backend client: $err");
-        die $self->new_response(503 => 'I18N_OPENXPKI_UI_BACKEND_UNREACHABLE');
-    }
-
-    #
     # Detect realm
     #
     my $detected_realm;
 
     my $realm_mode = $self->realm_mode;
-    $self->log->debug("Realm mode = $realm_mode");
+    $self->log->debug("Realm mode: $realm_mode");
 
     # PATH mode
     if ("path" eq $realm_mode) {
@@ -437,7 +399,10 @@ sub prepare ($self, $c) {
         # If the session has no realm set, try to get a realm from the map
         elsif (not $self->session->param('pki_realm')) {
             $self->log->debug("Checking config for realm '$realm'");
-            $detected_realm = $self->config->{realm}->{$realm};
+
+            $detected_realm = $self->config->get(['realm','map', $realm]);
+            # legacy config
+            $detected_realm //= $self->config->get(['realm', $realm]);
             if (not $detected_realm) {
                 $self->log->debug("Unknown realm requested: '$realm'");
                 return $self->new_response(406 => 'I18N_OPENXPKI_UI_NO_SUCH_REALM_OR_SERVICE');
@@ -450,18 +415,21 @@ sub prepare ($self, $c) {
 
     } elsif ("hostname" eq $realm_mode) {
         my $host = $ENV{HTTP_HOST};
-        $self->log->trace('Realm map is: ' . Dumper $self->config->{realm});
-        foreach my $rule (keys %{$self->config->{realm}}) {
+        my $realm_map = $self->config->get_hash('realm.map');
+        # legacy config
+        $realm_map //= $self->config->get_hash('realm');
+        $self->log->trace('Realm map is: ' . Dumper $realm_map );
+        while(my ($rule, $target) = each(%$realm_map)) {
             next unless ($host =~ qr/\A$rule\z/);
             $self->log->trace("realm detection match: $host / $rule ");
-            $detected_realm = $self->config->{realm}->{$rule};
+            $detected_realm = $target;
             last;
         }
         $self->log->warn('Unable to find realm from hostname: ' . $host) unless($detected_realm);
 
     } elsif ("fixed" eq $realm_mode) {
         # Fixed realm mode, mode must be defined in the config
-        $detected_realm = $self->config->{global}->{realm};
+        $detected_realm = $self->config->get('realm.value') // $self->config->get('global.realm');
     }
 
     if ($detected_realm) {
@@ -578,7 +546,8 @@ sub op_handlers {
     return [
         'default' => sub ($self) {
             # custom HTTP headers from config
-            $self->response->add_header($_ => $self->config->{header}->{$_}) for keys $self->config->{header}->%*;
+            my $headers = $self->config->get_hash('header');
+            $self->response->add_header( $_ => $headers->{$_} ) for keys %$headers;
             # default mime-type
             $self->response->add_header('content-type' => 'application/json; charset=UTF-8');
 

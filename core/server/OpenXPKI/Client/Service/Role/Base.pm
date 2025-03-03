@@ -40,6 +40,8 @@ use Digest::SHA qw( sha1_hex );
 use List::Util qw( any );
 
 # CPAN modules
+use Connector;
+use Connector::Builtin::Inline;
 use Crypt::PKCS10;
 use Log::Log4perl qw( :nowarn );
 use Mojo::Message::Request;
@@ -235,17 +237,33 @@ L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/
 These attributes will be set by L<OpenXPKI::Client::Web::Controller> so that
 the consuming service class does not need to care about setting them.
 
-=head3 config_obj
 
-An instance of L<OpenXPKI::Client::Config>.
+=head3 config
+
+I<Connector> pointing to the endpoint configuration for the service
+
+In legacy mode this is auto generated via config_obj
 
 =cut
-sub config_obj; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
-has config_obj => (
-    is => 'ro',
-    isa => 'OpenXPKI::Client::Config',
-    required => 1,
+sub config; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+has config => (
+    is => 'rw',
+    isa => 'Connector',
+    lazy => 1,
+    # replace builder with required after cgi decomm
+    #required => 1,
+    builder => '_build_config',
 );
+sub _build_config ($self) {
+    my $obj = $self->config_obj || die "No config object set";
+    state $configs = {};
+    my $endpoint = $self->endpoint;
+    unless ($configs->{$endpoint}) {
+        $self->log->trace("Load configuration for endpoint '$endpoint'");
+        $configs->{$endpoint} = Connector::Builtin::Inline->new( data => $obj->endpoint_config($endpoint) );
+    }
+    return $configs->{$endpoint};
+}
 
 =head3 webserver_env
 
@@ -314,23 +332,26 @@ has take_pickup_value_from_request => (
     default => 0,
 );
 
-=head2 Other readonly attributes
+=head3 config_obj
 
-=head3 config
-
-L<HashRef> containing the endpoint configuration as returned by
-L<OpenXPKI::Client::Config/endpoint_config>.
+An instance of L<OpenXPKI::Client::Config>.
+Required for legacy mode (using cgi scripts with file based config),
+Used to bootstrap the I<config> object.
 
 =cut
-sub config; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
-has config => (
-    is => 'rw',
-    isa => 'HashRef',
-    lazy => 1,
-    init_arg => undef,
-    builder => '_build_config',
+sub config_obj; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+has config_obj => (
+    is => 'ro',
+    isa => 'OpenXPKI::Client::Config',
+    required => 0,
+    predicate => 'has_legacy_config',
 );
-sub _build_config ($self) { $self->config_obj->endpoint_config($self->endpoint) }
+
+=head2 Other readonly attributes
+
+=head3 config_env_keys
+
+=cut
 
 has config_env_keys => (
     is => 'rw',
@@ -341,8 +362,8 @@ has config_env_keys => (
 );
 sub _config_env_keys ($self) {
     my %keys;
-    if (my $keys_str = $self->config->{$self->operation}->{env}) {
-        %keys = map { $_ => 1 } split /\s*,\s*/, $keys_str;
+    if (my @keys = $self->get_list_from_legacy_config([$self->operation, 'env'])) {
+        %keys = map { $_ => 1 } @keys;
         $self->log->trace('Configured ENV keys: ' . join(', ', keys %keys)) if $self->log->is_trace;
     }
     return \%keys;
@@ -383,10 +404,11 @@ has backend => (
 );
 sub _build_backend ($self) {
     try {
+        $self->log->debug('creating new socket connection for pid '.$PID);
         return OpenXPKI::Client::Simple->new({
             logger => $self->log,
-            config => $self->config->{global}, # realm and locale
-            auth => $self->config->{auth} || {}, # auth config
+            config => $self->config->get_hash('global'), # realm and locale
+            auth => $self->config->get_hash('auth') || {}, # auth config
         });
     }
     catch ($err) {
@@ -428,17 +450,20 @@ has default_wf_params => (
 );
 sub _build_default_wf_params ($self) {
     try {
-        my $p = {};
+
         my $operation = $self->operation;
         my $conf = $self->config;
 
-        # look for preset params
-        foreach my $key (keys %{$conf->{$operation}}) {
+        # init $p from preset
+        my $p = $conf->get_hash([$operation,'preset']) // {};
+
+        # legacy config has the params "inline" with prefix
+        foreach my $key ($conf->get_keys([$operation])) {
             next unless ($key =~ m{preset_(\w+)});
-            $p->{$1} = $conf->{$operation}->{$key};
+            $p->{$1} = $conf->get([$operation,$key]);
         }
 
-        my $servername = $conf->{$operation}->{servername} || $conf->{global}->{servername};
+        my $servername = $conf->get([$operation, 'servername']) || $conf->get(['global', 'servername']);
         if ($servername) {
             $p->{server} = $servername;
             $p->{interface} = $self->service_name;
@@ -588,8 +613,14 @@ has json => (
 # https://metacpan.org/dist/Moose/view/lib/Moose/Manual/Construction.pod#BUILD-and-parent-classes
 sub BUILD {}
 after 'BUILD' => sub ($self, $args) {
-    Log::Log4perl::MDC->put('endpoint', $self->endpoint);
-    OpenXPKI::Log4perl->set_default_facility( $self->service_name.'.'.$self->endpoint );
+
+    if ($self->endpoint) {
+        Log::Log4perl::MDC->put('endpoint', $self->endpoint);
+        OpenXPKI::Log4perl->set_default_facility( $self->service_name.'.'.$self->endpoint );
+    } else {
+        Log::Log4perl::MDC->put('endpoint', undef);
+        OpenXPKI::Log4perl->set_default_facility( $self->service_name );
+    }
 };
 
 =head2 request_param
@@ -665,7 +696,7 @@ sub handle_request ($self) {
                 die sprintf('Return value of operation handler for "%s" specified in %s->op_handlers() is not an instance of "OpenXPKI::Client::Service::Response"', $self->operation, $self->meta->name)
                   unless blessed $response && $response->isa('OpenXPKI::Client::Service::Response');
 
-                $response->add_debug_headers if (lc($self->config->{output}->{headers}//'') eq 'all');
+                $response->add_debug_headers if (lc($self->config->get('output.headers')//'') eq 'all');
 
                 last;
             }
@@ -818,7 +849,7 @@ sub handle_enrollment_request ($self) {
         workflow => 'certificate_enroll',
         pickup => 'pkcs10',
         pickup_attribute => 'transaction_id',
-        %{ $self->config->{$self->operation} || {} },
+        %{ $self->config->get_hash($self->operation) || {} },
     };
     $self->log->trace("Resulting pickup config: " . Dumper $conf) if $self->log->is_trace;
 
@@ -1071,7 +1102,7 @@ B<Returns> an L<OpenXPKI::Client::Service::Response>.
 =cut
 sub handle_property_request ($self, $operation = $self->operation) {
     # TODO - we need to consolidate the workflows for the different protocols
-    my $workflow_type = $self->config->{$operation}->{workflow} ||
+    my $workflow_type = $self->config->get([$operation, 'workflow']) ||
         $self->service_name.'_'.lc($operation);
 
     my $response = $self->new_response(
@@ -1311,5 +1342,40 @@ sub cgi_headers ($self, $headers) {
     @cgi_headers{@cgi_keys} = @values;
     return \%cgi_headers;
 }
+
+
+=head2 get_list_from_legacy_config
+
+Read a list of item from the config layer at the given path
+If the class is used with a legacy config (via config_obj), the method
+will read the path using C<get> and split the result at the comma.
+If the class is used with the new service config, a C<get_list> call is
+made.
+
+B<Parameters>
+
+=over
+
+=item * C<$path> I<String|ArrayRef> - config path
+
+=back
+
+B<Returns> a I<Array> found at the given config path
+
+=cut
+# A helper to convert paramter lists from old format
+sub get_list_from_legacy_config {
+    my $self = shift;
+    my @path =  @_;
+    my @list;
+    if ($self->has_legacy_config) {
+        my $items = $self->config->get(@path)//'';
+        @list = split /\s*,\s*/, $items;
+    } else {
+        @list = $self->config->get_list(@path);
+    }
+    return @list;
+}
+
 
 1;
