@@ -3,6 +3,7 @@ use OpenXPKI -base => 'Mojolicious::Controller';
 
 # Core modules
 use Module::Load ();
+use List::Util 'any';
 
 # Project modules
 use OpenXPKI::Log4perl;
@@ -81,9 +82,9 @@ sub index ($self) {
             || die "No configuration found for this service";
         # for the WebUI we create a reusable backend instance via the factory
         # FIXME we need to rework the O:C:Simple to make it reusable too
-        if ($service_name eq 'webui') {
+        if (any { $service_name eq $_ } ('webui','healthcheck')) {
             %backend = ( backend => $self->oxi_backend() );
-            $self->log->info('Adding backend for webui in '.$$);
+            $self->log->info("Adding backend for $service_name in $$");
         }
     }
     catch ($error) {

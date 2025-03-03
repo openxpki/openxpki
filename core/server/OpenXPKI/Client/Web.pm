@@ -147,7 +147,7 @@ sub startup ($self) {
     # Helpers
     $self->helper(oxi_service_config => sub ($sf, $service, $endpoint) {
         my $cfg = $self->{oxi_config_obj}->endpoint_config($service, $endpoint);
-        return $cfg if ($service eq 'webui');
+        return $cfg if any { $service eq $_ } ('webui','healthcheck');
 
         # Request for non existing endpoint / service
         # must be handled by the caller
