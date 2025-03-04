@@ -9,6 +9,7 @@ use MIME::Base64;
 use File::Spec;
 use IO::Dir 1.03;
 use Exporter qw( import );
+use Digest::SHA qw( sha1_base64 );
 
 # Symbols to export by default
 our @EXPORT = qw( AUTO_ID );
@@ -312,6 +313,20 @@ sub list_modules {
         }
     }
     return \%results;
+}
+
+=head2 generate_uid
+
+Generate a random uid (RFC 3548 URL and filename safe base64)
+
+=cut
+sub generate_uid {
+    shift if ($_[0] // '') eq __PACKAGE__; # support call via -> and ::
+
+    my $uid = sha1_base64(time.rand.$$);
+    ## RFC 3548 URL and filename safe base64
+    $uid =~ tr/+\//-_/;
+    return $uid;
 }
 
 1;

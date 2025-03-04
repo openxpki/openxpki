@@ -108,7 +108,6 @@ has client => (
         multi_param
         secure_param
         encrypt_jwt
-        generate_uid
     ) ],
 );
 
@@ -451,7 +450,7 @@ L<OpenXPKI::Client::Service::WebUI::Page::Cache/init_fetch>.
 sub call_persisted_response ($self, $data, $expire = '+5m') {
     die "Attempt to persist empty response data" unless $data;
 
-    my $id = $self->generate_uid;
+    my $id = OpenXPKI::Util->generate_uid;
     $self->log->debug('persist response ' . $id);
 
     $self->session->param('response_'.$id, $data );
@@ -628,7 +627,7 @@ sub __wf_token_id {
         $wf_args->{wf_type} = $wf_info->{workflow}->{type};
         $wf_args->{wf_last_update} = $wf_info->{workflow}->{last_update};
     }
-    my $id = $self->generate_uid;
+    my $id = OpenXPKI::Util->generate_uid;
     $self->log->debug("save wf_token: $id");
     $self->log->trace('token content = ' . Dumper $wf_args) if $self->log->is_trace;
     $self->session_param($id, $wf_args);
@@ -1001,10 +1000,6 @@ sub transate_sql_wildcards  {
 __PACKAGE__->meta->make_immutable;
 
 =pod
-
-=head2 generate_uid
-
-Generate a random uid (RFC 3548 URL and filename safe base64)
 
 =head2 encrypt_jwt
 

@@ -11,7 +11,6 @@ with qw(
 
 # Core modules
 use MIME::Base64;
-use Digest::SHA qw(sha1_base64);
 
 # CPAN modules
 use Crypt::JWT qw( encode_jwt decode_jwt );
@@ -772,7 +771,7 @@ sub _persist_status {
     my $self = shift;
     my $status = shift;
 
-    my $session_key = $self->generate_uid;
+    my $session_key = OpenXPKI::Util->generate_uid;
     $self->session->param($session_key, $status);
     $self->session->expire($session_key, 15);
 
@@ -790,19 +789,6 @@ sub _fetch_status {
 
     $self->log->debug("Set persisted status: " . $status->{message});
     return $status;
-}
-
-=head2 generate_uid
-
-Generate a random uid (RFC 3548 URL and filename safe base64)
-
-=cut
-sub generate_uid {
-    my $self = shift;
-    my $uid = sha1_base64(time.rand.$$);
-    ## RFC 3548 URL and filename safe base64
-    $uid =~ tr/+\//-_/;
-    return $uid;
 }
 
 =head2 encrypt_jwt

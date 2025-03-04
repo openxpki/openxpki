@@ -53,7 +53,7 @@ sub init_index ($self, $args = {}) {
             );
         }
 
-        my $id = $self->generate_uid;
+        my $id = OpenXPKI::Util->generate_uid;
         $self->session_param('bulk_'.$id, $bulk );
         $form->add_field(
             name => 'formid',
@@ -144,7 +144,7 @@ sub action_result ($self) {
             $action = $btn{action};
         }
 
-        my $selection_field = $self->generate_uid; # name of input field that will hold IDs of selected rows
+        my $selection_field = OpenXPKI::Util->generate_uid; # name of input field that will hold IDs of selected rows
         $btn{selection} = $selection_field;
 
         my $token = $self->wf_token_extra_param( undef, {
