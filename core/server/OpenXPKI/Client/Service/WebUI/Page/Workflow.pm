@@ -21,6 +21,7 @@ use MIME::Base64;
 
 # Project modules
 use OpenXPKI::Dumper;
+use OpenXPKI::i18n qw( i18nTokenizer );
 
 
 # used to cache static patterns like the creator lookup
@@ -1759,8 +1760,10 @@ sub __render_workflow_action_body {
         push @fields, $item;
         push @additional_fields, @more_items;
 
-        # if the field has a description text, push it to the @fielddesc list
-        my $descr = $field->{description};
+        # Show field description if text is non-empty.
+        # (to check the string we need to do i18n translation here even though
+        # the whole output JSON will be translated later on)
+        my $descr = i18nTokenizer($field->{description});
         if ($descr && $descr !~ /^\s*$/ && $field->{type} ne 'hidden') {
             push @fielddesc, { label => $item->{label}, value => $descr, format => 'raw' };
         }
