@@ -4,7 +4,7 @@ import { tracked } from '@glimmer/tracking'
 import { later, next, cancel } from '@ember/runloop'
 import { isArray } from '@ember/array'
 import { action, set as emSet } from '@ember/object'
-import { debug } from '@ember/debug'
+import { debug, warn } from '@ember/debug'
 import { guidFor } from '@ember/object/internals'
 import Page from 'openxpki/data/page'
 
@@ -522,7 +522,7 @@ export default class OxiContentService extends Service {
         if (!this.#focusFavourite) return
 
         if (!this.#focusFavourite.element) {
-            debug('NOT setting focus as favourite element does not exist (anymore?)')
+            warn('NOT setting focus as favourite element does not exist (anymore?)', { id: 'oxi.services.oxi-content' })
             this.#focusFavourite = null
             return
         }
@@ -537,7 +537,7 @@ export default class OxiContentService extends Service {
               OxiSection::Form::Field::xxx via "...attributes" and thus fires
               setFocusInfo(element, true) with itself as the first argument
             */
-            debug('Trying to set focus via custom event "oxi-focus" as favourite element is not visible')
+            warn('Trying to set focus via custom event "oxi-focus" as favourite element is not visible', { id: 'oxi.services.oxi-content' })
             this.#focusFavourite.element.dispatchEvent(new Event("oxi-focus"))
             return
         }
@@ -641,7 +641,7 @@ export default class OxiContentService extends Service {
     // Apply custom exception handler for given status code if one was set up
     // (bootstrap parameter 'on_exception').
     #handleServerException(status_code) {
-        debug(`Exception - handling server HTTP status code: ${status_code}`)
+        warn(`Exception - handling server HTTP status code: ${status_code}`, { id: 'oxi.services.oxi-content' })
         // Check custom exception handlers
         for (let handler of this.serverExceptions) {
             let codes = isArray(handler.status_code) ? handler.status_code : [ handler.status_code ]
@@ -695,7 +695,7 @@ export default class OxiContentService extends Service {
         let breadcrumb
 
         if (ignoreBreadcrumbs) {
-            debug('#setBreadcrumbs(): ignoring server-sent breadcrumbs during breadcrumb-initiated navigation')
+            warn('#setBreadcrumbs(): ignoring server-sent breadcrumbs during breadcrumb-initiated navigation', { id: 'oxi.services.oxi-content' })
             return
         }
 

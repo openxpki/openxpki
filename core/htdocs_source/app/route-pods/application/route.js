@@ -1,6 +1,6 @@
 import Route from '@ember/routing/route';
-import { action } from '@ember/object';
 /*
+import { action } from '@ember/object';
 import { on } from '@ember/object/evented';
 import { debug } from '@ember/debug';
 */

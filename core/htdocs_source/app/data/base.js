@@ -1,4 +1,4 @@
-import { debug } from '@ember/debug'
+import { warn } from '@ember/debug'
 
 /**
  * Base class for data transfer objects ("DTOs": objects with minimal behaviour).
@@ -80,9 +80,10 @@ export default class Base {
         }
 
         if (unknownProps.length > 0) {
-            debug(
+            warn(
                 `Attempt to set unknown properties in ${this.constructor.name} instance "${sourceHash[this.constructor._idField] ?? '<unknown>'}": ${unknownProps.join(', ')}. `
-                +`If you need to process these backend properties, please add them to ${this.constructor._type}.js or one of its ancestors.`
+                +`If you need to process these backend properties, please add them to ${this.constructor._type}.js or one of its ancestors.`,
+                { id: 'oxi.data.base' }
             )
         }
 

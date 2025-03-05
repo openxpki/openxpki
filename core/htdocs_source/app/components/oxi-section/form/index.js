@@ -3,7 +3,7 @@ import { action } from "@ember/object"
 import { tracked } from '@glimmer/tracking'
 import { isArray } from '@ember/array'
 import { service } from '@ember/service'
-import { debug } from '@ember/debug'
+import { debug, warn } from '@ember/debug'
 import { scheduleOnce } from '@ember/runloop'
 import Field from 'openxpki/data/field'
 import ContainerButton from 'openxpki/data/container-button'
@@ -346,7 +346,7 @@ export default class OxiSectionFormComponent extends Component {
             }
             catch (err) {
                 /* eslint-disable-next-line no-console */
-                console.debug(`Invalid validation regex for field ${field.name}: ecma_match = ${field.ecma_match}.\n${err}`)
+                console.warn(`Invalid validation regex for field ${field.name}: ecma_match = ${field.ecma_match}.\n${err}`)
             }
         }
         this.setFieldError(field, null)
@@ -471,7 +471,7 @@ export default class OxiSectionFormComponent extends Component {
         // show field specific error messages if any
         if (res?.status?.field_errors !== undefined) {
             for (const faultyField of res.status.field_errors) {
-                debug(`oxi-section/form (${this.args.def.action}): server reports faulty field: ${faultyField.name}`);
+                warn(`oxi-section/form (${this.args.def.action}): server reports faulty field: ${faultyField.name}`, { id: 'oxi.oxi-section.form' });
                 let clones = this.fields.filter(f => f.name === faultyField.name);
                 // if no index given: mark all clones as faulty
                 if (typeof faultyField.index === "undefined") {

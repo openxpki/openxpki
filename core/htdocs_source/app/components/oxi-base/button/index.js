@@ -1,7 +1,5 @@
 import Component from '@glimmer/component'
 import { tracked } from '@glimmer/tracking'
-import { action, set as emSet } from "@ember/object"
-import { debug } from '@ember/debug'
 import { service } from '@ember/service'
 import Clickable from 'openxpki/data/clickable'
 //import ow from 'ow'

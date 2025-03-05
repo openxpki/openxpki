@@ -1,9 +1,8 @@
-import Component from '@glimmer/component';
-import { service } from '@ember/service';
-import { action, set as emSet } from '@ember/object';
-import { tracked } from '@glimmer/tracking';
-import { debug } from '@ember/debug';
-import { A } from '@ember/array'
+import Component from '@glimmer/component'
+import { service } from '@ember/service'
+import { action, set as emSet } from '@ember/object'
+import { tracked } from '@glimmer/tracking'
+import { debug } from '@ember/debug'
 import ContainerButton from 'openxpki/data/container-button'
 import GridButton from 'openxpki/data/grid-button'
 import GridAction from 'openxpki/data/grid-action'
