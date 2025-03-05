@@ -33,15 +33,14 @@ import Choices from 'choices.js'
  * @class OxiBase::Select
  */
 export default class OxiSelectComponent extends Component {
-    cssClasses
     selectTarget = null // only for @inline
     #choicesObj = null
 
-    constructor() {
-        super(...arguments)
-        this.cssClasses = (this.args.inline)
+    get cssClasses() {
+        return (this.args.inline
             ? 'oxi-inline-select'
             : 'form-select text-truncate'
+        )
     }
 
     get placeholder() {
