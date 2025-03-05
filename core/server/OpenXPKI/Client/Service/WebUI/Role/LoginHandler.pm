@@ -147,13 +147,14 @@ sub handle_login ($self, $page, $action, $reply) {
         # Link to an internal method using the class!method
         if (my $loginpage = $self->login_page) {
 
+            # FIXME  this is not working
+            $self->log->debug("Redirect to internal login page: $loginpage");
             return $self->handle_view($loginpage);
 
         } elsif (my $loginurl = $self->login_url) {
 
             $self->log->debug("Redirect to external login page: $loginurl");
             $uilogin->redirect->external($loginurl);
-            return $uilogin;
 
         } elsif ( $self->request->headers->header('X-OPENXPKI-Client') ) {
 
@@ -174,6 +175,7 @@ sub handle_login ($self, $page, $action, $reply) {
             $self->log->debug('Redirect to login page: ' . $url);
             $uilogin->redirect->to($url);
         }
+        return $uilogin;
     }
 
     my $status = $reply->{SERVICE_MSG};
