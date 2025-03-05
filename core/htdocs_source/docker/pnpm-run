@@ -3,6 +3,15 @@ set -e
 
 test -z $1 && echo "Please specify a command as argument" && exit 1 || true
 
+if [ "update-lockfile" == "$1" ]; then
+  echo -e "\n[Copy pnpm-lock.yaml back to the host]"
+  # Use lock file from container: in Dockerfile we run "pnpm install" so
+  # pnpm-lock.yaml is already updated.
+  cp /pnpm-lock.yaml /output
+  echo -e "\nDone.\npnpm-lock.yaml was updated on your host."
+  exit
+fi
+
 RSYNC_OPTS=(--recursive --links --devices --specials --times --inplace --quiet)
 
 echo -e "\n[Copy source code without node_modules/, verdaccio-npm-cache/, docs-api/, dist/, dist-dev/, docker/]"
@@ -65,12 +74,6 @@ elif [ "update-deps" == "$1" ]; then
   pnpm install
   cp package.json pnpm-lock.yaml /output
   echo -e "\nDone.\npackage.json and pnpm-lock.yaml were updated on your host."
-
-elif [ "update-lockfile" == "$1" ]; then
-  # in Dockerfile we run "pnpm install" so pnpm-lock.yaml is already updated
-  echo -e "\n[Copy pnpm-lock.yaml back to the host]"
-  cp pnpm-lock.yaml /output
-  echo -e "\nDone.\npnpm-lock.yaml was updated on your host."
 
 elif [ "add" == "$1" ]; then
   module_list="$2"

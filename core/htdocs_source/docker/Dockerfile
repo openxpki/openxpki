@@ -30,7 +30,7 @@ RUN npm install -g npm@11.1.0 \
 # Create build dir
 RUN mkdir /build && chown -R $OXI_NODE_MODULES_OWNER /build
 
-# Copy depency lists separately to allow for Docker caching
+# Copy dependency lists separately to allow for Docker caching
 COPY package.json /
 COPY pnpm-lock.yaml /
 
