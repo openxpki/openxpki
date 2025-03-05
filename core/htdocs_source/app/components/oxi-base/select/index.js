@@ -1,7 +1,6 @@
 import Component from '@glimmer/component'
 import { action } from "@ember/object"
 import { debug } from '@ember/debug'
-import SlimSelect from 'slimselect'
 import Choices from 'choices.js'
 
 /**
@@ -33,7 +32,6 @@ import Choices from 'choices.js'
  * @class OxiBase::Select
  */
 export default class OxiSelectComponent extends Component {
-    selectTarget = null // only for @inline
     #choicesObj = null
 
     get cssClasses() {
@@ -52,11 +50,6 @@ export default class OxiSelectComponent extends Component {
     }
 
     @action
-    initSelectTarget(element) {
-        this.selectTarget = element
-    }
-
-    @action
     focussed(element) {
         // "redirect" focus to the dynamically created Choices.js object
         if (this.#choicesObj) this.#choicesObj.containerOuter.element.focus()
@@ -66,40 +59,31 @@ export default class OxiSelectComponent extends Component {
     // when the calling code has no "current selection" defined.
     @action
     startup(element) {
-        if (this.args.inline) {
-            new SlimSelect({
-                select: element,
-                settings: {
-                    contentLocation: this.selectTarget,
-                }
-            })
-        }
-        else {
-            this.#choicesObj = new Choices(element, {
-                classNames: {
-                    containerOuter: ['choices', 'form-control'],
-                    containerInner: [],
-                    list: ['choices__list', 'text-truncate'],
-                    activeState: ['is-active', 'shadow'],
-                },
-                noChoicesText: 'No choices to choose from',
-                searchEnabled: (this.args.list?.length || 0) > 5,
-                searchResultLimit: 10,
-                searchFields: [ 'label' ],
-                shouldSort: false,
-                itemSelectText: '',
-                placeholder: !!(this.args.placeholder ?? null),
-                callbackOnInit: function () {
-                    this.dropdown.element.addEventListener(
-                        'keydown', (event) => {
-                            // prevent form submit
-                            if (event.keyCode === 13) event.stopPropagation()
-                        },
-                        false,
-                    )
-                },
-            })
-        }
+        this.#choicesObj = new Choices(element, {
+            classNames: {
+                containerOuter: ['choices', this.args.inline ? 'oxi-inline-select' : 'form-control'],
+                containerInner: [],
+                list: ['choices__list', this.args.inline ? 'dummy-noop' : 'text-truncate'],
+                activeState: ['is-active', 'shadow'],
+            },
+            noChoicesText: 'No choices to choose from',
+            searchEnabled: true,
+            searchResultLimit: 10,
+            searchFields: [ 'label' ],
+            shouldSort: false,
+            itemSelectText: '',
+            placeholder: !!(this.args.placeholder ?? null),
+            placeholderValue: '',
+            callbackOnInit: function () {
+                this.dropdown.element.addEventListener(
+                    'keydown', (event) => {
+                        // prevent form submit
+                        if (event.keyCode === 13) event.stopPropagation()
+                    },
+                    false,
+                )
+            },
+        })
         if (this.args.onInsert) this.args.onInsert(element)
         this.notifyOnChange(element.selectedIndex)
     }

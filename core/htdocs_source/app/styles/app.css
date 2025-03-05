@@ -101,17 +101,31 @@ img.toplogo {
 }
 
 /* oxi-base/select - inline select field */
-.oxi-inline-select.ss-main {
+.choices.oxi-inline-select {
   color: RGBA(var(--bs-primary-rgb), var(--bs-link-opacity, 1)) !important; /* use link color to indicate that it is clickable */
   display: inline-flex;
   width: auto;
+}
+
+.choices.oxi-inline-select[data-type*="select-one"]::after {
+  right: 0;
+}
+
+.choices.oxi-inline-select .choices__item--selectable {
+  padding-right: 14px;
+}
+
+.choices.oxi-inline-select .choices__list--single {
+  margin: 0;
   font-weight: bold;
 }
-.oxi-inline-select.ss-main:not(.ss-open-below) {
-  border: 1px solid transparent;
+
+.choices.oxi-inline-select .choices__item--choice {
+  text-wrap: nowrap;
 }
-.oxi-inline-select.ss-main .ss-values .ss-single {
-  margin: 0;
+
+div.required .choices.oxi-inline-select {
+  border: 1px solid transparent;
 }
 
 /******************************************************************************
@@ -459,7 +473,7 @@ form div.required label.col-form-label {
 /* Input fields */
 div.required input:not(:checked):not(.choices__input),
 div.required select,
-div.required .choices, /* Choices.js */
+div.required .choices:not(.oxi-inline-select), /* Choices.js */
 div.required textarea {
   background-color:#fff3c2 !important;
   border:1px solid #444;
@@ -467,14 +481,14 @@ div.required textarea {
 
 div.required input.form-control[disabled] ,
 div.required select.form-control[disabled],
-div.required .choices:has(select.form-control[disabled]), /* Choices.js */
+div.required .choices:has(select.form-control[disabled]):not(.oxi-inline-select), /* Choices.js */
 div.required textarea.form-control[disabled] {
   border:1px solid #ccc;
 }
 
 div.optional input,
 div.optional select,
-div.optional .choices, /* Choices.js */
+div.optional .choices:not(.oxi-inline-select), /* Choices.js */
 div.optional textarea {
   border:1px #888 dashed;
 }

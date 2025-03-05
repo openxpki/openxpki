@@ -94,14 +94,6 @@ module.exports = function(defaults) {
   // uPlot
   app.import('node_modules/uplot/dist/uPlot.min.css');
 
-  // slim-select
-  app.import('node_modules/slim-select/dist/slimselect.css');
-  app.import('node_modules/slim-select/dist/slimselect.js', {
-    using: [
-      { transformation: 'amd', as: 'slimselect' }
-    ]
-  });
-
   // Choices.js
   app.import('node_modules/choices.js/public/assets/styles/choices.css');
   app.import('node_modules/choices.js/public/assets/scripts/choices.js', {

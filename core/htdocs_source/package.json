@@ -89,7 +89,6 @@
     "prettier-plugin-ember-template-tag": "^2.0.4",
     "qunit": "^2.24.1",
     "qunit-dom": "^3.4.0",
-    "slim-select": "^2.10.0",
     "stylelint": "^16.14.1",
     "stylelint-config-prettier": "^9.0.5",
     "stylelint-config-standard": "^37.0.0",

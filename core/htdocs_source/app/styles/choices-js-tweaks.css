@@ -1,5 +1,10 @@
 .choices {
   margin-bottom: 0;
+  font-size: inherit;
+}
+
+.choices__item {
+  font-size: inherit;
 }
 
 .choices__list {
@@ -7,13 +12,8 @@
   padding: 0;
 }
 
-
 .choices__list.choices__list--single {
   display: inline flow;
-/*
-  min-height: 2.5em;
-  padding: .375rem 2.25rem .375rem .75rem;
-*/
 }
 
 /* Option popup */
@@ -21,56 +21,13 @@
   margin-left: -0.75rem; /* level out 0.75rem padding of "form-control" (which we add to containerOuter via JS) */
   z-index: 6; /* appear above all following input fields */
   border-radius: 0.375rem;
+  width: unset; /* don't limit width of dropdown to the size of the select field */
 }
 
 /*
   Make Choices.js DIV-based SELECT look like our Bootstrap SELECTs
   (also see bootstrap-v5-tweaks.css)
 */
-
-/* .was-validated .form-select:valid:not([multiple]):not([size]) + .choices__list.choices__list--single,
-.was-validated .form-select:valid:not([multiple])[size="1"] + .choices__list.choices__list--single,
-.form-select.is-valid:not([multiple]):not([size]) + .choices__list.choices__list--single,
-.form-select.is-valid:not([multiple])[size="1"] + .choices__list.choices__list--single {
-  border-color: #5c8866;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23c8d6cb' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 1.75rem center,center right 2.25rem;
-  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
-  padding-right: 4.125rem;
-}
-
-.was-validated .form-select:invalid:not([multiple]):not([size]) + .choices__list.choices__list--single,
-.was-validated .form-select:invalid:not([multiple])[size="1"] + .choices__list.choices__list--single,
-.form-select.is-invalid:not([multiple]):not([size]) + .choices__list.choices__list--single,
-.form-select.is-invalid:not([multiple])[size="1"] + .choices__list.choices__list--single {
-  border-color: var(--bs-form-invalid-border-color);
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 1.75rem center,center right 2.25rem;
-  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
-  padding-right: 4.125rem;
-}
-
-.choices.is-focused .choices__list.choices__list--single {
-  border-color: #86b7fe;
-  outline: 0;
-  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-}
-
-.was-validated .choices.is-focused  .form-select:valid + .choices__list.choices__list--single,
-.choices.is-focused .form-select.is-valid + .choices__list.choices__list--single {
-  border-color: var(--bs-form-valid-border-color);
-  box-shadow: 0 0 0 0.25rem rgba(var(--bs-success-rgb), 0.25);
-}
-
-.was-validated .choices.is-focused .form-select:invalid + .choices__list.choices__list--single,
-.choices.is-focused .form-control.is-invalid + .choices__list.choices__list--single {
-  border-color: var(--bs-form-invalid-border-color);
-  box-shadow: 0 0 0 0.25rem rgba(var(--bs-danger-rgb), 0.25);
-} */
-
-
 .was-validated .choices:has(.form-select:valid:not([multiple]):not([size])),
 .was-validated .choices:has(.form-select:valid:not([multiple])[size="1"]),
 .was-validated .choices:has(.form-select.is-valid:not([multiple]):not([size])),
