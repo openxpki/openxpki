@@ -181,6 +181,16 @@ export default [
                     ],
                     value: "",
                 },
+                {
+                    type: "select",
+                    name: "select_inline",
+                    label: "Inline select",
+                    inline: true,
+                    options: [
+                        { value: 1, label: "Tusen" },
+                        { value: 2, label: "Takk" },
+                    ],
+                },
             ],
         }
     },

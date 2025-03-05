@@ -55,6 +55,7 @@ export default class Field extends Base {
      */
     options = []
     editable
+    inline
     _guardian        // reference to the parent Field object (if current field is a dependant)
     /*
      * oxisection/form/field/static
