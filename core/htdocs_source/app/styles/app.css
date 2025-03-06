@@ -490,7 +490,7 @@ div.optional input,
 div.optional select,
 div.optional .choices:not(.oxi-inline-select), /* Choices.js */
 div.optional textarea {
-  border:1px #888 dashed;
+  border:1px #888 dotted;
 }
 
 .oxi-checkbox {
