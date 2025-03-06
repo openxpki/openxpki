@@ -38,6 +38,11 @@ OpenXPKI::CLI::Command::acme
 
 Handle account registrations for the NICE ACME backend.
 
+B<NOTE>: This manages the account key in situations where OpenXPKI is
+used as ACME client to enroll certficates with an external CA. To
+manage the ACME clients enrolling against OpenXPKI you have to use the
+ACME client registration process via the endpoints and workflows.
+
 =cut
 
 sub nonce {

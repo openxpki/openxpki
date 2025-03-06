@@ -13,8 +13,10 @@ OpenXPKI::Client::API::Command::config::verify
 
 =head1 DESCRIPTION
 
-Show information of the (running) OpenXPKI configuration or
-validate a configuration tree.
+Verify the content of a directory holding a YAML system configuration.
+
+Contrary to I<config show> this works on a local copy and does not query
+the running instance!
 
 =cut
 
@@ -52,7 +54,9 @@ command "verify" => {
         $res = { digest => $conf->checksum, $param->module => $res_lint };
 
     } else {
+
         $res = { digest => $conf->checksum };
+
     }
 
     return $res;

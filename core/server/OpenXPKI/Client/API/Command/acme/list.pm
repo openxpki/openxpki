@@ -4,6 +4,7 @@ use OpenXPKI -client_plugin;
 command_setup
     parent_namespace_role => 1,
     needs_realm => 1,
+    protected => 1,
 ;
 
 =head1 NAME
@@ -32,7 +33,7 @@ command "list" => {
             namespace => 'nice.acme.account',
             key => $account->{key},
             deserialize => 'simple',
-        });
+        })->params;
         push @result, {
             key_id => $account->{key},
             kid =>    $res->{value}->{kid},

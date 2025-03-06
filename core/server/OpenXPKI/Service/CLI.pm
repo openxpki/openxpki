@@ -38,14 +38,17 @@ sub BUILD {
     my $self = shift;
 
     my $kid2role = {};
-    my @keys = CTX('config')->get_list(['system','cli','auth']);
+    my $keys = CTX('config')->get_hash(['system','cli','auth']);
+
     my @key_list = map {
-        my $pubkey = Crypt::PK::ECC->new(\$_->{key});
+        my $item = $keys->{$_};
+        my $pubkey = Crypt::PK::ECC->new(\$item->{key});
         my $jwk_hash = $pubkey->export_key_jwk('public', 1);
         $jwk_hash->{kid} = $pubkey->export_key_jwk_thumbprint();
-        $kid2role->{$jwk_hash->{kid}} = $_->{role} || '_System';
+        $kid2role->{$jwk_hash->{kid}} = $item->{role} || '_System';
+        $jwk_hash->{name} = $_;
         $jwk_hash;
-    } @keys;
+    } keys %$keys;
 
     $self->kid_list(\@key_list);
     $self->kid2role($kid2role);
@@ -144,6 +147,11 @@ sub _process_regular_command {
     my $message = OpenXPKI::DTO::Message::from_hash($hash);
     if (!($message->isa('OpenXPKI::DTO::Message::Command') ||
         $message->isa('OpenXPKI::DTO::Message::Enquiry'))) {
+
+        OpenXPKI::Exception::Command->throw(
+            'Received ProtectedCommand without proper authentication'
+        ) if ($message->isa('OpenXPKI::DTO::Message::ProtectedCommand'));
+
         OpenXPKI::Exception::Command->throw(
             sprintf('Invalid command message (not command but %s)', ref $message)
         );
@@ -337,6 +345,8 @@ sub __handle_enquiry {
         }
     } elsif ($enquiry eq 'realm') {
         $result = { result => $self->api->autoloader->get_realm_list };
+    } elsif ($enquiry eq 'ping') {
+        $result = { result => 'ok' };
     }
 
     return OpenXPKI::DTO::Message::Response->new(params => $result);

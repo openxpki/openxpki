@@ -17,8 +17,7 @@ Show the list of available commands
 
 command "list" => {
 } => sub ($self, $param) {
-
-    return $self->hint_command;
+    return hint_command($self,'');
 };
 
 __PACKAGE__->meta->make_immutable;

@@ -6,6 +6,7 @@ use FindBin qw( $Script );
 use Getopt::Long;
 use Module::Metadata;
 use JSON::PP;
+use Term::ReadKey;
 
 # CPAN modules
 use PPI::Document;
@@ -111,6 +112,17 @@ sub handle_error ($err, $debug_details = '') {
     exit 255;
 }
 
+sub read_password {
+
+    my $msg = shift;
+    say $msg if ($msg);
+    Term::ReadKey::ReadMode('noecho');
+    my $input = Term::ReadKey::ReadLine(0);
+    Term::ReadKey::ReadMode('restore');
+    my ($password) = $input =~ m{\A\s*(\S+)\s*\z};
+    return $password;
+}
+
 set_language('en_US');
 use Log::Log4perl qw(:easy :no_extra_logdie_message);
 
@@ -120,7 +132,7 @@ my %opt = ('verbose' => \$verbose);
 # pass_through: anything unknown, ambiguous or invalid will be passed through to @ARGV
 Getopt::Long::Configure('pass_through','bundling');
 
-GetOptions( \%opt, ('verbose|v+','json','json-pretty','auth-key|k=s','auth-config|c=s','no-caop','help'));
+GetOptions( \%opt, ('verbose|v+','json','json-pretty','auth-key|k=s','auth-config|c=s','pass|p:s','no-auth','help'));
 
 Getopt::Long::Configure('no_pass_through');
 
@@ -230,13 +242,28 @@ if (my $keyfile = $opt{'auth-key'}) {
 } else {
     my $keyfile = glob("~/.oxi/client.key");
     # first try to autodetect the admin mode key file...
-    if ((not $opt{'no-caop'}) && -e $keyfile && -r $keyfile) {
+    if ((not $opt{'no-auth'}) && -e $keyfile && -r $keyfile) {
         $auth_args{account_key} = $keyfile;
 
     # ...and second the user config file.
     } else {
 
     }
+}
+
+
+# if we have a keyfile we check if the password flag was given
+if ($auth_args{account_key}) {
+    my $pass;
+    if ($opt{'pass'}) {
+        $pass = $opt{'pass'};
+        if (substr($pass,0,4) eq 'env:') {
+            $pass = $ENV{substr($pass,4)} || die "Given ENV to read password is empty";
+        }
+    } elsif (defined $opt{'pass'}) {
+        $pass = read_password("Please enter your key password: ");
+    }
+    $auth_args{account_key} = Crypt::PK::ECC->new($auth_args{account_key}, $pass);
 }
 
 INFO('Enable operator mode using keyfile '. $auth_args{account_key})
@@ -340,14 +367,22 @@ Path to a config file to read the authentication details from.
 
 =item --auth-key|-k
 
-Path to the login key to run command as CA operator.
+Path to the login key to run commands in privileged mode
 
 Default location: ~/.oxi/client.key
 
-=item --no-caop
+=item --pass|-p
 
-Do not authenticate as CA operator and use the default user binding even if a CA
-operator key was autodetected.
+Passphrase to decrypt your authentication key in case it is protected.
+
+If used without argument, you will be prompted to enter your password.
+If the provided string starts with C<env:> it is assumed to point to
+an environment variable holding the password, any other value is
+considered to be the literal password.
+
+=item --no-auth
+
+Do not authenticate even if a login key/config was found.
 
 =back
 

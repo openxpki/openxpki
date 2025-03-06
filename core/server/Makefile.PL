@@ -238,6 +238,7 @@ WriteMakefile(
         'SQL::Abstract::More'           => '1.38',      # OpenXPKI::Server::Database
         'Sys::SigAction'                => '0.06',
         'Template'                      => '2.15',
+        'Term::ReadKey'                 => 0,
         'Test::More'                    => '1.001008',
         'Test::Pod::Coverage'           => '1.00',
         'Test::Pod'                     => '1.00',

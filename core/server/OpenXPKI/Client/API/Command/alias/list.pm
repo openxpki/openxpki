@@ -21,11 +21,12 @@ List (non-token) alias entries
 sub hint_group ($self, $input_params) {
     my $aliases = $self->run_command('list_alias_groups');
     my $tokens = $self->run_command('list_token_groups');
-
     my @groups;
-    while (my $item = shift @{$aliases->param('result')}) {
+    foreach my $item ($aliases->result()->@*) {
+        next unless ($item);
         push @groups, $item unless (any { $item eq $_ } values %{$tokens->params});
     }
+    $self->log->trace(Dumper \@groups);
     return  \@groups;
 }
 
@@ -36,11 +37,15 @@ command "list" => {
     upcoming => { isa => 'Bool' },
 } => sub ($self, $param) {
 
-    $self->check_group($param->group);
+    my $groups;
+    if ($param->group) {
+        $self->check_group($param->group);
+        $groups = [ $param->group ];
+    } else {
+        $groups = hint_group($self, '');
+    }
 
-    my $groups = $self->hint_group();
     my $res = {};
-
     my %validity;
     foreach my $key ('expired','valid','upcoming') {
         $validity{$key} = 1 if $param->$key;

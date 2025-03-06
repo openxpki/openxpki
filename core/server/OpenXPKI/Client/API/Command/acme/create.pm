@@ -4,6 +4,9 @@ use OpenXPKI -client_plugin;
 command_setup
     parent_namespace_role => 1,
     needs_realm => 1,
+    # this does NOT add security for the moment as you can still
+    # manipulate the datapool using the regular API commands
+    protected => 1,
 ;
 
 =head1 NAME
@@ -12,7 +15,7 @@ OpenXPKI::Client::API::Command::acme::create
 
 =head1 DESCRIPTION
 
-Register a new ACME account with an external CA and write the
+Register a new ACME account with an B<external> CA and write the
 registration information to the datapool.
 
 =cut
@@ -41,7 +44,7 @@ command "create" => {
 
     my $label = $param->label || encode_base64url(sha256($param->directory));
 
-    my $res = $self->run_command('get_data_pool_entry', {
+    my $res = $self->run_protected_command('get_data_pool_entry', {
         namespace => 'nice.acme.account',
         key => $label,
     });
@@ -65,7 +68,7 @@ command "create" => {
         $eab
     );
 
-    $self->run_command('set_data_pool_entry', {
+    $self->run_protected_command('set_data_pool_entry', {
         namespace => 'nice.acme.account',
         key => $label,
         value => $account,

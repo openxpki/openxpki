@@ -21,13 +21,14 @@ command "show" => {
     with_privatekey => { isa => 'Bool', label => 'Show Private Key' },
 } => sub ($self, $param) {
 
-    my $res = $self->run_command('get_data_pool_entry', {
+    my $res = $self->run_protected_command('get_data_pool_entry', {
         namespace => 'nice.acme.account',
         key => $param->id,
         deserialize => 'simple',
     });
+    die "No account found with id '${param->id}'" unless $res;
 
-    my $out = $res->{value};
+    my $out = $res->params->{value};
     $out->{key_id} = $param->id;
     delete $out->{jwk} unless $param->with_privatekey;
     return $out;
