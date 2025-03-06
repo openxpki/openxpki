@@ -109,6 +109,7 @@ OpenXPKI/Client/API/Response.pm
 OpenXPKI/Client/API/Util.pm
 
 # Wrappers for EST, RPC...
+OpenXPKI/Client/Service/Config.pm
 OpenXPKI/Client/Service/EST.pm
 OpenXPKI/Client/Service/Healthcheck.pm
 OpenXPKI/Client/Service/Response.pm
@@ -701,7 +702,6 @@ bin/openxpkiadm
 bin/openxpkictl
 bin/openxpkicli
 bin/openxpkicmd
-bin/openxpkictl-client
 bin/openxpkictl-client-debug
 
 # cgi stuff
