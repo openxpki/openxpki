@@ -1,14 +1,25 @@
-<select
-    ...attributes
-    class={{this.cssClasses}}
-    data-placeholder={{this.placeholder}}
-    {{on "oxi-focus" this.focussed}}
-    {{on "change" this.listChanged}}
-    {{on-init this.startup}}
+<OxiBase::InputGroup
+    @showIf={{not (or @noInputGroup @inline)}}
 >
-    {{#each @list as |item|}}
-        <option value="{{item.value}}" selected={{if (eq item.value @selected) "selected"}}>
-            {{item.label}}
-        </option>
-    {{/each}}
-</select>
+    <select
+        ...attributes
+        class={{this.cssClasses}}
+        data-placeholder={{this.placeholder}}
+        {{on "oxi-focus" this.focussed}}
+        {{on "change" this.notifyOnChange}}
+        {{on-init this.startup}}
+    >
+    </select>
+
+    {{#if this.allowClearing}}
+        <BsButton
+            @icon="glyphicon glyphicon-trash"
+            @type="light"
+            class="oxi-btn-cancel btn-sm"
+            @onClick={{this.clear}}
+        >
+        </BsButton>
+    {{/if}}
+
+    <div></div>
+</OxiBase::InputGroup>

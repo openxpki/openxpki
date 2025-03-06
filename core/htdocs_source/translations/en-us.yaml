@@ -76,6 +76,10 @@ component:
     copy: "Double-click to select all text"
   oxifield_static:
     unset: "<not set>"
+  oxibase_select:
+    search: "Filter items:"
+    no_choices: "No choices to choose from"
+    no_results: "No results found"
 
 autofill:
   button: "Query {target}"

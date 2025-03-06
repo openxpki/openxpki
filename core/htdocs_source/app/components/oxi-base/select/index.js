@@ -1,6 +1,8 @@
 import Component from '@glimmer/component'
-import { action } from "@ember/object"
+import { action } from '@ember/object'
 import { debug } from '@ember/debug'
+import { service } from '@ember/service'
+import { tracked } from '@glimmer/tracking'
 import Choices from 'choices.js'
 
 /**
@@ -14,6 +16,7 @@ import Choices from 'choices.js'
  *   @onInsert={{otherFunc}}
  *   @inline={{true}}
  *   @placeholder="Please choose"
+ *   @showClearButton={{true}}
  * />
  * ```
  *
@@ -32,7 +35,10 @@ import Choices from 'choices.js'
  * @class OxiBase::Select
  */
 export default class OxiSelectComponent extends Component {
+    @service('intl') intl
+
     #choicesObj = null
+    @tracked allowClearing = false
 
     get cssClasses() {
         return (this.args.inline
@@ -45,7 +51,7 @@ export default class OxiSelectComponent extends Component {
         let label = this.args.placeholder ?? null
         // convert empty to non-empty string so Choice.js will recognize placeholder
         // (but respect null/undefined = no placeholder)
-        if (label === "") label = '…'
+        if (label === '') label = '…'
         return label
     }
 
@@ -60,20 +66,25 @@ export default class OxiSelectComponent extends Component {
     @action
     startup(element) {
         this.#choicesObj = new Choices(element, {
+            choices: this.args.list.map(choice => new Object({ ...choice, selected: choice.value == this.args.selected })),
             classNames: {
                 containerOuter: ['choices', this.args.inline ? 'oxi-inline-select' : 'form-control'],
                 containerInner: [],
-                list: ['choices__list', this.args.inline ? 'dummy-noop' : 'text-truncate'],
+                itemSelectable: ['choices__item--selectable', this.args.inline ? 'dummy-noop' : 'text-truncate'],
                 activeState: ['is-active', 'shadow'],
             },
-            noChoicesText: 'No choices to choose from',
+            searchPlaceholderValue: this.intl.t('component.oxibase_select.search'),
+            noChoicesText: this.intl.t('component.oxibase_select.no_choices'),
+            noResultsText: this.intl.t('component.oxibase_select.no_results'),
             searchEnabled: true,
             searchResultLimit: 10,
-            searchFields: [ 'label' ],
+            searchFields: [ 'label', 'value' ],
             shouldSort: false,
             itemSelectText: '',
             placeholder: !!(this.args.placeholder ?? null),
-            placeholderValue: '',
+            fuseOptions: {
+                threshold: 0.2, // default threshold of 0.6 shows too many unrelated results
+            },
             callbackOnInit: function () {
                 this.dropdown.element.addEventListener(
                     'keydown', (event) => {
@@ -85,23 +96,29 @@ export default class OxiSelectComponent extends Component {
             },
         })
         if (this.args.onInsert) this.args.onInsert(element)
-        this.notifyOnChange(element.selectedIndex)
+        this.notifyOnChange()
     }
 
     @action
-    listChanged(event) {
-        this.notifyOnChange(event.target.selectedIndex)
-    }
+    notifyOnChange() {
+        let item = this.#choicesObj.getValue()
+        if (typeof item === 'undefined' || item === null) return
 
-    notifyOnChange(index) {
-        if (index === -1) { return } // there might be no options on page initialization, before field is hidden by a "partial" request
-        let item = this.args.list[index];
-        debug(`oxi-select: notifyOnChange (value="${item.value}", label="${item.label}")`)
+        if (this.args.showClearButton) this.allowClearing = true
+
+        debug(`oxi-select: notifyOnChange (value="${item.element.value}", label="${item.element.label}")`)
         if (typeof this.args.onChange !== "function") {
             /* eslint-disable-next-line no-console */
             console.error("<OxiBase::Select>: Wrong type parameter type for @onChange. Expected: function, given: " + (typeof this.args.onChange))
             return
         }
-        this.args.onChange(item.value, item.label)
+        this.args.onChange(item.element.value, item.element.label)
+    }
+
+    @action
+    clear() {
+        this.allowClearing = false
+        this.#choicesObj.removeActiveItems()
+        this.args.onChange(null, null)
     }
 }

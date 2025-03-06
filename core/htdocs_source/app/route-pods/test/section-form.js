@@ -144,17 +144,17 @@ export default [
                 {
                     type: "select",
                     name: "select_preset",
-                    label: "Select, preset",
+                    label: "Select, preset 'Tom'",
                     options: [
                         { value: 1, label: "Major" },
                         { value: 2, label: "Tom" },
                     ],
-                    value: 1,
+                    value: 2,
                 },
                 {
                     type: "select",
                     name: "select_maybe",
-                    label: "Select, is_optional = 1",
+                    label: "Select, optional",
                     options: [
                         { value: 1, label: "Major" },
                         { value: 2, label: "Tom" },
@@ -170,6 +170,17 @@ export default [
                     options: [
                         { value: 1, label: "Tusen" },
                         { value: 2, label: "Takk" },
+                    ],
+                },
+                {
+                    type: "select",
+                    name: "select_maybe_editable",
+                    label: "Select, editable, optional",
+                    editable: 1,
+                    is_optional: 1,
+                    options: [
+                        { value: 1, label: "Major" },
+                        { value: 2, label: "Tom" },
                     ],
                 },
                 {

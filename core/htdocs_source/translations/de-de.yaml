@@ -76,6 +76,10 @@ component:
     copy: "Doppelklick markiert gesamten Text"
   oxifield_static:
     unset: "<nicht gesetzt>"
+  oxibase_select:
+    search: "Auswahl filtern:"
+    no_choices: "Keine Optionen vorhanden"
+    no_results: "Keine Suchergebnisse"
 
 autofill:
   button: "{target} abfragen"
