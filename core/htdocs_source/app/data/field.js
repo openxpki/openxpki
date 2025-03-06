@@ -20,7 +20,7 @@ export default class Field extends Base {
     name
     _refName // internal use: original name, needed for dynamic input fields where 'name' can change
     _id = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER) // internal use: random ID
-    value
+    @tracked value
     label
     is_optional
     tooltip

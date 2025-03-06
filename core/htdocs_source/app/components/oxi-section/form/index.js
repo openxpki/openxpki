@@ -7,6 +7,7 @@ import { debug, warn } from '@ember/debug'
 import { scheduleOnce } from '@ember/runloop'
 import Field from 'openxpki/data/field'
 import ContainerButton from 'openxpki/data/container-button'
+import { next } from '@ember/runloop'
 
 /**
  * Draws a form.
@@ -72,18 +73,21 @@ export default class OxiSectionFormComponent extends Component {
      * key.
      */
     #prepareFields(fields) {
-        let result = [];
-        for (const fieldHash of fields) {
+        let result = []
+        for (let fieldHash of fields) {
+            // sanitize field "value" (before it's converted to a @tracked property of the Field object)
+            let refName = this.#sanitizeValue(fieldHash) // refName is only set for dynamic fields
+
             // convert hash into field
-            let field = Field.fromHash(fieldHash);
+            let field = Field.fromHash(fieldHash)
 
             // dynamic input fields will change the form field name depending on the
             // selected option, so we need an internal reference to the original name ("_refName")
-            field._refName = field.name;
+            field._refName = refName ?? field.name
 
             // standard fields
             if (! field.clonable) {
-                result.push(field);
+                result.push(field)
             }
             // clonable field
             else {
@@ -93,36 +97,43 @@ export default class OxiSectionFormComponent extends Component {
                 // process presets (array of key/value pairs): insert clones
                 // NOTE: this does NOT support dynamic input fields
                 if (isArray(field.value)) {
-                    let values = field.value.length ? field.value : [""];
+                    let values = field.value.length ? field.value : [""]
                     // add clones to field list
                     result.push(...values.map(v => {
-                        let clone = field.clone();
-                        clone.value = v;
-                        return clone;
-                    }));
+                        // use helper object to prevent repeated setting of @tracked "value" property
+                        let fragment = { name: field.name, value: v }
+                        this.#sanitizeValue(fragment)
+                        let clone = field.clone()
+                        clone.name = fragment.name
+                        clone.value = fragment.value
+                        return clone
+                    }))
                 }
                 else {
-                    result.push(field.clone());
+                    result.push(field.clone())
                 }
             }
         }
 
-        for (let field of result) {
-            if (field.value) {
-                // dynamic input fields: presets are key/value hashes.
-                // we need to convert `value: { key: NAME, value: VALUE }` to `name: NAME, value: VALUE`
-                if (typeof field.value === 'object' && field.value.key) {
-                    field.name = field.value.key;
-                    field.value = field.value.value;
-                }
-                // strip trailing newlines - esp. important for type "passwordverify"
-                if (typeof field.value === 'string') {
-                    field.value = field.value.replace(/\n*$/, "");
-                }
+        return result
+    }
+
+    #sanitizeValue(field) {
+        if (field.value) {
+            // dynamic input fields: presets are key/value hashes.
+            // we need to convert `value: { key: NAME, value: VALUE }` to `name: NAME, value: VALUE`
+            if (typeof field.value === 'object' && field.value.key) {
+                let refName = field.name
+                field.name = field.value.key
+                field.value = field.value.value
+                return refName
+            }
+            // strip trailing newlines - esp. important for type "passwordverify"
+            if (typeof field.value === 'string') {
+                field.value = field.value.replace(/\n*$/, "")
             }
         }
-
-        return result;
+        return null
     }
 
     // Create an array of Field objects for the currently active dependent fields.
@@ -154,7 +165,6 @@ export default class OxiSectionFormComponent extends Component {
     }
 
     #updateCloneFields() {
-        let deleteRefNames = []
         for (const name of Array.from(this.clonableRefNames)) { // use a copy so we can delete items in the loop
             let clones = this.fields.filter(f => f._refName === name)
 
@@ -286,8 +296,12 @@ export default class OxiSectionFormComponent extends Component {
      */
     @action
     setFieldValue(field, value, skipValidityChecks = false) {
-        debug(`oxi-section/form (${this.args.def.action}): setFieldValue (${field.name}, value = "${value}", skipValidityChecks = ${skipValidityChecks})`);
-        field.value = value;
+        next(() => this.#setFieldValue(field, value, skipValidityChecks))
+    }
+
+    #setFieldValue(field, value, skipValidityChecks = false) {
+        debug(`oxi-section/form (${this.args.def.action}): setFieldValue (${field.name}, value = "${value}", skipValidityChecks = ${skipValidityChecks})`)
+        field.value = value
 
         if (!skipValidityChecks) {
             if (this.#checkFieldValidity(field) == false) return Promise.resolve()
