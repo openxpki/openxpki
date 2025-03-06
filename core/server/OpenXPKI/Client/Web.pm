@@ -179,12 +179,18 @@ sub startup ($self) {
             $self->log->warn('Fork detected with active client handle');
         }
 
-        $self->log->debug('creating new socket connection for pid '.$PID) unless($client);
-
-        $client //= OpenXPKI::Client->new({
-            SOCKETFILE => $self->{oxi_config_obj}->get('system.backend.socket') || '/var/openxpki/openxpki.socket',
-            TIMEOUT => $self->{oxi_config_obj}->get('system.backend.timeout') || 30,
-        });
+        try {
+            if (!($client && $client->is_connected())) {
+                $self->log->debug('creating new socket connection for pid '.$PID) unless($client);
+                $client = OpenXPKI::Client->new({
+                    SOCKETFILE => $self->{oxi_config_obj}->get('system.backend.socket') || '/var/openxpki/openxpki.socket',
+                    TIMEOUT => $self->{oxi_config_obj}->get('system.backend.timeout') || 30,
+                });
+            }
+        } catch ($error) {
+            $self->log->error(sprintf("Unable to connect to backend (%s)", $error));
+            die "Unable to connect to backend";
+        }
         return $client;
     });
 
