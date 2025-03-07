@@ -240,9 +240,9 @@ the consuming service class does not need to care about setting them.
 
 =head3 config
 
-I<Connector> pointing to the endpoint configuration for the service
+I<Connector> pointing to the endpoint configuration for the service.
 
-In legacy mode this is auto generated via config_obj
+In legacy use (FCGI) this is auto generated via L</config_obj>.
 
 =cut
 sub config; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
@@ -250,7 +250,7 @@ has config => (
     is => 'rw',
     isa => 'Connector',
     lazy => 1,
-    # replace builder with required after cgi decomm
+    # FIXME replace builder with required after cgi decomm
     #required => 1,
     builder => '_build_config',
 );
