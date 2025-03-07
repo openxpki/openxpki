@@ -606,10 +606,7 @@ sub __reinit_session {
     my $self = shift;
     my $client = shift;
 
-    my $session = $self->session();
-    if (!$session) {
-        die "Can not reinit backend session without frontend session!";
-    }
+    my $session = $self->session;
 
     my $old_session =  $session->param('backend_session_id') || undef;
     $self->logger()->info('old backend session ' . $old_session) if ($old_session);
