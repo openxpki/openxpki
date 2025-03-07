@@ -80,7 +80,7 @@ sub init_json ($self, $args) {
 }
 
 sub _init_path ($self) {
-    my $dir = $self->client->static_dir;
+    my $dir = $self->webui->static_dir;
 
     if (not -d $dir) {
         $self->log->error('Configured path for static content does not exist: ' . $dir);

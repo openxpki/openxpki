@@ -299,7 +299,7 @@ sub init_result ($self, $args) {
                   format => 'failure'
                 },
                 { label => 'I18N_OPENXPKI_UI_SEARCH_EXPORT_RESULT',
-                  href => $self->client->script_url . '?page=certificate!export!id!'.$queryid,
+                  href => $self->script_url . '?page=certificate!export!id!'.$queryid,
                   target => '_blank',
                   format => 'optional'
                 },
@@ -737,7 +737,7 @@ sub init_detail ($self, $args = {}) {
     # for i18n parser I18N_OPENXPKI_CERT_ISSUED CRL_ISSUANCE_PENDING I18N_OPENXPKI_CERT_REVOKED I18N_OPENXPKI_CERT_EXPIRED
 
     # was in info, bullet list for downloads
-    my $base =  $self->client->script_url . "?page=certificate!download!identifier!$cert_identifier!format!";
+    my $base =  $self->script_url . "?page=certificate!download!identifier!$cert_identifier!format!";
     push @fields, { label => 'I18N_OPENXPKI_UI_DOWNLOAD_LABEL', value => [
         { page => "${base}pem", label => 'I18N_OPENXPKI_UI_DOWNLOAD_PEM',  format => 'extlink' },
         { page => "${base}der", label => 'I18N_OPENXPKI_UI_DOWNLOAD_DER', format => 'extlink' },
@@ -867,7 +867,7 @@ sub init_chain ($self, $args) {
     );
 
     # Download links
-    my $base =  $self->client->script_url . "?page=certificate!download!identifier!%s!format!%s";
+    my $base =  $self->script_url . "?page=certificate!download!identifier!%s!format!%s";
     my $pattern = '<li><a href="'.$base.'" target="_blank">%s</a></li>';
 
     foreach my $cert (@{$chain->{certificates}}) {

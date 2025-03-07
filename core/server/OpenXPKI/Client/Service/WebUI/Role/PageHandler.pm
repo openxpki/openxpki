@@ -100,7 +100,7 @@ sub handle_view ($self, $view_str, $args, $forced_status = undef) {
             }
 
         } else {
-            $page = OpenXPKI::Client::Service::WebUI::Page::Bootstrap->new(client => $self)->page_not_found;
+            $page = OpenXPKI::Client::Service::WebUI::Page::Bootstrap->new(webui => $self)->page_not_found;
             last;
         }
     }
@@ -209,7 +209,7 @@ sub _load_page_class ($self, $arg) {
 
         # check class if method exists (faster than checking the instantiated object)
         if ($pkg->can($fullmethod)) {
-            my $obj = $pkg->new(client => $self);
+            my $obj = $pkg->new(webui => $self);
             return ($obj, $fullmethod);
         }
     }

@@ -571,7 +571,7 @@ sub handle_ui_request ($self) {
 
     # shortcut to create new pure Page object for redirecting or error status
     my $new_page = sub ($cb) {
-        my $page = OpenXPKI::Client::Service::WebUI::Page->new(client => $self);
+        my $page = OpenXPKI::Client::Service::WebUI::Page->new(webui => $self);
         $cb->($page);
         return $page;
     };

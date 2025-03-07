@@ -6,7 +6,7 @@ requires qw(
     serializer
     send_command_v2
     call_persisted_response
-    client
+    script_url
 );
 
 # Core modules
@@ -313,7 +313,7 @@ sub __render_download {
             label => 'I18N_OPENXPKI_UI_CLICK_TO_DOWNLOAD',
             type => 'link',
             filename => $vv->{filename},
-            data => $self->client->script_url . "?page=$target",
+            data => $self->script_url . "?page=$target",
         };
     } else {
         my $type;

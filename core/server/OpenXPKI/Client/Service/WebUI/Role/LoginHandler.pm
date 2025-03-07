@@ -92,7 +92,7 @@ signature_for handle_login => (
     ],
 );
 sub handle_login ($self, $page, $action, $reply) {
-    my $uilogin = OpenXPKI::Client::Service::WebUI::Page::Login->new(client => $self);
+    my $uilogin = OpenXPKI::Client::Service::WebUI::Page::Login->new(webui => $self);
 
     # Login works in three steps realm -> auth stack -> credentials
 

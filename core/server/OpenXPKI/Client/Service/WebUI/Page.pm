@@ -33,7 +33,7 @@ has log => (
     isa => 'Object',
     init_arg => undef,
     lazy => 1,
-    default => sub ($self) { return $self->client->log },
+    default => sub ($self) { return $self->webui->log },
 );
 
 =head2 REQUEST PARAMETERS
@@ -96,10 +96,15 @@ B<Parameters>
 
 =back
 
+=head2 OTHER
+
+=head3 script_url
+
+URL path of the script (i.e. self reference) from config.
+
 =cut
 
-# "stub" subroutines to satisfy "requires" method checks of other consumed roles
-has client => (
+has webui => (
     required => 1,
     is => 'ro',
     isa => 'OpenXPKI::Client::Service::WebUI',
@@ -108,6 +113,7 @@ has client => (
         multi_param
         secure_param
         encrypt_jwt
+        script_url
     ) ],
 );
 
@@ -267,7 +273,7 @@ has ui_response => (
     isa => 'OpenXPKI::Client::Service::WebUI::Response',
     init_arg => undef,
     lazy => 1,
-    default => sub ($self) { return $self->client->ui_response },
+    default => sub ($self) { return $self->webui->ui_response },
     handles => [ qw(
         redirect
         confined_response has_confined_response
@@ -322,7 +328,7 @@ has session => (
     isa => 'OpenXPKI::Client::Service::WebUI::Session',
     init_arg => undef,
     lazy => 1,
-    default => sub ($self) { $self->client->session },
+    default => sub ($self) { $self->webui->session },
 );
 
 has serializer => (
@@ -427,7 +433,7 @@ sub attachment ($self, $arg) {
     die "attachment(): one of 'bytes' or 'bytes_callback' must be given"
         unless (defined $arg->bytes or $arg->bytes_callback);
 
-    $self->client->response->add_header(
+    $self->webui->response->add_header(
         'content-type' => $arg->mimetype,
         'content-disposition' => sprintf('attachment; filename="%s"', $arg->filename),
         $arg->expires ? ('expires' => '1m') : (),
@@ -669,14 +675,13 @@ sub send_command_v2 {
         $flags = { nostatus => 1 };
     }
 
-    my $backend = $self->client->backend;
-    my $reply = $backend->send_receive_service_msg(
+    my $reply = $self->webui->backend->send_receive_service_msg(
         'COMMAND' => {
             COMMAND => $command,
             PARAMS => $params,
             API => 2,
             TIMEOUT => ($flags->{timeout} || 0),
-            REQUEST_ID => $self->client->request->request_id,
+            REQUEST_ID => $self->webui->request->request_id,
         }
     );
     $self->last_reply($reply);
