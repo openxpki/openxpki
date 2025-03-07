@@ -168,7 +168,7 @@ sub startup ($self) {
         return $config_obj->get_wrapper('system');
     });
 
-    $self->helper(oxi_backend => sub ($sf) {
+    $self->helper(oxi_client => sub ($sf) {
         state $client;
         state $pid //= $PID;
         # in case the process was forked with an active handle we want a fresh one

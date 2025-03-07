@@ -24,10 +24,10 @@ has allowed_commands => (
     default => sub { [ '' ] },
 );
 
-has backend => (
+has client => (
     is => 'rw',
     isa => 'OpenXPKI::Client',
-    predicate => 'has_backend',
+    predicate => 'has_client',
 );
 
 # required by OpenXPKI::Client::Service::Role::Info
@@ -80,8 +80,8 @@ sub op_handlers {
             # try backend connection
             my $client;
             try {
-                $client = $self->backend;
-                my $reply = $self->backend->send_receive_service_msg('PING');
+                $client = $self->client;
+                my $reply = $self->client->send_receive_service_msg('PING');
 
                 $client->init_session;
                 $self->log->debug("Got new client: " . $client->session_id);

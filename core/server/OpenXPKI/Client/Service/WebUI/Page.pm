@@ -675,7 +675,7 @@ sub send_command_v2 {
         $flags = { nostatus => 1 };
     }
 
-    my $reply = $self->webui->backend->send_receive_service_msg(
+    my $reply = $self->webui->client->send_receive_service_msg(
         'COMMAND' => {
             COMMAND => $command,
             PARAMS => $params,

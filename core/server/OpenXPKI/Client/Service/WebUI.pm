@@ -142,16 +142,16 @@ sub _build_session ($self) {
     return $session;
 }
 
-# backend (server communication)
-has backend => (
+# client (server communication)
+has client => (
     is => 'rw',
     isa => 'OpenXPKI::Client',
-    predicate => 'has_backend',
-    trigger => \&_init_backend,
+    predicate => 'has_client',
+    trigger => \&_init_client,
 );
 
 # Creates an instance of OpenXPKI::Client and switch/create backend session
-sub _init_backend ($self, $client) {
+sub _init_client ($self, $client) {
     my $id = $client->get_session_id;
     my $old_id = $self->session->param('backend_session_id') || undef;
 
@@ -392,7 +392,7 @@ sub prepare ($self, $c) {
             $self->log->debug('Special path "index" - showing realm selection page');
 
             $self->session->flush;
-            $self->backend->detach; # enforce new backend session to get rid of selected realm etc.
+            $self->client->detach; # enforce new backend session to get rid of selected realm etc.
         }
 
         # If the session has no realm set, try to get a realm from the map
@@ -447,7 +447,7 @@ sub cleanup ($self) {
     # write session changes
     $self->session->flush if $self->has_session;
     # detach backend
-    $self->backend->detach if $self->has_backend;
+    $self->client->detach if $self->has_client;
 }
 
 # required by OpenXPKI::Client::Service::Role::Base
@@ -609,13 +609,13 @@ sub handle_ui_request ($self) {
 
     }
 
-    my $reply = $self->backend->send_receive_service_msg('PING');
+    my $reply = $self->client->send_receive_service_msg('PING');
     my $status = $reply->{SERVICE_MSG};
     $self->log->trace('PING reply = ' . Dumper $reply) if $self->log->is_trace;
     $self->log->debug("Current session status: $status");
 
     if ( $reply->{SERVICE_MSG} eq 'START_SESSION' ) {
-        $reply = $self->backend->init_session;
+        $reply = $self->client->init_session;
         $self->log->debug('Init new session');
         $self->log->trace('NEW_SESSION reply = ' . Dumper $reply) if $self->log->is_trace;
     }
@@ -704,7 +704,7 @@ sub logout_session {
     my $self = shift;
 
     $self->log->info("session logout");
-    $self->backend->logout;
+    $self->client->logout;
 
     # create a new session
     $self->new_frontend_session;

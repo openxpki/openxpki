@@ -83,7 +83,7 @@ sub index ($self) {
         # for the WebUI we create a reusable backend instance via the factory
         # FIXME we need to rework the O:C:Simple to make it reusable too
         if (any { $service_name eq $_ } ('webui','healthcheck')) {
-            %backend = ( backend => $self->oxi_backend() );
+            %backend = ( client => $self->oxi_client() );
             $self->log->info("Adding backend for $service_name in $$");
         }
     }

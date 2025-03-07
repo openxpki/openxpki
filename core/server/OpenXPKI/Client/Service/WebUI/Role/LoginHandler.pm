@@ -2,20 +2,22 @@ package OpenXPKI::Client::Service::WebUI::Role::LoginHandler;
 use OpenXPKI -role;
 use namespace::autoclean;
 
-requires 'log';
-requires 'config';
-requires 'session';
-requires 'request';
-requires 'backend';
-requires 'realm_mode';
-requires 'url_path';
-requires 'auth';
-requires 'has_auth';
+requires qw(
+    log
+    config
+    session
+    request
+    client
+    realm_mode
+    url_path
+    auth
+    has_auth
 
-requires 'param';
-requires 'handle_view';
-requires 'logout_session';
-requires 'new_frontend_session';
+    param
+    handle_view
+    logout_session
+    new_frontend_session
+);
 
 # Core modules
 use Encode;
@@ -184,7 +186,7 @@ sub handle_login ($self, $page, $action, $reply) {
         $self->log->debug("Status: '$status'");
         # realm set
         if ($pki_realm) {
-            $reply = $self->backend->send_receive_service_msg( 'GET_PKI_REALM', { PKI_REALM => $pki_realm, } );
+            $reply = $self->client->send_receive_service_msg( 'GET_PKI_REALM', { PKI_REALM => $pki_realm, } );
             $status = $reply->{SERVICE_MSG};
             $self->log->debug("Selected realm: '$pki_realm', new status: '$status'");
         # no realm set
@@ -258,7 +260,7 @@ sub handle_login ($self, $page, $action, $reply) {
         # Never auth with an internal stack!
         if ( $auth_stack && $auth_stack !~ /^_/) {
             $self->log->debug("Authentication stack: $auth_stack");
-            $reply = $self->backend->send_receive_service_msg( 'GET_AUTHENTICATION_STACK', {
+            $reply = $self->client->send_receive_service_msg( 'GET_AUTHENTICATION_STACK', {
                AUTHENTICATION_STACK => $auth_stack
             });
             $status = $reply->{SERVICE_MSG};
@@ -280,7 +282,7 @@ sub handle_login ($self, $page, $action, $reply) {
                 $auth_stack = $stack_list[0]->{value};
                 $self->session->param('auth_stack', $auth_stack);
                 $self->log->debug("Only one stack avail ($auth_stack) - autoselect");
-                $reply = $self->backend->send_receive_service_msg( 'GET_AUTHENTICATION_STACK', {
+                $reply = $self->client->send_receive_service_msg( 'GET_AUTHENTICATION_STACK', {
                     AUTHENTICATION_STACK => $auth_stack
                 } );
                 $status = $reply->{SERVICE_MSG};
@@ -330,7 +332,7 @@ sub handle_login ($self, $page, $action, $reply) {
 
                 $data = $self->_jwt_signature($data, $jws) if ($jws);
 
-                $reply = $self->backend->send_receive_service_msg( 'GET_CLIENT_LOGIN', $data );
+                $reply = $self->client->send_receive_service_msg( 'GET_CLIENT_LOGIN', $data );
 
             # as nothing was found we do not even try to login in and look for a redirect
             } elsif (my $loginurl = $auth->{login}) {
@@ -370,7 +372,7 @@ sub handle_login ($self, $page, $action, $reply) {
                 my $data = { certificate => $cert, chain => \@chain };
                 $data = $self->_jwt_signature($data, $jws) if ($jws);
 
-                $reply =  $self->backend->send_receive_service_msg( 'GET_X509_LOGIN', $data);
+                $reply =  $self->client->send_receive_service_msg( 'GET_X509_LOGIN', $data);
                 $self->log->trace('Auth result ' . Dumper $reply) if $self->log->is_trace;
             } else {
                 $self->log->error('Certificate missing for X509 Login');
@@ -397,7 +399,7 @@ sub handle_login ($self, $page, $action, $reply) {
                 return $uilogin->init_login_missing_data unless ($nonce);
 
                 $self->session->param('oidc-nonce' => undef);
-                $reply = $self->backend->send_receive_service_msg( 'GET_OIDC_LOGIN', {
+                $reply = $self->client->send_receive_service_msg( 'GET_OIDC_LOGIN', {
                     token => $token,
                     client_id => $oidc_client{client_id},
                     nonce => $nonce,
@@ -498,7 +500,7 @@ sub handle_login ($self, $page, $action, $reply) {
 
                 $data = $self->_jwt_signature($data, $jws) if ($jws);
 
-                $reply = $self->backend->send_receive_service_msg( 'GET_PASSWD_LOGIN', $data );
+                $reply = $self->client->send_receive_service_msg( 'GET_PASSWD_LOGIN', $data );
                 $self->log->trace('Auth result ' . Dumper $reply) if $self->log->is_trace;
 
             } else {
@@ -516,7 +518,7 @@ sub handle_login ($self, $page, $action, $reply) {
     if ( $reply->{SERVICE_MSG} eq 'SERVICE_READY' ) {
         $self->log->info('Authentication successul - fetch session info');
         # Fetch the user info from the server
-        $reply = $self->backend->send_receive_service_msg( 'COMMAND',
+        $reply = $self->client->send_receive_service_msg( 'COMMAND',
             { COMMAND => 'get_session_info', PARAMS => {}, API => 2 } );
 
         if ( $reply->{SERVICE_MSG} eq 'COMMAND' ) {
@@ -535,8 +537,8 @@ sub handle_login ($self, $page, $action, $reply) {
             }
             delete $session_info->{authinfo};
 
-            #$self->backend->rekey_session;
-            #my $new_backend_session_id = $self->backend->get_session_id;
+            #$self->client->rekey_session;
+            #my $new_backend_session_id = $self->client->get_session_id;
 
             # Generate a new frontend session to prevent session fixation
             # The backend session remains the same but can not be used by an
@@ -577,7 +579,7 @@ sub _jwt_signature ($self, $data, $jws) {
     my $pkey = $self->auth;
     return encode_jwt(payload => {
         param => $data,
-        sid => $self->backend->get_session_id,
+        sid => $self->client->get_session_id,
     }, key=> $pkey, auto_iat => 1, alg=>'ES256');
 }
 
@@ -603,7 +605,7 @@ sub _recreate_frontend_session {
     map { $self->session->param($_, $keep{$_}) } keys %keep;
 
     # set some data
-    $self->session->param('backend_session_id', $self->backend->get_session_id );
+    $self->session->param('backend_session_id', $self->client->get_session_id );
 
     # move userinfo to own node
     $self->session->param('userinfo', $session_info->{userinfo} || {});
@@ -618,7 +620,7 @@ sub _recreate_frontend_session {
     $self->session->param('login_timestamp', time);
 
     # Check for MOTD, e.g. { level => 'warn', message => 'Beware!' }
-    my $motd = $self->backend->send_receive_command_msg( 'get_motd' );
+    my $motd = $self->client->send_receive_command_msg( 'get_motd' );
     if (ref $motd->{PARAMS} eq 'HASH') {
         $self->log->trace('Got MOTD: '. Dumper $motd->{PARAMS} ) if $self->log->is_trace;
         $self->session->param('motd', $motd->{PARAMS} );
@@ -632,7 +634,7 @@ sub _recreate_frontend_session {
 }
 
 sub _set_menu ($self) {
-    my $reply = $self->backend->send_receive_command_msg('get_menu');
+    my $reply = $self->client->send_receive_command_msg('get_menu');
     my $menu = $reply->{PARAMS} or return;
 
     $self->log->trace('Menu = ' . Dumper $menu) if $self->log->is_trace;
