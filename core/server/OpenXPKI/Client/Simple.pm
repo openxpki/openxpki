@@ -7,11 +7,11 @@ OpenXPKI::Client::Simple - an easy way to connect to the openxpki daemon and run
 
 =head1 DESCRIPTION
 
-Designed as a kind of CLI interface for inline use within scripts. By
-default, it will not handle sessions and create a new session using the
-given auth info on each new instance (subsequent commands within one call
-are run on the same session). If you pass (and maintain) a session object to
-the constructor, it is used to persist the backend session during requests.
+Designed as a kind of CLI interface for inline use within scripts.
+
+It will not handle sessions and create a new session using the given auth info
+on each new instance (subsequent commands within one call are run on the same
+session).
 
 =cut
 
@@ -35,15 +35,6 @@ has auth => (
     isa => 'HashRef',
     lazy => 1,
     default  => sub { return { stack => 'Anonymous', user => undef, pass => undef } }
-);
-
-# ref to the cgi frontend session
-# if undef we behave as "one shot" client
-has 'session' => (
-    is => 'rw',
-    isa => 'Object|Undef',
-    default => undef,
-    lazy => 1,
 );
 
 has '_config' => (
@@ -235,17 +226,10 @@ sub _init_client ($self, $client, $old_client) {
 
     $log->debug("Initialize client");
 
-    my $reply;
-    # if we have a frontend session object, we also create a backend session
-    if ($self->session) {
-        $reply = $self->__reinit_session( $client );
-
     # initialize a fresh backend session
-    } else {
-        $reply = $client->init_session
-            or die "Could not initiate OpenXPKI server session. Stopped";
-        $log->debug("Started volatile session with id: " . $client->get_session_id);
-    }
+    my $reply = $client->init_session
+        or die "Could not initiate OpenXPKI server session. Stopped";
+    $log->debug("Started volatile session with id: " . $client->get_session_id);
 
     # this should not happen
     $reply = $client->send_receive_service_msg('PING') unless($reply);
@@ -578,74 +562,15 @@ sub disconnect {
 
     my $self = shift;
 
-    $self->logger()->debug('Disconnect client');
+    $self->logger->debug('Disconnect client');
 
-    # Use detach if an external session was provided
-    # otherwise the session will be terminated!
-    if ($self->session()) {
-        $self->client->detach();
-    } else {
-        $self->client->logout();
-    }
+    $self->client->logout;
+    $self->client->close_connection;
+    $self->_clear_client;
 
-    $self->client->close_connection();
-
-    $self->_clear_client();
     return $self;
-}
-
-=head2 __reinit_session
-
-Try to reconnect an existing session. Returns the result of init_session
-from the underlying client.
-
-=cut
-
-sub __reinit_session {
-
-    my $self = shift;
-    my $client = shift;
-
-    my $session = $self->session;
-
-    my $old_session =  $session->param('backend_session_id') || undef;
-    $self->logger()->info('old backend session ' . $old_session) if ($old_session);
-
-    my $reply;
-    # Fetch errors on session init
-    eval {
-        $reply = $client->init_session({ SESSION_ID => $old_session });
-    };
-    if (my $eval_err = $EVAL_ERROR) {
-        my $exc = OpenXPKI::Exception->caught();
-        if ($exc && $exc->message() eq 'I18N_OPENXPKI_CLIENT_INIT_SESSION_FAILED') {
-            # The session has gone - start a new one - might happen if the client was idle too long
-            $reply = $client->init_session({ SESSION_ID => undef });
-            $self->logger()->info('Backend session was gone - start a new one');
-        } else {
-            $self->logger()->error('Error creating backend session: ' . $eval_err->{message});
-            $self->logger()->trace($eval_err);
-            die "Backend communication problem";
-        }
-    }
-
-    my $client_session = $client->get_session_id();
-    # logging stuff only
-    if ($old_session && $client_session eq $old_session) {
-        $self->logger()->info('Resume backend session with id ' . $client_session);
-    } elsif ($old_session) {
-        $self->logger()->info('Re-Init backend session ' . $client_session . ' / ' . $old_session );
-    } else {
-        $self->logger()->info('New backend session with id ' . $client_session);
-    }
-    $session->param('backend_session_id', $client_session);
-    $self->logger()->trace( Dumper $session->dataref ) if $self->logger->is_trace;
-
-    return $reply;
-
 }
 
 __PACKAGE__->meta->make_immutable;
 
 __END__
-
