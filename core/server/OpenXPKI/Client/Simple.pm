@@ -72,8 +72,9 @@ has client => (
     is => 'rw',
     isa => 'Object|Undef',
     builder  => '_build_client',
-    lazy => 1,
     clearer => '_clear_client',
+    trigger => \&_init_client,
+    lazy => 1,
 );
 
 has logger => (
@@ -218,37 +219,32 @@ around BUILDARGS => sub {
 
 };
 
-sub _build_client {
-
-    my $self = shift;
-
-    my $timeout = $self->_config()->{'timeout'};
-    my $client = OpenXPKI::Client->new({
+sub _build_client ($self) {
+    my $timeout = $self->_config->{'timeout'};
+    my $client = OpenXPKI::Client->new(
         SOCKETFILE => $self->socket(),
-        ($timeout ? (TIMEOUT => $timeout) : ())
-    });
+        $timeout ? (TIMEOUT => $timeout) : (),
+    );
 
-    if (! defined $client) {
-        die "Could not instantiate OpenXPKI client. Stopped";
-    }
+    $self->_init_client($client);
+    return $client;
+}
 
-    my $log = $self->logger();
+sub _init_client ($self, $client, $old_client) {
+    my $log = $self->logger;
 
     $log->debug("Initialize client");
 
     my $reply;
     # if we have a frontend session object, we also create a backend session
-    if ($self->session()) {
+    if ($self->session) {
         $reply = $self->__reinit_session( $client );
 
-    # Init a fresh backend session
+    # initialize a fresh backend session
     } else {
-
-        $reply = $client->init_session();
-        if (!$reply) {
-            die "Could not initiate OpenXPKI server session. Stopped";
-        }
-        $log->debug("Started volatile session with id: " . $client->get_session_id() );
+        $reply = $client->init_session
+            or die "Could not initiate OpenXPKI server session. Stopped";
+        $log->debug("Started volatile session with id: " . $client->get_session_id);
     }
 
     # this should not happen
@@ -256,14 +252,14 @@ sub _build_client {
     $self->last_reply( $reply );
 
     if ($reply->{SERVICE_MSG} eq 'GET_PKI_REALM') {
-        my $realm = $self->realm();
-        if (! $realm ) {
+        my $realm = $self->realm;
+        if (not $realm) {
             $log->fatal("Found more than one realm but no realm is specified");
             $log->trace("Realms found:" . Dumper (keys %{$reply->{PARAMS}->{PKI_REALMS}}));
             die "No realm specified";
         }
         $log->debug("Selecting realm '$realm'");
-        my $auth = $self->auth();
+        my $auth = $self->auth;
         $reply = $client->send_receive_service_msg('GET_PKI_REALM',{
             PKI_REALM => $realm,
             (!ref $auth->{stack} ? (AUTHENTICATION_STACK => $auth->{stack}) : ()),
@@ -327,7 +323,7 @@ sub _build_client {
             }
             # failed to select a stack
             # TODO might be better to use the first or last auth stack as a default?
-            if (!$auth_stack) {
+            if (not $auth_stack) {
                 $log->fatal("Multiple auth stacks given but none has matching prereqs");
                 die "No auth stack could be selected";
             }
