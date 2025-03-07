@@ -5,7 +5,7 @@ use OpenXPKI -base => 'Mojolicious';
 use re qw( regexp_pattern );
 use Module::Load ();
 use POSIX ();
-use List::Util qw( first any );
+use List::Util qw( first any none );
 use MIME::Base64 qw( decode_base64 );
 
 # CPAN modules
@@ -135,6 +135,7 @@ sub startup ($self) {
     my $socket_owner = $self->{oxi_socket_owner};
     my $socket_group = $self->{oxi_socket_group};
     my $socket_mode = $self->{oxi_socket_mode};
+    my $config_obj = $self->{oxi_config_obj};
 
     # we use the stash to store the flag because $self in helper_oxi_config()
     # refers to an OpenXPKI::Client::Web::Controller instance
@@ -146,26 +147,29 @@ sub startup ($self) {
 
     # Helpers
     $self->helper(oxi_service_config => sub ($sf, $service, $endpoint) {
-        my $cfg = $self->{oxi_config_obj}->endpoint_config($service, $endpoint);
-        return $cfg if any { $service eq $_ } ('webui','healthcheck');
+        my $cfg = $config_obj->endpoint_config($service, $endpoint);
 
-        # Request for non existing endpoint / service
-        # must be handled by the caller
-        return unless(defined $cfg);
+        # Check endpoint and inject global.socket for any service but webui/healthcheck
+        if (none { $service eq $_ } ('webui','healthcheck')) {
+            # Request for non existing endpoint / service
+            # must be handled by the caller
+            return unless defined $cfg;
 
-        # FIXME: needs refactoring (see also Web::Controller)
-        # To create the backend socket for all non WebUI workers the old
-        # Client class expects the socket location in global->socket of
-        # the endpoint config but we want to have this a global value now
-        # Until this is reworked we inject the value from the system config
-        my $socket = $self->{oxi_config_obj}->get('system.backend.socket');
-        $socket ||= '/var/openxpki/openxpki.socket';
-        $cfg->set('global.socket', $socket);
+            # FIXME: needs refactoring (see also Web::Controller)
+            # To create the backend socket for all non WebUI workers the old
+            # Client class expects the socket location in global->socket of
+            # the endpoint config but we want to have this a global value now
+            # Until this is reworked we inject the value from the system config
+            my $socket = $config_obj->get('system.backend.socket');
+            $socket ||= '/var/openxpki/openxpki.socket';
+            $cfg->set('global.socket', $socket);
+        }
+
         return $cfg;
     });
 
     $self->helper(oxi_system_config => sub ($sf) {
-        return $self->{oxi_config_obj}->get_wrapper('system');
+        return $config_obj->get_wrapper('system');
     });
 
     $self->helper(oxi_backend => sub ($sf) {
@@ -183,8 +187,8 @@ sub startup ($self) {
             if (!($client && $client->is_connected())) {
                 $self->log->debug('creating new socket connection for pid '.$PID) unless($client);
                 $client = OpenXPKI::Client->new({
-                    SOCKETFILE => $self->{oxi_config_obj}->get('system.backend.socket') || '/var/openxpki/openxpki.socket',
-                    TIMEOUT => $self->{oxi_config_obj}->get('system.backend.timeout') || 30,
+                    SOCKETFILE => $config_obj->get('system.backend.socket') || '/var/openxpki/openxpki.socket',
+                    TIMEOUT => $config_obj->get('system.backend.timeout') || 30,
                 });
             }
         } catch ($error) {
@@ -206,7 +210,7 @@ sub startup ($self) {
         action => 'index',
     );
 
-    my @services = $self->{oxi_config_obj}->get_keys('service');
+    my @services = $config_obj->get_keys('service');
     for my $service (@services) {
         # fetch the class that consumes OpenXPKI::Client::Service::Role::Info
         my $class = $self->_load_service_class($service) or next;
