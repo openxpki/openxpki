@@ -24,12 +24,6 @@ has allowed_commands => (
     default => sub { [ '' ] },
 );
 
-has client => (
-    is => 'rw',
-    isa => 'OpenXPKI::Client',
-    predicate => 'has_client',
-);
-
 # required by OpenXPKI::Client::Service::Role::Info
 sub declare_routes ($r) {
     $r->get('/healthcheck' => sub { shift->redirect_to('check', command => 'ping') });

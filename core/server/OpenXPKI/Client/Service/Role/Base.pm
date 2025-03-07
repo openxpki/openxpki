@@ -389,6 +389,33 @@ sub _build_log ($self) { OpenXPKI::Log4perl->get_logger }
 
 =head3 client_simple
 
+An instance of L<OpenXPKI::Client>.
+
+=cut
+sub client; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+has client => (
+    is => 'rw',
+    isa => 'OpenXPKI::Client',
+    builder  => '_build_client',
+    predicate => 'has_client',
+    lazy => 1,
+);
+sub _build_client ($self) {
+    try {
+        my $socket = $self->config->get('global.socket');
+        my $timeout = $self->config->get('global.timeout');
+        return OpenXPKI::Client->new(
+            SOCKETFILE => $socket,
+            $timeout ? (TIMEOUT => $timeout) : (),
+        );
+    }
+    catch ($err) {
+        die $self->new_response( 50002 => "Could not create client object: $err" );
+    }
+}
+
+=head3 client_simple
+
 An instance of L<OpenXPKI::Client::Simple> initialized with the current
 endpoint configuration.
 
@@ -405,11 +432,12 @@ has client_simple => (
 sub _build_client_simple ($self) {
     try {
         $self->log->debug('creating new socket connection for pid '.$PID);
-        return OpenXPKI::Client::Simple->new({
+        return OpenXPKI::Client::Simple->new(
             logger => $self->log,
             config => $self->config->get_hash('global'), # realm and locale
             auth => $self->config->get_hash('auth') || {}, # auth config
-        });
+            client => $self->client,
+        );
     }
     catch ($err) {
         die $self->new_response( 50002 => "Could not create client object: $err" );

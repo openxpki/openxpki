@@ -142,15 +142,12 @@ sub _build_session ($self) {
     return $session;
 }
 
-# client (server communication)
-has client => (
-    is => 'rw',
-    isa => 'OpenXPKI::Client',
-    predicate => 'has_client',
+# Overwrite attribute from OpenXPKI::Client::Service::Role::Base
+has '+client' => (
     trigger => \&_init_client,
 );
 
-# Creates an instance of OpenXPKI::Client and switch/create backend session
+# Switch to or create backend session
 sub _init_client ($self, $client) {
     my $id = $client->get_session_id;
     my $old_id = $self->session->param('backend_session_id') || undef;
