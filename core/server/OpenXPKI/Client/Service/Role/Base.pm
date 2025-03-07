@@ -1222,7 +1222,7 @@ B<Returns> nothing and does not throw exceptions.
 =cut
 sub disconnect_backend ($self) {
     return unless $self->has_client_simple;
-    eval { $self->client_simple->disconnect if $self->client_simple };
+    eval { $self->client_simple->disconnect };
 }
 
 =head2 set_pkcs10_and_tid
