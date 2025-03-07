@@ -130,7 +130,7 @@ sub cgi_set_custom_wf_params ($self) {
 
 # required by OpenXPKI::Client::Service::Role::Base
 sub prepare_enrollment_result ($self, $workflow) {
-    my $result = $self->backend->run_command('get_cert',{
+    my $result = $self->client_simple->run_command('get_cert',{
         format => 'PKCS7',
         identifier => $workflow->{context}->{cert_identifier},
     });

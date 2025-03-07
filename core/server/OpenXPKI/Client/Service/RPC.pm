@@ -448,7 +448,7 @@ sub parse_rpc_request_body ($self) {
         my $op = $jwt_header->{method} or die $self->new_response( 40089 );
         $self->operation($op);
 
-        my $backend = $self->backend; # call outside the following try-catch block so OpenXPKI::Exception is not mangled
+        my $backend = $self->client_simple; # call outside the following try-catch block so OpenXPKI::Exception is not mangled
         try {
             # this will die if the certificate was not found
             # TOOD - this call fails if no backend connection can be made which gives a misleading
@@ -480,7 +480,7 @@ sub parse_rpc_request_body ($self) {
 
         $self->pkcs7($self->request->body);
 
-        my $backend = $self->backend; # call outside the following try-catch block so OpenXPKI::Exception is not mangled
+        my $backend = $self->client_simple; # call outside the following try-catch block so OpenXPKI::Exception is not mangled
         try {
             my $pkcs7_content = $backend->run_command('unwrap_pkcs7_signed_data', {
                 pkcs7 => $self->pkcs7,
@@ -593,7 +593,7 @@ sub handle_rpc_request ($self) {
             die $self->new_response( error => 40482, workflow => $wf );
 
         } else {
-            my $actions_avail = $self->backend->run_command('get_workflow_activities', { id => $wf->{id} });
+            my $actions_avail = $self->client_simple->run_command('get_workflow_activities', { id => $wf->{id} });
             if (!(grep { $_ eq $action } @{$actions_avail})) {
                 die $self->new_response( error => 40483, workflow => $wf );
             } else {
@@ -714,11 +714,8 @@ sub openapi_spec {
     });
 
     try {
-        my $client = $self->backend()
-          or die "Could not create OpenXPKI client\n";
-
         if (!$openapi_spec->{info}->{version}) {
-            my $server_version = $client->run_command('version');
+            my $server_version = $self->client_simple->run_command('version');
             $openapi_spec->{info}->{version} = $server_version->{config}->{api} || 'unknown';
         }
 
@@ -739,7 +736,7 @@ sub openapi_spec {
             my $pickup_workflow = $conf->get([$method, 'pickup_workflow']);
             my @pickup_input = $self->get_list_from_legacy_config([$method, 'pickup']);
 
-            my $method_spec = $client->run_command('get_rpc_openapi_spec', {
+            my $method_spec = $self->client_simple->run_command('get_rpc_openapi_spec', {
                 rpc_method => $method,
                 workflow => $wf_type,
                 ($action ? (action => $action) : ()),
@@ -811,7 +808,7 @@ sub openapi_spec {
             $add_component->($_, $method_spec->{components}->{$_}) for keys $method_spec->{components}->%*;
         }
 
-        $client->disconnect();
+        $self->client_simple->disconnect();
     }
     catch ($err) {
         $self->log->error("Unable to query OpenAPI specification from OpenXPKI server: $err");

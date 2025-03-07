@@ -387,22 +387,22 @@ has log => (
 );
 sub _build_log ($self) { OpenXPKI::Log4perl->get_logger }
 
-=head3 backend
+=head3 client_simple
 
 An instance of L<OpenXPKI::Client::Simple> initialized with the current
 endpoint configuration.
 
 =cut
-sub backend; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
-has backend => (
+sub client_simple; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+has client_simple => (
     is => 'rw',
     isa => 'Object|Undef',
     init_arg => undef,
     lazy => 1,
-    predicate => 'has_backend',
-    builder => '_build_backend',
+    predicate => 'has_client_simple',
+    builder => '_build_client_simple',
 );
-sub _build_backend ($self) {
+sub _build_client_simple ($self) {
     try {
         $self->log->debug('creating new socket connection for pid '.$PID);
         return OpenXPKI::Client::Simple->new({
@@ -1000,7 +1000,7 @@ sub pickup_via_datapool ($self, $namespace, $key) {
     }
     $self->log->debug("Pickup via datapool: $namespace.$key" );
 
-    my $wfl = $self->backend->run_command('get_data_pool_entry', {
+    my $wfl = $self->client_simple->run_command('get_data_pool_entry', {
         namespace => $namespace,
         key => $key,
     });
@@ -1038,7 +1038,7 @@ sub pickup_via_attribute ($self, $wf_type, $key, $value) {
     }
     $self->log->debug("Pickup via attribute: $key = $value" );
 
-    my $wfl = $self->backend->run_command('search_workflow_instances', {
+    my $wfl = $self->client_simple->run_command('search_workflow_instances', {
         type => $wf_type,
         attribute => { $key => $value },
         limit => 2
@@ -1062,7 +1062,7 @@ sub _pickup ($self, $wf_id) {
 
     $self->log->debug("Pick up workflow #${wf_id}");
 
-    my $wf_info = $self->backend->run_command(get_workflow_info => { id => $wf_id });
+    my $wf_info = $self->client_simple->run_command(get_workflow_info => { id => $wf_id });
     if (not $wf_info) {
         $self->log->error("Could not fetch workflow info for workflow #$wf_id");
         OpenXPKI::Exception::WorkflowPickupFailed->throw;
@@ -1142,7 +1142,7 @@ Throws an L<OpenXPKI::Client::Service::Response> in case of errors.
 =cut
 sub run_workflow ($self, %args) {
     # create the client object
-    my $client = $self->backend;
+    my $client = $self->client_simple;
     my $wf_info;
 
     try {
@@ -1184,7 +1184,7 @@ sub check_workflow_error ($self, $workflow, $error = '') {
         or ($workflow->{'proc_state'} ne 'finished' and not $workflow->{id})
         or ($workflow->{'proc_state'} eq 'exception')
     ) {
-        my $reply = $self->backend->last_reply || {};
+        my $reply = $self->client_simple->last_reply || {};
         # this is assembled in OpenXPKI::Service::Default->__send_error():
         if (my $err = $reply->{ERROR}) {
             if (my $class = $err->{CLASS}) {
@@ -1204,7 +1204,7 @@ sub check_workflow_error ($self, $workflow, $error = '') {
             }
         }
 
-        my $msg = $self->backend->last_error || $error;
+        my $msg = $self->client_simple->last_error || $error;
         die $self->new_response(
             error => 50003,
             $msg ? (error_message => $msg) : (),
@@ -1221,8 +1221,8 @@ B<Returns> nothing and does not throw exceptions.
 
 =cut
 sub disconnect_backend ($self) {
-    return unless $self->has_backend;
-    eval { $self->backend->disconnect if $self->backend };
+    return unless $self->has_client_simple;
+    eval { $self->client_simple->disconnect if $self->client_simple };
 }
 
 =head2 set_pkcs10_and_tid
