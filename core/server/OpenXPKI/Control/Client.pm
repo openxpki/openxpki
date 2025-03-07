@@ -105,7 +105,6 @@ sub cmd_start ($self) {
     my $force_screen_logging = 0;
     if ($self->opts->{dev}) {
         $ENV{MOJO_MODE} = 'development';
-        $force_screen_logging = 1 if $self->foreground;
     } else {
         $ENV{MOJO_MODE} = 'production';
     }
@@ -179,7 +178,6 @@ sub cmd_start ($self) {
         # daemon owner
         oxi_user => $user, # might be undef
         oxi_group => $group, # might be undef
-        oxi_skip_log_init => $force_screen_logging,
         # config object
         oxi_config_obj => $self->config(),
     });
@@ -387,8 +385,6 @@ Development mode:
 =over
 
 =item * treat all requests as if transmitted over HTTPS,
-
-=item * log to screen (ignore Log4perl configuration),
 
 =item * print detailed Mojolicious exceptions.
 

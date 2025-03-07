@@ -135,11 +135,7 @@ sub startup ($self) {
     my $socket_owner = $self->{oxi_socket_owner};
     my $socket_group = $self->{oxi_socket_group};
     my $socket_mode = $self->{oxi_socket_mode};
-    my $config_obj = $self->{oxi_config_obj};
-
-    # we use the stash to store the flag because $self in helper_oxi_config()
-    # refers to an OpenXPKI::Client::Web::Controller instance
-    $self->defaults('skip_log_init' => 1) if $self->{oxi_skip_log_init};
+    my $config_obj = $self->{oxi_config_obj}; # OpenXPKI::Client::Service::Config
 
     #$self->secrets(['Mojolicious rocks']);
 
@@ -312,14 +308,6 @@ sub startup ($self) {
             $self->log->trace("Webserver QUERY_STRING received via header: $query");
         }
     });
-}
-
-# We implement the config helper to be able to cache configurations across
-# multiple requests.
-sub helper_oxi_config ($self, $service, $endpoint) {
-
-    # this is the instance of the config connector
-    return $self->{oxi_config_obj}->get_hash(['endpoint',$service, $endpoint]);
 }
 
 sub _chown_socket ($self, $file, $user, $group, $mode) {
