@@ -4,6 +4,8 @@ use OpenXPKI -base => 'Mojolicious::Controller';
 # Core modules
 use Module::Load ();
 use List::Util 'any';
+use Log::Log4perl;
+use Log::Log4perl::MDC;
 
 # Project modules
 use OpenXPKI::Log4perl;
@@ -91,6 +93,19 @@ sub index ($self) {
         die sprintf("Error while loading configuration for service '%s': %s", $service_name, $error);
     }
 
+    if ($endpoint) {
+        Log::Log4perl::MDC->put('endpoint', $endpoint);
+        OpenXPKI::Log4perl->set_default_facility( $service_name .'.'. $endpoint );
+    } else {
+        Log::Log4perl::MDC->put('endpoint', undef);
+        OpenXPKI::Log4perl->set_default_facility( $service_name );
+    }
+
+    # replace Mojolicious logger by our own
+    $self->app->log(OpenXPKI::Log4perl->get_logger);
+    $self->stash('mojo.log' => undef); # reset DefaultHelper "log" (i.e. $self->log) which accesses stash "mojo.log"
+
+
     try {
         Module::Load::load($class);
         $service = $class->new(
@@ -118,9 +133,6 @@ sub index ($self) {
         $self->log->trace('Set language to '.$language);
         set_language($language);
     }
-
-    # @todo: is this still required?
-    $self->stash('mojo.log' => undef); # reset DefaultHelper "log" (i.e. $self->log) which accesses stash "mojo.log"
 
     $self->log->info(sprintf 'Incoming %s request: %s %s', uc($self->req->url->base->scheme), $self->req->method, $self->url_for);
     $self->log->trace("Service class $class instantiated");

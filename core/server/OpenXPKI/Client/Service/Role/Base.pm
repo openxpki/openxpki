@@ -640,16 +640,7 @@ has json => (
 # Please note that "around 'build'" is only allowed in roles.
 # https://metacpan.org/dist/Moose/view/lib/Moose/Manual/Construction.pod#BUILD-and-parent-classes
 sub BUILD {}
-after 'BUILD' => sub ($self, $args) {
-
-    if ($self->endpoint) {
-        Log::Log4perl::MDC->put('endpoint', $self->endpoint);
-        OpenXPKI::Log4perl->set_default_facility( $self->service_name.'.'.$self->endpoint );
-    } else {
-        Log::Log4perl::MDC->put('endpoint', undef);
-        OpenXPKI::Log4perl->set_default_facility( $self->service_name );
-    }
-};
+after 'BUILD' => sub ($self, $args) {};
 
 =head2 request_param
 
