@@ -209,7 +209,7 @@ msgstr ""
 "Typen zu finden, kann dieser als Präfix angegeben werden, z.B. IP:%"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_DESC"
-msgstr "Suche von Zertifikaten, die von dieser CA ausgestellt wurden."
+msgstr "Suche nach Zertifikaten, die von dieser CA ausgestellt wurden."
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_FIELD_HINT_LIST"
 msgstr "Erläuterungen zu den Suchfiltern:"
@@ -4079,8 +4079,7 @@ msgstr "Exakte Suche, inklusive Namensraum, Platzhalter erlaubt."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_DESC"
 msgstr ""
-"Suchen Sie nach Workflows entweder anhand einer bekannten Workflow-ID oder "
-"verschiedener Suchparameter."
+"Suchen nach Workflows anhand verschiedener Suchparameter."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_FIELD_HINT_LIST"
 msgstr "Erläuterungen zu den Suchfiltern:"
@@ -4097,11 +4096,8 @@ msgstr "Ergebnisse der Workflow-Suche"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_TITLE"
 msgstr "Suchergebnis"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_BY_ID_TITLE"
-msgstr "Suche nach ID"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_DATABASE_TITLE"
-msgstr "Datenbank durchsuchen"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_BY_ID_DESC"
+msgstr "Suche anhand einer bekannten Workflow-ID."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL"
 msgstr "Workflow-ID"

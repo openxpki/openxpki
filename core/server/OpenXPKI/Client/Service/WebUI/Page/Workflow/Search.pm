@@ -37,7 +37,6 @@ sub init_search ($self, $args) {
 
     $self->set_page(
         label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_LABEL',
-        description => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_DESC',
         breadcrumb => {
             is_root => 1,
             class => 'workflow-search',
@@ -56,7 +55,7 @@ sub init_search ($self, $args) {
     #
     $self->main->add_form(
         action => 'workflow!load',
-        label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_BY_ID_TITLE',
+        description => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_BY_ID_DESC',
         submit_label => 'I18N_OPENXPKI_UI_SEARCH_SUBMIT_LABEL',
     )->add_field(
         name => 'wf_id',
@@ -82,7 +81,7 @@ sub init_search ($self, $args) {
 
     my $form = $self->main->add_form(
         action => 'workflow!search',
-        label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_DATABASE_TITLE',
+        description => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_DESC',
         submit_label => 'I18N_OPENXPKI_UI_SEARCH_SUBMIT_LABEL',
     )
     ->add_field(
