@@ -150,6 +150,7 @@ OpenXPKI/Client/Service/WebUI/Page/Workflow/Result.pm
 OpenXPKI/Client/Service/WebUI/Page/Workflow/Search.pm
 OpenXPKI/Client/Service/WebUI/Page/Workflow/Select.pm
 OpenXPKI/Client/Service/WebUI/Page/Workflow/Start.pm
+OpenXPKI/Client/Service/WebUI/Page/Workflow/RendererRole.pm
 OpenXPKI/Client/Service/WebUI/Page/Workflow/Renderer/Profile.pm
 OpenXPKI/Client/Service/WebUI/Page/Workflow/Renderer/Report.pm
 OpenXPKI/Client/Service/WebUI/Page/Workflow/Renderer/Status.pm

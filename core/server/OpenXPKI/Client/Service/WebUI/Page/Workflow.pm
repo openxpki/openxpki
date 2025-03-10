@@ -18,6 +18,7 @@ use Module::Load ();
 # CPAN modules
 use Date::Parse qw( str2time );
 use MIME::Base64;
+use Moose::Util qw( apply_all_roles does_role is_role );
 
 # Project modules
 use OpenXPKI::Dumper;
@@ -559,7 +560,7 @@ sub render_from_workflow {
 
         $self->__render_workflow_action_head($wf_info, $wf_action);
 
-        # delegation based on activity    ;
+        # delegation based on activity
         if (my $uihandle = $wf_info->{activity}->{$wf_action}->{uihandle}) {
             $self->__delegate_call($uihandle, $args, $wf_action);
         } else {
@@ -766,20 +767,32 @@ sub __delegate_call {
         $self->log->trace("Trying to load UI handler module $pkg") if $self->log->is_trace;
         try {
             Module::Load::load($pkg);
-            $self->log->debug("Delegate rendering to $pkg->$method");
         }
         catch ($err) {
             next if $err =~ /^Can't locate/;
             die $err;
         }
 
-        # call method on delegation class
-        if ($param) {
-            $pkg->$method( $self, $args, $wf_action, $param );
+        my @parameters = ($args, $wf_action, $param ? $param : ());
+
+        # Apply renderer role and call the newly added method
+        if (does_role($pkg, 'OpenXPKI::Client::Service::WebUI::Page::Workflow::RendererRole')) {
+            $self->log->debug("Delegate rendering to renderer role: $pkg->$method");
+            die "$pkg must be a Moose role, but is a class" unless is_role($pkg);
+            apply_all_roles($self, $pkg);
+            die "Renderer role $pkg does not contain requested method $method()" unless $self->can($method);
+            $self->$method( @parameters );
+
+        # Call method on legacy delegation class
+        # FIXME Legacy renderer class
         } else {
-            $pkg->$method( $self, $args, $wf_action );
+            $self->log->debug("Delegate rendering to legacy renderer: $pkg->$method");
+            $pkg->can($method)
+                or die "Renderer class $pkg does not contain requested class method $method()";
+            $pkg->$method( $self, @parameters );
         }
-        return $self;
+
+        return;
     }
 
     die "Could not find UI handler class matching uihandle = $rel_class";
