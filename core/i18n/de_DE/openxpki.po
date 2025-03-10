@@ -152,10 +152,10 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_MINE_LABEL"
 msgstr "Meine Zertifikate"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER"
-msgstr "gültig bis"
+msgstr "Gültig bis"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE"
-msgstr "gültig ab"
+msgstr "Gültig ab"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE"
 msgstr "Profil"
@@ -314,28 +314,28 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_VALID_AT"
 msgstr "gültig zum"
 
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_AUTHORIZE"
-msgstr "Berechtigung als Registrar beantragen"
+msgstr "Berechtigung als Registrar beantragen."
 
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_ESCROW_KEY"
-msgstr "Starte Wiederherstellung des privaten Schlüssels"
+msgstr "Wiederherstellung des privaten Schlüssels."
 
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_LABEL"
 msgstr "Aktion"
 
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_PUBLISH"
-msgstr "<b>Publizierung</b> des Zertifikates anstoßen."
+msgstr "<b>Publizierung</b> des Zertifikates."
 
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_RENEW"
-msgstr "Starte Antrag zur <b>Erneuerung</b>."
+msgstr "<b>Erneuerung</b> beantragen."
 
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_REVOKE"
-msgstr "Starte Antrag zur <b>Sperrung</b>."
+msgstr "<b>Sperrung</b> beantragen."
 
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_SHOW_METADATA"
-msgstr "Meta-Daten des Zertifikates <b>anzeigen</b>."
+msgstr "Meta-Daten <b>anzeigen</b>."
 
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_UPDATE_METADATA"
-msgstr "Meta-Daten des Zertifikates <b>aktualisieren</b>."
+msgstr "Meta-Daten <b>bearbeiten</b>."
 
 msgid "I18N_OPENXPKI_UI_CERT_EXPORT_EXCEEDS_LIMIT"
 msgstr ""
@@ -586,7 +586,7 @@ msgid "I18N_OPENXPKI_UI_DOWNLOAD_DER"
 msgstr "Download als DER-Datei (CER)"
 
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_INSTALL"
-msgstr "Zertifikat im Browser installieren"
+msgstr "Im Browser installieren"
 
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_LABEL"
 msgstr "Download"
@@ -601,7 +601,7 @@ msgid "I18N_OPENXPKI_UI_DOWNLOAD_PKCS7_WITH_ROOT"
 msgstr "Download der Zertifikatskette (PKCS7), inkl. Root"
 
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY"
-msgstr "Download des privaten Schlüssels (PKCS12/PKCS8/Java)"
+msgstr "Download des privaten Schlüssels (PKCS12/PKCS8/Java)."
 
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHORT_DER"
 msgstr "DER (CER)"
@@ -613,10 +613,10 @@ msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHORT_PEM"
 msgstr "PEM (CRT)"
 
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHOW_PEM"
-msgstr "Zeige Zertifikat (PEM)"
+msgstr "Anzeigen (PEM)"
 
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHOW_TEXT"
-msgstr "Zeige Inhalt des Zertifikates (Text + PEM) "
+msgstr "Anzeigen (Text + PEM) "
 
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_TXT"
 msgstr "Download als PEM + Text"
@@ -2612,7 +2612,7 @@ msgstr ""
 "Sie die Einträge entfernen."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_ENDPOINT_AUTH_LABEL"
-msgstr "Antragsteller Autorisierung"
+msgstr "Autorisierter Antragsteller"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_DESC"
 msgstr ""
@@ -2624,7 +2624,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPLOAD_CERTIFICATE_LABEL"
 msgstr "Zertifikat hochladen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_APPROVE_BUTTON"
-msgstr "Antrag Freigeben"
+msgstr "Antrag freigeben"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
 msgstr "Archiviere am"
@@ -3579,7 +3579,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RUN_IN_BACKGROUND_DESC"
 msgstr "Wählen Sie diese Option, um den Workflow im Hintergrund auszuführen."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RUN_IN_BACKGROUND_LABEL"
-msgstr "im Hintergrund ausführen"
+msgstr "Im Hintergrund ausführen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_DESC"
 msgstr "Name des API-Endpunktes für diesen Antrag"

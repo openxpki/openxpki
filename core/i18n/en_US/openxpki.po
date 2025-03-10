@@ -316,7 +316,7 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_VALID_AT"
 msgstr "valid at"
 
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_AUTHORIZE"
-msgstr "Request <b>authorization</b> as registrar"
+msgstr "Request <b>authorization</b> as registrar."
 
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_ESCROW_KEY"
 msgstr "Download key restore file."
@@ -325,19 +325,19 @@ msgid "I18N_OPENXPKI_UI_CERT_ACTION_LABEL"
 msgstr "Action"
 
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_PUBLISH"
-msgstr "Trigger <b>publication</b> of this certificate."
+msgstr "<b>Publish</b> certificate."
 
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_RENEW"
-msgstr "Raise a <b>certificate renewal request</b>."
+msgstr "Certificate <b>renewal</b> request."
 
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_REVOKE"
-msgstr "Raise a <b>certificate revocation request</b>."
+msgstr "Certificate <b>revocation</b> request."
 
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_SHOW_METADATA"
-msgstr "<b>Show</b> the meta information associated with this certificate."
+msgstr "<b>Show</b> meta information."
 
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_UPDATE_METADATA"
-msgstr "<b>Update</b> the meta information associated with this certificate."
+msgstr "<b>Update</b> meta information."
 
 msgid "I18N_OPENXPKI_UI_CERT_EXPORT_EXCEEDS_LIMIT"
 msgstr ""
@@ -618,10 +618,10 @@ msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHORT_PEM"
 msgstr "PEM (CRT)"
 
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHOW_PEM"
-msgstr "Display certificate on screen (PEM)"
+msgstr "Display certificate (PEM)"
 
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHOW_TEXT"
-msgstr "Display certificate on screen (Text + PEM)"
+msgstr "Display certificate (Text + PEM)"
 
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_TXT"
 msgstr "Download text (TXT) format"
