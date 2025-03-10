@@ -262,6 +262,8 @@ if ($auth_args{account_key}) {
         }
     } elsif (defined $opt{'pass'}) {
         $pass = read_password("Please enter your key password: ");
+    } elsif ($ENV{OPENXPKI_CLIENT_KEY_PASSPHRASE}) {
+        $pass = $ENV{OPENXPKI_CLIENT_KEY_PASSPHRASE};
     }
     $auth_args{account_key} = Crypt::PK::ECC->new($auth_args{account_key}, $pass);
 }
@@ -379,6 +381,9 @@ If used without argument, you will be prompted to enter your password.
 If the provided string starts with C<env:> it is assumed to point to
 an environment variable holding the password, any other value is
 considered to be the literal password.
+
+If no option is given, the ENV key I<OPENXPKI_CLIENT_KEY_PASSPHRASE> is
+checked and used as password.
 
 =item --no-auth
 

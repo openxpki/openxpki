@@ -28,11 +28,21 @@ Add the public key to the system configuration at I<system.cli.auth>.
 command "create" => {
 } => sub ($self, $param) {
 
+    my $pass = main::read_password("Please enter password to encrypt the key (empty to skip):");
+    chomp $pass;
+    if ($pass) {
+        my $retype = main::read_password("Please retype password:");
+        chomp $retype;
+        if ($retype ne $pass) {
+            die "Given passwords do not match";
+        }
+    }
+
     #Key generation
     my $pk = Crypt::PK::ECC->new();
     $pk->generate_key('secp256r1');
     return {
-        private => $pk->export_key_pem('private','secret'),
+        private => $pk->export_key_pem('private',$pass),
         public  => $pk->export_key_pem('public'),
         id => $pk->export_key_jwk_thumbprint('SHA256'),
     };
