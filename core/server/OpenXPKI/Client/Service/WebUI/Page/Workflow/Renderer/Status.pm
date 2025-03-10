@@ -1,10 +1,16 @@
 package OpenXPKI::Client::Service::WebUI::Page::Workflow::Renderer::Status;
-use OpenXPKI -class;
+use OpenXPKI -role;
+
+with 'OpenXPKI::Client::Service::WebUI::Page::Workflow::RendererRole';
+
+requires qw(
+    render_from_workflow
+);
 
 use OpenXPKI::DateTime;
 use OpenXPKI::Serialization::Simple;
 
-sub render_process_status ($class, $self, $args, $wf_action, $param = undef) {
+sub render_process_status ($self, $args, $wf_action, $param = undef) {
 
     $self->log->trace( 'render_process_status: ' . Dumper $args ) if $self->log->is_trace;
 
@@ -45,7 +51,7 @@ sub render_process_status ($class, $self, $args, $wf_action, $param = undef) {
 }
 
 
-sub render_system_status ($class, $self, $args, $wf_action, $param = undef) {
+sub render_system_status ($self, $args, $wf_action, $param = undef) {
 
     my $wf_info = $args->{wf_info};
 
@@ -256,7 +262,7 @@ sub render_system_status ($class, $self, $args, $wf_action, $param = undef) {
     }) if (@nodes);
 
 
-    my $c = $class->_render_token_details($self, $wf_info);
+    my $c = $self->_render_token_details($wf_info);
     $critical ||= $c;
 
     if ($critical) {
@@ -268,17 +274,17 @@ sub render_system_status ($class, $self, $args, $wf_action, $param = undef) {
     }
 }
 
-sub render_token_status ($class, $self, $args, $wf_action, $param = undef) {
+sub render_token_status ($self, $args, $wf_action, $param = undef) {
     my $wf_info = $args->{wf_info};
 
     delete $wf_info->{state}->{uihandle};
 
     $self->render_from_workflow({ wf_info => $wf_info });
 
-    $class->_render_token_details($self, $wf_info);
+    $self->_render_token_details($wf_info);
 }
 
-sub _render_token_details ($class, $self, $wf_info) {
+sub _render_token_details ($self, $wf_info) {
     # we fetch the list of tokens to display from the context
     # this allows a user to configure this
     my @token = split /\W+/, $wf_info->{workflow}->{context}->{token};
@@ -340,6 +346,4 @@ sub _render_token_details ($class, $self, $wf_info) {
     return $critical;
 }
 
-__PACKAGE__->meta->make_immutable;
-
-__END__
+1;

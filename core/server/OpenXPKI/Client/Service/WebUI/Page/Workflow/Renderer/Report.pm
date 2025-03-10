@@ -1,11 +1,14 @@
 package OpenXPKI::Client::Service::WebUI::Page::Workflow::Renderer::Report;
-use OpenXPKI -class;
+use OpenXPKI -role;
 
-sub render_report_list {
+with 'OpenXPKI::Client::Service::WebUI::Page::Workflow::RendererRole';
 
-    my $class = shift; # static call
-    my $self = shift; # reference to the wrapping workflow/result
-    my $args = shift;
+requires qw(
+    call_persisted_response
+    script_url
+);
+
+sub render_report_list ($self, $args, $wf_action, $param = undef) {
 
     my $wf_info = $args->{wf_info}->{workflow};
 
@@ -47,3 +50,5 @@ sub render_report_list {
         },
     });
 }
+
+1;

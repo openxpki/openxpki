@@ -1,5 +1,13 @@
 package OpenXPKI::Client::Service::WebUI::Page::Workflow::Renderer::Profile;
-use OpenXPKI -class;
+use OpenXPKI -role;
+
+with 'OpenXPKI::Client::Service::WebUI::Page::Workflow::RendererRole';
+
+requires qw(
+    render_input_field
+    wf_token_field
+    get_form_buttons
+);
 
 # Core modules
 use List::Util qw( any first );
@@ -8,13 +16,7 @@ use List::Util qw( any first );
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::i18n qw( i18nGettext );
 
-sub render_profile_select {
-
-    my $class = shift; # static call
-    my $self = shift; # reference to the wrapping workflow/result
-    my $args = shift;
-    my $wf_action = shift;
-    my $param = shift || '';
+sub render_profile_select ($self, $args, $wf_action, $param = '') {
 
     $self->log->trace('render_profile_select with args: ' . Dumper $args) if $self->log->is_trace;
 
@@ -106,13 +108,7 @@ sub render_profile_select {
     }
 }
 
-sub render_subject_form {
-
-    my $class = shift; # static call
-    my $self = shift; # reference to the wrapping workflow/result
-    my $args = shift;
-    my $wf_action = shift;
-    my $param = shift;
+sub render_subject_form ($self, $args, $wf_action, $param = undef) {
 
     my %extra;
     # Parameters given in config via:
@@ -258,12 +254,7 @@ sub render_subject_form {
     }
 }
 
-sub render_key_select {
-
-    my $class = shift; # static call
-    my $self = shift; # reference to the wrapping workflow/result
-    my $args = shift;
-    my $wf_action = shift;
+sub render_key_select ($self, $args, $wf_action, $param = undef) {
 
     $self->log->trace( 'render_key_select with args: ' . Dumper $args ) if $self->log->is_trace;
 
@@ -368,13 +359,7 @@ sub render_key_select {
     $form->add_field(%{ $_ }) for @fields;
 }
 
-sub render_server_password {
-
-    my $class = shift; # static call
-    my $self = shift; # reference to the wrapping workflow/result
-    my $args = shift;
-    my $wf_action = shift;
-    my $param = shift;
+sub render_server_password ($self, $args, $wf_action, $param = undef) {
 
     $self->log->trace( 'render_server_password with args: ' . Dumper $args ) if $self->log->is_trace;
 
@@ -435,6 +420,4 @@ sub render_server_password {
     $form->add_field(%{ $_ }) for @fields;
 }
 
-__PACKAGE__->meta->make_immutable;
-
-__END__
+1;
