@@ -133,7 +133,7 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOES_NOT_EXIST"
 msgstr "Certificate does not exists"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER"
-msgstr "Certificate Identifier"
+msgstr "Identifier"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_ISSUER"
 msgstr "Issuer"
@@ -261,7 +261,7 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_VALIDITY_PLACEHOLDER"
 msgstr "select criteria and timestamp"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SERIAL"
-msgstr "Certificate Serial"
+msgstr "Serial"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_STATUS"
 msgstr "Status"

@@ -133,7 +133,7 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOES_NOT_EXIST"
 msgstr "Zertifikat existiert nicht"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER"
-msgstr "Zertifikats-Identifier"
+msgstr "Identifier"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_ISSUER"
 msgstr "Aussteller"

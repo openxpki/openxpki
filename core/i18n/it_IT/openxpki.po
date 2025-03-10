@@ -333,7 +333,7 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_VALIDITY_PLACEHOLDER"
 msgstr "Ricerca Certificato"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SERIAL"
-msgstr "Numero di serie del certificato"
+msgstr "Numero di serie"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_STATUS"
