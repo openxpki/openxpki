@@ -46,6 +46,4 @@ sub render_report_list {
             empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
         },
     });
-
-    return $self;
 }

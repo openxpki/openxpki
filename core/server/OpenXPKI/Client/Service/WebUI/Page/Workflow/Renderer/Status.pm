@@ -42,8 +42,6 @@ sub render_process_status ($class, $self, $args, $wf_action, $param = undef) {
             empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
         }
     });
-
-    return $self;
 }
 
 
@@ -268,9 +266,6 @@ sub render_system_status ($class, $self, $args, $wf_action, $param = undef) {
     } else {
         $self->status->success('I18N_OPENXPKI_UI_STATUS_SYSTEM_OK');
     }
-
-    return $self;
-
 }
 
 sub render_token_status ($class, $self, $args, $wf_action, $param = undef) {
@@ -281,8 +276,6 @@ sub render_token_status ($class, $self, $args, $wf_action, $param = undef) {
     $self->render_from_workflow({ wf_info => $wf_info });
 
     $class->_render_token_details($self, $wf_info);
-
-    return $self;
 }
 
 sub _render_token_details ($class, $self, $wf_info) {

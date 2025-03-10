@@ -104,9 +104,6 @@ sub render_profile_select {
                 data => \@profiledesc
         }});
     }
-
-    return $self;
-
 }
 
 sub render_subject_form {
@@ -259,9 +256,6 @@ sub render_subject_form {
                 data => \@fielddesc
         }});
     }
-
-    return $self;
-
 }
 
 sub render_key_select {
@@ -372,9 +366,6 @@ sub render_key_select {
         submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
     );
     $form->add_field(%{ $_ }) for @fields;
-
-    return $self;
-
 }
 
 sub render_server_password {
@@ -442,9 +433,6 @@ sub render_server_password {
         submit_label => $wf_action_info->{button} || 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
     );
     $form->add_field(%{ $_ }) for @fields;
-
-    return $self;
-
 }
 
 __PACKAGE__->meta->make_immutable;
