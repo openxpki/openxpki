@@ -4,12 +4,7 @@ use OpenXPKI -class;
 use OpenXPKI::DateTime;
 use OpenXPKI::Serialization::Simple;
 
-sub render_process_status {
-
-    my $class = shift; # static call
-    my $self = shift; # reference to the wrapping workflow/result
-    my $args = shift;
-    my $wf_action = shift;
+sub render_process_status ($class, $self, $args, $wf_action, $param = undef) {
 
     $self->log->trace( 'render_process_status: ' . Dumper $args ) if $self->log->is_trace;
 
@@ -52,11 +47,7 @@ sub render_process_status {
 }
 
 
-sub render_system_status {
-
-    my $class = shift; # static call
-    my $self = shift; # reference to the wrapping workflow/result
-    my $args = shift;
+sub render_system_status ($class, $self, $args, $wf_action, $param = undef) {
 
     my $wf_info = $args->{wf_info};
 
@@ -267,66 +258,8 @@ sub render_system_status {
     }) if (@nodes);
 
 
-    # we fetch the list of tokens to display from the context
-    # this allows a user to configure this
-    my @token = split /\s*,\s*/, $wf_info->{workflow}->{context}->{token};
-
-    $self->log->trace("context: " . Dumper $wf_info->{workflow}->{context} ) if $self->log->is_trace;
-
-
-    foreach my $type (@token) {
-
-        my $token = $self->send_command_v2( 'list_active_aliases', { type => $type, check_online => 1 } );
-
-        $self->log->trace("result: " . Dumper $token ) if $self->log->is_trace;
-
-        my @result;
-        foreach my $alias (@{$token}) {
-
-            my $className = '';
-            if ($alias->{status} ne 'ONLINE') {
-                $className = 'oxi-status-danger';
-                $critical = 1;
-            }
-
-            push @result, [
-                $alias->{alias},
-                $alias->{identifier},
-                $alias->{status},
-                $alias->{notbefore} + 0,
-                $alias->{notafter} + 0,
-                $className
-            ];
-        }
-
-        $self->main->add_section({
-            type => 'grid',
-            className => 'token',
-            content => {
-                label => 'I18N_OPENXPKI_UI_TOKEN_OF_TYPE ' . $type,
-                columns => [
-                    { sTitle => "I18N_OPENXPKI_UI_TOKEN_ALIAS" },
-                    { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER" },
-                    { sTitle => "I18N_OPENXPKI_UI_TOKEN_STATUS" },
-                    { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE", format => 'timestamp'},
-                    { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER", format => 'timestamp'},
-                    { sTitle => "_className"},
-                ],
-                data => \@result,
-                empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
-            }
-        });
-
-    }
-
-    $self->main->add_section({
-        type => 'text',
-        content => {
-            label => '',
-            description => 'I18N_OPENXPKI_UI_SUPPORT_TRAILER'
-        }
-    });
-
+    my $c = $class->_render_token_details($self, $wf_info);
+    $critical ||= $c;
 
     if ($critical) {
         $self->status->error('I18N_OPENXPKI_UI_STATUS_SYSTEM_CRITICAL');
@@ -340,18 +273,19 @@ sub render_system_status {
 
 }
 
-sub render_token_status {
-
-    my $class = shift; # static call
-    my $self = shift; # reference to the wrapping workflow/result
-    my $args = shift;
-
+sub render_token_status ($class, $self, $args, $wf_action, $param = undef) {
     my $wf_info = $args->{wf_info};
 
     delete $wf_info->{state}->{uihandle};
 
     $self->render_from_workflow({ wf_info => $wf_info });
 
+    $class->_render_token_details($self, $wf_info);
+
+    return $self;
+}
+
+sub _render_token_details ($class, $self, $wf_info) {
     # we fetch the list of tokens to display from the context
     # this allows a user to configure this
     my @token = split /\W+/, $wf_info->{workflow}->{context}->{token};
@@ -368,7 +302,8 @@ sub render_token_status {
 
             my $className = '';
             if ($alias->{status} ne 'ONLINE') {
-                $className = 'danger';
+                $className = 'oxi-status-danger';
+                $critical = 1;
             }
 
             push @result, [
@@ -409,8 +344,7 @@ sub render_token_status {
         }
     });
 
-    return $self;
-
+    return $critical;
 }
 
 __PACKAGE__->meta->make_immutable;
