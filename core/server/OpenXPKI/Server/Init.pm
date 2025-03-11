@@ -299,6 +299,7 @@ sub __do_init_api {
 sub __do_init_api2 {
     ##! 1: "init api2"
     my $api = OpenXPKI::Server::API2->new(
+        disable_protection => 1,
         enable_acls => 0,
         # acl_rule_accessor => sub { CTX('config')->get_hash('acl.rules.' . CTX('session')->data->role ) },
         log => CTX('log')->system,
