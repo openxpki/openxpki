@@ -213,8 +213,8 @@ around BUILDARGS => sub {
 sub _build_client ($self) {
     my $timeout = $self->_config->{'timeout'};
     my $client = OpenXPKI::Client->new(
-        SOCKETFILE => $self->socket(),
-        $timeout ? (TIMEOUT => $timeout) : (),
+        socketfile => $self->socket(),
+        $timeout ? (timeout => $timeout) : (),
     );
 
     $self->_init_client($client);

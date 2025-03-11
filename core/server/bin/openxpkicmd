@@ -173,11 +173,11 @@ if($params{instance}){
 debug(sprintf("Socketfile: %s", $params{socketfile}));
 
 my $reply;
-my $client = OpenXPKI::Client->new({
-    SOCKETFILE => $params{socketfile},
-    TIMEOUT  => $params{timeout},
-    API_VERSION => 2,
-});
+my $client = OpenXPKI::Client->new(
+    socketfile => $params{socketfile},
+    timeout => $params{timeout},
+    api_version => 2,
+);
 
 
 if (! defined $client) {

@@ -531,9 +531,9 @@ sub __connect_openxpki_daemon ($socket_file) {
         ## a use would disturb the server initialization
         require OpenXPKI::Client;
         # this only creates the class but does not fire up the socket!
-        my $cc= OpenXPKI::Client->new({
-            SOCKETFILE => $socket_file,
-        });
+        my $cc= OpenXPKI::Client->new(
+            socketfile => $socket_file,
+        );
 
         # try to talk to the daemon
         my $reply = $cc->send_receive_service_msg('PING');

@@ -28,9 +28,9 @@ my $socketfile = $ENV{OPENXPKI_CLIENT_SOCKETFILE} || '/var/openxpki/openxpki.soc
 sub __client {
     if (!$client) {
         eval{
-            $client = OpenXPKI::Client->new({
-                SOCKETFILE => $socketfile,
-            });
+            $client = OpenXPKI::Client->new(
+                socketfile => $socketfile,
+            );
             $client->init_session();
             DEBUG("Got new client: " . $client->session_id());
         };

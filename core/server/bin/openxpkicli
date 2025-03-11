@@ -260,10 +260,10 @@ OpenXPKI::Log4perl->init_screen_logger($params{debug} ? 'DEBUG' : 'WARN');
 debug(sprintf("Socketfile: %s", $params{socketfile}));
 
 my $reply;
-my $client = OpenXPKI::Client->new({
-    SOCKETFILE => $params{socketfile},
-    TIMEOUT  => $params{timeout},
-    });
+my $client = OpenXPKI::Client->new(
+    socketfile => $params{socketfile},
+    timeout  => $params{timeout},
+);
 
 
 if (! defined $client) {

@@ -108,10 +108,10 @@ sub connect {
         # instantiating the client means starting it as all initialization is
         # done in the constructor
         $self->oxi_client(
-            OpenXPKI::Client->new({
-                TIMEOUT => 5,
-                SOCKETFILE => $self->socket_file,
-            })
+            OpenXPKI::Client->new(
+                timeout => 5,
+                socketfile => $self->socket_file,
+            )
         );
     }
     catch ($err) {

@@ -87,29 +87,6 @@ has _socket => (
     predicate => 'has_socket',
 );
 
-around BUILDARGS => sub {
-
-    my $orig = shift;
-    my $class = shift;
-
-    # old call format using hash
-    if ( @_ == 1 && ref $_[0] eq 'HASH' ) {
-        my %params = %{$_[0]};
-        foreach my $key (qw(TIMEOUT SOCKETFILE TRANSPORT SERIALIZATION SERVICE  API_VERSION)) {
-            #warn $params->{$key};
-            if ($params{$key}) {
-                $params{lc($key)} = $params{$key};
-                delete $params{$key};
-            }
-        }
-
-        return $class->$orig(%params);
-    } else {
-        return $class->$orig(@_);
-    }
-
-};
-
 sub __build_socket {
 
     my $self = shift;
@@ -509,9 +486,8 @@ OpenXPKI::Client - OpenXPKI Client base library
 
     use OpenXPKI::Client;
     my $client = OpenXPKI::Client->new(
-        {
-             SOCKETFILE => './foo.socket',
-        });
+        socketfile => './foo.socket',
+    );
 
     # create new session
     $client->init_session();

@@ -405,8 +405,8 @@ sub _build_client ($self) {
         my $socket = $self->config->get('global.socket');
         my $timeout = $self->config->get('global.timeout');
         return OpenXPKI::Client->new(
-            SOCKETFILE => $socket,
-            $timeout ? (TIMEOUT => $timeout) : (),
+            socketfile => $socket,
+            $timeout ? (timeout => $timeout) : (),
         );
     }
     catch ($err) {
