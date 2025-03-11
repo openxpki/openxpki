@@ -221,7 +221,7 @@ sub _build_client ($self) {
     return $client;
 }
 
-sub _init_client ($self, $client, $old_client) {
+sub _init_client ($self, $client, $old_client = undef) {
     my $log = $self->logger;
 
     $log->debug("Initialize client");
