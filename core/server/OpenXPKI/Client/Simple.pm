@@ -109,19 +109,7 @@ I<auth.stack> and appropriate keys for the chosen login method.
 An instance of Log4perl can be passed via I<logger>, default is to log to
 STDERR with loglevel error.
 
-=head3 Explicit Config from File
-
-Pass the name of the config file to use as string to the new method, the
-file must be in the standard config ini format and have at least a section
-I<global> providing I<socket> and I<realm>.
-
-If an I<auth> section exists, it is mapped as is to the I<auth> parameter.
-
-You can set a loglevel and logfile location using I<log.file> and
-I<log.level>. Loglevel must be a Log4perl Level name without the leading
-dollar sign (e.g. level=DEBUG).
-
-=head3 Implicit Config from File
+=head3 Implicit config from file
 
 If you do not pass a I<config> argument to the new method, the class tries
 to find a config file at
@@ -130,14 +118,15 @@ to find a config file at
 
 =item string set in the environment OPENXPKI_CLIENT_CONF
 
-=item $HOME/.openxpki.conf
-
 =item /etc/openxpki/client.conf
 
 =back
 
-The same rules as above apply, in case you pass auth or logger as explicit
-arguments the settings in the file are ignored.
+If an I<auth> section exists, it is mapped as is to the I<auth> parameter.
+
+You can set a loglevel and logfile location using I<log.file> and
+I<log.level>. Loglevel must be a Log4perl Level name without the leading
+dollar sign (e.g. level=DEBUG).
 
 =cut
 
@@ -145,69 +134,47 @@ around BUILDARGS => sub {
 
     my $orig = shift;
     my $class = shift;
-    my $args = shift;
+    my %args = (@_ == 1 and ref $_[0]) ? $_[0]->%* : @_;
 
-    # Called with a scalar = use as config file name
-    my $file;
-    if ($args && !ref $args) {
-        die "Given config file does not exist or is not readable!" unless (-e $args && -r $args);
-        $file = $args;
-        $args = {};
-
-    } elsif (!$args || !$args->{config}) {
-        $file = '/etc/openxpki/client.conf';
+    if (not $args{config}) {
+        my $file = '/etc/openxpki/client.conf';
         if ($ENV{OPENXPKI_CLIENT_CONF}) {
             $file = $ENV{OPENXPKI_CLIENT_CONF};
             die "OPENXPKI_CLIENT_CONF is set but files does not exist or is not readable!" unless (-e $file && -r $file);
 
-        } elsif ($ENV{HOME} && -d $ENV{HOME} && -r $ENV{HOME}) {
-
-            my $path = File::Spec->canonpath( $ENV{HOME} );
-            my $cand = File::Spec->catdir( ( $path, '.openxpki.conf' ) );
-            $file = $cand if (-e $cand && -r $cand);
-
         }
 
-        if (!-r $file ) {
-            OpenXPKI::Client::Simple::_build_logger()->fatal("Unable to open configuration file $file");
+        if (not -r $file) {
+            OpenXPKI::Client::Simple::_build_logger->fatal("Unable to open configuration file $file");
             die "Unable to open configuration file $file";
         }
-    }
 
-    if ($file) {
         my $conf;
-        if (!read_config( $file => $conf )) {
-            OpenXPKI::Client::Simple::_build_logger()->fatal("Unable to read configuration file $file");
+        if (not read_config( $file => $conf )) {
+            OpenXPKI::Client::Simple::_build_logger->fatal("Unable to read configuration file $file");
             die "Unable to read configuration file $file";
         }
 
-        $args->{config} = $conf->{global};
+        $args{config} = $conf->{global};
+        $args{auth} //= $conf->{auth} if $conf->{auth};
 
-        if ($conf->{auth} && !$args->{auth}) {
-            $args->{auth} = $conf->{auth};
-        }
-
-        if ($conf->{log} && !$args->{logger}) {
+        if ($conf->{log} and not $args{logger}) {
             my $level = Log::Log4perl::Level::to_priority( uc( $conf->{log}->{level} || 'ERROR' ));
             if ($conf->{log}->{file}) {
-                Log::Log4perl->easy_init( { level   => $level,
-                    file  => ">>" . $conf->{log}->{file} } );
+                Log::Log4perl->easy_init({
+                    level => $level,
+                    file => '>>' . $conf->{log}->{file},
+                });
             } else {
                 Log::Log4perl->easy_init($level);
             }
-            $args->{logger} = Log::Log4perl->get_logger();
+            $args{logger} = Log::Log4perl->get_logger();
         }
 
-        if ($args->{logger}) {
-            $args->{logger}->trace('Config read from file ' . $file);
-        }
-
-        return $class->$orig($args);
-    } else {
-
-        return $class->$orig($args);
+        $args{logger}->trace('Config read from file ' . $file) if $args{logger};
     }
 
+    return $class->$orig(%args);
 };
 
 sub _build_client ($self) {
