@@ -101,10 +101,9 @@ command "get_data_pool_entry" => {
 
     # decryption
     if (($params->decrypt) && (my $encryption_key = $result->{encryption_key})) {
-        # asymmetric decryption of password safe entry
-        if (my ($safe_id) = $encryption_key =~ m{ \A p7:(.*) }xms ) {
-            ##! 16: "Asymmetric decryption (safe_id = $safe_id)"
-            # $safe_id: alias of password safe token, e.g. server-vault-1
+        # internal passwordsafe key encrypted with a main key
+        if (my ($safe_id) = $encryption_key =~ m{ \A \w+:(.*) }xms ) {
+            ##! 16: "Datapool decryption for key $encryption_key)"
             $value = $self->decrypt_passwordsafe($safe_id, $value); # from ::Util
         }
         # symmetric decryption

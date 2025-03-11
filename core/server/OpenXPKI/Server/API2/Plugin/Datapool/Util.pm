@@ -198,25 +198,18 @@ signature_for get_realm_encryption_key => (
     positional => [ 'Str' ],
 );
 sub get_realm_encryption_key ($self, $realm) {
-    my $token = $self->api->get_default_token();
 
-    # get symbolic name of current password safe (e.g. 'passwordsafe1')
     my $safe_id = $self->get_active_safe_id();
 
     ##! 16: 'current password safe id: ' . $safe_id
 
-    # the password safe is only used to encrypt the key for a symmetric key
-    # (volatile vault). using such a key should speed up encryption and
-    # reduce data size.
-
-    my $result;
-
-    # check if we already have a symmetric key for this password safe
+    # check if we already have a symmetric key for the active main key
+    # this is just a pointer to another datapool item holding the real key
     ##! 16: 'fetch associated symmetric key for password safe: ' . $safe_id
     my $data = $self->api->get_data_pool_entry(
         pki_realm => $realm,
         namespace => 'sys.datapool.pwsafe',
-        key       => 'p7:' . $safe_id,
+        key       => $safe_id,
     );
 
     #
@@ -233,6 +226,7 @@ sub get_realm_encryption_key ($self, $realm) {
             KEY       => $keyinfo->{key},
         };
     }
+
     #
     # Create new key
     #
@@ -291,14 +285,14 @@ sub create_realm_encryption_key ($self, $arg) {
         namespace  => 'sys.datapool.keys',
         key        => $key_id,
         value      => $enc_value,
-        enc_key_id => 'p7:' . $safe_id, # 'p7' = PKCS#7 encryption,
+        enc_key_id => 'token:'.$safe_id, # token prefix = crypto layer
     );
 
     # save password safe -> key id mapping
     $self->set_entry(
         pki_realm => $arg->pki_realm,
         namespace => 'sys.datapool.pwsafe',
-        key       => 'p7:' . $safe_id, # 'p7' = PKCS#7 encryption,
+        key       => $safe_id,
         value     => $key_id,
         $arg->expiration_date ? (expiration_date => $arg->expiration_date) : (),
         force => 1,
@@ -333,13 +327,13 @@ sub rekey_realm_encryption_key ($self, $key_id, $safe_id) {
     OpenXPKI::Exception->throw(message => 'Key not found', params => { key => $key_id })
         unless($result);
 
-    my ($old_safe_id) = $result->{encryption_key} =~ m{ \A p7:(.*) }xms;
+    my ($old_safe_id) = $result->{encryption_key} =~ m{ \A \w+:(.*) }xms;
     my $plain_key_value = $self->decrypt_passwordsafe($old_safe_id, $result->{datapool_value});
 
     # use the safe_id from the arguments or get the current one
     $safe_id ||= $self->get_active_safe_id();
 
-    if ('p7:'.$safe_id eq $result->{encryption_key}) {
+    if ($safe_id eq $old_safe_id) {
         CTX('log')->system()->warn(sprintf('Rekey request with target equal current token (Token: %s, Key: %s)', $safe_id, $key_id));
         # We issue a warning but proceed with the rekeying: this is required to
         # upgrade to OAEP without issuing a new vault token.
@@ -361,32 +355,36 @@ sub rekey_realm_encryption_key ($self, $key_id, $safe_id) {
         namespace  => 'sys.datapool.keys',
         key        => $key_id,
         value      => $enc_value,
-        enc_key_id => 'p7:' . $safe_id, # 'p7' = PKCS#7 encryption,
+        enc_key_id => 'token:'.$safe_id, # token prefix = crypto layer
         force => 1,
     );
 
     CTX('log')->audit('system')->info('Datapool encryption key was rekeyed', {
-        source => $old_safe_id,
+        source => $result->{encryption_key},
         target => $safe_id,
         keyid  => $key_id,
     });
 
 }
 
-# Asymmetric encryption using the given token
-# Note: encryption does not need any key an can be done using
-# the keyless default token.
+
+# encryption using the given token
 signature_for encrypt_passwordsafe => (
     method => 1,
     positional => [ 'Str', 'Str' ],
 );
 sub encrypt_passwordsafe ($self, $safe_id, $value) {
-    # $safe_id is the alias name of the token, e.g. server-vault-1
-    my $cert = $self->api->get_certificate_for_alias(alias => $safe_id);
-    OpenXPKI::Exception->throw(message => 'Certificate not found', params => { alias => $safe_id })
-        unless $cert && $cert->{data};
-    ##! 16: "retrieved cert: id = " . $cert->{identifier}
 
+    my $token = CTX('crypto_layer')->get_token({ TYPE => 'datasafe', NAME => $safe_id });
+    # Glue code to switch between old and new token layer
+    # this is a symmetric key token
+    if (ref $token eq 'OpenXPKI::Crypto::Token::Vault') {
+        OpenXPKI::Exception->throw(
+            message => 'vault token is not online',
+            params => { alias => $safe_id }
+        ) unless($token->online());
+        return $token->encrypt( $value );
+    }
 
     # support OAEP padding mode - IMHO superfluous but required by some HSM vendors
     # and regulatory bodies to meet formal requirements
@@ -410,9 +408,8 @@ sub encrypt_passwordsafe ($self, $safe_id, $value) {
     }
 
     ##! 16: 'asymmetric encryption via passwordsafe ' . $safe_id
-    return $self->api->get_default_token->command({
+    return $token->command({
         COMMAND => 'pkcs7_encrypt',
-        CERT    => $cert->{data},
         CONTENT => $value,
         %PADDING
     });
@@ -424,17 +421,26 @@ signature_for decrypt_passwordsafe => (
     positional => [ 'Str', 'Str' ],
 );
 sub decrypt_passwordsafe ($self, $safe_id, $enc_value) {
-    # $safe_id is the alias name of the token, e.g. server-vault-1
-    my $safe_token = CTX('crypto_layer')->get_token({ TYPE => 'datasafe', 'NAME' => $safe_id})
+
+    my $token = CTX('crypto_layer')->get_token({ TYPE => 'datasafe', 'NAME' => $safe_id })
         or OpenXPKI::Exception->throw(
             message => 'Token of password safe referenced in datapool entry not available',
             params => { token_id  => $safe_id }
         );
 
+    if (ref $token eq 'OpenXPKI::Crypto::Token::Vault') {
+        OpenXPKI::Exception->throw(
+            message => 'vault token is not online',
+            params => { alias => $safe_id }
+        ) unless($token->online());
+        return $token->decrypt( $enc_value );
+    }
+
     ##! 16: "asymmetric decryption via passwordsafe '$safe_id'"
+
     my $value;
     try {
-        $value = $safe_token->command({ COMMAND => 'pkcs7_decrypt', PKCS7 => $enc_value });
+        $value = $token->command({ COMMAND => 'pkcs7_decrypt', PKCS7 => $enc_value });
     }
     catch ($err) {
         if ($err->isa('OpenXPKI::Exception')) {
@@ -518,21 +524,34 @@ sub fetch_symmetric_key ($self, $realm, $key_id) {
     };
 }
 
+=head2 get_active_safe_id
+
+Return the key identifier of the active datavault token.
+
+=cut
+
 sub get_active_safe_id {
     my $self = shift;
 
+    my $safe_id;
+
     # if ignore_validity is set we accept expired tokens, see #744
-    my %validity;
     if (CTX('config')->get(["system","datavault","ignore_validity"])) {
-        %validity = ( validity => {
-            notbefore => undef,
-            notafter => DateTime->from_epoch( epoch => 0 ),
-        });
+        $safe_id = $self->api->get_token_alias_by_type(
+            type => 'datasafe',
+            validity => {
+                notbefore => undef,
+                notafter => DateTime->from_epoch( epoch => 0 ),
+            }
+        );
+    } else {
+        $safe_id = $self->api->get_token_alias_by_type(
+            type => 'datasafe'
+        );
     }
 
-    return $self->api->get_token_alias_by_type(
-        type => 'datasafe', %validity
-    );
+    return $safe_id;
+
 }
 
 # Read encryption from volatile vault and decrypt it.

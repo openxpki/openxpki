@@ -902,7 +902,8 @@ sub __alias_print {
         return "  not set\n\n";
     }
 
-    my $cert = CTX('api2')->get_cert( identifier => $alias->{identifier}, format => 'DBINFO' );
+    my $cert;
+    $cert = CTX('api2')->get_cert( identifier => $alias->{identifier}, format => 'DBINFO' ) if ($alias->{identifier});
 
     my @out;
     push @out, "  Alias     : $alias->{alias}\n";

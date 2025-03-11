@@ -142,6 +142,9 @@ before '_route_call' => sub {
         ($location) = split('\.', $path, 2);
     }
 
+    # prevent undef warnings if path was empty
+    $location //= '';
+
     ##! 16: "_route_call interception on $location was ($path)"
     # system or realm acces - no prefix
     if ( any { $_ eq  $location } ('system', 'realm', 'endpoint')) {
