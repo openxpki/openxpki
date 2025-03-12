@@ -12,16 +12,12 @@ use List::Util;
 
 # CPAN modules
 use JSON;
-use Type::Params qw( signature_for );
 
 # Project modules
 use OpenXPKI::i18n qw( i18nGettext );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Types;
 use OpenXPKI::Server::API2::Plugin::Workflow::Util;
-
-# should be done after imports to safely disable warnings in Perl < 5.36
-use experimental 'signatures';
 
 # Sources for "type" and "format" (subtype):
 #   OpenXPKI::Client::Service::WebUI::Page::Workflow->__render_fields()
