@@ -218,6 +218,7 @@ OpenXPKI/Crypto/SecretManager.pm
 OpenXPKI/Crypto/SecretRole.pm
 OpenXPKI/Crypto/Secret/Plain.pm
 OpenXPKI/Crypto/TokenManager.pm
+OpenXPKI/Crypto/Token/Vault.pm
 OpenXPKI/Crypto/Toolkit.pm
 OpenXPKI/Crypto/VolatileVault.pm
 
@@ -704,7 +705,6 @@ bin/openxpkiadm
 bin/openxpkictl
 bin/openxpkicli
 bin/openxpkicmd
-bin/openxpkictl-client-debug
 
 # cgi stuff
 cgi-bin/scepv3.fcgi
