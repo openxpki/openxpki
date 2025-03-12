@@ -329,4 +329,31 @@ sub generate_uid {
     return $uid;
 }
 
+=head2 is_systemd
+
+Checks if we are running under systemd and returns a I<TRUE> value in that case,
+I<FALSE> otherwise.
+
+=cut
+sub is_systemd {
+    shift if ($_[0] // '') eq __PACKAGE__; # support call via -> and ::
+
+    # check 1: INVOCATION_ID
+    return 1 if defined $ENV{INVOCATION_ID};
+
+    # check 2: cgroup
+    return 1 if eval {
+        my $content = do {
+            local $INPUT_RECORD_SEPARATOR;
+            my $fh;
+            open $fh, '<', "/proc/$$/cgroup" or return;
+            <$fh>;
+        };
+        chomp $content;
+        return 1 if $content =~ /system\.slice/;
+    };
+
+    return 0;
+}
+
 1;

@@ -110,7 +110,7 @@ sub init_or_fallback ($class, @args) {
 
 =head2 init_screen_logger
 
-Initialize Log4perl with a basic screen logger configuration.
+Initialize Log4perl with a basic screen (or journald) logger configuration.
 
 B<Parameters:>
 
@@ -128,25 +128,28 @@ sub init_screen_logger ($class, @args) {
     # if someone calls us with :: instead of ->, $class contains first argument instead of class name
     unshift(@args, $class) if $class ne __PACKAGE__;
 
-    my $prio = shift(@args) // 'WARN';
-
     _add_patternlayout_spec();
 
     Log::Log4perl::Logger->reset if Log::Log4perl->initialized; # avoid re-initialization warning
 
-    my $pattern = (uc($prio) eq 'DEBUG' or uc($prio) eq 'TRACE')
-        ? '%d %p{3} %m [%i{verbose}]%n'
+    my $prio = uc(shift(@args)) // 'WARN';
+    my $appender = OpenXPKI::Util->is_systemd ? 'Journald' : 'Screen';
+
+    my $pattern = ($prio eq 'DEBUG' or $prio eq 'TRACE')
+        ? '%p{3} [%c] %m [%i{verbose}]%n'
         : '%m%n';
 
-    my $config = {
-        'log4perl.rootLogger' => uc($prio).', SCREEN',
-        'log4perl.category.connector' => 'ERROR, SCREEN', # explicitely silence Connector
-        'log4perl.appender.SCREEN' => 'Log::Log4perl::Appender::Screen',
-        'log4perl.appender.SCREEN.layout' => 'Log::Log4perl::Layout::PatternLayout',
-        'log4perl.appender.SCREEN.layout.ConversionPattern' => $pattern,
-    };
+    my $config = <<"EOF";
+        log4perl.rootLogger = $prio, $appender
+        log4perl.category.connector = ERROR, $appender
+        log4perl.appender.Screen                          = Log::Log4perl::Appender::Screen
+        log4perl.appender.Screen.layout                   = Log::Log4perl::Layout::PatternLayout
+        log4perl.appender.Screen.layout.ConversionPattern = $pattern
+        log4perl.appender.Journald        = OpenXPKI::Log4perl::Appender::Journald
+        log4perl.appender.Journald.layout = Log::Log4perl::Layout::NoopLayout
+EOF
 
-    Log::Log4perl->init($config);
+    Log::Log4perl->init(\$config);
 }
 
 # Add custom PatternLayout placeholder %i which shows all MDC variables
