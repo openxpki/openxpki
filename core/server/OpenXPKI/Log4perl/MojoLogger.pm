@@ -9,18 +9,17 @@ use Mojo::Util qw( monkey_patch );
 our $LOGGERS_BY_NAME = {};
 
 has category => (
-    is => 'rw',
+    is => 'ro',
     isa => 'Str',
     required => 1,
-    trigger => sub {
-        my ($self, $new, $old) = @_;
-        $self->_logger(Log::Log4perl->get_logger($new)) if (not $old or $old ne $new);
-    },
 );
 
 has _logger => (
     is => 'rw',
     isa => 'Log::Log4perl::Logger',
+    init_arg => undef,
+    lazy => 1,
+    default => sub { Log::Log4perl->get_logger(shift->category) },
 );
 
 has history => (
@@ -37,7 +36,7 @@ has max_history_size => (
     default => 10,
 );
 
-
+# Static method: constructor replacement
 sub get_logger {
     my ($class, $category) = @_;
 
@@ -47,7 +46,7 @@ sub get_logger {
     # Have we created it previously?
     return $LOGGERS_BY_NAME->{$category} if exists $LOGGERS_BY_NAME->{$category};
 
-    # Use our Mojo::Log compatible logger
+    # Instantiate ourself
     my $logger = $class->new( category => $category );
     $LOGGERS_BY_NAME->{$category} = $logger; # save it in global structure
 
@@ -136,7 +135,7 @@ OpenXPKI::Log4perl::MojoLogger - Log::Log4perl and Mojo::Log compatible logger
 
   use OpenXPKI::Log4perl::MojoLogger;
 
-  $c->log( OpenXPKI::Log4perl::MojoLogger->new( category => 'openxpki.x' ) );
+  $c->log( OpenXPKI::Log4perl::MojoLogger->get_logger('openxpki.x') );
 
 =head1 DESCRIPTION:
 
@@ -285,10 +284,3 @@ This returns the last few logged messages as an array reference in the format:
 =head2 C<max_history_size>
 
 Maximum number of messages to be kept in the history buffer (see above). Defaults to 10.
-
-=head1 COPYRIGHT & LICENSE
-
-Original code copyright 2009-2019 Breno G. de Oliveira, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
