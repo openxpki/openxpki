@@ -5,10 +5,10 @@ use OpenXPKI qw( -class -typeconstraints );
 use File::Spec;
 
 # CPAN modules
-use List::Util qw(any);
+use List::Util qw( any );
 
 # Project modules
-use OpenXPKI::i18n qw( set_language set_locale_prefix);
+use OpenXPKI::i18n qw( set_language set_locale_prefix );
 use OpenXPKI::Config::Backend;
 
 extends 'Connector::Multi';
@@ -45,7 +45,15 @@ has credential_backend => (
     is => 'rw',
     isa => 'Bool',
     default => 0
-    );
+);
+
+has services => (
+    is => 'rw',
+    isa => 'ArrayRef',
+    init_arg => undef,
+    lazy => 1,
+    default => sub { [ sort shift->get_keys('service') ] },
+);
 
 # Here we do the chain loading of a serialized/signed config
 sub BUILD {

@@ -206,8 +206,7 @@ sub startup ($self) {
         action => 'index',
     );
 
-    my @services = $config_obj->get_keys('service');
-    for my $service (@services) {
+    for my $service ($config_obj->services->@*) {
         # fetch the class that consumes OpenXPKI::Client::Service::Role::Info
         my $class = $self->_load_service_class($service) or next;
         # inject "service_name" into stash, but only for this route
