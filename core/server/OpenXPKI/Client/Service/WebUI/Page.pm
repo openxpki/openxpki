@@ -16,7 +16,7 @@ use Data::UUID;
 # Project modules
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Client::Service::WebUI::Response;
-
+use OpenXPKI::Log4perl;
 
 =pod
 
@@ -30,10 +30,13 @@ L<Log::Log4perl::Logger> or L<OpenXPKI::Log4perl::MojoLogger>.
 
 has log => (
     is => 'ro',
-    isa => 'Object',
+    isa => duck_type( [qw(
+           trace    debug    info    warn    error    fatal
+        is_trace is_debug is_info is_warn is_error is_fatal
+    )] ),
     init_arg => undef,
     lazy => 1,
-    default => sub ($self) { return $self->webui->log },
+    default => sub { OpenXPKI::Log4perl->get_logger },
 );
 
 =head2 REQUEST PARAMETERS

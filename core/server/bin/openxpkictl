@@ -75,12 +75,12 @@ sub get_file_pod ($filename) {
 show_pod(-verbose => 1) unless @ARGV;
 
 #
-# Argument parsing
+# Argument parsing (global arguments)
 #
 my $verbosity = 0;
-my %opt = ('verbose' => \$verbosity);
+my %global_opts = ('verbose' => \$verbosity);
 Getopt::Long::Configure('pass_through','bundling');
-GetOptions( \%opt, qw(
+GetOptions( \%global_opts, qw(
     help|?
     man
     verbose|v+
@@ -89,33 +89,32 @@ GetOptions( \%opt, qw(
 ));
 Getopt::Long::Configure('no_pass_through');
 
-show_pod(-exitstatus => 0, -verbose => 2) if $opt{man};
+show_pod(-exitstatus => 0, -verbose => 2) if $global_opts{man};
 
 # --help without arguments: show our own POD
-show_pod(-verbose => 1) if ($opt{help} and not @ARGV);
+show_pod(-verbose => 1) if ($global_opts{help} and not @ARGV);
 
 #
 # Log4perl
 #
-my $l4p_level = 'ERROR';
+$global_opts{l4p_level} = 'WARN';
 if ($verbosity == 1) {
-    $l4p_level = 'INFO';
+    $global_opts{l4p_level} = 'INFO';
 } elsif ($verbosity == 2) {
-    $l4p_level = 'DEBUG';
+    $global_opts{l4p_level} = 'DEBUG';
 } elsif ($verbosity > 2) {
-    $l4p_level = 'TRACE';
+    $global_opts{l4p_level} = 'TRACE';
 }
-OpenXPKI::Log4perl->init_screen_logger($l4p_level);
+OpenXPKI::Log4perl->init_screen_logger($global_opts{l4p_level});
 
 #
 # Attributes defined by OpenXPKI::Control::Role
 #
 my %role_attrs = ();
-# $args->{SILENT} = $opt{quiet} ? 1 : 0;
-if ($opt{config}) {
-    $role_attrs{config_path} = File::Spec->rel2abs($opt{config});
-} elsif ($opt{instance}) {
-    $role_attrs{config_path} = sprintf '/etc/openxpki/%s/config.d/', $opt{instance};
+if ($global_opts{config}) {
+    $role_attrs{config_path} = File::Spec->rel2abs($global_opts{config});
+} elsif ($global_opts{instance}) {
+    $role_attrs{config_path} = sprintf '/etc/openxpki/%s/config.d/', $global_opts{instance};
 }
 
 #
@@ -133,7 +132,7 @@ if ($command eq 'version') {
 
     if (not $scope) {
         # --help COMMAND: show brief help with available scopes
-        if ($opt{help}) {
+        if ($global_opts{help}) {
             show_pod(
                 -verbose => 1,
                 -oxi_pod => "=head1 USAGE\n\n$Script $command SCOPE [OPTIONS]\n\nSCOPEs:\n\n%%CONTROL_SCOPES%%\n",
@@ -148,7 +147,7 @@ if ($command eq 'version') {
 
     Module::Load::load($class);
 
-    if ($opt{help} or $command eq 'help') {
+    if ($global_opts{help} or $command eq 'help') {
         # oxi help SCOPE: show scope POD
         show_pod(
             -oxi_pod => sprintf(
@@ -174,10 +173,10 @@ if ($command eq 'version') {
     }
 
     # Evaluate (extract) command+scope specific options
-    my %options;
+    my %opts;
     if (my @getopts = $class->getopt_params($command)) {
         TRACE('GetOptions parameters: ' . Dumper \@getopts);
-        GetOptions( \%options, @getopts ) or exit 1;
+        GetOptions( \%opts, @getopts ) or exit 1;
     }
 
     # Extract command+scope specific positional args AFTER any --options.
@@ -186,16 +185,16 @@ if ($command eq 'version') {
     # Instantiate scope class
     my $control = $class->new(
         %role_attrs,
-        scalar keys %options ? (opts => \%options) : (),
-        scalar @args ? (args => \@args) : (),
+        global_opts => \%global_opts,
+        opts => \%opts,
+        args => \@args,
     );
-
 
     # Execute command
     TRACE(sprintf 'Calling %s->%s with options (%s) and arguments (%s)',
         $class,
         $command,
-        join(', ', map { "$_=$options{$_}" } sort keys %options),
+        join(', ', map { "$_=$opts{$_}" } sort keys %opts),
         join(', ', @args)
     );
     try {

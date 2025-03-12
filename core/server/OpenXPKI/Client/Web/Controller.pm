@@ -95,10 +95,10 @@ sub index ($self) {
 
     if ($endpoint) {
         Log::Log4perl::MDC->put('endpoint', $endpoint);
-        OpenXPKI::Log4perl->set_default_facility( $service_name .'.'. $endpoint );
+        OpenXPKI::Log4perl->set_default_facility("openxpki.client.service.$service_name.$endpoint");
     } else {
         Log::Log4perl::MDC->put('endpoint', undef);
-        OpenXPKI::Log4perl->set_default_facility( $service_name );
+        OpenXPKI::Log4perl->set_default_facility("openxpki.client.service.$service_name");
     }
 
     # replace Mojolicious logger by our own

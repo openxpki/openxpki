@@ -66,6 +66,12 @@ has args => (
     default => sub { [] },
 );
 
+has global_opts => (
+    is => 'ro',
+    isa => 'HashRef',
+    default => sub { {} },
+);
+
 has opts => (
     is => 'ro',
     isa => 'HashRef',

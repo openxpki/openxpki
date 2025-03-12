@@ -22,7 +22,6 @@ use Mojo::Util qw( extract_usage getopt url_escape monkey_patch );
 use Mojo::File;
 
 # Project modules
-use OpenXPKI::Util;
 use OpenXPKI::Log4perl;
 use OpenXPKI::Client::Service::Config;
 
@@ -55,7 +54,7 @@ has '+config_path' => (
 );
 
 has silent => (
-    is => 'rw',
+    is => 'ro',
     isa => 'Bool',
     init_arg => undef,
     lazy => 1,
@@ -63,19 +62,27 @@ has silent => (
 );
 
 has foreground => (
-    is => 'rw',
+    is => 'ro',
     isa => 'Bool',
     init_arg => undef,
     lazy => 1,
-    default => sub { $_[0]->systemd_mode || $_[0]->opts->{nd} ? 1 : 0 },
+    default => sub { $_[0]->systemd_mode || $_[0]->dev_mode || $_[0]->opts->{nd} ? 1 : 0 },
 );
 
 has systemd_mode => (
-    is => 'rw',
+    is => 'ro',
     isa => 'Bool',
     init_arg => undef,
     lazy => 1,
     default => sub { $_[0]->opts->{systemd} ? 1 : 0 },
+);
+
+has dev_mode => (
+    is => 'ro',
+    isa => 'Bool',
+    init_arg => undef,
+    lazy => 1,
+    default => sub { $_[0]->opts->{dev} ? 1 : 0 },
 );
 
 # required by OpenXPKI::Control::Role
@@ -104,16 +111,47 @@ sub cmd_start ($self) {
         return 0;
     }
 
-    my $force_screen_logging = 0;
-    if ($self->opts->{dev}) {
+    OpenXPKI::Log4perl->set_default_facility('openxpki.client.server');
+    my $log = OpenXPKI::Log4perl->get_logger;
+
+    $log->logdie("--dev and --systemd are mutual exclusive options")
+        if ($self->dev_mode and $self->systemd_mode);
+
+    $log->logdie("Attempt to run background process with console logging: this leads to hidden log messages.\n".
+                 "Please set the log target (system.logger.target) either to 'file' or 'none'")
+        if ($self->config->system_logger_target eq 'console' and not $self->foreground);
+
+    my $setup_log4perl = 1;
+
+    # Development mode
+    if ($self->dev_mode) {
         $ENV{MOJO_MODE} = 'development';
+        $log->warn('Development mode - skip log4perl setup and log to screen');
+        $setup_log4perl = 0;
+
+    # Production mode
     } else {
         $ENV{MOJO_MODE} = 'production';
+
+        # Re-Initialize Log4perl with client config
+        my $log4perl_conf = $self->config->log4perl_conf(
+            current_level => $self->global_opts->{l4p_level},
+        );
+        if ($log->is_trace) {
+            # trace log this BEFORE Log4perl re-init, i.e. if "openxpkictl -vvv ..." was called
+            my $indented = $log4perl_conf;
+            $indented =~ s/^/    /gm;
+            $log->trace("Generated Log4perl configuration:\n$indented");
+        }
+        if ($self->config->system_logger_target eq 'none') {
+            $log->warn('Logging will be disabled according to config (system.logger.target: none)')
+        } else {
+            $log->info('Setup logging according to config in ' . $self->config_path);
+        };
+
+        OpenXPKI::Log4perl->init_or_fallback( \$log4perl_conf );
     }
 
-    my $log = OpenXPKI::Log4perl->get_logger('openxpki.client');
-
-    $log->info('Foreground development mode: logging to console (Log4perl config will be ignored)') if $force_screen_logging;
     $log->trace('ENV = ' . Dumper \%ENV) if $log->is_trace;
 
     my $user = $self->opts->{user} || $self->cfg->{user};
@@ -175,7 +213,7 @@ sub cmd_start ($self) {
 
     $daemon->build_app('OpenXPKI::Client::Web' => {
         %web_params,
-        # Mojo attribute: pass the client root logger
+        # Mojo attribute: explicitely pass our logger to Mojolicious
         log => $log,
         # daemon owner
         oxi_user => $user, # might be undef
@@ -378,6 +416,12 @@ Target group for the socket file (default: same as --group or current group)
 Permissions for the socket file (default: use umask upon creation or keep
 current permissions if socket file already exists)
 
+=item B<--no-detach>
+
+=item B<--nd>
+
+Do not fork, i.e. do not send daemon to background.
+
 =item B<--dev>
 
 =item B<-d>
@@ -386,17 +430,14 @@ Development mode:
 
 =over
 
+=item * stay in foreground (equals C<--nd>).
+
 =item * treat all requests as if transmitted over HTTPS,
 
 =item * print detailed Mojolicious exceptions.
 
+=item * print all messages to screen (ignores any Log4perl configuration).
+
 =back
-
-=item B<--no-detach>
-
-=item B<--nd>
-
-Do not fork, i.e. do not send daemon to background. Together with --dev this
-will show all messages in the console.
 
 =back

@@ -395,8 +395,7 @@ has transaction_id => (
 
 =head2 log
 
-A logger object, per default set
-C<OpenXPKI::Log4perl-E<gt>get_logger>.
+A logger object, per default set to C<OpenXPKI::Log4perl-E<gt>get_logger>.
 
 =cut
 has log => (
@@ -406,10 +405,8 @@ has log => (
         is_trace is_debug is_info is_warn is_error is_fatal
     )] ),
     lazy => 1,
-    builder => '_build_log',
+    default => sub ($self) { OpenXPKI::Log4perl->get_logger },
 );
-sub _build_log ($self) { OpenXPKI::Log4perl->get_logger }
-
 
 =head1 METHODS
 

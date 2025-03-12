@@ -371,8 +371,7 @@ sub _config_env_keys ($self) {
 
 =head3 log
 
-A logger object, per default set
-C<OpenXPKI::Log4perl-E<gt>get_logger('openxpki.client.' . $self-E<gt>service_name)>.
+A logger object, per default set to C<OpenXPKI::Log4perl-E<gt>get_logger>.
 
 =cut
 sub log; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
