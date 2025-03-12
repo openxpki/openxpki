@@ -98,13 +98,14 @@ sub init_or_fallback ($class, @args) {
 
     # use config if given
     if ($config) {
-        Log::Log4perl::Logger->reset; # avoid re-initialization warning
+        Log::Log4perl::Logger->reset if Log::Log4perl->initialized; # avoid re-initialization warning
         Log::Log4perl->init($config);
     # or fall back on screen logger unless there is a running config
     } elsif (not Log::Log4perl->initialized) {
         $class->init_screen_logger;
     }
-    Log::Log4perl->get_logger('')->warn($_) for @warnings;
+
+    Log::Log4perl->get_logger($default_facility // '')->warn($_) for @warnings;
 }
 
 =head2 init_screen_logger
