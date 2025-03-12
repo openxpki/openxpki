@@ -86,7 +86,7 @@ sub index ($self) {
         # FIXME we need to rework the O:C:Simple to make it reusable too
         if (any { $service_name eq $_ } ('webui','healthcheck')) {
             %backend = ( client => $self->oxi_client() );
-            $self->log->info("Adding backend for $service_name in $$");
+            $self->log->debug("Adding backend for $service_name in $$");
         }
     }
     catch ($error) {
