@@ -140,6 +140,7 @@ sub init_screen_logger ($class, @args) {
 
     my $config = {
         'log4perl.rootLogger' => uc($prio).', SCREEN',
+        'log4perl.category.connector' => 'ERROR, SCREEN', # explicitely silence Connector
         'log4perl.appender.SCREEN' => 'Log::Log4perl::Appender::Screen',
         'log4perl.appender.SCREEN.layout' => 'Log::Log4perl::Layout::PatternLayout',
         'log4perl.appender.SCREEN.layout.ConversionPattern' => $pattern,
