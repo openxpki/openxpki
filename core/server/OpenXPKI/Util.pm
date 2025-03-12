@@ -126,8 +126,8 @@ sub asterisk_to_sql_wildcard {
 
 =head2 filter_hash
 
-Filters the given I<HashRef> so that at maximum the resulting hash only the given
-keys.
+Filters the given I<HashRef> so that at maximum the resulting hash only contains
+the given keys.
 
 B<Parameters>
 

@@ -7,7 +7,7 @@ with 'OpenXPKI::Control::Role';
 
 Control OpenXPKI service handler (web server) processes.
 
-Configuration path: C<system.client>
+Configuration path: C<system.server>
 
 =head1 OpenXPKI::Control::Client
 
@@ -34,7 +34,7 @@ has cfg => (
         return {
             pid_file => '/run/openxpki-clientd.pid',
             socket_file => '/var/openxpki/openxpki-clientd.socket',
-            %{$self->config()->get_hash('system.server')}
+            $self->config->get_hash('system.server')->%*,
         };
     }
 );
@@ -44,7 +44,9 @@ has config => (
     isa => 'Connector',
     lazy => 1,
     default => sub ($self) {
-        return OpenXPKI::Client::Service::Config->new( config_dir => $self->config_path() );
+        return OpenXPKI::Client::Service::Config->new(
+            config_dir => $self->config_path
+        );
     }
 );
 
