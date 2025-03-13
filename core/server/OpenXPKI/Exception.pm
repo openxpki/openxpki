@@ -43,6 +43,10 @@ use Exception::Class (
     'OpenXPKI::Exception::WorkflowPickupFailed' => {
         isa => 'OpenXPKI::Exception',
     },
+    # Error while executing a command
+    'OpenXPKI::Exception::InvalidConfig' => {
+        isa => 'OpenXPKI::Exception',
+    },
 );
 
 my $log4perl_logger;

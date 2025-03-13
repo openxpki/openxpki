@@ -34,8 +34,9 @@ sub START {
     if ($EVAL_ERROR) {
         ##! 4: "compilation of driver " . $class . " failed\n$EVAL_ERROR"
         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_CRYPTO_API_EVAL_ERROR',
+            message => 'Unable to load backend class for crypto api',
             params  => {
+                class => $class,
                 error_message => $EVAL_ERROR,
             },
         );
