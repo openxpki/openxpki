@@ -65,7 +65,19 @@ Usage example: simple multi-part pin
 
 Required: total number of secret parts
 
+=head2 kcv
+
+The argon2 value of the user supplied input to validate against.
+
+Implementation is done in the instance classes.
+
 =cut
+
+has kcv => (
+    is => 'ro',
+    isa => 'Str',
+    predicate => 'has_kcv',
+);
 
 # required by OpenXPKI::Crypto::SecretRole
 sub required_part_count; # prevent the Moose role from complaining
@@ -124,6 +136,14 @@ sub set_secret {
             index => $index,
         }
     ) if ($index < 1 or $index > $self->required_part_count);
+
+
+    # does not yet work for multipart secrets
+    if ($self->has_kcv) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_UI_SECRET_UNLOCK_KCV_MISMATCH",
+        ) unless (Crypt::Argon2::argon2id_verify($self->kcv, $part));
+    }
 
     $self->set_part($index-1, $part);
 

@@ -195,6 +195,7 @@ sub _create_object {
         require OpenXPKI::Crypto::Secret::Plain;
         my $secret = OpenXPKI::Crypto::Secret::Plain->new(
             part_count => 1,
+            ($secret_def->{kcv} ? (kcv => $secret_def->{kcv}) : ()),
         );
         if (defined $secret_def->{value}) {
             $secret->set_secret($secret_def->{value});
@@ -206,7 +207,9 @@ sub _create_object {
     elsif ('plain' eq $method) {
         require OpenXPKI::Crypto::Secret::Plain;
         return OpenXPKI::Crypto::Secret::Plain->new(
+            # KCV and Multi-Part is not yet working
             part_count => ($secret_def->{total_shares} || 1),
+            ($secret_def->{kcv} ? (kcv => $secret_def->{kcv}) : ()),
         );
     }
     elsif ('split' eq $method) {
@@ -616,16 +619,6 @@ sub set_part {
 
     ##! 2: "setting $alias" . (defined $part ? ", part $part" : "")
     $obj->set_secret($value, $part); # $part might be undef
-
-    if ($def->{kcv} and $obj->is_complete) {
-        my $password = $obj->get_secret;
-        if (!Crypt::Argon2::argon2id_verify($def->{kcv}, $password)) {
-            $obj->thaw($old_secret);
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_UI_SECRET_UNLOCK_KCV_MISMATCH",
-            );
-        }
-    }
 
     $self->_save_to_cache($def->{_realm}, $alias, $def->{cache}, $obj->freeze);
     ##! 1: "finished"
