@@ -76,8 +76,8 @@ sub hash {
         # argon2id_pass($passwd, $salt, $t_cost, $m_factor, $parallelism, $tag_size)
         $computed_secret = Crypt::Argon2::argon2id_pass( $passwd, $salt,
             ($params->{time} || 3),
-            ($params->{memory} || '32M'),
-            ($params->{p} || 1),
+            ($params->{memory} || '2G'),
+            ($params->{p} || 4),
             ($params->{tag} || 16)
         );
         $prefix = '';
