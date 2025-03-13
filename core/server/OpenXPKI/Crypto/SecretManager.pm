@@ -212,6 +212,17 @@ sub _create_object {
             ($secret_def->{kcv} ? (kcv => $secret_def->{kcv}) : ()),
         );
     }
+    elsif ('kdf' eq $method) {
+        require OpenXPKI::Crypto::Secret::KDF;
+        ##! 32: $secret_def->{kdf_param}
+        my $secret = OpenXPKI::Crypto::Secret::KDF->new(
+            ($secret_def->{kcv} ? (kcv => $secret_def->{kcv}) : ()),
+            kdf => $secret_def->{kdf},
+            salt => $secret_def->{salt},
+            kdf_param => ($secret_def->{kdf_param} || {}),
+        );
+        return $secret;
+    }
     elsif ('split' eq $method) {
         my %split_secret_args = (
             quorum_k => $secret_def->{required_shares},
