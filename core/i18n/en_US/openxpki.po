@@ -3738,10 +3738,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_NO_ACTION"
 msgstr "Request invalid - no action"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_AFTER_LABEL"
-msgstr "last update after"
+msgstr "update after"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_BEFORE_LABEL"
-msgstr "last update before"
+msgstr "update before"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_HINT"
 msgstr ""
