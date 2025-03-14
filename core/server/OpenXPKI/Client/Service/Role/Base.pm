@@ -1315,6 +1315,8 @@ always an L<OpenXPKI::Client::Service::Response> is returned.
 
 =cut
 sub cgi_safe_sub :prototype($&) ($self, $handler_sub) {
+    OpenXPKI::Log4perl->set_default_facility( $self->config_obj->log_facility );
+
     my $response;
     try {
         $response = $handler_sub->();
