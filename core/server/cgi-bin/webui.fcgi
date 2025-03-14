@@ -188,7 +188,7 @@ while (my $cgi = CGI::Fast->new("")) {
             return $client->new_response(503 => 'I18N_OPENXPKI_UI_BACKEND_UNREACHABLE');
         }
 
-        $client->backend($backend_client);
+        $client->client($backend_client);
 
         #
         # Detect realm
