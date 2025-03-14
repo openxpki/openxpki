@@ -100,10 +100,10 @@ msgid "I18N_OPENXPKI_UI_BULK_RECHECK_LABEL"
 msgstr "Re-run Checks"
 
 msgid "I18N_OPENXPKI_UI_BULK_REJECT_CRR_LABEL"
-msgstr "Reject Selected"
+msgstr "Reject Revocation"
 
 msgid "I18N_OPENXPKI_UI_BULK_REJECT_CSR_LABEL"
-msgstr "Reject Selected"
+msgstr "Reject Request"
 
 msgid "I18N_OPENXPKI_UI_BUTTON_ACME_APPROVE_ACCOUNT_LABEL"
 msgstr "Approve Account"

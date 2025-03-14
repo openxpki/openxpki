@@ -100,10 +100,10 @@ msgid "I18N_OPENXPKI_UI_BULK_RECHECK_LABEL"
 msgstr "Erneut überprüfen"
 
 msgid "I18N_OPENXPKI_UI_BULK_REJECT_CRR_LABEL"
-msgstr "Ausgewählte ablehnen"
+msgstr "Sperrung ablehnen"
 
 msgid "I18N_OPENXPKI_UI_BULK_REJECT_CSR_LABEL"
-msgstr "Ausgewählte ablehnen"
+msgstr "Antrag ablehnen"
 
 msgid "I18N_OPENXPKI_UI_BUTTON_ACME_APPROVE_ACCOUNT_LABEL"
 msgstr "Nutzerkonto genehmigen"
