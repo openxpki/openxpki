@@ -171,13 +171,15 @@ The following client configuration nodes are read:
 
     # basic Log4perl configuration
     logger:
-        # root log level (default: WARN)
+        # Default log level (default: WARN)
         level: DEBUG
-        # target for service logs (server always logs to "console")
-        #   file    - (default) one file per service: /var/log/openxpki/<svc>.log
-        #   console - journald if running as systemd unit, STDOUT otherwise
+
+        # Target for service logs (server always logs to "console")
+        #   "file"    = (default) /var/log/openxpki/<service>.log
+        #   "console" = journald if running as systemd unit, STDOUT otherwise
         target: console
-        # complete Log4perl config that overrides everything
+
+        # Complete Log4perl config that overrides everything.
         # (either a multiline string or key:value pairs)
         config: |-
             log4perl.oneMessagePerAppender = 1
