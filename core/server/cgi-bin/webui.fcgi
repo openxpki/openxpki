@@ -154,7 +154,7 @@ while (my $cgi = CGI::Fast->new("")) {
 
     my $mojo_req = OpenXPKI::Client::Service::WebUI->cgi_to_mojo_request;
 
-    my $client = OpenXPKI::Client::Service::WebUI->new(
+    my $webui = OpenXPKI::Client::Service::WebUI->new(
         service_name => 'webui',
         config_obj => $config,
         webserver_env => \%ENV,
@@ -168,9 +168,9 @@ while (my $cgi = CGI::Fast->new("")) {
 
     my $session_front;
 
-    my $response = $client->cgi_safe_sub(sub {
-        my $session_cookie = $client->session_cookie;
-        $session_front = $client->session;
+    my $response = $webui->cgi_safe_sub(sub {
+        my $session_cookie = $webui->session_cookie;
+        $session_front = $webui->session;
 
         #
         # Backend (server communication)
@@ -185,27 +185,27 @@ while (my $cgi = CGI::Fast->new("")) {
         }
         catch ($err) {
             $log->error("Error creating backend client: $err");
-            return $client->new_response(503 => 'I18N_OPENXPKI_UI_BACKEND_UNREACHABLE');
+            return $webui->new_response(503 => 'I18N_OPENXPKI_UI_BACKEND_UNREACHABLE');
         }
 
-        $client->client($backend_client);
+        $webui->client($backend_client);
 
         #
         # Detect realm
         #
         my $detected_realm;
 
-        my $realm_mode = $client->realm_mode;
+        my $realm_mode = $webui->realm_mode;
         $log->debug("Realm mode = $realm_mode");
 
         # PATH mode
         if ("path" eq $realm_mode) {
             # Set the path to the directory component of the script, this
             # automagically creates seperate cookies for path based realms
-            $session_cookie->path($client->url_path->to_string);
+            $session_cookie->path($webui->url_path->to_string);
 
             # Interpret last part of the URL path as realm
-            my $script_realm = $client->url_path->parts->[-1];
+            my $script_realm = $webui->url_path->parts->[-1];
             if ('webui' eq $script_realm) {
                 $script_realm = '' ;
                 $log->warn('Unable to read realm from URL path');
@@ -223,7 +223,7 @@ while (my $cgi = CGI::Fast->new("")) {
             elsif (not $session_front->param('pki_realm')) {
                 if (not $conf->{realm}->{$script_realm}) {
                     $log->debug('No realm for ident: ' . $script_realm );
-                    return $client->new_response(406 => 'I18N_OPENXPKI_UI_NO_SUCH_REALM_OR_SERVICE');
+                    return $webui->new_response(406 => 'I18N_OPENXPKI_UI_NO_SUCH_REALM_OR_SERVICE');
                 } else {
                     $detected_realm = $conf->{realm}->{$script_realm};
                 }
@@ -256,16 +256,16 @@ while (my $cgi = CGI::Fast->new("")) {
         }
 
         # custom HTTP headers from config
-        $client->response->add_header($_ => $client->config->{header}->{$_}) for keys $client->config->{header}->%*;
+        $webui->response->add_header($_ => $webui->config->{header}->{$_}) for keys $webui->config->{header}->%*;
         # default mime-type
-        $client->response->add_header('content-type' => 'application/json; charset=UTF-8');
+        $webui->response->add_header('content-type' => 'application/json; charset=UTF-8');
 
-        my $page = $client->handle_ui_request; # isa OpenXPKI::Client::Service::WebUI::Page
-        $client->response->result($page);
-        return $client->response;
+        my $page = $webui->handle_ui_request; # isa OpenXPKI::Client::Service::WebUI::Page
+        $webui->response->result($page);
+        return $webui->response;
     }); # cgi_safe_sub
 
-    send_response($cgi, $client, $response);
+    send_response($cgi, $webui, $response);
 
     $log->debug('Finished request handling');
 
