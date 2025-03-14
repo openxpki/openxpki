@@ -70,9 +70,8 @@ sub index ($self) {
     # read target service class
     my $class = $self->stash('service_class') or die "Missing parameter 'service_class' in Mojolicious stash";
     my $service_name = $self->stash('service_name') or die "Missing parameter 'service_class' in Mojolicious stash";
+    my $endpoint = $self->stash('endpoint') or die "Missing or empty parameter 'endpoint' in Mojolicious stash";
     my $no_config = $self->stash('no_config');
-    my $endpoint = $self->stash('endpoint'); # may be an empty string
-    die "Missing parameter 'endpoint' in Mojolicious stash" unless defined $endpoint;
 
     # load and instantiate service class
     my $service;
@@ -93,18 +92,12 @@ sub index ($self) {
         die sprintf("Error while loading configuration for service '%s': %s", $service_name, $error);
     }
 
-    if ($endpoint) {
-        Log::Log4perl::MDC->put('endpoint', $endpoint);
-        OpenXPKI::Log4perl->set_default_facility("openxpki.client.service.$service_name.$endpoint");
-    } else {
-        Log::Log4perl::MDC->put('endpoint', undef);
-        OpenXPKI::Log4perl->set_default_facility("openxpki.client.service.$service_name");
-    }
+    Log::Log4perl::MDC->put('endpoint', $endpoint);
+    OpenXPKI::Log4perl->set_default_facility("openxpki.client.service.$service_name.$endpoint");
 
     # replace Mojolicious logger by our own
     $self->app->log(OpenXPKI::Log4perl->get_logger);
     $self->stash('mojo.log' => undef); # reset DefaultHelper "log" (i.e. $self->log) which accesses stash "mojo.log"
-
 
     try {
         Module::Load::load($class);

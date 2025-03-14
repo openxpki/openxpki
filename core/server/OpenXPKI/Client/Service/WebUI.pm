@@ -356,10 +356,7 @@ sub declare_routes ($r) {
     # WebUI URLs as of 3.26
     $r->any('/webui/<realm>')->to(
         service_class => __PACKAGE__,
-        endpoint => '',
-        # OpenXPKI::Client::Service::Role::Base->_build_config() will pass the
-        # falsy endpoint to OpenXPKI::Client::Config->endpoint_config() which
-        # will then load the default() config
+        endpoint => 'default',
     );
 }
 

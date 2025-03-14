@@ -70,10 +70,7 @@ has system_logger_target => (
 );
 
 # Here we do the chain loading of a serialized/signed config
-sub BUILD {
-    my $self = shift;
-    my $args = shift;
-
+sub BUILD ($self, $args) {
     # when we are here, the BASECONNECTOR is already initialized which is
     # usually an instance of O::C::Backend. We now probe if there is a
     # node called "bootstrap" and if so we replace the current backend
@@ -128,8 +125,7 @@ sub BUILD {
 
 }
 
-sub checksum {
-    my $self = shift;
+sub checksum ($self) {
     $self->BASECONNECTOR()->_config(); # makes sure the backend is initialized
     return $self->BASECONNECTOR()->checksum();
 }
@@ -151,29 +147,19 @@ sub get_scalar_as_list ($self, $path) {
     return @values;
 }
 
-sub endpoint_config {
-
-    my $self = shift;
-    my $service = shift;
-    my $endpoint = shift;
-
-    # Special handling of WebUI
-    if ($service eq 'webui') {
-        return $self->get_wrapper(['service', 'webui', 'default']);
-    }
-
+sub endpoint_config ($self, $service, $endpoint = undef) {
     if (!$endpoint) {
         $self->log->info("Request for service config requires endpoint");
         return;
     }
 
-    # @todo: Implement wildcard and default config
+    # TODO Implement wildcard and default config
     if (!$self->exists(['service', $service, $endpoint ])) {
-        $self->log->info("Requested service config ($service/$endpoint) does not exist");
+        $self->log->info("Requested service config (service.$service.$endpoint) does not exist");
         return;
     }
-    return $self->get_wrapper(['service', $service, $endpoint ]);
 
+    return $self->get_wrapper([ 'service', $service, $endpoint ]);
 }
 
 =head2 log4perl_conf
