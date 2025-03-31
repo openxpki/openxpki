@@ -23,13 +23,13 @@
                         <dd.menu as |ddm|>
                             {{#each navEntry.entries as |entry|}}
                                 <ddm.item>
-                                    {{#if entry.key}}
+                                    {{#if entry.page}}
                                         {{! We need the href in addition to the click handler to support
                                             opening the page in a new window }}
                                         <a
                                             class="dropdown-item {{if entry.active "active"}}"
-                                            href="{{url-for "openxpki" entry.key}}"
-                                            {{on "click" (fn this.navigateTo entry.key navbar.collapse)}}
+                                            href="{{url-for "openxpki" entry.page}}"
+                                            {{on "click" (fn this.navigateTo entry.page navbar.collapse)}}
                                         >
                                             {{entry.label}}
                                         </a>
@@ -49,8 +49,8 @@
                     <nav.item class="mx-lg-2">
                         <a
                             class="nav-link {{if navEntry.active "active"}}"
-                            href="{{url-for "openxpki" navEntry.key}}"
-                            {{on "click" (fn this.navigateTo navEntry.key navbar.collapse)}}
+                            href="{{url-for "openxpki" navEntry.page}}"
+                            {{on "click" (fn this.navigateTo navEntry.page navbar.collapse)}}
                         >
                             {{navEntry.label}}
                         </a>

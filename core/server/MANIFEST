@@ -163,6 +163,7 @@ OpenXPKI/Client/Service/WebUI/Response/Button.pm
 OpenXPKI/Client/Service/WebUI/Response/DTO.pm
 OpenXPKI/Client/Service/WebUI/Response/DTORole.pm
 OpenXPKI/Client/Service/WebUI/Response/Menu.pm
+OpenXPKI/Client/Service/WebUI/Response/Menu/Item.pm
 OpenXPKI/Client/Service/WebUI/Response/OnException.pm
 OpenXPKI/Client/Service/WebUI/Response/OnException/Handler.pm
 OpenXPKI/Client/Service/WebUI/Response/PageInfo.pm
@@ -724,6 +725,8 @@ cgi-bin/healthcheck.fcgi
 htdocs/assets/bootstrap-v5-tweaks.css
 htdocs/assets/choices-js-tweaks.css
 htdocs/assets/chunk.04b5e769fbf1d1409605.js
+htdocs/assets/chunk.088ab646fe5edbbc35b5.js
+htdocs/assets/chunk.088ab646fe5edbbc35b5.js.LICENSE.txt
 htdocs/assets/chunk.09010993f92343c86200.js
 htdocs/assets/chunk.09e17b3536a32796d42c.js
 htdocs/assets/chunk.13992ceb042add1f44f2.js
@@ -758,8 +761,6 @@ htdocs/assets/chunk.79f62618ec578a275ca8.js
 htdocs/assets/chunk.84adb6e166a4ced92552.js
 htdocs/assets/chunk.84b2b77e3e6a8c9ec88f.js
 htdocs/assets/chunk.851ad5ffc52c5a394f10.js
-htdocs/assets/chunk.85bc33eb8a2f5de0a4bc.js
-htdocs/assets/chunk.85bc33eb8a2f5de0a4bc.js.LICENSE.txt
 htdocs/assets/chunk.85c46e5aa6dbb4b6cfbc.js
 htdocs/assets/chunk.8a8b6138006fd657b013.js
 htdocs/assets/chunk.8c1fb5294c57ad3d6ace.js

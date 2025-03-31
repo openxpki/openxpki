@@ -1,9 +1,12 @@
 package OpenXPKI::Client::Service::WebUI::Response::Menu;
 use OpenXPKI -dto;
 
-has 'items' => (
+# Project modules
+use OpenXPKI::Client::Service::WebUI::Response::Menu::Item;
+
+has '_items' => (
     is => 'rw',
-    isa => 'ArrayRef[HashRef]',
+    isa => 'ArrayRef[OpenXPKI::Client::Service::WebUI::Response::Menu::Item]',
     traits => ['Array'],
     handles => {
         _add_item => 'push',
@@ -15,11 +18,23 @@ has 'items' => (
 
 
 # overrides OpenXPKI::Client::Service::WebUI::Response::DTORole->is_set()
-sub is_set { ! shift->_no_item }
+sub is_set ($self) { not $self->_no_item }
 
-sub add_item {
-    my $self = shift;
-    $self->_add_item(@_);
+signature_for items => (
+    method => 1,
+    positional => [ 'ArrayRef[HashRef]' ],
+);
+sub items ($self, $items) {
+    $self->add_item($_) for $items->@*;
+}
+
+signature_for add_item => (
+    method => 1,
+    positional => [ 'HashRef' ],
+);
+sub add_item ($self, $attrs) {
+    my $i = OpenXPKI::Client::Service::WebUI::Response::Menu::Item->new($attrs->%*);
+    $self->_add_item($i);
     return $self; # allows for method chaining
 }
 
