@@ -1,5 +1,5 @@
 package OpenXPKI::Client::Service::WebUI::Response::OnException;
-use OpenXPKI::Client::Service::WebUI::Response::DTO;
+use OpenXPKI -dto;
 
 # Project modules
 use OpenXPKI::Client::Service::WebUI::Response::OnException::Handler;

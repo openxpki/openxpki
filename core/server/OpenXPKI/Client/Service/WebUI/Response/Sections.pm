@@ -1,8 +1,7 @@
 package OpenXPKI::Client::Service::WebUI::Response::Sections;
-use OpenXPKI::Client::Service::WebUI::Response::DTO;
+use OpenXPKI qw( -dto -typeconstraints );
 
 # CPAN modules
-use Moose::Util::TypeConstraints; # PLEASE NOTE: this enables all warnings via Moose::Exporter
 use Moose::Util qw( does_role );
 
 # Project modules

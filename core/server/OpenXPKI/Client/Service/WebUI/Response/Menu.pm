@@ -1,5 +1,5 @@
 package OpenXPKI::Client::Service::WebUI::Response::Menu;
-use OpenXPKI::Client::Service::WebUI::Response::DTO;
+use OpenXPKI -dto;
 
 has 'items' => (
     is => 'rw',

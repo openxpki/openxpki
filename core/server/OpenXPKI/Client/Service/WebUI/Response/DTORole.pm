@@ -57,9 +57,7 @@ delimiter. A trailing slash is a shortcut and means: append the attribute name.
     # }
 
 =cut
-sub resolve {
-    my $self = shift;
-
+sub resolve ($self) {
     my $result = {};
     my @all_attrs = $self->meta->get_all_attributes;
     for my $attr (@all_attrs) {
@@ -116,9 +114,7 @@ if a C<default> was specified).
 Should be overridden if required.
 
 =cut
-sub is_set {
-    my $self = shift;
-
+sub is_set ($self) {
     return any { $_->has_value($self) } $self->meta->get_all_attributes;
 }
 

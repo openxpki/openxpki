@@ -1,5 +1,5 @@
 package OpenXPKI::Client::Service::WebUI::Response::Button;
-use OpenXPKI::Client::Service::WebUI::Response::DTO;
+use OpenXPKI -dto;
 
 has 'label' => (
     is => 'rw',

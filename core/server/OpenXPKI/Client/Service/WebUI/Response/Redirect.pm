@@ -1,7 +1,5 @@
 package OpenXPKI::Client::Service::WebUI::Response::Redirect;
-use OpenXPKI::Client::Service::WebUI::Response::DTO;
-
-use Moose::Util::TypeConstraints qw( enum ); # PLEASE NOTE: this enables all warnings via Moose::Exporter
+use OpenXPKI qw( -dto -typeconstraints );
 
 has 'to' => (
     is => 'rw',
@@ -10,9 +8,12 @@ has 'to' => (
     documentation => 'goto',
 );
 
+my $int_ext = enum([qw( internal external )]);
+no Moose::Util::TypeConstraints; # otherwise sub type() will collide with our accessor "type"
+
 has 'type' => (
     is => 'rw',
-    isa => enum([qw( internal external )]),
+    isa => $int_ext,
     default => 'internal',
 );
 

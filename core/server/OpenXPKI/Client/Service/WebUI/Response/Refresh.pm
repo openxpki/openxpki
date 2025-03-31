@@ -1,5 +1,5 @@
 package OpenXPKI::Client::Service::WebUI::Response::Refresh;
-use OpenXPKI::Client::Service::WebUI::Response::DTO;
+use OpenXPKI -dto;
 
 has 'uri' => (
     is => 'rw',

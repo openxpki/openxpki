@@ -1,5 +1,5 @@
 package OpenXPKI::Client::Service::WebUI::Response;
-use OpenXPKI::Client::Service::WebUI::Response::DTO;
+use OpenXPKI -dto;
 
 
 =head1 NAME

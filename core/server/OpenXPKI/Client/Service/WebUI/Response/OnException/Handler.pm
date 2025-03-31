@@ -1,5 +1,5 @@
 package OpenXPKI::Client::Service::WebUI::Response::OnException::Handler;
-use OpenXPKI::Client::Service::WebUI::Response::DTO;
+use OpenXPKI -dto;
 
 has 'status_code' => (
     is => 'rw',

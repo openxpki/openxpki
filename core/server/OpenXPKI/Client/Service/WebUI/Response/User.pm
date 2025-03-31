@@ -1,5 +1,5 @@
 package OpenXPKI::Client::Service::WebUI::Response::User;
-use OpenXPKI::Client::Service::WebUI::Response::DTO;
+use OpenXPKI -dto;
 
 # The attributes are roughly equal to (and are built from) the results of the
 # "get_session_info" API command, modified in OpenXPKI::Client::Service::WebUI::Page::Bootstrap.

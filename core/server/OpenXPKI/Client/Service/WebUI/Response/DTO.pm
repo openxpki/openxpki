@@ -1,8 +1,8 @@
 package OpenXPKI::Client::Service::WebUI::Response::DTO;
+use strict;
+use warnings;
 
 # CPAN modules
-use Moose ();
-use MooseX::StrictConstructor ();
 use Moose::Exporter;
 
 # Project modules
@@ -14,7 +14,7 @@ use OpenXPKI::Client::Service::WebUI::Response::DTORole;
 To define a new data transfer object (DTO) simply say:
 
     package OpenXPKI::Client::Service::WebUI::Response::MyData;
-    use OpenXPKI::Client::Service::WebUI::Response::DTO;
+    use OpenXPKI -dto;
 
     has 'message' => (
         is => 'rw',
@@ -30,19 +30,18 @@ This will modify your package as follows:
 
 =over
 
-=item * import C<Moose> (i.e. adds "use Moose;" so you don't have to do it),
-
-=item * provide the L</has_dto> keyword to define nested DTOs,
+=item * add C<use Moose> and C<use MooseX::StrictConstructor>,
 
 =item * apply the Moose role L<OpenXPKI::Client::Service::WebUI::Response::DTORole>.
+
+=item * provide the L</has_dto> keyword to define nested DTOs,
 
 =back
 
 =cut
 Moose::Exporter->setup_import_methods(
-    also => [ "Moose", "MooseX::StrictConstructor" ],
-    with_meta => [ "has_dto" ],
-    base_class_roles => [ "OpenXPKI::Client::Service::WebUI::Response::DTORole" ],
+    with_meta => [ 'has_dto' ],
+    base_class_roles => [ 'OpenXPKI::Client::Service::WebUI::Response::DTORole' ],
 );
 
 =head2 has_dto

@@ -1,5 +1,5 @@
 package OpenXPKI::Client::Service::WebUI::Response::PageInfo;
-use OpenXPKI::Client::Service::WebUI::Response::DTO;
+use OpenXPKI -dto;
 
 use OpenXPKI::Client::Service::WebUI::Response::Button;
 

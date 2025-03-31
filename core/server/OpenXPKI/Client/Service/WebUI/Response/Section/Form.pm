@@ -1,5 +1,5 @@
 package OpenXPKI::Client::Service::WebUI::Response::Section::Form;
-use OpenXPKI::Client::Service::WebUI::Response::DTO;
+use OpenXPKI -dto;
 
 with 'OpenXPKI::Client::Service::WebUI::Response::SectionRole';
 

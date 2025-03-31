@@ -34,6 +34,9 @@ OpenXPKI - Base module to reduce boilerlate code in our packages.
     # API plugin
     use OpenXPKI -plugin;
 
+    # WebUI Data Transfer Object
+    use OpenXPKI -dto;
+
 =cut
 
 sub import {
@@ -52,10 +55,11 @@ sub import {
           or die sprintf 'Missing base class after "use OpenXPKI -base" called at %s line %s'."\n", $caller_file, $caller_line;
     }
 
-    my $moose_class = delete $flags{-class};
+    my $dto = delete $flags{-dto}; # WebUI DTO
+    my $moose_class = delete $flags{-class} || $dto;
     my $moose_exporter = delete $flags{-exporter};
     my $moose_typeconstraints = delete $flags{-typeconstraints};
-    my $moose_strictconstructor = delete $flags{-strictconstructor};
+    my $moose_strictconstructor = delete $flags{-strictconstructor} || $dto;
     my $moose_nonmoose = delete $flags{-nonmoose};
     my $moose_role = delete $flags{-role};
     my $class_std = delete $flags{-class_std};
@@ -96,6 +100,11 @@ sub import {
     if ($plugin or $client_plugin) {
         OpenXPKI::Base::API::Plugin->import::into(1);
         OpenXPKI::Client::API::Plugin->import::into(1) if $client_plugin;
+    }
+
+    # WebUI Data Transfer Object
+    if ($dto) {
+        OpenXPKI::Client::Service::WebUI::Response::DTO->import::into(1);
     }
 
     utf8->import::into(1);
@@ -278,6 +287,16 @@ additionally adds the imports
     use Moose;
     use OpenXPKI::Base::API::Plugin;
     use OpenXPKI::Client::API::Plugin;
+
+=head2 WebUI Data Transfer Object
+
+    use OpenXPKI -dto;
+
+additionally adds the imports
+
+    use Moose;
+    use MooseX::StrictConstructor;
+    use OpenXPKI::Client::Service::WebUI::Response::DTO;
 
 =head2 Imports
 

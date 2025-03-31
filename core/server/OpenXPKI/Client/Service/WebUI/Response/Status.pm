@@ -1,13 +1,13 @@
 package OpenXPKI::Client::Service::WebUI::Response::Status;
-use OpenXPKI::Client::Service::WebUI::Response::DTO;
-
-use Moose::Util::TypeConstraints qw( enum ); # PLEASE NOTE: this enables all warnings via Moose::Exporter
+use OpenXPKI qw( -dto -typeconstraints );
 
 has 'level' => (
     is => 'rw',
     isa => enum([qw( success info warn error )]),
     default => 'info',
 );
+
+no Moose::Util::TypeConstraints; # otherwise sub message() will collide with our accessor "message"
 
 has 'message' => (
     is => 'rw',
