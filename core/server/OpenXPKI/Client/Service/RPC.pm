@@ -178,6 +178,59 @@ sub send_response ($self, $c, $response) {
 
         return $c->render(text => $output);
 
+
+    # endpoint should send content directly
+    } elsif ($self->config->exists([$self->operation,'download'])) {
+
+        my $download = $self->config->get_hash([$self->operation,'download']);
+
+        $self->log->debug('Direct download configured');
+        # the payload of the workflow
+        my $data = $response->result->{data} || {};
+
+        $self->log->trace(Dumper $data);
+
+        my $payload;
+        my $mime = $download->{mime} || 'application/octet-stream';
+        my $filename = $download->{filename};
+
+        # download config must specify a field to read the data from
+        # or a template string to be applied on the data hash
+        if (my $template = $download->{template}) {
+            $self->log->debug('Rendering template using context '. $template);
+            $payload  = OpenXPKI::Template->new()->render($template, $data);
+        } else {
+            my $field = $download->{field} || 'output';
+            $self->log->debug('Read payload from '. $field);
+            $payload = $data->{$field} // '';
+
+            # support download field format from UI (hash with data and header)
+            if (ref $payload eq 'HASH') {
+                $filename = $payload->{filename} if ($payload->{filename});
+                $mime = $payload->{mime} if ($payload->{mime});
+                $payload = $payload->{data};
+            }
+
+            # support for array of certificates/crls
+            if (ref $payload eq 'ARRAY') {
+                $payload = join("\n", $payload->@*);
+            }
+        }
+
+        if (!$payload) {
+            $c->res->code('404');
+            $c->res->message('Not found');
+            return $c->render();
+        }
+
+        $self->log->trace(Dumper $payload);
+
+        $c->res->headers->content_type($download->{mime} || 'application/octet-stream');
+        $c->res->headers->content_disposition("attachment;filename=".$download->{filename})
+            if ($download->{filename});
+
+        return $c->render(text => $payload);
+
     # JSON
     } else {
         my $data;
