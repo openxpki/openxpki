@@ -52,7 +52,7 @@ our %named_messages = (
     # Server errors
     #
     50000 => 'Server error',
-    50001 => 'Unable to fetch configuration from server - connect failed',
+    50001 => 'Unable to connect to backend',
     50002 => 'Unable to initialize client',
     50003 => 'Unexpected response from backend',
     50005 => 'ENV variable "server" and servername are both set but are mutually exclusive',

@@ -442,6 +442,21 @@ sub is_connected
     return 1;
 }
 
+sub ping {
+
+    my $self = shift;
+
+    try {
+        my $msg = $self->send_receive_service_msg('PING');
+        ##! 32: $msg
+        return 1;
+    } catch ($error) {
+    }
+
+    return 0;
+
+}
+
 sub close_connection {
     my $self = shift;
 

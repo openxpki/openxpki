@@ -400,10 +400,11 @@ has client => (
     lazy => 1,
 );
 sub _build_client ($self) {
+    my $cc;
     try {
         my $socket = $self->config->get('global.socket');
         my $timeout = $self->config->get('global.timeout');
-        return OpenXPKI::Client->new(
+        $cc = OpenXPKI::Client->new(
             socketfile => $socket,
             $timeout ? (timeout => $timeout) : (),
         );
@@ -411,6 +412,14 @@ sub _build_client ($self) {
     catch ($err) {
         die $self->new_response( 50002 => "Could not create client object: $err" );
     }
+
+    # The constructor does not check if the backend is there
+    # so we now run a ping and bail out with a backend error if not
+    die $self->new_response( 50001 => "Could not talk to backend" )
+        unless($cc->ping());
+
+    return $cc;
+
 }
 
 =head3 client_simple
@@ -439,6 +448,7 @@ sub _build_client_simple ($self) {
         );
     }
     catch ($err) {
+        die $err if ($err->isa('OpenXPKI::Client::Service::Response'));
         die $self->new_response( 50002 => "Could not create client object: $err" );
     }
 }

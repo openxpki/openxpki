@@ -464,7 +464,11 @@ sub parse_rpc_request_body ($self) {
 
             $jwt_header->{signer_cert} = $cert;
         }
-        catch ($err) {
+        catch ($error) {
+
+            # rethrow error reponse
+            die $error if ($error->isa('OpenXPKI::Client::Service::Response'));
+
             die $self->new_response( 40088, $cert ? 'JWT signature could not be verified' : 'Given key id was not found' );
         }
 
@@ -490,6 +494,9 @@ sub parse_rpc_request_body ($self) {
             $json_str = $pkcs7_content->{value} or die $self->new_response( 50080 );
         }
         catch ($error) {
+            # rethrow error reponse
+            die $error if ($error->isa('OpenXPKI::Client::Service::Response'));
+
             die $self->new_response( 50080, $error );
         }
 
