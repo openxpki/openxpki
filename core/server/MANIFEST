@@ -352,6 +352,7 @@ OpenXPKI/Server/API2/Plugin/Cert/DateCondition.pm
 OpenXPKI/Server/API2/Plugin/Control/reload.pm
 OpenXPKI/Server/API2/Plugin/Control/version.pm
 OpenXPKI/Server/API2/Plugin/Control/control_watchdog.pm
+OpenXPKI/Server/API2/Plugin/Control/license_info.pm
 OpenXPKI/Server/API2/Plugin/Control/purge_application_log.pm
 OpenXPKI/Server/API2/Plugin/Control/config_show.pm
 OpenXPKI/Server/API2/Plugin/Crypto/generate_key.pm
