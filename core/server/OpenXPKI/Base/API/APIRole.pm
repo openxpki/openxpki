@@ -465,6 +465,22 @@ sub dispatch ($self, $arg) {
     return $result;
 }
 
+=head2 command_help
+
+Returns a nested I<HashRef>.
+
+The key I<protected> is boolean 0/1 and marks a protected command.
+
+The key I<arguments> holds a HashRef where keys are the argument names
+and value is a HasfRef describing the argument:
+
+  'foobar' => {
+    documentation => 'the optional foobar argument accepts a string',
+    required => 0,
+    type => 'Str'
+  }
+
+=cut
 # TODO Might be better part of the bootstrap process to have this cached?
 # TODO Add $namespace argument (default to '')
 signature_for command_help => (
@@ -486,7 +502,15 @@ sub command_help ($self, $command) {
         })
     } $attributes->@*;
 
-    return \%arguments;
+    # error handling here is superfluous as also done in above call
+    my $package = $self->namespace_commands('')->{ $command }
+        or OpenXPKI::Exception->throw('Unknown API command: ' . $command);
+    my $is_protected = $package->meta->is_protected( $command )  ? 1 : 0;
+
+    return {
+        protected => $is_protected,
+        arguments => \%arguments,
+    };
 
 }
 

@@ -4,6 +4,7 @@ use OpenXPKI;
 # Core modules
 use FindBin qw( $Script );
 use Getopt::Long;
+use List::Util qw(none any);
 use Module::Metadata;
 use JSON::PP;
 use Term::ReadKey;
@@ -63,6 +64,11 @@ sub show_help ($arg) {
         $pod.= "=back\n\n";
 
         $api->show_pod(-oxi_pod => $pod);
+    }
+
+
+    if ($cmd eq 'api' && none { $subcmd eq $_ } ('','help','list')) {
+        $subcmd = 'execute';
     }
 
     #
@@ -163,33 +169,42 @@ $api->show_pod(
     -sections => 'COMMANDS',
 ) unless (@ARGV or $opt{help});
 
-my $command = ($opt{help} ? 'help' : shift) // '';
+my $want_help = $opt{help};
+my $command = shift // '';
+my $subcommand = shift  // '';
+
+if ($command eq 'help') {
+    $want_help = 1;
+    $command = $subcommand;
+    $subcommand = shift // '';
+}
 
 # help is also avail via flag for subcommands
-if ($command eq 'help') {
-    if (@ARGV) {
-        my $cmd = $ARGV[0];
-        my $subcmd = $ARGV[1];
+if ($want_help) {
+
+    if (!$command) {
+        $api->show_pod(-oxi_pod => join('', $api->get_pod_nodes(__FILE__)));
+
+    # we let the help request for a named command pass and catch this later
+    } elsif ($command ne 'api' || any { $subcommand eq $_ } ('list','help','execute')) {
         show_help(
             api => $api,
-            command => $cmd,
-            defined $subcmd ? (subcommand => $subcmd) : (),
+            command =>  $command,
+            $subcommand ? (subcommand => $subcommand) : (),
         );
-    } else {
-        $api->show_pod(-oxi_pod => join('', $api->get_pod_nodes(__FILE__)));
     }
 }
 
-my $subcommand = shift;
 # List subcommands for command
 if (not $subcommand) {
     say "Missing subcommand.\n";
     show_help(
         api => $api,
         command => $command,
-        short => 1,
+        short => 0,
     );
 }
+
 
 # we have command and subcommand so lets handle parameters and dispatch
 
@@ -200,6 +215,18 @@ my %params;
 # by GetOptions which leaves the extra parameters after "--" on ARGV
 while (@ARGV && substr($ARGV[0],0,1) ne '-') {
     push @extra_args, shift;
+}
+
+# special handling of the API command
+# we want to use the server command directly as subcommand
+if ($command eq 'api' && none { $subcommand eq $_ } ('list','help','execute')) {
+    $params{command} = $subcommand;
+    # named command wit help flag passed from above
+    if ($want_help) {
+        $subcommand = 'help';
+    } else {
+        $subcommand = 'execute';
+    }
 }
 
 # Create GetOption spec from the parameters recorded in the command
