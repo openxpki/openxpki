@@ -334,6 +334,7 @@ OpenXPKI/Server/API2/Plugin/Cert/get_cert.pm
 OpenXPKI/Server/API2/Plugin/Cert/get_cert_actions.pm
 OpenXPKI/Server/API2/Plugin/Cert/get_cert_attributes.pm
 OpenXPKI/Server/API2/Plugin/Cert/get_cert_identifier.pm
+OpenXPKI/Server/API2/Plugin/Cert/get_cert_statistic.pm
 OpenXPKI/Server/API2/Plugin/Cert/get_chain.pm
 OpenXPKI/Server/API2/Plugin/Cert/get_crl.pm
 OpenXPKI/Server/API2/Plugin/Cert/get_crl_list.pm

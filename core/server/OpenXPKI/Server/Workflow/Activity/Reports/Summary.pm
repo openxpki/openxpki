@@ -17,181 +17,22 @@ sub execute {
 
     my $target_key = $self->param('target_key');
 
-    my $valid_at;
+    my %params;
+
     if ($self->param('valid_at')) {
-       $valid_at = OpenXPKI::DateTime::get_validity({
+       $params{valid_at} = OpenXPKI::DateTime::get_validity({
             VALIDITY =>  $self->param('valid_at'),
             VALIDITYFORMAT => 'detect',
-        });
-    } else {
-       $valid_at = DateTime->now();
+        })->epoch();
     }
 
-    my $epoch = $valid_at->epoch();
+    map {
+        my $val = $self->param($_);
+        next unless ($val);
+        $params{$_} = $val;
+    } qw(near_expiry recent_expiry recent_renewal);
 
-    # For special data types see:
-    #  - https://metacpan.org/pod/SQL::Abstract::More#BIND-VALUES-WITH-TYPES
-    #  - https://metacpan.org/pod/DBI#bind_param
-    my %base_query = (
-        from => 'certificate',
-    );
-    my %base_conditions = (
-        'certificate.req_key' => { '!=' => undef },
-        'certificate.pki_realm' => $pki_realm,
-    );
-
-    my $db = CTX('dbi');
-    my $tuple;
-    my $result = {};
-
-    # total count
-    $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(identifier)|amount' ],
-        where => {
-            %base_conditions
-        }
-    );
-    $result->{total_count} = sprintf "%01d", $tuple->{amount};
-
-    # Revoked
-    $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(identifier)|amount' ],
-        where => {
-            %base_conditions,
-            status => [ 'REVOKED', 'CRL_ISSUANCE_PENDING' ],
-        }
-    );
-    $result->{total_revoked} = sprintf "%01d", $tuple->{amount} + 0;
-
-
-    # valid revoked
-    $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(identifier)|amount' ],
-        where => {
-            %base_conditions,
-            status => [ 'REVOKED', 'CRL_ISSUANCE_PENDING' ],
-            notbefore => { '<' => $epoch },
-            notafter  => { '>' => $epoch },
-        }
-    );
-    $result->{valid_revoked} = sprintf "%01d", $tuple->{amount} + 0;
-
-
-    # Distinct
-    $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(DISTINCT subject)|amount' ],
-        where => {
-            %base_conditions,
-        }
-    );
-    $result->{total_distinct} = sprintf "%01d", $tuple->{amount} + 0;
-
-
-    # Expired
-    $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(identifier)|amount' ],
-        where => {
-            %base_conditions,
-            status => 'ISSUED',
-            notafter => { '<' => $epoch },
-        }
-    );
-    $result->{total_expired} = sprintf "%01d", $tuple->{amount} + 0;
-
-
-    # Valid
-    $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(identifier)|amount' ],
-        where => {
-            %base_conditions,
-            status => 'ISSUED',
-            notbefore => { '<' => $epoch },
-            notafter  => { '>' => $epoch },
-        }
-    );
-    $result->{valid_count} = sprintf "%01d", $tuple->{amount} + 0;
-
-
-    # Valid distinct
-    $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(DISTINCT subject)|amount' ],
-        where => {
-            %base_conditions,
-            status => 'ISSUED',
-            notbefore => { '<' => $epoch },
-            notafter  => { '>' => $epoch },
-        }
-    );
-    $result->{valid_distinct} = sprintf "%01d", $tuple->{amount} + 0;
-
-
-    # Valid by profile
-    $tuple = $db->select_arrays(
-        from_join => 'certificate {req_key=req_key,pki_realm=pki_realm} csr',
-        columns  => [ 'profile', 'COUNT(identifier)|amount' ],
-        where => {
-            %base_conditions,
-            status => 'ISSUED',
-            notbefore => { '<' => $epoch },
-            notafter  => { '>' => $epoch },
-        },
-        group_by => 'csr.profile',
-    );
-    ##! 1: $tuple
-    $result->{by_profile} = { map { $_->[0] => $_->[1]  } @{$tuple} };
-
-    # Near expiry
-    my $near_expiry_validity = $self->param('near_expiry') || '+000030';
-    my $expiry_cutoff = OpenXPKI::DateTime::get_validity({
-        REFERENCEDATE => $valid_at,
-        VALIDITY => $near_expiry_validity,
-        VALIDITYFORMAT => 'detect',
-    })->epoch();
-
-    $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(identifier)|amount' ],
-        where => {
-            %base_conditions,
-            status => 'ISSUED',
-            notafter  => { -between => [ $epoch, $expiry_cutoff  ] },
-        }
-    );
-    $result->{near_expiry} = sprintf "%01d", $tuple->{amount} + 0;
-
-
-    # Recent expiry
-    $expiry_cutoff = OpenXPKI::DateTime::get_validity({
-        REFERENCEDATE => $valid_at,
-        VALIDITY => $self->param('recent_expiry') || '-000030',
-        VALIDITYFORMAT => 'detect',
-    })->epoch();
-
-    $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(identifier)|amount' ],
-        where => {
-            %base_conditions,
-            status => 'ISSUED',
-            notafter  => { -between => [ $expiry_cutoff, $epoch ] },
-        }
-    );
-    $result->{recent_expiry} = sprintf "%01d", $tuple->{amount};
-
-    $expiry_cutoff = OpenXPKI::DateTime::get_validity({
-        REFERENCEDATE => $valid_at,
-        VALIDITY => $self->param('recent_renewal') || '-000030',
-        VALIDITYFORMAT => 'detect',
-    })->epoch();
-
-    $tuple = $db->select_one(
-        from_join => 'certificate certificate.identifier=identifier certificate_attributes|ca',
-        columns  => [ 'COUNT(certificate.identifier)|amount' ],
-        where => {
-            %base_conditions,
-            notafter  => { -between => [ $expiry_cutoff, $epoch ] },
-            attribute_contentkey => 'system_renewal_cert_identifier',
-        }
-    );
-    $result->{recent_renewed} = sprintf "%01d", $tuple->{amount};
+    my $result = CTX('api2')->get_cert_statistic(%params);
 
     ##! 32: 'Report result ' . Dumper $result
     if ($target_key) {
