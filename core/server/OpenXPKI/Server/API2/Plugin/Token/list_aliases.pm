@@ -25,7 +25,6 @@ returned.
             identifier => '...', # certificate identifier
             notbefore => '...',  # certificate validity (UNIX epoch timestamp)
             notafter => '...',   # certificate validity (UNIX epoch timestamp)
-            status => '...',     # verbose status of the token: ONLINE, OFFLINE or UNKNOWN
         },
         {
             ...
