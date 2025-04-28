@@ -720,6 +720,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_DIGEST"
 msgstr "Sì"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DIGEST_ALG"
+msgstr "Sì"
+
 # Remove?
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_FAIL"
@@ -1047,10 +1051,6 @@ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_FILENAME_LABEL"
 msgstr "FALLIMENTO"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
-msgstr "Informazioni Processi"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_DESC"
 msgstr "Descrizione del profilo client OpenVPN per gli utenti"
 
@@ -1171,6 +1171,9 @@ msgstr "mostra le liste di revoca precedenti"
 # Remove?
 msgid "I18N_OPENXPKI_UI_KEY"
 msgstr "Chiave"
+
+msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM"
+msgstr "Parametri della Chiave"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_KEYSTORE_ALIAS_CONTAINS_INVALID_CHARACTERS"
@@ -1700,6 +1703,14 @@ msgstr "Stile denominazione avanzato"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_ADVANCED_STYLE_LABEL"
 msgstr "Extended naming (expert use only)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_ID"
+msgstr "Nome Applicazione"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_ID_DESC"
+msgstr "Il nome dell’applicazione che agisce come client."
 
 msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_NAME"
 msgstr "Nome Applicazione"
@@ -2602,6 +2613,14 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_RETYPE_SERVER_PASSWORD_LABEL"
 msgstr "La tua Password per la chiave privata"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTRENEW_INITIAL_DESC"
+msgstr "Respingi questa richiesta di revoca."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTRENEW_INITIAL_LABEL"
+msgstr "Termina Workflow"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_AUTH_INIT_DESC"
@@ -3950,6 +3969,10 @@ msgstr ""
 "Inserisci 0 per usare il valore di default"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTIFICATION_LOG_LABEL"
+msgstr "Certificato"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTIFY_EXPIRY_MESSAGE_LABEL"
 msgstr "Esporta Certificato"
 
@@ -5050,6 +5073,15 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUBJECT_COMPLETE_LABEL"
 msgstr "Review Request"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUBJECT_COMPLETE_RENEWAL_DESC"
+msgstr ""
+"La tua richiesta è pronta per essere trasmessa, controlla che le "
+"informazioni inserite siano corrette. Puoi aggiornare le informazioni usando "
+"i pulsanti qui sotto.<br><b>Se le informazioni sono complete, usa il "
+"pulsante Invia per accodare la tua richiesta alla fase successiva del "
+"procedimento</b>."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUCCESS_DESC"
 msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 
@@ -5261,6 +5293,16 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_SUCCESS_DESC"
 msgstr ""
 "Il certificato è stato revocato ed è stata emessa una nuova Lista Revoche "
 "(CRL)."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REDIRECT_DESC"
+msgstr ""
+"La Richiesta di revoca è stata definitivamente rifiutata e non può essere "
+"riavviata."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REDIRECT_LABEL"
+msgstr "Revoca Rifiutata"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REJECTED_DESC"
@@ -5494,6 +5536,14 @@ msgstr "Richiesta Revoca Certificato"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_PREREG_REQUEST_LABEL"
+msgstr "Richiesta Revoca Certificato (CRR, Certificate Revocation Request)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_DESC"
+msgstr "Richiesta Revoca Certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_LABEL"
 msgstr "Richiesta Revoca Certificato (CRR, Certificate Revocation Request)"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_DESC"
@@ -5797,8 +5847,9 @@ msgstr "Sì"
 #~ msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
 #~ msgstr "Il valore date/time inserito non è stato convalidato."
 
-#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM"
-#~ msgstr "Parametri della Chiave"
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
+#~ msgstr "Informazioni Processi"
 
 #~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_CURVE_NAME"
 #~ msgstr "Nome della Curva"

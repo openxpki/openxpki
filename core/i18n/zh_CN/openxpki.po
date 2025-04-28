@@ -622,6 +622,11 @@ msgstr "已请求延迟吊销。"
 msgid "I18N_OPENXPKI_UI_DIGEST"
 msgstr "是"
 
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DIGEST_ALG"
+msgstr "是"
+
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_FAIL"
 msgstr "失败"
 
@@ -875,9 +880,6 @@ msgstr "导出密码"
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_FILENAME_LABEL"
 msgstr "密钥库下载"
 
-msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
-msgstr "下载格式"
-
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_DESC"
 msgstr "密钥库的格式，大多数应用程序使用PKCS12容器。"
 
@@ -978,6 +980,9 @@ msgstr "项目"
 # Remove?
 msgid "I18N_OPENXPKI_UI_KEY"
 msgstr "密钥"
+
+msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM"
+msgstr "密钥参数"
 
 msgid "I18N_OPENXPKI_UI_KEYSTORE_ALIAS_CONTAINS_INVALID_CHARACTERS"
 msgstr "别名包含 a-z A-Z 0-9 - _ 之外的字符。"
@@ -1473,6 +1478,14 @@ msgstr "高级命名方式"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_ADVANCED_STYLE_LABEL"
 msgstr "扩展命名（仅限专家使用）"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_ID"
+msgstr "应用程序名称"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_ID_DESC"
+msgstr "客户端的应用程序的名称。"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_NAME"
 msgstr "应用程序名称"
@@ -2276,6 +2289,14 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_RETYPE_SERVER_PASSWORD_LABEL"
 msgstr "你的密钥密码"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTRENEW_INITIAL_DESC"
+msgstr "拒绝此吊销请求。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTRENEW_INITIAL_LABEL"
+msgstr "睡眠中"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_AUTH_INIT_DESC"
@@ -3475,6 +3496,10 @@ msgstr ""
 "使用日历图标或以MM.DD.YYYY格式输入日期，键入0以使用默认值。 日期为UTC时区！"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTIFICATION_LOG_LABEL"
+msgstr "证书"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTIFY_EXPIRY_MESSAGE_LABEL"
 msgstr "证书过期通知"
 
@@ -4452,6 +4477,13 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUBJECT_COMPLETE_LABEL"
 msgstr "审查请求"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUBJECT_COMPLETE_RENEWAL_DESC"
+msgstr ""
+"您的请求已准备就绪，可以提交。 请检查显示的信息是否正确。 您可以使用下面的按"
+"钮更新信息，<b>如果信息完整，请使用“提交”按钮将请求放入队列中以进行进一步处理"
+"</b>。"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUCCESS_DESC"
 msgstr "此工作流程已成功完成，无法重新启动"
 
@@ -4645,6 +4677,14 @@ msgstr "此工作流程最终失败，无法重新启动"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_SUCCESS_DESC"
 msgstr "证书已被吊销，并发布了吊销列表。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REDIRECT_DESC"
+msgstr "该请求最终被拒绝，无法重新启动。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REDIRECT_LABEL"
+msgstr "请求被拒绝"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REJECTED_DESC"
 msgstr "该请求最终被拒绝，无法重新启动。"
@@ -4853,6 +4893,14 @@ msgstr "证书签名请求（CSR）"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_PREREG_REQUEST_LABEL"
+msgstr "证书签名请求（CSR）"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_DESC"
+msgstr "证书签名请求（CSR）"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_LABEL"
 msgstr "证书签名请求（CSR）"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_DESC"
@@ -5113,8 +5161,8 @@ msgstr "是"
 #~ msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
 #~ msgstr "输入的日期/时间无法验证。"
 
-#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM"
-#~ msgstr "密钥参数"
+#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
+#~ msgstr "下载格式"
 
 #~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_CURVE_NAME"
 #~ msgstr "曲线名称"

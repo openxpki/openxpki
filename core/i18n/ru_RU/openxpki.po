@@ -715,6 +715,10 @@ msgid "I18N_OPENXPKI_UI_DIGEST"
 msgstr "Имя учетной записи"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_DIGEST_ALG"
+msgstr "Имя учетной записи"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_FAIL"
 msgstr "Имя учетной записи"
 
@@ -1029,10 +1033,6 @@ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_FILENAME_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
-msgstr "Профиль пользователя"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_DESC"
 msgstr "Экспорт"
 
@@ -1155,6 +1155,10 @@ msgstr "Комментарий"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_KEY"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM"
 msgstr "Имя учетной записи"
 
 #, fuzzy
@@ -1752,6 +1756,14 @@ msgstr "Расширенный профиль"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_ADVANCED_STYLE_LABEL"
 msgstr "Расширенный профиль"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_ID"
+msgstr "Имя"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_ID_DESC"
+msgstr "Имя владельца сертификата, например, Иван Петрович Сидоров."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_NAME"
@@ -2796,6 +2808,14 @@ msgstr "Утвердить заявку на сертификат (CSR)"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_RETYPE_SERVER_PASSWORD_LABEL"
 msgstr "Утвердить заявку на сертификат (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTRENEW_INITIAL_DESC"
+msgstr "Отклонить заявку на отзыв сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTRENEW_INITIAL_LABEL"
+msgstr "Отклонить заявку на отзыв сертификата"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_AUTH_INIT_DESC"
@@ -4246,6 +4266,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_TOOLTIP"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTIFICATION_LOG_LABEL"
+msgstr "Идентификатор сертификата"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTIFY_EXPIRY_MESSAGE_LABEL"
 msgstr "Родительский технологический процесс"
 
@@ -5491,6 +5515,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUBJECT_COMPLETE_LABEL"
 msgstr "Технологические процессы"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUBJECT_COMPLETE_RENEWAL_DESC"
+msgstr "Технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUCCESS_DESC"
 msgstr "Технологические процессы"
 
@@ -5690,6 +5718,14 @@ msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_SUCCESS_DESC"
+msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REDIRECT_DESC"
+msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REDIRECT_LABEL"
 msgstr "Технологические процессы"
 
 #, fuzzy
@@ -5920,6 +5956,14 @@ msgstr "Отзыв сертификата"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_PREREG_REQUEST_LABEL"
+msgstr "Отзыв сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_DESC"
+msgstr "Отзыв сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_LABEL"
 msgstr "Отзыв сертификата"
 
 #, fuzzy
@@ -6223,8 +6267,8 @@ msgstr "Имя учетной записи"
 #~ msgstr "SPKAC-строка пуста."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM"
-#~ msgstr "Имя учетной записи"
+#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
+#~ msgstr "Профиль пользователя"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_CURVE_NAME"

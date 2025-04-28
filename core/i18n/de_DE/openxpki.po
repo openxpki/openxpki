@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2025-02-04 16:08+0100\n"
+"PO-Revision-Date: 2025-04-28 18:45+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -508,9 +508,8 @@ msgstr "Ablauf nach"
 msgid "I18N_OPENXPKI_UI_DATAPOOL_EXPIRES_BEFORE"
 msgstr "Ablauf vor"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_DATAPOOL_INVENTORY_LABEL"
-msgstr "Message of the Day"
+msgstr "Inventory"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_KEY"
 msgstr "Eintrag"
@@ -562,6 +561,9 @@ msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr "verzögerte Sperrung beantragt"
 
 msgid "I18N_OPENXPKI_UI_DIGEST"
+msgstr "Digest"
+
+msgid "I18N_OPENXPKI_UI_DIGEST_ALG"
 msgstr "Digest"
 
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_FAIL"
@@ -798,9 +800,6 @@ msgstr "Export-Passwort"
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_FILENAME_LABEL"
 msgstr "Keystore Download"
 
-msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
-msgstr "Download Format"
-
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_DESC"
 msgstr ""
 "Format des Downloads, die meisten Anwendungen benötigen einen PKCS12 "
@@ -901,6 +900,9 @@ msgstr "Einträge"
 # Remove?
 msgid "I18N_OPENXPKI_UI_KEY"
 msgstr "Key"
+
+msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM"
+msgstr "Schlüsselparameter"
 
 msgid "I18N_OPENXPKI_UI_KEYSTORE_ALIAS_CONTAINS_INVALID_CHARACTERS"
 msgstr "Alias enthält ungültige Zeichen (a-z A-Z 0-9 - _ )."
@@ -1331,6 +1333,12 @@ msgstr "Erweiterte Namensgebung"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_ADVANCED_STYLE_LABEL"
 msgstr "Experten-Modus"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_ID"
+msgstr "Anwendungs-ID"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_ID_DESC"
+msgstr "Referenznummer oder Kennzeichen der Anwendung/System"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_NAME"
 msgstr "Anwendungsbezeichner"
@@ -2118,6 +2126,18 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_RETYPE_SERVER_PASSWORD_LABEL"
 msgstr "Ihr Registrierungsschlüssel"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTRENEW_INITIAL_DESC"
+msgstr ""
+"Geben Sie den Zeritifikatsidentifier an oder verwenden Sie die automatische "
+"Suche, um das Zertifikat zu finden, dass Sie erneuern möchten. "
+"Falls Sie das Zertifikat nicht finden oder auswählen können, "
+"verwenden Sie bitte die Zertifikatssuche. Das Ergebnis enthält einen "
+"direkten Link, um den Antrag auszuführen."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTRENEW_INITIAL_LABEL"
+msgstr "Zertifikat erneuern"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_AUTH_INIT_DESC"
 msgstr ""
@@ -3356,6 +3376,9 @@ msgstr ""
 "Verwenden Sie das Kalendersymbol oder geben Sie DD.MM.YYYY direkt ein, leer "
 "für Standard"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTIFICATION_LOG_LABEL"
+msgstr "Benachrichtigungen"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTIFY_EXPIRY_MESSAGE_LABEL"
 msgstr "Nachricht"
 
@@ -4078,8 +4101,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_PLACEHOLDER"
 msgstr "Exakte Suche, inklusive Namensraum, Platzhalter erlaubt."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_DESC"
-msgstr ""
-"Suchen nach Workflows anhand verschiedener Suchparameter."
+msgstr "Suchen nach Workflows anhand verschiedener Suchparameter."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_FIELD_HINT_LIST"
 msgstr "Erläuterungen zu den Suchfiltern:"
@@ -4363,6 +4385,15 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUBJECT_COMPLETE_LABEL"
 msgstr "Antragsdaten überprüfen"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUBJECT_COMPLETE_RENEWAL_DESC"
+msgstr ""
+"Ihr Antrag kann bearbeitet werden. Bitte prüfen Sie die angezeigten "
+"Informationen sorgfältig. Sie können die Informationen über die unten "
+"angezeigten Schaltflächen anpassen. Wenn alle Informationen korrekt sind, "
+"wählen Sie 'Zertifikat ausstellen', um die Bearbeitung des Antrags zu "
+"starten."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUCCESS_DESC"
 msgstr ""
 "Das von Ihnen beantragte Zertifikat wurden mit den nachfolgend aufgeführten "
@@ -4584,6 +4615,14 @@ msgstr ""
 "Endpunkten  verzögert sein kann. Falls Sie manuelle Endpunktkonfigurationen "
 "im Einsatz haben, stellen Sie sicher, dass Sie diese bei Bedarf ebenfalls "
 "aktualisieren."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REDIRECT_DESC"
+msgstr "Der Antrag wurde abgelehnt und kann nicht erneut eingereicht werden."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REDIRECT_LABEL"
+msgstr "Antrag abgelehnt"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REJECTED_DESC"
 msgstr "Der Antrag wurde abgelehnt und kann nicht erneut eingereicht werden."
@@ -4808,6 +4847,14 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_PREREG_REQUEST_LABEL"
 msgstr "Zertifikat Vorregistrierung (CPRR)"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_DESC"
+msgstr ""
+"Erneuerung eines bestehenden Zertifikates. Übernimmt die Angaben zu Subject "
+"und SAN in einen neuen Zertifikatsantrag."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_LABEL"
+msgstr "Zertifikatserneuerung"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_DESC"
 msgstr "Antrag zur Sperrung eines Zertifikates"
@@ -5054,8 +5101,8 @@ msgstr "ja"
 #~ msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
 #~ msgstr "Die eingegebene Zeitangabe ist ungültig/nicht zulässig."
 
-#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM"
-#~ msgstr "Schlüsselparameter"
+#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
+#~ msgstr "Download Format"
 
 #~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_CURVE_NAME"
 #~ msgstr "Kurve"

@@ -607,6 +607,10 @@ msgstr "遅延失効がリクエストされました。"
 msgid "I18N_OPENXPKI_UI_DIGEST"
 msgstr "はい"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DIGEST_ALG"
+msgstr "はい"
+
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_FAIL"
 msgstr "失敗"
 
@@ -846,9 +850,6 @@ msgstr "エクスポートする私有鍵にパスワードを設定します。
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_FILENAME_LABEL"
 msgstr "キーストアのダウンロード"
 
-msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
-msgstr "ダウンロードフォーマット"
-
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_DESC"
 msgstr ""
 "キーストアの形式は、ほとんどのアプリケーションがPKCS12形式で動作します。"
@@ -950,6 +951,9 @@ msgstr "アイテム"
 # Remove?
 msgid "I18N_OPENXPKI_UI_KEY"
 msgstr "キー"
+
+msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM"
+msgstr "キーパラメータ"
 
 msgid "I18N_OPENXPKI_UI_KEYSTORE_ALIAS_CONTAINS_INVALID_CHARACTERS"
 msgstr "エイリアスには、a-z A-Z 0-9 - _以外の文字が含まれています。"
@@ -1403,6 +1407,16 @@ msgstr "高度な入力スタイル"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_ADVANCED_STYLE_LABEL"
 msgstr "拡張プロファイル（エキスパート）"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_ID"
+msgstr "アプリケーション名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_ID_DESC"
+msgstr ""
+"ホスト名にコロンを付加したアプリケーション名。3〜12文字（a-z, 0-9, ダッシュ, "
+"アンダースコア）。"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_NAME"
 msgstr "アプリケーション名"
@@ -2188,6 +2202,14 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_RETYPE_SERVER_PASSWORD_LABEL"
 msgstr "登録鍵"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTRENEW_INITIAL_DESC"
+msgstr "証明書の許可"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTRENEW_INITIAL_LABEL"
+msgstr "証明書の許可"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_AUTH_INIT_DESC"
@@ -3360,6 +3382,10 @@ msgstr ""
 "カレンダーアイコンを使用するか、MM.DD.YYYY形式で日付を入力し、デフォルトを使"
 "用するには0を入力します。日付けはUTCの時間帯です。"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTIFICATION_LOG_LABEL"
+msgstr "証明書"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTIFY_EXPIRY_MESSAGE_LABEL"
 msgstr "証明書失効通知"
 
@@ -4315,6 +4341,13 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUBJECT_COMPLETE_LABEL"
 msgstr "リクエスト請求"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUBJECT_COMPLETE_RENEWAL_DESC"
+msgstr ""
+"あなたのリクエストはすぐに送信されます。表示された情報が正しいかどうかを確認"
+"してください。以下のボタンを使用して情報を更新することができます。<b>情報が完"
+"全な場合は、送信ボタンを使用して追加処理のリクエストを送信してください</b>"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUCCESS_DESC"
 msgstr "このワークフローは成功して終了し、再実行はできません"
 
@@ -4510,6 +4543,14 @@ msgstr ""
 "により、エンドポイントでの新しいトークンの表示が遅れることがあります。一部の"
 "エンドポイントで手動によるトークン設定をしている場合は、使用前に必ず更新して"
 "ください。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REDIRECT_DESC"
+msgstr "リクエストは拒否され、再実効はできません。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REDIRECT_LABEL"
+msgstr "リクエスト拒否"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REJECTED_DESC"
 msgstr "リクエストは拒否され、再実効はできません。"
@@ -4708,6 +4749,17 @@ msgstr ""
 "す。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_PREREG_REQUEST_LABEL"
+msgstr "証明書事前登録申請(CPRR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_DESC"
+msgstr ""
+"証明書の事前登録を使用すると、APIキーを使用した自動化インターフェースにより、"
+"後から登録するためのcommonNameへのホスト名の割り当てを要求することができま"
+"す。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_LABEL"
 msgstr "証明書事前登録申請(CPRR)"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_DESC"
@@ -4993,8 +5045,8 @@ msgstr "はい"
 #~ msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
 #~ msgstr "入力された日付/時刻を検証できませんでした。"
 
-#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM"
-#~ msgstr "キーパラメータ"
+#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
+#~ msgstr "ダウンロードフォーマット"
 
 #~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_CURVE_NAME"
 #~ msgstr "種別"

@@ -569,6 +569,10 @@ msgstr "Delayed revocation requested."
 msgid "I18N_OPENXPKI_UI_DIGEST"
 msgstr "Digest"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DIGEST_ALG"
+msgstr "Digest"
+
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_FAIL"
 msgstr "fail"
 
@@ -802,9 +806,6 @@ msgstr "Export Password"
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_FILENAME_LABEL"
 msgstr "Keystore Download"
 
-msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
-msgstr "Download Format"
-
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_DESC"
 msgstr ""
 "The format of the keystore, most applications will work with PKCS12 "
@@ -906,6 +907,9 @@ msgstr "Items"
 # Remove?
 msgid "I18N_OPENXPKI_UI_KEY"
 msgstr "Key"
+
+msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM"
+msgstr "Key Parameters"
 
 msgid "I18N_OPENXPKI_UI_KEYSTORE_ALIAS_CONTAINS_INVALID_CHARACTERS"
 msgstr "Alias does contain characters other than a-z A-Z 0-9 - _ ."
@@ -1327,6 +1331,12 @@ msgstr "Advanced naming style"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_ADVANCED_STYLE_LABEL"
 msgstr "Extended naming (expert use only)"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_ID"
+msgstr "Application ID"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_ID_DESC"
+msgstr "The id/reference number of the application or system"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_NAME"
 msgstr "Application Name"
@@ -2075,6 +2085,16 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_RETYPE_SERVER_PASSWORD_LABEL"
 msgstr "Your Enrollment Key"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTRENEW_INITIAL_DESC"
+msgstr "Type the certificate identifier or use the autosearch function to find the "
+"certificate you want to renew. If you can not find/"
+"identify your certificate please select certificate search from the main "
+"menu. The result list will contain a link to change the metadata."
+
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTRENEW_INITIAL_LABEL"
+msgstr "Certificate Renewal"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_AUTH_INIT_DESC"
 msgstr "Select the endpoint for which you want to request the authorization."
@@ -3222,6 +3242,9 @@ msgstr ""
 "Use the calendar icon or enter a date in MM.DD.YYYY format, type 0 to use "
 "the default. Dates are in UTC timezone!"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTIFICATION_LOG_LABEL"
+msgstr "Notifications"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTIFY_EXPIRY_MESSAGE_LABEL"
 msgstr "Notification"
 
@@ -4193,6 +4216,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUBJECT_COMPLETE_LABEL"
 msgstr "Review Request"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUBJECT_COMPLETE_RENEWAL_DESC"
+msgstr ""
+"Your request is ready to be submitted. Please check if the information shown "
+"is correct. You can update information using the buttons below, <b>if the "
+"information is complete, please use the Submit button to enqueue the request "
+"for further processing</b>."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUCCESS_DESC"
 msgstr "This workflow has finished with success and can not be restarted"
 
@@ -4400,6 +4431,14 @@ msgstr ""
 "might delay the visibility of the new token on the endpoints. If you use "
 "manual token configurations for some endpoints make sure to update them."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REDIRECT_DESC"
+msgstr "The request was finally rejected and can not be restartet."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REDIRECT_LABEL"
+msgstr "Request Rejected"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REJECTED_DESC"
 msgstr "The request was finally rejected and can not be restartet."
 
@@ -4591,6 +4630,17 @@ msgstr ""
 "using a API key."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_PREREG_REQUEST_LABEL"
+msgstr "Certificate Preregistration Request (CPRR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_DESC"
+msgstr ""
+"With certificate preregistration you can request the assignment of  "
+"hostnames to a commonName for later enrollment via an automated interface "
+"using a API key."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_LABEL"
 msgstr "Certificate Preregistration Request (CPRR)"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_DESC"
@@ -4837,8 +4887,8 @@ msgstr "Yes"
 #~ msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
 #~ msgstr "The entered date/time could not be validated."
 
-#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM"
-#~ msgstr "Key Parameters"
+#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
+#~ msgstr "Download Format"
 
 #~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_CURVE_NAME"
 #~ msgstr "Curve Name"
