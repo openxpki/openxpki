@@ -2025,72 +2025,8 @@ msgstr "未知错误"
 msgid "I18N_OPENXPKI_UI_UPTIME_LABEL"
 msgstr "CA域"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_ADD_USER"
-msgstr "访客"
-
 msgid "I18N_OPENXPKI_UI_USER_ANONYMOUS"
 msgstr "访客"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_EDIT_USER"
-msgstr "新搜索"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_LIST_EMPTY_LABEL"
-msgstr "无可用数据"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_MAIL"
-msgstr "密钥算法"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_REALNAME"
-msgstr "真名"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_ROLE"
-msgstr "准备"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_ROLE_RAOP"
-msgstr "RSA"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_ROLE_USER"
-msgstr "用户ID"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_DESC"
-msgstr "使用下面的过滤器搜索工作流程。"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_LABEL"
-msgstr "搜索工作流程"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_DESC"
-msgstr "与您的搜索匹配的证书，单击行以显示详细信息。"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_LABEL"
-msgstr "您的搜索查询结果"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_TITLE"
-msgstr "证书搜索结果"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_SUBMIT_LABEL"
-msgstr "马上搜索"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_TITLE"
-msgstr "颁发此域的证书"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_USERNAME"
-msgstr "用户名"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_EXISTS_NOT_AN_ENTITY"
 msgstr "证书不是实体证书。"
@@ -5185,6 +5121,70 @@ msgstr "是"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
 #~ msgstr "请先选择配置文件"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_ADD_USER"
+#~ msgstr "访客"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_EDIT_USER"
+#~ msgstr "新搜索"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_LIST_EMPTY_LABEL"
+#~ msgstr "无可用数据"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_MAIL"
+#~ msgstr "密钥算法"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_REALNAME"
+#~ msgstr "真名"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_ROLE"
+#~ msgstr "准备"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_ROLE_RAOP"
+#~ msgstr "RSA"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_ROLE_USER"
+#~ msgstr "用户ID"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_DESC"
+#~ msgstr "使用下面的过滤器搜索工作流程。"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_LABEL"
+#~ msgstr "搜索工作流程"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_DESC"
+#~ msgstr "与您的搜索匹配的证书，单击行以显示详细信息。"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_LABEL"
+#~ msgstr "您的搜索查询结果"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_TITLE"
+#~ msgstr "证书搜索结果"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_SUBMIT_LABEL"
+#~ msgstr "马上搜索"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_TITLE"
+#~ msgstr "颁发此域的证书"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_USERNAME"
+#~ msgstr "用户名"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_ENDPOINT_AUTH_LABEL"

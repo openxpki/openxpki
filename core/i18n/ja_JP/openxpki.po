@@ -1956,57 +1956,8 @@ msgstr "不明なエラー"
 msgid "I18N_OPENXPKI_UI_UPTIME_LABEL"
 msgstr "CAレルム"
 
-msgid "I18N_OPENXPKI_UI_USER_ADD_USER"
-msgstr "ユーザーの追加"
-
 msgid "I18N_OPENXPKI_UI_USER_ANONYMOUS"
 msgstr "ゲスト"
-
-msgid "I18N_OPENXPKI_UI_USER_EDIT_USER"
-msgstr "選択したユーザの編集"
-
-msgid "I18N_OPENXPKI_UI_USER_LIST_EMPTY_LABEL"
-msgstr "検索条件に一致するユーザは見つかりませんでした。"
-
-msgid "I18N_OPENXPKI_UI_USER_MAIL"
-msgstr "メール"
-
-msgid "I18N_OPENXPKI_UI_USER_REALNAME"
-msgstr "本名"
-
-msgid "I18N_OPENXPKI_UI_USER_ROLE"
-msgstr "役割"
-
-msgid "I18N_OPENXPKI_UI_USER_ROLE_RAOP"
-msgstr "RAオペレーター"
-
-msgid "I18N_OPENXPKI_UI_USER_ROLE_USER"
-msgstr "ユーザ"
-
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_DESC"
-msgstr "ユーザ検索"
-
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_LABEL"
-msgstr "ユーザ検索"
-
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_DESC"
-msgstr ""
-"検索結果に表示されているユーザーをクリックすると、詳細情報を表示できます"
-
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_LABEL"
-msgstr "ユーザ検索の結果"
-
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_TITLE"
-msgstr "ユーザ検索結果"
-
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_SUBMIT_LABEL"
-msgstr "今すぐ検索"
-
-msgid "I18N_OPENXPKI_UI_USER_TITLE"
-msgstr "ユーザ管理"
-
-msgid "I18N_OPENXPKI_UI_USER_USERNAME"
-msgstr "ユーザ名"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_EXISTS_NOT_AN_ENTITY"
 msgstr "証明書は実在の証明書ではありません。"
@@ -5185,11 +5136,60 @@ msgstr "はい"
 #~ msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_LOG"
 #~ msgstr "ワークフローログにアクセスするために必要な権利がありません。"
 
+#~ msgid "I18N_OPENXPKI_UI_USER_ADD_USER"
+#~ msgstr "ユーザーの追加"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_EDIT_USER"
+#~ msgstr "選択したユーザの編集"
+
 #~ msgid "I18N_OPENXPKI_UI_USER_IS_CERTIFICATE_OWNER_FAILED"
 #~ msgstr "ユーザーは証明書の所有者ではありません。"
 
 #~ msgid "I18N_OPENXPKI_UI_USER_IS_CERTIFICATE_OWNER_NO_OWNER_FOUND"
 #~ msgstr "証明書には所有者がいません。"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_LIST_EMPTY_LABEL"
+#~ msgstr "検索条件に一致するユーザは見つかりませんでした。"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_MAIL"
+#~ msgstr "メール"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_REALNAME"
+#~ msgstr "本名"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_ROLE"
+#~ msgstr "役割"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_ROLE_RAOP"
+#~ msgstr "RAオペレーター"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_ROLE_USER"
+#~ msgstr "ユーザ"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_DESC"
+#~ msgstr "ユーザ検索"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_LABEL"
+#~ msgstr "ユーザ検索"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_DESC"
+#~ msgstr ""
+#~ "検索結果に表示されているユーザーをクリックすると、詳細情報を表示できます"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_LABEL"
+#~ msgstr "ユーザ検索の結果"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_TITLE"
+#~ msgstr "ユーザ検索結果"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_SUBMIT_LABEL"
+#~ msgstr "今すぐ検索"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_TITLE"
+#~ msgstr "ユーザ管理"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_USERNAME"
+#~ msgstr "ユーザ名"
 
 #~ msgid "I18N_OPENXPKI_UI_VALIDATOR_COMMON_NAME_TO_LONG"
 #~ msgstr "以下の情報から作成される一般名称は、64文字の制限を超えています。"

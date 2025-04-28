@@ -2307,76 +2307,8 @@ msgstr "Tipo"
 
 # Remove?
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_ADD_USER"
-msgstr "Stato del Certificato"
-
-# Remove?
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_USER_ANONYMOUS"
 msgstr "Stato del Certificato"
-
-# Remove?
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_EDIT_USER"
-msgstr "Stato del Certificato"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_LIST_EMPTY_LABEL"
-msgstr "Nessun dato disponibile"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_MAIL"
-msgstr "Algoritmo della Chiave"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_REALNAME"
-msgstr "Nome reale"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_ROLE"
-msgstr "Completo"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_ROLE_RAOP"
-msgstr "RSA"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_ROLE_USER"
-msgstr "ID Utente"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_DESC"
-msgstr "Ricerca nei Workflow usando i filtri qui sotto."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_LABEL"
-msgstr "Ricerca nei Workflow"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_DESC"
-msgstr ""
-"Certificati corrispondenti alla tua ricerca, clicca su una riga per "
-"visualizzare informazioni dettagliate sul certificato corrispondente."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_LABEL"
-msgstr "Risultati Ricerca Certificati"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_TITLE"
-msgstr "Risultati Ricerca Certificati"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_SUBMIT_LABEL"
-msgstr "cerca adesso"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_TITLE"
-msgstr "Emissione Lista Revoche (CRL)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_USERNAME"
-msgstr "Nome utente"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_EXISTS_NOT_AN_ENTITY"
 msgstr "Certificato non è di tipo entity."
@@ -5873,6 +5805,74 @@ msgstr "Sì"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
 #~ msgstr "Seleziona prima un profilo nel campo soprastante"
+
+# Remove?
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_ADD_USER"
+#~ msgstr "Stato del Certificato"
+
+# Remove?
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_EDIT_USER"
+#~ msgstr "Stato del Certificato"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_LIST_EMPTY_LABEL"
+#~ msgstr "Nessun dato disponibile"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_MAIL"
+#~ msgstr "Algoritmo della Chiave"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_REALNAME"
+#~ msgstr "Nome reale"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_ROLE"
+#~ msgstr "Completo"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_ROLE_RAOP"
+#~ msgstr "RSA"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_ROLE_USER"
+#~ msgstr "ID Utente"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_DESC"
+#~ msgstr "Ricerca nei Workflow usando i filtri qui sotto."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_LABEL"
+#~ msgstr "Ricerca nei Workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_DESC"
+#~ msgstr ""
+#~ "Certificati corrispondenti alla tua ricerca, clicca su una riga per "
+#~ "visualizzare informazioni dettagliate sul certificato corrispondente."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_LABEL"
+#~ msgstr "Risultati Ricerca Certificati"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_TITLE"
+#~ msgstr "Risultati Ricerca Certificati"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_SUBMIT_LABEL"
+#~ msgstr "cerca adesso"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_TITLE"
+#~ msgstr "Emissione Lista Revoche (CRL)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_USERNAME"
+#~ msgstr "Nome utente"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_ENDPOINT_AUTH_LABEL"

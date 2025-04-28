@@ -1848,74 +1848,8 @@ msgstr "Unbekannter Fehler"
 msgid "I18N_OPENXPKI_UI_UPTIME_LABEL"
 msgstr "Uptime"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_ADD_USER"
-msgstr "Gast"
-
 msgid "I18N_OPENXPKI_UI_USER_ANONYMOUS"
 msgstr "Gast"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_EDIT_USER"
-msgstr "Neue Suche"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_LIST_EMPTY_LABEL"
-msgstr "Keine Daten verfügbar"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_MAIL"
-msgstr "Algorithmus"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_REALNAME"
-msgstr "Realname"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_ROLE"
-msgstr "entsperrt"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_ROLE_RAOP"
-msgstr "RSA"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_ROLE_USER"
-msgstr "User ID"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_DESC"
-msgstr ""
-"Suche nach Workflows, entweder anhand einer bekannten Workflow-ID oder "
-"verschiedener Suchparameter."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_LABEL"
-msgstr "Suche nach Workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_DESC"
-msgstr ""
-"Zertifikate, die ihren Suchkriterien entsprechen. Weitere Informationen "
-"erhalten Sie durch Anklicken einer Zeile."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_LABEL"
-msgstr "Ergebnis der Zertifikatssuche"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_TITLE"
-msgstr "Suchergebnis"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_SUBMIT_LABEL"
-msgstr "Suche starten"
-
-msgid "I18N_OPENXPKI_UI_USER_TITLE"
-msgstr "Benutzerverwaltung"
-
-msgid "I18N_OPENXPKI_UI_USER_USERNAME"
-msgstr "Benutzername"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_EXISTS_NOT_AN_ENTITY"
 msgstr "Dieses Zertifikat ist keine Entität dieser CA"
@@ -2127,14 +2061,13 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_RETYPE_SERVER_PASSWORD_LABEL"
 msgstr "Ihr Registrierungsschlüssel"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTRENEW_INITIAL_DESC"
 msgstr ""
 "Geben Sie den Zeritifikatsidentifier an oder verwenden Sie die automatische "
-"Suche, um das Zertifikat zu finden, dass Sie erneuern möchten. "
-"Falls Sie das Zertifikat nicht finden oder auswählen können, "
-"verwenden Sie bitte die Zertifikatssuche. Das Ergebnis enthält einen "
-"direkten Link, um den Antrag auszuführen."
+"Suche, um das Zertifikat zu finden, dass Sie erneuern möchten. Falls Sie das "
+"Zertifikat nicht finden oder auswählen können, verwenden Sie bitte die "
+"Zertifikatssuche. Das Ergebnis enthält einen direkten Link, um den Antrag "
+"auszuführen."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTRENEW_INITIAL_LABEL"
 msgstr "Zertifikat erneuern"
@@ -4385,7 +4318,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUBJECT_COMPLETE_LABEL"
 msgstr "Antragsdaten überprüfen"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUBJECT_COMPLETE_RENEWAL_DESC"
 msgstr ""
 "Ihr Antrag kann bearbeitet werden. Bitte prüfen Sie die angezeigten "
@@ -5124,6 +5056,72 @@ msgstr "ja"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
 #~ msgstr "Bitte zuerst Profil wählen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_ADD_USER"
+#~ msgstr "Gast"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_EDIT_USER"
+#~ msgstr "Neue Suche"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_LIST_EMPTY_LABEL"
+#~ msgstr "Keine Daten verfügbar"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_MAIL"
+#~ msgstr "Algorithmus"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_REALNAME"
+#~ msgstr "Realname"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_ROLE"
+#~ msgstr "entsperrt"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_ROLE_RAOP"
+#~ msgstr "RSA"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_ROLE_USER"
+#~ msgstr "User ID"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_DESC"
+#~ msgstr ""
+#~ "Suche nach Workflows, entweder anhand einer bekannten Workflow-ID oder "
+#~ "verschiedener Suchparameter."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_LABEL"
+#~ msgstr "Suche nach Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_DESC"
+#~ msgstr ""
+#~ "Zertifikate, die ihren Suchkriterien entsprechen. Weitere Informationen "
+#~ "erhalten Sie durch Anklicken einer Zeile."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_LABEL"
+#~ msgstr "Ergebnis der Zertifikatssuche"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_TITLE"
+#~ msgstr "Suchergebnis"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_SUBMIT_LABEL"
+#~ msgstr "Suche starten"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_TITLE"
+#~ msgstr "Benutzerverwaltung"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_USERNAME"
+#~ msgstr "Benutzername"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_ENDPOINT_AUTH_LABEL"
 #~ msgstr "Berechtigte(r) Endpunkt(e)"

@@ -1845,57 +1845,8 @@ msgstr "Unknown error"
 msgid "I18N_OPENXPKI_UI_UPTIME_LABEL"
 msgstr "Uptime"
 
-msgid "I18N_OPENXPKI_UI_USER_ADD_USER"
-msgstr "Add User"
-
 msgid "I18N_OPENXPKI_UI_USER_ANONYMOUS"
 msgstr "Guest"
-
-msgid "I18N_OPENXPKI_UI_USER_EDIT_USER"
-msgstr "Edit the selected user"
-
-msgid "I18N_OPENXPKI_UI_USER_LIST_EMPTY_LABEL"
-msgstr "No user matching your search was found"
-
-msgid "I18N_OPENXPKI_UI_USER_MAIL"
-msgstr "Email"
-
-msgid "I18N_OPENXPKI_UI_USER_REALNAME"
-msgstr "Realname"
-
-msgid "I18N_OPENXPKI_UI_USER_ROLE"
-msgstr "Role"
-
-msgid "I18N_OPENXPKI_UI_USER_ROLE_RAOP"
-msgstr "RA Operator"
-
-msgid "I18N_OPENXPKI_UI_USER_ROLE_USER"
-msgstr "User"
-
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_DESC"
-msgstr "Search for users"
-
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_LABEL"
-msgstr "Search for users"
-
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_DESC"
-msgstr "User Search Results"
-
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_LABEL"
-msgstr "Result of your search query"
-
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_TITLE"
-msgstr "User Search Results"
-
-msgid "I18N_OPENXPKI_UI_USER_SEARCH_SUBMIT_LABEL"
-msgstr "Search"
-
-# user management
-msgid "I18N_OPENXPKI_UI_USER_TITLE"
-msgstr "User Management"
-
-msgid "I18N_OPENXPKI_UI_USER_USERNAME"
-msgstr "Username"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_EXISTS_NOT_AN_ENTITY"
 msgstr "Certificate is not an entity certificate."
@@ -2087,11 +2038,11 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_RETYPE_SERVER_PASSWORD_LABEL"
 msgstr "Your Enrollment Key"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTRENEW_INITIAL_DESC"
-msgstr "Type the certificate identifier or use the autosearch function to find the "
-"certificate you want to renew. If you can not find/"
-"identify your certificate please select certificate search from the main "
-"menu. The result list will contain a link to change the metadata."
-
+msgstr ""
+"Type the certificate identifier or use the autosearch function to find the "
+"certificate you want to renew. If you can not find/identify your certificate "
+"please select certificate search from the main menu. The result list will "
+"contain a link to change the metadata."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTRENEW_INITIAL_LABEL"
 msgstr "Certificate Renewal"
@@ -4216,7 +4167,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUBJECT_COMPLETE_LABEL"
 msgstr "Review Request"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUBJECT_COMPLETE_RENEWAL_DESC"
 msgstr ""
 "Your request is ready to be submitted. Please check if the information shown "
@@ -4910,6 +4860,55 @@ msgstr "Yes"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
 #~ msgstr "Please select profile first"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_ADD_USER"
+#~ msgstr "Add User"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_EDIT_USER"
+#~ msgstr "Edit the selected user"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_LIST_EMPTY_LABEL"
+#~ msgstr "No user matching your search was found"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_MAIL"
+#~ msgstr "Email"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_REALNAME"
+#~ msgstr "Realname"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_ROLE"
+#~ msgstr "Role"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_ROLE_RAOP"
+#~ msgstr "RA Operator"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_ROLE_USER"
+#~ msgstr "User"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_DESC"
+#~ msgstr "Search for users"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_LABEL"
+#~ msgstr "Search for users"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_DESC"
+#~ msgstr "User Search Results"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_LABEL"
+#~ msgstr "Result of your search query"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_TITLE"
+#~ msgstr "User Search Results"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_SUBMIT_LABEL"
+#~ msgstr "Search"
+
+# user management
+#~ msgid "I18N_OPENXPKI_UI_USER_TITLE"
+#~ msgstr "User Management"
+
+#~ msgid "I18N_OPENXPKI_UI_USER_USERNAME"
+#~ msgstr "Username"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_ENDPOINT_AUTH_LABEL"
 #~ msgstr "Authorized Endpoint(s)"
