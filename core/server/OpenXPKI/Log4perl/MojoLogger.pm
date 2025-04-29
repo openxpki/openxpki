@@ -6,6 +6,8 @@ extends 'Mojo::EventEmitter';
 use Log::Log4perl;
 use Mojo::Util qw( monkey_patch );
 
+Log::Log4perl->wrapper_register(__PACKAGE__); # make Log4perl step up to the next call frame
+
 our $LOGGERS_BY_NAME = {};
 
 has category => (
@@ -68,9 +70,6 @@ sub BUILD ($self, $args) {
 }
 
 sub _message ($self, $method, @message) {
-    my $depth = 3;
-    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + $depth;
-
     if ($self->_logger->$method( @message )) {
         my $hist = $self->history;
         my $max = $self->max_history_size;
