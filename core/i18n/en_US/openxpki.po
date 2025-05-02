@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2025-02-04 16:08+0100\n"
+"PO-Revision-Date: 2025-05-02 12:38+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -513,9 +513,8 @@ msgstr "Expires after"
 msgid "I18N_OPENXPKI_UI_DATAPOOL_EXPIRES_BEFORE"
 msgstr "Expires before"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_DATAPOOL_INVENTORY_LABEL"
-msgstr "Message of the Day"
+msgstr "Inventory"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_KEY"
 msgstr "Entry"
@@ -569,9 +568,8 @@ msgstr "Delayed revocation requested."
 msgid "I18N_OPENXPKI_UI_DIGEST"
 msgstr "Digest"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_DIGEST_ALG"
-msgstr "Digest"
+msgstr "Digest Algorithm"
 
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_FAIL"
 msgstr "fail"
@@ -1980,30 +1978,6 @@ msgstr "Cancel"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_USER"
 msgstr "Access to this workflow is forbidden for the current user"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ADDUSER_LOAD_FORM_DESC"
-msgstr " "
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ADDUSER_LOAD_FORM_LABEL"
-msgstr "Edit Data"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ADDUSER_PERSIST_DESC"
-msgstr "Creates a new user and stores it in the database"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ADDUSER_PERSIST_LABEL"
-msgstr "Create User"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ADDUSER_TERMINATE_DESC"
-msgstr "Abort this workflow. This will not create a new user."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ADDUSER_TERMINATE_LABEL"
-msgstr "Abort User Creation"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ADDUSER_UPDATE_CONTEXT_DESC"
-msgstr "Please update the information using the form below."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ADDUSER_UPDATE_CONTEXT_LABEL"
-msgstr "Update User Attributes"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CRR_DESC"
 msgstr ""
 "Please validate the given information and approve the revocation request "
@@ -2253,36 +2227,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_UPLOAD_PKCS10_LABEL"
 msgstr "Upload CSR (PKCS10)"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDITUSER_LOAD_DATA_DESC"
-msgstr " "
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDITUSER_LOAD_DATA_LABEL"
-msgstr "Select User to edit"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDITUSER_LOAD_FORM_DESC"
-msgstr " "
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDITUSER_LOAD_FORM_LABEL"
-msgstr "Edit Data"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDITUSER_PERSIST_DESC"
-msgstr "Persist the changed data to the database"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDITUSER_PERSIST_LABEL"
-msgstr "Persist Data"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDITUSER_TERMINATE_DESC"
-msgstr "Abort this workflow. This will leave the user account unchanged."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDITUSER_TERMINATE_LABEL"
-msgstr "Abort Change"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDITUSER_UPDATE_CONTEXT_DESC"
-msgstr "Please update the information using the form below."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDITUSER_UPDATE_CONTEXT_LABEL"
-msgstr "Update User Attributes"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ACCEPT_REQUEST_DESC"
 msgstr "Accept Request"
 
@@ -2418,34 +2362,6 @@ msgstr "Define Report Options"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REPORT_SUMMARY_INITIALIZE_LABEL"
 msgstr "Define Report Options"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RESETPASS_ASK_CLIENT_PASSWORD_DESC"
-msgstr " "
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RESETPASS_ASK_CLIENT_PASSWORD_LABEL"
-msgstr "Set New Password"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RESETPASS_ASK_RESET_PASSWORD_DESC"
-msgstr ""
-"An email has been sent to you. Please provide the contained password below "
-"to confirm the password reset"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RESETPASS_ASK_RESET_PASSWORD_LABEL"
-msgstr "Confirm Reset"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RESETPASS_INIT_DESC"
-msgstr ""
-"Please provide the email of the user account for which you want to reset the "
-"passort"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RESETPASS_INIT_LABEL"
-msgstr "Reset User Password"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RESETPASS_PERSIST_DESC"
-msgstr " "
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RESETPASS_PERSIST_LABEL"
-msgstr "Persist Password"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REVOKE_CERTIFICATE_DESC"
 msgstr "Schedule this certificate for revocation"
@@ -2638,45 +2554,6 @@ msgstr "Exception Message"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_EXPORT_PRIVATEKEY_RETRY_PASSWORD_BUTTON_LABEL"
 msgstr "Re-Enter Password"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ADDUSER_EMAIL_DESC"
-msgstr "Email of user"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ADDUSER_EMAIL_LABEL"
-msgstr "Email"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ADDUSER_EMAIL_PLACEHOLDER"
-msgstr "Email"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ADDUSER_REALNAME_DESC"
-msgstr "Real name of user"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ADDUSER_REALNAME_LABEL"
-msgstr "Realname"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ADDUSER_REALNAME_PLACEHOLDER"
-msgstr "Realname"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ADDUSER_ROLE_DESC"
-msgstr "Role of the user e.g. User, RA Operator,..."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ADDUSER_ROLE_LABEL"
-msgstr "Role"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ADDUSER_ROLE_RAOP"
-msgstr "RA Operator"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ADDUSER_ROLE_USER"
-msgstr "User"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ADDUSER_USERNAME_DESC"
-msgstr "Username of the account that should be edited"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ADDUSER_USERNAME_LABEL"
-msgstr "Username"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ADDUSER_USERNAME_PLACEHOLDER"
-msgstr "Username"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVALS_LABEL"
 msgstr "Approvals"
@@ -2936,45 +2813,6 @@ msgstr "usually not required, use the selector on the right or type a datetime"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_TOOLTIP"
 msgstr "the revocation will be scheduled after the given date"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EDITUSER_EMAIL_DESC"
-msgstr "Email of user"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EDITUSER_EMAIL_LABEL"
-msgstr "Email"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EDITUSER_EMAIL_PLACEHOLDER"
-msgstr "Email"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EDITUSER_REALNAME_DESC"
-msgstr "Real name of user"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EDITUSER_REALNAME_LABEL"
-msgstr "Realname"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EDITUSER_REALNAME_PLACEHOLDER"
-msgstr "Realname"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EDITUSER_ROLE_DESC"
-msgstr "Role of the user e.g. User, RA Operator,..."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EDITUSER_ROLE_LABEL"
-msgstr "Role"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EDITUSER_ROLE_RAOP"
-msgstr "RA Operator"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EDITUSER_ROLE_USER"
-msgstr "User"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EDITUSER_USERNAME_DESC"
-msgstr "Username of the account that should be edited"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EDITUSER_USERNAME_LABEL"
-msgstr "Username"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EDITUSER_USERNAME_PLACEHOLDER"
-msgstr "Username"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EMAIL_DESC"
 msgstr " "
@@ -3371,26 +3209,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REQUEST_MODE_LABEL"
 msgstr "Request Mode"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RESETPASS_EMAIL_DESC"
-msgstr ""
-"The email address of the user account for which you want to reset the "
-"password"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RESETPASS_EMAIL_LABEL"
-msgstr "Email"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RESETPASS_EMAIL_PLACEHOLDER"
-msgstr "Email"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RESETPASS_RESET_PASSWORD_DESC"
-msgstr "The password you received per email"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RESETPASS_RESET_PASSWORD_LABEL"
-msgstr "Reset Password"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RESETPASS_RESET_PASSWORD_PLACEHOLDER"
-msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_TIME_DESC"
 msgstr ""
@@ -3965,34 +3783,6 @@ msgstr "Message set"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_START_BUTTON"
 msgstr "Start Workflow"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ADDUSER_CHOOSE_ACTION_DESC"
-msgstr ""
-"Below you see the new user attributes. Please choose from the actions below "
-"how to proceed. 'Abort' will terminate the workflow without writing the "
-"attributes back to the database, 'Update' will show the form again while "
-"'Save' will persist the data and finish the workflow."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ADDUSER_CHOOSE_ACTION_LABEL"
-msgstr "Check Data"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ADDUSER_DATA_UPDATE_DESC"
-msgstr "This workflow is paused and will be continued by the watchdog"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ADDUSER_DATA_UPDATE_LABEL"
-msgstr "Updated"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ADDUSER_INIT_DESC"
-msgstr "Add a new user"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ADDUSER_INIT_LABEL"
-msgstr "State"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ADDUSER_SUCCESS_DESC"
-msgstr "A new user account was created"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ADDUSER_SUCCESS_LABEL"
-msgstr "New User Created"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED"
 msgstr "This workflow was archived."
 
@@ -4004,6 +3794,14 @@ msgstr "Canceled"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CAPUBLISH_INITIAL_LABEL"
 msgstr "Publish CA/CRL Information"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERTRENEW_FAILURE_DESC"
+msgstr ""
+"This certificate can not be renewed as the preconditions for renewal are not "
+"met. See the output below for more details."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERTRENEW_FAILURE_LABEL"
+msgstr "Renewal check failed"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_ENROLL_SUCCESS_DESC"
 msgstr "The certificate was issued and will be send to the client on request."
@@ -4180,34 +3978,6 @@ msgstr "This workflow has finished with success and can not be restarted"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUCCESS_LABEL"
 msgstr "Certificate Issued"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDITUSER_CHOOSE_ACTION_DESC"
-msgstr ""
-"Below you see the new user attributes. Please choose from the actions below "
-"how to proceed. 'Abort' will terminate the workflow without writing the "
-"attributes back to the database, 'Update' will show the form again while "
-"'Save' will persist the data and finish the workflow."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDITUSER_CHOOSE_ACTION_LABEL"
-msgstr "Check Data"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDITUSER_DATA_UPDATE_DESC"
-msgstr "This workflow is paused and will be continued by the watchdog"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDITUSER_DATA_UPDATE_LABEL"
-msgstr "Updated"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDITUSER_INIT_DESC"
-msgstr "Change attributes of user accounts"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDITUSER_INIT_LABEL"
-msgstr "State"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDITUSER_SUCCESS_DESC"
-msgstr "The changes have been persisted to the database."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDITUSER_SUCCESS_LABEL"
-msgstr "User account was updated"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_MANUAL_AUTHORIZATION_DESC"
 msgstr ""
 "This request was send without any authentication information. If you are the "
@@ -4381,13 +4151,12 @@ msgstr ""
 "might delay the visibility of the new token on the endpoints. If you use "
 "manual token configurations for some endpoints make sure to update them."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REDIRECT_DESC"
-msgstr "The request was finally rejected and can not be restartet."
+msgstr ""
+"A new request is prepared in the background. You will be redirected shortly."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REDIRECT_LABEL"
-msgstr "Request Rejected"
+msgstr "Preparing request"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REJECTED_DESC"
 msgstr "The request was finally rejected and can not be restartet."
@@ -4403,36 +4172,6 @@ msgstr "Report Result"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REPORT_SUMMARY_SUCCESS_LABEL"
 msgstr "Report Result"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RESETPASS_ASK_CLIENT_PASSWORD_DESC"
-msgstr "Please provide the new password"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RESETPASS_ASK_CLIENT_PASSWORD_LABEL"
-msgstr "Provide New Password"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RESETPASS_ASK_RESET_PASSWORD_DESC"
-msgstr "The password you received per email"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RESETPASS_ASK_RESET_PASSWORD_LABEL"
-msgstr "Reset Password"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RESETPASS_INIT_DESC"
-msgstr "Reset own user password"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RESETPASS_INIT_LABEL"
-msgstr "State"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RESETPASS_RETRY_EMAIL_DESC"
-msgstr "No user account is associated with the provided email"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RESETPASS_RETRY_EMAIL_LABEL"
-msgstr "Email not Found"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RESETPASS_SUCCESS_DESC"
-msgstr "The new password was persisted in the database"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RESETPASS_SUCCESS_LABEL"
-msgstr "New Password Set"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RETRY_EXCEEDED_DESC"
 msgstr ""
@@ -4553,13 +4292,6 @@ msgstr "Request registration of a new ACME user account"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_NEWACCOUNT_LABEL"
 msgstr "ACME Account Registration"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ADDUSER_DESC"
-msgstr "Add a new user"
-
-# adduser workflow
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ADDUSER_LABEL"
-msgstr "Add User"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_DESC"
 msgstr ""
 "Publish CA information (CA certificates and CRLs) to defined repositories."
@@ -4582,16 +4314,13 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_PREREG_REQUEST_LABEL"
 msgstr "Certificate Preregistration Request (CPRR)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_DESC"
 msgstr ""
-"With certificate preregistration you can request the assignment of  "
-"hostnames to a commonName for later enrollment via an automated interface "
-"using a API key."
+"Request renewal of an expiring certificate. Will issue a certificate with "
+"the same attributes but a new key and validity."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_LABEL"
-msgstr "Certificate Preregistration Request (CPRR)"
+msgstr "Certificate Renewal Request"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_DESC"
 msgstr "Certificate Revocation Request"
@@ -4686,13 +4415,6 @@ msgstr "This workflow revokes all certificates that belong to a certain entity"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BY_ENTITY_LABEL"
 msgstr "Revoke by Entity"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EDITUSER_DESC"
-msgstr "Edit attributes of user accounts"
-
-# edituser workflow
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EDITUSER_LABEL"
-msgstr "Edit User"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_ESCROWKEY_DESC"
 msgstr ""
 "Download the private key encrypted to be restored by an escrow officer."
@@ -4770,13 +4492,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REQUEST_CHECKER_LABEL"
 msgstr "Request Checker"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RESETPASS_DESC"
-msgstr "Reset own user password"
-
-# reset_password workflow
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RESETPASS_LABEL"
-msgstr "Reset User Password"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_GETCA_SHOW_CHAIN_LABEL"
 msgstr "Show cached SCEP GetCACert response"
 
@@ -4816,127 +4531,3 @@ msgstr "Wake Up"
 
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "Yes"
-
-#~ msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_DESCRIPTION"
-#~ msgstr "Bulk approve or reject outstanding enrollment requests."
-
-#~ msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_LABEL"
-#~ msgstr "Enrollments"
-
-#~ msgid "I18N_OPENXPKI_UI_CERT_SUBJECT_PARTS"
-#~ msgstr "Subject Parts"
-
-# Remove?
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_CUST"
-#~ msgstr "Yes"
-
-#~ msgid "I18N_OPENXPKI_UI_DATAPOOL_ACME_ACCOUNT_LABEL"
-#~ msgstr "ACME Account Information (NICE)"
-
-#~ msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
-#~ msgstr "The entered date/time could not be validated."
-
-#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
-#~ msgstr "Download Format"
-
-#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_CURVE_NAME"
-#~ msgstr "Curve Name"
-
-#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_ENC_ALG"
-#~ msgstr "Encryption"
-
-#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_KEY_LENGTH"
-#~ msgstr "Key Length"
-
-#~ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_PARAMSET"
-#~ msgstr "Parameters"
-
-#~ msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD"
-#~ msgstr "Encryption Password"
-
-#~ msgid "I18N_OPENXPKI_UI_MENU_USERS"
-#~ msgstr "Manage Users"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
-#~ msgstr "Please select profile first"
-
-#~ msgid "I18N_OPENXPKI_UI_USER_ADD_USER"
-#~ msgstr "Add User"
-
-#~ msgid "I18N_OPENXPKI_UI_USER_EDIT_USER"
-#~ msgstr "Edit the selected user"
-
-#~ msgid "I18N_OPENXPKI_UI_USER_LIST_EMPTY_LABEL"
-#~ msgstr "No user matching your search was found"
-
-#~ msgid "I18N_OPENXPKI_UI_USER_MAIL"
-#~ msgstr "Email"
-
-#~ msgid "I18N_OPENXPKI_UI_USER_REALNAME"
-#~ msgstr "Realname"
-
-#~ msgid "I18N_OPENXPKI_UI_USER_ROLE"
-#~ msgstr "Role"
-
-#~ msgid "I18N_OPENXPKI_UI_USER_ROLE_RAOP"
-#~ msgstr "RA Operator"
-
-#~ msgid "I18N_OPENXPKI_UI_USER_ROLE_USER"
-#~ msgstr "User"
-
-#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_DESC"
-#~ msgstr "Search for users"
-
-#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_LABEL"
-#~ msgstr "Search for users"
-
-#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_DESC"
-#~ msgstr "User Search Results"
-
-#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_LABEL"
-#~ msgstr "Result of your search query"
-
-#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_RESULT_TITLE"
-#~ msgstr "User Search Results"
-
-#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_SUBMIT_LABEL"
-#~ msgstr "Search"
-
-# user management
-#~ msgid "I18N_OPENXPKI_UI_USER_TITLE"
-#~ msgstr "User Management"
-
-#~ msgid "I18N_OPENXPKI_UI_USER_USERNAME"
-#~ msgstr "Username"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_ENDPOINT_AUTH_LABEL"
-#~ msgstr "Authorized Endpoint(s)"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_EXTRA_INFO_LABEL"
-#~ msgstr "Technical Information"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_PENDING_DESC"
-#~ msgstr "This request requires approval."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_PENDING_LABEL"
-#~ msgstr "Approval Pending"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_REVIEW_DESC"
-#~ msgstr "This workflow failed finally."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_REVIEW_LABEL"
-#~ msgstr "FAILURE"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_DESC"
-#~ msgstr ""
-#~ "With certificate preregistration you can request the assignment of  "
-#~ "hostnames to a commonName for later enrollment via an automated interface "
-#~ "using a API key."
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_LABEL"
-#~ msgstr "Preregistration Request Report"
