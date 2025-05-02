@@ -66,7 +66,7 @@ command "get_datavault_status" => {
     if ($params->has_alias) {
         $safe_id = $params->alias;
     } else {
-        eval {  $self->get_active_safe_id(); }
+        eval {  $safe_id = $self->get_active_safe_id(); }
     }
     return {} unless ($safe_id);
 
@@ -75,7 +75,7 @@ command "get_datavault_status" => {
     # a pointer to the identifier of the actual datapool AES key
     # can be empty if the datapool was not initialized or the key
     # AES was created with an expiration date
-    my $key_info = $self->get_entry( $pki_realm, 'sys.datapool.pwsafe', 'token:'.$safe_id );
+    my $key_info = $self->get_entry( $pki_realm, 'sys.datapool.pwsafe', $safe_id );
 
     ##! 16: "Realm $pki_realm, safe $safe_id, key: ". $key_info->{datapool_value}
     ##! 64: $key_info
