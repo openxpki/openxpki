@@ -341,7 +341,7 @@ if ($res->state == 200) {
     } elsif ($opt{'json'}) {
         print $json->encode($out);
     } else {
-        my $ypp = YAML::PP->new;
+        my $ypp = YAML::PP->new( schema => [qw/ + Perl tags=!perl / ]);
         print $ypp->dump_string($out);
     }
     exit 0;

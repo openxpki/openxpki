@@ -4,7 +4,6 @@ use OpenXPKI -client_plugin;
 # TODO - this is not protected but does not need a realm as its local...
 command_setup
     parent_namespace_role => 1,
-    protected => 1,
 ;
 
 =head1 NAME
