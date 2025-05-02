@@ -1,0 +1,19 @@
+[Install]
+WantedBy=multi-user.target
+
+[Unit]
+Description=OpenXPKI Trustcenter Frontend
+After=network.target apache2.service openxpkid.service
+PartOf=openxpki-clientd.socket
+
+[Service]
+Type=exec
+PIDFile=/run/openxpki-clientd.pid
+EnvironmentFile=-/etc/sysconfig/openxpki
+ExecStart=/usr/bin/openxpkictl start client --systemd $OPENXPKI_CLIENT_OPTS
+User=openxpkiclient
+Group=openxpkiclient
+TimeoutStartSec=5s
+TimeoutStopSec=10s
+Restart=on-failure
+PrivateTmp=true

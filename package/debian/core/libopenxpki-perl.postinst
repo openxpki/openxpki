@@ -79,12 +79,13 @@ case "$1" in
         chown openxpki:openxpki /var/openxpki
         chmod 755 /var/openxpki
 
-        # Log directory needs to be writable by the server and the apache
-        # apache creates the files with his primary group so we need
-        # the group to have write permission on the log directory
-        chown openxpki:www-data /var/log/openxpki
-        # to prevent apache from deleting the server log we add the sticky bit
-        chmod 1775 /var/log/openxpki
+        # Logs for client (Mojolicious process)
+        chown openxpkiclient:pkiadm /var/log/openxpki-ui
+        chmod 750 /var/log/openxpki-ui
+
+        # Logs for backend process
+        chown openxpki:pkiadm /var/log/openxpki
+        chmod 750 /var/log/openxpki
 
         # create index.html as symlink to default.html
         test -e /var/www/openxpki/index.html || ln -s default.html /var/www/openxpki/index.html
