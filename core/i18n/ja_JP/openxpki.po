@@ -397,6 +397,22 @@ msgstr "ダウンロードするにはこちらをクリック"
 msgid "I18N_OPENXPKI_UI_CMDB_FAILED"
 msgstr "CMDBの検索に失敗しました。"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CONFIG_ENDPOINT_LABEL"
+msgstr "設定のバージョン"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CONFIG_FOOTPRINT_LABEL"
+msgstr "設定のバージョン"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CONFIG_PROFILE_LABEL"
+msgstr "関連性"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CONFIG_PROTOCOL_LABEL"
+msgstr "設定のバージョン"
+
 msgid "I18N_OPENXPKI_UI_CONFIG_STATUS_LABEL"
 msgstr "設定のバージョン"
 

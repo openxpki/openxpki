@@ -56,6 +56,7 @@ sub render_system_status ($self, $args, $wf_action, $param = undef) {
     my $wf_info = $args->{wf_info};
 
     my $status = $self->send_command_v2("get_ui_system_status");
+    my $footprint = $self->send_command_v2("get_realm_footprint");
 
     my @fields;
 
@@ -206,9 +207,20 @@ sub render_system_status ($self, $args, $wf_action, $param = undef) {
         value  => $status->{hostname},
     };
 
+
+    push @fields, {
+        label  => 'I18N_OPENXPKI_UI_CONFIG_FOOTPRINT_LABEL',
+        value  => [
+            { label => 'I18N_OPENXPKI_UI_CONFIG_ENDPOINT_LABEL', value => $footprint->{endpoint} },
+            { label => 'I18N_OPENXPKI_UI_CONFIG_PROFILE_LABEL', value => $footprint->{profile} },
+            { label => 'I18N_OPENXPKI_UI_CONFIG_PROTOCOL_LABEL', value => $footprint->{protocol} },
+        ],
+        format => 'deflist',
+    };
+
     push @fields, {
         label  => 'I18N_OPENXPKI_UI_CONFIG_STATUS_LABEL',
-        value  => [ map {  +{ label => $_, value => $status->{config}->{$_} } unless ($_ eq 'depend'); } sort keys %{$status->{config}} ],
+        value  => [ map {  +{ label => $_, value => $status->{config}->{$_} } unless ($_ eq 'depend' || $status->{config}->{$_} eq ''); } sort keys %{$status->{config}} ],
         format => 'deflist',
     } if ($status->{config});
 

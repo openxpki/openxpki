@@ -384,6 +384,18 @@ msgstr "Zum Download hier klicken."
 msgid "I18N_OPENXPKI_UI_CMDB_FAILED"
 msgstr "Prüfung gegen die CMDB fehlgeschlagen"
 
+msgid "I18N_OPENXPKI_UI_CONFIG_ENDPOINT_LABEL"
+msgstr "Endpunkte"
+
+msgid "I18N_OPENXPKI_UI_CONFIG_FOOTPRINT_LABEL"
+msgstr "Fussabdruck"
+
+msgid "I18N_OPENXPKI_UI_CONFIG_PROFILE_LABEL"
+msgstr "Profile"
+
+msgid "I18N_OPENXPKI_UI_CONFIG_PROTOCOL_LABEL"
+msgstr "Enrollment Protokolle"
+
 msgid "I18N_OPENXPKI_UI_CONFIG_STATUS_LABEL"
 msgstr "Konfiguration"
 
