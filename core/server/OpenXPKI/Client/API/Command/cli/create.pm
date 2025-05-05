@@ -29,8 +29,8 @@ command "create" => {
 } => sub ($self, $param) {
 
     my $pass = main::read_password("Please enter password to encrypt the key (empty to skip):");
-    chomp $pass;
     if ($pass) {
+        chomp $pass;
         my $retype = main::read_password("Please retype password:");
         chomp $retype;
         if ($retype ne $pass) {
