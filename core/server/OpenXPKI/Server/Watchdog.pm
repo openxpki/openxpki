@@ -854,7 +854,10 @@ sub __wake_up_workflow {
 sub __restore_session {
     my ($self, $realm, $frozen_session) = @_;
 
-    CTX('session')->data->pki_realm($realm);     # set realm
+    # set realm
+    CTX('session')->data->pki_realm($realm);
+    Log::Log4perl::MDC->put('pki_realm', $realm);
+
     CTX('session')->data->thaw($frozen_session); # set user and role
 
     # Set MDC for logging
