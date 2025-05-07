@@ -312,7 +312,7 @@ sub startup ($self) {
 sub _chown_socket ($self, $file, $user, $group, $mode) {
     # Modify socket permissions
     if ($mode) {
-        chmod $mode, $file;
+        chmod oct($mode), $file;
         $self->log->debug(sprintf('Permissions of socket file "%s" set to: %s', $file, $mode));
     }
 

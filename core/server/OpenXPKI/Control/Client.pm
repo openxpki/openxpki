@@ -31,8 +31,8 @@ has cfg => (
     lazy => 1,
     default => sub ($self) {
         return {
-            pid_file => '/run/openxpki-clientd.pid',
-            socket_file => '/var/openxpki/openxpki-clientd.socket',
+            pid_file => '/run/openxpki-clientd/openxpki-clientd.pid',
+            socket_file => '/run/openxpki-clientd/openxpki-clientd.sock',
             $self->config->get_hash('system.server')->%*,
         };
     }
