@@ -224,7 +224,7 @@ has 'client' => (
     lazy => 1,
     predicate => "has_client",
     default => sub {
-        return OpenXPKI::Client->new( socketfile => '/var/openxpki/openxpki.socket' );
+        return OpenXPKI::Client->new( socketfile => '/run/openxpkid/openxpkid.sock' );
     }
 );
 

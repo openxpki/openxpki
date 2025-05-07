@@ -36,7 +36,7 @@ my $result;
 my $client = MockUI->new({
     session => $session,
     logger => $log,
-    config => { socket => '/var/openxpki/openxpki.socket' }
+    config => { socket => '/run/openxpkid/openxpkid.sock' }
 });
 
 $client->update_rtoken();

@@ -6,7 +6,7 @@ my @files = (
             "t/var/openxpki/connector.log",
             "t/var/openxpki/stderr.log",
             "t/var/openxpki/openxpkid.pid",
-            "t/var/openxpki/openxpki.socket",
+            "t/run/openxpkid/openxpkid.sock",
             );
 
 ## 2 * number of files

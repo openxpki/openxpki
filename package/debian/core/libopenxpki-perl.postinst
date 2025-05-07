@@ -74,10 +74,10 @@ case "$1" in
         # Apply chown to main folder
         chown -R openxpki:root /etc/openxpki/
 
-        # Fix directory permissions
-        # socket directory
-        chown openxpki:openxpki /var/openxpki
-        chmod 755 /var/openxpki
+
+        # If this is an existing install we create a symlink
+        # to the new socket location to not break things
+        test -d /var/openxpki && ln -s /run/openxpkid/openxpki.sock /var/openxpki/openxpki.socket
 
         # Logs for client (Mojolicious process)
         chown openxpkiclient:pkiadm /var/log/openxpki-ui
@@ -121,7 +121,7 @@ case "$1" in
             echo "pkiadm ALL=(ALL) NOPASSWD:service openxpkid" > /etc/sudoers.d/pkiadm
         fi;
 
-        if [ -e "/var/openxpki/openxpki.socket" ]; then
+        if [ -e "/run/openxpkid/openxpkid.sock" ]; then
             echo "OpenXPKI seems to be running! You should restart it NOW to avoid any";
             echo "compatibility issues. You usually also need to restart the webserver"
             echo "process."

@@ -643,7 +643,7 @@ sub __get_server_config {
     ##! 1: "start"
     my $config = CTX('config');
 
-    my $socketfile = $config->get('system.server.socket_file');
+    my $socketfile = $config->get('system.server.socket_file') || '/run/openxpkid/openxpkid.sock';
 
     # check if socket filename is too long
     if (unpack_sockaddr_un(pack_sockaddr_un($socketfile)) ne $socketfile) {
@@ -694,7 +694,7 @@ sub __get_server_config {
     $params{user}     = $config->get('system.server.user');
     $params{group}    = $config->get('system.server.group');
     $params{port}     = $socketfile . '|unix';
-    $params{pid_file} = $config->get('system.server.pid_file');
+    $params{pid_file} = $config->get('system.server.pid_file') || '/run/openxpkid/openxpkid.sock';
 
     ## check daemon user
     for my $param (qw( user group port pid_file )) {

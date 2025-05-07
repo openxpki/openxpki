@@ -34,7 +34,7 @@ OpenXPKI::Log4perl->init_or_fallback( $config{global}{log_config} );
 my $log = Log::Log4perl->get_logger();
 
 # set defaults
-$config{global}{socket} ||= '/var/openxpki/openxpki.socket';
+$config{global}{socket} ||= '/run/openxpkid/openxpkid.sock';
 
 $log->info('Start fcgi loop ' . $$. ', config: ' . $configfile);
 

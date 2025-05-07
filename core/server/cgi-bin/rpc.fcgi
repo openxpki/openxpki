@@ -171,7 +171,7 @@ The basic configuration in default.conf must contain log and auth info:
   [global]
   log_config = /etc/openxpki/rpc/log.conf
   log_facility = client.rpc
-  socket = /var/openxpki/openxpki.socket
+  socket = /run/openxpkid/openxpkid.sock
 
   [auth]
   stack = _System

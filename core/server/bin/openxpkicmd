@@ -164,10 +164,8 @@ foreach my $entry (@wf_parameters) {
     }
 }
 
-if($params{instance}){
-    $params{socketfile} = sprintf '/var/openxpki/%s/openxpki.socket', $params{instance};
-} elsif(!$params{socketfile}){
-    $params{socketfile} = '/var/openxpki/openxpki.socket';
+if(!$params{socketfile}){
+    $params{socketfile} = '/run/openxpkid/openxpkid.sock';
 }
 
 debug(sprintf("Socketfile: %s", $params{socketfile}));
@@ -366,5 +364,5 @@ only wfid and no action, a list of possible actions is shown.
 
 =head1 EXAMPLES
 
-openxpkicmd --socketfile /var/openxpki/openxpki.socket --realm "Server CA" I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE
+openxpkicmd --socketfile /run/openxpkid/openxpkid.sock --realm "Server CA" I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE
 

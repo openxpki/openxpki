@@ -24,7 +24,7 @@ our @cfgpath = ( $dirname );
 our %cfg = ();
 
 my $test = OpenXPKI::Test::QA::More->new({
-    socketfile => '/var/openxpki/openxpki.socket',
+    socketfile => '/run/openxpkid/openxpkid.sock',
     realm => '',
 }) or die "Error creating new test instance: $@";
 

@@ -157,7 +157,7 @@ sub startup ($self) {
             # the endpoint config but we want to have this a global value now
             # Until this is reworked we inject the value from the system config
             my $socket = $config_obj->get('system.backend.socket');
-            $socket ||= '/var/openxpki/openxpki.socket';
+            $socket ||= '/run/openxpkid/openxpkid.sock';
             $cfg->set('global.socket', $socket);
         }
 
@@ -183,7 +183,7 @@ sub startup ($self) {
             if (!($client && $client->is_connected())) {
                 $self->log->debug('creating new socket connection for pid '.$PID) unless($client);
                 $client = OpenXPKI::Client->new(
-                    socketfile => $config_obj->get('system.backend.socket') || '/var/openxpki/openxpki.socket',
+                    socketfile => $config_obj->get('system.backend.socket') || '/run/openxpkid/openxpkid.sock',
                     timeout => $config_obj->get('system.backend.timeout') || 30,
                 );
             }

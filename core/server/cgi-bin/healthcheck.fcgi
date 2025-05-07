@@ -23,7 +23,7 @@ my @allowed_methods;
 # set from ENV via apache
 @allowed_methods = split /\W+/, $ENV{OPENXPKI_HEALTHCHECK} if ($ENV{OPENXPKI_HEALTHCHECK});
 
-my $socketfile = $ENV{OPENXPKI_CLIENT_SOCKETFILE} || '/var/openxpki/openxpki.socket';
+my $socketfile = $ENV{OPENXPKI_CLIENT_SOCKETFILE} || '/run/openxpkid/openxpkid.sock';
 
 sub __client {
     if (!$client) {

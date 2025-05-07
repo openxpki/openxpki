@@ -99,12 +99,12 @@ has path_import_dir  => (
 
 has path_socket_file => (
     is => 'rw', isa => 'Str', lazy => 1,
-    default => sub { shift->testenv_root."/var/openxpki/openxpki.socket" },
+    default => sub { shift->testenv_root."/run/openxpkid/openxpkid.sock" },
 );
 
 has path_pid_file    => (
     is => 'rw', isa => 'Str', lazy => 1,
-    default => sub { shift->testenv_root."/run/openxpkid.pid" },
+    default => sub { shift->testenv_root."/run/openxpkid/openxpkid.pid" },
 );
 
 has path_stderr_file => (

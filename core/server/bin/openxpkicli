@@ -248,10 +248,8 @@ foreach my $entry (@{$params{filearg}}) {
 
 }
 
-if($params{instance}){
-    $params{socketfile} = sprintf '/var/openxpki/%s/openxpki.socket', $params{instance};
-} elsif(!$params{socketfile}){
-    $params{socketfile} = '/var/openxpki/openxpki.socket';
+if(!$params{socketfile}){
+    $params{socketfile} = '/run/openxpkid/openxpkid.sock';
     debug("using default socket %s \n", $params{socketfile});
 }
 
