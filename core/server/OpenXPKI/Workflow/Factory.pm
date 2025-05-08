@@ -294,8 +294,10 @@ sub get_action_and_state_info ($self, $type, $state, $actions, $context) {
 =head2 can_create_workflow (type, role)
 
 Check if the given role (default is the session role) is allowed to
-create workflows of the given type. Returns true/false and throws an
-exception if the workflow type is unknown or missing.
+create workflows of the given type.
+Returns true if the role can create the workflow
+Returns false if the workflow exists but role is not allowed
+Returns undef if the workflow is not found at all
 
 =cut
 
@@ -312,12 +314,10 @@ sub can_create_workflow {
 
     my $conn = CTX('config');
 
-    OpenXPKI::Exception->throw(
-        message => 'I18N_OPENXPKI_UI_WORKFLOW_CREATE_UNKNOWN_TYPE'
-    ) unless($conn->exists([ 'workflow', 'def', $type]));
+    return unless($conn->exists([ 'workflow', 'def', $type]));
 
     # if creator is set then access is allowed
-    return ($conn->exists([ 'workflow', 'def', $type, 'acl', $role, 'creator' ]));
+    return ($conn->exists([ 'workflow', 'def', $type, 'acl', $role, 'creator' ]) ? 1 : 0);
 
 }
 
