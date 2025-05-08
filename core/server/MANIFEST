@@ -75,6 +75,7 @@ OpenXPKI/Client/API/Command/cli/create.pm
 OpenXPKI/Client/API/Command/cli/ping.pm
 OpenXPKI/Client/API/Command/cli/show.pm
 OpenXPKI/Client/API/Command/config.pm
+OpenXPKI/Client/API/Command/config/footprint.pm
 OpenXPKI/Client/API/Command/config/verify.pm
 OpenXPKI/Client/API/Command/config/show.pm
 OpenXPKI/Client/API/Command/config/smtptest.pm
@@ -134,7 +135,6 @@ OpenXPKI/Client/Service/WebUI/Page/Information.pm
 OpenXPKI/Client/Service/WebUI/Page/Login.pm
 OpenXPKI/Client/Service/WebUI/Page/Secret.pm
 OpenXPKI/Client/Service/WebUI/Page/Source.pm
-OpenXPKI/Client/Service/WebUI/Page/Users.pm
 OpenXPKI/Client/Service/WebUI/Page/Workflow.pm
 OpenXPKI/Client/Service/WebUI/Page/Workflow/Attribute.pm
 OpenXPKI/Client/Service/WebUI/Page/Workflow/Bulk.pm
