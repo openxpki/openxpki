@@ -18,7 +18,7 @@ $OUTPUT_AUTOFLUSH = 1;
 has socketfile => (
     is      => 'ro',
     isa     => 'Str',
-    required => 1,
+    default => '/run/openxpkid/openxpkid.sock',
 );
 
 has timeout => (

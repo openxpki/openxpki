@@ -172,8 +172,8 @@ debug(sprintf("Socketfile: %s", $params{socketfile}));
 
 my $reply;
 my $client = OpenXPKI::Client->new(
-    socketfile => $params{socketfile},
-    timeout => $params{timeout},
+    ($params{socketfile} ? (socketfile => $params{socketfile}) : ()),
+    (defined $params{timeout} ? (timeout  => $params{timeout}) : ()),
     api_version => 2,
 );
 

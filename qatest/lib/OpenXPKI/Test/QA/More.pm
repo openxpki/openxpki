@@ -259,7 +259,7 @@ sub connect {
 
     my $c = OpenXPKI::Client->new(
         timeout    => 100,
-        socketfile => $self->get_socketfile
+        ($self->get_socketfile ? (socketfile => $self->get_socketfile) : ())
     );
     if ( not $c ) {
         croak "Unable to create OpenXPKI::Client instance: $@";

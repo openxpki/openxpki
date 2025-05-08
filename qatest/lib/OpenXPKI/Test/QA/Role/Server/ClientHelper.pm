@@ -110,7 +110,7 @@ sub connect {
         $self->oxi_client(
             OpenXPKI::Client->new(
                 timeout => 5,
-                socketfile => $self->socket_file,
+                ($self->socket_file ? (socketfile => $self->socket_file) :()),
             )
         );
     }

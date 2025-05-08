@@ -299,17 +299,6 @@ sub status ($self, $arg) {
     my $pid = $self->__get_pid;
     my $alive = defined $pid ? kill(0, $pid) : 0;
 
-    # my $socketfile = $self->cfg->{socketfile}
-    #     or die "Missing config entry: system.server.socket_file\n";
-
-    # my $client;
-    # my $i = 4;
-    # while ($i-- > 0) {
-    #     $client = __connect_openxpki_daemon($socketfile);
-    #     last if $client;
-    #     sleep 2 if $i > 0;
-    # }
-
     if ($alive) {
         print "OpenXPKI Client is running.\n" unless $arg->silent;
         return 0;

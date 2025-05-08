@@ -370,13 +370,14 @@ signature_for status => (
     ],
 );
 sub status ($self, $arg) {
-    my $socket_file = $self->opts->{socket_file} // $self->cfg->{socket_file}
-        or die "Missing config entry: system.server.socket_file\n";
+
+    # can be undef
+    my $socket_file = $self->opts->{socket_file} // $self->cfg->{socket_file};
 
     my $client;
     my $i = 4;
     while ($i-- > 0) {
-        $client = __connect_openxpki_daemon($socket_file);
+        $client = $self->__connect_openxpki_daemon($socket_file);
         last if $client;
         sleep 2 if $i > 0;
     }
@@ -537,9 +538,7 @@ sub __read_pid_file ($self) {
     return $self->slurp_if_exists($pid_file);
 }
 
-sub __connect_openxpki_daemon ($socket_file) {
-    # if there is no socket it does not make sense to test the client
-    return unless (-e $socket_file);
+sub __connect_openxpki_daemon($socket_file) {
 
     my $client;
     eval {
@@ -547,13 +546,12 @@ sub __connect_openxpki_daemon ($socket_file) {
         ## a use would disturb the server initialization
         require OpenXPKI::Client;
         # this only creates the class but does not fire up the socket!
-        my $cc= OpenXPKI::Client->new(
-            socketfile => $socket_file,
+        my $cc = OpenXPKI::Client->new(
+            $socket_file ? (socketfile => $socket_file) : ()
         );
 
         # try to talk to the daemon
-        my $reply = $cc->send_receive_service_msg('PING');
-        if ($reply && $reply->{SERVICE_MSG} eq 'START_SESSION') {
+        if ($cc->ping()) {
             $client = $cc;
         }
     };

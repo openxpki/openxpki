@@ -141,6 +141,9 @@ sub startup ($self) {
 
     $self->exception_format('txt') unless 'development' eq $self->mode;
 
+    # inject socket location
+    my $socket = $config_obj->get('system.backend.socket');
+
     # Helpers
     $self->helper(oxi_service_config => sub ($sf, $service, $endpoint) {
         my $cfg = $config_obj->endpoint_config($service, $endpoint);
@@ -156,9 +159,7 @@ sub startup ($self) {
             # Client class expects the socket location in global->socket of
             # the endpoint config but we want to have this a global value now
             # Until this is reworked we inject the value from the system config
-            my $socket = $config_obj->get('system.backend.socket');
-            $socket ||= '/run/openxpkid/openxpkid.sock';
-            $cfg->set('global.socket', $socket);
+            $cfg->set('global.socket', $socket) if($socket);
         }
 
         return $cfg;
@@ -183,8 +184,8 @@ sub startup ($self) {
             if (!($client && $client->is_connected())) {
                 $self->log->debug('creating new socket connection for pid '.$PID) unless($client);
                 $client = OpenXPKI::Client->new(
-                    socketfile => $config_obj->get('system.backend.socket') || '/run/openxpkid/openxpkid.sock',
-                    timeout => $config_obj->get('system.backend.timeout') || 30,
+                    ($socket ? (socketfile => $socket) : ()),
+                    timeout => ($config_obj->get('system.backend.timeout') || 30),
                 );
             }
         } catch ($error) {
