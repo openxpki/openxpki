@@ -539,8 +539,7 @@ sub __read_pid_file ($self) {
     return $self->slurp_if_exists($pid_file);
 }
 
-sub __connect_openxpki_daemon($socket_file) {
-
+sub __connect_openxpki_daemon ($self, $socket_file) {
     my $client;
     eval {
         ## do not make a use statement from this
@@ -557,7 +556,6 @@ sub __connect_openxpki_daemon($socket_file) {
         }
     };
     return $client;
-
 }
 
 __PACKAGE__->meta->make_immutable;
