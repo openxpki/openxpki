@@ -360,15 +360,7 @@ sub start_or_reload {
 
         return 0 if $config->get('system.watchdog.disabled');
 
-        my (undef, $uid, undef, $gid) = OpenXPKI::Util->resolve_user_group(
-            $config->get('system.server.user'),
-            $config->get('system.server.group'),
-            'server process'
-        );
-
         my $watchdog = OpenXPKI::Server::Watchdog->new();
-        $watchdog->userid($uid),
-        $watchdog->groupid($gid),
         $watchdog->keep_parent_sigchld($args{keep_parent_sigchld} ? 1 : 0);
         $watchdog->run;
     }

@@ -29,7 +29,6 @@ use Proc::ProcessTable;
 # Project modules
 use OpenXPKI::VERSION;
 
-
 has cfg => (
     is => 'rw',
     isa => 'HashRef',
@@ -39,13 +38,18 @@ has cfg => (
 
         require OpenXPKI::Config;
         my $config = OpenXPKI::Config->new;
-        return {
-            pid_file => $config->get('system.server.pid_file') || '/run/openxpkid/openxpkid.pid',
-            socket_file => $config->get('system.server.socket_file') || '/run/openxpkid/openxpkid.sock',
-            type => $config->get('system.server.type') || 'Fork',
+        my %cfg = (
+            pid_file => '/run/openxpkid/openxpkid.pid',
+            socket_file => '/run/openxpkid/openxpkid.sock',
+            type => 'Fork',
             depend => $config->get_hash('system.version.depend') || undef,
             license => $config->get('system.license') || '',
-        };
+        );
+        map {
+            my $val = $config->get(['system','server', $_ ]);
+            $cfg{$_} = $val if ($val);
+        } qw(user group pid_file socket_owner socket_group socket_mode socket_file type);
+        return \%cfg;
     },
 );
 
@@ -62,7 +66,6 @@ has __restart => (
     default => 0,
 );
 
-
 # required by OpenXPKI::Control::Role
 sub getopt_params ($class, $command) {
     return qw(
@@ -71,6 +74,14 @@ sub getopt_params ($class, $command) {
         quiet
         nd|no-detach
         nocensor
+        verbose|v
+        user|u=s
+        group|g=s
+        pid_file|pid-file|p=s
+        socket_file|socket-file|s=s
+        socket_owner|socket-owner=s
+        socket_group|socket-group=s
+        socket_mode|socket-mode=s
     );
 }
 
@@ -132,6 +143,10 @@ sub cmd_stop ($self) {
 # required by OpenXPKI::Control::Role
 sub cmd_reload ($self) {
     my $pid = $self->__read_pid_file;
+    if (!$pid) {
+        print "Sending 'reload' command failed as pid file could not be read\n" unless $self->silent;
+        return 0;
+    }
     print "Sending 'reload' command to OpenXPKI server (PID: $pid)\n" unless $self->silent;
     kill HUP => $pid;
     return 0;
@@ -211,13 +226,6 @@ sub start ($self, $arg) {
 
     $OpenXPKI::Debug::NOCENSOR = 1 if $arg->debug_nocensor;
 
-    # Load the required locations from the config
-    my $socket_file = $self->cfg->{socket_file}
-        or do {
-            warn "Missing config entry: system.server.socket_file\n";
-            return 1;
-        };
-
     # Test if there is a pid file for the current config
     my $pid = $self->__read_pid_file;
 
@@ -264,6 +272,13 @@ sub start ($self, $arg) {
     my $pid_file  = $self->cfg->{pid_file};
     unlink $pid_file if ($pid_file && -e $pid_file);
 
+
+    # Merge config with command line options to start server
+    my %config = map {
+        my $vv = $self->opts->{$_} // $self->cfg->{$_};
+        defined $vv ? ($_ => $vv) : ();
+    } qw(user group pid_file socket_owner socket_group socket_mode socket_file);
+
     # common start procedure for forking and foreground mode
     my $start_server = sub {
         # SILENT is required to work correctly with start-stop-daemons
@@ -273,6 +288,7 @@ sub start ($self, $arg) {
             SILENT => $arg->silent,
             TYPE => $self->cfg->{type},
             NODETACH => $arg->foreground,
+            CONFIG => \%config
         );
         $server->start;
     };
@@ -354,7 +370,7 @@ signature_for status => (
     ],
 );
 sub status ($self, $arg) {
-    my $socket_file = $self->cfg->{socket_file}
+    my $socket_file = $self->opts->{socket_file} // $self->cfg->{socket_file}
         or die "Missing config entry: system.server.socket_file\n";
 
     my $client;
@@ -516,8 +532,9 @@ sub list_process {
 }
 
 sub __read_pid_file ($self) {
-    die "Missing config entry: system.server.pid_file\n" unless $self->cfg->{pid_file};
-    return $self->slurp_if_exists($self->cfg->{pid_file});
+    my $pid_file = $self->opts->{pid_file} || $self->cfg->{pid_file};
+    die "Missing config entry: system.server.pid_file\n" unless $pid_file;
+    return $self->slurp_if_exists($pid_file);
 }
 
 sub __connect_openxpki_daemon ($socket_file) {
