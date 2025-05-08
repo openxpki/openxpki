@@ -46,7 +46,7 @@ test ! -z $OXI_TEST_DB_MYSQL_NAME  && echo "|     docker start mariadb"
 test ! -z $OXI_TEST_DB_ORACLE_NAME && echo "|     docker start oracle"
 
 cat <<'__FOOTER'
-|     openxpkictl start server
+|     systemctl start openxpkid
 |
 | Most actions need root rights, so you better do "sudo su" first.
 ^--
