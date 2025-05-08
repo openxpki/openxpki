@@ -45,10 +45,11 @@ has cfg => (
             depend => $config->get_hash('system.version.depend') || undef,
             license => $config->get('system.license') || '',
         );
-        map {
-            my $val = $config->get(['system','server', $_ ]);
-            $cfg{$_} = $val if ($val);
-        } qw(user group pid_file socket_owner socket_group socket_mode socket_file type);
+        for (qw(user group pid_file socket_owner socket_group socket_mode socket_file type)) {
+            if (my $val = $config->get(['system', 'server', $_])) {
+                $cfg{$_} = $val;
+            }
+        }
         return \%cfg;
     },
 );
