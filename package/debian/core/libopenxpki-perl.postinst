@@ -74,10 +74,26 @@ case "$1" in
         # Apply chown to main folder
         chown -R openxpki:root /etc/openxpki/
 
-
         # If this is an existing install we create a symlink
         # to the new socket location to not break things
         test -d /var/openxpki && ln -s /run/openxpkid/openxpki.sock /var/openxpki/openxpki.socket
+
+        # Create the pkiadm user
+        COUNT=`grep '^pkiadm:' /etc/passwd | wc -l`;
+        if [ $COUNT -eq 0 ]; then
+            # Use useradd here as we need an additonal group
+            useradd --create-home -G openxpki pkiadm;
+
+            # In case somebody decided to change the home base
+            HOME=`grep pkiadm /etc/passwd | cut -d":" -f6`
+            chown pkiadm:openxpki $HOME
+            chmod 750 $HOME
+        fi;
+
+        # Create the sudo file to restart oxi from pkiadm
+        if [ ! -e /etc/sudoers.d/pkiadm ] && [ -d /etc/sudoers.d ]; then
+            echo "pkiadm ALL=(ALL) NOPASSWD:service openxpkid" > /etc/sudoers.d/pkiadm
+        fi;
 
         # Logs for client (Mojolicious process)
         chown openxpkiclient:pkiadm /var/log/openxpki-ui
@@ -102,23 +118,6 @@ case "$1" in
         # Setup logrotate
         if [ -e /etc/logrotate.d/ ] &&  [ ! -e /etc/logrotate.d/openxpki ]; then
             cp /usr/share/doc/libopenxpki-perl/examples/logrotate.conf /etc/logrotate.d/openxpki
-        fi;
-
-        # Create the pkiadm user
-        COUNT=`grep '^pkiadm:' /etc/passwd | wc -l`;
-        if [ $COUNT -eq 0 ]; then
-            # Use useradd here as we need an additonal group
-            useradd --create-home -G openxpki pkiadm;
-
-            # In case somebody decided to change the home base
-            HOME=`grep pkiadm /etc/passwd | cut -d":" -f6`
-            chown pkiadm:openxpki $HOME
-            chmod 750 $HOME
-        fi;
-
-        # Create the sudo file to restart oxi from pkiadm
-        if [ ! -e /etc/sudoers.d/pkiadm ] && [ -d /etc/sudoers.d ]; then
-            echo "pkiadm ALL=(ALL) NOPASSWD:service openxpkid" > /etc/sudoers.d/pkiadm
         fi;
 
         if [ -e "/run/openxpkid/openxpkid.sock" ]; then
