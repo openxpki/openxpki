@@ -584,8 +584,7 @@ sub handle_ui_request ($self) {
     # Handle logout / session restart
     # Do this before connecting the server to have the client in the
     # new session and to recover from backend session failure
-    if ($page eq 'logout' or $action eq 'logout') {
-
+    if ($page eq 'logout') {
         # For SSO Logins the session might hold an external link
         # to logout from the SSO provider
         my $authinfo = $self->session->param('authinfo') || {};
