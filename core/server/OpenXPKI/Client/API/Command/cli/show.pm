@@ -21,7 +21,7 @@ command "show" => {
     # accessing internals via rawapi
     my $client = $self->rawapi->client;
     my $res = {
-        socketfile => '/run/openxpkid/openxpkid.sock',
+        socketfile => $OpenXPKI::Defaults::SERVER_SOCKET,
         timeout => 30,
         account_key => 'none',
         ping => 'failed',

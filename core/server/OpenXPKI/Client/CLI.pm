@@ -21,7 +21,7 @@ C<OpenXPKI::Service::CLI>.
 =cut
 
 has '+socketfile' => (
-    default => '/run/openxpkid/openxpkid.sock',
+    default => $OpenXPKI::Defaults::SERVER_SOCKET,
 );
 
 has '+service' => (

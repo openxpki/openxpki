@@ -21,6 +21,7 @@ OpenXPKI/Control/Server.pm
 OpenXPKI/Control/Terminal.pm
 OpenXPKI/DateTime.pm
 OpenXPKI/Debug.pm
+OpenXPKI/Defaults.pm
 OpenXPKI/Dumper.pm
 OpenXPKI/DN.pm
 OpenXPKI/Exception.pm

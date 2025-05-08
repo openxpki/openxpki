@@ -141,6 +141,7 @@ sub import {
     OpenXPKI::Exception->import::into(1);
     OpenXPKI::Util->import::into(1);
     OpenXPKI::Types->import::into(1) if $types;
+    OpenXPKI::Defaults->import::into(1);
 
     # Disable "experimental" warnings: should be done after other imports to safely disable warnings in Perl < 5.36
     warnings->unimport::out_of(1, qw(
@@ -189,6 +190,7 @@ This is equivalent to adding the following imports to the calling package:
     use OpenXPKI::Debug;
     use OpenXPKI::Exception;
     use OpenXPKI::Util;
+    use OpenXPKI::Defaults;
 
 Various options allow to import additional modules:
 

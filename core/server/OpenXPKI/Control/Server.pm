@@ -39,8 +39,8 @@ has cfg => (
         require OpenXPKI::Config;
         my $config = OpenXPKI::Config->new;
         my %cfg = (
-            pid_file => '/run/openxpkid/openxpkid.pid',
-            socket_file => '/run/openxpkid/openxpkid.sock',
+            pid_file => $OpenXPKI::Defaults::SERVER_PID,
+            socket_file => $OpenXPKI::Defaults::SERVER_SOCKET,
             type => 'Fork',
             depend => $config->get_hash('system.version.depend') || undef,
             license => $config->get('system.license') || '',

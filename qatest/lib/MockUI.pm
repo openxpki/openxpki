@@ -111,7 +111,7 @@ sub factory {
     my $client = MockUI->new({
         session => $session,
         logger => $log,
-        config => { socket => '/run/openxpkid/openxpkid.sock' }
+        config => { socket => $OpenXPKI::Defaults::SERVER_SOCKET }
     });
 
     $client->update_rtoken();

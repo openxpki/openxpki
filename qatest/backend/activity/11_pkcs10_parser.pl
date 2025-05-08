@@ -12,6 +12,7 @@ use Data::Dumper;
 use Config::Std;
 use File::Basename;
 use OpenXPKI::Serialization::Simple;
+use OpenXPKI::Defaults;
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($WARN);
 
@@ -24,7 +25,7 @@ our @cfgpath = ( $dirname );
 our %cfg = ();
 
 my $test = OpenXPKI::Test::QA::More->new({
-    socketfile => '/run/openxpkid/openxpkid.sock',
+    socketfile => $OpenXPKI::Defaults::SERVER_SOCKET,
     realm => '',
 }) or die "Error creating new test instance: $@";
 

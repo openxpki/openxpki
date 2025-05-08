@@ -17,6 +17,7 @@ use Data::Dumper;
 use Log::Log4perl qw(:easy);
 
 use OpenXPKI::Client;
+use OpenXPKI::Defaults;
 #use OpenXPKI::Serialization::Simple;
 
 binmode(STDOUT, ':encoding(UTF-8)');
@@ -165,7 +166,7 @@ foreach my $entry (@wf_parameters) {
 }
 
 if(!$params{socketfile}){
-    $params{socketfile} = '/run/openxpkid/openxpkid.sock';
+    $params{socketfile} = $OpenXPKI::Defaults::SERVER_SOCKET;
 }
 
 debug(sprintf("Socketfile: %s", $params{socketfile}));

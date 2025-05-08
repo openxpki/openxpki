@@ -11,6 +11,7 @@ use English;
 use Data::Dumper;
 use Log::Log4perl qw(:easy);
 use MockUI;
+use OpenXPKI::Defaults;
 
 #Log::Log4perl->easy_init($DEBUG);
 Log::Log4perl->easy_init($ERROR);
@@ -36,7 +37,7 @@ my $result;
 my $client = MockUI->new({
     session => $session,
     logger => $log,
-    config => { socket => '/run/openxpkid/openxpkid.sock' }
+    config => { socket => $OpenXPKI::Defaults::SERVER_SOCKET }
 });
 
 $client->update_rtoken();
