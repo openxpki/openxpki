@@ -383,7 +383,7 @@ sub prepare ($self, $c) {
 
         # Prepare realm selection
         if ('index' eq $realm) {
-            $self->log->debug('Special path "index" - showing realm selection page');
+            $self->log->debug('- special path "index" - showing realm selection page');
 
             $self->session->flush;
             $self->client->detach; # enforce new backend session to get rid of selected realm etc.
@@ -391,47 +391,51 @@ sub prepare ($self, $c) {
 
         # If the session has no realm set, try to get a realm from the map
         elsif (not $self->session->param('pki_realm')) {
-            $self->log->debug("Checking config for realm '$realm'");
+            $self->log->debug("- checking config for realm '$realm'");
 
             $detected_realm = $self->config->get(['realm','map', $realm]);
             # legacy config
             $detected_realm //= $self->config->get(['realm', $realm]);
             if (not $detected_realm) {
-                $self->log->debug("Unknown realm requested: '$realm'");
+                $self->log->debug("- unknown realm requested: '$realm'");
                 return $self->new_response(406 => 'I18N_OPENXPKI_UI_NO_SUCH_REALM_OR_SERVICE');
             }
 
         # realm already stored in session
         } else {
-            $self->log->debug("Using realm previously stored in session: '$realm'");
+            $self->log->debug("- using realm previously stored in session: '$realm'");
         }
 
+    # HOSTNAME mode
     } elsif ("hostname" eq $realm_mode) {
         my $host = $self->request_url->host // '';
         $self->log->debug("- looking for rule to match host '$host'");
         my $realm_map = $self->config->get_hash('realm.map');
+
         # TODO Remove legacy config support:
         $realm_map //= $self->config->get_hash('realm');
-        $self->log->trace('Realm map = ' . Dumper $realm_map ) if $self->log->is_trace;
-        while (my ($rule, $target) = each(%$realm_map)) {
-            next unless ($host =~ qr/\A$rule\z/);
-            $self->log->debug("Realm match for host '$host': rule = $rule") if $self->log->is_trace;
-            $detected_realm = $target;
+
+        $self->log->trace('- realm map = ' . Dumper $realm_map ) if $self->log->is_trace;
+        while (my ($pattern, $realm) = each(%$realm_map)) {
+            next unless ($host =~ qr/\A$pattern\z/);
+            $self->log->debug("- match: pattern = $pattern") if $self->log->is_trace;
+            $detected_realm = $realm;
             last;
         }
-        $self->log->warn('Unable to find realm from hostname: ' . $host) unless($detected_realm);
+        $self->log->warn("- unable to find matching realm for hostname '$host'") unless $detected_realm;
 
+    # FIXED mode
     } elsif ("fixed" eq $realm_mode) {
         # Fixed realm mode, mode must be defined in the config
         $detected_realm = $self->config->get('realm.value') // $self->config->get('global.realm');
     }
 
     if ($detected_realm) {
-        $self->log->debug("Storing detected realm '$detected_realm' in session");
         my ($realm, $stack) = split /\s*;\s*/, $detected_realm;
         $self->session->param('pki_realm', $realm);
+        $self->log->debug("- detected realm = '$realm' stored in session");
         if ($stack) {
-            $self->log->debug("Auto-select auth stack '$stack' based on realm config");
+            $self->log->debug("- auto-select auth stack '$stack' based on realm config");
             $self->session->param('auth_stack', $stack);
         }
     }
