@@ -20,7 +20,7 @@ has 'type' => (
 sub external {
     my $self = shift;
     my $to = shift;
-    $self->type('external');
+    $self->type('external'); # evaluated in services/oxi-content.js, method #redirect()
     $self->to($to);
 }
 

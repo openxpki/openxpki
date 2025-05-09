@@ -589,22 +589,8 @@ sub handle_ui_request ($self) {
     # Handle logout / session restart
     # Do this before connecting the server to have the client in the
     # new session and to recover from backend session failure
-    if ($page eq 'logout') {
-        # For SSO Logins the session might hold an external link
-        # to logout from the SSO provider
-        my $authinfo = $self->session->param('authinfo') || {};
-        my $goto = $authinfo->{logout};
-
-        # clear the session before redirecting to make sure we are safe
-        $self->logout_session;
-        $self->log->info('Logout from session');
-
-        # now perform the redirect if set
-        if ($goto) {
-            $self->log->debug("External redirect on logout to: $goto");
-            return $new_page->(sub { shift->redirect->to($goto) });
-        }
-
+    if (my $logout_page = $self->handle_logout($page)) { # from OpenXPKI::Client::Service::WebUI::Role::LoginHandler
+        return $logout_page;
     }
 
     # Establish backend connection

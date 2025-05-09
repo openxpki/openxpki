@@ -100,18 +100,6 @@ sub handle_login ($self, $page, $action, $reply) {
 
     my $session = $self->session;
 
-    # incoming logout command
-    if ($page eq 'logout') {
-        $uilogin->redirect->to('login!logout');
-        return $uilogin;
-    }
-
-    # redirect to the "you have been logged out page"
-    if ($page eq 'login!logout') {
-        $uilogin->init_logout;
-        return $uilogin;
-    }
-
     $self->log->info("Not logged in. Doing auth. page = '$page', action = '$action'");
 
     # Special handling for "pki_realm" and "auth_stack" params
@@ -570,6 +558,38 @@ sub handle_login ($self, $page, $action, $reply) {
     $self->log->debug("unhandled error during auth");
     return;
 
+}
+
+sub handle_logout ($self, $page) {
+    my $uilogin = OpenXPKI::Client::Service::WebUI::Page::Login->new(webui => $self);
+
+    if ($page eq 'logout') {
+        # For SSO Logins the session might hold an external link
+        # to logout from the SSO provider
+        my $authinfo = $self->session->param('authinfo') || {};
+        my $goto = $authinfo->{logout};
+
+        # clear the session before redirecting to make sure we are safe
+        $self->logout_session;
+
+        # now perform the redirect if set
+        if ($goto) {
+            $self->log->debug("External redirect on logout to: $goto");
+            $uilogin->redirect->external($goto);
+        } else {
+            $uilogin->redirect->to('login!logout');
+        }
+
+        return $uilogin;
+    }
+
+    # show the "you have been logged out" page
+    if ($page eq 'login!logout') {
+        $uilogin->init_logout;
+        return $uilogin;
+    }
+
+    return;
 }
 
 sub _jwt_signature ($self, $data, $jws) {
