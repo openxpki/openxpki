@@ -92,7 +92,7 @@ while (my $cgi = CGI::Fast->new()) {
         my $opts = {
             logger => $log,
             config => {
-                socket => $config{global}{socket},
+                socket => $config{global}{socket}//'',
                 realm => $pki_realm
             }
         };

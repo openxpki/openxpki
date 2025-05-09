@@ -579,7 +579,7 @@ sub __alias_update {
         my $client = OpenXPKI::Client::Simple->new({
             config => {
                 realm => $insert_hash->{pki_realm},
-                socket => CTX('config')->get(['system','server','socket_file']),
+                socket => CTX('config')->get(['system','server','socket_file'])//'',
             },
             auth => { stack => '_System' },
         });
@@ -636,7 +636,7 @@ sub __alias_update {
             my $user = CTX('config')->get(['system','server','user']);
             my $uid = getpwnam($user) // die "$user not known\n"; # might be 0 in Docker so we need //, not ||
 
-            my $group = CTX('config')->get(['system','server','user']);
+            my $group = CTX('config')->get(['system','server','group']);
             my $gid = getgrnam($group) // die "$group not known\n";
             chown ($uid, $gid, $keyfile) || die "Unable to chown $keyfile to $uid/$gid\n";
             chmod oct("0400"), $keyfile || die "Unable to change mode on $keyfile\n";
