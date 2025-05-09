@@ -370,7 +370,7 @@ sub prepare ($self, $c) {
     my $detected_realm;
 
     my $realm_mode = $self->realm_mode;
-    $self->log->debug("Realm mode: $realm_mode");
+    $self->log->debug("Realm detection mode: $realm_mode");
 
     # PATH mode
     if ("path" eq $realm_mode) {
@@ -407,14 +407,14 @@ sub prepare ($self, $c) {
         }
 
     } elsif ("hostname" eq $realm_mode) {
-        my $host = $ENV{HTTP_HOST};
+        my $host = $self->request->url->to_abs->host;
         my $realm_map = $self->config->get_hash('realm.map');
-        # legacy config
+        # TODO Remove legacy config support:
         $realm_map //= $self->config->get_hash('realm');
-        $self->log->trace('Realm map is: ' . Dumper $realm_map );
-        while(my ($rule, $target) = each(%$realm_map)) {
+        $self->log->trace('Realm map = ' . Dumper $realm_map ) if $self->log->is_trace;
+        while (my ($rule, $target) = each(%$realm_map)) {
             next unless ($host =~ qr/\A$rule\z/);
-            $self->log->trace("realm detection match: $host / $rule ");
+            $self->log->debug("Realm match for host '$host': rule = $rule") if $self->log->is_trace;
             $detected_realm = $target;
             last;
         }
