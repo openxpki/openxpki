@@ -602,10 +602,10 @@ sub handle_ui_request ($self) {
 
     }
 
+    # Establish backend connection
     my $reply = $self->client->send_receive_service_msg('PING');
-    my $status = $reply->{SERVICE_MSG};
     $self->log->trace('PING reply = ' . Dumper $reply) if $self->log->is_trace;
-    $self->log->debug("Current session status: $status");
+    $self->log->debug("Current session status: " . $reply->{SERVICE_MSG});
 
     if ( $reply->{SERVICE_MSG} eq 'START_SESSION' ) {
         $reply = $self->client->init_session;
@@ -633,7 +633,7 @@ sub handle_ui_request ($self) {
     $self->logout_session if $self->session->param('is_logged_in');
 
     # try to log in
-    return $self->handle_login($page || '', $action, $reply); # from OpenXPKI::Client::Service::WebUI::Role::Login
+    return $self->handle_login($page || '', $action, $reply); # from OpenXPKI::Client::Service::WebUI::Role::LoginHandler
 
 }
 
@@ -671,37 +671,28 @@ sub _get_action ($self) {
     }
 }
 
-sub new_frontend_session {
-
-    my $self = shift;
-
+sub new_frontend_session ($self) {
     # create new session object but reuse old settings
     $self->session($self->session->clone);
 
     Log::Log4perl::MDC->put('sid', substr($self->session->id,0,4));
     $self->log->debug('New frontend session: ID = '. $self->session->id);
-
 }
 
 =head2 logout_session
 
 Delete and flush the current session and recreate a new one using
 the remaining class object. If the internal session handler is used,
-the session is cleared but not destreoyed.
+the session is cleared but not destroyed.
 
-If you pass a reference to the CGI handler, the session cookie is updated.
 =cut
 
-sub logout_session {
-
-    my $self = shift;
-
-    $self->log->info("session logout");
+sub logout_session ($self) {
+    $self->log->info("Logout = create new frontend session");
     $self->client->logout;
 
     # create a new session
     $self->new_frontend_session;
-
 }
 
 =head2 ui_response_to_json
