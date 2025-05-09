@@ -407,7 +407,8 @@ sub prepare ($self, $c) {
         }
 
     } elsif ("hostname" eq $realm_mode) {
-        my $host = $self->request_url->host;
+        my $host = $self->request_url->host // '';
+        $self->log->debug("- looking for rule to match host '$host'");
         my $realm_map = $self->config->get_hash('realm.map');
         # TODO Remove legacy config support:
         $realm_map //= $self->config->get_hash('realm');
