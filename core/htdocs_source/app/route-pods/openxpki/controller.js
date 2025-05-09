@@ -104,16 +104,6 @@ export default class OpenXpkiController extends Controller {
         return `${agent.browser} ${known_version}`
     }
 
-    // We don't use <ddm.LinkTo> but our own method to navigate to target page.
-    // This way we can force Ember to do a transition even if the new page is
-    // the same page as before by setting parameter "force" a timestamp.
-    @action
-    navigateTo(page, navbarCollapseFunc, event) {
-        if (event) { event.stopPropagation(); event.preventDefault() }
-        if (navbarCollapseFunc) navbarCollapseFunc()
-        this.content.openPage({ name: page, target: this.content.TARGET.TOP, force: true, params: { trigger: 'nav' } })
-    }
-
     @action
     logout(event) {
         if (event) { event.stopPropagation(); event.preventDefault() }

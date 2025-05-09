@@ -16,6 +16,11 @@ has 'url' => (
     isa => 'Str',
 );
 
+has 'icon' => (
+    is => 'rw',
+    isa => 'Str',
+);
+
 subtype 'ArrayRefOfMenuItem', as 'ArrayRef['.__PACKAGE__.']';
 coerce 'ArrayRefOfMenuItem',
     from 'ArrayRef[HashRef]',
