@@ -273,7 +273,7 @@ sub op_handlers {
     return [
         'openapi-spec' => sub ($self) {
             $self->openapi_mode(1);
-            my $url = $self->request->url->to_abs;
+            my $url = $self->request_url;
             my $baseurl = sprintf "%s://%s%s", $url->protocol, $url->host_port, $url->path->to_abs_string;
             my $spec = $self->openapi_spec($baseurl) or die $self->new_response( 50082 );
             return $self->new_response(result => $spec);

@@ -410,10 +410,10 @@ sub handle_login ($self, $page, $action, $reply) {
                 my $tt = OpenXPKI::Template->new;
                 my $uri_pattern = $auth->{redirect_uri} || 'https://[% host _ baseurl %]';
                 my $redirect_uri = $tt->render( $uri_pattern, {
-                    host => $self->request->url->host,
+                    host => $self->request_url->host,
                     baseurl => $self->session->param('baseurl'),
-                    realm =>   $pki_realm,
-                    stack =>   $auth_stack,
+                    realm => $pki_realm,
+                    stack => $auth_stack,
                 });
 
                 if (my $code = $self->param('code')) {

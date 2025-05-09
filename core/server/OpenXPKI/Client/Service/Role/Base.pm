@@ -638,6 +638,20 @@ has json => (
     },
 );
 
+=head3 request_url
+
+L<Mojo::URL> object encapsulating the absolute request URL.
+
+=cut
+sub request_url; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+has request_url => (
+    is => 'ro',
+    isa => 'Mojo::URL',
+    init_arg => undef,
+    lazy => 1,
+    default => sub { shift->request->url->to_abs },
+);
+
 =head1 METHODS
 
 =cut

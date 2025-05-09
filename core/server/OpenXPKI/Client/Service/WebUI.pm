@@ -83,7 +83,7 @@ sub _build_session ($self) {
     # OIDC session
     # TODO - we might want to embed this into the session handler
     if (
-        $self->request->url->to_abs->path->parts->[-1] eq 'oidc_redirect'
+        $self->request_url->path->parts->[-1] eq 'oidc_redirect'
         and (my $oidc_state = $self->request->param('state'))
     ) {
         try {
@@ -240,7 +240,7 @@ has url_path => (
     isa => 'Mojo::Path',
     lazy => 1,
     default => sub ($self) {
-        my $path = $self->request->url->to_abs->path->clone->trailing_slash(0); # remove trailing slash
+        my $path = $self->request_url->path->clone->trailing_slash(0); # remove trailing slash
 
         # Strip off /cgi-bin/xxx
         my $i = firstidx { $_ eq 'cgi-bin' } $path->parts->@*;
@@ -407,7 +407,7 @@ sub prepare ($self, $c) {
         }
 
     } elsif ("hostname" eq $realm_mode) {
-        my $host = $self->request->url->to_abs->host;
+        my $host = $self->request_url->host;
         my $realm_map = $self->config->get_hash('realm.map');
         # TODO Remove legacy config support:
         $realm_map //= $self->config->get_hash('realm');
