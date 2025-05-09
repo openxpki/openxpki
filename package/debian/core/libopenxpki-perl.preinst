@@ -6,7 +6,7 @@
 set -e
 
 case "$1" in
-    install)
+    install|upgrade)
         COUNT=`grep '^openxpki:' /etc/group | wc -l`;
         if [ $COUNT -eq 0 ]; then
             addgroup --system openxpki;

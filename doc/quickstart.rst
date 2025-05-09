@@ -114,6 +114,11 @@ Now, create an empty database and assign a database user::
     GRANT ALL ON openxpki.* TO 'openxpki'@'localhost';
     flush privileges;
 
+Create a user for the UI session storage
+
+    CREATE USER 'openxpki_session'@'localhost' IDENTIFIED BY 'mysecret';
+    GRANT SELECT, INSERT, UPDATE, DELETE ON openxpki.frontend_session TO 'openxpki_session'@'localhost';
+
 ...and put the used credentials into /etc/openxpki/config.d/system/database.yaml::
 
     main:
