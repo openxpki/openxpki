@@ -56,8 +56,7 @@ case "$1" in
             if [ -d /etc/apache2/sites-available/ ]; then
                 if [ ! -e /etc/apache2/sites-available/openxpki.conf ]; then
                     cp /usr/share/doc/libopenxpki-perl/examples/apache2-openxpki-site.conf /etc/apache2/sites-available/openxpki.conf
-                    /usr/sbin/a2enmod headers
-                    /usr/sbin/a2enmod rewrite
+                    /usr/sbin/a2enmod headers macro proxy proxy_http rewrite ssl
                     /usr/sbin/a2ensite openxpki
                 fi;
             fi;
@@ -76,7 +75,8 @@ case "$1" in
 
         # If this is an existing install we create a symlink
         # to the new socket location to not break things
-        test -d /var/openxpki && ln -s /run/openxpkid/openxpki.sock /var/openxpki/openxpki.socket
+        # works only if the system was down before!
+        test -d /var/openxpki && test ! -d /var/openxpki/openxpki.socket && ln -s /run/openxpkid/openxpki.sock /var/openxpki/openxpki.socket
 
         # Create the pkiadm user
         COUNT=`grep '^pkiadm:' /etc/passwd | wc -l`;

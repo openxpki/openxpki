@@ -29,6 +29,13 @@ $(EXTRA_DIRS):
 
 dirs: $(EXTRA_DIRS)
 
+shell:
+	docker run --entrypoint /bin/bash --rm -ti \
+		-v $(abspath ../../):/openxpki:ro \
+		-v $(abspath repository):/repository \
+		-v $(abspath extra:/extra-packages) \
+		-v $(abspath packages):/packages \
+		-v $(abspath secret/debian2023.key):/signkey:ro oxibuilder4bookworm
 repo:
 	docker run --rm -ti \
 		-v $(abspath ../../):/openxpki:ro \
