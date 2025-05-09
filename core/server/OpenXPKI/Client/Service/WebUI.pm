@@ -246,7 +246,7 @@ has url_path => (
         my $i = firstidx { $_ eq 'cgi-bin' } $path->parts->@*;
         splice $path->parts->@*, $i if $i != -1;
 
-        $self->log->debug('Sanitized script path = ' . $path->to_string);
+        $self->log->trace('Sanitized script path: ' . $path->to_string) if $self->log->is_trace;
         return $path;
     },
 );
