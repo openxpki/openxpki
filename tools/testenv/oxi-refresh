@@ -105,7 +105,9 @@ echo
 # stop OpenXPKI early to prevent crashes due to DB access problems etc.
 if [[ $IS_RESTART -eq 1 ]]; then
     set +e
-    openxpkictl stop server >>$LOG 2>&1
+    if command -v openxpkictl >/dev/null; then
+        openxpkictl stop server >>$LOG 2>&1
+    fi
     set -e
 fi
 
@@ -127,48 +129,48 @@ else
     for realm_dir in /etc/openxpki/config.d/realm/*; do
         rm -rf "$realm_dir/workflow/def"
     done
+fi
 
-    # copy config/ to /etc/openxpki
-    echo "- copy config"
-    pushd $OXI_TEST_SAMPLECONFIG_DIR > /dev/null
-        DESTDIR= make install >>$LOG 2>&1
-    popd > /dev/null
+# copy config/ to /etc/openxpki
+echo "- copy config"
+pushd $OXI_TEST_SAMPLECONFIG_DIR > /dev/null
+    DESTDIR= make install >>$LOG 2>&1
+popd > /dev/null
 
-    chmod 750              /etc/openxpki/config.d
-    chown -R root:openxpki /etc/openxpki/config.d
+chmod 750              /etc/openxpki/config.d
+chown -R root:openxpki /etc/openxpki/config.d
 
-    mv /etc/openxpki/local/keys /tmp/openxpki-keys
-    rsync -a --delete $OXI_TEST_SAMPLECONFIG_DIR/contrib/local/* /etc/openxpki/local/ >>$LOG 2>&1
-    chmod 750              /etc/openxpki/local
-    chown -R root:openxpki /etc/openxpki/local
-    mv /tmp/openxpki-keys /etc/openxpki/local/keys
+if [ -d /etc/openxpki/local/keys ]; then mv /etc/openxpki/local/keys /tmp/openxpki-keys; fi
+rsync -a --delete $OXI_TEST_SAMPLECONFIG_DIR/contrib/local/* /etc/openxpki/local/ >>$LOG 2>&1
+chmod 750              /etc/openxpki/local
+chown -R root:openxpki /etc/openxpki/local
+if [ -d /tmp/openxpki-keys ]; then mv /tmp/openxpki-keys /etc/openxpki/local/keys; fi
 
-    # set en_US as default language to get correct I18N translations (e.g. in rpc.fcgi)
-    sed -ri 's/^(\s*default_language:).*/\1 en_US/' /etc/openxpki/config.d/system/server.yaml
+# set en_US as default language to get correct I18N translations (e.g. in rpc.fcgi)
+sed -ri 's/^(\s*default_language:).*/\1 en_US/' /etc/openxpki/config.d/system/server.yaml
 
-    # set OpenXPKI socket owner to webserver user
-    sed -ri 's/^(\s*socket_owner:).*/\1 www-data/' /etc/openxpki/config.d/system/server.yaml
+# set OpenXPKI socket owner to webserver user
+sed -ri 's/^(\s*socket_owner:).*/\1 www-data/' /etc/openxpki/config.d/system/server.yaml
 
-    # set plain datavault password "root"
-    sed -zri 's/(secret:\s+default:\s+.*?)value@?:[^\n]+/\1value: root/' /etc/openxpki/config.d/system/crypto.yaml
+# set plain datavault password "root"
+sed -zri 's/(secret:\s+default:\s+.*?)value@?:[^\n]+/\1value: root/' /etc/openxpki/config.d/system/crypto.yaml
 
-    # Specify hostname to force MySQL connection via TCP, not socket
-    webui_conf=/etc/openxpki/frontend.d/service/webui/default.yaml
-    if [ -e $webui_conf ]; then
-        echo "- set WebUI session driver to database"
-        sed -ri 's/^(\s*)(#\s*)?(driver\s*:).*/\1\3 driver:openxpki/'                                $webui_conf
-        sed -ri 's/^(\s*)(#\s*)?(DataSource\s*:).*/\1\3 dbi:MariaDB:dbname=openxpki;host=127.0.0.1/' $webui_conf
-        sed -ri 's/^(\s*)(#\s*)?(User\s*:).*/\1\3 openxpki_session/'                                 $webui_conf
-        sed -ri 's/^(\s*)(#\s*)?(Password\s*:).*/\1\3 mysecret/'                                     $webui_conf
-    fi
-    legacy_webui_conf=/etc/openxpki/webui/default.conf
-    if [ -e $legacy_webui_conf ]; then
-        echo "- set legacy WebUI session driver to database"
-        sed -ri 's/^(#\s*)?(driver\s*=).*/\2 driver:openxpki/'                                $legacy_webui_conf
-        sed -ri 's/^(#\s*)?(DataSource\s*=).*/\2 dbi:MariaDB:dbname=openxpki;host=127.0.0.1/' $legacy_webui_conf
-        sed -ri 's/^(#\s*)?(User\s*=).*/\2 openxpki_session/'                                 $legacy_webui_conf
-        sed -ri 's/^(#\s*)?(Password\s*=).*/\2 mysecret/'                                     $legacy_webui_conf
-    fi
+# Specify hostname to force MySQL connection via TCP, not socket
+webui_conf=/etc/openxpki/frontend.d/service/webui/default.yaml
+if [ -e $webui_conf ]; then
+    echo "- set WebUI session driver to database"
+    sed -ri 's/^(\s*)(#\s*)?(driver\s*:).*/\1\3 driver:openxpki/'                                $webui_conf
+    sed -ri 's/^(\s*)(#\s*)?(DataSource\s*:).*/\1\3 dbi:MariaDB:dbname=openxpki;host=127.0.0.1/' $webui_conf
+    sed -ri 's/^(\s*)(#\s*)?(User\s*:).*/\1\3 openxpki_session/'                                 $webui_conf
+    sed -ri 's/^(\s*)(#\s*)?(Password\s*:).*/\1\3 mysecret/'                                     $webui_conf
+fi
+legacy_webui_conf=/etc/openxpki/webui/default.conf
+if [ -e $legacy_webui_conf ]; then
+    echo "- set legacy WebUI session driver to database"
+    sed -ri 's/^(#\s*)?(driver\s*=).*/\2 driver:openxpki/'                                $legacy_webui_conf
+    sed -ri 's/^(#\s*)?(DataSource\s*=).*/\2 dbi:MariaDB:dbname=openxpki;host=127.0.0.1/' $legacy_webui_conf
+    sed -ri 's/^(#\s*)?(User\s*=).*/\2 openxpki_session/'                                 $legacy_webui_conf
+    sed -ri 's/^(#\s*)?(Password\s*=).*/\2 mysecret/'                                     $legacy_webui_conf
 fi
 
 set +e

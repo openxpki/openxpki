@@ -10,7 +10,7 @@ def virtualbox_version()
     if vboxmanage != nil
         s = Vagrant::Util::Subprocess.execute(vboxmanage, '--version')
         s = s.stdout.strip!
-        s = s.split('_').first
+        s = s.split('r').first
         return s
     else
         return nil
@@ -30,9 +30,8 @@ Vagrant.configure("2") do |config|
   config.vm.define "develop", primary:true do |dev|
       dev.vm.hostname = "oxi-dev-alldb"
 
-
-      dev.vm.synced_folder ".", "/vagrant", type: "sshfs"
-      dev.vm.synced_folder "../..", "/code-repo", type: "sshfs"
+      dev.vm.synced_folder ".", "/vagrant"
+      dev.vm.synced_folder "../..", "/code-repo"
 
       # prevent Vagrant error "stdin: is not a tty"
       dev.vm.provision "Edit /root/.profile", :type => "shell", :inline => "sed -ri 's/^(mesg.*)/# \\1/' /root/.profile"
