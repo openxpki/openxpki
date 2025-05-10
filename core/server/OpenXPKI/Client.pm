@@ -239,6 +239,13 @@ sub send_receive_command_msg ($self, $cmd, $arg = {}) {
     });
 }
 
+sub check_msg ($self, $msg, $key, $value) {
+    return (
+        defined $msg and ref $msg eq 'HASH'
+        and defined $msg->{$key} and $msg->{$key} eq $value
+    );
+}
+
 sub init_session ($self, $arg = {}) {
     my $msg;
     ##! 4: "initialize session"
@@ -303,9 +310,7 @@ sub detach ($self) {
 
     $self->session_id( '' );
 
-    if (defined $msg && ref $msg eq 'HASH' && $msg->{SERVICE_MSG} eq 'DETACH') {
-        return 1;
-    }
+    return 1 if $self->check_msg($msg, SERVICE_MSG => 'DETACH');
 
     OpenXPKI::Exception->throw(
         message => "I18N_OPENXPKI_CLIENT_DETACH_FAILED",
@@ -321,9 +326,7 @@ sub logout ($self) {
 
     $self->session_id( '' );
 
-    if (defined $msg && ref $msg eq 'HASH' && $msg->{SERVICE_MSG} eq 'LOGOUT') {
-        return 1;
-    }
+    return 1 if $self->check_msg($msg, SERVICE_MSG => 'LOGOUT');
 
     OpenXPKI::Exception->throw(
         message => "I18N_OPENXPKI_CLIENT_LOGOUT_FAILED",
@@ -336,9 +339,9 @@ sub is_logged_in ($self) {
     eval {
         $msg = $self->send_receive_service_msg('PING');
     };
-    if (defined $msg && ref $msg eq 'HASH' && $msg->{SERVICE_MSG} eq 'SERVICE_READY') {
-        return 1;
-    }
+
+    return 1 if $self->check_msg($msg, SERVICE_MSG => 'SERVICE_READY');
+
     return;
 }
 
