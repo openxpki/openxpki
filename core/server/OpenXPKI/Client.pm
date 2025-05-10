@@ -360,7 +360,7 @@ sub is_connected ($self) {
         }
     } elsif ($EVAL_ERROR) {
         # completely unknown die => -1
-        return -1;
+        return;
     }
     return 1;
 }
