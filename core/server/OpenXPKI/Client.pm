@@ -327,7 +327,7 @@ sub logout ($self) {
 
     OpenXPKI::Exception->throw(
         message => "I18N_OPENXPKI_CLIENT_LOGOUT_FAILED",
-        params => { MESSAGE_FROM_SERVER => $msg },
+        params => { MESSAGE_FROM_SERVER => Dumper $msg },
     );
 }
 
