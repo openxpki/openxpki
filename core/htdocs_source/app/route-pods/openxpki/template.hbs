@@ -12,11 +12,11 @@
     <navbar.toggle toggle={{true}} />
     <navbar.content id="oxi-navbar">
         <navbar.nav class="me-auto" as |nav|>
-            {{#each this.model.navEntries as |navEntry|}}
+            {{#each this.model.navEntries as |navEntry index|}}
                 {{!-- sub menu --}}
                 {{#if navEntry.entries.length}}
-                    <nav.dropdown class="mx-lg-2" as |dd|>
-                        <dd.toggle class="{{if navEntry.active "active"}}">
+                    <nav.dropdown as |dd|>
+                        <dd.toggle class="{{if navEntry.active "active"}} {{if (not (eq index 0)) "border-start"}} border-tertiary-subtle py-2 px-lg-3">
                             {{navEntry.label}}
                             <span class="caret"></span>
                         </dd.toggle>
@@ -42,9 +42,9 @@
                     </nav.dropdown>
                 {{!-- plain menu item --}}
                 {{else}}
-                    <nav.item class="mx-lg-2">
+                    <nav.item>
                         <OxiBase::MenuItem
-                            class="nav-link"
+                            class="nav-link {{if (not (eq index 0)) "border-start"}} border-tertiary-subtle py-2 px-lg-3"
                             @spec={{navEntry}}
                             @beforeNav={{navbar.collapse}}
                         />
@@ -55,7 +55,7 @@
         <navbar.nav as |nav|>
             {{#if this.model.user}}
                 <nav.item>
-                    <nav.linkTo {{on "click" this.logout}}>
+                    <nav.linkTo {{on "click" this.logout}} class="border-start border-tertiary-subtle py-2 px-lg-3">
                         {{t 'site.logout'}}
                     </nav.linkTo>
                 </nav.item>
@@ -127,7 +127,7 @@
                     {{this.model.top.page.label}}
                 {{/if}}
                 {{#if this.model.isAutoRefresh}}
-                    <span class="alert alert-info py-1 ms-2 fs-6" role="alert">
+                    <span class="alert alert-info py-2 ms-2 fs-6" role="alert">
                         <span class="glyphicon glyphicon-refresh spin-slow"></span>
                         &nbsp;{{t 'site.banner.autorefresh'}}
                     </span>

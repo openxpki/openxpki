@@ -2,12 +2,12 @@
     opening the page in a new window }}
 <a
     ...attributes
-    class={{if @spec.active "active"}}
-          href="{{if @spec.page (url-for "openxpki" @spec.page) @spec.url}}"
+    class="{{if @spec.active "active"}} icon-link"
+    href="{{if @spec.page (url-for "openxpki" @spec.page) @spec.url}}"
     {{on "click" (if @spec.page (fn this.navigateTo @spec.page) (fn this.callUrl @spec.url))}}
 >
     {{#if @spec.icon}}
-        <span class="glyphicon {{@spec.icon}} pe-1 small"></span>
+        <span class="glyphicon {{@spec.icon}} text-secondary pe-1"></span>
     {{/if}}
     {{@spec.label}}
 </a>
