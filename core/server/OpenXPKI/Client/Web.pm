@@ -181,8 +181,8 @@ sub startup ($self) {
         }
 
         try {
-            if (!($client && $client->is_connected())) {
-                $self->log->debug('creating new socket connection for pid '.$PID) unless($client);
+            unless ($client and $client->is_connected) {
+                $self->log->debug('creating new socket connection for pid '.$PID) unless $client;
                 $client = OpenXPKI::Client->new(
                     ($socket ? (socketfile => $socket) : ()),
                     timeout => ($config_obj->get('system.backend.timeout') || 30),
