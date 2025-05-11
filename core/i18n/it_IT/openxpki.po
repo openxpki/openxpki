@@ -1432,6 +1432,10 @@ msgstr "Home"
 msgid "I18N_OPENXPKI_UI_MENU_INFORMATION"
 msgstr "Informazioni"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_LOGIN"
+msgstr "Mostra Liste Revoche (CRL)"
+
 msgid "I18N_OPENXPKI_UI_MENU_MANAGE_SECRET"
 msgstr "Gestione Secrets"
 
@@ -1465,6 +1469,10 @@ msgstr "Informazioni Processi"
 
 msgid "I18N_OPENXPKI_UI_MENU_PUBLISH_CA_CRL"
 msgstr "Pubblica CA/CRL"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_REALM_SELECTION"
+msgstr "Descrizione nome reale"
 
 # Remove?
 msgid "I18N_OPENXPKI_UI_MENU_REPORT_FULL"

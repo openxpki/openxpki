@@ -92,6 +92,7 @@ sub __is_valid_message : PRIVATE {
     my $valid_messages = {
         'NEW' => [
             'PING',
+            'GET_LOGOUT_MENU',
             'CONTINUE_SESSION',
             'NEW_SESSION',
             'DETACH_SESSION',
@@ -100,24 +101,28 @@ sub __is_valid_message : PRIVATE {
         ],
         'SESSION_ID_SENT' => [
             'PING',
+            'GET_LOGOUT_MENU',
             'SESSION_ID_ACCEPTED',
             'CONTINUE_SESSION',
             'DETACH_SESSION',
         ],
         'SESSION_ID_SENT_FROM_CONTINUE' => [
             'PING',
+            'GET_LOGOUT_MENU',
             'SESSION_ID_ACCEPTED',
             'CONTINUE_SESSION',
             'DETACH_SESSION',
         ],
         'SESSION_ID_SENT_FROM_RESET' => [
             'PING',
+            'GET_LOGOUT_MENU',
             'SESSION_ID_ACCEPTED',
             'CONTINUE_SESSION',
             'DETACH_SESSION',
         ],
         'WAITING_FOR_PKI_REALM' => [
             'PING',
+            'GET_LOGOUT_MENU',
             'LOGOUT',
             'GET_PKI_REALM',
             'NEW_SESSION',
@@ -126,6 +131,7 @@ sub __is_valid_message : PRIVATE {
         ],
         'WAITING_FOR_AUTHENTICATION_STACK' => [
             'PING',
+            'GET_LOGOUT_MENU',
             'LOGOUT',
             'GET_AUTHENTICATION_STACK',
             'NEW_SESSION',
@@ -134,6 +140,7 @@ sub __is_valid_message : PRIVATE {
         ],
         'WAITING_FOR_LOGIN' => [
             'PING',
+            'GET_LOGOUT_MENU',
             'LOGOUT',
             'GET_PASSWD_LOGIN',
             'GET_CLIENT_LOGIN',
@@ -575,6 +582,12 @@ sub __handle_GET_REALM_LIST : PRIVATE {
     return { PARAMS => CTX('api2')->get_realm_list() };
 }
 
+sub __handle_GET_LOGOUT_MENU : PRIVATE {
+    ##! 1: 'start'
+    my $self    = shift;
+    my $ident   = ident $self;
+    return { PARAMS => CTX('api2')->get_menu() };
+}
 
 sub __handle_COMMAND : PRIVATE {
     ##! 1: 'start'

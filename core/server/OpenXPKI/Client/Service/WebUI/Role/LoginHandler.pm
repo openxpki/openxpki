@@ -17,6 +17,7 @@ requires qw(
     handle_view
     logout_session
     new_frontend_session
+    ping_client
 );
 
 # Core modules
@@ -96,30 +97,17 @@ signature_for handle_login => (
 sub handle_login ($self, $page, $action, $reply) {
     my $uilogin = OpenXPKI::Client::Service::WebUI::Page::Login->new(webui => $self);
 
-    # Login works in three steps realm -> auth stack -> credentials
+    $self->log->info("Not logged in - authenticating; page = '$page', action = '$action'");
 
-    my $session = $self->session;
-
-    $self->log->info("Not logged in. Doing auth. page = '$page', action = '$action'");
-
-    # Special handling for "pki_realm" and "auth_stack" params
-    if ($action eq 'login!realm' and $self->param('pki_realm')) {
-        $self->session->param('pki_realm', scalar $self->param('pki_realm'));
+    # Read login parameters "pki_realm" and "auth_stack"
+    if ($action eq 'login!realm' and my $realm = scalar $self->param('pki_realm')) {
+        $self->log->debug("Overwrite realm with '$realm' set via action '$action'");
+        $self->session->param('pki_realm', $realm);
         $self->session->param('auth_stack', undef);
-        $self->log->debug('set realm in session: ' . $self->param('pki_realm') );
     }
-    if ($action eq 'login!stack' and $self->param('auth_stack')) {
-        $self->session->param('auth_stack', scalar $self->param('auth_stack'));
-        $self->log->debug('set auth_stack in session: ' . $self->param('auth_stack') );
-    }
-
-    # ENV always overrides session, keep this after the above block to prevent
-    # people from hacking into the session parameters
-    if ($self->request->env->{OPENXPKI_PKI_REALM}) {
-        $self->session->param('pki_realm', $self->request->env->{OPENXPKI_PKI_REALM});
-    }
-    if ($self->request->env->{OPENXPKI_AUTH_STACK}) {
-        $self->session->param('auth_stack', $self->request->env->{OPENXPKI_AUTH_STACK});
+    if ($action eq 'login!stack' and my $stack = scalar $self->param('auth_stack')) {
+        $self->log->debug("Overwrite auth stack with '$stack' set via action '$action'");
+        $self->session->param('auth_stack', $stack);
     }
 
     my $pki_realm = $self->session->param('pki_realm') || '';
@@ -168,90 +156,87 @@ sub handle_login ($self, $page, $action, $reply) {
         return $uilogin;
     }
 
-    my $status = $reply->{SERVICE_MSG};
+    # Login works in three steps realm -> auth stack -> credentials
 
-    if ( $status eq 'GET_PKI_REALM' ) {
-        $self->log->debug("Status: '$status'");
-        # realm set
-        if ($pki_realm) {
-            $reply = $self->client->send_receive_service_msg( 'GET_PKI_REALM', { PKI_REALM => $pki_realm, } );
-            $status = $reply->{SERVICE_MSG};
-            $self->log->debug("Selected realm: '$pki_realm', new status: '$status'");
-        # no realm set
-        } else {
-            my $realms = $reply->{PARAMS}->{PKI_REALMS};
+    $self->log->debug(sprintf("Status: '%s'", $reply->{SERVICE_MSG}));
 
-            my $safe_realm_str = sub {
-                my $r = lc(shift);
-                $r =~ s/[_\s]/-/g;
-                $r =~ s/[^a-z0-9-]//g;
-                $r =~ s/-+/-/g;
-                "oxi-realm-card-$r"
-            };
-
-            my @cards;
-            # "path" mode: realm cards are links to defined sub paths
-            if ('path' eq $self->realm_mode) {
-                # use webui config but only take realms known to the server:
-                my @realm_list =
-                    sort { lc($realms->{$a}->{LABEL}) cmp lc($realms->{$b}->{LABEL}) }
-                    grep { $realms->{$_} }
-                    keys $self->realm_path_map->%*;
-
-                # create a link for each <realm URL path> = <realm> + <auth stack>
-                for my $realm (@realm_list) {
-                    my $auth_stacks = $realms->{$realm}->{AUTH_STACKS};
-
-                    my @defs = $self->realm_path_map->{$realm}->@*;
-                    for my $def (@defs) {
-                        my $stack = $def->{stack};
-                        my $footer = $stack
-                            ? ($auth_stacks->{$stack} ? $auth_stacks->{$stack}->{label} : $stack)
-                            : '';
-                        push @cards, {
-                            label => $realms->{$realm}->{LABEL},
-                            description => $realms->{$realm}->{DESCRIPTION},
-                            footer => $footer,
-                            image => $realms->{$realm}->{IMAGE},
-                            color => $realms->{$realm}->{COLOR},
-                            css_class => $safe_realm_str->($realm),
-                            href => $def->{url},
-                        };
-                    }
-                }
-
-            # other modes: realm cards are actions that set the "pki_realm" parameter
-            } else {
-                @cards =
-                    map { {
-                        label => $realms->{$_}->{LABEL},
-                        description => $realms->{$_}->{DESCRIPTION},
-                        image => $realms->{$_}->{IMAGE},
-                        color => $realms->{$_}->{COLOR},
-                        css_class => $safe_realm_str->($_),
-                        action => 'login!realm',
-                        action_params => {
-                            pki_realm => $realms->{$_}->{NAME},
-                        },
-                    } }
-                    sort { lc($realms->{$a}->{LABEL}) cmp lc($realms->{$b}->{LABEL}) }
-                    keys %{$realms};
-            }
-
-            $uilogin->init_realm_cards(\@cards, $self->realm_layout eq 'list' ? 1 : 0);
-            return $uilogin;
-        }
+    # store realm in backend session if it's set
+    if ( $reply->{SERVICE_MSG} eq 'GET_PKI_REALM' and $pki_realm) {
+        $reply = $self->client->send_receive_service_msg( 'GET_PKI_REALM', { PKI_REALM => $pki_realm } );
     }
 
-    if ( $status eq 'GET_AUTHENTICATION_STACK' ) {
-        $self->log->debug("Status: '$status'");
+    # if no realm set
+    if ( $reply->{SERVICE_MSG} eq 'GET_PKI_REALM' and not $pki_realm) {
+        my $realms = $reply->{PARAMS}->{PKI_REALMS};
+
+        my $safe_realm_str = sub {
+            my $r = lc(shift);
+            $r =~ s/[_\s]/-/g;
+            $r =~ s/[^a-z0-9-]//g;
+            $r =~ s/-+/-/g;
+            "oxi-realm-card-$r"
+        };
+
+        my @cards;
+        # "path" mode: realm cards are links to defined sub paths
+        if ('path' eq $self->realm_mode) {
+            # use webui config but only take realms known to the server:
+            my @realm_list =
+                sort { lc($realms->{$a}->{LABEL}) cmp lc($realms->{$b}->{LABEL}) }
+                grep { $realms->{$_} }
+                keys $self->realm_path_map->%*;
+
+            # create a link for each <realm URL path> = <realm> + <auth stack>
+            for my $realm (@realm_list) {
+                my $auth_stacks = $realms->{$realm}->{AUTH_STACKS};
+
+                my @defs = $self->realm_path_map->{$realm}->@*;
+                for my $def (@defs) {
+                    my $stack = $def->{stack};
+                    my $footer = $stack
+                        ? ($auth_stacks->{$stack} ? $auth_stacks->{$stack}->{label} : $stack)
+                        : '';
+                    push @cards, {
+                        label => $realms->{$realm}->{LABEL},
+                        description => $realms->{$realm}->{DESCRIPTION},
+                        footer => $footer,
+                        image => $realms->{$realm}->{IMAGE},
+                        color => $realms->{$realm}->{COLOR},
+                        css_class => $safe_realm_str->($realm),
+                        href => $def->{url},
+                    };
+                }
+            }
+
+        # other modes: realm cards are actions that set the "pki_realm" parameter
+        } else {
+            @cards =
+                map { {
+                    label => $realms->{$_}->{LABEL},
+                    description => $realms->{$_}->{DESCRIPTION},
+                    image => $realms->{$_}->{IMAGE},
+                    color => $realms->{$_}->{COLOR},
+                    css_class => $safe_realm_str->($_),
+                    action => 'login!realm',
+                    action_params => {
+                        pki_realm => $realms->{$_}->{NAME},
+                    },
+                } }
+                sort { lc($realms->{$a}->{LABEL}) cmp lc($realms->{$b}->{LABEL}) }
+                keys %{$realms};
+        }
+
+        $uilogin->init_realm_cards(\@cards, $self->realm_layout eq 'list' ? 1 : 0);
+        return $uilogin;
+    }
+
+    if ( $reply->{SERVICE_MSG} eq 'GET_AUTHENTICATION_STACK' ) {
         # Never auth with an internal stack!
         if ( $auth_stack && $auth_stack !~ /^_/) {
             $self->log->debug("Authentication stack: $auth_stack");
             $reply = $self->client->send_receive_service_msg( 'GET_AUTHENTICATION_STACK', {
                AUTHENTICATION_STACK => $auth_stack
             });
-            $status = $reply->{SERVICE_MSG};
         } else {
             my $stacks = $reply->{'PARAMS'}->{'AUTHENTICATION_STACKS'};
 
@@ -273,7 +258,6 @@ sub handle_login ($self, $page, $action, $reply) {
                 $reply = $self->client->send_receive_service_msg( 'GET_AUTHENTICATION_STACK', {
                     AUTHENTICATION_STACK => $auth_stack
                 } );
-                $status = $reply->{SERVICE_MSG};
             } else {
                 $self->log->trace("Offering stacks: " . Dumper \@stack_list ) if $self->log->is_trace;
                 $uilogin->init_auth_stack(\@stack_list);
@@ -282,13 +266,12 @@ sub handle_login ($self, $page, $action, $reply) {
         }
     }
 
-    $self->log->debug("Selected realm $pki_realm, new status " . $status);
-    $self->log->trace('Reply: ' . Dumper $reply) if $self->log->is_trace;
+    $self->log->debug(sprintf("Selected realm: '%s', new status: '%s'", $pki_realm, $reply->{SERVICE_MSG}));
+    $self->log->trace('Reply = ' . Dumper $reply) if $self->log->is_trace;
 
     # we have more than one login handler and leave it to the login
     # class to render it right.
-    if ( $status =~ /GET_(.*)_LOGIN/ ) {
-        $self->log->debug("Status: '$status'");
+    if ( $reply->{SERVICE_MSG} =~ /GET_(.*)_LOGIN/ ) {
         my $login_type = $1;
 
         ## FIXME - need a good way to configure login handlers
@@ -555,8 +538,9 @@ sub handle_login ($self, $page, $action, $reply) {
         return $uilogin;
     }
 
-    $self->log->debug("unhandled error during auth");
-    return;
+    $self->log->error("Unhandled error during auth");
+    $uilogin->status->error("Unhandled error during authentication");
+    return $uilogin;
 
 }
 
@@ -569,10 +553,25 @@ sub handle_logout ($self, $page) {
         my $authinfo = $self->session->param('authinfo') || {};
         my $goto = $authinfo->{logout};
 
-        # clear the session before redirecting to make sure we are safe
-        $self->logout_session;
+        # create new frontend and backend sessions
+        $self->logout_session; # pki_realm will be preserved
 
-        # now perform the redirect if set
+        # make sure backend session knows realm and frontend session knows
+        # backend session so e.g. "get_menu" returns the proper logout menu from
+        # the realm config (if any).
+        $self->_init_client($self->client); # initialize backend session and store its ID in frontend session
+
+        if (my $pki_realm = $self->session->param('pki_realm')) {
+            # store realm in backend session
+            my $reply = $self->ping_client;
+            if ($reply->{SERVICE_MSG} eq 'GET_PKI_REALM') {
+                $self->client->send_receive_service_msg('GET_PKI_REALM', {
+                    PKI_REALM => $pki_realm,
+                });
+            }
+        }
+
+        # perform the redirect if set
         if ($goto) {
             $self->log->debug("External redirect on logout to: $goto");
             $uilogin->redirect->external($goto);
@@ -657,7 +656,7 @@ sub _set_menu ($self) {
     my $reply = $self->client->send_receive_command_msg('get_menu');
     my $menu = $reply->{PARAMS} or return;
 
-    $self->log->trace('Menu = ' . Dumper $menu) if $self->log->is_trace;
+    $self->log->trace('UI config = ' . Dumper $menu) if $self->log->is_trace;
 
     $self->session->param('menu_items', $menu->{main} || []);
 
@@ -722,6 +721,7 @@ sub _set_menu ($self) {
     }
 
     # Check syntax of "certdetails".
+    # TODO Replace by proper config linter
     # (the sub{} below allows using "return" instead of nested "if"-structures)
     my $certdetails = sub {
         my $result;

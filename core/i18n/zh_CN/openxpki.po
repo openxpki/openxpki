@@ -1223,6 +1223,10 @@ msgstr "主页"
 msgid "I18N_OPENXPKI_UI_MENU_INFORMATION"
 msgstr "信息"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_LOGIN"
+msgstr "显示吊销列表（CRL）"
+
 msgid "I18N_OPENXPKI_UI_MENU_MANAGE_SECRET"
 msgstr "管理秘密"
 
@@ -1256,6 +1260,10 @@ msgstr "处理信息"
 
 msgid "I18N_OPENXPKI_UI_MENU_PUBLISH_CA_CRL"
 msgstr "发布CA/CRL"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_REALM_SELECTION"
+msgstr "真实姓名"
 
 # Remove?
 msgid "I18N_OPENXPKI_UI_MENU_REPORT_FULL"

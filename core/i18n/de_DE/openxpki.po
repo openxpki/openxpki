@@ -1110,6 +1110,9 @@ msgstr "Start"
 msgid "I18N_OPENXPKI_UI_MENU_INFORMATION"
 msgstr "Information"
 
+msgid "I18N_OPENXPKI_UI_MENU_LOGIN"
+msgstr "Login"
+
 msgid "I18N_OPENXPKI_UI_MENU_MANAGE_SECRET"
 msgstr "Passwortverwaltung"
 
@@ -1139,6 +1142,9 @@ msgstr "Prozessinformationen"
 
 msgid "I18N_OPENXPKI_UI_MENU_PUBLISH_CA_CRL"
 msgstr "CA/CRL veröffentlichen"
+
+msgid "I18N_OPENXPKI_UI_MENU_REALM_SELECTION"
+msgstr "Realm ändern"
 
 msgid "I18N_OPENXPKI_UI_MENU_REPORT_FULL"
 msgstr "Zertifikatsdetails"

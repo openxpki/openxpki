@@ -1115,6 +1115,9 @@ msgstr "Home"
 msgid "I18N_OPENXPKI_UI_MENU_INFORMATION"
 msgstr "Information"
 
+msgid "I18N_OPENXPKI_UI_MENU_LOGIN"
+msgstr "Login"
+
 msgid "I18N_OPENXPKI_UI_MENU_MANAGE_SECRET"
 msgstr "Manage Secrets"
 
@@ -1144,6 +1147,9 @@ msgstr "Process Information"
 
 msgid "I18N_OPENXPKI_UI_MENU_PUBLISH_CA_CRL"
 msgstr "Publish CA/CRL"
+
+msgid "I18N_OPENXPKI_UI_MENU_REALM_SELECTION"
+msgstr "Change Realm"
 
 msgid "I18N_OPENXPKI_UI_MENU_REPORT_FULL"
 msgstr "Full Certificate Status Report"

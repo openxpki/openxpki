@@ -1450,6 +1450,10 @@ msgid "I18N_OPENXPKI_UI_MENU_INFORMATION"
 msgstr "Тестировщик"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_LOGIN"
+msgstr "Имя учетной записи"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_MENU_MANAGE_SECRET"
 msgstr "Имя учетной записи"
 
@@ -1488,6 +1492,10 @@ msgstr "Профиль пользователя"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_MENU_PUBLISH_CA_CRL"
 msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_REALM_SELECTION"
+msgstr "Имя владельца сертификата, например, Иван Петрович Сидоров."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_MENU_REPORT_FULL"

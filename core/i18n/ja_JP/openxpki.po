@@ -1176,6 +1176,10 @@ msgstr "ホーム"
 msgid "I18N_OPENXPKI_UI_MENU_INFORMATION"
 msgstr "情報"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_LOGIN"
+msgstr "証明書失効リスト（CRL）の表示"
+
 msgid "I18N_OPENXPKI_UI_MENU_MANAGE_SECRET"
 msgstr "秘密鍵の管理"
 
@@ -1209,6 +1213,10 @@ msgstr "プロセス情報"
 
 msgid "I18N_OPENXPKI_UI_MENU_PUBLISH_CA_CRL"
 msgstr "CA / CRLの発行"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_REALM_SELECTION"
+msgstr "本名"
 
 # Remove?
 msgid "I18N_OPENXPKI_UI_MENU_REPORT_FULL"

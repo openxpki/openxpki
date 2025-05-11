@@ -60,9 +60,6 @@ sub init_structure ($self, $args) {
             $self->user->last_login($last_login);
         }
 
-        # Menu items
-        $self->menu->items($self->session_param('menu_items'));
-
         # Ping endpoint
         if (my $ping = $self->session_param('ping')) {
             $self->ping($ping);
@@ -79,11 +76,26 @@ sub init_structure ($self, $args) {
         }
     }
 
-    # default menu if nothing was set before
-    $self->menu->add_item({
-        key => 'logout',
-        label => 'I18N_OPENXPKI_UI_CLEAR_LOGIN',
-    }) unless $self->menu->is_set;
+    # Configured menu items
+    if (my $menu = $self->session_param('menu_items')) { # session parameter is set in OpenXPKI::Client::Service::WebUI::Role::LoginHandler->_set_menu()
+        $self->menu->items($menu);
+
+    # Default (Logout) menu
+    } else {
+        $self->menu->items([
+            {
+                key => 'login',
+                label => 'I18N_OPENXPKI_UI_MENU_LOGIN',
+                icon => 'glyphicon-log-in',
+            },
+            {
+                key => 'logout',
+                label => 'I18N_OPENXPKI_UI_CLEAR_LOGIN',
+                icon => 'glyphicon-eject',
+            },
+            # I18N_OPENXPKI_UI_MENU_REALM_SELECTION
+        ]) unless $self->menu->is_set;
+    }
 
     return $self;
 }

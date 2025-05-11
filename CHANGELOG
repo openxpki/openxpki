@@ -2,6 +2,7 @@ Please list items to be added to the final release comment here
 
 New Features
 - openxpkictl can now start and stop server and client (and terminal processes in OpenXPKI Enterprise Edition)
+- Customizable logout menu (config node realm.<REALM>.uicontrol._logout.main)
 
 Upgrades, Improvements and Bugfixes
 - SELECT fields in workflows now support dependent fields (fields only shown if a specific option is selected)
@@ -9,3 +10,4 @@ Upgrades, Improvements and Bugfixes
 
 Removals, Deprecations, Breaking Changes
 - Config fallback from simplereenroll to simpleenroll in EST is deprecated and will be removed in next release
+- Environment variables OPENXPKI_PKI_REALM and OPENXPKI_AUTH_STACK to enforce realm/stack are no longer supported. You may use config items "realm.mode: fixed" and "realm.value: REALM;STACK" instead.

@@ -157,7 +157,7 @@ sub _init_client ($self, $client) {
     } else {
         eval {
             $self->log->debug('Backend session: try re-init with ID = ' . ($old_id || '<undef>'));
-            $client->init_session({ SESSION_ID => $old_id });
+            $client->init_session({ SESSION_ID => $old_id }); # initialize backend session
         };
         if (my $eval_err = $EVAL_ERROR) {
             my $exc = OpenXPKI::Exception->caught;
@@ -165,7 +165,7 @@ sub _init_client ($self, $client) {
                 $self->log->debug('Backend session was gone - start a new one');
                 # The session has gone - start a new one - might happen if the GUI
                 # was idle too long or the server was flushed
-                $client->init_session({ SESSION_ID => undef });
+                $client->init_session({ SESSION_ID => undef }); # initialize backend session
                 $self->ui_response->status->warn('I18N_OPENXPKI_UI_BACKEND_SESSION_GONE');
             } else {
                 $self->log->error('Error creating backend session: ' . $eval_err->{message});
@@ -277,6 +277,63 @@ has ui_response => (
     },
 );
 
+=head2 action
+
+Returns the value of the request parameter L<action> if set and the XSRFtoken is
+valid. If the token is invalid, returns an empty string and sets the response
+status to an error message.
+
+If the parameter is empty or not set an empty string is returned.
+
+=cut
+sub action; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+has action => (
+    init_arg => undef,
+    is => 'ro',
+    isa => 'Str',
+    lazy => 1,
+    default => sub ($self) {
+        my $rtoken_session = $self->session->param('rtoken') || '';
+        my $rtoken_request = $self->param('_rtoken') || '';
+
+        # check XSRF token
+        if (my $action = $self->param('action')) {
+            if ($rtoken_request && ($rtoken_request eq $rtoken_session)) {
+                $self->log->debug("Action '$action': valid request");
+                return ($action // '');
+
+            # required to make the login page work when the session expires, #552
+            } elsif( !$rtoken_session and ($action =~ /^login\!/ )) {
+                $self->log->debug("Action '$action': login with expired session, ignoring rtoken");
+                return ($action // '');
+
+            } else {
+                $self->log->debug("Action '$action': request with invalid rtoken ($rtoken_request != $rtoken_session)");
+                $self->ui_response->status->error('I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID');
+                return '';
+            }
+
+        } else {
+            return '';
+        }
+    },
+);
+
+sub current_realm; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+has current_realm => (
+    init_arg => undef,
+    is => 'rw',
+    isa => 'Str',
+    predicate => 'has_current_realm',
+);
+
+sub current_auth_stack; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+has current_auth_stack => (
+    init_arg => undef,
+    is => 'rw',
+    isa => 'Str',
+    predicate => 'has_current_auth_stack',
+);
 
 sub BUILD ($self, $args) {
     # Config - set defaults
@@ -367,7 +424,7 @@ sub prepare ($self, $c) {
     #
     # Detect realm
     #
-    my $detected_realm;
+    my $current_realm;
 
     my $realm_mode = $self->realm_mode;
     $self->log->debug("Realm detection mode: $realm_mode");
@@ -389,21 +446,26 @@ sub prepare ($self, $c) {
             $self->client->detach; # enforce new backend session to get rid of selected realm etc.
         }
 
-        # If the session has no realm set, try to get a realm from the map
-        elsif (not $self->session->param('pki_realm')) {
-            $self->log->debug("- checking config for realm '$realm'");
+        # Realm already stored in session
+        elsif (my $session_realm = $self->session->param('pki_realm')) {
+            $self->log->debug("- using realm previously stored in session: '$session_realm'");
+            $self->current_realm($session_realm);
+            if (my $session_stack = $self->session->param('auth_stack')) {
+                $self->current_auth_stack($session_stack);
+            }
 
-            $detected_realm = $self->config->get(['realm','map', $realm]);
-            # legacy config
-            $detected_realm //= $self->config->get(['realm', $realm]);
-            if (not $detected_realm) {
+        # If the session has no realm set, try to get a realm from the map
+        } else {
+            $self->log->debug("- checking config for realm '$realm'");
+            $current_realm = $self->config->get(['realm','map', $realm]);
+
+            # TODO Remove legacy config
+            $current_realm //= $self->config->get(['realm', $realm]);
+
+            if (not $current_realm) {
                 $self->log->debug("- unknown realm requested: '$realm'");
                 return $self->new_response(406 => 'I18N_OPENXPKI_UI_NO_SUCH_REALM_OR_SERVICE');
             }
-
-        # realm already stored in session
-        } else {
-            $self->log->debug("- using realm previously stored in session: '$realm'");
         }
 
     # HOSTNAME mode
@@ -419,26 +481,27 @@ sub prepare ($self, $c) {
         while (my ($pattern, $realm) = each(%$realm_map)) {
             next unless ($host =~ qr/\A$pattern\z/);
             $self->log->debug("- match: pattern = $pattern") if $self->log->is_trace;
-            $detected_realm = $realm;
+            $current_realm = $realm;
             last;
         }
-        $self->log->warn("- unable to find matching realm for hostname '$host'") unless $detected_realm;
+        $self->log->warn("- unable to find matching realm for hostname '$host'") unless $current_realm;
 
     # FIXED mode
     } elsif ("fixed" eq $realm_mode) {
         # Fixed realm mode, mode must be defined in the config
-        $detected_realm = $self->config->get('realm.value') // $self->config->get('global.realm');
+        $current_realm = $self->config->get('realm.value') // $self->config->get('global.realm');
     }
 
-    if ($detected_realm) {
-        my ($realm, $stack) = split /\s*;\s*/, $detected_realm;
-        $self->session->param('pki_realm', $realm);
-        $self->log->debug("- detected realm = '$realm' stored in session");
+    if ($current_realm) {
+        my ($realm, $stack) = split /\s*;\s*/, $current_realm;
+        $self->log->debug("- detected realm: '$realm'");
+        $self->current_realm($realm);
         if ($stack) {
-            $self->log->debug("- auto-select auth stack '$stack' based on realm config");
-            $self->session->param('auth_stack', $stack);
+            $self->log->debug("- auto-selected auth stack based on realm config: '$stack'");
+            $self->current_auth_stack($stack);
         }
     }
+
 }
 
 # optionally called by OpenXPKI::Client::Service::Role::Base
@@ -564,11 +627,11 @@ sub prepare_enrollment_result {}
 
 sub handle_ui_request ($self) {
     my $page = $self->param('page') || '';
-    my $action = $self->_get_action;
+    my $action = $self->action;
 
     $self->log->debug('Incoming request: ' . join(', ', $page ? "page '$page'" : (), $action ? "action '$action'" : ()));
 
-    # shortcut to create new pure Page object for redirecting or error status
+    # Shortcut to create new pure Page object for redirecting or error status
     my $new_page = sub ($cb) {
         my $page = OpenXPKI::Client::Service::WebUI::Page->new(webui => $self);
         $cb->($page);
@@ -594,12 +657,10 @@ sub handle_ui_request ($self) {
     }
 
     # Establish backend connection
-    my $reply = $self->client->send_receive_service_msg('PING');
-    $self->log->trace('PING reply = ' . Dumper $reply) if $self->log->is_trace;
-    $self->log->debug("Current session status: " . $reply->{SERVICE_MSG});
+    my $reply = $self->ping_client;
 
     if ( $reply->{SERVICE_MSG} eq 'START_SESSION' ) {
-        $reply = $self->client->init_session;
+        $reply = $self->client->init_session; # initialize backend session
         $self->log->debug('Init new session');
         $self->log->trace('NEW_SESSION reply = ' . Dumper $reply) if $self->log->is_trace;
     }
@@ -609,62 +670,64 @@ sub handle_ui_request ($self) {
         return $new_page->(sub ($p) { $p->status->error($p->message_from_error_reply($reply)) });
     }
 
-    # Only handle requests if we have an open channel (unless it's the bootstrap page)
+    # Set logout menu for bootstrap page if we're not logged in (= not SERVICE_READY)
+    if ($reply->{SERVICE_MSG} ne 'SERVICE_READY' and not defined $self->session->param('menu_items')) {
+        my $reply = $self->client->send_receive_service_msg('GET_LOGOUT_MENU');
+        if ($reply->{PARAMS} and my $menu = $reply->{PARAMS}->{main}) {
+            $self->log->trace('Received logout menu = ' . Dumper $menu) if $self->log->is_trace;
+            $self->session->param('menu_items', $menu);
+        }
+    }
+
+    # Set pki_realm and auth_stack from auto-detection (URL path or hostname or
+    # config) or previous session after logout
+    $self->session->param('pki_realm', $self->current_realm) if $self->has_current_realm;
+    $self->session->param('auth_stack', $self->current_auth_stack) if $self->has_current_auth_stack;
+
+    # Handle page if logged in (open channel) unless it's the bootstrap page
     if ( $reply->{SERVICE_MSG} eq 'SERVICE_READY' or $page =~ /^bootstrap!(.+)/) {
         if ($action) {
             # Action is only valid within a post request
-            return $self->handle_action($action); # from OpenXPKI::Client::Service::WebUI::Role::Page
+            return $self->handle_action($action); # from OpenXPKI::Client::Service::WebUI::Role::PageHandler
         } else {
-            return $self->handle_view($page || 'home'); # from OpenXPKI::Client::Service::WebUI::Role::Page
+            return $self->handle_view($page || 'home'); # from OpenXPKI::Client::Service::WebUI::Role::PageHandler
         }
     }
 
-    # if the backend session logged out but did not terminate
+    # If the backend session logged out but did not terminate
     # we get the problem that ui is logged in but backend is not
     $self->logout_session if $self->session->param('is_logged_in');
 
-    # try to log in
+    # Handle login
     return $self->handle_login($page || '', $action, $reply); # from OpenXPKI::Client::Service::WebUI::Role::LoginHandler
-
 }
 
-=head2 _get_action
+=head2 ping_client
 
-Returns the value of the request parameter L<action> if set and the XSRFtoken is
-valid. If the token is invalid, returns L<undef> and sets the global status to
-error. If the parameter is empty or not set an empty string is returned.
+Pings the server and returns the received I<SERVICE_MSG>.
 
 =cut
 
-sub _get_action ($self) {
-    my $rtoken_session = $self->session->param('rtoken') || '';
-    my $rtoken_request = $self->param('_rtoken') || '';
-
-    # check XSRF token
-    if (my $action = $self->param('action')) {
-        if ($rtoken_request && ($rtoken_request eq $rtoken_session)) {
-            $self->log->debug("Action '$action': valid request");
-            return $action;
-
-        # required to make the login page work when the session expires, #552
-        } elsif( !$rtoken_session and ($action =~ /^login\!/ )) {
-            $self->log->debug("Action '$action': login with expired session, ignoring rtoken");
-            return $action;
-
-        } else {
-            $self->log->debug("Action '$action': request with invalid rtoken ($rtoken_request != $rtoken_session)");
-            $self->ui_response->status->error('I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID');
-            return '';
-        }
-
-    } else {
-        return '';
-    }
+sub ping_client ($self) {
+    my $reply = $self->client->send_receive_service_msg('PING');
+    $self->log->trace('PING reply = ' . Dumper $reply) if $self->log->is_trace;
+    $self->log->debug("Current session status: " . $reply->{SERVICE_MSG});
+    return $reply;
 }
 
+=head2 new_frontend_session
+
+Create a new frontend session with the same settings as the previous one. The
+only preserved data is the C<pki_realm>.
+
+=cut
+
 sub new_frontend_session ($self) {
+    my $pki_realm = $self->session->param('pki_realm');
+
     # create new session object but reuse old settings
     $self->session($self->session->clone);
+    $self->session->param(pki_realm => $pki_realm) if $pki_realm;
 
     Log::Log4perl::MDC->put('sid', substr($self->session->id,0,4));
     $self->log->debug('New frontend session: ID = '. $self->session->id);
@@ -672,14 +735,13 @@ sub new_frontend_session ($self) {
 
 =head2 logout_session
 
-Delete and flush the current session and recreate a new one using
-the remaining class object. If the internal session handler is used,
-the session is cleared but not destroyed.
+Logout from the backend session and create a new frontend session while
+preserving the C<pki_realm>.
 
 =cut
 
 sub logout_session ($self) {
-    $self->log->info("Logout = create new frontend session");
+    $self->log->info("Logout = create new backend and frontend session");
     $self->client->logout;
 
     # create a new session
