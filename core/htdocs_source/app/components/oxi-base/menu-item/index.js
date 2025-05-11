@@ -21,12 +21,33 @@ import { service } from '@ember/service'
  */
 export default class OxiMenuItemComponent extends Component {
     @service('oxi-content') content
+    @service router;
+
+    constructor() {
+        super(...arguments)
+        console.log(this.args.spec)
+    }
+
+    get href() {
+        if (this.args.spec.entries) return "#"
+        if (this.args.spec.page) return this.router.urlFor("openxpki", this.args.spec.page);
+        if (this.args.spec.url) return this.args.spec.url
+        return "#"
+    }
+
+    @action
+    openTarget(event) {
+        if (event) { event.stopPropagation(); event.preventDefault() }
+        if (this.args.spec.entries) return this.#callBeforeNav()
+        if (this.args.spec.page) return this.#navigateTo(this.args.spec.page)
+        if (this.args.spec.url) return this.#callUrl(this.args.spec.url)
+        return this.#callBeforeNav()
+    }
 
     // We don't use <ddm.LinkTo> but our own method to navigate to target page.
     // This way we can force Ember to do a transition even if the new page is
     // the same page as before by setting parameter "force" a timestamp.
-    @action
-    navigateTo(page, event) {
+    #navigateTo(page, event) {
         if (event) { event.stopPropagation(); event.preventDefault() }
         this.#callBeforeNav()
         this.content.openPage({
@@ -37,8 +58,7 @@ export default class OxiMenuItemComponent extends Component {
         })
     }
 
-    @action
-    callUrl(url, event) {
+    #callUrl(url, event) {
         if (event) { event.stopPropagation(); event.preventDefault() }
         this.#callBeforeNav()
         window.open(url, '_self')
@@ -46,7 +66,7 @@ export default class OxiMenuItemComponent extends Component {
 
     #callBeforeNav() {
         let beforeNav = this.args.beforeNav
-        if (typeof beforeNav === 'undefined' && beforeNav === null) return
+        if (typeof beforeNav === 'undefined' || beforeNav === null) return
         if (typeof beforeNav !== 'function') {
             /* eslint-disable-next-line no-console */
             console.error("<OxiBase::MenuItem>: Wrong type parameter type for @beforeNav. Expected: function, given: " + (typeof this.args.beforeNav))

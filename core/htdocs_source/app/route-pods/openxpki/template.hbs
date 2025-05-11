@@ -16,10 +16,11 @@
                 {{!-- sub menu --}}
                 {{#if navEntry.entries.length}}
                     <nav.dropdown as |dd|>
-                        <dd.toggle class="{{if navEntry.active "active"}} {{if (not (eq index 0)) "border-start"}} border-tertiary-subtle py-2 px-lg-3">
-                            {{navEntry.label}}
-                            <span class="caret"></span>
-                        </dd.toggle>
+                        <OxiBase::MenuItem
+                            class="dropdown-toggle nav-link {{if navEntry.active "active"}} {{if (not (eq index 0)) "border-start"}} border-tertiary-subtle py-2 px-lg-3"
+                            @spec={{navEntry}}
+                            @beforeNav={{dd.toggleDropdown}}
+                        />
                         <dd.menu as |ddm|>
                             {{#each navEntry.entries as |entry|}}
                                 <ddm.item>
@@ -27,7 +28,7 @@
                                         <OxiBase::MenuItem
                                             class="dropdown-item"
                                             @spec={{entry}}
-                                            @beforeNav={{navbar.collapse}}
+                                            @beforeNav={{queue dd.toggleDropdown navbar.collapse}}
                                         />
                                     {{else}}
                                         {{#if entry.label}}
@@ -55,9 +56,11 @@
         <navbar.nav as |nav|>
             {{#if this.model.user}}
                 <nav.item>
-                    <nav.linkTo {{on "click" this.logout}} class="border-start border-tertiary-subtle py-2 px-lg-3">
-                        {{t 'site.logout'}}
-                    </nav.linkTo>
+                    <OxiBase::MenuItem
+                        class="nav-link border-start border-tertiary-subtle py-2 px-lg-3"
+                        @spec={{hash label=(t 'site.logout') icon='glyphicon-log-out'}}
+                        @beforeNav={{this.logout}}
+                    />
                 </nav.item>
             {{/if}}
         </navbar.nav>

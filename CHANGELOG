@@ -5,6 +5,7 @@ New Features
 
 Upgrades, Improvements and Bugfixes
 - SELECT fields in workflows now support dependent fields (fields only shown if a specific option is selected)
+- Menu items can now include an icon
 
 Removals, Deprecations, Breaking Changes
 - Config fallback from simplereenroll to simpleenroll in EST is deprecated and will be removed in next release

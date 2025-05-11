@@ -3,8 +3,8 @@
 <a
     ...attributes
     class="{{if @spec.active "active"}} icon-link"
-    href="{{if @spec.page (url-for "openxpki" @spec.page) @spec.url}}"
-    {{on "click" (if @spec.page (fn this.navigateTo @spec.page) (fn this.callUrl @spec.url))}}
+    href={{this.href}}
+    {{on "click" this.openTarget}}
 >
     {{#if @spec.icon}}
         <span class="glyphicon {{@spec.icon}} text-secondary pe-1"></span>
