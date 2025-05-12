@@ -1,4 +1,7 @@
 /* Ember supports plain CSS out of the box. More info: https://cli.emberjs.com/release/advanced-use/stylesheets/ */
+@use "bootstrap-icons/font/bootstrap-icons.scss" with (
+  $bootstrap-icons-font-dir: "fonts/" // will result in "asset/fonts" as specified in ember-cli-build.js
+);
 
 /*
 PLEASE NOTE: CSS imports for Node.js modules are done in /ember-cli-build.js .

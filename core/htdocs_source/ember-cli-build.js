@@ -105,6 +105,11 @@ module.exports = function(defaults) {
   // Bootstrap
   app.import('node_modules/bootstrap/dist/css/bootstrap.css');
 
+  // Bootstrap Icons
+  app.import('node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2', {
+    destDir: 'assets/fonts'
+  });
+
   // Flatpickr
   app.import('node_modules/flatpickr/dist/flatpickr.css');
 
