@@ -68,7 +68,7 @@ import Clickable from 'openxpki/data/clickable'
 */
 let format2css = {
     none:           "", // to allow formatting via <OxiBase::Button class="..."> without adding fallback defaults
-    primary:        "btn-primary",
+    primary:        "btn-primary bg-primary-subtle",
     submit:         "btn-light oxi-btn-submit",
     loading:        "btn-light oxi-btn-loading",
     cancel:         "btn-light oxi-btn-cancel",

@@ -24,6 +24,27 @@
   width: unset; /* don't limit width of dropdown to the size of the select field */
 }
 
+[data-bs-theme=dark] .choices__list--dropdown,
+[data-bs-theme=dark] .choices__list[aria-expanded] {
+  background-color: #000;
+}
+
+[data-bs-theme=dark] .is-open .choices__list--dropdown,
+[data-bs-theme=dark] .is-open .choices__list[aria-expanded] {
+  border: 1px solid #666;
+}
+
+[data-bs-theme=dark] .choices__list--dropdown .choices__item--selectable.is-highlighted,
+[data-bs-theme=dark] .choices__list[aria-expanded] .choices__item--selectable.is-highlighted {
+  background-color: #555555;
+}
+
+/* Search field in options popup */
+[data-bs-theme=dark] .choices[data-type*="select-one"] .choices__input {
+  background-color: #000;
+  border-bottom: 1px solid #666;
+}
+
 /*
   Make Choices.js DIV-based SELECT look like our Bootstrap SELECTs
   (also see bootstrap-v5-tweaks.css)
@@ -38,6 +59,13 @@
   background-position: right 1.75rem center,center right 2.25rem;
   background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
   padding-right: 3.125rem;
+}
+
+.was-validated .choices:has(.form-select:valid:not([multiple]):not([size])),
+.was-validated .choices:has(.form-select:valid:not([multiple])[size="1"]),
+.was-validated .choices:has(.form-select.is-valid:not([multiple]):not([size])),
+.was-validated .choices:has(.form-select.is-valid:not([multiple])[size="1"]) {
+  border-color: #79a082;
 }
 
 .was-validated .choices:has(.form-select:invalid:not([multiple]):not([size])),

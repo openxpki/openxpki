@@ -3,6 +3,7 @@ Please list items to be added to the final release comment here
 New Features
 - openxpkictl can now start and stop server and client (and terminal processes in OpenXPKI Enterprise Edition)
 - Customizable logout menu (config node realm.<REALM>.uicontrol._logout.main)
+- Dark mode is now supported for the UI
 
 Upgrades, Improvements and Bugfixes
 - SELECT fields in workflows now support dependent fields (fields only shown if a specific option is selected)

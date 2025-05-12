@@ -36,6 +36,10 @@ body {
   color: #757373;
 }
 
+[data-bs-theme=dark] .oxi-header-bar {
+  color: #8d8b8b;
+}
+
 img.toplogo {
   height: 40px;
 }
@@ -46,12 +50,20 @@ img.toplogo {
   min-height: 100vh;
 }
 
+[data-bs-theme=dark] .oxi-page {
+  background-color: #0a0a0a;
+}
+
 .oxi-page > .row {
   min-height: 100vh;
 }
 
 .oxi-content {
   background-color: #fff;
+}
+
+[data-bs-theme=dark] .oxi-content {
+  background-color: #000;
 }
 
 /* Shrink application width for large screens */
@@ -94,6 +106,10 @@ img.toplogo {
   height: 60px;
   padding-top: 20px;
   background-color: #f5f5f5;
+}
+
+[data-bs-theme=dark] .oxi-footer {
+  background-color: #333;
 }
 
 .userinfo {
@@ -158,6 +174,10 @@ div.required .choices.oxi-inline-select {
   color: #fff;
 }
 
+[data-bs-theme=dark] .oxi-width-restricted + .oxi-resize-overlay span::after {
+  color: #000;
+}
+
 .oxi-width-restricted + .oxi-resize-overlay:hover span::after {
   visibility: visible;
 }
@@ -185,9 +205,13 @@ div.required .choices.oxi-inline-select {
   bottom:0;
   left:0;
   right:0;
-  background-color:#fff;
+  background-color: #fff;
   opacity:0.7;
   z-index:1001;
+}
+
+[data-bs-theme=dark] .dimmer {
+  background-color: #000;
 }
 
 .oxi-loading-banner {
@@ -219,7 +243,11 @@ div.required .choices.oxi-inline-select {
  */
 
 .oxi-breadcrumb + .oxi-breadcrumb::before {
-  color: #ffffff;
+  color: #fff;
+}
+
+[data-bs-theme=dark] .oxi-breadcrumb + .oxi-breadcrumb::before {
+  color: #000;
 }
 
 .oxi-breadcrumb::before {
@@ -258,6 +286,7 @@ div.required .choices.oxi-inline-select {
 div.oxi-grid th.sortable {
   cursor: pointer;
   -webkit-user-select: none;
+  user-select: none;
 }
 
 .oxi-grid {
@@ -265,40 +294,67 @@ div.oxi-grid th.sortable {
 }
 
 /* plain grid-row without status */
-tr.gridrow > td {}
 tr.gridrow:hover > td {background-color: #E7E7E7 !important;}
+[data-bs-theme=dark] tr.gridrow:hover > td {background-color: #333 !important;}
 
 /* certificate specific classes: issued, expired, revoked */
-tr.gridrow-issued > td {}
 tr.gridrow-issued:hover > td {background-color: #E7E7E7 !important;}
-tr.gridrow-expired > td {background-color:#fcf8e3 !important;}
-tr.gridrow-expired:hover > td {background-color: #E7E7E7 !important;}
+tr.gridrow-expired > td {background-color:#fcf7ca !important;}
+tr.gridrow-expired:hover > td {background-color: #f3f330 !important;}
 tr.gridrow-revoked > td {background-color: #f2dede !important;}
 tr.gridrow-revoked:hover > td {background-color: #e6c1c7 !important;}
 
+[data-bs-theme=dark] tr.gridrow-issued:hover > td {background-color: #333 !important;}
+[data-bs-theme=dark] tr.gridrow-expired > td {background-color:#413706 !important;}
+[data-bs-theme=dark] tr.gridrow-expired:hover > td {background-color: #333 !important;}
+[data-bs-theme=dark] tr.gridrow-revoked > td {background-color: #421010 !important;}
+[data-bs-theme=dark] tr.gridrow-revoked:hover > td {background-color: #333 !important;}
+
 /* ca certificat/token specific classes: online, offline, upcomging */
 tr.gridrow-online > td {background-color:#dff0d8 !important;}
-tr.gridrow-online:hover > td {background-color: #E7E7E7 !important;}
-tr.gridrow-offline > td {background-color:#f2dede !important;}
-tr.gridrow-offline:hover > td {background-color: #E7E7E7 !important;}
+tr.gridrow-online:hover > td {background-color: #c9e2b3 !important;}
+tr.gridrow-offline > td {background-color:#f3d3d3 !important;}
+tr.gridrow-offline:hover > td {background-color: #e6a1ac !important;}
 tr.gridrow-upcoming > td {background-color:#d9edf7 !important;}
 tr.gridrow-upcoming:hover > td {background-color: #E7E7E7 !important;}
 
+[data-bs-theme=dark] tr.gridrow-online > td {background-color:#204412 !important;}
+[data-bs-theme=dark] tr.gridrow-online:hover > td {background-color: #333 !important;}
+[data-bs-theme=dark] tr.gridrow-offline > td {background-color:#421010 !important;}
+[data-bs-theme=dark] tr.gridrow-offline:hover > td {background-color: #333 !important;}
+[data-bs-theme=dark] tr.gridrow-upcoming > td {background-color:#0a3043 !important;}
+[data-bs-theme=dark] tr.gridrow-upcoming:hover > td {background-color: #333 !important;}
+
 /* workflow specific classes: finished, exception, manual, pause, failed */
-tr.gridrow-finished > td {background-color: #e8f0e4!important;}
+tr.gridrow-finished > td {background-color: #dff0d8 !important;}
 tr.gridrow-finished:hover > td {background-color: #c9e2b3 !important;}
-tr.gridrow-failed > td {background-color: #f3d3d3!important;}
-tr.gridrow-failed:hover > td {background-color: #e6a1ac!important;}
-tr.gridrow-manual > td { background-color: #fcfcca!important; }
-tr.gridrow-manual:hover > td {background-color: #f3f330!important;}
-tr.gridrow-paused > td {background-color: silver !important;}
+tr.gridrow-failed > td {background-color: #f3d3d3 important;}
+tr.gridrow-failed:hover > td {background-color: #e6a1ac !important;}
+tr.gridrow-manual > td { background-color: #fcf7ca !important; }
+tr.gridrow-manual:hover > td {background-color: #f3f330 !important;}
+tr.gridrow-paused > td {background-color: #C0C0C0 !important;}
 tr.gridrow-paused:hover > td {background-color: #e7e7e7 !important;}
-tr.gridrow-retry_exceeded > td {background-color: #ffc04d!important;}
-tr.gridrow-retry_exceeded:hover > td {background-color: #ffe4b3!important;}
-tr.gridrow-exception > td {background-color: #ffc04d!important;}
-tr.gridrow-exception:hover > td {background-color: #ffe4b3!important;}
-tr.gridrow-archived > td {background-color: #e0ffe0!important;}
-tr.gridrow-archived:hover > td {background-color: #c0ddc0!important;}
+tr.gridrow-retry_exceeded > td {background-color: #ffc04d !important;}
+tr.gridrow-retry_exceeded:hover > td {background-color: #ffe4b3 !important;}
+tr.gridrow-exception > td {background-color: #ffc04d !important;}
+tr.gridrow-exception:hover > td {background-color: #ffe4b3 !important;}
+tr.gridrow-archived > td {background-color: #e0ffe0 !important;}
+tr.gridrow-archived:hover > td {background-color: #c0ddc0 !important;}
+
+[data-bs-theme=dark] tr.gridrow-finished > td {background-color: #204412 !important;}
+[data-bs-theme=dark] tr.gridrow-finished:hover > td {background-color: #333 !important;}
+[data-bs-theme=dark] tr.gridrow-failed > td {background-color: #421010 !important;}
+[data-bs-theme=dark] tr.gridrow-failed:hover > td {background-color: #333 !important;}
+[data-bs-theme=dark] tr.gridrow-manual > td { background-color: #413706 !important; }
+[data-bs-theme=dark] tr.gridrow-manual:hover > td {background-color: #333 !important;}
+[data-bs-theme=dark] tr.gridrow-paused > td {background-color: #404040 !important;}
+[data-bs-theme=dark] tr.gridrow-paused:hover > td {background-color: #333 !important;}
+[data-bs-theme=dark] tr.gridrow-retry_exceeded > td {background-color: #aa7109 !important;}
+[data-bs-theme=dark] tr.gridrow-retry_exceeded:hover > td {background-color: #333 !important;}
+[data-bs-theme=dark] tr.gridrow-exception > td {background-color: #64450b !important;}
+[data-bs-theme=dark] tr.gridrow-exception:hover > td {background-color: #333 !important;}
+[data-bs-theme=dark] tr.gridrow-archived > td {background-color: #021d02 !important;}
+[data-bs-theme=dark] tr.gridrow-archived:hover > td {background-color: #333 !important;}
 
 /* general classes...*/
 tr.gridrow-ok > td {background-color: #dff0d8 !important;}
@@ -307,6 +363,13 @@ tr.gridrow-warning > td {background-color: #fbeed5 !important;}
 tr.gridrow-warning:hover > td {background-color: #faf2cc !important;}
 tr.gridrow-danger > td {background-color: #ebcccc !important;}
 tr.gridrow-danger:hover > td {background-color: #e6c1c7 !important;}
+
+[data-bs-theme=dark] tr.gridrow-ok > td {background-color: #dff0d8 !important;}
+[data-bs-theme=dark] tr.gridrow-ok:hover > td {background-color: #333 !important;}
+[data-bs-theme=dark] tr.gridrow-warning > td {background-color: #493209 !important;}
+[data-bs-theme=dark] tr.gridrow-warning:hover > td {background-color: #333 !important;}
+[data-bs-theme=dark] tr.gridrow-danger > td {background-color: #421010 !important;}
+[data-bs-theme=dark] tr.gridrow-danger:hover > td {background-color: #333 !important;}
 
 /******************************************************************************
  * Key-Value lists
@@ -361,6 +424,10 @@ tr.gridrow-danger:hover > td {background-color: #e6c1c7 !important;}
   color: #9cA5Ad;
 }
 
+[data-bs-theme=dark] .oxi-keyvalue-dots::after {
+  color: #525a60;
+}
+
 .oxi-truncate {
   /* like Bootstraps "text-truncate" class */
   overflow: hidden;
@@ -410,14 +477,14 @@ tr.gridrow-danger:hover > td {background-color: #e6c1c7 !important;}
 
 /* same colors as Bootstrap's "alert-danger" */
 .oxi-status-danger {
-  background-color:#f8d7da;
-  color: #721c24;
+  background-color: var(--bs-danger-bg-subtle);
+  color: var(--bs-danger-text-emphasis);
 }
 
 /* same colors as Bootstrap's "alert-warning" */
 .oxi-status-warning {
-  background-color: #fff3cd;
-  color: #856404;
+  background-color: var(--bs-warning-bg-subtle);
+  color: var(--bs-warning-text-emphasis);
 }
 
 /* <code> - keep line wraps */
@@ -479,6 +546,14 @@ div.required textarea {
   border:1px solid #444;
 }
 
+[data-bs-theme=dark] div.required input:not(:checked):not(.choices__input),
+[data-bs-theme=dark] div.required select,
+[data-bs-theme=dark] div.required .choices:not(.oxi-inline-select), /* Choices.js */
+[data-bs-theme=dark] div.required textarea {
+  background-color:#3a2f03 !important;
+  border:1px solid #777777;
+}
+
 div.required input.form-control[disabled] ,
 div.required select.form-control[disabled],
 div.required .choices:has(select.form-control[disabled]):not(.oxi-inline-select), /* Choices.js */
@@ -486,11 +561,25 @@ div.required textarea.form-control[disabled] {
   border:1px solid #ccc;
 }
 
+[data-bs-theme=dark] div.required input.form-control[disabled] ,
+[data-bs-theme=dark] div.required select.form-control[disabled],
+[data-bs-theme=dark] div.required .choices:has(select.form-control[disabled]):not(.oxi-inline-select), /* Choices.js */
+[data-bs-theme=dark] div.required textarea.form-control[disabled] {
+  border:1px solid #333;
+}
+
 div.optional input,
 div.optional select,
 div.optional .choices:not(.oxi-inline-select), /* Choices.js */
 div.optional textarea {
   border:1px #888 dotted;
+}
+
+[data-bs-theme=dark] div.optional input,
+[data-bs-theme=dark] div.optional select,
+[data-bs-theme=dark] div.optional .choices:not(.oxi-inline-select), /* Choices.js */
+[data-bs-theme=dark] div.optional textarea {
+  border:1px #787878 dotted;
 }
 
 .oxi-checkbox {
@@ -534,6 +623,9 @@ div.optional input.flatpickr-input {
 div.required input.flatpickr-input {
   background-color: #fff3c2;
 }
+[data-bs-theme=dark] div.required input.flatpickr-input {
+  background-color: #3a2f03;
+}
 
 /******************************************************************************
  * Buttons
@@ -544,10 +636,28 @@ div.required input.flatpickr-input {
   border-color: #357ebd;
 }
 
-.oxi-btn-loading:hover, .oxi-btn-loading:focus, .oxi-btn-loading:active, .oxi-btn-loading.active {
+[data-bs-theme=dark] .oxi-btn-loading {
+  color: #000;
+  background-color: #3b7cb5;
+  border-color: #4a8bc4;
+}
+
+.oxi-btn-loading:hover,
+.oxi-btn-loading:focus,
+.oxi-btn-loading:active,
+.oxi-btn-loading.active {
   color: #fff;
   background-color: #3276b1;
   border-color: #285e8e;
+}
+
+[data-bs-theme=dark] .oxi-btn-loading:hover,
+[data-bs-theme=dark] .oxi-btn-loading:focus,
+[data-bs-theme=dark] .oxi-btn-loading:active,
+[data-bs-theme=dark] .oxi-btn-loading.active {
+  color: #000;
+  background-color: #5390c6;
+  border-color: #75a6d1;
 }
 
 .oxi-button-container a.btn::before {
@@ -559,47 +669,104 @@ div.required input.flatpickr-input {
 
 /* Button format from workflow defs */
 
-.oxi-btn-expected,
-.oxi-btn-expected:focus,
+.oxi-btn-expected,.oxi-btn-expected:focus,
 .oxi-btn-submit,
 .oxi-btn-submit:focus {
-  color: #333; border-color: #ccc;
   background-color: #c9e2b3;
+}
+
+[data-bs-theme=dark] .oxi-btn-expected,
+[data-bs-theme=dark] .oxi-btn-expected:focus,
+[data-bs-theme=dark] .oxi-btn-submit,
+[data-bs-theme=dark] .oxi-btn-submit:focus {
+  background-color: #344b20;
 }
 
 .oxi-btn-optional,
 .oxi-btn-optional:focus {
-  color: #333; border-color: #ccc;
   background-color: #e4e4da;
+}
+
+[data-bs-theme=dark] .oxi-btn-optional,
+[data-bs-theme=dark] .oxi-btn-optional:focus {
+  background-color: #26261d;
 }
 
 .oxi-btn-failure,
 .oxi-btn-failure:focus,
 .oxi-btn-cancel,
 .oxi-btn-cancel:focus {
-  color: #333; border-color: #ccc;
   background-color: #e39f9f;
+}
+
+[data-bs-theme=dark] .oxi-btn-failure,
+[data-bs-theme=dark] .oxi-btn-failure:focus,
+[data-bs-theme=dark] .oxi-btn-cancel,
+[data-bs-theme=dark] .oxi-btn-cancel:focus {
+  background-color: #5b1f1f;
 }
 
 .oxi-btn-reset,
 .oxi-btn-reset:focus,
 .oxi-btn-alternative,
 .oxi-btn-alternative:focus {
-  color: #333; border-color: #ccc;
   background-color: #ffd78c;
+}
+
+[data-bs-theme=dark] .oxi-btn-reset,
+[data-bs-theme=dark] .oxi-btn-reset:focus,
+[data-bs-theme=dark] .oxi-btn-alternative,
+[data-bs-theme=dark] .oxi-btn-alternative:focus {
+  background-color: #6f4a06;
 }
 
 .oxi-btn-exceptional,
 .oxi-btn-exceptional:focus {
-  color: #333; border-color: #ccc;
   background-color: #79d1f3;
+}
+
+[data-bs-theme=dark] .oxi-btn-exceptional,
+[data-bs-theme=dark] .oxi-btn-exceptional:focus {
+  background-color: #126281;
 }
 
 .oxi-btn-terminate,
 .oxi-btn-terminate:focus {
-  color: #333; border-color: #ccc;
   background-color: #ad7fa8;
 }
+
+[data-bs-theme=dark] .oxi-btn-terminate,
+[data-bs-theme=dark] .oxi-btn-terminate:focus {
+  background-color: #7d5479;
+}
+
+/* Background for all buttons above */
+.oxi-btn-expected,    .oxi-btn-expected:focus,
+.oxi-btn-submit,      .oxi-btn-submit:focus,
+.oxi-btn-optional,    .oxi-btn-optional:focus,
+.oxi-btn-optional,    .oxi-btn-optional:focus,
+.oxi-btn-failure,     .oxi-btn-failure:focus,
+.oxi-btn-cancel,      .oxi-btn-cancel:focus,
+.oxi-btn-reset,       .oxi-btn-reset:focus,
+.oxi-btn-alternative, .oxi-btn-alternative:focus,
+.oxi-btn-exceptional, .oxi-btn-exceptional:focus,
+.oxi-btn-terminate,   .oxi-btn-terminate:focus {
+  color: #333; border-color: #ccc;
+}
+
+[data-bs-theme=dark] .oxi-btn-expected,    [data-bs-theme=dark] .oxi-btn-expected:focus,
+[data-bs-theme=dark] .oxi-btn-submit,      [data-bs-theme=dark] .oxi-btn-submit:focus,
+[data-bs-theme=dark] .oxi-btn-optional,    [data-bs-theme=dark] .oxi-btn-optional:focus,
+[data-bs-theme=dark] .oxi-btn-optional,    [data-bs-theme=dark] .oxi-btn-optional:focus,
+[data-bs-theme=dark] .oxi-btn-failure,     [data-bs-theme=dark] .oxi-btn-failure:focus,
+[data-bs-theme=dark] .oxi-btn-cancel,      [data-bs-theme=dark] .oxi-btn-cancel:focus,
+[data-bs-theme=dark] .oxi-btn-reset,       [data-bs-theme=dark] .oxi-btn-reset:focus,
+[data-bs-theme=dark] .oxi-btn-alternative, [data-bs-theme=dark] .oxi-btn-alternative:focus,
+[data-bs-theme=dark] .oxi-btn-exceptional, [data-bs-theme=dark] .oxi-btn-exceptional:focus,
+[data-bs-theme=dark] .oxi-btn-terminate,   [data-bs-theme=dark] .oxi-btn-terminate:focus {
+  color: #ccc; border-color: #333;
+}
+
 
 .oxi-btn-tile {
   background: transparent;

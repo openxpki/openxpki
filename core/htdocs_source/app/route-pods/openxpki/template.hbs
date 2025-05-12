@@ -6,7 +6,7 @@
 <BsNavbar
     @backgroundColor="secondary"
     @toggleBreakpoint="lg"
-    class="py-2 py-lg-0 mb-3 bg-opacity-10 border-2 border-bottom border-secondary"
+    class="py-2 py-lg-0 mb-3 bg-opacity-10 border-2 border-bottom"
     as |navbar|
 >
     <navbar.toggle toggle={{true}} />
@@ -57,12 +57,22 @@
             {{#if this.model.user}}
                 <nav.item>
                     <OxiBase::MenuItem
-                        class="nav-link border-start border-tertiary-subtle py-2 px-lg-3"
+                        class="nav-link py-2 px-lg-3"
                         @spec={{hash label=(t 'site.logout') icon='glyphicon-log-out'}}
                         @beforeNav={{this.logout}}
                     />
                 </nav.item>
             {{/if}}
+            <nav.item>
+                <div class="nav-link border-start border-tertiary-subtle py-2 px-lg-3">
+                    <button type="button"
+                        class="btn btn-sm {{if this.nightMode "btn-outline-info" "btn-warning bg-warning-subtle"}}"
+                        {{on "click" this.toggleNightMode}}
+                    >
+                        {{#if this.nightMode}}&#9789;{{else}}&#9728;{{/if}}
+                    </button>
+                </div>
+            </nav.item>
         </navbar.nav>
     </navbar.content>
 </BsNavbar>
@@ -139,7 +149,7 @@
         </div>
         <div class="col col-md-auto oxi-pagehead" {{on-init this.setTempCopyElement}}>
             {{#if this.workflowCopyIdButton}}
-                <OxiBase::Button @button={{this.workflowCopyIdButton}} class="btn-sm btn-light oxi-btn-copy-workflow-id" />
+                <OxiBase::Button @button={{this.workflowCopyIdButton}} class="btn-sm bg-secondary-subtle oxi-btn-copy-workflow-id" />
             {{/if}}
             {{#each this.model.top.page.buttons as |btn|}}
                 <OxiBase::Button @button={{btn}} class="btn-sm" />
