@@ -1,7 +1,7 @@
 package OpenXPKI::Client::Service::WebUI::Page::Source;
 use OpenXPKI -class;
 
-extends 'OpenXPKI::Client::Service::WebUI::Result';
+extends 'OpenXPKI::Client::Service::WebUI::Page';
 
 =head1 NAME
 
