@@ -33,8 +33,6 @@ export default class OpenXpkiController extends Controller {
 
     @tracked loading = false
 
-    @tracked nightMode = false
-
     // button to copy workflow ID to clipboard
     tempCopyElement = null
 
@@ -132,12 +130,5 @@ export default class OpenXpkiController extends Controller {
 
         /* eslint-disable-next-line no-console */
         console.info("Contents copied to clipboard")
-    }
-
-    @action
-    toggleNightMode() {
-        this.nightMode = !this.nightMode
-        let theme = this.nightMode ? 'dark' : 'light'
-        document.documentElement.setAttribute('data-bs-theme', theme)
     }
 }

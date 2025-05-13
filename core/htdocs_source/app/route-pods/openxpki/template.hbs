@@ -1,6 +1,5 @@
 <OxiBase::Navbar @items={{this.model.navEntries}}>
     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-
         {{#if this.model.user}}
             <li class="nav-item">
                 <OxiBase::MenuItem
@@ -10,19 +9,6 @@
                 />
             </li>
         {{/if}}
-
-        <li class="nav-item my-auto">
-            <span class="nav-link py-2 py-lg-0 ps-lg-2">
-                <button
-                    type="button"
-                    class="btn btn-sm {{if this.nightMode "btn-outline-info" "btn-warning bg-warning-subtle"}}"
-                    {{on "click" this.toggleNightMode}}
-                >
-                    <i class="bi {{if this.nightMode "bi-moon-fill" "bi-sun-fill"}}"></i>
-                </button>
-            </span>
-        </li>
-
     </ul>
 </OxiBase::Navbar>
 

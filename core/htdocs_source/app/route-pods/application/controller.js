@@ -20,6 +20,7 @@ export default class ApplicationController extends Controller {
     @service('intl') intl
 
     @tracked restricted_width = true
+    @tracked nightMode = false
 
     constructor() {
         super(...arguments)
@@ -37,5 +38,12 @@ export default class ApplicationController extends Controller {
         let el = document.querySelector(".oxi-loading-banner")
         if (!el) return
         el.parentNode.removeChild(el)
+    }
+
+    @action
+    toggleNightMode() {
+        this.nightMode = !this.nightMode
+        let theme = this.nightMode ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-bs-theme', theme)
     }
 }
