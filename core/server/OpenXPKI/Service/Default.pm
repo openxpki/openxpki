@@ -93,6 +93,7 @@ sub __is_valid_message : PRIVATE {
         'NEW' => [
             'PING',
             'GET_LOGOUT_MENU',
+            'LOGOUT',
             'CONTINUE_SESSION',
             'NEW_SESSION',
             'DETACH_SESSION',
@@ -102,6 +103,7 @@ sub __is_valid_message : PRIVATE {
         'SESSION_ID_SENT' => [
             'PING',
             'GET_LOGOUT_MENU',
+            'LOGOUT',
             'SESSION_ID_ACCEPTED',
             'CONTINUE_SESSION',
             'DETACH_SESSION',
@@ -109,6 +111,7 @@ sub __is_valid_message : PRIVATE {
         'SESSION_ID_SENT_FROM_CONTINUE' => [
             'PING',
             'GET_LOGOUT_MENU',
+            'LOGOUT',
             'SESSION_ID_ACCEPTED',
             'CONTINUE_SESSION',
             'DETACH_SESSION',
@@ -116,6 +119,7 @@ sub __is_valid_message : PRIVATE {
         'SESSION_ID_SENT_FROM_RESET' => [
             'PING',
             'GET_LOGOUT_MENU',
+            'LOGOUT',
             'SESSION_ID_ACCEPTED',
             'CONTINUE_SESSION',
             'DETACH_SESSION',
@@ -507,18 +511,21 @@ sub __handle_LOGOUT : PRIVATE {
     my $ident   = ident $self;
     my $message = shift;
 
-    my $old_session = CTX('session');
+    my $old_session;
 
-    ##! 8: "logout received - terminate session " . $old_session->id,
-    CTX('log')->system->debug('Terminating session ' . $old_session->id);
+    if (OpenXPKI::Server::Context::hascontext('session')) {
+        $old_session = CTX('session');
+        ##! 8: "logout received - terminate session " . $old_session->id,
+        CTX('log')->system->debug('Terminating session ' . $old_session->id);
+    }
 
     $self->__change_state({ STATE => 'NEW' });
 
-    OpenXPKI::Server::Context::killsession();
+    OpenXPKI::Server::Context::killsession;
 
-    Log::Log4perl::MDC->remove();
+    Log::Log4perl::MDC->remove;
 
-    if (!$old_session->delete()) {
+    if ($old_session and not $old_session->delete) {
         CTX('log')->system->warn('Error terminating session!');
     }
 
