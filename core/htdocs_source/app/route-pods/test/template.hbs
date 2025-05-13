@@ -23,7 +23,7 @@
     }}
     <div class="row">
         <div class="col-lg-12">
-            <div class="card border-info">
+            <div class="card border-secondary">
                 <div class="card-body">
                     <OxiBase::ButtonContainer @buttons={{this.buttons}} />
                 </div>
@@ -36,8 +36,8 @@
     }}
     <div class="row">
         <div class="col-lg-12">
-            <div class="card border-info">
-                <div class="card-header bg-info"></div>
+            <div class="card border-secondary">
+                <div class="card-header bg-secondary"></div>
                 <div class="card-body">
                     <div class="row">
                         {{#each this.charts as |chart|}}
@@ -60,8 +60,8 @@
 
             {{#each this.forms as |form index|}}
                 {{#if (eq index this.selectedFormIndex) }}
-                    <div class="card border-info">
-                        <div class="card-header bg-info"></div>
+                    <div class="card border-secondary">
+                        <div class="card-header bg-secondary"></div>
                         <div class="card-body">
                             <OxiSection @content={{form}}/>
                         </div>
@@ -76,8 +76,8 @@
     }}
     <div class="row">
         <div class="col-lg-12">
-            <div class="card border-info">
-                <div class="card-header bg-info"></div>
+            <div class="card border-secondary">
+                <div class="card-header bg-secondary"></div>
                 <div class="card-body">
                     <form>
                         <OxiBase::ButtonContainer @buttons={{this.test_buttons}} />
@@ -93,8 +93,8 @@
     <div class="row">
         <div class="col-lg-12">
             {{#each this.sections as |sectionDef|}}
-                <div class="card border-info">
-                    <div class="card-header bg-info"></div>
+                <div class="card border-secondary">
+                    <div class="card-header bg-secondary"></div>
                     <div class="card-body">
                         <OxiSection @content={{sectionDef}}/>
                     </div>

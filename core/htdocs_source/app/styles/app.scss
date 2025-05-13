@@ -782,6 +782,10 @@ div.required input.flatpickr-input {
   background-color: rgba(var(--bs-light-rgb));
 }
 
+[data-bs-theme=dark] .oxi-btn-card {
+  background-color: rgba(var(--bs-dark-rgb));
+}
+
 .oxi-btn-card:hover {
   border-color: unset;
 }
