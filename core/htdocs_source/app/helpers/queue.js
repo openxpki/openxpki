@@ -1,7 +1,7 @@
 import Helper from "@ember/component/helper"
 
 /**
- * Call all given functions.
+ * Returns a function that call all given functions (or Promises).
  *
  * Example:
  * ```html
@@ -11,11 +11,10 @@ import Helper from "@ember/component/helper"
  */
 export default class Queue extends Helper {
     compute([...actions]) {
-        return actions.reduce((chain, action) => {
-            return chain.then((results) => {
-                const result = action();
-                return Promise.resolve(result).then(res => [...results, res])
-            });
-        }, Promise.resolve([]));
+        return function() {
+            for (const action of actions) {
+                action()
+            }
+        }
     }
 }

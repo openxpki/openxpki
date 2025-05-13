@@ -1,0 +1,69 @@
+<nav class="navbar navbar-expand-lg py-1 mb-3 bg-secondary-subtle border-2 border-bottom border-secondary-subtle">
+    <div class="container-fluid">
+        <button
+            class="navbar-toggler" type="button"
+            aria-controls="oxi-navbar" aria-expanded={{if this.isCollapsed "false" "true"}} aria-label="Toggle navigation"
+            {{on "click" this.toggleCollapse}}
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="navbar-collapse {{if this.isCollapsed "collapse"}}" id="oxi-navbar">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                {{#each @items as |item index|}}
+
+                    {{!-- sub menu --}}
+                    {{#if item.entries.length}}
+
+                        <li class="nav-item dropdown">
+                            <OxiBase::MenuItem
+                                @spec={{item}}
+                                @onClick={{if (eq this.currentlyOpenDropdown index) this.closeDropdown (fn this.openDropdown index)}}
+                                class="nav-link dropdown-toggle {{this.getRootItemClasses index}}"
+                                role="button"
+                                {{on "focusout" this.closeDropdown}}
+                            />
+                            <ul class="dropdown-menu {{if (eq this.currentlyOpenDropdown index) "show"}}">
+                                {{#each item.entries as |subItem|}}
+                                    <li>
+                                        {{#if (or subItem.page subItem.url)}}
+                                            <OxiBase::MenuItem
+                                                @spec={{subItem}}
+                                                @onClick={{queue this.closeDropdown this.collapse}}
+                                                @isSubmenu={{true}}
+                                                class="dropdown-item"
+                                            />
+                                        {{else}}
+                                            {{#if subItem.label}}
+                                                <div class="dropdown-header">{{subItem.label}}</div>
+                                            {{else}}
+                                                <div class="dropdown-divider"></div>
+                                            {{/if}}
+                                        {{/if}}
+                                    </li>
+                                {{/each}}
+                            </ul>
+                        </li>
+
+                    {{!-- plain menu item --}}
+                    {{else}}
+
+                        <li class="nav-item">
+                            <OxiBase::MenuItem
+                                @spec={{item}}
+                                @onClick={{queue this.closeDropdown this.collapse}}
+                                class="nav-link {{this.getRootItemClasses index}}"
+                                role="button"
+                            />
+                        </li>
+
+                    {{/if}}
+
+                {{/each}}
+            </ul>
+
+            {{yield}}
+
+        </div>
+    </div>
+</nav>

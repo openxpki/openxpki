@@ -23,16 +23,19 @@ export default class OxiMenuItemComponent extends Component {
     @service('oxi-content') content
     @service router;
 
-    constructor() {
-        super(...arguments)
-        console.log(this.args.spec)
-    }
-
     get href() {
         if (this.args.spec.entries) return "#"
         if (this.args.spec.page) return this.router.urlFor("openxpki", this.args.spec.page);
         if (this.args.spec.url) return this.args.spec.url
         return "#"
+    }
+
+    get icon() {
+        let icon = this.args.spec.icon
+        if (! icon) return null
+        if (icon.match(/^glyphicon-/)) return `glyphicon ${icon}`
+        if (icon.match(/^bi-/)) return `bi ${icon}`
+        return icon
     }
 
     @action
@@ -65,13 +68,13 @@ export default class OxiMenuItemComponent extends Component {
     }
 
     #callBeforeNav() {
-        let beforeNav = this.args.beforeNav
-        if (typeof beforeNav === 'undefined' || beforeNav === null) return
-        if (typeof beforeNav !== 'function') {
+        let onClick = this.args.onClick
+        if (typeof onClick === 'undefined' || onClick === null) return
+        if (typeof onClick !== 'function') {
             /* eslint-disable-next-line no-console */
-            console.error("<OxiBase::MenuItem>: Wrong type parameter type for @beforeNav. Expected: function, given: " + (typeof this.args.beforeNav))
+            console.error("<OxiBase::MenuItem>: Wrong type parameter type for @onClick. Expected: function, given: " + (typeof this.args.onClick))
             return
         }
-        beforeNav()
+        onClick()
     }
 }

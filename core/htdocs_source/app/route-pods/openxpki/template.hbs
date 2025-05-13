@@ -1,81 +1,30 @@
-{{!
-  *************************************
-  Menu
-  *************************************
-}}
-<BsNavbar
-    @backgroundColor="secondary"
-    @toggleBreakpoint="lg"
-    class="py-2 py-lg-0 mb-3 bg-opacity-10 border-2 border-bottom"
-    as |navbar|
->
-    <navbar.toggle toggle={{true}} />
-    <navbar.content id="oxi-navbar">
-        <navbar.nav class="me-auto" as |nav|>
-            {{#each this.model.navEntries as |navEntry index|}}
-                {{!-- sub menu --}}
-                {{#if navEntry.entries.length}}
-                    <nav.dropdown as |dd|>
-                        <OxiBase::MenuItem
-                            class="dropdown-toggle nav-link {{if navEntry.active "active"}} {{if (not (eq index 0)) "border-start"}} border-tertiary-subtle py-2 px-lg-3"
-                            @spec={{navEntry}}
-                            @beforeNav={{dd.toggleDropdown}}
-                        />
-                        <dd.menu as |ddm|>
-                            {{#each navEntry.entries as |entry|}}
-                                <ddm.item>
-                                    {{#if (or entry.page entry.url)}}
-                                        <OxiBase::MenuItem
-                                            class="dropdown-item"
-                                            @spec={{entry}}
-                                            @beforeNav={{queue dd.toggleDropdown navbar.collapse}}
-                                        />
-                                    {{else}}
-                                        {{#if entry.label}}
-                                            <span class="dropdown-header">{{entry.label}}</span>
-                                        {{else}}
-                                            <div class="dropdown-divider"></div>
-                                        {{/if}}
-                                    {{/if}}
-                                </ddm.item>
-                            {{/each}}
-                        </dd.menu>
-                    </nav.dropdown>
-                {{!-- plain menu item --}}
-                {{else}}
-                    <nav.item>
-                        <OxiBase::MenuItem
-                            class="nav-link {{if (not (eq index 0)) "border-start"}} border-tertiary-subtle py-2 px-lg-3"
-                            @spec={{navEntry}}
-                            @beforeNav={{navbar.collapse}}
-                        />
-                    </nav.item>
-                {{/if}}
-            {{/each}}
-        </navbar.nav>
-        <navbar.nav as |nav|>
-            {{#if this.model.user}}
-                <nav.item>
-                    <OxiBase::MenuItem
-                        class="nav-link py-2 px-lg-3"
-                        @spec={{hash label=(t 'site.logout') icon='glyphicon-log-out'}}
-                        @beforeNav={{this.logout}}
-                    />
-                </nav.item>
-            {{/if}}
-            <nav.item>
-                <div class="nav-link border-start border-tertiary-subtle py-2 px-lg-3">
-                    <button type="button"
-                        class="btn btn-sm {{if this.nightMode "btn-outline-info" "btn-warning bg-warning-subtle"}}"
-                        {{on "click" this.toggleNightMode}}
-                    >
-                        {{#if this.nightMode}}&#9789;{{else}}&#9728;{{/if}}
-                    </button>
-                </div>
-            </nav.item>
-        </navbar.nav>
-    </navbar.content>
-</BsNavbar>
+<OxiBase::Navbar @items={{this.model.navEntries}}>
+    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+
+        {{#if this.model.user}}
+            <li class="nav-item">
+                <OxiBase::MenuItem
+                    @spec={{hash label=(t 'site.logout') icon='glyphicon-log-out'}}
+                    @onClick={{this.logout}}
+                    class="nav-link py-1 ps-2 px-lg-2"
+                />
+            </li>
+        {{/if}}
+
+        <li class="nav-item my-auto">
+            <span class="nav-link py-2 py-lg-0 ps-lg-2">
+                <button
+                    type="button"
+                    class="btn btn-sm {{if this.nightMode "btn-outline-info" "btn-warning bg-warning-subtle"}}"
+                    {{on "click" this.toggleNightMode}}
+                >
+                    <i class="bi {{if this.nightMode "bi-moon-fill" "bi-sun-fill"}}"></i>
+                </button>
+            </span>
+        </li>
+
+    </ul>
+</OxiBase::Navbar>
 
 <div class="container-fluid pe-md-3 {{this.model.top.page.className}}">
     {{!
