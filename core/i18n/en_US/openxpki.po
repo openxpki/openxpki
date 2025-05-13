@@ -1506,10 +1506,13 @@ msgid "I18N_OPENXPKI_UI_PROFILE_REQUESTOR_REALNAME_DESC"
 msgstr "The full name of the requester"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_DNS"
-msgstr "DNS"
+msgstr "DNS/FQDN"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_DNS_DESCRIPTION"
-msgstr "DNS server"
+msgstr "FQDN/DNS name"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_SAN_DNS_WILDCARD_DESCRIPTION"
+msgstr "FQDN/DNS name, wildcard allowed (*.example.com)"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_IP"
 msgstr "IP Address"

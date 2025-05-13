@@ -1513,13 +1513,16 @@ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_DNS"
 msgstr "DNS"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_DNS_DESCRIPTION"
-msgstr "DNS server"
+msgstr "FQDN/DNS-Bezeichner"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_SAN_DNS_WILDCARD_DESCRIPTION"
+msgstr "FQDN/DNS-Bezeichner, Platzhalter erlaubt (*.example.com)"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_IP"
 msgstr "IP-Adresse"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_IP_DESCRIPTION"
-msgstr "IPv4 Adresse"
+msgstr "IP-Adresse"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_RID"
 msgstr "RID"
