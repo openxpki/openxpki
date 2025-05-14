@@ -67,12 +67,13 @@ command "get_menu" => {
         # auto migrate to new keyword (v3.32+)
         ($elem->{page} = $elem->{key} && delete $elem->{key}) if (defined $elem->{key});
 
-        # check if this is a workflow item
-        my ($wf_type) = $elem->{page} =~ m{\Aworkflow!.+!wf_type!(\w+)};
-
-        # check acl for workflows, just return if wf_type is not set
-        return (!$wf_type || $wf_factory->can_create_workflow($wf_type)) ?
-            $elem : ();
+        # check acl for workflows if this is a workflow item
+        if (my ($wf_type) = ($elem->{page}//'') =~ m{\Aworkflow!.+!wf_type!(\w+)}) {
+            return $wf_factory->can_create_workflow($wf_type) ? $elem : ();
+        # otherwise do nothing
+        } else {
+            return $elem;
+        }
     };
 
     my @menu = map {
