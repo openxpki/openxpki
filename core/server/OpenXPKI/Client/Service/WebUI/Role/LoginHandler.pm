@@ -9,10 +9,12 @@ requires qw(
     request
     client
     realm_mode
-    url_path
     auth
     has_auth
+    current_realm
+    is_realm_selection_page
 
+    url_path_for
     param
     handle_view
     logout_session
@@ -66,17 +68,15 @@ has realm_path_map => (
 );
 sub _build_realm_path_map ($self) {
     my $map = {};
-    my $path = $self->url_path->clone->trailing_slash(1);
 
     my $realm_map = $self->config->get_hash('realm.map');
     # legacy config
     $realm_map //= $self->config->get_hash('realm');
     for my $url_alias (keys $realm_map->%*) {
         my ($realm, $stack) = split (/\s*;\s*/, $realm_map->{$url_alias});
-        $path->parts->[-1] = $url_alias;
         $map->{$realm} //= [];
         push $map->{$realm}->@*, {
-            url => $path->to_string,
+            url => $self->url_path_for($url_alias)->to_string,
             stack => $stack,
         }
     };
@@ -137,6 +137,7 @@ sub handle_login ($self, $page, $action, $reply) {
         } elsif ( $self->request->headers->header('X-OPENXPKI-Client') ) {
 
             # Session is gone but we are still in the ember application
+            $self->log->debug("Ember UI request with invalid backend session - redirect to login page");
             $uilogin->redirect->to('login');
 
         } else {
@@ -156,17 +157,56 @@ sub handle_login ($self, $page, $action, $reply) {
         return $uilogin;
     }
 
-    # Login works in three steps realm -> auth stack -> credentials
+    # Login usually works in three steps realm -> auth stack -> credentials.
+    # If there is only one realm, the server skips the realm selection phase.
 
     $self->log->debug(sprintf("Status: '%s'", $reply->{SERVICE_MSG}));
 
+    # Only one realm? Redirect in "path" mode
+    # (server skipped realm selection so we assume there is only one realm)
+    if (
+        'path' eq $self->realm_mode
+        and $self->is_realm_selection_page
+        and $reply->{SERVICE_MSG} eq 'GET_AUTHENTICATION_STACK'
+    ) {
+        # fetch realm name
+        $reply = $self->client->send_receive_service_msg('GET_REALM_LIST');
+        my $realm_list = $reply->{PARAMS};
+
+        my $error;
+        if (scalar $realm_list->@* == 1) {
+            my $realm = $realm_list->[0]->{name};
+            if (my $paths = $self->realm_path_map->{$realm}) {
+                if (scalar $paths->@* == 1) {
+                    my $url = $paths->[0]->{url} . '/';
+                    $self->log->debug("Only one realm - redirect to: $url");
+                    $uilogin->redirect->external($url);
+                    return $uilogin;
+                } else {
+                    $error = "Non-decidable redirect: config service.webui.realm.map contains more than one URL path for realm '$realm'";
+                }
+            } else {
+                $error = "Missing redirect target: config service.webui.realm.map does not contain realm '$realm'";
+            }
+        } else {
+            $error = "Non-decidable redirect: server skipped realm selection but there is more than one realm";
+        }
+
+        $self->log->error($error);
+        $uilogin->status->error($error);
+        return $uilogin;
+    }
+
     # store realm in backend session if it's set
     if ( $reply->{SERVICE_MSG} eq 'GET_PKI_REALM' and $pki_realm) {
+        $self->log->debug("Set chosen pki_realm '$pki_realm' in backend session");
         $reply = $self->client->send_receive_service_msg( 'GET_PKI_REALM', { PKI_REALM => $pki_realm } );
     }
 
     # if no realm set
     if ( $reply->{SERVICE_MSG} eq 'GET_PKI_REALM' and not $pki_realm) {
+        $self->log->debug("No realm chosen, showing realm selection page");
+
         my $realms = $reply->{PARAMS}->{PKI_REALMS};
 
         my $safe_realm_str = sub {
@@ -545,6 +585,8 @@ sub handle_login ($self, $page, $action, $reply) {
 }
 
 sub handle_logout ($self, $page) {
+    return unless ($page eq 'logout' or $page eq 'login!logout');
+
     my $uilogin = OpenXPKI::Client::Service::WebUI::Page::Login->new(webui => $self);
 
     if ($page eq 'logout') {

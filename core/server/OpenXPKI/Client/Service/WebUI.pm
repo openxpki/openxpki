@@ -319,6 +319,12 @@ has action => (
     },
 );
 
+=head2 current_realm
+
+Contains the current realm if it could be detected from path or hostname or
+read from the client session.
+
+=cut
 sub current_realm; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
 has current_realm => (
     init_arg => undef,
@@ -327,12 +333,54 @@ has current_realm => (
     predicate => 'has_current_realm',
 );
 
+=head2 current_auth_stack
+
+Contains the current stack name if it could be detected from path or hostname or
+read from the client session.
+
+=cut
 sub current_auth_stack; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
 has current_auth_stack => (
     init_arg => undef,
     is => 'rw',
     isa => 'Str',
     predicate => 'has_current_auth_stack',
+);
+
+=head2
+
+Set to C<1> if the current page is the realm selection page (I<realm_mode>
+C<"path"> only).
+
+=cut
+sub is_realm_selection_page; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+has is_realm_selection_page => (
+    init_arg => undef,
+    is => 'rw',
+    isa => 'Bool',
+    default => 0,
+);
+
+=head1 METHODS
+
+=head2 url_path_for
+
+Assembles the URL path for the given realm using the pattern of the Mojolicious
+route of the current request (= the one defined in L</declare_routes>).
+
+Returns a L<Mojo::URL> object.
+
+=cut
+
+sub url_path_for; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+has '_url_path_for' => (
+    init_arg => undef,
+    is => 'rw',
+    isa => 'CodeRef',
+    traits => [ 'Code' ],
+    handles => {
+        'url_path_for' => 'execute',
+    },
 );
 
 sub BUILD ($self, $args) {
@@ -421,6 +469,11 @@ sub declare_routes ($r) {
 sub prepare ($self, $c) {
     $self->operation('default');
 
+    # set the method to generate URL paths
+    $self->_url_path_for( sub ($realm) {
+        return $c->url_for(realm => $realm); # https://metacpan.org/pod/Mojolicious::Controller#url_for
+    } );
+
     #
     # Detect realm
     #
@@ -440,15 +493,13 @@ sub prepare ($self, $c) {
 
         # Prepare realm selection
         if ('index' eq $realm) {
-            $self->log->debug('- special path "index" - showing realm selection page');
-
-            $self->session->flush;
-            $self->client->detach; # enforce new backend session to get rid of selected realm etc.
-        }
+            $self->log->debug('- special path "index"');
+            $self->session->param('pki_realm', undef);
+            $self->is_realm_selection_page(1);
 
         # Realm already stored in session
-        elsif (my $session_realm = $self->session->param('pki_realm')) {
-            $self->log->debug("- using realm previously stored in session: '$session_realm'");
+        } elsif (my $session_realm = $self->session->param('pki_realm')) {
+            $self->log->debug("- realm '$session_realm' read from client session");
             $self->current_realm($session_realm);
             if (my $session_stack = $self->session->param('auth_stack')) {
                 $self->current_auth_stack($session_stack);
@@ -456,14 +507,14 @@ sub prepare ($self, $c) {
 
         # If the session has no realm set, try to get a realm from the map
         } else {
-            $self->log->debug("- checking config for realm '$realm'");
+            $self->log->debug("- realm '$realm' requested via path - reading config");
             $current_realm = $self->config->get(['realm','map', $realm]);
 
             # TODO Remove legacy config
             $current_realm //= $self->config->get(['realm', $realm]);
 
             if (not $current_realm) {
-                $self->log->debug("- unknown realm requested: '$realm'");
+                $self->log->info("- realm '$realm' unknown (not found in config)");
                 return $self->new_response(406 => 'I18N_OPENXPKI_UI_NO_SUCH_REALM_OR_SERVICE');
             }
         }
@@ -625,11 +676,18 @@ sub cgi_set_custom_wf_params {}
 # required by OpenXPKI::Client::Service::Role::Base
 sub prepare_enrollment_result {}
 
+=head2 handle_ui_request
+
+Main entry point to handle the UI requests after some setup done in L</prepare>.
+
+Returns an instance of L<OpenXPKI::Client::Service::WebUI::Page>.
+
+=cut
 sub handle_ui_request ($self) {
     my $page = $self->param('page') || '';
     my $action = $self->action;
 
-    $self->log->debug('Incoming request: ' . join(', ', $page ? "page '$page'" : (), $action ? "action '$action'" : ()));
+    $self->log->info('Incoming request: ' . join(', ', $page ? "page '$page'" : (), $action ? "action '$action'" : ()));
 
     # Shortcut to create new pure Page object for redirecting or error status
     my $new_page = sub ($cb) {
@@ -654,6 +712,12 @@ sub handle_ui_request ($self) {
     # new session and to recover from backend session failure
     if (my $logout_page = $self->handle_logout($page)) { # from OpenXPKI::Client::Service::WebUI::Role::LoginHandler
         return $logout_page;
+    }
+
+    # Prepare realm selection: enforce new server session to get rid of selected realm etc.
+    if ($self->is_realm_selection_page) {
+        $self->log->debug('Enforce new server session to prepare realm selection');
+        $self->client->detach;
     }
 
     # Establish backend connection
@@ -698,8 +762,8 @@ sub handle_ui_request ($self) {
     # we get the problem that ui is logged in but backend is not
     $self->logout_session if $self->session->param('is_logged_in');
 
-    # Handle login
-    return $self->handle_login($page || '', $action, $reply); # from OpenXPKI::Client::Service::WebUI::Role::LoginHandler
+    # Handle login (from OpenXPKI::Client::Service::WebUI::Role::LoginHandler)
+    return $self->handle_login($page || '', $action, $reply);
 }
 
 =head2 ping_client

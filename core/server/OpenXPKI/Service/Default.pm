@@ -141,6 +141,7 @@ sub __is_valid_message : PRIVATE {
             'NEW_SESSION',
             'CONTINUE_SESSION',
             'DETACH_SESSION',
+            'GET_REALM_LIST',
         ],
         'WAITING_FOR_LOGIN' => [
             'PING',
