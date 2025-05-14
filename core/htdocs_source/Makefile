@@ -130,6 +130,15 @@ docs: docker-build ## create Javascript API documentation in /docs-api
 	  docs
 
 #
+# Interactive shell
+#
+shell: docker-build ## run interactive shell
+	$(MANAGER) run $(MANAGER_OPTS_RUN) -ti --rm \
+	  -v $(abspath ./):/source:ro \
+	  --entrypoint /bin/bash \
+	  $(IMAGE)
+
+#
 # Build Docker image
 #
 # Docker image is built using the internal Docker cache, the last image
