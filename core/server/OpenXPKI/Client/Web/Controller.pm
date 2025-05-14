@@ -127,11 +127,10 @@ sub index ($self) {
         set_language($language);
     }
 
-    $self->log->info(sprintf 'Incoming %s request: %s %s', uc($self->req->url->base->scheme), $self->req->method, $self->url_for);
     $self->log->trace("Service class $class instantiated");
 
     # preparations and checks
-    $self->log->debug("Request handling (1/3): preparations and checks");
+    $self->log->trace("Request handling (1/3): preparations and checks");
 
     my $response;
     try {
@@ -145,7 +144,7 @@ sub index ($self) {
 
     if (not $response) {
         # request handling
-        $self->log->debug("Request handling (2/3): process request");
+        $self->log->trace("Request handling (2/3): process request");
         $response = $service->handle_request;
         die "Result of $class->handle_request() is not an instance of OpenXPKI::Client::Service::Response"
           unless $response->isa('OpenXPKI::Client::Service::Response');
@@ -159,7 +158,7 @@ sub index ($self) {
     $self->res->message($response->http_status_message);
 
     # HTTP response
-    $self->log->debug("Request handling (3/3): send response");
+    $self->log->trace("Request handling (3/3): send response");
     $service->send_response($self, $response);
 
     $service->cleanup if $service->can('cleanup');

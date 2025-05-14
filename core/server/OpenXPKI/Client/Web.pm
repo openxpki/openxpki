@@ -5,7 +5,7 @@ use OpenXPKI -base => 'Mojolicious';
 use re qw( regexp_pattern );
 use Module::Load ();
 use POSIX ();
-use List::Util qw( first any none );
+use List::Util qw( first any none max );
 use MIME::Base64 qw( decode_base64 );
 
 # CPAN modules
@@ -274,52 +274,65 @@ sub startup ($self) {
     # Inject query string and webserver ENV from our custom HTTP headers
     #
     $self->hook(before_dispatch => sub ($c) { # Mojolicious request dispatch hook
-        Log::Log4perl::MDC->remove;
-        Log::Log4perl::MDC->put('rid', $c->req->request_id);
+        try {
+            Log::Log4perl::MDC->remove;
+            Log::Log4perl::MDC->put('rid', $c->req->request_id);
 
-        # Normally e.g. Apache should be configured to forward the "Host" header
-        # (via "ProxyPreserveHost On"). But if X-Forwarded-Host is set we use
-        # this because "Host" may contain the local webserver host.
-        if (my $host_port = $c->req->headers->header('X-Forwarded-Host')) {
-            $self->log->debug("Use info from header X-Forwarded-Host = $host_port");
-            $c->req->url->host_port($host_port);
-        }
+            # Normally e.g. Apache should be configured to forward the "Host" header
+            # (via "ProxyPreserveHost On"). But if X-Forwarded-Host is set we use
+            # this because "Host" may contain the local webserver host.
+            if (my $host_port = $c->req->headers->header('X-Forwarded-Host')) {
+                $self->log->trace("Use info from header X-Forwarded-Host = $host_port");
+                $c->req->url->host_port($host_port);
+            }
 
-        $self->log->trace(sprintf 'Incoming %s request', uc($c->req->url->base->protocol)); # ->protocol: Normalized version of ->scheme
+            if ($self->mode eq 'development') {
+                $self->log->debug('Enforce HTTPS because of Mojolicious development mode');
+                $c->req->url->base->scheme('https');
+            }
 
-        if ($self->mode eq 'development') {
-            $self->log->debug('Enforce HTTPS because of Mojolicious development mode');
-            $c->req->url->base->scheme('https');
-        }
+            $self->log->error("Missing header X-ReverseProxy-ENVSET - Reverse proxy setup seems to be incomplete")
+                unless $c->req->headers->header('X-ReverseProxy-ENVSET');
 
-        $self->log->error("Missing header X-ReverseProxy-ENVSET - Reverse proxy setup seems to be incomplete")
-            unless $c->req->headers->header('X-ReverseProxy-ENVSET');
+            my $webserver_env = {};
+            for my $key ($c->req->headers->names->@*) {
+                # inject forwarded webserver ENV into Mojo::Request
+                if (my ($env_key) = $key =~ /^X-ReverseProxy-ENV-(.*)/) {
+                    if (not any { $env_key eq $_ } @webserver_env_vars) {
+                        $self->log->debug("Ignoring unknown ENV variable received via header '$key'");
+                        next;
+                    };
+                    $webserver_env->{$env_key} = decode_base64($c->req->headers->header($key));
+                    $self->log->trace("Webserver ENV variable received via header: $env_key");
+                }
+            }
+            $c->stash(webserver_env => $webserver_env);
 
-        my $webserver_env = {};
-        for my $key ($c->req->headers->names->@*) {
-            # inject forwarded webserver ENV into Mojo::Request
-            if (my ($env_key) = $key =~ /^X-ReverseProxy-ENV-(.*)/) {
-                if (not any { $env_key eq $_ } @webserver_env_vars) {
-                    $self->log->debug("Ignoring unknown ENV variable received via header '$key'");
-                    next;
-                };
-                $webserver_env->{$env_key} = decode_base64($c->req->headers->header($key));
-                $self->log->trace("Webserver ENV variable received via header: $env_key");
+            # Inject query parameters forwarded by webserver into Mojo::Request.
+            # NOTE:
+            # We need this workaround because Apache reverse proxy cannot forward
+            # QUERY_STRING to the backend server. The "proxy_pass" documentation
+            # which is also valid for "RewriteRule ... url [p]" says: "url is a
+            # partial URL for the remote server and cannot include a query string."
+            # (https://httpd.apache.org/docs/2.4/mod/mod_proxy.html#proxypass)
+            if (my $query_b64 = $c->req->headers->header('X-ReverseProxy-QueryString')) {
+                my $query = decode_base64($query_b64);
+                $c->req->url->query($query);
+                $self->log->trace("Webserver QUERY_STRING received via header: $query");
+            }
+
+            if ($self->log->is_debug) {
+                my $msg = sprintf('%s request: %s %s ',
+                    uc($c->req->url->base->scheme),
+                    $c->req->method,
+                    $c->req->url->path,
+                );
+                $self->log->debug($msg . '-' x max(80-length($msg), 0));
             }
         }
-        $c->stash(webserver_env => $webserver_env);
-
-        # Inject query parameters forwarded by webserver into Mojo::Request.
-        # NOTE:
-        # We need this workaround because Apache reverse proxy cannot forward
-        # QUERY_STRING to the backend server. The "proxy_pass" documentation
-        # which is also valid for "RewriteRule ... url [p]" says: "url is a
-        # partial URL for the remote server and cannot include a query string."
-        # (https://httpd.apache.org/docs/2.4/mod/mod_proxy.html#proxypass)
-        if (my $query_b64 = $c->req->headers->header('X-ReverseProxy-QueryString')) {
-            my $query = decode_base64($query_b64);
-            $c->req->url->query($query);
-            $self->log->trace("Webserver QUERY_STRING received via header: $query");
+        catch ($error) {
+            $self->log->error($error);
+            die $error;
         }
     });
 }
