@@ -240,14 +240,20 @@ sub startup ($self) {
             # Drop privileges (manager process)
             # (the "wait" event happends after PID file creation)
             $server->once(wait => sub ($server) {
-                # set owner/mode on AF_UNIX domain sockets
-                my $socket = $server->ioloop->acceptor($server->acceptors->[0])->handle;
-                if ($socket->isa('IO::Socket::UNIX')) {
-                    my $socket_file = $socket->hostpath;
-                    $self->_chown_socket($socket_file, $socket_owner, $socket_group, $socket_mode);
+                try {
+                    # set owner/mode on AF_UNIX domain sockets
+                    my $socket = $server->ioloop->acceptor($server->acceptors->[0])->handle;
+                    if ($socket->isa('IO::Socket::UNIX')) {
+                        my $socket_file = $socket->hostpath;
+                        $self->_chown_socket($socket_file, $socket_owner, $socket_group, $socket_mode);
+                    }
+                    # drop process privileges
+                    $self->_drop_privileges($server->pid_file, $user, $group, "Manager $$");
                 }
-                # drop process privileges
-                $self->_drop_privileges($server->pid_file, $user, $group, "Manager $$");
+                catch ($error) {
+                    $self->log->error($error);
+                    die $error;
+                }
             });
         } else {
             $self->log->warn('The OpenXPKI client will only work properly with Mojolicious server Mojo::Server::Prefork');
