@@ -76,7 +76,10 @@ case "$1" in
         # If this is an existing install we create a symlink
         # to the new socket location to not break things
         # works only if the system was down before!
-        test -d /var/openxpki && test ! -e /var/openxpki/openxpki.socket && ln -s /run/openxpkid/openxpki.sock /var/openxpki/openxpki.socket
+        # Note that -e is false if the symlink exists but the linked file does not
+        if  [ -d /var/openxpki ] && [ ! -e /var/openxpki/openxpki.socket ]; && [ ! -h /var/openxpki/openxpki.socket ]; then
+            ln -s /run/openxpkid/openxpkid.sock /var/openxpki/openxpki.socket
+        fi
 
         # Create the pkiadm user
         COUNT=`grep '^pkiadm:' /etc/passwd | wc -l`;
