@@ -631,7 +631,7 @@ OpenXPKI/Server/Workflow/Condition/HasRole.pm
 OpenXPKI/Server/Workflow/Condition/IsCertificateOwner.pm
 OpenXPKI/Server/Workflow/Condition/IsEqual.pm
 OpenXPKI/Server/Workflow/Condition/IsWrappedRequest.pm
-OpenXPKI/Server/Workflow/Condition/isTrue.pm
+OpenXPKI/Server/Workflow/Condition/IsTrue.pm
 OpenXPKI/Server/Workflow/Condition/KeyGenerationMode.pm
 OpenXPKI/Server/Workflow/Condition/KeyParams.pm
 OpenXPKI/Server/Workflow/Condition/Matches.pm
