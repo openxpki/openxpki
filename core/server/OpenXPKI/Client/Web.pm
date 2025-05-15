@@ -132,6 +132,7 @@ sub startup ($self) {
     #my $config = $self->{oxi_config_obj} or die 'Missing parameter "oxi_config_obj" to ' . __PACKAGE__ . '->new()';
     my $user = $self->{oxi_user};
     my $group = $self->{oxi_group};
+    # we keep this here for reference but always pass in the user here
     my $socket_owner = $self->{oxi_socket_owner};
     my $socket_group = $self->{oxi_socket_group};
     my $socket_mode = $self->{oxi_socket_mode};

@@ -93,7 +93,6 @@ sub getopt_params ($self, $command) {
         group|g=s
         pid_file|pid-file|p=s
         socket_file|socket-file|s=s
-        socket_owner|socket-owner=s
         socket_group|socket-group=s
         socket_mode|socket-mode=s
         systemd
@@ -189,7 +188,7 @@ sub cmd_start ($self) {
 
         # each parameter might be undef:
         %web_params = (
-            oxi_socket_owner => $self->opts->{socket_owner} || $self->cfg->{socket_owner} || $user,
+            oxi_socket_owner => $user,
             oxi_socket_group => $self->opts->{socket_group} || $self->cfg->{socket_group} || $group,
             oxi_socket_mode => $self->opts->{socket_mode} || $self->cfg->{socket_mode},
         );
