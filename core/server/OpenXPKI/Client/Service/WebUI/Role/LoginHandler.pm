@@ -76,7 +76,7 @@ sub _build_realm_path_map ($self) {
         my ($realm, $stack) = split (/\s*;\s*/, $realm_map->{$url_alias});
         $map->{$realm} //= [];
         push $map->{$realm}->@*, {
-            url => $self->url_path_for($url_alias)->to_string,
+            url => $self->url_path_for($url_alias)->to_string . '/',
             stack => $stack,
         }
     };
@@ -178,7 +178,7 @@ sub handle_login ($self, $page, $action, $reply) {
             my $realm = $realm_list->[0]->{name};
             if (my $paths = $self->realm_path_map->{$realm}) {
                 if (scalar $paths->@* == 1) {
-                    my $url = $paths->[0]->{url} . '/';
+                    my $url = $paths->[0]->{url};
                     $self->log->debug("Only one realm - redirect to: $url");
                     $uilogin->redirect->external($url);
                     return $uilogin;
