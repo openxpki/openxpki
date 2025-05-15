@@ -13,8 +13,11 @@ announce() {
 announce "Basic setup"
 /vagrant/assets/provision-basics.sh
 
-announce "Install Virtualbox guest addins"
-/vagrant/assets/provision-vbox.sh $VBOX_VERSION
+# :-(
+# Guest update does not work anymore as the VBoxGuestAdditions installer wants
+# to unmount the shared folders which fails while Vagrant runs the installer.
+#announce "Install Virtualbox guest addins"
+#/vagrant/assets/provision-vbox.sh $VBOX_VERSION
 
 announce "Install Git"
 /vagrant/assets/provision-git.sh
