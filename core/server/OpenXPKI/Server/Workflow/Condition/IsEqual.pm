@@ -1,4 +1,4 @@
-package OpenXPKI::Server::Workflow::Condition::Equality;
+package OpenXPKI::Server::Workflow::Condition::IsEqual;
 use OpenXPKI;
 
 use parent qw( OpenXPKI::Server::Workflow::Condition );
@@ -12,22 +12,20 @@ sub _evaluate {
 
     my $key = $self->param('key') || configuration_error('no key given');
 
-    my $reference = $self->param('value') // configuration_error('no reference value given');
-
-
-    ##! 32: "$key / $reference"
-
-    $self->log->info("Evaluate $key to match reference value");
-
+    # value might be set via _map and be empty
+    my $reference = $self->param('value') // '';
     my $value = $wf->context->param->{$key};
-    ##! 32: $value
+
+    ##! 32: "$key / $reference /  $value"
+    $self->log->info("Match $key against reference value");
 
     condition_error('value is undefined') unless(defined $value);
 
-    condition_error('value is empty') unless($value != "");
+    condition_error('value is empty') unless($value ne "");
 
     condition_error('value does not match reference') unless($value eq $reference);
 
+    return 1;
 
 }
 
@@ -37,7 +35,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::Equality
+OpenXPKI::Server::Workflow::Condition::IsEqual
 
 =head1 DESCRIPTION
 
@@ -47,7 +45,7 @@ matches the reference value given as I<value>.
 =head1 Configuration
 
   has_cert_subject_set:
-      class: OpenXPKI::Server::Workflow::Condition::Matches
+      class: OpenXPKI::Server::Workflow::Condition::IsEqual
       param:
           key: cert_subject
           value: tls_server

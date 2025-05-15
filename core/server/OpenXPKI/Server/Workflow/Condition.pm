@@ -139,6 +139,10 @@ sub param {
     return;
 }
 
+sub _from_context {
+    return OpenXPKI::Server::Workflow::Helpers::get_value_from_context( @_ );
+}
+
 1;
 __END__
 

@@ -33,6 +33,7 @@ sub _evaluate {
     ##! 32: $value
     condition_error('value does not match regex') unless($value =~ $regex);
 
+    return 1;
 
 }
 
