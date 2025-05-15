@@ -19,5 +19,8 @@ docker images -f "dangling=true" -q \
  | while read ID; do docker rmi $ID; done                             >$LOG 2>&1
 
 
+echo "Clean up unused packages"
+apt -y autoremove                                                     >$LOG 2>&1
+
 echo "Clean up Apt cache"
 apt-get -q=2 clean                                                    >$LOG 2>&1

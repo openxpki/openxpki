@@ -38,3 +38,6 @@ install_packages mc rsync gettext \
 
 echo "Apt - upgrade"
 apt-get upgrade --assume-yes --with-new-pkgs >$LOG 2>&1
+
+systemctl stop unattended-upgrades >$LOG 2>&1
+apt-get purge -y unattended-upgrades >$LOG 2>&1
