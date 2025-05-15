@@ -225,6 +225,13 @@ sub pre_loop_hook {
     # we are tricking Net::Server to believe that it should not change
     # owner and group of the process and do it ourselves shortly afterwards
 
+    # 2025-05: As it is possible to have a process running in mutliple groups
+    #   it is possible to get rid of all this extra code when we accept that
+    #   we can not set the socket_owner to a different user.
+    #   As this might something which can not be fixed easily in a customer
+    #   environment with the old CGI frontend we keep this solution for now
+    #   and add a deprecation warning
+
     ### drop privileges
     eval{
         # Set verbose process name
@@ -698,7 +705,11 @@ sub __get_server_config {
         my (undef, $socket_uid, undef, $socket_gid)
           = OpenXPKI::Util->resolve_user_group($self->{CONFIG}->{socket_owner}//'', $self->{CONFIG}->{socket_group}//'', 'socket', 1);
 
-        $params{socket_owner} = $socket_uid if defined $socket_uid;
+        if (defined $socket_uid) {
+            warn "using socket_owner is deprecated and will be removed in next relase\n".
+                "please use socket_group instead!\n";
+            $params{socket_owner} = $socket_uid ;
+        }
         $params{socket_group} = $socket_gid if defined $socket_gid;
     }
     catch ($err) {

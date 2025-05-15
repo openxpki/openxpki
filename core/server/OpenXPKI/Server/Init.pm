@@ -116,7 +116,7 @@ sub init {
         log_wrapper("Initialization task '$task' finished", "debug") unless $keys->{SILENT};
     }
 
-    log_wrapper("OpenXPKI initialization finished") unless $keys->{SILENT};
+    print "OpenXPKI initialization finished\n" unless $keys->{SILENT};
 
     OpenXPKI::Server::Context::killsession();
 
