@@ -177,7 +177,7 @@ install -m 660 -o www -g www /dev/null /var/log/openxpki/webui.log
 install -m 660 -o www -g www /dev/null /var/log/openxpki/scep.log
 install -m 660 -o www -g www /dev/null /var/log/openxpki/soap.log
 
-- It is essential that www and openpki are two different users in your system.
+- It is essential that www and openxpki are two different users in your system.
 
 - Start daemons in this order:
     database server,

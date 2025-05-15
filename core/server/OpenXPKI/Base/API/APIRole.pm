@@ -21,7 +21,7 @@ use OpenXPKI::Base::API::PluginRole;
 use OpenXPKI::Base::API::Autoloader;
 use OpenXPKI::Util;
 
-=head2 REQUIRED METHODS
+=head1 REQUIRED METHODS
 
 =head2 namespace
 
@@ -29,6 +29,12 @@ Perl package namespace that will be searched for the command plugin classes.
 
 =cut
 requires 'namespace';
+
+=head2 handle_dispatch_error
+
+Handler for errors/exceptions during command dispatch.
+
+=cut
 requires 'handle_dispatch_error';
 
 =head1 SYNOPSIS
