@@ -7,9 +7,8 @@ extends 'Connector::Multi';
 use File::Spec;
 
 # Project modules
-use OpenXPKI::i18n qw( set_language set_locale_prefix );
+use OpenXPKI::i18n qw( set_language set_locale_prefix);
 use OpenXPKI::Config::Backend;
-
 
 my @allowed_targets = qw( console file none );
 
@@ -17,7 +16,7 @@ has 'config_dir' => (
     is => 'ro',
     isa => 'Str',
     lazy => 1,
-    default => '/etc/openxpki/frontend.d',
+    default => $OpenXPKI::Defaults::CLIENT_CONFIG_DIR,
 );
 
 has '+BASECONNECTOR' => (

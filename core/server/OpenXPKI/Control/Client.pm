@@ -50,7 +50,7 @@ has config => (
 );
 
 has '+config_path' => (
-    default => '/etc/openxpki/frontend.d',
+    default => $OpenXPKI::Defaults::CLIENT_CONFIG_DIR,
 );
 
 has silent => (

@@ -11,7 +11,10 @@ our $DATABASE_SCHEMA  = [1,2,3];
 
 our $SERVER_SOCKET  = '/run/openxpkid/openxpkid.sock';
 our $SERVER_PID     = '/run/openxpkid/openxpkid.pid';
+our $SERVER_CONFIG_DIR = '/etc/openxpki/config.d/';
+
 our $CLIENT_SOCKET  = '/run/openxpki-clientd/openxpki-clientd.sock';
 our $CLIENT_PID     = '/run/openxpki-clientd/openxpki-clientd.pid';
+our $CLIENT_CONFIG_DIR = '/etc/openxpki/client.d/';
 
 1;

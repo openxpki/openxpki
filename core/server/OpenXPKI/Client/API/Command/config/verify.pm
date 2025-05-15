@@ -26,7 +26,7 @@ use Mojo::Loader;
 use OpenXPKI::Config::Backend;
 
 command "verify" => {
-    config => { isa => 'ReadableDir', label => 'Path to local config tree', default => '/etc/openxpki/config.d' },
+    config => { isa => 'ReadableDir', label => 'Path to local config tree', default => $OpenXPKI::Defaults::SERVER_CONFIG_DIR },
     path => { isa => 'Str', label => 'Path to dump' },
     module => { isa => 'Str', label => 'Optional linter module' },
 } => sub ($self, $param) {

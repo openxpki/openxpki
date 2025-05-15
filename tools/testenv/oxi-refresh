@@ -156,7 +156,7 @@ sed -ri 's/^(\s*default_language:).*/\1 en_US/' /etc/openxpki/config.d/system/se
 sed -zri 's/(secret:\s+default:\s+.*?)value@?:[^\n]+/\1value: root/' /etc/openxpki/config.d/system/crypto.yaml
 
 # Specify hostname to force MySQL connection via TCP, not socket
-webui_conf=/etc/openxpki/frontend.d/service/webui/default.yaml
+webui_conf=/etc/openxpki/client.d/service/webui/default.yaml
 if [ -e $webui_conf ]; then
     echo "- set WebUI session driver to database"
     sed -ri 's/^(\s*)(#\s*)?(driver\s*:).*/\1\3 driver:openxpki/'                                $webui_conf
@@ -248,7 +248,7 @@ sed -zri 's/depend:\s*\n\s+core:[^\n]+\n//' /etc/openxpki/config.d/system/versio
 
 # Set user and group to root (allows to e.g. run under a /root/.plenv environment)
 echo -e "Client config: set client socket_group to 'root'"
-perl -pe 's{^(socket_group)\s*:.*}{$1: www-data}g;' -i /etc/openxpki/frontend.d/system/server.yaml
+perl -pe 's{^(socket_group)\s*:.*}{$1: www-data}g;' -i /etc/openxpki/client.d/system/server.yaml
 
 # configure web server
 echo -e "Configure Apache web server"

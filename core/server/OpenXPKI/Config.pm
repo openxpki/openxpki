@@ -29,7 +29,7 @@ has 'config_dir' => (
     is => 'ro',
     isa => 'Str',
     lazy => 1,
-    default => '/etc/openxpki/config.d',
+    default => $OpenXPKI::Defaults::SERVER_CONFIG_DIR,
 );
 
 has backend => (
