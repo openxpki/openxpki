@@ -7,6 +7,7 @@ use File::Spec;
 
 # CPAN modules
 use Log::Log4perl;
+use List::Util 'none';
 
 # Project modules
 use OpenXPKI::i18n qw(set_language set_locale_prefix);
@@ -106,10 +107,7 @@ sub init {
                 $err->rethrow;
             } else {
                 log_wrapper("Error during initialization task '$task': $err", "fatal");
-                OpenXPKI::Exception->throw(
-                    message => "I18N_OPENXPKI_SERVER_INIT_TASK_INIT_FAILURE",
-                    params  => { task => $task, ERROR => $err },
-                );
+                die "$err";
             }
         }
 
@@ -277,12 +275,15 @@ sub __do_init_dbi {
     OpenXPKI::Server::Context::setcontext({
         'dbi' => get_database("main", ($keys->{CLI} ? 1 : 0) )
     });
-    my $db_version = CTX('dbi')->version();
-    if (!$db_version) {
-        warn "Please set database schema version!";
+    my $db_version = CTX('dbi')->version() || '';
+    my @accepted = $OpenXPKI::Defaults::DATABASE_SCHEMA->@*;
+    if (none { $_ eq $db_version } @accepted) {
+        die "current database schema '$db_version' is not compatible with this release\n".
+             "accepted version are " .join(",", @accepted) . "\n";
     }
+
     ##! 32: 'db schema version is ' . $db_version
-    CTX('config')->set('system.version.dbschema', $db_version );
+    CTX('config')->set('system.version.dbschema', $db_version || 0 );
 }
 
 sub __do_init_acl {

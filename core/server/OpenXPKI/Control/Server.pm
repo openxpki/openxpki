@@ -25,6 +25,7 @@ use File::Temp;
 
 # CPAN modules
 use Proc::ProcessTable;
+use List::Util qw(none notall);
 
 # Project modules
 use OpenXPKI::VERSION;
@@ -242,7 +243,21 @@ sub start ($self, $arg) {
         }
     }
 
-    if ($self->cfg->{depend} && (my $core = $self->cfg->{depend}->{core})) {
+    if (ref $self->cfg->{depend} ne 'HASH' ||
+        notall { defined $self->cfg->{depend}->{$_} } ('core','config')) {
+        warn "you must specify 'core' and 'config' in system.version.depend\n";
+        return 1;
+    }
+
+    my $cfg_ver = $self->cfg->{depend}->{config};
+    my @accepted = $OpenXPKI::Defaults::CONFIG_SCHEMA->@*;
+    if (none { $_ eq $cfg_ver } @accepted) {
+        warn "current config version '$cfg_ver' is not compatible with this release\n";
+        warn "accepted version are " .join(",", @accepted) . "\n";
+        return 1;
+    }
+
+    if (my $core = $self->cfg->{depend}->{core}) {
         my ($Major, $Minor) = ($OpenXPKI::VERSION::VERSION =~ m{\A(\d)\.(\d+)});
         my ($major, $minor) = ($core =~ m{\A(\d)\.(\d+)});
         if ($major != $Major) {
@@ -260,9 +275,6 @@ sub start ($self, $arg) {
                 return 1;
             }
         }
-    } else {
-        warn "Config entry system.version.depend is not set - unable to check required version!\n";
-        warn "Hint: Add expected minimum version to 'system.version.depend.core'\n";
     }
 
     if (not $arg->silent) {
