@@ -1671,6 +1671,10 @@ msgstr "DNS"
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_DNS_DESCRIPTION"
 msgstr "DNS服务器"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_SAN_DNS_WILDCARD_DESCRIPTION"
+msgstr "DNS服务器"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_IP"
 msgstr "IP地址"
 
@@ -2711,9 +2715,6 @@ msgstr "此工作流程已成功完成，无法重新启动"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_NOT_ALLOWED"
 msgstr "您无权启动此工作流程"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_UNKNOWN_TYPE"
-msgstr "无法启动工作流程：未知类型"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_ANONYMOUS"
@@ -4953,6 +4954,9 @@ msgstr "是"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_ENDPOINT_AUTH_LABEL"
 #~ msgstr "编辑有效期"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_UNKNOWN_TYPE"
+#~ msgstr "无法启动工作流程：未知类型"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_EXTRA_INFO_LABEL"
 #~ msgstr "技术信息"

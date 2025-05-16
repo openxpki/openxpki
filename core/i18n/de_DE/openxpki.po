@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2025-05-05 10:42+0200\n"
+"PO-Revision-Date: 2025-05-16 12:52+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -2584,9 +2584,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_NOT_ALLOWED"
 msgstr "Sie sind nicht berechtigt diesen Workflow zu starten."
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_UNKNOWN_TYPE"
-msgstr "Der Workflow konnte nicht gestartet werden: Typ unbekannt"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_ANONYMOUS"
 msgstr "anonymer Benutzer"
 
@@ -2965,7 +2962,6 @@ msgstr "Inventar"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVENTORY_TOOLTIP"
 msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_DESC"
 msgstr ""
 "Sie können direkt den alphanumerischen Zertifikatsidentifier eingeben oder "
@@ -2974,17 +2970,14 @@ msgstr ""
 "das gewünschte per Mausklick aus. Die Suche beginnt nach der Eingabe von "
 "mindestens drei Zeichen."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_LABEL"
-msgstr "Zertifikat"
+msgstr "Aussteller"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_PLACEHOLDER"
 msgstr ""
 "Geben Sie den Zertifikatsidentifier an oder tippen Sie für die automatische "
 "Suche."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_TOOLTIP"
 msgstr ""
 "Die automatische Vervollständigung durchsucht das vollständige Subject aller "
@@ -4195,11 +4188,12 @@ msgstr "Dieser Workflow wartet auf weitere Bearbeitung."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_LABEL"
 msgstr "Bearbeitung ausstehend"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_USER_DESC"
-msgstr "Dieser Sperrantrag muss genehmigt werden."
+msgstr ""
+"Bitte überprüfen Sie die Angaben des Antrags und nutzen Sie 'Genehmigen' "
+"wenn sie überzeugt sind, dass die bereitgestellten Informationen korrekt "
+"sind. Falls sie den Antrag zurückweisen möchten, nutzen sie 'Abbrechen'. "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_USER_LABEL"
 msgstr "Genehmigung ausstehend"
 
@@ -4638,3 +4632,6 @@ msgstr "aufwecken"
 
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "ja"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_UNKNOWN_TYPE"
+#~ msgstr "Der Workflow konnte nicht gestartet werden: Typ unbekannt"

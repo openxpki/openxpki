@@ -1598,6 +1598,10 @@ msgstr "DNS"
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_DNS_DESCRIPTION"
 msgstr "DNSサーバ"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_SAN_DNS_WILDCARD_DESCRIPTION"
+msgstr "DNSサーバ"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_IP"
 msgstr "IPアドレス"
 
@@ -2666,9 +2670,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_NOT_ALLOWED"
 msgstr "このワークフローを開始することは許可されていません"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_UNKNOWN_TYPE"
-msgstr "ワークフローを開始できません：原因不明"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_ANONYMOUS"
 msgstr "匿名ユーザ"
@@ -5553,6 +5554,9 @@ msgstr "はい"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CONFIRM_LABEL_CANCEL"
 #~ msgstr "リトライ"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_UNKNOWN_TYPE"
+#~ msgstr "ワークフローを開始できません：原因不明"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_SUCCESS_DESC"
 #~ msgstr "このワークフローは正常に終了しており、再開することはできません。"

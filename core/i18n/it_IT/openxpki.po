@@ -1901,6 +1901,10 @@ msgstr "DNS"
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_DNS_DESCRIPTION"
 msgstr "Server DNS"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_SAN_DNS_WILDCARD_DESCRIPTION"
+msgstr "Server DNS"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_IP"
 msgstr "Indirizzo IP"
 
@@ -3100,10 +3104,6 @@ msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_NOT_ALLOWED"
-msgstr "Creator"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_UNKNOWN_TYPE"
 msgstr "Creator"
 
 #, fuzzy
@@ -5636,6 +5636,10 @@ msgstr "Sì"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_ENDPOINT_AUTH_LABEL"
 #~ msgstr "Modifica Validità"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_UNKNOWN_TYPE"
+#~ msgstr "Creator"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_EXTRA_INFO_LABEL"
