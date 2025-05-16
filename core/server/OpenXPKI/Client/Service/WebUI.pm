@@ -200,7 +200,6 @@ has realm_mode => (
         select
         path
         hostname
-        fixed
     )]),
     lazy => 1,
     default => sub ($self) { $self->config->get('realm.mode') || $self->config->get('global.realm_mode') || 'select' },
@@ -515,7 +514,7 @@ sub prepare ($self, $c) {
 
             if (not $current_realm) {
                 $self->log->info("- realm '$realm' unknown (not found in config)");
-                return $self->new_response(406 => 'I18N_OPENXPKI_UI_NO_SUCH_REALM_OR_SERVICE');
+                return $self->new_response(404 => 'I18N_OPENXPKI_UI_NO_SUCH_REALM_OR_SERVICE');
             }
         }
 
@@ -537,10 +536,6 @@ sub prepare ($self, $c) {
         }
         $self->log->warn("- unable to find matching realm for hostname '$host'") unless $current_realm;
 
-    # FIXED mode
-    } elsif ("fixed" eq $realm_mode) {
-        # Fixed realm mode, mode must be defined in the config
-        $current_realm = $self->config->get('realm.value') // $self->config->get('global.realm');
     }
 
     if ($current_realm) {
