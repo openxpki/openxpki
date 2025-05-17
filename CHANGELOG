@@ -11,4 +11,4 @@ Upgrades, Improvements and Bugfixes
 
 Removals, Deprecations, Breaking Changes
 - Config fallback from simplereenroll to simpleenroll in EST is deprecated and will be removed in next release
-- Environment variables OPENXPKI_PKI_REALM and OPENXPKI_AUTH_STACK to enforce realm/stack are no longer supported. You may use config items "realm.mode: fixed" and "realm.value: REALM;STACK" instead.
+- Environment variables OPENXPKI_PKI_REALM and OPENXPKI_AUTH_STACK to enforce realm/stack are no longer supported.
