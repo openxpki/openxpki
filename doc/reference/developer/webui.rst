@@ -462,7 +462,7 @@ Displays the given text as is (i.e. HTML formatting allowed).
 code
 ^^^^
 
-Rendered with fixed-with typo, unix linebreaks are converted to html linebreaks.
+Rendered with fixed-width, unix linebreaks are converted to html linebreaks.
 
 deflist
 ^^^^^^^
