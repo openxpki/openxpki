@@ -684,13 +684,17 @@ div.required input.flatpickr-input {
 }
 
 .oxi-btn-optional,
-.oxi-btn-optional:focus {
-  background-color: #e4e4da;
+.oxi-btn-optional:focus,
+.oxi-btn-info,
+.oxi-btn-info:focus {
+    background-color: #e4e4da;
 }
 
 [data-bs-theme=dark] .oxi-btn-optional,
-[data-bs-theme=dark] .oxi-btn-optional:focus {
-  background-color: #26261d;
+[data-bs-theme=dark] .oxi-btn-optional:focus,
+[data-bs-theme=dark] .oxi-btn-info,
+[data-bs-theme=dark] .oxi-btn-info:focus {
+    background-color: #26261d;
 }
 
 .oxi-btn-failure,
@@ -745,26 +749,26 @@ div.required input.flatpickr-input {
 .oxi-btn-expected,    .oxi-btn-expected:focus,
 .oxi-btn-submit,      .oxi-btn-submit:focus,
 .oxi-btn-optional,    .oxi-btn-optional:focus,
-.oxi-btn-optional,    .oxi-btn-optional:focus,
 .oxi-btn-failure,     .oxi-btn-failure:focus,
 .oxi-btn-cancel,      .oxi-btn-cancel:focus,
 .oxi-btn-reset,       .oxi-btn-reset:focus,
 .oxi-btn-alternative, .oxi-btn-alternative:focus,
 .oxi-btn-exceptional, .oxi-btn-exceptional:focus,
-.oxi-btn-terminate,   .oxi-btn-terminate:focus {
+.oxi-btn-terminate,   .oxi-btn-terminate:focus,
+.oxi-btn-info,        .oxi-btn-info:focus {
   color: #333; border-color: #ccc;
 }
 
 [data-bs-theme=dark] .oxi-btn-expected,    [data-bs-theme=dark] .oxi-btn-expected:focus,
 [data-bs-theme=dark] .oxi-btn-submit,      [data-bs-theme=dark] .oxi-btn-submit:focus,
 [data-bs-theme=dark] .oxi-btn-optional,    [data-bs-theme=dark] .oxi-btn-optional:focus,
-[data-bs-theme=dark] .oxi-btn-optional,    [data-bs-theme=dark] .oxi-btn-optional:focus,
 [data-bs-theme=dark] .oxi-btn-failure,     [data-bs-theme=dark] .oxi-btn-failure:focus,
 [data-bs-theme=dark] .oxi-btn-cancel,      [data-bs-theme=dark] .oxi-btn-cancel:focus,
 [data-bs-theme=dark] .oxi-btn-reset,       [data-bs-theme=dark] .oxi-btn-reset:focus,
 [data-bs-theme=dark] .oxi-btn-alternative, [data-bs-theme=dark] .oxi-btn-alternative:focus,
 [data-bs-theme=dark] .oxi-btn-exceptional, [data-bs-theme=dark] .oxi-btn-exceptional:focus,
-[data-bs-theme=dark] .oxi-btn-terminate,   [data-bs-theme=dark] .oxi-btn-terminate:focus {
+[data-bs-theme=dark] .oxi-btn-terminate,   [data-bs-theme=dark] .oxi-btn-terminate:focus,
+[data-bs-theme=dark] .oxi-btn-info,        [data-bs-theme=dark] .oxi-btn-info:focus {
   color: #ccc; border-color: #333;
 }
 

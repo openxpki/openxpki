@@ -41,7 +41,7 @@ export default class OpenXpkiController extends Controller {
             return Link.fromHash({
                 label: this.intl.t('button.workflow.copy_id.label', { id: this.model.top.page.workflow_id }),
                 tooltip: this.intl.t('button.workflow.copy_id.tooltip'),
-                format: 'none',
+                format: 'info',
                 onClick: this.copyWorkflowIdToClipboard,
             })
         } else {

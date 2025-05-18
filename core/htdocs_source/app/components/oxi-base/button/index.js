@@ -81,7 +81,7 @@ let format2css = {
     terminate:      "btn-secondary oxi-btn-terminate",
     tile:           "btn-secondary oxi-btn-tile",
     card:           "btn-secondary oxi-btn-card",
-    info:           "btn-secondary bg-secondary-subtle oxi-btn-info",
+    info:           "btn-secondary oxi-btn-info",
 }
 
 export default class OxiClickableComponent extends Component {

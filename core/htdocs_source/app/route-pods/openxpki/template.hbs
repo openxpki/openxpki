@@ -84,7 +84,7 @@
         </div>
         <div class="col col-md-auto oxi-pagehead" {{on-init this.setTempCopyElement}}>
             {{#if this.workflowCopyIdButton}}
-                <OxiBase::Button @button={{this.workflowCopyIdButton}} class="btn-sm bg-secondary-subtle oxi-btn-copy-workflow-id" />
+                <OxiBase::Button @button={{this.workflowCopyIdButton}} class="btn-sm oxi-btn-copy-workflow-id" />
             {{/if}}
             {{#each this.model.top.page.buttons as |btn|}}
                 <OxiBase::Button @button={{btn}} class="btn-sm" />
