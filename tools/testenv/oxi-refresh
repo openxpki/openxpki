@@ -159,10 +159,11 @@ sed -zri 's/(secret:\s+default:\s+.*?)value@?:[^\n]+/\1value: root/' /etc/openxp
 webui_conf=/etc/openxpki/client.d/service/webui/default.yaml
 if [ -e $webui_conf ]; then
     echo "- set WebUI session driver to database"
-    sed -ri 's/^(\s*)(#\s*)?(driver\s*:).*/\1\3 driver:openxpki/'                                $webui_conf
-    sed -ri 's/^(\s*)(#\s*)?(DataSource\s*:).*/\1\3 dbi:MariaDB:dbname=openxpki;host=127.0.0.1/' $webui_conf
-    sed -ri 's/^(\s*)(#\s*)?(User\s*:).*/\1\3 openxpki_session/'                                 $webui_conf
-    sed -ri 's/^(\s*)(#\s*)?(Password\s*:).*/\1\3 mysecret/'                                     $webui_conf
+    sed -ri 's/^(\s*)(#\s*)?(driver)\s*:.*/\1\3: driver:openxpki/'                                $webui_conf
+    sed -ri 's/^(\s*)(#\s*)?(DataSource)\s*:.*/\1\3: dbi:MariaDB:dbname=openxpki;host=127.0.0.1/' $webui_conf
+    sed -ri 's/^(\s*)(#\s*)?(User)@?\s*:.*/\1\3: openxpki_session/'                               $webui_conf
+    sed -ri 's/^(\s*)(#\s*)?(Password)@?\s*:.*/\1\3: mysecret/'                                   $webui_conf
+    sed -ri 's/^(\s*)(#\s*)?(EncryptKey)@?\s*:.*/\1\3: mysecret/'                                 $webui_conf
 fi
 legacy_webui_conf=/etc/openxpki/webui/default.conf
 if [ -e $legacy_webui_conf ]; then
