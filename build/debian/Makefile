@@ -35,14 +35,14 @@ shell:
 		-v $(abspath repository):/repository \
 		-v $(abspath extra:/extra-packages) \
 		-v $(abspath packages):/packages \
-		-v $(abspath secret/debian2023.key):/signkey:ro oxibuilder4bookworm
+		-v $(abspath secret/debian2025.key):/signkey:ro oxibuilder4bookworm
 repo:
 	docker run --rm -ti \
 		-v $(abspath ../../):/openxpki:ro \
 		-v $(abspath repository):/repository \
 		-v $(abspath extra:/extra-packages) \
 		-v $(abspath packages):/packages \
-		-v $(abspath secret/debian2023.key):/signkey:ro oxibuilder4bookworm repo
+		-v $(abspath secret/debian2025.key):/signkey:ro oxibuilder4bookworm repo
 
 .DEFAULT: packages
 	docker run --rm -ti \
