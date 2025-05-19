@@ -188,7 +188,7 @@ sub send_response ($self, $c, $response) {
         # the payload of the workflow
         my $data = $response->result->{data} || {};
 
-        $self->log->trace(Dumper $data);
+        $self->log->trace(Dumper $data) if $self->log->is_trace;
 
         my $payload;
         my $mime = $download->{mime} || 'application/octet-stream';
@@ -604,41 +604,15 @@ sub handle_rpc_request ($self) {
     die $self->new_response( 40480 => sprintf 'Configuration of RPC method "%s" must contain "workflow" entry', $self->operation )
       unless $conf->{workflow};
 
+    $self->log->trace("RPC workflow config: " . Dumper $conf)  if $self->log->is_trace;
+
     my $wf;
 
     #
     # Try pickup
     #
-    my $pickup_key = $conf->{pickup};
-    if ($pickup_key) {
-        try {
-            # pickup via workflow
-            if (my $wf_type = $conf->{pickup_workflow}) {
-                $wf = $self->pickup_via_workflow($wf_type, $pickup_key);
-
-            # pickup via datapool
-            } elsif (my $ns = $conf->{pickup_namespace}) {
-                $wf = $self->pickup_via_datapool($ns, $self->request_param($pickup_key));
-
-            # pickup via workflow attribute search
-            } else {
-                my $key = $conf->{pickup_attribute} || $pickup_key;
-                my $value = $self->request_param($pickup_key);
-                $wf = $self->pickup_via_attribute($conf->{workflow}, $key, $value);
-            }
-            # only if pickup was done at all and did not die
-            if ($wf) {
-                $self->check_workflow_error($wf);
-            }
-        }
-        catch ($error) {
-            if (blessed $error and $error->isa('OpenXPKI::Exception::WorkflowPickupFailed')) {
-                $self->log->debug('Workflow pickup failed');
-            }
-            else {
-                die $error;
-            }
-        }
+    if ($conf->{pickup}) {
+        $wf = $self->pickup_request($conf->{pickup}, $conf->{workflow});
     }
 
     # Endpoint has a "resume and execute" definition so run action if possible
@@ -687,7 +661,7 @@ sub handle_rpc_request ($self) {
     # ) if (not $pickup_key and $wf->{proc_state} ne 'finished');
 
     # Workflow paused - send "request pending" / ask client to retry
-    if ($pickup_key and $wf->{proc_state} ne 'finished') {
+    if ($conf->{pickup} and $wf->{proc_state} ne 'finished') {
         return $self->new_pending_response($wf);
 
     } else {
@@ -793,9 +767,19 @@ sub openapi_spec {
             my @out = $self->get_list_from_legacy_config([$method, 'output']);
             my $action = $conf->get([$method, 'execute_action']);
 
-            my $pickup_workflow = $conf->get([$method, 'pickup_workflow']);
-            my @pickup_input = $self->get_list_from_legacy_config([$method, 'pickup']);
+            # the structure for pickup has changed so we need some more glue code here
+            my $pickup_workflow;
+            my @pickup_input;
 
+            if ($self->has_legacy_config) {
+                $pickup_workflow = $conf->get([$method, 'pickup_workflow']);
+                @pickup_input = $self->get_list_from_legacy_config([$method, 'pickup']);
+            } else {
+                $pickup_workflow = $conf->get([$method, 'pickup', 'workflow']);
+                @pickup_input = $conf->get_list([$method, 'pickup', 'input']);
+            }
+
+            $self->log->debug("Fetch openapi-spec for $method / $wf_type");
             my $method_spec = $self->client_simple->run_command('get_rpc_openapi_spec', {
                 rpc_method => $method,
                 workflow => $wf_type,

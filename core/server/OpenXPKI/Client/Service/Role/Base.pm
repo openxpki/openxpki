@@ -889,43 +889,15 @@ sub handle_enrollment_request ($self) {
     #
     my $conf = {
         workflow => 'certificate_enroll',
-        pickup => 'pkcs10',
-        pickup_attribute => 'transaction_id',
         %{ $self->config->get_hash($self->operation) || {} },
     };
     $self->log->trace("Resulting pickup config: " . Dumper $conf) if $self->log->is_trace;
 
     my $pickup_failed;
-    my $workflow;
-    try {
-        # pickup via workflow
-        if (my $wf_type = $conf->{pickup_workflow}) {
-            $workflow = $self->pickup_via_workflow($wf_type, $conf->{pickup});
-
-        # pickup via datapool
-        } elsif (my $ns = $conf->{pickup_namespace}) {
-            $workflow = $self->pickup_via_datapool($ns, $self->wf_params->{transaction_id});
-
-        # pickup via workflow attribute search
-        } elsif (my $key = $conf->{pickup_attribute}) {
-            $workflow = $self->pickup_via_attribute($conf->{workflow}, $key, $self->wf_params->{transaction_id});
-        }
-        # only if pickup was done at all and did not die
-        if ($workflow) {
-            $self->check_workflow_error($workflow);
-        }
-    }
-    catch ($error) {
-        if (blessed $error and $error->isa('OpenXPKI::Exception::WorkflowPickupFailed')) {
-            $pickup_failed = 1;
-        }
-        else {
-            die $error;
-        }
-    }
+    my $workflow = $self->pickup_request($conf->{pickup}, $conf->{workflow});
 
     # exception if pickup failed and there is no PKCS#10 parameter
-    if ($pickup_failed and not $self->wf_params->{pkcs10}) {
+    if (not defined $workflow and not $self->wf_params->{pkcs10}) {
         $self->log->debug('Workflow pickup failed and no PKCS#10 given');
         die $self->new_response( 40005 );
     }
@@ -966,6 +938,112 @@ sub handle_enrollment_request ($self) {
     }
 }
 
+
+=head2 pickup_request
+
+Process pickup configuration and delegate to the pickup method.
+
+Runs C<pickup_via_workflow> if I<workflow> is set, requires I<input>,
+must be a list reference.
+
+Runs C<pickup_via_datapool> if I<namespace> is set, input parameter can
+be provided via I<input> (must be scalar), default is to use the same
+name as given to I<namespace>.
+
+If neither one is set, run C<pickup_via_attribute>, requires I<wf_type>
+given as second argument. Attribute key can be given via I<attribute>,
+defaults to I<transaction_id>. Input parameter can be provided via
+I<input> (must be scalar), default is to use the name given to I<attribute>.
+
+Support for old legacy configuration is builtin and triggered if the
+argument given in key I<pickup> is a string.
+
+B<Parameters>
+
+=over
+
+=item * C<pickup_config> I<HashRef> - pickup configuration
+
+=item * C<wf_type> I<Str> - workflow to pickup, required in attribute mode
+
+=back
+
+B<Returns> the workflow object if pickup was successfully handled or
+undef if pickup did not find a workflow to resume.
+
+=cut
+
+sub pickup_request ($self, $pickup_config, $wf_type) {
+
+    my $pickup_keys;
+    my $pickup_attribute;
+    my $pickup_workflow;
+    my $pickup_namespace;
+
+    if (ref $pickup_config eq 'HASH') {
+        $pickup_keys = $pickup_config->{input};
+        $pickup_workflow = $pickup_config->{workflow};
+        $pickup_namespace = $pickup_config->{namespace};
+        $pickup_attribute = $pickup_config->{attribute};
+    } elsif ($pickup_config) {
+        # Map from legacy config via config object
+        my $config = $self->config->get_hash($self->operation) || {};
+        $pickup_attribute = $config->{pickup_attribute};
+        $pickup_namespace = $config->{pickup_namespace};
+        $pickup_workflow  = $config->{pickup_workflow};
+        my @keys = split /\s*,\s*/, $pickup_config;
+        if (scalar @keys == 1) {
+            $pickup_keys = $keys[0];
+        } else {
+            $pickup_keys = \@keys;
+        }
+    }
+
+    my $wf_id;
+    # pickup via workflow - workflow and keys are required
+    if ($pickup_workflow) {
+        die "pickup input is mandatory in workflow mode" unless($pickup_keys);
+        die "pickup input must be list in workflow mode" unless(ref $pickup_keys eq 'ARRAY');
+        $wf_id = $self->pickup_via_workflow($pickup_workflow, $pickup_keys);
+
+    # pickup via datapool
+    } elsif ($pickup_namespace) {
+
+        # require keys to be scalar (undef is fine)
+        die "pickup input must be scalar in namespace mode" if (ref $pickup_keys);
+
+        # use namespace as parameter name as default
+        $pickup_keys ||= $pickup_namespace;
+
+        # run pickup
+        $wf_id = $self->pickup_via_datapool($pickup_namespace, $self->request_param($pickup_keys));
+
+    # pickup via workflow attribute search
+    } else {
+
+        # mandatory
+        $wf_type || die "pickup in attribute mode without main workflow";
+
+        # require keys to be scalar (undef is fine)
+        die "pickup input must be scalar in namespace mode" if (ref $pickup_keys);
+
+        # default attribute
+        $pickup_attribute ||= 'transaction_id';
+
+        # default use attribute also as parameter name
+        $pickup_keys ||= $pickup_attribute;
+
+        # run pickup
+        $wf_id = $self->pickup_via_attribute($wf_type, $pickup_attribute, $self->request_param($pickup_keys));
+    }
+    # only if pickup was done at all and did not die
+    if ($wf_id) {
+        $self->check_workflow_error($wf_id);
+    }
+    return $wf_id;
+
+}
+
 =head2 pickup_via_workflow
 
 Resume a workflow by retrieving its ID via a pickup workflow.
@@ -976,8 +1054,8 @@ B<Parameters>
 
 =item * C<$wf_type> I<Str> - Workflow type of the pickup workflow
 
-=item * C<$keys_str> I<Str> - Comma separated list of parameter names to read
-from C<$self-E<gt>wf_params> or the request parameters and pass to the pickup
+=item * C<$keys> I<ArrayRef> - list of parameter names to read from
+C<$self-E<gt>wf_params> or the request parameters and pass to the pickup
 workflow
 
 =back
@@ -988,21 +1066,22 @@ The I<HashRef> equals the item C<workflow> in the I<HashRef> returned by
 L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info>.
 
 =cut
-sub pickup_via_workflow ($self, $wf_type, $keys_str) {
+sub pickup_via_workflow ($self, $wf_type, $keys) {
     my $params;
-    my @keys = split /\s*,\s*/, $keys_str;
-    foreach my $key (@keys) {
+
+    foreach my $key ($keys->@*) {
         # take value from param hash if defined, this makes data
         # from the environment available to the pickup workflow
         my $val = $self->wf_params->{$key} // $self->request_param($key);
         $params->{$key} = $val if defined $val;
+        $self->log->trace(sprintf('pickup key %s is value %s', $key, $val // '<undef>'));
     }
 
     if (not scalar keys $params->%*) {
         $self->log->debug('Ignoring pickup via workflow: all pickup keys are empty');
         return;
     }
-    $self->log->debug(sprintf 'Pickup via workflow "%s" with keys: %s', $wf_type, join(',', @keys));
+    $self->log->debug(sprintf 'Pickup via workflow "%s" with keys: %s', $wf_type, join(',', $keys->@*));
 
     my $result = $self->run_workflow(
         type => $wf_type,
@@ -1090,10 +1169,11 @@ sub pickup_via_attribute ($self, $wf_type, $key, $value) {
     return $self->_pickup(@$wfl == 1 ? $wfl->[0]->{workflow_id} : undef);
 }
 
+
 sub _pickup ($self, $wf_id) {
     if (not $wf_id) {
         $self->log->trace("Cannot pick up workflow: query did not return workflow ID");
-        OpenXPKI::Exception::WorkflowPickupFailed->throw;
+        return undef;
     }
 
     if (ref $wf_id or $wf_id !~ m{\A\d+\z}) {

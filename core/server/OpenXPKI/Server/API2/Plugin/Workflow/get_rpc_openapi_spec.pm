@@ -164,7 +164,7 @@ command "get_rpc_openapi_spec" => {
                 },
             };
         # The resume action has no params so we need only the pickup params
-        } else {
+        } elsif ($pickup_input_schema) {
             $result->{input_schema} = {
                 $pickup_input_schema->%*,
                 title => "Pickup and Resume Workflow",
