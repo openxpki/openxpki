@@ -6,6 +6,7 @@ use FindBin qw( $Script );
 use Getopt::Long;
 use List::Util qw(none any);
 use Module::Metadata;
+use Mojo::Loader;
 use JSON::PP;
 use Term::ReadKey;
 
@@ -138,7 +139,16 @@ my %opt = ('verbose' => \$verbose);
 # pass_through: anything unknown, ambiguous or invalid will be passed through to @ARGV
 Getopt::Long::Configure('pass_through','bundling');
 
-GetOptions( \%opt, ('verbose|v+','json','json-pretty','auth-key|k=s','auth-config|c=s','pass|p:s','no-auth','help'));
+GetOptions( \%opt, ('verbose|v+','json','json-pretty','auth-key|k=s','auth-config|c=s','pass|p:s','no-auth','help','version|V'));
+
+if ($opt{version}) {
+    if (!Mojo::Loader::load_class('OpenXPKI::Enterprise::VERSION')) {
+        say "OpenXPKI Enterprise Edition v$OpenXPKI::Enterprise::VERSION::VERSION (core v$OpenXPKI::VERSION::VERSION)";
+    } else {
+        say "OpenXPKI Community Edition v$OpenXPKI::VERSION::VERSION";
+    }
+    exit 0;
+}
 
 Getopt::Long::Configure('no_pass_through');
 
