@@ -27,6 +27,8 @@ Returns the UI menu and page definitions (I<HashRef>)
 
 =item * pseudo role I<_logout> if the user is logged out.
 
+=back
+
 The definitions are read from config path C<realm.E<lt>REALME<gt>.uicontrol.E<lt>ROLEE<gt>>.
 
 Upgrades elements with the old syntax I<key> to I<page> and removes any items
