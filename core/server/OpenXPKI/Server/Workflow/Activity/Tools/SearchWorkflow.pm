@@ -47,7 +47,7 @@ sub execute {
 
     my $attr;
     if ($self->param('wf_creator')) {
-        $attr->{'creator'} = ~~ $self->param('wf_creator');
+        $attr->{'creator'} = scalar $self->param('wf_creator');
     }
 
     if (defined $self->param('tenant')) {
@@ -59,7 +59,7 @@ sub execute {
     foreach my $key ($self->param()) {
         ##! 16: 'Param key ' . $key
         next unless $key =~ /attr_(\w+)/;
-        $attr->{$1} = ~~ $self->param($key);
+        $attr->{$1} = scalar $self->param($key);
     }
 
     $query->{attribute} = $attr;

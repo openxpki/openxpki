@@ -84,7 +84,7 @@ sub action_result ($self) {
     my $attr = $self->build_attribute_subquery( $spec->{attributes} );
 
     if ($self->param('wf_creator')) {
-        $attr->{'creator'} = ~~$self->param('wf_creator');
+        $attr->{'creator'} = scalar $self->param('wf_creator');
     }
 
     if ($attr) {
