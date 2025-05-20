@@ -28,6 +28,7 @@ lives_ok {
     $api = OpenXPKI::TestCommands->new(
         log => Log::Log4perl->get_logger(),
         enable_acls => 0,
+        disable_protection => 1,
     );
 } "instantiate";
 
@@ -85,9 +86,8 @@ lives_ok {
     $api = OpenXPKI::TestCommands->new(
         log => Log::Log4perl->get_logger(),
         enable_acls => 0,
-        disable_protection => 0,
     );
-} "instantiate API in DOS Protected Mode";
+} "instantiate API in DOS Protected Mode :-)";
 
 lives_and {
     my $result = $api->dispatch(command => "givetheparams", params => { name => "Max", size => 5, level => 4 });
