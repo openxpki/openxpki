@@ -569,7 +569,7 @@ sub __get_extensions
         elsif ($name eq "issuer_alt_name")
         {
             my @issuers = @{$profile->get_extension("issuer_alt_name")};
-            if ((scalar(@issuers) == 1) && $issuers[0] == 'copy') {
+            if (scalar @issuers == 1 and $issuers[0] eq 'copy') {
                 push @config, "issuerAltName = ${critical}issuer:copy";
             } else {
                 # RFC allows same syntax as SAN here but we do not support this for now
