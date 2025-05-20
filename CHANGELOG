@@ -1,14 +1,23 @@
 Please list items to be added to the final release comment here
 
 New Features
-- openxpkictl can now start and stop server and client (and terminal processes in OpenXPKI Enterprise Edition)
-- Customizable logout menu (config node realm.<REALM>.uicontrol._logout.main)
-- Dark mode is now supported for the UI
+- new consolidated command line interface `oxi`
+- dedicated service layer for web client (obsoletes FCGI)
+- openxpkictl as entry point to manage all daemon processes
+- enhanced systemd interation (Runtime Directory / Non-Root startup)
+- customizable logout menu
+- dark mode is now supported for the UI
+- workflow condition classes for context related checks
 
 Upgrades, Improvements and Bugfixes
-- SELECT fields in workflows now support dependent fields (fields only shown if a specific option is selected)
-- Menu items can now include an icon
+- SELECT fields in workflows now support dependent fields
+- menu items can now include an icon (Bootstrap/Glyphs)
+- dedicated directories for log files from client and server
+- upgrade UI to Ember 6.2.1
 
 Removals, Deprecations, Breaking Changes
-- Config fallback from simplereenroll to simpleenroll in EST is deprecated and will be removed in next release
-- Environment variables OPENXPKI_PKI_REALM and OPENXPKI_AUTH_STACK to enforce realm/stack are no longer supported.
+- config fallback from simplereenroll to simpleenroll in EST was removed
+- setting realm and stack via is no longer supported
+- group and permission layout in systemd units changed
+- new YAML parser requires quoting of validity patterns
+- system configuration now requires "depend" settings
