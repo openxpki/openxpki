@@ -64,7 +64,7 @@ in the package selection menu, as this will speed up the installation later.
 To avoid an "untrusted package" warning, you should add our package signing key
 (you might need to install gpg before)::
 
-    wget https://packages.openxpki.org/v3/debian/Release.key -O - 2>/dev/null | \
+    wget https://packages.openxpki.org/v3/bookworm/Release.key -O - 2>/dev/null | \
     tee Release.key | gpg -o /usr/share/keyrings/openxpki.pgp --dearmor
 
 The https connection is protected by a Let's Encrypt certificate but

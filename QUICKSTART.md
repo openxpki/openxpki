@@ -30,7 +30,7 @@ We recommend starting with a minimal Debian install and selecting "SSH Server" a
 Add our package signing key:
 
 ```bash
-wget https://packages.openxpki.org/v3/debian/Release.key -O - 2>/dev/null | \
+wget https://packages.openxpki.org/v3/bookworm/Release.key -O - 2>/dev/null | \
 tee Release.key | gpg -o /usr/share/keyrings/openxpki.pgp --dearmor
 ```
 
