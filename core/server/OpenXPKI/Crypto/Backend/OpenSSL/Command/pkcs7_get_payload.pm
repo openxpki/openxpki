@@ -1,11 +1,7 @@
-use strict;
-use warnings;
-
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_get_payload;
+use OpenXPKI;
 
-use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
-
-use Data::Dumper;
+use parent qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 
 sub get_command
 {

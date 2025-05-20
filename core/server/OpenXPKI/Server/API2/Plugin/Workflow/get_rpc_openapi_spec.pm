@@ -12,7 +12,6 @@ use List::Util;
 
 # CPAN modules
 use JSON;
-use Type::Params qw( signature_for );
 
 # Project modules
 use OpenXPKI::i18n qw( i18nGettext );
@@ -20,11 +19,8 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Types;
 use OpenXPKI::Server::API2::Plugin::Workflow::Util;
 
-# should be done after imports to safely disable warnings in Perl < 5.36
-use experimental 'signatures';
-
 # Sources for "type" and "format" (subtype):
-#   OpenXPKI::Client::UI::Workflow->__render_fields()
+#   OpenXPKI::Client::Service::WebUI::Page::Workflow->__render_fields()
 #   https://openxpki.readthedocs.io/en/latest/reference/developer/webui.html?highlight=rawlist#formattet-strings-string-format
 
 our %FORMAT_MAP = (
@@ -168,7 +164,7 @@ command "get_rpc_openapi_spec" => {
                 },
             };
         # The resume action has no params so we need only the pickup params
-        } else {
+        } elsif ($pickup_input_schema) {
             $result->{input_schema} = {
                 $pickup_input_schema->%*,
                 title => "Pickup and Resume Workflow",

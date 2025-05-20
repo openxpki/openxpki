@@ -1,13 +1,8 @@
-# OpenXPKI::Server::Workflow::Observer::Log
-# Written by Alexander Klink and Martin Bartosch for the OpenXPKI project 2007
-# Copyright (c) 2007 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Observer::Log;
-
-use strict;
+use OpenXPKI;
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Debug;
+
 
 sub update {
 

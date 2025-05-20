@@ -1,6 +1,5 @@
 package OpenXPKI::Workflow::Handler;
-
-use Moose;
+use OpenXPKI -class;
 
 =head1 NAME
 
@@ -16,13 +15,9 @@ specify additional instances that should be created to the constructor.
 
 =cut
 
-use English;
-
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Workflow::Factory;
 use OpenXPKI::Workflow::Config;
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 
 
 has '_cache' => (

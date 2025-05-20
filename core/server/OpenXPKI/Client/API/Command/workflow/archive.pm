@@ -10,7 +10,7 @@ command_setup
 
 OpenXPKI::Client::API::Command::workflow::archive
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Trigger archivial of a workflow.
 

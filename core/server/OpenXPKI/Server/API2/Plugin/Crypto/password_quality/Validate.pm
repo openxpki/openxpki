@@ -1,5 +1,5 @@
 package OpenXPKI::Server::API2::Plugin::Crypto::password_quality::Validate;
-use Moose;
+use OpenXPKI qw( -class -typeconstraints );
 
 # Quite some code was borrowed from Data::Transpose::PasswordPolicy
 # (by Marco Pessotto) and Data::Password::Entropy (by Олег Алистратов)
@@ -10,10 +10,6 @@ use IO::Uncompress::Gunzip qw(gunzip $GunzipError);
 
 # CPAN modules
 use Moose::Meta::Class;
-use Moose::Util::TypeConstraints; # PLEASE NOTE: this enables all warnings via Moose::Exporter
-
-# Project modules
-use OpenXPKI::Debug;
 
 =head1 NAME
 

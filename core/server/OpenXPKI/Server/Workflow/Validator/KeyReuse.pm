@@ -1,15 +1,13 @@
 package OpenXPKI::Server::Workflow::Validator::KeyReuse;
+use OpenXPKI -class;
 
-use Moose;
 extends 'OpenXPKI::Server::Workflow::Validator';
 
-use English;
-
 use Workflow::Exception qw( validation_error );
-use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Debug;
 
+use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Crypt::PKCS10;
+
 
 sub _validate {
     my ( $self, $wf, $pkcs10 ) = @_;

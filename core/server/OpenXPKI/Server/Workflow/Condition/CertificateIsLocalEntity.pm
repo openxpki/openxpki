@@ -1,14 +1,11 @@
 package OpenXPKI::Server::Workflow::Condition::CertificateIsLocalEntity;
+use OpenXPKI;
 
-use strict;
-use warnings;
-use base qw( OpenXPKI::Server::Workflow::Condition );
+use parent qw( OpenXPKI::Server::Workflow::Condition );
+
 use Workflow::Exception qw( condition_error configuration_error );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Serialization::Simple;
-use OpenXPKI::Debug;
-use English;
-use OpenXPKI::Exception;
 
 
 sub _evaluate {

@@ -1,5 +1,6 @@
 package OpenXPKI::Test::QA::Role::Workflows::Instance;
-use Moose;
+use OpenXPKI -class;
+
 # Core modules
 use Test::More;
 use Test::Exception;

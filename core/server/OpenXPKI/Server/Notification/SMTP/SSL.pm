@@ -1,6 +1,6 @@
 package OpenXPKI::Server::Notification::SMTP::SSL;
+use OpenXPKI -class;
 
-use Moose;
 extends 'OpenXPKI::Server::Notification::SMTP';
 
 =head1 NAME
@@ -19,8 +19,6 @@ Same as for OpenXPKI::Server::Notification::SMTP
 
 =cut
 
-use English;
-use Data::Dumper;
 use Net::SMTP::SSL;
 
 sub _new_smtp {

@@ -1,5 +1,5 @@
 package OpenXPKI::Server::Bedroom;
-use Moose;
+use OpenXPKI -class;
 
 =head1 NAME
 
@@ -10,24 +10,15 @@ OpenXPKI::Server::Bedroom - Helper module to... err... make child processes
 
 =cut
 
-# Core modules
-use English;
-
 # CPAN modules
 use POSIX ();
 use IO::Handle;
 use Log::Log4perl;
-use Type::Params qw( signature_for );
 
 # Project modules
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
-# should be done after imports to safely disable warnings in Perl < 5.36
-use experimental 'signatures';
 
-#
 has old_sig_set => (
     is => 'rw',
     isa => 'POSIX::SigSet',

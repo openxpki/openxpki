@@ -1,15 +1,10 @@
-## OpenXPKI::Server::Workflow::Condition::NICE::IsCertificatePending.pm
-##
-## Written 2011 by Oliver Welter <openxpki@oliwel.de>
-## for the OpenXPKI project
-## (C) Copyright 2011 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Condition::NICE::IsCertificatePending;
+use OpenXPKI;
 
-use strict;
-use warnings;
-use base qw( Workflow::Condition );
+use parent qw( Workflow::Condition );
+
 use Workflow::Exception qw( condition_error configuration_error );
+
 
 sub evaluate {
 

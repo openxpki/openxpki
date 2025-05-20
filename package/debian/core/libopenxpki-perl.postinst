@@ -56,8 +56,7 @@ case "$1" in
             if [ -d /etc/apache2/sites-available/ ]; then
                 if [ ! -e /etc/apache2/sites-available/openxpki.conf ]; then
                     cp /usr/share/doc/libopenxpki-perl/examples/apache2-openxpki-site.conf /etc/apache2/sites-available/openxpki.conf
-                    /usr/sbin/a2enmod headers
-                    /usr/sbin/a2enmod rewrite
+                    /usr/sbin/a2enmod headers macro proxy proxy_http rewrite ssl
                     /usr/sbin/a2ensite openxpki
                 fi;
             fi;
@@ -74,17 +73,38 @@ case "$1" in
         # Apply chown to main folder
         chown -R openxpki:root /etc/openxpki/
 
-        # Fix directory permissions
-        # socket directory
-        chown openxpki:openxpki /var/openxpki
-        chmod 755 /var/openxpki
+        # If this is an existing install we create a symlink to the new socket
+        # location to not break things.
+        # Works only if the system is not running!
+        # Note that -e is false if symlink exists but linked file does not.
+        if [ -d /var/openxpki -a ! -e /var/openxpki/openxpki.socket -a ! -h /var/openxpki/openxpki.socket ]; then
+            ln -s /run/openxpkid/openxpkid.sock /var/openxpki/openxpki.socket
+        fi
 
-        # Log directory needs to be writable by the server and the apache
-        # apache creates the files with his primary group so we need
-        # the group to have write permission on the log directory
-        chown openxpki:www-data /var/log/openxpki
-        # to prevent apache from deleting the server log we add the sticky bit
-        chmod 1775 /var/log/openxpki
+        # Create the pkiadm user
+        COUNT=`grep '^pkiadm:' /etc/passwd | wc -l`;
+        if [ $COUNT -eq 0 ]; then
+            # Use useradd here as we need an additonal group
+            useradd --create-home -G openxpki pkiadm;
+
+            # In case somebody decided to change the home base
+            HOME=`grep pkiadm /etc/passwd | cut -d":" -f6`
+            chown pkiadm:openxpki $HOME
+            chmod 750 $HOME
+        fi;
+
+        # Create the sudo file to restart oxi from pkiadm
+        if [ ! -e /etc/sudoers.d/pkiadm ] && [ -d /etc/sudoers.d ]; then
+            echo "pkiadm ALL=(ALL) NOPASSWD:/usr/sbin/service openxpkid" > /etc/sudoers.d/pkiadm
+        fi;
+
+        # Logs for client (Mojolicious process)
+        chown openxpkiclient:pkiadm /var/log/openxpki-ui
+        chmod 750 /var/log/openxpki-ui
+
+        # Logs for backend process
+        chown openxpki:pkiadm /var/log/openxpki
+        chmod 750 /var/log/openxpki
 
         # create index.html as symlink to default.html
         test -e /var/www/openxpki/index.html || ln -s default.html /var/www/openxpki/index.html
@@ -103,24 +123,7 @@ case "$1" in
             cp /usr/share/doc/libopenxpki-perl/examples/logrotate.conf /etc/logrotate.d/openxpki
         fi;
 
-        # Create the pkiadm user
-        COUNT=`grep '^pkiadm:' /etc/passwd | wc -l`;
-        if [ $COUNT -eq 0 ]; then
-            # Use useradd here as we need an additonal group
-            useradd --create-home -G openxpki pkiadm;
-
-            # In case somebody decided to change the home base
-            HOME=`grep pkiadm /etc/passwd | cut -d":" -f6`
-            chown pkiadm:openxpki $HOME
-            chmod 750 $HOME
-        fi;
-
-        # Create the sudo file to restart oxi from pkiadm
-        if [ ! -e /etc/sudoers.d/pkiadm ] && [ -d /etc/sudoers.d ]; then
-            echo "pkiadm ALL=(ALL) NOPASSWD:service openxpkid" > /etc/sudoers.d/pkiadm
-        fi;
-
-        if [ -e "/var/openxpki/openxpki.socket" ]; then
+        if [ -e "/run/openxpkid/openxpkid.sock" ]; then
             echo "OpenXPKI seems to be running! You should restart it NOW to avoid any";
             echo "compatibility issues. You usually also need to restart the webserver"
             echo "process."

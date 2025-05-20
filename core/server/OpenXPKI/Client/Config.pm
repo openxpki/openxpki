@@ -96,11 +96,24 @@ construction, defaults to I</etc/openxpki> when not read from ENV
 
 # the service specific path
 has 'basepath' => (
-    required => 0,
     is => 'ro',
     isa => 'Str',
     lazy => 1,
     builder => '__init_basepath'
+);
+
+=head3 skip_log_init
+
+Set this to C<1> to skip initialization of L<Log4perl>. This is useful if the
+application e.g. runs in debug mode and a screen output has already been
+configured.
+
+=cut
+
+has 'skip_log_init' => (
+    is => 'ro',
+    isa => 'Str',
+    default => 0,
 );
 
 =head3 logger
@@ -118,7 +131,10 @@ has 'log' => (
     )] ),
     init_arg => undef,
     lazy => 1,
-    default => sub ($self) { OpenXPKI::Log4perl->get_logger($self->log_facility) },
+    default => sub ($self) {
+        OpenXPKI::Log4perl->set_default_facility($self->log_facility);
+        return OpenXPKI::Log4perl->get_logger();
+    },
 );
 
 =head3 logconf
@@ -131,7 +147,7 @@ expanded with the value of I<service>.
 
     [logger]
     log_level = WARN
-    filename  = /var/log/openxpki/%s.log
+    filename  = /var/log/openxpki-ui/%s.log
 
 =cut
 
@@ -141,9 +157,9 @@ has 'logconf' => (
     default => sub { return {
         recreate    => 1,
         recreate_check_interval => 120,
-        filename    => '/var/log/openxpki/%s.log',
+        filename    => '/var/log/openxpki-ui/%s.log',
         layout      => 'Log::Log4perl::Layout::PatternLayout',
-        'layout.ConversionPattern' => '%d %p{3} %m []%n',
+        'layout.ConversionPattern' => '%d %p{3} %m [MDC]%n',
         syswrite    => 1,
         utf8        => 1
     }}
@@ -208,7 +224,7 @@ has 'client' => (
     lazy => 1,
     predicate => "has_client",
     default => sub {
-        return OpenXPKI::Client->new( socketfile => '/var/openxpki/openxpki.socket' );
+        return OpenXPKI::Client->new();
     }
 );
 
@@ -257,9 +273,9 @@ sub BUILD {
     set_locale_prefix($config->{global}->{locale_directory}) if $config->{global}->{locale_directory};
     $self->language($config->{global}->{default_language}) if $config->{global}->{default_language};
 
-    $self->__init_log4perl;
+    $self->__init_log4perl unless $self->skip_log_init;
 
-    $self->log->debug(sprintf("Config for service '%s' loaded", $self->service));
+    $self->log->debug(sprintf("Configuration for service '%s' loaded", $self->service));
     $self->log->trace('Global config: ' . Dumper $config ) if $self->log->is_trace;
 
 }
@@ -388,7 +404,6 @@ sub endpoint_config {
         # non existing files and other errors are handled inside loader
         $config = $self->__load_config($endpoint);
         $self->_cache->set( $endpoint  => $config );
-        $self->log->debug('added config to cache ' . $endpoint);
     }
 
     $self->language($config->{global}->{default_language} || $self->default->{global}->{default_language} || '');
@@ -445,8 +460,8 @@ sub __load_config {
 sub __init_log4perl {
     my $self = shift;
 
-    # if no logger section was found we use the log settings from global
-    # if those are also missing this falls back to a SCREEN appender
+    # If no logger section was found we use the log settings from global.
+    # If those are also missing then init_or_fallback() falls back to screen output.
     return OpenXPKI::Log4perl->init_or_fallback( $self->default->{global}->{log_config} )
       unless $self->default->{logger};
 
@@ -464,13 +479,11 @@ sub __init_log4perl {
     $conf->{filename} = sprintf($conf->{filename}, $self->service);
 
     # add the MDC part to the conversion pattern in case it is not set (empty [] in string)
-    if ($conf->{'layout.ConversionPattern'} && $conf->{'layout.ConversionPattern'} =~ m{\[\]}) {
-        if ($self->service eq 'webui') {
-            $conf->{'layout.ConversionPattern'} =~ s{\[\]}{[pid=%P|sid=%X{sid}]};
-        } elsif($loglevel =~ m{DEBUG|TRACE}) {
-            $conf->{'layout.ConversionPattern'} =~ s{\[\]}{[pid=%P|%i]};
+    if ($conf->{'layout.ConversionPattern'}) {
+        if($loglevel =~ m{DEBUG|TRACE}) {
+            $conf->{'layout.ConversionPattern'} =~ s{\[MDC\]}{[%i{verbose}]}g;
         } else {
-            $conf->{'layout.ConversionPattern'} =~ s{\[\]}{[pid=%P|ep=%X{endpoint}]};
+            $conf->{'layout.ConversionPattern'} =~ s{\[MDC\]}{[%i]}g;
         }
     }
 

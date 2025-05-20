@@ -3,10 +3,11 @@ import { action } from "@ember/object"
 import { tracked } from '@glimmer/tracking'
 import { isArray } from '@ember/array'
 import { service } from '@ember/service'
-import { debug } from '@ember/debug'
+import { debug, warn } from '@ember/debug'
 import { scheduleOnce } from '@ember/runloop'
 import Field from 'openxpki/data/field'
 import ContainerButton from 'openxpki/data/container-button'
+import { next } from '@ember/runloop'
 
 /**
  * Draws a form.
@@ -21,15 +22,15 @@ import ContainerButton from 'openxpki/data/container-button'
  * @extends Component
  */
 export default class OxiSectionFormComponent extends Component {
-    @service('intl') intl;
-    @service('oxi-content') content;
-    @service router;
+    @service('intl') intl
+    @service('oxi-content') content
+    @service router
 
-    @tracked loading = false;
-    @tracked fields = [];
+    @tracked loading = false
+    @tracked fields = []
 
     clonableRefNames = new Set()
-    domElementsByFieldId = {};
+    domElementsByFieldId = {}
     dependants = {} // dependent fields by parent field name
 
     get buttons() {
@@ -56,34 +57,37 @@ export default class OxiSectionFormComponent extends Component {
     }
 
     hiddenFieldFilter(f) {
-        return f.type !== "hidden" && f.type !== "encrypted";
+        return f.type !== "hidden" && f.type !== "encrypted"
     }
 
     constructor() {
-        super(...arguments);
-        this.fields = this.#prepareFields(this.args.def.fields);
-        this.#updateCloneFields();
+        super(...arguments)
+        this.fields = this.#prepareFields(this.args.def.fields)
+        this.#updateCloneFields()
     }
 
     /**
-     * Convert an array of field definition hashes into an array of Field objects.
+     * Convert array of field definition hashes into an array of Field objects.
      * Create multiple cloned fields if multiple values are given.
-     * Properly set current key and value for input fields with dynamic (choosable)
-     * key.
+     * Properly set current key and value for input fields with dynamic
+     * (choosable) key (= name).
      */
     #prepareFields(fields) {
-        let result = [];
-        for (const fieldHash of fields) {
+        let result = []
+        for (let fieldHash of fields) {
+            // sanitize field "value" (before it's converted to a @tracked property of the Field object)
+            let refName = this.#sanitizeValue(fieldHash) // refName is only set for dynamic fields
+
             // convert hash into field
-            let field = Field.fromHash(fieldHash);
+            let field = Field.fromHash(fieldHash)
 
             // dynamic input fields will change the form field name depending on the
             // selected option, so we need an internal reference to the original name ("_refName")
-            field._refName = field.name;
+            field._refName = refName ?? field.name
 
             // standard fields
             if (! field.clonable) {
-                result.push(field);
+                result.push(field)
             }
             // clonable field
             else {
@@ -93,36 +97,43 @@ export default class OxiSectionFormComponent extends Component {
                 // process presets (array of key/value pairs): insert clones
                 // NOTE: this does NOT support dynamic input fields
                 if (isArray(field.value)) {
-                    let values = field.value.length ? field.value : [""];
+                    let values = field.value.length ? field.value : [""]
                     // add clones to field list
                     result.push(...values.map(v => {
-                        let clone = field.clone();
-                        clone.value = v;
-                        return clone;
-                    }));
+                        // use helper object to prevent repeated setting of @tracked "value" property
+                        let fragment = { name: field.name, value: v }
+                        this.#sanitizeValue(fragment)
+                        let clone = field.clone()
+                        clone.name = fragment.name
+                        clone.value = fragment.value
+                        return clone
+                    }))
                 }
                 else {
-                    result.push(field.clone());
+                    result.push(field.clone())
                 }
             }
         }
 
-        for (let field of result) {
-            if (field.value) {
-                // dynamic input fields: presets are key/value hashes.
-                // we need to convert `value: { key: NAME, value: VALUE }` to `name: NAME, value: VALUE`
-                if (typeof field.value === 'object' && field.value.key) {
-                    field.name = field.value.key;
-                    field.value = field.value.value;
-                }
-                // strip trailing newlines - esp. important for type "passwordverify"
-                if (typeof field.value === 'string') {
-                    field.value = field.value.replace(/\n*$/, "");
-                }
+        return result
+    }
+
+    #sanitizeValue(field) {
+        if (field.value) {
+            // dynamic input fields: presets are key/value hashes.
+            // we need to convert `value: { key: NAME, value: VALUE }` to `name: NAME, value: VALUE`
+            if (typeof field.value === 'object' && field.value.key) {
+                let refName = field.name
+                field.name = field.value.key
+                field.value = field.value.value
+                return refName
+            }
+            // strip trailing newlines - esp. important for type "passwordverify"
+            if (typeof field.value === 'string') {
+                field.value = field.value.replace(/\n*$/, "")
             }
         }
-
-        return result;
+        return null
     }
 
     // Create an array of Field objects for the currently active dependent fields.
@@ -154,7 +165,6 @@ export default class OxiSectionFormComponent extends Component {
     }
 
     #updateCloneFields() {
-        let deleteRefNames = []
         for (const name of Array.from(this.clonableRefNames)) { // use a copy so we can delete items in the loop
             let clones = this.fields.filter(f => f._refName === name)
 
@@ -178,15 +188,15 @@ export default class OxiSectionFormComponent extends Component {
     }
 
     get uniqueFieldNames() {
-        let result = [];
+        let result = []
         for (const field of this.fields) {
             if (result.indexOf(field.name) < 0) { result.push(field.name) }
         }
-        return result;
+        return result
     }
 
     get visibleFields() {
-        return this.fields.filter(this.hiddenFieldFilter);
+        return this.fields.filter(this.hiddenFieldFilter)
     }
 
     @action
@@ -230,25 +240,25 @@ export default class OxiSectionFormComponent extends Component {
         return this.#encodeFields({
             includeEmpty,
             fieldNames: this.uniqueFieldNames,
-        });
+        })
     }
 
     #encodeFields({ fieldNames, includeEmpty = false, renameMap = new Map() }) {
-        let result = new Map();
+        let result = new Map()
 
         for (const name of fieldNames) {
-            var newName = renameMap.has(name) ? renameMap.get(name) : name;
+            var newName = renameMap.has(name) ? renameMap.get(name) : name
 
             // send clonables as list (even if there's only one field) and other fields as plain values
             let potentialClones = this.fields.filter(f =>
                 f.name === name && (typeof f.value !== 'undefined') && (f.value !== "" || includeEmpty)
-            );
+            )
 
-            if (potentialClones.length === 0) continue; // there's not even one field to send
+            if (potentialClones.length === 0) continue // there's not even one field to send
 
             if (potentialClones[0].type == 'encrypted') {
                 // prefix triggers auto-decryption in the backend
-                newName = '_encrypted_jwt_' + newName;
+                newName = '_encrypted_jwt_' + newName
             }
 
             // encode ArrayBuffer as Base64 and change field name as a flag
@@ -271,11 +281,11 @@ export default class OxiSectionFormComponent extends Component {
                 ? potentialClones.map(c => encodeValue(c.value))    // array for clonable fields
                 : encodeValue(potentialClones[0].value)             // or plain value otherwise
             // setting 'result' must be separate step as encodeValue() modifies 'newName'
-            result.set(newName, value);
+            result.set(newName, value)
 
-            debug(`${name} = ${ potentialClones[0].clonable ? `[${value}]` : `"${value}"` }`);
+            debug(`${name} = ${ potentialClones[0].clonable ? `[${value}]` : `"${value}"` }`)
         }
-        return Object.fromEntries(result);
+        return Object.fromEntries(result)
     }
 
     /**
@@ -286,8 +296,12 @@ export default class OxiSectionFormComponent extends Component {
      */
     @action
     setFieldValue(field, value, skipValidityChecks = false) {
-        debug(`oxi-section/form (${this.args.def.action}): setFieldValue (${field.name}, value = "${value}", skipValidityChecks = ${skipValidityChecks})`);
-        field.value = value;
+        next(() => this.#setFieldValue(field, value, skipValidityChecks))
+    }
+
+    #setFieldValue(field, value, skipValidityChecks = false) {
+        debug(`oxi-section/form (${this.args.def.action}): setFieldValue (${field.name}, value = "${value}", skipValidityChecks = ${skipValidityChecks})`)
+        field.value = value
 
         if (!skipValidityChecks) {
             if (this.#checkFieldValidity(field) == false) return Promise.resolve()
@@ -306,14 +320,14 @@ export default class OxiSectionFormComponent extends Component {
         // action on change?
         if (!field.actionOnChange) return Promise.resolve()
 
-        debug(`oxi-section/form (${this.args.def.action}): executing actionOnChange ("${field.actionOnChange}")`);
+        debug(`oxi-section/form (${this.args.def.action}): executing actionOnChange ("${field.actionOnChange}")`)
         let request = {
             action: field.actionOnChange,
             _sourceField: field.name,
             ...this.#encodeAllFields({ includeEmpty: true }),
-        };
+        }
 
-        let fields = this.fields;
+        let fields = this.fields
 
         return this.content.requestUpdate(request)
         .then((doc) => {
@@ -321,14 +335,14 @@ export default class OxiSectionFormComponent extends Component {
             for (const newField of this.#prepareFields(doc.fields)) {
                 for (const oldField of fields) {
                     if (oldField.name === newField.name) {
-                        let idx = fields.indexOf(oldField);
-                        fields[idx] = newField;
+                        let idx = fields.indexOf(oldField)
+                        fields[idx] = newField
                     }
                 }
             }
-            this.fields = fields; // trigger refresh
-            return null;
-        });
+            this.fields = fields // trigger refresh
+            return null
+        })
     }
 
     // check validation regex
@@ -346,7 +360,7 @@ export default class OxiSectionFormComponent extends Component {
             }
             catch (err) {
                 /* eslint-disable-next-line no-console */
-                console.debug(`Invalid validation regex for field ${field.name}: ecma_match = ${field.ecma_match}.\n${err}`)
+                console.warn(`Invalid validation regex for field ${field.name}: ecma_match = ${field.ecma_match}.\n${err}`)
             }
         }
         this.setFieldError(field, null)
@@ -359,8 +373,8 @@ export default class OxiSectionFormComponent extends Component {
      */
     @action
     setFieldName(field, name) {
-        debug(`oxi-section/form (${this.args.def.action}): setFieldName (${field.name} -> ${name})`);
-        field.name = name;
+        debug(`oxi-section/form (${this.args.def.action}): setFieldName (${field.name} -> ${name})`)
+        field.name = name
     }
 
     /**
@@ -369,7 +383,7 @@ export default class OxiSectionFormComponent extends Component {
      */
     @action
     setFieldError(field, message, isServerError = false) {
-        debug(`oxi-section/form (${this.args.def.action}): setFieldError (${field.name}, message = ${message}, isServerError = ${isServerError})`);
+        debug(`oxi-section/form (${this.args.def.action}): setFieldError (${field.name}, message = ${message}, isServerError = ${isServerError})`)
 
         if (isServerError) {
             field._server_error = message
@@ -394,13 +408,13 @@ export default class OxiSectionFormComponent extends Component {
      */
     @action
     encodeFields(fieldNames, renameMap) {
-        debug(`oxi-section/form (${this.args.def.action}): encodeFields ()`);
+        debug(`oxi-section/form (${this.args.def.action}): encodeFields ()`)
 
-        return this.#encodeFields({ fieldNames, renameMap, includeEmpty: true });
+        return this.#encodeFields({ fieldNames, renameMap, includeEmpty: true })
     }
 
     get originalFieldCount() {
-        return this.args.def.fields.filter(this.hiddenFieldFilter).length;
+        return this.args.def.fields.filter(this.hiddenFieldFilter).length
     }
 
     /**
@@ -418,15 +432,15 @@ export default class OxiSectionFormComponent extends Component {
     registerField(field, element, takesInput) { // 'field' is injected in our template via (fn ...)
         if (!takesInput) return
 
-        this.domElementsByFieldId[field._id] = element;
+        this.domElementsByFieldId[field._id] = element
 
         /*
          * A) Focus for newly added clone fields
          */
         if (field._focusClone) {
-            element.focus();
-            field._focusClone = false;
-            return;
+            element.focus()
+            field._focusClone = false
+            return
         }
 
         /*
@@ -434,17 +448,17 @@ export default class OxiSectionFormComponent extends Component {
          */
         let meta = this.args.meta || {}
         let index = this.fields.findIndex(f => f === field)
-        this.content.registerFocusElement(meta.isPopup, true, element, meta.sectionNo, index);
+        this.content.registerFocusElement(meta.isPopup, true, element, meta.sectionNo, index)
     }
 
     @action
     async submit() {
-        debug(`oxi-section/form (${this.args.def.action}): submit`);
+        debug(`oxi-section/form (${this.args.def.action}): submit`)
 
         // check validity and gather form data
         for (const field of this.fields) {
             if (!field.is_optional && !field.value) {
-                this.setFieldError(field, this.intl.t('component.oxisection_form.missing_value'));
+                this.setFieldError(field, this.intl.t('component.oxisection_form.missing_value'))
                 return
             } else {
                 // previous server-side error (reset if user changes the input value)
@@ -457,30 +471,30 @@ export default class OxiSectionFormComponent extends Component {
         let request = {
             action: this.args.def.action,
             ...this.#encodeAllFields({ includeEmpty: false }),
-        };
+        }
 
         let res
         try {
-            this.loading = true;
+            this.loading = true
             res = await this.content.requestPage(request)
         }
         finally {
-            this.loading = false;
+            this.loading = false
         }
 
         // show field specific error messages if any
         if (res?.status?.field_errors !== undefined) {
             for (const faultyField of res.status.field_errors) {
-                debug(`oxi-section/form (${this.args.def.action}): server reports faulty field: ${faultyField.name}`);
-                let clones = this.fields.filter(f => f.name === faultyField.name);
+                warn(`oxi-section/form (${this.args.def.action}): server reports faulty field: ${faultyField.name}`, { id: 'oxi.oxi-section.form' })
+                let clones = this.fields.filter(f => f.name === faultyField.name)
                 // if no index given: mark all clones as faulty
                 if (typeof faultyField.index === "undefined") {
                     for (const clone of clones) {
-                        this.setFieldError(clone, faultyField.error, true);
+                        this.setFieldError(clone, faultyField.error, true)
                     }
                 // otherwise just pick the specified clone
                 } else {
-                    this.setFieldError(clones[faultyField.index], faultyField.error, true);
+                    this.setFieldError(clones[faultyField.index], faultyField.error, true)
                 }
             }
         }

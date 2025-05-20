@@ -53,19 +53,33 @@ command "render_subject_from_template" => {
     my $config = CTX('config');
 
     my $profile = $params->profile;
+    ##! 64: $profile
     my $vars    = $params->vars; $self->cleanup_for_tt($vars);
     ##! 64: $vars
     my $style;
     if ($params->has_style) {
         $style = $params->style;
+        OpenXPKI::Exception->throw(
+            message => 'Given profile/style does not exsit',
+            params  => {
+                PROFILE => $profile,
+                STYLE   => $style,
+            }
+        ) unless($config->exists(['profile', $profile, 'style', $style]));
     }
     else {
         my @styles = $config->get_keys("profile.$profile.style");
+        OpenXPKI::Exception->throw(
+            message => 'Given profile does not exsits or does not have any styles defined',
+            params  => {
+                PROFILE => $profile,
+            }
+        ) unless(@styles);
         $style = (sort @styles)[0];
         ##! 8: 'Autodetected style ' . $style
     }
 
-    my $dn_template = $config->get("profile.$profile.style.$style.subject.dn")
+    my $dn_template = $config->get(['profile', $profile, 'style', $style, 'subject', 'dn'])
         or OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_PROFILE_RENDER_SUBJECT_FROM_TEMPLATE_NO_DN_TEMPLATE',
             params  => {

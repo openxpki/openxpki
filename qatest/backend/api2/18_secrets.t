@@ -77,11 +77,11 @@ lives_and {
 # clear_secret
 lives_and {
     # 'clear_secret' calls clear_secret_group() which calls
-    # OpenXPKI::Control::reload() which wants to read
+    # OpenXPKI::Control::Server::cmd_reload() which wants to read
     # some (non-existing) config and kill the (non-running) server...
     no warnings 'redefine';
-    local *OpenXPKI::Control::reload = sub {
-        note "intercepted call to OpenXPKI::Control::reload()";
+    local *OpenXPKI::Control::Server::cmd_reload = sub {
+        note "intercepted call to OpenXPKI::Control::Server::cmd_reload()";
     };
 
     $oxitest->api2_command("clear_secret" => { secret => "mi-1" });

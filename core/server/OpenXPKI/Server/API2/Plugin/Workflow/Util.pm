@@ -1,24 +1,18 @@
 package OpenXPKI::Server::API2::Plugin::Workflow::Util;
-use Moose;
+use OpenXPKI -class;
 
-# Core modules
-use English;
+=head1 NAME
 
-# CPAN modules
-use Type::Params qw( signature_for );
+OpenXPKI::Server::API2::Plugin::Workflow::Util - Utility functions for workflow
+related API methods
+
+=cut
 
 # Project modules
 use OpenXPKI::Server;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Connector::WorkflowContext;
-use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
-
-# Feature::Compat::Try should be done last to safely disable warnings
-use Feature::Compat::Try;
-
-# should be done after imports to safely disable warnings in Perl < 5.36
-use experimental 'signatures';
 
 
 has factory => (
@@ -27,6 +21,8 @@ has factory => (
     lazy => 1,
     default => sub { CTX('workflow_factory')->get_factory },
 );
+
+=head1 METHODS
 
 =head2 validate_input_params
 

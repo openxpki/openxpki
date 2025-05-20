@@ -1,4 +1,7 @@
 package OpenXPKI::Template::Plugin::PKCS10;
+use OpenXPKI;
+
+use parent qw( Template::Plugin );
 
 =head1 OpenXPKI::Template::Plugin::PKCS10
 
@@ -23,15 +26,8 @@ Will result in
 
 =cut
 
-use strict;
-use warnings;
-use base qw( Template::Plugin );
-use Template::Plugin;
-
-use Data::Dumper;
 use OpenXPKI::Crypt::PKCS10;
 use OpenXPKI::Crypt::DN;
-use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
 

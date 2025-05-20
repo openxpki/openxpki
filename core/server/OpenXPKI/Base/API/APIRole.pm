@@ -10,8 +10,6 @@ plugins.
 
 # Core modules
 use Module::Load ();
-use File::Spec;
-use IO::Dir 1.03;
 use List::Util qw( any );
 
 # CPAN modules
@@ -21,6 +19,7 @@ use Moose::Util qw( does_role );
 use OpenXPKI::Server::Log;
 use OpenXPKI::Base::API::PluginRole;
 use OpenXPKI::Base::API::Autoloader;
+use OpenXPKI::Util;
 
 =head2 REQUIRED METHODS
 
@@ -45,7 +44,7 @@ Then to use it:
 
     my $api = OpenXPKI::Server::API2->new(
         acl_rule_accessor => sub { CTX('config')->get('acl.rules.' . CTX('session')->data->role ) },
-        log => OpenXPKI::Server::Log->new(CONFIG => '')->system,
+        log => OpenXPKI::Server::Log->new(use_current_config => 1)->system,
     );
     printf "Available commands in root namespace: %s\n", join(", ", keys $api->namespace_commands->%*);
 
@@ -122,9 +121,9 @@ has enable_acls => (
     default => 1,
 );
 
-=head2 enable_protection
+=head2 disable_protection
 
-Optional: set to TRUE to enable protection of commands.
+Optional: set to TRUE to disable protection of protected commands.
 
 Protected commands are defined via L<C<protected_command()>|OpenXPKI::Base::API::Plugin/protected_command>
 and must then be called by passing C<protected_call =E<gt> 1> to L</dispatch>.
@@ -134,7 +133,7 @@ Default: FALSE
 Can only be set via constructor.
 
 =cut
-has enable_protection => (
+has disable_protection => (
     is => 'ro',
     isa => 'Bool',
     default => 0,
@@ -234,7 +233,7 @@ sub _build_namespace_commands ($self) {
     my @modules = ();
     my $pkg_map = {};
     try {
-        $pkg_map = _list_modules($self->namespace."::");
+        $pkg_map = OpenXPKI::Util->list_modules($self->namespace.'::', 1);
     }
     catch ($err) {
         OpenXPKI::Exception->throw (
@@ -387,7 +386,7 @@ B<Named parameters>
 =item * C<params> - Parameter hash
 
 =item * C<protected_call> - Optional: must be set to TRUE to call a protected
-command while L</enable_protection> is TRUE
+command while L</disable_protection> is not TRUE
 
 =back
 
@@ -421,7 +420,7 @@ sub dispatch ($self, $arg) {
         );
 
     # Protected command?
-    if ($self->enable_protection and $package->meta->is_protected($command) and not $arg->protected_call) {
+    if (not $self->disable_protection and $package->meta->is_protected($command) and not $arg->protected_call) {
         OpenXPKI::Exception->throw(
             message => "Forbidden call to protected API command",
             params => { namespace => $rel_ns, command => $command, caller => sprintf("%s:%s", ($self->my_caller())[1,2]) }
@@ -466,7 +465,24 @@ sub dispatch ($self, $arg) {
     return $result;
 }
 
-# TODO - might be better part of the bootstrap process to have this cached?
+=head2 command_help
+
+Returns a nested I<HashRef>.
+
+The key I<protected> is boolean 0/1 and marks a protected command.
+
+The key I<arguments> holds a HashRef where keys are the argument names
+and value is a HasfRef describing the argument:
+
+  'foobar' => {
+    documentation => 'the optional foobar argument accepts a string',
+    required => 0,
+    type => 'Str'
+  }
+
+=cut
+# TODO Might be better part of the bootstrap process to have this cached?
+# TODO Add $namespace argument (default to '')
 signature_for command_help => (
     method => 1,
     positional => [
@@ -486,7 +502,15 @@ sub command_help ($self, $command) {
         })
     } $attributes->@*;
 
-    return \%arguments;
+    # error handling here is superfluous as also done in above call
+    my $package = $self->namespace_commands('')->{ $command }
+        or OpenXPKI::Exception->throw('Unknown API command: ' . $command);
+    my $is_protected = $package->meta->is_protected( $command )  ? 1 : 0;
+
+    return {
+        protected => $is_protected,
+        arguments => \%arguments,
+    };
 
 }
 
@@ -498,11 +522,12 @@ parameters of the given command.
 =cut
 signature_for get_command_attributes => (
     method => 1,
-    positional => [ 'Str', 'Str' ],
+    positional => [ 'Str|Undef', 'Str' ],
 );
 sub get_command_attributes ($self, $namespace, $command) {
     $namespace //= ''; # convert undef to empty string (= root namespace)
-    my $package = $self->namespace_commands($namespace)->{ $command };
+    my $package = $self->namespace_commands($namespace)->{ $command }
+        or OpenXPKI::Exception->throw('Unknown API command: ' . $command);
     my $meta = $package->meta;
 
     OpenXPKI::Exception->throw(
@@ -714,81 +739,6 @@ sub _get_acl_rules {
 
     $self->log->debug("ACL config: command '$command' not allowed") if $self->log->is_debug;
     return;
-}
-
-=head2 _list_modules
-
-Lists all modules below the given namespace.
-
-B<Parameters>
-
-=over
-
-=item * C<$namespace> - Perl namespace (e.g. C<OpenXPKI::Base::API::Plugin>)
-
-=back
-
-=cut
-# Taken from Module::List
-
-sub _list_modules {
-    my ($prefix) = @_;
-
-    my $root_rx = qr/[a-zA-Z_][0-9a-zA-Z_]*/;
-    my $notroot_rx = qr/[0-9a-zA-Z_]+/;
-
-    OpenXPKI::Exception->throw(message => "Bad module name given to _list_modules()", params => { prefix => $prefix })
-        unless (
-            $prefix =~ /\A(?:${root_rx}::(?:${notroot_rx}::)*)?\z/x
-            and $prefix !~ /(?:\A|[^:]::)\.\.?::/
-        );
-
-    my @prefixes = ($prefix);
-    my %seen_prefixes;
-    my %results;
-
-    while(@prefixes) {
-        my $prefix = pop(@prefixes);
-        my @dir_suffix = split(/::/, $prefix);
-        my $module_rx = $prefix eq "" ? $root_rx : $notroot_rx;
-        my $pmc_rx = qr/\A($module_rx)\.pmc\z/;
-        my $pm_rx = qr/\A($module_rx)\.pm\z/;
-        my $dir_rx = $prefix eq "" ? $root_rx : $notroot_rx;
-        $dir_rx = qr/\A$dir_rx\z/;
-        # Reverse @INC so that modules paths listed earlier win (by overwriting
-        # previously found modules in $results{...}.
-        # This is similar to Perl's behaviour when including modules.
-        for my $incdir (reverse @INC) {
-            my $dir = File::Spec->catdir($incdir, @dir_suffix);
-            my $dh = IO::Dir->new($dir) or next;
-            my @entries = $dh->read;
-            $dh->close;
-            # list modules
-            for my $pmish_rx ($pmc_rx, $pm_rx) {
-                for my $entry (@entries) {
-                    if($entry =~ $pmish_rx) {
-                        my $name = $prefix.$1;
-                        $results{$name} = File::Spec->catdir($dir, $entry);
-                    }
-                }
-            }
-            # recurse
-            for my $entry (@entries) {
-                my $dir = File::Spec->catdir($dir, $entry);
-                next unless (
-                    File::Spec->no_upwards($entry)
-                    and $entry =~ $dir_rx
-                    and -d $dir
-                );
-                my $newpfx = $prefix.$entry."::";
-                if (!exists($seen_prefixes{$newpfx})) {
-                    push @prefixes, $newpfx;
-                    $seen_prefixes{$newpfx} = undef;
-                }
-            }
-        }
-    }
-    return \%results;
 }
 
 =head1 ACLs

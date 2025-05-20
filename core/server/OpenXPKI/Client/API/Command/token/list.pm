@@ -10,7 +10,7 @@ command_setup
 
 OpenXPKI::Client::API::Command::token::list
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Show information about the active crypto tokens in a realm.
 

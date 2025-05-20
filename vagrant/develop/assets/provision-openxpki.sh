@@ -22,63 +22,16 @@ fi
 # Read our configuration and the one written by previous (DB) provisioning scripts
 while read def; do export $def; done < /etc/environment
 
-# STARTUP SCRIPT
-## Disabled because it expects mysql package and is not needed in dev env (?)
-## cp /code-repo/package/debian/core/libopenxpki-perl.openxpkid.init /etc/init.d/openxpkid
 
-# USERS AND GROUPS
+echo "Create users, directories and set up logrotate + log files"
 
-apache_user=www-data
-if $(grep -q apache /etc/passwd); then apache_user=apache; fi
+# create main users
+bash $OXI_SOURCE_DIR/package/debian/core/libopenxpki-perl.preinst install
 
-# openxpki
-if ! $(grep -q openxpki /etc/passwd); then
-    echo "System user 'openxpki'"
-    useradd  --system --no-create-home -U openxpki
-    # add apache user to openxpki group (to allow connecting the socket)
-    usermod -G openxpki $apache_user
-else
-    echo "System user 'openxpki' - already set up."
-fi
-
-# pkiadm
-# if ! $(grep -q pkiadm /etc/passwd); then
-#     echo "System user 'pkiadm'"
-#     adduser --quiet --system --disabled-password --group pkiadm
-#     usermod pkiadm -G openxpki
-#     # In case somebody decided to change the home base
-#     HOME=`grep pkiadm /etc/passwd | cut -d":" -f6`
-#     chown pkiadm:openxpki $HOME
-#     chmod 750 $HOME
-# else
-#     echo "System user 'pkiadm' - already set up."
-# fi
-
-# Create the sudo file to restart oxi from pkiadm
-if [ -d /etc/sudoers.d ]; then
-    echo "pkiadm ALL=(ALL) NOPASSWD:/etc/init.d/openxpki" > /etc/sudoers.d/pkiadm
-fi
-
-echo "Create directories and log files"
-
-# DIRECTORIES
 mkdir -p /etc/openxpki
-
-mkdir -p /var/openxpki/session
-chown -R openxpki:openxpki /var/openxpki
-
 mkdir -p /var/log/openxpki
-chown openxpki:openxpki /var/log/openxpki
-
+mkdir -p /var/log/openxpki-ui
 mkdir -p /var/www/openxpki
-chown $apache_user:$apache_user /var/www/openxpki
-
-# LOG FILES
-for f in webui acme certep cmc est rpc scep soap; do
-    touch /var/log/openxpki/${f}.log
-    chown $apache_user:openxpki /var/log/openxpki/${f}.log
-    chmod 660 /var/log/openxpki/${f}.log
-done
 
 # logrotate
 if [ -e /etc/logrotate.d/ ]; then
@@ -86,12 +39,43 @@ if [ -e /etc/logrotate.d/ ]; then
     cp $OXI_TEST_SAMPLECONFIG_DIR/contrib/logrotate.conf /etc/logrotate.d/openxpki
 fi
 
+# run dir
+mkdir -p /run/openxpkid
+chown -R openxpki:openxpki /run/openxpkid
+
+mkdir -p /run/openxpki-clientd
+chown -R openxpkiclient:openxpkiclient /run/openxpki-clientd
+
+# file based session
+mkdir -p /var/openxpki/session
+chown -R openxpki:openxpki /var/openxpki
+
+# webserver dir
+mkdir -p /var/www/openxpki
+chown www-data:www-data /var/www/openxpki
+
+# prevent libopenxpki-perl.postinst from complaining if run again
+test -L /var/openxpki/openxpki.socket && rm /var/openxpki/openxpki.socket
+
+# prevent libopenxpki-perl.postinst errors
+echo "" > /var/www/openxpki/localconfig.yaml
+echo "" > /var/www/openxpki/default.html
+
+# set directory permissions and create pkiadm user
+bash $OXI_SOURCE_DIR/package/debian/core/libopenxpki-perl.postinst configure
+
+# client log files
+for f in webui acme certep cmc est rpc scep soap; do
+    touch /var/log/openxpki-ui/${f}.log
+    chown openxpkiclient:pkiadm /var/log/openxpki-ui/${f}.log
+    chmod 660 /var/log/openxpki-ui/${f}.log
+done
+
 # Apache configuration
 if command -v apache2 >/dev/null; then
     echo "Configure Apache"
 
-    a2enmod cgid                                                      >$LOG 2>&1
-    a2enmod fcgid                                                     >$LOG 2>&1
+    a2enmod ssl cgid fcgid headers rewrite proxy proxy_http macro               >$LOG 2>&1
     # (Apache will be restarted by oxi-refresh)
 fi
 

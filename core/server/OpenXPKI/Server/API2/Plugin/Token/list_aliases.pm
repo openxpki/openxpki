@@ -8,8 +8,6 @@ OpenXPKI::Server::API2::Plugin::Token::list_aliases
 =cut
 
 # Project modules
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Types;
 
@@ -27,7 +25,6 @@ returned.
             identifier => '...', # certificate identifier
             notbefore => '...',  # certificate validity (UNIX epoch timestamp)
             notafter => '...',   # certificate validity (UNIX epoch timestamp)
-            status => '...',     # verbose status of the token: ONLINE, OFFLINE or UNKNOWN
         },
         {
             ...

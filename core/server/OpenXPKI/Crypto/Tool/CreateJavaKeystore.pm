@@ -1,17 +1,9 @@
-## OpenXPKI::Crypto::Tool::CreateJavaKeystore
-## Written 2006 by Alexander Klink for the OpenXPKI project
-## based on OpenXPKI::Crypto::Toolkit
-## (C) Copyright 2006 by The OpenXPKI Project
 package OpenXPKI::Crypto::Tool::CreateJavaKeystore;
-use base qw( OpenXPKI::Crypto::Toolkit );
+use OpenXPKI -class_std;
 
-use strict;
-use warnings;
-
-use Class::Std;
+use parent qw( OpenXPKI::Crypto::Toolkit );
 
 1;
-__END__
 
 =head1 Name
 

@@ -1,11 +1,7 @@
-## OpenXPKI::Crypto::Backend::OpenSSL::Command::decrypt_digest
-
-use strict;
-use warnings;
-
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::decrypt_digest;
+use OpenXPKI;
 
-use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
+use parent qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 
 sub get_command {
     my $self = shift;

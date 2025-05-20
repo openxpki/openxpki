@@ -134,18 +134,27 @@ export default [
                 },
                 {
                     type: "select",
-                    name: "select_preset",
-                    label: "Select, preset",
+                    name: "select_no_preset_no_placeholder",
+                    label: "Select, no preset, no placeholder",
                     options: [
                         { value: 1, label: "Major" },
                         { value: 2, label: "Tom" },
                     ],
-                    value: 1,
+                },
+                {
+                    type: "select",
+                    name: "select_preset",
+                    label: "Select, preset 'Tom'",
+                    options: [
+                        { value: 1, label: "Major" },
+                        { value: 2, label: "Tom" },
+                    ],
+                    value: 2,
                 },
                 {
                     type: "select",
                     name: "select_maybe",
-                    label: "Select, is_optional = 1",
+                    label: "Select, optional",
                     options: [
                         { value: 1, label: "Major" },
                         { value: 2, label: "Tom" },
@@ -165,12 +174,37 @@ export default [
                 },
                 {
                     type: "select",
+                    name: "select_maybe_editable",
+                    label: "Select, editable, optional",
+                    editable: 1,
+                    is_optional: 1,
+                    options: [
+                        { value: 1, label: "Major" },
+                        { value: 2, label: "Tom" },
+                    ],
+                },
+                {
+                    type: "select",
                     name: "select_2",
                     label: "Select, one choice",
                     options: [
                         { value: "11", label: "Ocean" },
                     ],
                     value: "",
+                },
+                {
+                    type: "select",
+                    name: "select_inline",
+                    label: "Inline select",
+                    inline: true,
+                    options: [
+                        { value: 1, label: "Apocalypse Peaks" },
+                        { value: 2, label: "Bishop's Itchington" },
+                        { value: 3, label: "Cape Disappointment" },
+                        { value: 4, label: "Port Circumcision" },
+                        { value: 5, label: "Eggs and Bacon Bay" },
+                        { value: 6, label: "Foulness Island" },
+                    ],
                 },
             ],
         }

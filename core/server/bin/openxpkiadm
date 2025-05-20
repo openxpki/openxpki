@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use English;
 use OpenXPKI::Debug;
-use OpenXPKI::Control;
 use Getopt::Long;
 use Pod::Usage;
 use Proc::SafeExec;
@@ -12,7 +11,7 @@ use POSIX ":sys_wait_h";
 use Errno;
 use File::Spec;
 use File::Basename;
-use YAML;
+use YAML::PP;
 use MIME::Base64;
 use Crypt::X509;
 use JSON; # early use of JSON avoids "Subroutine JSON::PP::Boolean::(++ redefined at /usr/share/perl/5.28/overload.pm line 48"
@@ -580,7 +579,7 @@ sub __alias_update {
         my $client = OpenXPKI::Client::Simple->new({
             config => {
                 realm => $insert_hash->{pki_realm},
-                socket => CTX('config')->get(['system','server','socket_file']),
+                socket => CTX('config')->get(['system','server','socket_file'])//'',
             },
             auth => { stack => '_System' },
         });
@@ -637,7 +636,7 @@ sub __alias_update {
             my $user = CTX('config')->get(['system','server','user']);
             my $uid = getpwnam($user) // die "$user not known\n"; # might be 0 in Docker so we need //, not ||
 
-            my $group = CTX('config')->get(['system','server','user']);
+            my $group = CTX('config')->get(['system','server','group']);
             my $gid = getgrnam($group) // die "$group not known\n";
             chown ($uid, $gid, $keyfile) || die "Unable to chown $keyfile to $uid/$gid\n";
             chmod oct("0400"), $keyfile || die "Unable to change mode on $keyfile\n";
@@ -903,7 +902,8 @@ sub __alias_print {
         return "  not set\n\n";
     }
 
-    my $cert = CTX('api2')->get_cert( identifier => $alias->{identifier}, format => 'DBINFO' );
+    my $cert;
+    $cert = CTX('api2')->get_cert( identifier => $alias->{identifier}, format => 'DBINFO' ) if ($alias->{identifier});
 
     my @out;
     push @out, "  Alias     : $alias->{alias}\n";
@@ -1705,7 +1705,7 @@ if ($cmd eq 'initdb') {
                 $hash = $hash->{$item};
             }
         }
-        print Dump $hash;
+        print YAML::PP->new->dump_string($hash);
     }
 
     if ($ret == 0) {

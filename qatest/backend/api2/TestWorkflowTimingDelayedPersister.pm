@@ -1,10 +1,9 @@
 package TestWorkflowTimingDelayedPersister;
-use strict;
-use warnings;
+use OpenXPKI;
+
+use parent qw( OpenXPKI::Server::Workflow::Persister::DBI );
 
 use OpenXPKI::Server::Context qw( CTX );
-
-use base qw( OpenXPKI::Server::Workflow::Persister::DBI );
 
 
 sub update_workflow {

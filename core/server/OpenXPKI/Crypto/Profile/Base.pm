@@ -1,6 +1,5 @@
 package OpenXPKI::Crypto::Profile::Base;
-use strict;
-use warnings;
+use OpenXPKI;
 
 =head1 NAME
 
@@ -14,7 +13,6 @@ Base class for profiles used in the CA.
 =cut
 
 # Core modules
-use English;
 use MIME::Base64;
 
 # CPAN modules
@@ -22,8 +20,6 @@ use DateTime;
 use Template;
 
 # Project modules
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Crypt::X509;
 use OpenXPKI::Server::Context qw( CTX );
 

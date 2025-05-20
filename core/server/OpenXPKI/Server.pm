@@ -15,7 +15,8 @@ use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Watchdog;
 use OpenXPKI::Server::Notification::Handler;
 use OpenXPKI::Util;
-use OpenXPKI::Control;
+use OpenXPKI::Control::Server;
+use OpenXPKI::Service::CLI;
 
 
 our $stop_soon = 0;
@@ -35,6 +36,7 @@ sub new {
     $self->{TYPE}   = $keys->{TYPE} // 'Fork';
     $self->{SILENT} = $keys->{SILENT};
     $self->{BACKGROUND} = ($keys->{NODETACH} ? 0 : 1);
+    $self->{CONFIG} = $keys->{CONFIG};
 
     ## group access is allowed
     $self->{umask} = 0007; # octal
@@ -49,7 +51,7 @@ sub start {
 
     $self->__init_server;
 
-    CTX('log')->system->info(sprintf("Server: %s", OpenXPKI::Control::get_version(config => CTX('config'))));
+    CTX('log')->system->info(sprintf("Server: %s", OpenXPKI::Control::Server->new->get_version(config => CTX('config'))));
     CTX('log')->system->info(sprintf("Perl: %s", $^V->normal));
     if (CTX('log')->system->is_debug) {
         CTX('log')->system->debug("Environment:");
@@ -155,10 +157,12 @@ sub post_bind_hook {
 
     # socket ownership defaults to daemon user/group...
     # ... but can be overwritten in the config file
+    # ... empty value means we where started as user already
     my $process_owner = $self->{PARAMS}->{process_owner};
     my $process_group = $self->{PARAMS}->{process_group};
-    my $socket_owner = $self->{PARAMS}->{socket_owner} // $process_owner;
-    my $socket_group = $self->{PARAMS}->{socket_group} // $process_group;
+    my $socket_owner = $self->{PARAMS}->{socket_owner} // $process_owner // -1;
+    my $socket_group = $self->{PARAMS}->{socket_group} // $process_group // -1;
+    my $socket_mode = $self->{PARAMS}->{socket_mode};
 
     if (($socket_owner != -1) || ($socket_group != -1)) {
         # try to change socket ownership
@@ -185,6 +189,12 @@ sub post_bind_hook {
                 },
             );
         }
+    }
+
+    # change mode of socket if requested
+    if ($socket_mode) {
+        CTX('log')->system()->debug("Setting permission on '$socketfile' to '$socket_mode'");
+        chmod (oct($socket_mode), $socketfile) || die "Unable to change mode to '$socket_mode' on socketfile $socketfile";
     }
 
     # change the owner of the pidfile to the daemon user
@@ -215,20 +225,28 @@ sub pre_loop_hook {
     # we are tricking Net::Server to believe that it should not change
     # owner and group of the process and do it ourselves shortly afterwards
 
+    # 2025-05: As it is possible to have a process running in mutliple groups
+    #   it is possible to get rid of all this extra code when we accept that
+    #   we can not set the socket_owner to a different user.
+    #   As this might something which can not be fixed easily in a customer
+    #   environment with the old CGI frontend we keep this solution for now
+    #   and add a deprecation warning
+
     ### drop privileges
     eval{
         # Set verbose process name
         OpenXPKI::Server::__set_process_name("server");
 
+        # can be empty if we are startet as non-root (via systemd)
         my $gid = $self->{PARAMS}->{process_group};
-        if ( $gid ne $EGID ){
+        if ( $gid && $gid ne $EGID ){
             $self->log(2, "Setting GID to '$gid'");
             CTX('log')->system->debug("Setting GID to '$gid'");
 
             set_gid( $gid );
         }
         my $uid = $self->{PARAMS}->{process_owner};
-        if ( $uid ne $EUID ){
+        if ( $uid && $uid ne $EUID ){
             $self->log(2, "Setting UID to '$uid'");
             CTX('log')->system->debug("Setting UID to '$uid'");
 
@@ -265,8 +283,8 @@ sub pre_loop_hook {
             my $agent = CTX('config')->get_hash(['system','metrics','agent']) // {};
             require OpenXPKI::Metrics::Prometheus; # this is EE code
             OpenXPKI::Metrics::Prometheus->start(
-                user  => $agent->{user}  // CTX('config')->get('system.server.user'),
-                group => $agent->{group} // CTX('config')->get('system.server.group'),
+                user  => $agent->{user}  // $EUID,
+                group => $agent->{group} // $EGID+0,
                 host  => $agent->{host}  // 'localhost',
                 port  => $agent->{port}  // 7070,
                 keep_parent_sigchld => $is_forking,
@@ -305,7 +323,7 @@ sub sig_term {
     }
     $stop_soon = 1;
     # terminate the watchdog
-    # This is obsolete for a "global shutdown" using the OpenXPKI::Control::stop
+    # This is obsolete for a "global shutdown" using the OpenXPKI::Control::Server->new->stop
     # method but should be kept in case somebody sends a term to the daemon which
     # will stop spawning of new childs but should allow existing ones to finish
     # FIXME - this will cause the watchdog to terminate if you kill a child,
@@ -317,7 +335,7 @@ sub sig_term {
 
 sub sig_hup {
     ##! 1: 'start'
-    my $pids = OpenXPKI::Control::get_pids();
+    my $pids = OpenXPKI::Control::Server->get_pids();
 
     CTX('log')->system()->info(sprintf "SIGHUP received - cleanup childs (%01d found)", scalar @{$pids->{worker}});
 
@@ -443,6 +461,15 @@ sub do_process_request {
     ##! 2: "service detector - deserializing data"
     my $data = $serializer->deserialize ($transport->read());
 
+    my $check_service_enabled = sub ($service_name) {
+        if (CTX('config')->get("system.server.service.$service_name.enabled")) {
+            return 1;
+        } else {
+            $transport->write($serializer->serialize("Service '$service_name' is not enabled.\n"));
+            $log->warn("Request to disabled service '$service_name'");
+            return;
+        }
+    };
     ##! 64: "service detector - received type: $data"
 
     # By the way, if you're adding support for a new service here,
@@ -451,24 +478,14 @@ sub do_process_request {
     my $service;
 
     if ($data eq "Default") {
+        $check_service_enabled->($data) or return;
         $service = OpenXPKI::Service::Default->new({
              TRANSPORT     => $transport,
              SERIALIZATION => $serializer,
         });
     }
-    elsif ($data eq 'SCEP') {
-        $service = OpenXPKI::Service::SCEP->new({
-            TRANSPORT     => $transport,
-            SERIALIZATION => $serializer,
-        });
-    }
-    elsif ($data eq 'LibSCEP') {
-        $service = OpenXPKI::Service::LibSCEP->new({
-            TRANSPORT     => $transport,
-            SERIALIZATION => $serializer,
-        });
-    }
     elsif ($data eq 'CLI') {
+        $check_service_enabled->($data) or return;
         my $idle_timeout = CTX('config')->get('system.server.service.CLI.idle_timeout');
         my $max_execution_time = CTX('config')->get('system.server.service.CLI.max_execution_time');
 
@@ -482,7 +499,7 @@ sub do_process_request {
     }
     else {
         $transport->write($serializer->serialize("OpenXPKI::Server: Unsupported service.\n"));
-        $log->fatal("Unsupported service.");
+        $log->fatal("Request to unsupported service '$data'");
         return;
     }
 
@@ -544,23 +561,6 @@ sub __init_net_server {
 
     eval {
         $self->{PARAMS} = $self->__get_server_config();
-
-        # Net::Server does not provide a hook that lets us change the
-        # ownership of the created socket properly: it chowns the socket
-        # file itself just before set_uid/set_gid. hence we make Net::Server
-        # believe that it does not have to set_uid/set_gid itself and do this
-        # a little later in the pre_loop_hook
-        # to make this work, delete the corresponding settings from the
-        # Net::Server init params
-        if (exists $self->{PARAMS}->{user}) {
-            $self->{PARAMS}->{process_owner} = $self->{PARAMS}->{user};
-            delete $self->{PARAMS}->{user};
-        }
-        if (exists $self->{PARAMS}->{group}) {
-            $self->{PARAMS}->{process_group} = $self->{PARAMS}->{group};
-            delete $self->{PARAMS}->{group};
-        }
-
         unlink ($self->{PARAMS}->{socketfile});
         CTX('log')->system()->info("Server initialization completed");
 
@@ -638,29 +638,30 @@ sub __init_user_interfaces {
 
 sub __get_server_config {
     my $self = shift;
-    my %params = ();
+    my %params = (
+        process_owner => $EUID,
+        # EGID is a list of ALL groups the user is in
+        # adding 0 triggers type conversion which keeps the first integer
+        process_group => $EGID+0,
+        proto => "unix"
+    );
 
     ##! 1: "start"
     my $config = CTX('config');
 
-    my $socketfile = $config->get('system.server.socket_file');
+    # User and Socket information is set via CONFIG
+    # socket_file and pid_file is mandatory
+    $params{pid_file}   = $self->{CONFIG}->{pid_file} || die "pid_file is mandatory for OpenXPKI::Server";
+    $params{socketfile} = $self->{CONFIG}->{socket_file} || die "socket_file is mandatory for OpenXPKI::Server";
+    $params{socket_mode} = $self->{CONFIG}->{socket_mode} if ($self->{CONFIG}->{socket_mode});
+    $params{port}       = $params{socketfile} . '|unix';
 
     # check if socket filename is too long
-    if (unpack_sockaddr_un(pack_sockaddr_un($socketfile)) ne $socketfile) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_CONFIG_SOCKETFILE_TOO_LONG",
-            params  => { SOCKETFILE => $socketfile },
-            log => {
-                message => "Socket file '$socketfile' path length exceeds system limits",
-                facility => 'system',
-                priority => 'fatal',
-            },
-        );
-    }
+    die "server socket_file exceeds system limits"
+        unless (unpack_sockaddr_un(pack_sockaddr_un($params{socketfile})) eq $params{socketfile});
 
-    $params{alias} = $config->get('system.server.name') || 'main';
-    $params{socketfile} = $socketfile;
-    $params{proto}      = "unix";
+    $params{alias} = CTX('config')->get(['system','server','name']) || 'main';
+
     if ($self->{TYPE} eq 'Simple') {
         $params{server_type} = 'Single';
     }
@@ -691,40 +692,24 @@ sub __get_server_config {
             },
         );
     }
-    $params{user}     = $config->get('system.server.user');
-    $params{group}    = $config->get('system.server.group');
-    $params{port}     = $socketfile . '|unix';
-    $params{pid_file} = $config->get('system.server.pid_file');
-
-    ## check daemon user
-    for my $param (qw( user group port pid_file )) {
-        unless ($params{$param}) {
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_SERVER_CONFIG_MISSING_PARAMETER",
-                params  => { "PARAMETER" => $param },
-                log => {
-                    message => "Missing server configuration parameter '$param'",
-                    facility => 'system',
-                    priority => 'fatal',
-                },
-            );
-        }
-    }
 
     try {
-        # resolve process owner, die on empty user/group
-        (undef, $params{user}, undef, $params{group})
-          = OpenXPKI::Util->resolve_user_group($params{user}, $params{group}, 'server process');
+        # resolve process owner, empty is ok as values are preset from EUID/EGID
+        my (undef, $process_uid, undef, $process_gid)
+          = OpenXPKI::Util->resolve_user_group($self->{CONFIG}->{user}//'', $self->{CONFIG}->{group}//'', 'server process', 1);
 
-        # check if we have different ownership settings for the socket
-        my $socket_owner = $config->get('system.server.socket_owner');
-        my $socket_group = $config->get('system.server.socket_group');
+        $params{process_owner} = $process_uid if defined $process_uid;
+        $params{process_group} = $process_gid if defined $process_gid;
 
         # resolve socket owner, allow and pass through empty user/group
         my (undef, $socket_uid, undef, $socket_gid)
-          = OpenXPKI::Util->resolve_user_group($socket_owner, $socket_group, 'socket', 1);
+          = OpenXPKI::Util->resolve_user_group($self->{CONFIG}->{socket_owner}//'', $self->{CONFIG}->{socket_group}//'', 'socket', 1);
 
-        $params{socket_owner} = $socket_uid if defined $socket_uid;
+        if (defined $socket_uid) {
+            warn "using socket_owner is deprecated and will be removed in next relase\n".
+                "please use socket_group instead!\n";
+            $params{socket_owner} = $socket_uid ;
+        }
         $params{socket_group} = $socket_gid if defined $socket_gid;
     }
     catch ($err) {
@@ -833,6 +818,8 @@ Constructor. Parameters to configure the server:
 =item * SILENT - (I<Bool>) silent startup with start-stop-daemons during System V init
 
 =item * NODETACH - (I<Bool>) run the parent process in foreground (i.e. no daemon)
+
+=item * CONFIG - (I<HashRef>) user/group and socket related settings
 
 =back
 

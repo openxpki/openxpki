@@ -1,19 +1,19 @@
 import Route from '@ember/routing/route';
-import { action } from '@ember/object';
 /*
+import { action } from '@ember/object';
 import { on } from '@ember/object/evented';
 import { debug } from '@ember/debug';
 */
 
 export default class ApplicationRoute extends Route {
+/*
     // fired when attempting to transition into a route and any of the hooks
     // returns a promise that rejects
     @action
-    error(error /*, transition*/) {
-        /* eslint-disable-next-line no-console */
-        console.error(error);
+    error(error, transition) {
+        console.error(error); // eslint-disable-line no-console
     }
-/*
+
     // triggered when the router enters the route
     @on('activate', function() {
         debug("Application route - event 'activate'");

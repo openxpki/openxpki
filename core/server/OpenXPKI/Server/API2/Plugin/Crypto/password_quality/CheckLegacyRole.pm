@@ -1,4 +1,12 @@
 package OpenXPKI::Server::API2::Plugin::Crypto::password_quality::CheckLegacyRole;
+use OpenXPKI -role;
+
+requires 'register_check';
+requires 'password';
+requires 'enable';
+requires 'disable';
+requires '_known_sequences';
+requires '_check_dict';
 
 =head1 NAME
 
@@ -18,20 +26,6 @@ For more information about the checks see
 L<OpenXPKI::Server::API2::Plugin::Crypto::password_quality>.
 
 =cut
-
-use Moose::Role;
-
-# Project modules
-use OpenXPKI::Debug;
-
-
-requires 'register_check';
-requires 'password';
-requires 'enable';
-requires 'disable';
-requires '_known_sequences';
-requires '_check_dict';
-
 
 has sequence_len => (
     is => 'rw',

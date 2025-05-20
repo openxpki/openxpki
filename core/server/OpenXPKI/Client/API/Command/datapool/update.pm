@@ -10,7 +10,7 @@ command_setup
 
 OpenXPKI::Client::API::Command::datapool::update
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Update the value and/or expiration date of a datapool item
 

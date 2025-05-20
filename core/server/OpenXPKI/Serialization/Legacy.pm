@@ -1,16 +1,11 @@
-use strict;
-use warnings;
+package OpenXPKI::Serialization::Legacy;
+use OpenXPKI;
 
 use JSON;
-use Encode;
-
-package OpenXPKI::Serialization::Legacy;
 
 use OpenXPKI::VERSION;
 our $VERSION = $OpenXPKI::VERSION::VERSION;
 
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use MIME::Base64;
 
 sub new {

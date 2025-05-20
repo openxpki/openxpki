@@ -1,13 +1,7 @@
 package OpenXPKI::Server::NICE::Factory;
-
-use strict;
-use warnings;
-use English;
+use OpenXPKI;
 
 use Module::Load();
-
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Serialization::Simple;

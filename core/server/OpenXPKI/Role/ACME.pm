@@ -1,10 +1,8 @@
 package OpenXPKI::Role::ACME;
-
-use Moose::Role;
+use OpenXPKI -role;
 
 use Crypt::PK::RSA;
 use Crypt::PK::ECC;
-use Data::Dumper;
 
 =head1 Attributes
 

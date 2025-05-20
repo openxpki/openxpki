@@ -1,11 +1,7 @@
-## OpenXPKI::Crypto::Backend::OpenSSL::Command::create_params
-
-use strict;
-use warnings;
-
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::create_params;
+use OpenXPKI;
 
-use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
+use parent qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 
 sub get_command
 {

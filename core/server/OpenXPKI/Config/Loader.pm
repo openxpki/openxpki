@@ -1,6 +1,6 @@
 package OpenXPKI::Config::Loader;
+use OpenXPKI -class;
 
-use Moose;
 extends 'Connector::Builtin::Memory';
 
 use Storable qw(freeze thaw);

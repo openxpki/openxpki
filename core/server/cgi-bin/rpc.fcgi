@@ -114,14 +114,14 @@ while (my $cgi = CGI::Fast->new("")) {
     }
     catch ($error) {
         $log->error($error);
-        send_output($cgi, OpenXPKI::Client::Service::Response->new_error(50007), 0);
+        send_output($cgi, OpenXPKI::Client::Service::Response->new( 50007 ), 0);
         next;
     }
 
     my $client = OpenXPKI::Client::Service::RPC->new(
         service_name => 'rpc',
         config_obj => $config,
-        apache_env => \%ENV,
+        webserver_env => \%ENV,
         remote_address => $ENV{REMOTE_ADDR},
         request => $req,
         endpoint => $endpoint,
@@ -136,7 +136,7 @@ while (my $cgi = CGI::Fast->new("")) {
 
         # special handling for requests for OpenAPI (Swagger) spec
         if ($client->operation eq 'openapi-spec') {
-            my $url = $client->request->url->to_abs;
+            my $url = $client->request_url;
             my $baseurl = sprintf "%s://%s%s", $url->protocol, $url->host_port, $url->path->to_abs_string;
             my $spec = $client->openapi_spec($baseurl) or die $client->new_response( 50082 );
             $openapi_mode = 1;
@@ -171,7 +171,7 @@ The basic configuration in default.conf must contain log and auth info:
   [global]
   log_config = /etc/openxpki/rpc/log.conf
   log_facility = client.rpc
-  socket = /var/openxpki/openxpki.socket
+  socket = /run/openxpkid/openxpkid.sock
 
   [auth]
   stack = _System

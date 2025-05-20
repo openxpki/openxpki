@@ -1,10 +1,9 @@
 package OpenXPKI::Server::Workflow::Activity::NICE::CallMethod;
+use OpenXPKI;
 
-use strict;
-use base qw( OpenXPKI::Server::Workflow::Activity );
+use parent qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Debug;
 
 use OpenXPKI::Server::NICE::Factory;
 

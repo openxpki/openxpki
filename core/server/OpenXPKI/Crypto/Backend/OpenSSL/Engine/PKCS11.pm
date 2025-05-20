@@ -1,15 +1,8 @@
-## OpenXPKI::Crypto::Backend::OpenSSL::Engine::PKCS11
-## Copyright (C) 2003-2007 Michael Bell
-
-use strict;
-use warnings;
-
 package OpenXPKI::Crypto::Backend::OpenSSL::Engine::PKCS11;
+use OpenXPKI;
 
-use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Engine);
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
-use English;
+use parent qw(OpenXPKI::Crypto::Backend::OpenSSL::Engine);
+
 use OpenXPKI::Server::Context qw( CTX );
 
 

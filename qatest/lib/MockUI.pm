@@ -1,14 +1,15 @@
 package MockUI;
+use OpenXPKI -class;
 
-use Moose;
 use namespace::autoclean;
 
-extends 'OpenXPKI::Client::UI';
+extends 'OpenXPKI::Client::Service::WebUI';
 
 use JSON;
-use CGIMock;
 use CGI::Session;
-use OpenXPKI::Client::UI::Request;
+
+use OpenXPKI::Client::Service::WebUI::Request;
+use CGIMock;
 
 
 has cgi => (
@@ -76,13 +77,13 @@ sub __request {
     open(STDOUT, '>', \$out);
 
     my $result = $self->handle_request(
-        OpenXPKI::Client::UI::Request->new(
-            cgi => $self->cgi,
+        OpenXPKI::Client::Service::WebUI::Request->new(
+            mojo_request => ???
             session => $self->session,
             log => $self->log,
         )
     );
-    $result->render;
+    $result->render; <---- !!
     my $json = $self->json->decode($out);
 
     if (ref $json->{main} and my $fields = $json->{main}->[0]->{content}->{fields}) {
@@ -110,7 +111,7 @@ sub factory {
     my $client = MockUI->new({
         session => $session,
         logger => $log,
-        config => { socket => '/var/openxpki/openxpki.socket' }
+        config => { socket => $OpenXPKI::Defaults::SERVER_SOCKET }
     });
 
     $client->update_rtoken();

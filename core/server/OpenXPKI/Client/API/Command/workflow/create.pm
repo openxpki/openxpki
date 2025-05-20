@@ -10,7 +10,7 @@ command_setup
 
 OpenXPKI::Client::API::Command::workflow::create
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Initiate a new workflow
 

@@ -11,7 +11,7 @@ command_setup
 
 OpenXPKI::Client::API::Command::alias::update
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Update an existing alias entry
 

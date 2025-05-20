@@ -85,7 +85,7 @@ lives_ok {
     $api = OpenXPKI::TestCommands->new(
         log => Log::Log4perl->get_logger(),
         enable_acls => 0,
-        enable_protection => 1,
+        disable_protection => 0,
     );
 } "instantiate API in DOS Protected Mode";
 

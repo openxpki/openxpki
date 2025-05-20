@@ -1,14 +1,10 @@
 package OpenXPKI::Server::NICE::Role::KeyGenerationLocal;
+use OpenXPKI -role;
 
-use English;
 use MIME::Base64;
 
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Crypt::PubKey;
 use OpenXPKI::Server::Context qw( CTX );
-
-use Moose::Role;
 
 =head1 NAME
 

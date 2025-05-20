@@ -1,16 +1,11 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::PublishCRL;
+use OpenXPKI qw( -class -nonmoose );
 
-use Moose;
-use MooseX::NonMoose;
 extends qw( OpenXPKI::Server::Workflow::Activity );
 with qw( OpenXPKI::Server::Workflow::Role::Publish );
 
-use English;
-
 use MIME::Base64;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use OpenXPKI::Crypt::X509;
 use Workflow::Exception qw(configuration_error workflow_error);
 
@@ -123,7 +118,7 @@ sub execute {
     }
 
     if (!defined $data->{der} || $data->{der} eq '') {
-        workflow_error('Failed to convert CRL to DER');        
+        workflow_error('Failed to convert CRL to DER');
     }
 
     my $x509_issuer = OpenXPKI::Crypt::X509->new( $certificate->{data} );
@@ -131,12 +126,12 @@ sub execute {
     $data->{issuer} = $x509_issuer->subject_hash();
     $data->{subject} = $x509_issuer->get_subject();
     $data->{subject_key_identifier} = $x509_issuer->get_subject_key_id();
-            
+
     my $failed = $self->__walk_targets( $prefix, $target, $data->{issuer}{CN}[0], $data, {} );
-    
+
     # pause stops execution of the remaining code
     $self->pause('I18N_OPENXPKI_UI_ERROR_DURING_PUBLICATION') if ($failed);
-     
+
     # Set the publication date in the database, only if not set already
     if (!$crl->{publication_date}) {
         $dbi->update(

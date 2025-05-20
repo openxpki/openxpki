@@ -10,7 +10,7 @@ command_setup
 
 OpenXPKI::Client::API::Command::workflow::execute
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Run action on an existing workflow instance
 

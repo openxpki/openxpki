@@ -13,7 +13,7 @@ OpenXPKI::Client::API::PluginMetaClassTrait - Moose metaclass role (aka.
 
 B<Not intended for direct use> - this is part of the internal API magic.
 
-=METHODS
+=head1 METHODS
 
 =head2 set_command_behaviour
 
@@ -54,7 +54,7 @@ sub set_command_behaviour ($self, $arg) {
         $self->add_default_attribute_spec(
             realm => {
                 isa => 'Str', required => 1,
-                label => 'PKI Realm', description => 'Name of the realm to operate this command on',
+                label => 'PKI Realm', description => 'Name of the realm to operate this command on. Also used for authentication when not in operator mode.',
                 hint => 'hint_realm',
             }
         );

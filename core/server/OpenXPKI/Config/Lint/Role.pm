@@ -1,5 +1,5 @@
 package OpenXPKI::Config::Lint::Role;
-use Moose::Role;
+use OpenXPKI -role;
 
 requires 'lint';
 

@@ -1,9 +1,8 @@
 package OpenXPKI::Connector::Secret;
+use OpenXPKI -class;
 
-use Moose;
 extends 'Connector';
 
-use English;
 use OpenXPKI::Server::Context qw( CTX );
 
 

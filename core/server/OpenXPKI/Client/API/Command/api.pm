@@ -5,13 +5,9 @@ use OpenXPKI -role;
 
 OpenXPKI::CLI::Command::api
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
-Run commands of the OpenXPKI API
-
-=head1 USAGE
-
-Feed me!
+Run API commands.
 
 =cut
 

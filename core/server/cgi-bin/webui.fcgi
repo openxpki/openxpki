@@ -1,4 +1,5 @@
 #!/usr/bin/perl -w
+use OpenXPKI;
 
 # If you are unable to run under FastCGI, you can use this script unmodified
 # as long as you have the FastCGI perl module installed. If you do not have
@@ -6,39 +7,27 @@
 # the use CGI::Fast from the modules list.
 # In either case, you might need to change the extension of the scripturl in
 # the webui config file.
-use strict;
-use warnings;
-use English;
 
 # Core modules
-use Data::Dumper;
 use MIME::Base64 qw( encode_base64 decode_base64 );
-use Digest::SHA;
-use Scalar::Util qw( blessed );
 use Encode;
 
 # CPAN modules
 use CGI 4.08;
 use CGI::Fast;
-use CGI::Session;
 use JSON;
 use Config::Std;
 use Log::Log4perl::MDC;
-use Crypt::CBC;
-use Crypt::JWT qw( decode_jwt );
+use Mojolicious::Controller;
 
 # Project modules
 use OpenXPKI::Log4perl;
 use OpenXPKI::i18n qw( i18nGettext i18nTokenizer set_language set_locale_prefix);
 use OpenXPKI::Client;
 use OpenXPKI::Client::Config;
-use OpenXPKI::Client::UI;
-use OpenXPKI::Client::UI::Request;
-use OpenXPKI::Client::UI::Response;
-use OpenXPKI::Client::UI::SessionCookie;
-
-# Feature::Compat::Try should be done last to safely disable warnings
-use Feature::Compat::Try;
+use OpenXPKI::Client::Service::Response;
+use OpenXPKI::Client::Service::WebUI;
+use OpenXPKI::Client::Service::WebUI::Session;
 
 
 my $conf;
@@ -49,368 +38,243 @@ my @header_tpl;
 # switching sessions in backend to prevent users from getting wrong sessions!
 my $backend_client;
 
+my $config;
 
-sub __load_config {
+=head2 send_response_fcgi
 
-    my $cgi = shift;
+Renders the HTTP response via FCGI.
 
-    my $config = OpenXPKI::Client::Config->new('webui');
-    $log = $config->log();
-    # do NOT call config here as webui does not
-    # use the URI based  endpoint logic yet
-    $conf = $config->default();
+=cut
 
-    $log->info("Config read, FCGI pid = $$");
-    $log->trace(Dumper $conf) if $log->is_trace;
+# TODO Remove CGI legacy send_response_fcgi()
+sub send_response ($cgi, $ui, $response) {
 
-    # set defaults
-    $conf->{global}->{socket} ||= '/var/openxpki/openxpki.socket';
-    $conf->{global}->{scripturl} ||= '/cgi-bin/webui.fcgi';
+    my $status = '200 OK';
 
-    foreach my $key (keys %{$conf->{header}}) {
-        my $val = $conf->{header}->{$key};
-        $key =~ s/-/_/g;
-        push @header_tpl, ("-$key", $val);
-    }
+    if ($response->has_error) {
+        $status = $response->http_status_line;
+        chomp $status;
 
-    # legacy config compatibility
-    if ($conf->{global}->{session_path} || defined $conf->{global}->{ip_match} || $conf->{global}->{session_timeout}) {
-        if ($conf->{session}) {
-            $log->error('Session parameters found both in [global] and [session] - ignoring [global]');
+        if ($ui->request->headers->header('X-OPENXPKI-Client')) {
+            print $cgi->header( -type => 'application/json', charset => 'utf8', -status => $status );
+            print encode_json({
+                status => {
+                    level => 'error',
+                    message => $response->error_message,
+                }
+            });
         } else {
-            $log->warn('Session parameters in [global] are deprecated, please use [session]');
-            $conf->{session} = {
-                'ip_match' => $conf->{global}->{ip_match} || 0,
-                'timeout' => $conf->{global}->{session_timeout} || undef,
-            };
-            $conf->{session_driver} = { Directory => ( $conf->{global}->{session_path} || '/tmp') };
-        }
-    }
-
-    if ($conf->{session}->{ip_match}) {
-       $CGI::Session::IP_MATCH = 1;
-    }
-
-    if (($conf->{session}->{driver}//'') eq 'openxpki') {
-        warn "Builtin session driver is deprecated and will be removed with next release!";
-        $log->warn("Builtin session driver is deprecated and will be removed with next release!");
-    }
-
-    return 1;
-}
-
-sub __handle_error {
-
-    my $cgi = shift;
-    my $error = shift;
-
-    # only echo UI error messages to prevent data leakage
-    if (!$error || $error !~ /I18N_OPENXPKI_UI/) {
-        my $msg = $error || '__handle_error() was called with undef';
-        if ($log) { $log->error($msg) } else { warn "$error\n" }
-        $error = i18nGettext('I18N_OPENXPKI_UI_APPLICATION_ERROR');
-    } else {
-        $error = i18nTokenizer($error);
-        if ($log) { $log->info($error) } else { warn "$error\n" }
-    }
-
-    if ( $cgi->http('HTTP_X-OPENXPKI-Client') ) {
-        print $cgi->header( -type => 'application/json' );
-        print encode_json({ status => { 'level' => 'error', 'message' => $error } });
-    } else {
-        my $error_utf8 = Encode::encode('UTF-8', $error);
-        print $cgi->header( -type => 'text/html' );
-        print <<"EOF";
+            print $cgi->header( -type => 'text/html', charset => 'utf8', -status => $status );
+            # my $error = Encode::encode('UTF-8', $response->error_message);
+            my $error = $response->error_message;
+            print <<"EOF";
 <!DOCTYPE html>
 <html>
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>$error_utf8</title>
+        <title>$error</title>
     </head>
     <body>
         <h1>An error occured</h1>
-        <p>$error_utf8</p>
+        <p>$error</p>
     </body>
 </html>
 EOF
+        }
+        return;
     }
-    return;
+
+    my $page = $response->result;
+    my $ui_resp = $page->ui_response;
+
+    # helper to print HTTP headers
+    my $print_headers = sub {
+        my @headers = $ui->cgi_headers($response->extra_headers)->%*;
+        push @headers, -cookie => [ map { $_->to_string } $ui->session_cookie->as_mojo_cookies($ui->session)->@* ];
+        print $cgi->header(@headers);
+    };
+
+    # File download
+    if ($page->has_raw_bytes or $page->has_raw_bytes_callback) {
+        $print_headers->();
+        # A) raw bytes in memory
+        if ($page->has_raw_bytes) {
+            $ui->log->debug("Sending raw bytes (in memory)");
+            print $page->raw_bytes;
+        }
+        # B) raw bytes retrieved by callback function
+        elsif ($page->has_raw_bytes_callback) {
+            $ui->log->debug("Sending raw bytes (via callback)");
+            # run callback, passing a printing function as argument
+            $page->raw_bytes_callback->(sub { print @_ });
+        }
+
+    # Standard JSON response
+    } elsif ($ui->request->headers->header('X-OPENXPKI-Client')) {
+        $print_headers->();
+        $ui->log->debug("Sending JSON response");
+        print $ui->ui_response_to_json($ui_resp);
+
+    # Redirects
+    } else {
+        my $url = '';
+        # redirect to given page
+        if ($ui_resp->redirect->is_set) {
+            $url = $ui_resp->redirect->to;
+
+        # redirect to downloads / page pages
+        } elsif (my $body = $ui->ui_response_to_json($ui_resp)) {
+            $url = $page->call_persisted_response( { data => $body } );
+        }
+
+        $ui->log->debug("Raw redirect target: $url");
+
+        # if url does not start with http or slash, prepend baseurl + route name
+        if ($url !~ m{\A http|/}x) {
+            my $baseurl = $ui->session->param('baseurl') || $ui->request->param('baseurl');
+            $ui->log->debug("Adding baseurl $baseurl");
+            $url = sprintf("%s/#/openxpki/%s", $baseurl, $url);
+        }
+        # HTTP redirect
+        $ui->log->debug("Sending HTTP redirect to: $url");
+        print $cgi->redirect($url);
+    }
 }
 
-# Returns the Crypt::CBC cipher to use for cookie encryption or undef if no
-# session.cookey config entry is defined.
-sub __get_cookie_cipher {
+$config = OpenXPKI::Client::Config->new('webui');
+$log = $config->log;
+$log->info("UI handler initialized");
 
-    my $key = $conf->{session}->{cookey} || '';
-    # Fingerprint: a list of ENV variables, added to the cookie passphrase,
-    # binds the cookie encyption to the system environment.
-    # Even though Crypt::CBC will run a hash on the passphrase we still use
-    # sha256 here to preprocess the input data one by one to keep the memory
-    # footprint as small as possible.
-    if ($conf->{session}->{fingerprint}) {
-        $log->trace('Use fingerprint for cookie encryption: ' . $conf->{session}->{fingerprint});
-        my $sha = Digest::SHA->new('sha256');
-        $sha->add($key) if $key;
-        map { $sha->add($ENV{$_}) if $ENV{$_} } split /\W+/, $conf->{session}->{fingerprint};
-        $key = $sha->digest;
-    }
-    return unless ($key);
-    $log->trace(sprintf('Cookie encryption key: %*vx', '', $key)) if $log->trace;
-    my $cipher = Crypt::CBC->new(
-        -key => $key,
-        -pbkdf => 'opensslv2',
-        -cipher => 'Crypt::OpenSSL::AES',
+$conf = $config->endpoint_config('');
+
+while (my $cgi = CGI::Fast->new("")) {
+
+    $log->debug("FCGI pid = $$");
+
+    my $mojo_req = OpenXPKI::Client::Service::WebUI->cgi_to_mojo_request;
+
+    my $webui = OpenXPKI::Client::Service::WebUI->new(
+        service_name => 'webui',
+        config_obj => $config,
+        webserver_env => \%ENV,
+        remote_address => $ENV{REMOTE_ADDR},
+        request => $mojo_req,
+        endpoint => '',
+        # OpenXPKI::Client::Service::Role::Base->_build_config() will pass the
+        # empty endpoint to OpenXPKI::Client::Config->endpoint_config() which
+        # will then load the default() config
     );
-    return $cipher;
 
-}
+    my $session_front;
 
-while (my $cgi = CGI::Fast->new) {
-    # load config once
-    if (not $conf) {
+    my $response = $webui->cgi_safe_sub(sub {
+        my $session_cookie = $webui->session_cookie;
+        $session_front = $webui->session;
+
+        #
+        # Backend (server communication)
+        #
         try {
-            __load_config($cgi);
+            if (not $backend_client or not $backend_client->is_connected) {
+                $backend_client = OpenXPKI::Client->new(
+                    ($conf->{global}->{socket} ? (socketfile => $conf->{global}->{socket}) : ())
+                );
+                $backend_client->send_receive_service_msg('PING');
+            }
         }
         catch ($err) {
-            warn "$err\n";
-            __handle_error($cgi, 'I18N_OPENXPKI_UI_APPLICATION_ERROR');
-             next; # stop current loop upon error
-        }
-    }
-
-    $log->debug("Check for CGI session, FCGI pid = $$");
-
-    my $insecure_cookie = $cgi->http('X-OpenXPKI-Ember-HTTP-Proxy') ? 1 : 0;
-    $log->debug("Header 'X-OpenXPKI-Ember-HTTP-Proxy' found - creating insecure cookie for HTTP proxy")
-      if $insecure_cookie;
-
-    my $cipher = __get_cookie_cipher();
-    my $session_cookie = OpenXPKI::Client::UI::SessionCookie->new(
-        cgi => $cgi,
-        $cipher ? (cipher => $cipher) : (),
-        insecure => $insecure_cookie, # flag to skip "secure" option in cookie
-    );
-
-    my $sess_id;
-    # TODO - we might want to embed this into the session handler
-    if ($ENV{SCRIPT_URL} =~ m{oidc_redirect\z} && (my $oidc_state = $cgi->param('state'))) {
-        try {
-            # the state paramater is the (encrypted) session id
-            # wrapped into a HMAC JWT using the extid cookie
-            $log->debug('Restore session from OIDC redirect');
-            my $hash_key = $cgi->cookie('oxi-extid') || die 'Unable to find CSRF cookie';
-            my $state = decode_jwt( key => $hash_key, token => $oidc_state );
-            $log->trace(Dumper $state) if $log->is_trace;
-            $sess_id = $state->{session_id};
-            $sess_id = $cipher->decrypt(decode_base64($sess_id)) if ($cipher);
-            # TODO - need to handle errors here!
-        }
-        catch ($err) {
-            $log->error($err);
-            __handle_error($cgi, "I18N_OPENXPKI_UI_OIDC_LOGIN_FAILED");
-            next;
-        }
-    } else {
-        try {
-            $sess_id = $session_cookie->fetch_id;
-        }
-        catch ($err) {
-            $log->error($err);
-        }
-    }
-
-    Log::Log4perl::MDC->remove();
-    Log::Log4perl::MDC->put('sid', $sess_id ? substr($sess_id,0,4) : undef);
-
-    if ($sess_id) {
-        $log->debug("Previous frontend session ID read from cookie: $sess_id");
-    } else {
-        $log->debug("No previous frontend session ID found in cookie (or no cookie)");
-    }
-
-    try {
-        if (!$backend_client || !$backend_client->is_connected()) {
-            $backend_client = OpenXPKI::Client->new({
-                SOCKETFILE => $conf->{global}->{socket}
-            });
-            $backend_client->send_receive_service_msg('PING');
-        }
-    }
-    catch ($err) {
-       $log->error("Error creating backend client: $err");
-       __handle_error($cgi, "I18N_OPENXPKI_UI_BACKEND_UNREACHABLE");
-       next;
-    }
-
-    # create CGI session
-    my $session_front = CGI::Session->new(
-        $conf->{session}->{driver},
-        $sess_id, # may be undef
-        $conf->{session_driver} ? $conf->{session_driver} : { Directory => '/tmp' },
-    );
-    $session_front->expire($conf->{session}->{timeout}) if defined $conf->{session}->{timeout};
-
-    Log::Log4perl::MDC->put('sid', substr($session_front->id,0,4));
-    $log->debug(
-        'Frontend session: ID = ' . $session_front->id .
-        ($session_front->expire ? ', expiration = ' . $session_front->expire : '')
-    );
-
-    # update the session cookie
-    $session_cookie->session($session_front);
-
-    # HTTP response wrapper
-    my $response = OpenXPKI::Client::UI::Response->new(session_cookie => $session_cookie);
-    $response->add_header(@header_tpl);
-
-    # Set the path to the directory component of the script, this
-    # automagically creates seperate cookies for path based realms
-    my $realm_mode = $conf->{global}->{realm_mode} || 'select';
-    my $detected_realm;
-    my $realm_path_map; # only for realm_mode = path
-    $log->debug("Realm mode = $realm_mode");
-
-    if ($realm_mode eq "path") {
-        my $script_path = $ENV{'REQUEST_URI'};
-
-        # Strip off /cgi-bin/xxx?aa=bb ("cgi-bin", last path component, query string)
-        $script_path =~ s|\/(f?cgi-bin\/)?([^\/]+)((\?.*)?)$||;
-        $response->session_cookie->path($script_path);
-
-        $log->debug("Script path = '$script_path'");
-
-        # We use the last part of the script name for the realm
-        my $script_realm;
-        if ($script_path =~ qq|\/([^\/]+)\$|) {
-            $script_realm = $1;
-        } else {
-            $log->warn('Unable to read realm from URL path');
+            $log->error("Error creating backend client: $err");
+            return $webui->new_response(503 => 'I18N_OPENXPKI_UI_BACKEND_UNREACHABLE');
         }
 
-        # Prepare realm selection
-        if ('index' eq $script_realm) {
-            $log->debug('Special path detected - showing realm selection page');
+        $webui->client($backend_client);
 
-            # Enforce new session to get rid of selected realm etc.
-            $session_front->flush();
-            $backend_client->detach();
+        #
+        # Detect realm
+        #
+        my $detected_realm;
 
-            # Create a map of realms to URL paths:
-            # {
-            #     realma => [
-            #         { url => 'realm-a', stack => 'LocalPassword' },
-            #         { url => 'realm-a-cert', stack => 'Certificate' },
-            #     ],
-            #     realmb => ...
-            # }
-            my $realm_root_url = $script_path;
-            $realm_root_url =~ s{^ ( ( / [^/]+ )*? ) / [^/]* /? $}{$1}msx; # strip off last path component
+        my $realm_mode = $webui->realm_mode;
+        $log->debug("Realm mode = $realm_mode");
 
-            for my $url_alias (keys $conf->{realm}->%*) {
-                my ($realm, $stack) = split (/\s*;\s*/, $conf->{realm}->{$url_alias});
-                $realm_path_map->{$realm} //= [];
-                push $realm_path_map->{$realm}->@*, {
-                    url => sprintf("%s/%s/", $realm_root_url, $url_alias),
-                    stack => $stack,
+        # PATH mode
+        if ("path" eq $realm_mode) {
+            # Set the path to the directory component of the script, this
+            # automagically creates seperate cookies for path based realms
+            $session_cookie->path($webui->url_path->to_string);
+
+            # Interpret last part of the URL path as realm
+            my $script_realm = $webui->url_path->parts->[-1];
+            if ('webui' eq $script_realm) {
+                $script_realm = '' ;
+                $log->warn('Unable to read realm from URL path');
+            }
+
+            # Prepare realm selection
+            if ('index' eq $script_realm) {
+                $log->debug('Special path detected - showing realm selection page');
+
+                $session_front->flush;
+                $backend_client->detach; # enforce new backend session to get rid of selected realm etc.
+            }
+
+            # If the session has no realm set, try to get a realm from the map
+            elsif (not $session_front->param('pki_realm')) {
+                if (not $conf->{realm}->{$script_realm}) {
+                    $log->debug('No realm for ident: ' . $script_realm );
+                    return $webui->new_response(406 => 'I18N_OPENXPKI_UI_NO_SUCH_REALM_OR_SERVICE');
+                } else {
+                    $detected_realm = $conf->{realm}->{$script_realm};
                 }
-            };
+            }
 
-            $log->trace('URL path and auth stacks by realm: ' . Dumper($realm_path_map)) if $log->is_trace;
+        } elsif ("hostname" eq $realm_mode) {
+            my $host = $ENV{HTTP_HOST};
+            $log->trace('Realm map is: ' . Dumper $conf->{realm});
+            foreach my $rule (keys %{$conf->{realm}}) {
+                next unless ($host =~ qr/\A$rule\z/);
+                $log->trace("realm detection match: $host / $rule ");
+                $detected_realm = $conf->{realm}->{$rule};
+                last;
+            }
+            $log->warn('Unable to find realm from hostname: ' . $host) unless($detected_realm);
+
+        } elsif ("fixed" eq $realm_mode) {
+            # Fixed realm mode, mode must be defined in the config
+            $detected_realm = $conf->{global}->{realm};
         }
 
-        # If the session has no realm set, try to get a realm from the map
-        elsif (!$session_front->param('pki_realm')) {
-            if (!$conf->{realm}->{$script_realm}) {
-                $log->debug('No realm for ident: ' . $script_realm );
-                __handle_error($cgi, 'I18N_OPENXPKI_UI_NO_SUCH_REALM_OR_SERVICE');
-                $session_front->flush();
-                $backend_client->detach();
-                next;
-            } else {
-                $detected_realm = $conf->{realm}->{$script_realm};
+        if ($detected_realm) {
+            $log->debug("Detected realm is '$detected_realm'");
+            my ($realm, $stack) = split /\s*;\s*/, $detected_realm;
+            $session_front->param('pki_realm', $realm);
+            if ($stack) {
+                $log->debug("Auto-select auth stack '$stack' based on realm detection");
+                $session_front->param('auth_stack', $stack);
             }
         }
 
-    } elsif ($realm_mode eq "hostname") {
-        my $host = $ENV{HTTP_HOST};
-        $log->trace('Realm map is: ' . Dumper $conf->{realm});
-        foreach my $rule (keys %{$conf->{realm}}) {
-            next unless ($host =~ qr/\A$rule\z/);
-            $log->trace("realm detection match: $host / $rule ");
-            $detected_realm = $conf->{realm}->{$rule};
-            last;
-        }
-        $log->warn('Unable to find realm from hostname: ' . $host) unless($detected_realm);
+        # custom HTTP headers from config
+        $webui->response->add_header($_ => $webui->config->{header}->{$_}) for keys $webui->config->{header}->%*;
+        # default mime-type
+        $webui->response->add_header('content-type' => 'application/json; charset=UTF-8');
 
-    } elsif ($realm_mode eq "fixed") {
-        # Fixed realm mode, mode must be defined in the config
-        $detected_realm = $conf->{global}->{realm};
-    }
+        my $page = $webui->handle_ui_request; # isa OpenXPKI::Client::Service::WebUI::Page
+        $webui->response->result($page);
+        return $webui->response;
+    }); # cgi_safe_sub
 
-    if ($detected_realm) {
-        $log->debug("Detected realm is '$detected_realm'");
-        my ($realm, $stack) = split /\s*;\s*/, $detected_realm;
-        $session_front->param('pki_realm', $realm);
-        if ($stack) {
-            $log->debug("Auto-select auth stack '$stack' based on realm detection");
-            $session_front->param('auth_stack', $stack);
-        }
-    }
+    send_response($cgi, $webui, $response);
 
-    if ($conf->{login} && $conf->{login}->{stack}) {
-        $ENV{OPENXPKI_AUTH_STACK} = $conf->{login}->{stack};
-    }
+    $log->debug('Finished request handling');
 
-    $response->add_header(-type => 'application/json; charset=UTF-8');
-
-    $log->trace('Init UI using backend ' . ref $backend_client);
-
-    my $result;
-    try {
-        my %pkey;
-        if ($conf->{auth}->{'sign.key'}) {
-            my $pk = decode_base64($conf->{auth}->{'sign.key'});
-            $pkey{auth} = \$pk;
-        }
-
-        my $client = OpenXPKI::Client::UI->new({
-            backend => $backend_client,
-            session => $session_front,
-            log => $log,
-            $cipher ? (cipher => $cipher) : (),
-            socket_path => $conf->{global}->{'socket'},
-            script_url => $conf->{global}->{scripturl},
-            $conf->{global}->{staticdir} ? (static_dir => $conf->{global}->{staticdir}) : (),
-            $conf->{global}->{loginpage} ? (login_page => $conf->{global}->{loginpage}) : (),
-            $conf->{global}->{loginurl} ? (login_url => $conf->{global}->{loginurl}) : (),
-            resp => $response,
-            realm_mode => $realm_mode,
-            realm_layout => $conf->{global}->{realm_layout} || 'card',
-            $realm_path_map ? (realm_path_map => $realm_path_map) : (),
-            %pkey,
-        });
-
-        my $req = OpenXPKI::Client::UI::Request->new( cgi => $cgi, log => $log, session => $session_front );
-        $log->trace(ref($req).' - '.Dumper({ map { $_ => $req->{$_} } qw( method cache cgi ) }) ) if ($log->is_trace());
-        $result = $client->handle_request( $req );
-        $result->render; # CGI output
-        $log->debug('Finished request handling');
-        $log->trace(ref($result).' - '.Dumper({ map { $_ => $result->{$_} } qw( type _page redirect extra _result ) }) ) if $log->is_trace();
-    }
-    catch ($err) {
-        __handle_error($cgi, $err);
-    }
-
-    # write session changes to backend
-    $session_front->flush();
-    # Detach session
-    $backend_client->detach();
-
+    # write session changes
+    $session_front->flush if $session_front;
+    # detach backend
+    $backend_client->detach if $backend_client;
 }
 
 $log->info('End fcgi loop ' . $$);
 
 1;
-
-__END__;

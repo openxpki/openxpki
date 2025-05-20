@@ -1,17 +1,15 @@
 
 package OpenXPKI::Server::Workflow::Activity::Tools::PresetProfileFields;
+use OpenXPKI;
 
-use strict;
-use base qw( OpenXPKI::Server::Workflow::Activity );
+use parent qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
-use English;
 use OpenXPKI::DN;
 use OpenXPKI::Serialization::Simple;
 use Template;
 use Digest::SHA qw(sha1_hex);
+
 
 sub execute {
 

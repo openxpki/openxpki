@@ -139,7 +139,6 @@ sub __persistCertificateInformation {
                     ? (subject_key_identifier => $cert_data->{authority_key_identifier})
                     : (subject => $cert_data->{issuer_dn}),
                 status    => 'ISSUED',
-                pki_realm => [ $pki_realm, undef ],
             },
         );
         ##! 32: 'returned issuer ' . Dumper( $issuer )

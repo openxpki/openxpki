@@ -153,13 +153,13 @@ rsync_exclude=(--exclude=.git/ --exclude=node_modules/ --exclude=verdaccio-npm-c
 # Compile OpenXPKI
 #
 echo -e "\nCompilation and installation"
-echo "- synchronize source code from host to $OXI_CORE_DIR"
-rsync -a --delete "${rsync_exclude[@]}" $OXI_SOURCE_DIR/core/ $OXI_CORE_DIR >$LOG 2>&1
+echo "- copy source code from host to $OXI_CORE_DIR"
+rsync -a --delete "${rsync_exclude[@]}" $OXI_SOURCE_DIR/core/ $OXI_CORE_DIR     >$LOG 2>&1
 
 # Copy EE Perl modules
 if [[ $COPY_EE_CODE -eq 1 && -d $OXI_EE_SOURCE_DIR/opt/myperl/site_perl/OpenXPKI ]]; then
     echo "  --> incl. EE code"
-    rsync -a $OXI_EE_SOURCE_DIR/opt/myperl/site_perl/  $OXI_CORE_DIR/server/ >$LOG 2>&1
+    rsync -a $OXI_EE_SOURCE_DIR/opt/myperl/site_perl/ $OXI_CORE_DIR/server/     >$LOG 2>&1
 fi
 
 # Set version so Makefile.PL does not need "vergen" (which we will not copy to $OXI_CORE_DIR)
@@ -172,11 +172,11 @@ __VERSION
 echo "- OpenXPKI version: $OXI_VERSION"
 
 # Copy web UI files
-echo "- synchronize UI code"
+echo "- copy UI code"
 rsync -a --delete "${rsync_exclude[@]}" $OXI_SOURCE_DIR/core/server/htdocs/ /var/www/openxpki/ >$LOG 2>&1
 rsync -a --delete "${rsync_exclude[@]}" $OXI_SOURCE_DIR/core/server/cgi-bin/ /usr/lib/cgi-bin/ >$LOG 2>&1
 
-# Copy EE web UI files
+# Copy EE web UI files + update EE systemd units
 if [ $COPY_EE_CODE -eq 1 ]; then
     if [ -d $OXI_EE_SOURCE_DIR/opt/myperl/share/cgi-bin ]; then
         echo -e "  --> incl. EE code"
@@ -184,15 +184,29 @@ if [ $COPY_EE_CODE -eq 1 ]; then
     fi
 
     # Copy EE /usr files (must be done after copying files with "rsync -a --delete ... /usr/lib/cgi-bin")
+    # INCLUDES systemd units!
     if [ -d $OXI_EE_SOURCE_DIR/usr ]; then
-        echo -e "- synchronize EE /usr files"
+        echo -e "- copy EE /usr files"
         rsync -a $OXI_EE_SOURCE_DIR/usr/ /usr/ >$LOG 2>&1
     fi
 fi
 
+# Overwrite EE systemd units with Debian units
+echo -e "- copy Debian systemd units"
+cp $OXI_SOURCE_DIR/package/debian/core/libopenxpki-perl.openxpkid.service /usr/lib/systemd/system/openxpkid.service >$LOG 2>&1
+cp $OXI_SOURCE_DIR/package/debian/core/libopenxpki-perl.openxpki-clientd.service /usr/lib/systemd/system/openxpki-clientd.service >$LOG 2>&1
+
+# finish systemd unit setup after EE code was copied
+echo "- replacements in systemd units: apache -> www-data; /usr/bin -> /usr/local/bin"
+find /usr/lib/systemd/system/ -name 'openxpki*' | \
+    xargs perl -pe 's{^(User|Group)=openxpki$}{$1=root}g; s{(User|Group)=apache}{$1=www-data}g; s{/usr/bin/openxpkictl}{/usr/local/bin/openxpkictl}g;' -i >$LOG 2>&1
+
+echo "- reload systemd"
+systemctl daemon-reload
+
 # Copy EE scripts
 if [[ $COPY_EE_CODE -eq 1 && -d $OXI_EE_SOURCE_DIR/opt/myperl/bin ]]; then
-    echo "- synchronize EE scripts and add them to Makefile.PL:"
+    echo "- copy EE scripts and add them to Makefile.PL:"
     rsync -a $OXI_EE_SOURCE_DIR/opt/myperl/bin/ $OXI_CORE_DIR/server/bin/ >$LOG 2>&1
 
     # inject EE scripts into Makefile.PL's EXE_FILES array

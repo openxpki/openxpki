@@ -1,11 +1,10 @@
 package OpenXPKI::Connector::WorkflowContext;
+use OpenXPKI -class;
 
-use Moose;
 extends 'Connector';
 
-use English;
 use DateTime;
-use Data::Dumper;
+
 use OpenXPKI::DateTime;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Serialization::Simple;

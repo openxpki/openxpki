@@ -1,0 +1,14 @@
+{{! We need the href in addition to the click handler to support
+    opening the page in a new window }}
+<a
+    ...attributes
+    class={{if @spec.active "active"}}
+    aria-current={{if @spec.active (if @isSubmenu "true" "page") ""}}
+    href={{this.href}}
+    {{on "click" this.openTarget}}
+>
+    {{#if this.icon}}
+        <span class="{{this.icon}} text-secondary pe-1"></span>
+    {{/if}}
+    {{@spec.label}}
+</a>

@@ -5,8 +5,10 @@
     >
         {{@content.options.0.label}}
     </div>
-{{else if @content.editable}}
-    <div class="input-group has-validation">
+{{else}}
+    <OxiBase::InputGroup
+        @showIf={{@content.editable}}
+    >
         {{#if this.customMode}}
             <input
                 type="text"
@@ -20,30 +22,27 @@
             />
         {{else}}
             <OxiBase::Select
-                @list={{this.options}}
-                @selected={{this.sanitizedValue}}
+                @list={{@content.options}}
+                @selected={{@content.value}}
                 @onChange={{this.optionSelected}}
+                @placeholder={{this.placeholder}}
+                @showClearButton={{@content.is_optional}}
+                @noInputGroup={{@content.editable}}
+                @inline={{@content.inline}}
                 required={{not @content.is_optional}}
                 {{on-init @setFocusInfo true}}
             />
         {{/if}}
-        <BsButton
-            @type=""
-            @active={{this.customMode}}
-            @onClick={{this.toggleCustomMode}}
-            class="btn-light border-secondary"
-        >
-            {{t 'component.oxifield_select.custom_value'}}
-        </BsButton>
-        <div class="invalid-feedback">{{@error}}</div>
-    </div>
-{{else}}
-    <OxiBase::Select
-        @list={{this.options}}
-        @selected={{this.sanitizedValue}}
-        @onChange={{this.optionSelected}}
-        required={{not @content.is_optional}}
-        {{on-init @setFocusInfo true}}
-    />
-    <div class="invalid-feedback">{{@error}}</div>
+        {{#if @content.editable}}
+            <BsButton
+                @type=""
+                @active={{this.customMode}}
+                @onClick={{this.toggleCustomMode}}
+                class="bg-secondary-subtle border-secondary"
+            >
+                {{t 'component.oxifield_select.custom_value'}}
+            </BsButton>
+        {{/if}}
+        {{#if @error}}<div class="invalid-feedback">{{@error}}</div>{{/if}}
+    </OxiBase::InputGroup>
 {{/if}}

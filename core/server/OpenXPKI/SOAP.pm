@@ -1,10 +1,7 @@
 package OpenXPKI::SOAP;
+use OpenXPKI;
 
-use strict;
-use warnings;
-use English;
 use Config::Std;
-use Data::Dumper;
 use SOAP::Transport::HTTP;
 #use SOAP::Transport::HTTP2; # Please adjust contructor call below, if you switch this!
 

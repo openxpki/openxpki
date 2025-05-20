@@ -1,4 +1,7 @@
 package OpenXPKI::Template::Plugin::DateTime;
+use OpenXPKI;
+
+use parent qw( Template::Plugin );
 
 =head1 OpenXPKI::Template::Plugin::DateTime
 
@@ -16,10 +19,6 @@ export the methods, you need to address them with the plugin name, e.g.
 
 =cut
 
-use strict;
-use warnings;
-use base qw( Template::Plugin );
-use Template::Plugin;
 use OpenXPKI::DateTime;
 
 =head2 validity (timespec, reference)

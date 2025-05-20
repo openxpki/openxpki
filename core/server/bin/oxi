@@ -1,25 +1,155 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl -w
 use OpenXPKI;
 
+# Core modules
+use FindBin qw( $Script );
 use Getopt::Long;
-use Pod::Usage;
+use List::Util qw(none any);
+use Module::Metadata;
+use Mojo::Loader;
 use JSON::PP;
-use YAML;
+use Term::ReadKey;
 
+# CPAN modules
+use PPI::Document;
+use YAML::PP;
+
+# Project modules
 use OpenXPKI::i18n qw(set_language);
 use OpenXPKI::Client::API;
 use OpenXPKI::Client::API::Response;
 use OpenXPKI::Client::CLI;
 use OpenXPKI::DTO::Authenticator;
 
+=head2 show_help I<command> [I<subcommand>]
+
+Runs C<get_pod_text> on the package name constructed from the given arguments.
+
+If a I<subcommand> is given, evaluates the parameter specification and
+renders a description on the parameters.
+
+=cut
+
+signature_for show_help => (
+    named => [
+        api => 'OpenXPKI::Client::API',
+        command => 'Str',
+        subcommand => 'Str', { default => '' },
+        short => 'Bool', { default => 0 },
+    ],
+);
+sub show_help ($arg) {
+    my $api = $arg->api;
+    my $cmd = $arg->command;
+    my $subcmd = $arg->subcommand // '';
+    my $subcmd_var = $arg->subcommand || '[SUBCOMMAND]';
+
+    LOGDIE("Invalid characters in command") unless $cmd =~ m{\A\w*\z};
+    LOGDIE("Invalid characters in subcommand") unless $subcmd =~ m{\A\w*\z};
+
+    my $pod;
+    $pod.= "=head1 USAGE\n\n%%SCRIPT%% $cmd $subcmd_var [OPTIONS] PARAMETERS\n\n" unless $arg->short;
+
+    #
+    # COMMAND help
+    #
+    # TODO - select right sections and enhance formatting
+    unless ($subcmd) {
+        $pod.= $api->get_pod($cmd, 'DESCRIPTION') unless $arg->short;
+
+        $pod.= "\n\n=head1 SUBCOMMANDS\n\n=over\n\n";
+        my $subcmds = $api->subcommands($cmd);
+        for my $subcmd (sort keys $subcmds->%*) {
+            $pod.= sprintf "=item %s\n\n%s\n\n", $subcmd, $subcmds->{$subcmd};
+        }
+        $pod.= "=back\n\n";
+
+        $api->show_pod(-oxi_pod => $pod);
+    }
+
+
+    if ($cmd eq 'api' && none { $subcmd eq $_ } ('','help','list')) {
+        $subcmd = 'execute';
+    }
+
+    #
+    # SUBCOMMAND help
+    #
+    $pod.= $api->get_pod("${cmd}::$subcmd", 'DESCRIPTION');
+
+    my $attrs = $api->get_attribute_details($cmd, $subcmd);
+    if (scalar keys $attrs->%*) {
+        $pod.= "\n\n=head1 PARAMETERS\n\n=over\n\n";
+        for my $name (sort keys $attrs->%*) {
+            $pod.= sprintf(
+                "=item --%s (%s)\n\n%s\n\n",
+                $name, $attrs->{$name}->{spec}, $attrs->{$name}->{desc},
+            );
+        };
+        $pod.= "=back\n\n";
+    }
+
+    $pod.= $api->get_pod(__FILE__, 'OPTIONS');
+
+    $api->show_pod(-oxi_pod => $pod);
+}
+
+sub handle_error ($err, $debug_details = '') {
+    # a simple plain error message
+    if (not ref $err) {
+        ERROR(OpenXPKI::i18n::i18nTokenizer($err));
+        exit 10;
+    }
+
+    # known special error
+    if (blessed $err) {
+        if ($err->isa('OpenXPKI::DTO::ValidationException')) {
+            ERROR(OpenXPKI::i18n::i18nTokenizer($err->message));
+            exit 10;
+        }
+        if ($err->isa('OpenXPKI::Exception')) {
+            ERROR(OpenXPKI::i18n::i18nTokenizer($err->message)) unless $err->__is_logged;
+            exit 10;
+        }
+    }
+
+    # unknown error
+    ERROR($debug_details) if $debug_details;
+    ERROR(sprintf "Something went wrong (%s)", ref $err);
+    exit 255;
+}
+
+sub read_password {
+
+    my $msg = shift;
+    say $msg if ($msg);
+    Term::ReadKey::ReadMode('noecho');
+    my $input = Term::ReadKey::ReadLine(0);
+    Term::ReadKey::ReadMode('restore');
+    my ($password) = $input =~ m{\A\s*(\S+)\s*\z};
+    return $password;
+}
+
 set_language('en_US');
 use Log::Log4perl qw(:easy :no_extra_logdie_message);
-pod2usage( -verbose => 1 ) unless (@ARGV);
 
 my $verbose = 0;
 my %opt = ('verbose' => \$verbose);
+
+# pass_through: anything unknown, ambiguous or invalid will be passed through to @ARGV
 Getopt::Long::Configure('pass_through','bundling');
-GetOptions( \%opt, ('verbose|v+','json','json-pretty','auth-key|k=s','auth-config|c=s','no-caop','help'));
+
+GetOptions( \%opt, ('verbose|v+','json','json-pretty','auth-key|k=s','auth-config|c=s','pass|p:s','no-auth','help','version|V'));
+
+if ($opt{version}) {
+    if (!Mojo::Loader::load_class('OpenXPKI::Enterprise::VERSION')) {
+        say "OpenXPKI Enterprise Edition v$OpenXPKI::Enterprise::VERSION::VERSION (core v$OpenXPKI::VERSION::VERSION)";
+    } else {
+        say "OpenXPKI Community Edition v$OpenXPKI::VERSION::VERSION";
+    }
+    exit 0;
+}
+
 Getopt::Long::Configure('no_pass_through');
 
 my $l4p_level;
@@ -37,37 +167,54 @@ if ($verbose > 2) {
 }
 Log::Log4perl->easy_init({ level => $l4p_level, layout => $l4p_layout });
 
-my $api = OpenXPKI::Client::API->new(enable_acls => 0);
+my $api = OpenXPKI::Client::API->new(
+    enable_acls => 0,
+    script_name => $Script,
+);
+
+# Help
+$api->show_pod(
+    -msg => "Missing command. Use --help for more details.\n",
+    -oxi_pod => $api->get_pod(__FILE__),
+    -sections => 'COMMANDS',
+) unless (@ARGV or $opt{help});
+
+my $want_help = $opt{help};
+my $command = shift // '';
+my $subcommand = shift  // '';
+
+if ($command eq 'help') {
+    $want_help = 1;
+    $command = $subcommand;
+    $subcommand = shift // '';
+}
 
 # help is also avail via flag for subcommands
-if ($opt{help} && @ARGV) {
-    say $api->help(@ARGV);
-    exit 0;
-}
+if ($want_help) {
 
-# Get list of commands
-my $command = shift;
-if ($command eq 'help') {
+    if (!$command) {
+        $api->show_pod(-oxi_pod => join('', $api->get_pod_nodes(__FILE__)));
 
-    if (@ARGV) {
-        say $api->help(@ARGV);
-        exit 0;
+    # we let the help request for a named command pass and catch this later
+    } elsif ($command ne 'api' || any { $subcommand eq $_ } ('list','help','execute')) {
+        show_help(
+            api => $api,
+            command =>  $command,
+            $subcommand ? (subcommand => $subcommand) : (),
+        );
     }
-
-    say "oxi COMMAND [SUBCOMMAND] [OPTIONS] ARGUMENTS";
-    say "";
-    say $api->help;
-    exit 0;
 }
 
-my $subcommand = shift;
 # List subcommands for command
 if (not $subcommand) {
-    say "oxi $command [SUBCOMMAND] [OPTIONS] ARGUMENTS";
-    say "";
-    say $api->help($command);
-    exit 0;
+    say "Missing subcommand.\n";
+    show_help(
+        api => $api,
+        command => $command,
+        short => 0,
+    );
 }
+
 
 # we have command and subcommand so lets handle parameters and dispatch
 
@@ -80,10 +227,27 @@ while (@ARGV && substr($ARGV[0],0,1) ne '-') {
     push @extra_args, shift;
 }
 
+# special handling of the API command
+# we want to use the server command directly as subcommand
+if ($command eq 'api' && none { $subcommand eq $_ } ('list','help','execute')) {
+    $params{command} = $subcommand;
+    # named command wit help flag passed from above
+    if ($want_help) {
+        $subcommand = 'help';
+    } else {
+        $subcommand = 'execute';
+    }
+}
+
 # Create GetOption spec from the parameters recorded in the command
-if (my @getopts = $api->getopt_params($command, $subcommand)) {
-    TRACE('GetOptions parameters: ' . Dumper \@getopts);
-    GetOptions( \%params, @getopts ) || exit 1;
+try {
+    if (my @getopts = $api->getopt_params($command, $subcommand)) {
+        TRACE('GetOptions parameters: ' . Dumper \@getopts);
+        GetOptions( \%params, @getopts ) || exit 1;
+    }
+}
+catch ($error) {
+    handle_error($error);
 }
 
 # reserved internal command parameters
@@ -115,13 +279,30 @@ if (my $keyfile = $opt{'auth-key'}) {
 } else {
     my $keyfile = glob("~/.oxi/client.key");
     # first try to autodetect the admin mode key file...
-    if ((not $opt{'no-caop'}) && -e $keyfile && -r $keyfile) {
+    if ((not $opt{'no-auth'}) && -e $keyfile && -r $keyfile) {
         $auth_args{account_key} = $keyfile;
 
     # ...and second the user config file.
     } else {
 
     }
+}
+
+
+# if we have a keyfile we check if the password flag was given
+if ($auth_args{account_key}) {
+    my $pass;
+    if ($opt{'pass'}) {
+        $pass = $opt{'pass'};
+        if (substr($pass,0,4) eq 'env:') {
+            $pass = $ENV{substr($pass,4)} || die "Given ENV to read password is empty";
+        }
+    } elsif (defined $opt{'pass'}) {
+        $pass = read_password("Please enter your key password: ");
+    } elsif ($ENV{OPENXPKI_CLIENT_KEY_PASSPHRASE}) {
+        $pass = $ENV{OPENXPKI_CLIENT_KEY_PASSPHRASE};
+    }
+    $auth_args{account_key} = Crypt::PK::ECC->new($auth_args{account_key}, $pass);
 }
 
 INFO('Enable operator mode using keyfile '. $auth_args{account_key})
@@ -154,8 +335,8 @@ catch ($err) {
 TRACE(Dumper $res);
 
 my $json = JSON::PP->new();
-if ($res->state == 200) {
 
+if ($res->state == 200) {
     my $out = $res->payload;
     if (blessed $out) {
         $out = $out->params();
@@ -170,83 +351,80 @@ if ($res->state == 200) {
     } elsif ($opt{'json'}) {
         print $json->encode($out);
     } else {
-        print YAML::Dump $out;
+        my $ypp = YAML::PP->new( schema => [qw/ + Perl tags=!perl / ]);
+        print $ypp->dump_string($out);
     }
     exit 0;
 
+} else {
+    handle_error($res->payload, sprintf("State: %d", $res->state));
 }
 
-if (blessed $res->payload and $res->payload->isa('OpenXPKI::DTO::ValidationException')) {
-    ERROR(OpenXPKI::i18n::i18nTokenizer($res->payload->message));
-    exit 10;
-}
-
-# a simple plain error message
-if (ref $res->payload eq '') {
-    ERROR(OpenXPKI::i18n::i18nTokenizer($res->payload));
-    exit 10;
-}
-
-if (blessed $res->payload and $res->payload->isa('OpenXPKI::Exception')) {
-    # We assume that all OpenXPKI::Exceptions are already logged
-    exit 10;
-}
-
-ERROR(sprintf "Something went wrong (%d, %s)", $res->state, ref $res->payload);
-exit 255;
 
 =head1 NAME
 
-oxi - tool for managing OpenXPKI instances and artefacts
+%%SCRIPT%% - Manage OpenXPKI instances and artefacts
 
-=head1 USAGE
+=head1 SYNOPSIS
 
-oxi COMMAND [SUBCOMMAND] [OPTIONS] PARAMETER
+Manage OpenXPKI instances and artefacts:
 
-Type C<help> to get the list of available commands.
+    %%SCRIPT%% COMMAND [SUBCOMMAND] [OPTIONS] PARAMETERS
 
-Type the name of any command to get available subcommands.
+Show detailed help on a command or subcommand:
 
-Type C<help E<lt>commandE<gt> [E<lt>subcommandE<gt>]> for detailed help
-on a command or subcommand.
+    %%SCRIPT%% help COMMAND [SUBCOMMAND]
+    %%SCRIPT%% COMMAND [SUBCOMMAND] --help
 
-=head2 Global Options
+=head1 COMMANDS
+
+%%COMMANDS%%
+
+=head1 OPTIONS
 
 =over
 
-=item verbose|v
+=item --help
 
-raise loglevel to INFO, DEBUG (-vv) or TRACE (-vvv)
+Show help on a command or subcommand.
 
-=item json
+=item --verbose|-v
 
-print output data as compact JSON structure
+Raise loglevel to INFO, DEBUG (-vv) or TRACE (-vvv).
 
-=item json-pretty
+=item --json
 
-print output data as formated JSON structure
+Print output data as compact JSON structure.
 
-=item auth-config|c
+=item --json-pretty
 
-path to a config file to read the authentication details from
+Print output data as formated JSON structure.
 
-=item auth-key|k
+=item --auth-config|-c
 
-path to the login key to run command as ca operator
+Path to a config file to read the authentication details from.
 
-the default location is ~/.oxi/client.key
+=item --auth-key|-k
 
-=item no-caop
+Path to the login key to run commands in privileged mode
 
-do not authenticate as ca operator and use the default user binding
-even if a ca operator key was autodetected.
+Default location: ~/.oxi/client.key
 
-=item realm
+=item --pass|-p
 
-realm to run the command against, also used for authentication when
-not in ca operator mode.
+Passphrase to decrypt your authentication key in case it is protected.
 
-This option is not available on global commands.
+If used without argument, you will be prompted to enter your password.
+If the provided string starts with C<env:> it is assumed to point to
+an environment variable holding the password, any other value is
+considered to be the literal password.
+
+If no option is given, the ENV key I<OPENXPKI_CLIENT_KEY_PASSPHRASE> is
+checked and used as password.
+
+=item --no-auth
+
+Do not authenticate even if a login key/config was found.
 
 =back
 

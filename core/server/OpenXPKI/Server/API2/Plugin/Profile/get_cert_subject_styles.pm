@@ -9,9 +9,6 @@ OpenXPKI::Server::API2::Plugin::Profile::get_cert_subject_styles
 
 =cut
 
-# Project modules
-use OpenXPKI::Exception;
-
 =head2 get_cert_subject_styles
 
 This API command was removed - calling it will throw an exception.

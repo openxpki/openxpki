@@ -1,12 +1,9 @@
 package OpenXPKI::Crypto::Backend::OpenSSL::Engine::Inline;
+use OpenXPKI;
 
-use strict;
-use warnings;
-use English;
-use OpenXPKI::Exception;
+use parent qw(OpenXPKI::Crypto::Backend::OpenSSL::Engine::OpenSSL);
+
 use OpenXPKI::Server::Context qw( CTX );
-
-use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Engine::OpenSSL);
 
 sub get_key_object
 {

@@ -1,5 +1,5 @@
 package OpenXPKI::Server::Watchdog;
-use Moose;
+use OpenXPKI -class;
 
 
 =head1 NAME
@@ -18,25 +18,16 @@ The namespace is I<system.watchdog>. The properties are:
 
 =cut
 
-# Core modules
-use English;
-
 # CPAN modules
 use Log::Log4perl::MDC;
 use Sys::Hostname;
 
 # Project modules
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
-use OpenXPKI::Control;
+use OpenXPKI::Control::Server;
 use OpenXPKI::Server;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::DateTime;
-use OpenXPKI::Util;
-
-# Feature::Compat::Try should be done last to safely disable warnings
-use Feature::Compat::Try;
 
 
 our $TERMINATE = 0;
@@ -361,7 +352,7 @@ sub start_or_reload {
     my %args = @_;
 
     ##! 1: 'start'
-    my $pids = OpenXPKI::Control::get_pids();
+    my $pids = OpenXPKI::Control::Server->get_pids();
 
     # Start watchdog if not running
     if (not scalar @{$pids->{watchdog}}) {
@@ -369,15 +360,7 @@ sub start_or_reload {
 
         return 0 if $config->get('system.watchdog.disabled');
 
-        my (undef, $uid, undef, $gid) = OpenXPKI::Util->resolve_user_group(
-            $config->get('system.server.user'),
-            $config->get('system.server.group'),
-            'server process'
-        );
-
         my $watchdog = OpenXPKI::Server::Watchdog->new();
-        $watchdog->userid($uid),
-        $watchdog->groupid($gid),
         $watchdog->keep_parent_sigchld($args{keep_parent_sigchld} ? 1 : 0);
         $watchdog->run;
     }
@@ -398,7 +381,7 @@ This will NOT kill the watchdog but tell it to gracefully stop.
 =cut
 sub terminate {
     ##! 1: 'terminate'
-    my $pids = OpenXPKI::Control::get_pids();
+    my $pids = OpenXPKI::Control::Server->get_pids();
 
     if (scalar $pids->{watchdog}) {
         kill 'TERM', @{$pids->{watchdog}};
@@ -429,7 +412,7 @@ sub run {
     CTX('log')->system->info('Watchdog: starting' . (scalar @userinfo ? ' with '.join(',', @userinfo) : ''));
 
     # Check if we already have a watchdog running
-    my $result = OpenXPKI::Control::get_pids();
+    my $result = OpenXPKI::Control::Server->get_pids();
     my $instance_count = scalar @{$result->{watchdog}};
     if ($instance_count >= $self->max_instance_count()) {
         OpenXPKI::Exception->throw(
@@ -530,7 +513,7 @@ sub __main_loop {
         config => CTX('config')->checksum,
         uptime => $BASETIME,
         node => hostname,
-        last_update => time,
+        last_update => 0,
     };
     while (not $TERMINATE) {
         ##! 64: 'Watchdog: do loop'
@@ -578,7 +561,7 @@ sub __main_loop {
             if ($self->interval_status_update &&
                 ((time - $beacon->{last_update}) > $self->interval_status_update )) {
 
-                my $pids = OpenXPKI::Control::get_pids();
+                my $pids = OpenXPKI::Control::Server->get_pids();
                 my $now = time()*1000;
                 foreach my $key ('watchdog','worker','workflow') {
                     my $value = scalar @{$pids->{$key}};
@@ -863,7 +846,10 @@ sub __wake_up_workflow {
 sub __restore_session {
     my ($self, $realm, $frozen_session) = @_;
 
-    CTX('session')->data->pki_realm($realm);     # set realm
+    # set realm
+    CTX('session')->data->pki_realm($realm);
+    Log::Log4perl::MDC->put('pki_realm', $realm);
+
     CTX('session')->data->thaw($frozen_session); # set user and role
 
     # Set MDC for logging

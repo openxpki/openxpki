@@ -25,7 +25,7 @@ use OpenXPKI::Server::API2::Plugin::Token::Util;
 Check if the datavault token for datapool encryption is available,
 both parameters are optional.
 
-    my $info = CTX('api2')->get_data_pool_entry(
+    my $info = CTX('api2')->get_datavault_status(
         alias => 'vault-1',
         check_online => 1,
     );
@@ -62,8 +62,12 @@ command "get_datavault_status" => {
     my ($self, $params) = @_;
 
     # the token alias name of the latest datavault certificate
-    my $safe_id = $params->alias;
-    eval { $safe_id = $self->get_active_safe_id();} unless($safe_id);
+    my $safe_id;
+    if ($params->has_alias) {
+        $safe_id = $params->alias;
+    } else {
+        eval {  $safe_id = $self->get_active_safe_id(); }
+    }
     return {} unless ($safe_id);
 
     my $pki_realm = CTX('session')->data->pki_realm;
@@ -71,7 +75,7 @@ command "get_datavault_status" => {
     # a pointer to the identifier of the actual datapool AES key
     # can be empty if the datapool was not initialized or the key
     # AES was created with an expiration date
-    my $key_info = $self->get_entry( $pki_realm, 'sys.datapool.pwsafe', 'p7:'.$safe_id );
+    my $key_info = $self->get_entry( $pki_realm, 'sys.datapool.pwsafe', $safe_id );
 
     ##! 16: "Realm $pki_realm, safe $safe_id, key: ". $key_info->{datapool_value}
     ##! 64: $key_info

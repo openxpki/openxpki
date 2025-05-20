@@ -10,7 +10,7 @@ OpenXPKI::Server::API2::Plugin::Control::control_watchdog
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Types;
-use OpenXPKI::Control;
+use OpenXPKI::Control::Server;
 
 
 =head1 COMMANDS
@@ -61,7 +61,7 @@ command "control_watchdog" => {
         return OpenXPKI::Server::Watchdog->terminate;
     }
     if ("status" eq $action) {
-        my $result = OpenXPKI::Control::get_pids;
+        my $result = OpenXPKI::Control::Server->get_pids;
         return {
             pid => $result->{watchdog},
             children => ref $result->{workflow} ? scalar @{$result->{workflow}} : 0

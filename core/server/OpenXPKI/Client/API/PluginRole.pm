@@ -25,12 +25,9 @@ Return the list of available realms by calling the backend.
 
 =cut
 sub hint_realm ($self, $input_params) {
-    state $client = OpenXPKI::Client->new({
-        SOCKETFILE => '/var/openxpki/openxpki.socket'
-    });
-    my $reply = $client->send_receive_service_msg('GET_REALM_LIST');
-    $self->log->trace('Reply from GET_REALM_LIST: ' . Dumper $reply) if $self->log->is_trace;
-    return [ map { $_->{name} } $reply->{PARAMS}->@* ];
+    my $realms = $self->run_enquiry('realm');
+    $self->log->trace(Dumper $realms->result) if $self->log->is_trace;
+    return [ map { $_->{name} } ($realms->result || [])->@* ] ;
 }
 
 sub build_hash_from_payload ($self, $param, $allow_bool = 0) {

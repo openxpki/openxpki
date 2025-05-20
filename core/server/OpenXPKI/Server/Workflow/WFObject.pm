@@ -1,159 +1,128 @@
-# OpenXPKI::Server::Workflow::WFObject
-# Written by Scott Hardin for the OpenXPKI Project 2010
-# Copyright (c) 2010 by the OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::WFObject;
-use Class::Std;
-{
-    use strict;
+use OpenXPKI -class_std;
 
-    #use base qw( Class::Std );
-    use Carp qw( confess );
-    use OpenXPKI::Debug;
-    use Data::Dumper;
-    use English;
+use Carp qw( confess );
 
-    # Storage for object attributes
-    my %workflow_of : ATTR( name => 'workflow' );
-    my %context_key_of : ATTR( name => 'context_key' );
-    my %need_update : ATTR;
-    my %serializer : ATTR;
-    my %data_ref : ATTR;
+# Storage for object attributes
+my %workflow_of : ATTR( name => 'workflow' );
+my %context_key_of : ATTR( name => 'context_key' );
+my %need_update : ATTR;
+my %serializer : ATTR;
+my %data_ref : ATTR;
 
-    # IMPORTANT: usually, new() is not overridden when using Class::Std. We
-    # hack this here, however, to be able to "do the right thing" and return
-    # the correct type (e.g.: WFArray) if the parameter already exists.
-    #    sub new2 {
-    #        my $self = shift;
-    #        warn "WFObject: in new2 self='$self'";
-    #        return $self;
-    #    }
+# Handle initialization of objects of this class
+sub BUILD {
+    my ( $self, $id, $args ) = @_;
 
-    # Handle initialization of objects of this class
-    sub BUILD {
-        my ( $self, $id, $args ) = @_;
+    # TODO: Add sanity checks for context key!!
 
-    #    # sanity checks
-    #    if ( not defined $workflow{ $id } ) {
-    #        confess "Required attribute 'workflow' not set";
-    #    } elsif ( ref( $workflow{ $id } ) ne 'HASH' ) {
-    #        confess "Required attribute 'workflow' must be a hash reference";
-    #    } elsif ( not exists $workflow{ $id }->{context} ) {
-    #        confess "Required attribute 'workflow' must have context key";
-    #    }
+    # SHORTCIRCUIT INIT CODE HERE!!!!
 
-        # TODO: Add sanity checks for context key!!
+    #    warn "ARGS=", join(', ', %{ $args });
+    #    warn "XXX context_key=", $context_key_of{ $id };
+    #    return;
+    #    my $context = $workflow_of{ ident $self }->{context};
+    #    $self->set_serializer( OpenXPKI::Serialization::Simple->new() );
 
-        # SHORTCIRCUIT INIT CODE HERE!!!!
+    my $ser = $serializer{$id} = OpenXPKI::Serialization::Simple->new();
 
-        #    warn "ARGS=", join(', ', %{ $args });
-        #    warn "XXX context_key=", $context_key_of{ $id };
-        #    return;
-        #    my $context = $workflow_of{ ident $self }->{context};
-        #    $self->set_serializer( OpenXPKI::Serialization::Simple->new() );
+    my $context_key = $args->{context_key};
+    my $raw_data;
 
-        my $ser = $serializer{$id} = OpenXPKI::Serialization::Simple->new();
+    my $context
+        = defined $args->{context}
+        ? $args->{context}
+        : $args->{workflow}->{context};
 
-        my $context_key = $args->{context_key};
-        my $raw_data;
+    if ($context) {
+        $raw_data = $context->param($context_key);
+    }
+    elsif ( exists $args->{workflow}->{CONTEXT} ) {
+        $context = $args->{workflow}->{CONTEXT};
+        $raw_data = $context->{$context_key};
+    }
+    else {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_WFOBJECT_DESERIALIZE_ERR',
+            params  => {
+                'ERROR' => 'WFObject created without workflow context'
+            }
+        );
+        return;
+    }
 
-        my $context
-            = defined $args->{context}
-            ? $args->{context}
-            : $args->{workflow}->{context};
 
-        if ($context) {
-            $raw_data = $context->param($context_key);
+    if ( defined $raw_data ) {
+        my $data;
+
+        if (ref $raw_data) {
+            $data = $raw_data;
+        } else {
+            # put this in eval to prevent complete blow-up
+            eval { $data = $ser->deserialize($raw_data); };
         }
-        elsif ( exists $args->{workflow}->{CONTEXT} ) {
-            $context = $args->{workflow}->{CONTEXT};
-            $raw_data = $context->{$context_key};
+        if ( my $exc = OpenXPKI::Exception->caught() ) {
+
+            # append some details and re-throw exception
+
+            my $params = $exc->params();
+            $params->{MORE_INFO}
+                = "WFObject had problem deserializing context parameter '"
+                . $context_key . "'";
+            $exc->params($params);
+            $exc->rethrow();
+
         }
-        else {
+        if ($EVAL_ERROR) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_WFOBJECT_DESERIALIZE_ERR',
-                params  => {
-                    'ERROR' => 'WFObject created without workflow context'
-                }
+                params  => { 'ERROR' => $EVAL_ERROR }
             );
-            return;
         }
-
-
-        if ( defined $raw_data ) {
-            my $data;
-
-            if (ref $raw_data) {
-                $data = $raw_data;
-            } else {
-                # put this in eval to prevent complete blow-up
-                eval { $data = $ser->deserialize($raw_data); };
-            }
-            if ( my $exc = OpenXPKI::Exception->caught() ) {
-
-                # append some details and re-throw exception
-
-                my $params = $exc->params();
-                $params->{MORE_INFO}
-                    = "WFObject had problem deserializing context parameter '"
-                    . $context_key . "'";
-                $exc->params($params);
-                $exc->rethrow();
-
-            }
-            if ($EVAL_ERROR) {
-                OpenXPKI::Exception->throw(
-                    message => 'I18N_OPENXPKI_WFOBJECT_DESERIALIZE_ERR',
-                    params  => { 'ERROR' => $EVAL_ERROR }
-                );
-            }
-            $data_ref{ ident $self } = $data;
-        }
-    }
-
-    sub write {
-        my ($self)  = @_;
-        my $id      = ident $self;
-        my $context = $workflow_of{$id}->{context};
-
-        #        if ( $need_update{ $id } ) {
-        my $raw = $serializer{$id}->serialize( $data_ref{$id} );
-        $context->param( $context_key_of{$id}, $raw );
-
-        #        }
-
-    }
-
-    # Handle cleanup
-    sub DEMOLISH {
-        my ( $self, $id ) = @_;
-        my $context = $workflow_of{$id}->{context};
-
-        if ( $need_update{$id} ) {
-            my $raw = $serializer{$id}->serialize( $data_ref{$id} );
-            $context->param( $context_key_of{$id}, $raw );
-        }
-    }
-
-    sub _get_data_ref : RESTRICTED {
-        my ($self) = @_;
-        return $data_ref{ ident $self };
-    }
-
-    sub _set_data_ref : RESTRICTED {
-        my ( $self, $ref ) = @_;
-        return $data_ref{ ident $self } = $ref;
-    }
-
-    sub _will_need_update : RESTRICTED {
-        my ( $self, $ref ) = @_;
-        $need_update{ ident $self }++;
+        $data_ref{ ident $self } = $data;
     }
 }
 
-1;
+sub write {
+    my ($self)  = @_;
+    my $id      = ident $self;
+    my $context = $workflow_of{$id}->{context};
 
-__END__
+    #        if ( $need_update{ $id } ) {
+    my $raw = $serializer{$id}->serialize( $data_ref{$id} );
+    $context->param( $context_key_of{$id}, $raw );
+
+    #        }
+
+}
+
+# Handle cleanup
+sub DEMOLISH {
+    my ( $self, $id ) = @_;
+    my $context = $workflow_of{$id}->{context};
+
+    if ( $need_update{$id} ) {
+        my $raw = $serializer{$id}->serialize( $data_ref{$id} );
+        $context->param( $context_key_of{$id}, $raw );
+    }
+}
+
+sub _get_data_ref : RESTRICTED {
+    my ($self) = @_;
+    return $data_ref{ ident $self };
+}
+
+sub _set_data_ref : RESTRICTED {
+    my ( $self, $ref ) = @_;
+    return $data_ref{ ident $self } = $ref;
+}
+
+sub _will_need_update : RESTRICTED {
+    my ( $self, $ref ) = @_;
+    $need_update{ ident $self }++;
+}
+
+1;
 
 =head1 NAME
 

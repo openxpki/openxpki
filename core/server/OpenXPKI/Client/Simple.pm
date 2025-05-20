@@ -7,11 +7,11 @@ OpenXPKI::Client::Simple - an easy way to connect to the openxpki daemon and run
 
 =head1 DESCRIPTION
 
-Designed as a kind of CLI interface for inline use within scripts. By
-default, it will not handle sessions and create a new session using the
-given auth info on each new instance (subsequent commands within one call
-are run on the same session). If you pass (and maintain) a session object to
-the constructor, it is used to persist the backend session during requests.
+Designed as a kind of CLI interface for inline use within scripts.
+
+It will not handle sessions and create a new session using the given auth info
+on each new instance (subsequent commands within one call are run on the same
+session).
 
 =cut
 
@@ -35,15 +35,6 @@ has auth => (
     isa => 'HashRef',
     lazy => 1,
     default  => sub { return { stack => 'Anonymous', user => undef, pass => undef } }
-);
-
-# ref to the cgi frontend session
-# if undef we behave as "one shot" client
-has 'session' => (
-    is => 'rw',
-    isa => 'Object|Undef',
-    default => undef,
-    lazy => 1,
 );
 
 has '_config' => (
@@ -72,8 +63,9 @@ has client => (
     is => 'rw',
     isa => 'Object|Undef',
     builder  => '_build_client',
-    lazy => 1,
     clearer => '_clear_client',
+    trigger => \&_init_client,
+    lazy => 1,
 );
 
 has logger => (
@@ -117,19 +109,7 @@ I<auth.stack> and appropriate keys for the chosen login method.
 An instance of Log4perl can be passed via I<logger>, default is to log to
 STDERR with loglevel error.
 
-=head3 Explicit Config from File
-
-Pass the name of the config file to use as string to the new method, the
-file must be in the standard config ini format and have at least a section
-I<global> providing I<socket> and I<realm>.
-
-If an I<auth> section exists, it is mapped as is to the I<auth> parameter.
-
-You can set a loglevel and logfile location using I<log.file> and
-I<log.level>. Loglevel must be a Log4perl Level name without the leading
-dollar sign (e.g. level=DEBUG).
-
-=head3 Implicit Config from File
+=head3 Implicit config from file
 
 If you do not pass a I<config> argument to the new method, the class tries
 to find a config file at
@@ -138,14 +118,15 @@ to find a config file at
 
 =item string set in the environment OPENXPKI_CLIENT_CONF
 
-=item $HOME/.openxpki.conf
-
 =item /etc/openxpki/client.conf
 
 =back
 
-The same rules as above apply, in case you pass auth or logger as explicit
-arguments the settings in the file are ignored.
+If an I<auth> section exists, it is mapped as is to the I<auth> parameter.
+
+You can set a loglevel and logfile location using I<log.file> and
+I<log.level>. Loglevel must be a Log4perl Level name without the leading
+dollar sign (e.g. level=DEBUG).
 
 =cut
 
@@ -153,117 +134,83 @@ around BUILDARGS => sub {
 
     my $orig = shift;
     my $class = shift;
-    my $args = shift;
+    my %args = (@_ == 1 and ref $_[0]) ? $_[0]->%* : @_;
 
-    # Called with a scalar = use as config file name
-    my $file;
-    if ($args && !ref $args) {
-        die "Given config file does not exist or is not readable!" unless (-e $args && -r $args);
-        $file = $args;
-        $args = {};
-
-    } elsif (!$args || !$args->{config}) {
-        $file = '/etc/openxpki/client.conf';
+    if (not $args{config}) {
+        my $file = '/etc/openxpki/client.conf';
         if ($ENV{OPENXPKI_CLIENT_CONF}) {
             $file = $ENV{OPENXPKI_CLIENT_CONF};
             die "OPENXPKI_CLIENT_CONF is set but files does not exist or is not readable!" unless (-e $file && -r $file);
 
-        } elsif ($ENV{HOME} && -d $ENV{HOME} && -r $ENV{HOME}) {
-
-            my $path = File::Spec->canonpath( $ENV{HOME} );
-            my $cand = File::Spec->catdir( ( $path, '.openxpki.conf' ) );
-            $file = $cand if (-e $cand && -r $cand);
-
         }
 
-        if (!-r $file ) {
-            OpenXPKI::Client::Simple::_build_logger()->fatal("Unable to open configuration file $file");
+        if (not -r $file) {
+            OpenXPKI::Client::Simple::_build_logger->fatal("Unable to open configuration file $file");
             die "Unable to open configuration file $file";
         }
-    }
 
-    if ($file) {
         my $conf;
-        if (!read_config( $file => $conf )) {
-            OpenXPKI::Client::Simple::_build_logger()->fatal("Unable to read configuration file $file");
+        if (not read_config( $file => $conf )) {
+            OpenXPKI::Client::Simple::_build_logger->fatal("Unable to read configuration file $file");
             die "Unable to read configuration file $file";
         }
 
-        $args->{config} = $conf->{global};
+        $args{config} = $conf->{global};
+        $args{auth} //= $conf->{auth} if $conf->{auth};
 
-        if ($conf->{auth} && !$args->{auth}) {
-            $args->{auth} = $conf->{auth};
-        }
-
-        if ($conf->{log} && !$args->{logger}) {
+        if ($conf->{log} and not $args{logger}) {
             my $level = Log::Log4perl::Level::to_priority( uc( $conf->{log}->{level} || 'ERROR' ));
             if ($conf->{log}->{file}) {
-                Log::Log4perl->easy_init( { level   => $level,
-                    file  => ">>" . $conf->{log}->{file} } );
+                Log::Log4perl->easy_init({
+                    level => $level,
+                    file => '>>' . $conf->{log}->{file},
+                });
             } else {
                 Log::Log4perl->easy_init($level);
             }
-            $args->{logger} = Log::Log4perl->get_logger();
+            $args{logger} = Log::Log4perl->get_logger();
         }
 
-        if ($args->{logger}) {
-            $args->{logger}->trace('Config read from file ' . $file);
-        }
-
-        return $class->$orig($args);
-    } else {
-
-        return $class->$orig($args);
+        $args{logger}->trace('Config read from file ' . $file) if $args{logger};
     }
 
+    return $class->$orig(%args);
 };
 
-sub _build_client {
+sub _build_client ($self) {
+    my $timeout = $self->_config->{'timeout'};
+    my $client = OpenXPKI::Client->new(
+        ($self->socket() ? (socketfile => $self->socket()) : ()),
+        $timeout ? (timeout => $timeout) : (),
+    );
 
-    my $self = shift;
+    $self->_init_client($client);
+    return $client;
+}
 
-    my $timeout = $self->_config()->{'timeout'};
-    my $client = OpenXPKI::Client->new({
-        SOCKETFILE => $self->socket(),
-        ($timeout ? (TIMEOUT => $timeout) : ())
-    });
-
-    if (! defined $client) {
-        die "Could not instantiate OpenXPKI client. Stopped";
-    }
-
-    my $log = $self->logger();
+sub _init_client ($self, $client, $old_client = undef) {
+    my $log = $self->logger;
 
     $log->debug("Initialize client");
 
-    my $reply;
-    # if we have a frontend session object, we also create a backend session
-    if ($self->session()) {
-        $reply = $self->__reinit_session( $client );
-
-    # Init a fresh backend session
-    } else {
-
-        $reply = $client->init_session();
-        if (!$reply) {
-            die "Could not initiate OpenXPKI server session. Stopped";
-        }
-        $log->debug("Started volatile session with id: " . $client->get_session_id() );
-    }
+    # initialize a fresh backend session
+    my $reply = $client->init_session
+        or die "Could not initiate OpenXPKI server session. Stopped";
+    $log->debug("Started volatile session with id: " . $client->get_session_id);
 
     # this should not happen
     $reply = $client->send_receive_service_msg('PING') unless($reply);
     $self->last_reply( $reply );
 
     if ($reply->{SERVICE_MSG} eq 'GET_PKI_REALM') {
-        my $realm = $self->realm();
-        if (! $realm ) {
+        my $realm = $self->realm;
+        if (not $realm) {
             $log->fatal("Found more than one realm but no realm is specified");
             $log->trace("Realms found:" . Dumper (keys %{$reply->{PARAMS}->{PKI_REALMS}}));
             die "No realm specified";
         }
         $log->debug("Selecting realm '$realm'");
-        my $auth = $self->auth();
+        my $auth = $self->auth;
         $reply = $client->send_receive_service_msg('GET_PKI_REALM',{
             PKI_REALM => $realm,
             (!ref $auth->{stack} ? (AUTHENTICATION_STACK => $auth->{stack}) : ()),
@@ -273,19 +220,20 @@ sub _build_client {
 
     if ($reply->{SERVICE_MSG} eq 'GET_AUTHENTICATION_STACK') {
         my $auth = $self->auth();
+        my $stacks = $reply->{PARAMS}->{AUTHENTICATION_STACKS};
 
         my $auth_stack;
         # Option 1: No Auth stack in config - we are screwed
-        if (!$auth->{stack}) {
-            $log->fatal("Found more than one auth stack but no stack is specified");
-            $log->trace("Stacks found:" . join(" ", keys %{$reply->{PARAMS}->{AUTHENTICATION_STACKS}}));
-            die "No auth stack specified";
-
+        if (not $auth->{stack}) {
+            $log->fatal("Server offers more than one auth stack but no stack was configured");
+            $log->trace("Server offers:" . join(', ', keys $stacks->%*));
+            die "No auth stack configured";
         }
 
         # Option 2: Single Auth stack in config - take it
-        if (!ref $auth->{stack}) {
+        if (not ref $auth->{stack}) {
             $auth_stack = $auth->{stack};
+            $log->debug("Auth stack: selecting '$auth_stack'");
 
         # Option 3: Mutliple Auth stacks in config
         # check type against current env for prereqs
@@ -294,45 +242,44 @@ sub _build_client {
         # type "x509" requires SSL_CLIENT_CERT
         # type "passwd" is always selected
         } else {
-            my $stacks = $reply->{PARAMS}->{AUTHENTICATION_STACKS};
-            foreach my $stack (@{$auth->{stack}}) {
-                if (!$stacks->{$stack}) {
-                    $log->debug("Auth stack $stack in config is not offered by server");
+            foreach my $stack ($auth->{stack}->@*) {
+                if (not $stacks->{$stack}) {
+                    $log->debug("Configured auth stack '$stack' is not offered by server");
                     next;
                 }
                 my $stack_type = $stacks->{$stack}->{type} || 'passwd';
                 if ($stack_type eq 'passwd') {
-                    $log->debug("Selecting $stack / passwd");
+                    $log->debug("Auth stack: selecting '$stack' / passwd");
                     $auth_stack = $stack;
                     last;
                 } elsif ($stack_type eq 'client') {
-                    if (!$ENV{REMOTE_USER} && !$ENV{'OPENXPKI_USER'}) {
-                        $log->debug("Skipping $stack / client");
-                        next;
+                    if ($ENV{REMOTE_USER} or $ENV{'OPENXPKI_USER'}) {
+                        $log->debug("Auth stack: selecting '$stack' / client");
+                        $auth_stack = $stack;
+                        last;
                     }
-                    $log->debug("Selecting $stack / client");
-                    $auth_stack = $stack;
-                    last;
+                    $log->debug("Auth stack: skipping '$stack' / client");
+                    next;
                 } elsif ($stack_type eq 'x509') {
-                    if (!$ENV{SSL_CLIENT_CERT}) {
-                        $log->debug("Skipping $stack / x509");
-                        next;
+                    if ($ENV{SSL_CLIENT_CERT}) {
+                        $log->debug("Auth stack: selecting '$stack' / x509");
+                        $auth_stack = $stack;
+                        last;
                     }
-                    $log->debug("Selecting $stack / x509");
-                    $auth_stack = $stack;
-                    last;
+                    $log->debug("Auth stack: skipping '$stack' / x509");
+                    next;
                 } else {
-                    $log->debug("Skipping $stack / unknown type $stack_type");
+                    $log->debug("Auth stack: skipping '$stack' / unknown type '$stack_type'");
                 }
             }
-            # failed to select a stack (might be better to use the first or last one as a default?)
-            if (!$auth_stack) {
-                $log->fatal("Mutliple auth stacks given but none matches the prepreqs");
-                die "No auth stack could be selected specified";
+            # failed to select a stack
+            # TODO might be better to use the first or last auth stack as a default?
+            if (not $auth_stack) {
+                $log->fatal("Multiple auth stacks given but none has matching prereqs");
+                die "No auth stack could be selected";
             }
         }
 
-        $log->debug("Selecting auth stack ". $auth_stack);
         # we send the stack without params which will either return a session
         # for anonymous stacks or the required parameter list.
 
@@ -340,7 +287,7 @@ sub _build_client {
             AUTHENTICATION_STACK => $auth_stack,
         });
         $self->last_reply( $reply );
-        $log->trace("Auth stack request ". Dumper $reply) if $log->is_trace;
+        $log->trace("Auth stack request: ". Dumper $reply) if $log->is_trace;
     }
 
     # FIXME / TODO - most of this code is duplicated in the WebUI Login code
@@ -392,7 +339,7 @@ sub _build_client {
             die "Unsupported login scheme: $login_type. Stopped";
         }
 
-        $data = $self->__jwt_signature($data, $reply->{SIGN}) if ($reply->{SIGN});
+        $data = $self->__jwt_signature($data) if ($reply->{SIGN});
 
         $log->trace("Auth data ". Dumper $data) if $log->is_trace;
         $reply = $client->send_receive_service_msg('GET_'.$login_type.'_LOGIN', $data );
@@ -412,11 +359,9 @@ sub __jwt_signature {
 
     my $self = shift;
     my $data = shift;
-    my $jws = shift;
 
     my $auth = $self->auth();
     return unless($auth->{'sign.key'});
-    $self->logger()->debug('Sign data using key id ' . $jws->{keyid} );
     my $pkey = decode_base64($auth->{'sign.key'});
     return encode_jwt(payload => {
         param => $data,
@@ -582,77 +527,15 @@ sub disconnect {
 
     my $self = shift;
 
-    $self->logger()->debug('Disconnect client');
+    $self->logger->debug('Disconnect client');
 
-    # Use detach if an external session was provided
-    # otherwise the session will be terminated!
-    if ($self->session()) {
-        $self->client->detach();
-    } else {
-        $self->client->logout();
-    }
+    $self->client->logout;
+    $self->client->close_connection;
+    $self->_clear_client;
 
-    $self->client->close_connection();
-
-    $self->_clear_client();
     return $self;
-}
-
-=head2 __reinit_session
-
-Try to reconnect an existing session. Returns the result of init_session
-from the underlying client.
-
-=cut
-
-sub __reinit_session {
-
-    my $self = shift;
-    my $client = shift;
-
-    my $session = $self->session();
-    if (!$session) {
-        die "Can not reinit backend session without frontend session!";
-    }
-
-    my $old_session =  $session->param('backend_session_id') || undef;
-    $self->logger()->info('old backend session ' . $old_session) if ($old_session);
-
-    my $reply;
-    # Fetch errors on session init
-    eval {
-        $reply = $client->init_session({ SESSION_ID => $old_session });
-    };
-    if (my $eval_err = $EVAL_ERROR) {
-        my $exc = OpenXPKI::Exception->caught();
-        if ($exc && $exc->message() eq 'I18N_OPENXPKI_CLIENT_INIT_SESSION_FAILED') {
-            # The session has gone - start a new one - might happen if the client was idle too long
-            $reply = $client->init_session({ SESSION_ID => undef });
-            $self->logger()->info('Backend session was gone - start a new one');
-        } else {
-            $self->logger()->error('Error creating backend session: ' . $eval_err->{message});
-            $self->logger()->trace($eval_err);
-            die "Backend communication problem";
-        }
-    }
-
-    my $client_session = $client->get_session_id();
-    # logging stuff only
-    if ($old_session && $client_session eq $old_session) {
-        $self->logger()->info('Resume backend session with id ' . $client_session);
-    } elsif ($old_session) {
-        $self->logger()->info('Re-Init backend session ' . $client_session . ' / ' . $old_session );
-    } else {
-        $self->logger()->info('New backend session with id ' . $client_session);
-    }
-    $session->param('backend_session_id', $client_session);
-    $self->logger()->trace( Dumper $session->dataref ) if $self->logger->is_trace;
-
-    return $reply;
-
 }
 
 __PACKAGE__->meta->make_immutable;
 
 __END__
-

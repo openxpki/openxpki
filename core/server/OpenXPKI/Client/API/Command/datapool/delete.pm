@@ -10,7 +10,7 @@ command_setup
 
 OpenXPKI::Client::API::Command::datapool::delete
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Delete a single item or a full namespace from the datapool
 

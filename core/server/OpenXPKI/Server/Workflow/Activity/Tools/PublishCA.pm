@@ -1,13 +1,10 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::PublishCA;
+use OpenXPKI qw( -class -nonmoose );
 
-use Moose;
-use MooseX::NonMoose;
 extends qw( OpenXPKI::Server::Workflow::Activity );
 with qw( OpenXPKI::Server::Workflow::Role::Publish );
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use OpenXPKI::Crypt::X509;
 use Workflow::Exception qw(configuration_error workflow_error);
 

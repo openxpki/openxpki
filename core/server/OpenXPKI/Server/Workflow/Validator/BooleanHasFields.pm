@@ -1,10 +1,9 @@
 package OpenXPKI::Server::Workflow::Validator::BooleanHasFields;
+use OpenXPKI -class;
 
-use Moose;
 extends 'OpenXPKI::Server::Workflow::Validator';
 
 use Workflow::Exception qw( validation_error );
-use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 
 sub _validate {

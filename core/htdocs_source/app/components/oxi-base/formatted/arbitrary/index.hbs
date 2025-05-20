@@ -10,7 +10,7 @@
     <BsButton
         @onClick={{this.toggleDetails}}
         @type=""
-        class="btn-sm btn-light border-secondary"
+        class="btn-sm bg-secondary-subtle border-secondary"
     >
         [{{this.type}}]
         {{#if this.detailsOpen}}
@@ -20,7 +20,7 @@
         {{/if}}
     </BsButton>
     {{#if this.detailsOpen}}
-        <div class="card card-body bg-light">
+        <div class="card card-body bg-secondary-subtle">
             <pre class="text-prewrap {{@class}}">{{this.asJSON}}</pre>
         </div>
     {{/if}}

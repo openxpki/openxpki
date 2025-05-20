@@ -1,5 +1,5 @@
 package OpenXPKI::Metrics;
-use Moose;
+use OpenXPKI -class;
 
 =head1 NAME
 
@@ -45,9 +45,6 @@ use File::Find qw();
 # CPAN modules
 use Time::HiRes qw( gettimeofday tv_interval );
 use Data::UUID;
-
-# Feature::Compat::Try should be done last to safely disable warnings
-use Feature::Compat::Try;
 
 ################################################################################
 # Attributes

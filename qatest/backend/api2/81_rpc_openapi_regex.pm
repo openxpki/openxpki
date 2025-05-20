@@ -1,9 +1,7 @@
 #!/usr/bin/perl
-use strict;
-use warnings;
+use OpenXPKI;
 
 # Core modules
-use English;
 use FindBin qw( $Bin );
 
 # CPAN modules

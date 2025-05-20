@@ -1,6 +1,5 @@
 package OpenXPKI::Server::Database::Role::MergeSupport;
-
-use Moose::Role;
+use OpenXPKI -role;
 
 =head1 Name
 

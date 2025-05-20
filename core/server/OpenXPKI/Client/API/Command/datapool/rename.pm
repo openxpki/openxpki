@@ -10,7 +10,7 @@ command_setup
 
 OpenXPKI::Client::API::Command::datapool::rename
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Change the key of an existing datapool value
 

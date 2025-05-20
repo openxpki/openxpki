@@ -1,18 +1,13 @@
-## OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_crl
-## (C)opyright 2005 Michael Bell
-
-use strict;
-use warnings;
-
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_crl;
+use OpenXPKI;
 
-use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
+use parent qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 
 sub get_command
 {
     my $self = shift;
 
-    
+
     if (! exists $self->{DATA})
     {
         OpenXPKI::Exception->throw (

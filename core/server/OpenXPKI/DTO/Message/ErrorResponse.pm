@@ -1,6 +1,6 @@
 package OpenXPKI::DTO::Message::ErrorResponse;
+use OpenXPKI -class;
 
-use Moose;
 with 'OpenXPKI::DTO::Message';
 
 has error_code => (
@@ -15,4 +15,4 @@ has message => (
     required => 1,
 );
 
-1;
+__PACKAGE__->meta->make_immutable;

@@ -1,7 +1,6 @@
 package OpenXPKI::Template::Plugin::CheckDNS;
+use OpenXPKI qw( -class -nonmoose -typeconstraints );
 
-use Moose;
-use MooseX::NonMoose;
 extends 'Template::Plugin';
 
 =head1 OpenXPKI::Template::Plugin::CheckDNS
@@ -18,11 +17,7 @@ to the "USE" statement:
 =cut
 
 use Net::DNS;
-
-use Moose::Util::TypeConstraints; # PLEASE NOTE: this enables all warnings via Moose::Exporter
 use HTML::Entities;
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 
 
 has 'resolver' => (

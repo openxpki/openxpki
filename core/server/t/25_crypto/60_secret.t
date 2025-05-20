@@ -155,10 +155,10 @@ lives_and {
 } "multipart secret: retrieve";
 
 lives_and {
-    # clear_secret() calls OpenXPKI::Control::reload which wants to read
+    # clear_secret() calls OpenXPKI::Control::Server->new->cmd_reload which wants to read
     # some (non-existing) config and kill the (non-running) server...
     no warnings 'redefine';
-    local *OpenXPKI::Control::reload = sub { note "intercepted OpenXPKI::Control::reload()" };
+    local *OpenXPKI::Control::Server::cmd_reload = sub { note "intercepted OpenXPKI::Control::Server::cmd_reload()" };
 
     $tm->clear_secret("monkey_island");
     is $tm->get_secret_inserted_part_count("monkey_island"), 0;
@@ -207,10 +207,10 @@ lives_ok {
 } "TokenManager instance 2";
 
 lives_and {
-    # clear_secret() calls OpenXPKI::Control::reload which wants to read
+    # clear_secret() calls OpenXPKI::Control::Server::cmd_reload which wants to read
     # some (non-existing) config and kill the (non-running) server...
     no warnings 'redefine';
-    local *OpenXPKI::Control::reload = sub { note "intercepted OpenXPKI::Control::reload()" };
+    local *OpenXPKI::Control::Server::cmd_reload = sub { note "intercepted OpenXPKI::Control::Server::cmd_reload()" };
 
     $tm->clear_secret("monkey_island");
     $tm->set_secret_part({ GROUP => "monkey_island", PART => 2, VALUE => $phrase });

@@ -12,7 +12,7 @@ use Log::Log4perl;
 use OpenXPKI::i18n qw( i18nGettext );
 use Exception::Class (
     'OpenXPKI::Exception' => {
-        fields => [ 'children', 'params' ],
+        fields => [ 'children', 'params', '__is_logged' ],
     },
     # Validation failed on workflow or api input field
     'OpenXPKI::Exception::InputValidator' => {
@@ -43,7 +43,13 @@ use Exception::Class (
     'OpenXPKI::Exception::WorkflowPickupFailed' => {
         isa => 'OpenXPKI::Exception',
     },
+    # Error while executing a command
+    'OpenXPKI::Exception::InvalidConfig' => {
+        isa => 'OpenXPKI::Exception',
+    },
 );
+
+Log::Log4perl->wrapper_register(__PACKAGE__); # make Log4perl step up to the next call frame
 
 my $log4perl_logger;
 
@@ -131,11 +137,11 @@ sub throw {
     $proto->rethrow if ref $proto;
 
     # lazy mode -  message string given as single argument
-    my %args = (@_);
+    my %args;
     if (scalar @_ == 1) {
-        %args = (message => shift );
+        %args = (message => shift);
     } else {
-        %args           = (@_);
+        %args = (@_);
     }
 
     # If an error is given and the error is an OpenXPKI::Exception
@@ -172,17 +178,14 @@ sub throw {
     my $priority = $args{log}->{priority} || 'error';
 
     eval {
-        # this hides this subroutine from the call stack to get the real
-        # location of the exception
-        local $Log::Log4perl::caller_depth =
-              $Log::Log4perl::caller_depth + 2;
-
         if (OpenXPKI::Server::Context::hascontext('log')) {
             my $log = OpenXPKI::Server::Context::CTX('log');
             $log->$facility()->$priority( $message );
+            $self->{__is_logged} = 1;
         } else {
             my $log = Log::Log4perl->get_logger('openxpki.'. $facility );
             $log->$priority( $message );
+            $self->{__is_logged} = 1;
         }
     };
 

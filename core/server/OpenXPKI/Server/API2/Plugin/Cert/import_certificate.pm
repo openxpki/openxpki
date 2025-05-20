@@ -12,6 +12,7 @@ OpenXPKI::Server::API2::Plugin::Cert::import_certificate
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Types;
 use OpenXPKI::Crypt::X509;
+use OpenXPKI::Serialization::Simple;
 
 =head1 COMMANDS
 
@@ -274,6 +275,22 @@ command "import_certificate" => {
                 },
             );
 
+            # todo this is duplicated in NICE persist - should be consolidated
+            my @structured_subject_alt_names = @{$x509->get_subject_alt_name()};
+            my $serializer = OpenXPKI::Serialization::Simple->new;
+            for my $san (@structured_subject_alt_names) {
+                # keep the old format for scalars as we need this to search in SAN
+                my $val = ((ref $san->[1]) ? $serializer->serialize($san) : join(":", @$san));
+                $dbi->insert(
+                    into => 'certificate_attributes',
+                    values => {
+                        attribute_key        => AUTO_ID,
+                        identifier           => $cert_identifier,
+                        attribute_contentkey => 'subject_alt_name',
+                        attribute_value      => $val,
+                    },
+                );
+            }
         }
 
     } else {

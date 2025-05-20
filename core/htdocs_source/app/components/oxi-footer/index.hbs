@@ -1,12 +1,19 @@
 <div class="oxi-footer">
-    <div class="container-fluid">
-        {{#if this.config.footer}}
-            {{defuse this.config.footer}}
-        {{else}}
-            {{!-- template-lint-disable no-bare-strings --}}
-            <p class="text-center text-secondary credit">
-                &copy; {{t 'site.copyright' year=this.config.copyrightYear}} &ndash; <a href="http://www.openxpki.org/">{{t 'site.author'}}</a>
-            </p>
-        {{/if}}
+    <div class="container-fluid text-center">
+        <div class="row">
+            <div class="col">
+                {{#if this.config.footer}}
+                    {{defuse this.config.footer}}
+                {{else}}
+                    {{!-- template-lint-disable no-bare-strings --}}
+                    <span class="text-center text-secondary credit">
+                        &copy; {{t 'site.copyright' year=this.config.copyrightYear}} &ndash; <a href="http://www.openxpki.org/">{{t 'site.author'}}</a>
+                    </span>
+                {{/if}}
+            </div>
+
+            {{yield}}
+
+        </div>
     </div>
 </div>

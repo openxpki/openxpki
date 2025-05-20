@@ -1,7 +1,5 @@
 package OpenXPKI::DTO::Authenticator;
-
-use Moose;
-use Moose::Util::TypeConstraints;
+use OpenXPKI qw( -class -typeconstraints );
 
 use Crypt::PK::ECC;
 

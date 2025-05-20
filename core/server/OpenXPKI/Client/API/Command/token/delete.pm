@@ -11,7 +11,7 @@ command_setup
 
 OpenXPKI::Client::API::Command::token::delete
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Delete the token for a given alias name
 

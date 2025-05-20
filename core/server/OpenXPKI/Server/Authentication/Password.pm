@@ -1,12 +1,8 @@
 package OpenXPKI::Server::Authentication::Password;
+use OpenXPKI -class;
 
-use Moose;
 extends 'OpenXPKI::Server::Authentication::Base';
 
-use English;
-
-use Data::Dumper;
-use OpenXPKI::Debug;
 use OpenXPKI::Password;
 use OpenXPKI::Server::Authentication::Handle;
 use OpenXPKI::Server::Context qw( CTX );

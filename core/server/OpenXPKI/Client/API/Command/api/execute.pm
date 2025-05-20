@@ -10,17 +10,22 @@ command_setup
 
 OpenXPKI::Client::API::Command::api::execute
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
-Run a bare API command on the server
+Run a named API command on the server.
+
+The name of the command to run is taken from the command parameter, it
+is also supported to replace the term I<execute> with the actual name
+of the command, e.g. 'oxi api get_cert ...'.
+
+Parameters for the command itself are just appended to the command
+as I<key=value>, flags are given as I<key>.
+
+Protected commands can be executed if called with a configured
+authentication key. Even if the command itself might run in global
+mode it is currently mandatory to provide a realm.
 
 =cut
-
-sub hint_command ($self, $input_params) {
-    my $actions = $self->run_enquiry('command');
-    $self->log->trace(Dumper $actions->result) if ($self->log->is_trace);
-    return $actions->result || [];
-}
 
 command "execute" => {
     command => { isa => 'Str', label => 'Command', hint => 'hint_command', required => 1 },
@@ -30,22 +35,30 @@ command "execute" => {
     my $payload = $self->build_hash_from_payload($param, 1);
 
     my $api_params = $self->help_command($command);
+    my $args = $api_params->{arguments};
+    my $protected = $api_params->{protected};
+
     my $cmd_parameters;
-    foreach my $key (keys %$api_params) {
+    foreach my $key (keys $args->%*) {
         $self->log->debug("Checking $key");
         if (defined $payload->{$key}) {
             $cmd_parameters->{$key} = $payload->{$key};
             delete $payload->{$key};
-        } elsif ($api_params->{$key}->{required}) {
-            die "The parameter $key is mandatory for running $command";
+        } elsif ($args->{$key}->{required}) {
+            die "The parameter *$key* is mandatory for running '$command'\n";
         }
     }
 
     if (my @keys = keys %$payload) {
-        die "One or more arguments are not accepted by the API command: " . join(',', @keys);
+        die "One or more arguments are not accepted by the API command: " . join(',', @keys) . "\n";
     }
 
-    my $res = $self->run_command($param->command, $cmd_parameters);
+    my $res;
+    if ($protected) {
+        $res = $self->run_protected_command($command, $cmd_parameters);
+    } else {
+        $res = $self->run_command($command, $cmd_parameters);
+    }
     return $res;
 
 };

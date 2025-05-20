@@ -1,7 +1,7 @@
 package OpenXPKI::Role::SubjectAltNameMaps;
+use OpenXPKI -role;
 
 use Socket qw(inet_aton);
-use Moose::Role;
 
 has subject_alt_name_map => (
     is => 'rw',

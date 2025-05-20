@@ -1,18 +1,11 @@
 package OpenXPKI::Crypto::Toolkit;
-
-use strict;
-use warnings;
-
-use Class::Std;
+use OpenXPKI -class_std;
 
 use OpenXPKI::Crypto::CLI;
 use OpenXPKI::Server::Context qw( CTX );
 
-use OpenXPKI::Debug;
 use Template;
-use OpenXPKI::Exception;
 use OpenXPKI::FileUtils;
-use English;
 
 use File::Spec;
 use Module::Load ();

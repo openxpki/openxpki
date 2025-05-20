@@ -14,7 +14,7 @@
             {{on "dragover" this.showCopyEffect}}
             {{on-init @setFocusInfo true}}
         />
-        <div class="invalid-feedback">{{@error}}</div>
+        {{#if @error}}<div class="invalid-feedback">{{@error}}</div>{{/if}}
     </div>
     <div class="col-lg-2 d-flex flex-column justify-content-start gap-2">
         {{#if @content.allow_upload}}

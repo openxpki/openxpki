@@ -1,11 +1,9 @@
 package OpenXPKI::Server::Workflow::Activity::EST::CACerts;
+use OpenXPKI;
 
-use warnings;
-use strict;
-use OpenXPKI::Debug;
+use parent qw( OpenXPKI::Server::Workflow::Activity );
+
 use OpenXPKI::Server::Context qw( CTX );
-
-use base qw( OpenXPKI::Server::Workflow::Activity );
 
 sub execute {
 

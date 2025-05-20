@@ -1,5 +1,7 @@
 package OpenXPKI::Test::QA::Role::SampleConfig;
-use Moose::Role;
+use OpenXPKI -role;
+
+requires 'testenv_root';
 
 =head1 NAME
 
@@ -9,20 +11,14 @@ to include the complete sample configuration from `config/config.d`
 =cut
 
 # Core modules
-use English;
-
-# CPAN modules
+use Cwd qw( abs_path );
 use Test::More;
 use File::Find;
 use File::Spec;
-use Cwd qw( abs_path );
 use FindBin qw( $Bin );
 
-# Project modules
-use YAML::Tiny;
-
-
-requires "testenv_root";
+# CPAN modules
+use YAML::PP;
 
 =head1 DESCRIPTION
 
@@ -103,12 +99,12 @@ has path_import_dir  => (
 
 has path_socket_file => (
     is => 'rw', isa => 'Str', lazy => 1,
-    default => sub { shift->testenv_root."/var/openxpki/openxpki.socket" },
+    default => sub { shift->testenv_root . $OpenXPKI::Defaults::SERVER_SOCKET },
 );
 
 has path_pid_file    => (
     is => 'rw', isa => 'Str', lazy => 1,
-    default => sub { shift->testenv_root."/run/openxpkid.pid" },
+    default => sub { shift->testenv_root . $OpenXPKI::Defaults::SERVER_PID },
 );
 
 has path_stderr_file => (
@@ -223,7 +219,7 @@ sub _yaml2perl {
         $dir =~ s/\/*$//; # strip trailing slash
 
         # slurp
-        my $yaml = YAML::Tiny->read($filepath);
+        my $yaml = YAML::PP->new->load_file($filepath);
 
         # assemble relative path
         my @relpath = File::Spec->splitdir($dir);

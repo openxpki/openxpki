@@ -1,11 +1,11 @@
 package OpenXPKI::Server::Workflow::Validator::KeyGenerationParams;
+use OpenXPKI;
 
-use strict;
-use warnings;
-use base qw( OpenXPKI::Server::Workflow::Validator );
-use OpenXPKI::Debug;
+use parent qw( OpenXPKI::Server::Workflow::Validator );
+
 use OpenXPKI::Server::Context qw( CTX );
 use Workflow::Exception qw( validation_error configuration_error );
+
 
 sub _preset_args {
     return [ qw(cert_profile key_alg key_gen_params enc_alg) ];

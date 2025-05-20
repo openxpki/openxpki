@@ -1,10 +1,10 @@
-# TestCfg.pm - A kludge for consolidating a few test routines
-#
-
 package TestCfg;
+use OpenXPKI -class_std;
+
 use Config::Std;
-use Data::Dumper;
-use Class::Std;
+
+# TestCfg.pm - A kludge for consolidating a few test routines
+
 {
     # Class attributes
     my %cfg_of; # stores the configuration
@@ -82,13 +82,6 @@ use Class::Std;
         }
         close $fh;
 
-#        warn "# DNs found: ", join( "\n#\t", '', @dn ), "\n";
-#        warn "# Using LDAP config ",
-          join( '/',
-            $cfg->{'ldapadmin'}{'user'},
-            $cfg->{'ldapadmin'}{'pass'},
-            $cfg->{'ldapadmin'}{'url'} ),
-          "\n";
         my @cmd = (
             $cfg->{instance}{ldapdelete}, '-x',
             '-c',                       '-D',
@@ -124,8 +117,6 @@ use Class::Std;
 
 1;
 
-__END__
-
 =head1 NAME
 
 TestCfg
@@ -146,4 +137,4 @@ This is a helper module for the test scripts.
         path => [ $dirname . '/../../../config/tests/testset', $dirname ],
     );
 
-
+=cut

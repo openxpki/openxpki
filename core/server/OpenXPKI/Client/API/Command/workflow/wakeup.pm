@@ -10,7 +10,7 @@ command_setup
 
 OpenXPKI::Client::API::Command::workflow::wakeup
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Manually wakeup a paused workflow.
 

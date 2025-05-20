@@ -1,16 +1,7 @@
-## OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_decrypt
-## Written 2005 by Michael Bell for the OpenXPKI project
-## Rewritten 2006 by Julia Dubenskaya for the OpenXPKI project
-## (C) Copyright 2005-2006 by The OpenXPKI Project
-
-use strict;
-use warnings;
-
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_decrypt;
+use OpenXPKI;
 
-use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
-
-use OpenXPKI::Debug;
+use parent qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 
 sub get_command
 {

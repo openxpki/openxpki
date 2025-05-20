@@ -1,9 +1,8 @@
 package OpenXPKI::Connector::Regex;
+use OpenXPKI -class;
 
-use Moose;
 extends 'Connector';
 
-use English;
 
 has replace => (
     is  => 'ro',

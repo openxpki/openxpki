@@ -1,10 +1,8 @@
-## OpenXPKI::Crypto::Backend::OpenSSL::Engine::nCipher
-## Written 2005 by Michael Bell for the OpenXPKI project
-## Rewritten 2006 by Julia Dubenskaya for the OpenXPKI project
-## Extended 2008 by Martin Bartosch for the OpenXPKI project
-##   - added HSM and key online tests
-## (C) Copyright 2005-2008 by The OpenXPKI Project
-##
+package OpenXPKI::Crypto::Backend::OpenSSL::Engine::nCipher;
+use OpenXPKI;
+
+use parent qw(OpenXPKI::Crypto::Backend::OpenSSL::Engine);
+
 ## This driver supports nCipher nShield HSMs using HWCRHK keys that are
 ## preloaded using 'with-nfast pause' or 'preload pause'.
 ##
@@ -20,15 +18,6 @@
 ## Other versions (in particular such between the tested ones) may work.
 ##
 
-package OpenXPKI::Crypto::Backend::OpenSSL::Engine::nCipher;
-
-use strict;
-use warnings;
-use English;
-
-use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Engine);
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
 use Memoize;

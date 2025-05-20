@@ -178,7 +178,7 @@ sub op_handlers {
                     signer_cert => $self->signer,
                 );
                 # Load URL paramters if defined by config
-                my $conf = $self->config->{'PKIOperation'};
+                my $conf = $self->config->get_hash('PKIOperation');
                 if ($conf->{param}) {
                     my @keys =
                         grep { $_ ne "operation" and $_ ne "message" }
@@ -238,7 +238,7 @@ sub cgi_set_custom_wf_params ($self) {
             signer_cert => $self->signer,
         );
         # Load URL paramters if defined by config
-        my $conf = $self->config->{'PKIOperation'};
+        my $conf = $self->config->get_hash('PKIOperation');
         if ($conf->{param}) {
             my $extra;
             my @extra_params;
@@ -282,7 +282,7 @@ sub set_pkcs7_message ($self, $pkcs7) {
 
     my $attrs = {};
     try {
-        $attrs = $self->backend->run_command('scep_unwrap_message' => { message => $pkcs7 });
+        $attrs = $self->client_simple->run_command('scep_unwrap_message' => { message => $pkcs7 });
     }
     catch ($err) {
         $self->log->error("$err"); # stringification
@@ -320,7 +320,7 @@ sub generate_pkcs7_response ($self, $response) {
         }
 
         $self->log->warn(sprintf('Client error / malformed request: %s (internal code: %s)', $failInfo, $response->error));
-        return $self->backend->run_command('scep_generate_failure_response', {
+        return $self->client_simple->run_command('scep_generate_failure_response', {
             %params,
             failinfo => $failInfo,
         });
@@ -330,11 +330,11 @@ sub generate_pkcs7_response ($self, $response) {
 
     } elsif ($response->is_pending) {
         $self->log->info('Send pending response for ' . $self->transaction_id );
-        return $self->backend->run_command('scep_generate_pending_response', \%params);
+        return $self->client_simple->run_command('scep_generate_pending_response', \%params);
 
     } else {
-        $params{chain} = $self->config->{output}->{chain} || 'chain';
-        return $self->backend->run_command('scep_generate_cert_response', {
+        $params{chain} = $self->config->get('output.chain') || 'chain';
+        return $self->client_simple->run_command('scep_generate_cert_response', {
             %params,
             identifier => $response->result,
             signer => $self->signer,

@@ -248,22 +248,13 @@ foreach my $entry (@{$params{filearg}}) {
 
 }
 
-if($params{instance}){
-    $params{socketfile} = sprintf '/var/openxpki/%s/openxpki.socket', $params{instance};
-} elsif(!$params{socketfile}){
-    $params{socketfile} = '/var/openxpki/openxpki.socket';
-    debug("using default socket %s \n", $params{socketfile});
-}
-
-OpenXPKI::Log4perl::init_or_fallback('' , $params{debug} ? 'DEBUG' : 'WARN');
-
-debug(sprintf("Socketfile: %s", $params{socketfile}));
+OpenXPKI::Log4perl->init_screen_logger($params{debug} ? 'DEBUG' : 'WARN');
 
 my $reply;
-my $client = OpenXPKI::Client->new({
-    SOCKETFILE => $params{socketfile},
-    TIMEOUT  => $params{timeout},
-    });
+my $client = OpenXPKI::Client->new(
+    ($params{socketfile} ? (socketfile => $params{socketfile}) : ()),
+    (defined $params{timeout} ? (timeout  => $params{timeout}) : ()),
+);
 
 
 if (! defined $client) {

@@ -1,14 +1,9 @@
-# OpenXPKI::Server::Workflow::Activity::Tools::CancelApprovals.pm
-# Written by Michael Bell for the OpenXPKI project 2006
-# Copyright (c) 2006 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Activity::Tools::CancelApprovals;
+use OpenXPKI;
 
-use strict;
-use base qw( OpenXPKI::Server::Workflow::Activity );
+use parent qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
 use OpenXPKI::Serialization::Simple;
 
 sub execute

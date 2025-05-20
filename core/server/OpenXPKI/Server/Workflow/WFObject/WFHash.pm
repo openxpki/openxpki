@@ -1,11 +1,8 @@
-# OpenXPKI::Server::Workflow::WFObject::WFHash
-# Written by Scott Hardin for the OpenXPKI Project 2010
-# Copyright (c) 2010 by the OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::WFObject::WFHash;
+use OpenXPKI;
 
-use strict;
-use base qw( OpenXPKI::Server::Workflow::WFObject );
+use parent qw( OpenXPKI::Server::Workflow::WFObject );
+
 use Carp qw( confess );
 
 # Storage for object attributes

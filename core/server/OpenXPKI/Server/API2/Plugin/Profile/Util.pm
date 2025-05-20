@@ -1,8 +1,7 @@
 package OpenXPKI::Server::API2::Plugin::Profile::Util;
-use Moose;
+use OpenXPKI -class;
 
 # Project modules
-use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Workflow::Factory;
 use OpenXPKI::Workflow::Field;

@@ -77,4 +77,5 @@ libtree-dagnode-perl
 libtype-tiny-perl
 libworkflow-perl
 libyaml-libyaml-perl
-libyaml-perl
+libyaml-pp-perl
+libppix-regexp-perl

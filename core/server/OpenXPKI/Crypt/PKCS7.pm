@@ -1,13 +1,11 @@
 package OpenXPKI::Crypt::PKCS7;
+use OpenXPKI -class;
 
-use Moose;
 with 'OpenXPKI::Role::IssuerSerial';
 
-use English;
 use MIME::Base64;
 use Convert::ASN1 ':tag';
 use Exporter qw( import );
-use OpenXPKI::Debug;
 use OpenXPKI::Crypt::DN;
 use OpenXPKI::Crypt::X509;
 
@@ -389,10 +387,12 @@ sub __build_envelope_signed_data {
     };
 
     my $aa = $si->{authenticatedAttributes}->{aaSet} || $si->{authenticatedAttributes}->{aaSequence};
-    my $attrib = $mapattrib->($aa) if ($aa);
+    my $attrib;
+    $attrib = $mapattrib->($aa) if ($aa);
 
     my $ua = $si->{unauthenticatedAttributes}->{uaSet} || $si->{unauthenticatedAttributes}->{uaSequence};
-    my $uattrib = $mapattrib->($ua) if ($ua);
+    my $uattrib;
+    $uattrib = $mapattrib->($ua) if ($ua);
 
     return {
         digest_alg => $oids{$digest_oid} || $digest_oid,

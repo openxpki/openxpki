@@ -1,13 +1,12 @@
 # OpenXPKI::Server::Workflow::Condition::Connector::Exists
 package OpenXPKI::Server::Workflow::Condition::Connector::Exists;
+use OpenXPKI;
 
-use strict;
-use warnings;
-use base qw( OpenXPKI::Server::Workflow::Condition );
+use parent qw( OpenXPKI::Server::Workflow::Condition );
+
 use Workflow::Exception qw( condition_error configuration_error );
 use OpenXPKI::Server::Context qw( CTX );
 
-use OpenXPKI::Debug;
 
 sub _evaluate
 {

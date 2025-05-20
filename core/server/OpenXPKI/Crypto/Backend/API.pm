@@ -1,20 +1,9 @@
-## OpenXPKI::Crypto::Backend::API
-## Written 2006 by Michael Bell for the OpenXPKI project
-## Converted to use Class::Std and OpenXPKI::Crypto::API
-## 2006 by Alexander Klink for the OpenXPKI project
-## (C) Copyright 2006 by The OpenXPKI Project
 package OpenXPKI::Crypto::Backend::API;
-use base qw( OpenXPKI::Crypto::API );
+use OpenXPKI -class_std;
 
-use strict;
-use warnings;
+use parent qw( OpenXPKI::Crypto::API );
 
-use Class::Std;
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
-use English;
-#use Smart::Comments;
 
 ## scalar value:
 ##     - 0 means the parameter is optional
@@ -35,9 +24,6 @@ sub __init_command_params : PRIVATE {
 
     ## define params for all the crypto commands
     my $command_params = {
-    "list_algorithms" => {"FORMAT"        => 1,
-                          "ALG"           => 0,
-                          "PARAM"         => 0},
     "convert_cert"    => {"DATA"             => 1,
                           "IN"               => ["DER", "PEM"],
                           "OUT"              => ["DER","TXT","PEM","TXTPEM"],
@@ -102,13 +88,6 @@ sub __init_command_params : PRIVATE {
                            'PASSWD' => 0,
                            'CERT' => 0,
                            'PADDING' => ["__undef","oaep","pkcs1"],
-                         },
-    "get_pkcs8_keytype" => { 'DATA'   => 1,
-                            'PASSWD' => 1,
-                           },
-    'is_issuer'       => {
-                            'CERT'             => 1,
-                            'POTENTIAL_ISSUER' => 1,
                          },
     "is_prime"        => {"PRIME"   => 1,
                          },

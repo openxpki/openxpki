@@ -54,7 +54,7 @@ if ($ENV{DEBUG_LEVEL}) {
 
 BEGIN { use_ok "OpenXPKI::Server::Log" };
 
-my $log = OpenXPKI::Server::Log->new(CONFIG => \$log_conf);
+my $log = OpenXPKI::Server::Log->new(config => \$log_conf);
 
 # Not logged
 ok (! $log->log (FACILITY => "auth",

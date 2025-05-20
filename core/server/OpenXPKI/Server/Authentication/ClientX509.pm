@@ -1,16 +1,12 @@
 package OpenXPKI::Server::Authentication::ClientX509;
+use OpenXPKI -class;
 
-use Moose;
 extends 'OpenXPKI::Server::Authentication::X509';
 
-use English;
-
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
-use OpenXPKI::Server::Context qw( CTX );
-
 use DateTime;
-use Data::Dumper;
+
+use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Server::Authentication::Handle;
 
 sub handleInput {
 

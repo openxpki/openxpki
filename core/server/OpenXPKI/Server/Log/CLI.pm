@@ -1,14 +1,5 @@
-## OpenXPKI::Server::Log::CLI.pm
-##
-## Logger class to be used in CLI scripts, logs to stdout
-## Written in 2013 by Olvier Welter for the OpenXPKI Project
-## (C) Copyright 2013 by The OpenXPKI Project
-
 package OpenXPKI::Server::Log::CLI;
-
-use strict;
-use warnings;
-use English;
+use OpenXPKI;
 
 use Log::Log4perl qw( :easy );
 

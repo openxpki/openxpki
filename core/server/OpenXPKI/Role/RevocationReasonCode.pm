@@ -1,6 +1,5 @@
 package OpenXPKI::Role::RevocationReasonCode;
-
-use Moose::Role;
+use OpenXPKI -role;
 
 use List::Util qw(first);
 

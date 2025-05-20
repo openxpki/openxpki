@@ -10,7 +10,7 @@ command_setup
 
 OpenXPKI::Client::API::Command::workflow::fail
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Manually set a hanging workflow to failed, see I<fail_workflow> for
 details.

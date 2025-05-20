@@ -143,7 +143,6 @@ B<before> you use C<OpenXPKI::Test>:
 =cut
 
 # Core modules
-use Data::Dumper;
 use File::Path qw( remove_tree );
 use File::Temp qw( tempdir );
 use Module::Load ();
@@ -153,7 +152,7 @@ use MIME::Base64;
 use Moose::Util;
 use Moose::Meta::Class;
 use Digest::SHA;
-use YAML::Tiny;
+use YAML::PP;
 use Test::More;
 use Test::Deep::NoTest qw( eq_deeply bag ); # use eq_deeply() without beeing in a test
 use Import::Into;
@@ -416,7 +415,7 @@ has log_level => (
 =item * I<log_class> (optional) - A regex: only show log messages originating
 from Perl packages matching this value.
 
-E.g. C<log_class =E<gt> qr/^OpenXPKI::Client::UI/> to show messages from all
+E.g. C<log_class =E<gt> qr/^OpenXPKI::Client::Service::WebUI/> to show messages from all
 packages below this namespace. Default: qr/^/ (= all packages)
 
 =cut
@@ -833,7 +832,7 @@ sub init_user_config {
         my $val = $self->user_config->{$_};
         # support config given as YAML string
         if (ref $val eq '') {
-            $val = YAML::Tiny->read_string($val)->[0];
+            $val = YAML::PP->new->load_string($val);
         }
         $self->add_conf($_ => $val);
     }
@@ -903,8 +902,8 @@ sub init_server {
     OpenXPKI::Server::Context::reset();
     OpenXPKI::Server::Init::reset();
 
-    # init log object (and force it to NOT reinitialize Log4perl)
-    OpenXPKI::Server::Context::setcontext({ log => OpenXPKI::Server::Log->new(CONFIG => undef) })
+    # init log object
+    OpenXPKI::Server::Context::setcontext({ log => OpenXPKI::Server::Log->new(use_current_config => 1) })
         unless OpenXPKI::Server::Context::hascontext("log"); # may already be set if multiple instances of OpenXPKI::Test are created
 
     # init basic CTX objects: all those we do not explicitely skip
@@ -1170,8 +1169,7 @@ sub _build_dbi {
 
     #Log::Log4perl->easy_init($OFF);
     return OpenXPKI::Server::Database->new(
-        # "CONFIG => undef" prevents OpenXPKI::Server::Log from re-initializing Log4perl
-        log => OpenXPKI::Server::Log->new(CONFIG => undef)->system,
+        log => OpenXPKI::Server::Log->new(use_current_config => 1)->system,
         db_params => $self->db_conf,
     );
 }

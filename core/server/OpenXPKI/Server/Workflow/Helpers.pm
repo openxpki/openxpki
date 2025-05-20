@@ -1,11 +1,9 @@
 package OpenXPKI::Server::Workflow::Helpers;
-
-use strict;
-use warnings;
-use English;
+use OpenXPKI;
 
 use Workflow::Exception qw( configuration_error );
 
+use OpenXPKI::Serialization::Simple;
 
 =head2 get_service_config_path
 
@@ -55,6 +53,32 @@ sub get_service_config_path {
     }
 
     return \@prefix;
+
+}
+
+=head2 get_value_from_context
+
+Helper to fetch a value from the context.
+
+Deserialised the value in case it is an object.
+
+=cut
+
+sub get_value_from_context {
+
+    my $workflow_class = shift;
+    my $ctxkey = shift;
+
+    my $ctx = $workflow_class->workflow()->context()->param( $ctxkey );
+    if (!defined $ctx || $ctx eq '') {
+        return $ctx;
+    }
+    if (OpenXPKI::Serialization::Simple::is_serialized($ctx)) {
+        ##! 32: ' needs deserialize '
+        my $ser  = OpenXPKI::Serialization::Simple->new();
+        $ctx = $ser->deserialize( $ctx );
+    }
+    return $ctx;
 
 }
 

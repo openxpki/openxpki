@@ -1,5 +1,5 @@
 package OpenXPKI::Server::Database::Driver::MariaDB2;
-use Moose;
+use OpenXPKI -class;
 
 with qw(
     OpenXPKI::Server::Database::Role::SequenceSupport
@@ -20,9 +20,6 @@ use version;
 # CPAN modules
 use DBI qw(:sql_types);
 use DBI::Const::GetInfoType; # provides %GetInfoType hash
-
-# Project modules
-use OpenXPKI::Exception;
 
 ################################################################################
 # required by OpenXPKI::Server::Database::Role::Driver

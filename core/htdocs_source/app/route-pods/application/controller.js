@@ -17,8 +17,15 @@ import { service } from '@ember/service'
 
 export default class ApplicationController extends Controller {
     @service('oxi-content') content
+    @service('intl') intl
 
     @tracked restricted_width = true
+    @tracked nightMode = false
+
+    constructor() {
+        super(...arguments)
+        this.intl.setLocale(['en-us']);
+    }
 
     @action toggleWidth() {
         this.restricted_width = !this.restricted_width
@@ -31,5 +38,12 @@ export default class ApplicationController extends Controller {
         let el = document.querySelector(".oxi-loading-banner")
         if (!el) return
         el.parentNode.removeChild(el)
+    }
+
+    @action
+    toggleNightMode() {
+        this.nightMode = !this.nightMode
+        let theme = this.nightMode ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-bs-theme', theme)
     }
 }

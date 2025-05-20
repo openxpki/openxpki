@@ -1,6 +1,6 @@
 package OpenXPKI::DTO::Message::Authenticate;
+use OpenXPKI -class;
 
-use Moose;
 with 'OpenXPKI::DTO::Message';
 
 has realm => (
@@ -18,4 +18,4 @@ has stack => (
 
 # use params to pass credentials
 
-1;
+__PACKAGE__->meta->make_immutable;

@@ -1,14 +1,6 @@
-# OpenXPKI::Serialization::Fast
-# Written 2008 by Alexander Klink for the OpenXPKI project
-# (C) Copyright 2008 by The OpenXPKI Project
-
 package OpenXPKI::Serialization::Fast;
+use OpenXPKI;
 
-use strict;
-use warnings;
-
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use Data::Serializer;
 
 sub new {

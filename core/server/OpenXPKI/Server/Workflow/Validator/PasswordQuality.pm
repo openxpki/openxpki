@@ -1,15 +1,13 @@
 package OpenXPKI::Server::Workflow::Validator::PasswordQuality;
+use OpenXPKI qw( -class -nonmoose );
+
+extends qw( Workflow::Validator );
 
 # CPAN modules
-use Moose;
-use MooseX::NonMoose;
 use Workflow::Exception qw( validation_error configuration_error );
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Debug;
-
-extends qw( Workflow::Validator );
 
 =head1 NAME
 

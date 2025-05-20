@@ -1,9 +1,3 @@
-## OpenXPKI::Crypto::Backend::OpenSSL::Command
-## (C)opyright 2005 Michael Bell
-
-use strict;
-use warnings;
-
 use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_random;
 use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_pkcs10;
 use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_pkcs12;
@@ -26,12 +20,10 @@ use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_pkey;
 use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_params;
 
 package OpenXPKI::Crypto::Backend::OpenSSL::Command;
+use OpenXPKI;
 
-use OpenXPKI::Debug;
 use OpenXPKI::DN;
 use OpenXPKI::FileUtils;
-use OpenXPKI::Exception;
-use English;
 
 sub new
 {

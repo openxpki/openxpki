@@ -1,12 +1,10 @@
 # OpenXPKI::Server::Workflow::Condition
 package OpenXPKI::Server::Workflow::Condition;
+use OpenXPKI;
 
-use strict;
-use base qw( Workflow::Condition );
+use parent qw( Workflow::Condition );
 
-use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
 
 __PACKAGE__->mk_accessors( qw( workflow params _map ) );
 
@@ -139,6 +137,10 @@ sub param {
         }
     }
     return;
+}
+
+sub _from_context {
+    return OpenXPKI::Server::Workflow::Helpers::get_value_from_context( @_ );
 }
 
 1;

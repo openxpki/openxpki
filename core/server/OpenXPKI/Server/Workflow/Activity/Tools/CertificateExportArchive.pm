@@ -1,12 +1,10 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::CertificateExportArchive;
+use OpenXPKI;
 
-use strict;
-use base qw( OpenXPKI::Server::Workflow::Activity );
+use parent qw( OpenXPKI::Server::Workflow::Activity );
 
 use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use MIME::Base64 qw(encode_base64);
 use Workflow::Exception qw(configuration_error);
 

@@ -1,7 +1,5 @@
 package OpenXPKI::Server::API2::Plugin::Api::Util::ModuleFinder;
-use strict;
-use warnings;
-use English;
+use OpenXPKI;
 
 =head1 NAME
 
@@ -126,13 +124,13 @@ sub searchfor {
         }
 
         if ($recurse) {
-            opendir(D,$dir) or die "Can't opendir $dir: $!\n";
+            opendir(my $D,$dir) or die "Can't opendir $dir: $!\n";
             my @newdirs = map catfile($dir, $_), grep {
                 not /^\.\.?\z/s and
                 not /^auto\z/s  and   # save time! don't search auto dirs
                 -d  catfile($dir, $_)
-            } readdir D;
-            closedir(D)     or die "Can't closedir $dir: $!\n";
+            } readdir $D;
+            closedir($D)     or die "Can't closedir $dir: $!\n";
             next unless @newdirs;
             # what a wicked map!
             @newdirs = map((s/\.dir\z//,$_)[1],@newdirs) if $self->is_vms;

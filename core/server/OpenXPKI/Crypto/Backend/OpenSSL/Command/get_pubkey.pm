@@ -1,11 +1,7 @@
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::get_pubkey;
+use OpenXPKI;
 
-use strict;
-use warnings;
-
-use OpenXPKI::Debug;
-
-use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
+use parent qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 
 sub get_command
 {

@@ -1,17 +1,14 @@
 package OpenXPKI::Crypt::PKCS7::SCEP;
+use OpenXPKI -class;
 
-use Moose;
 with 'OpenXPKI::Role::IssuerSerial';
 
-use English;
 use MIME::Base64;
 use Convert::ASN1 ':tag';
 use Crypt::CBC;
 use Crypt::Digest qw( digest_data );
 
-use OpenXPKI::Debug;
 use OpenXPKI::Random;
-use OpenXPKI::Exception;
 use OpenXPKI::Crypt::PKCS10;
 use OpenXPKI::Crypt::X509;
 use OpenXPKI::Crypt::PKCS7 qw(encode_tag decode_tag find_oid);
@@ -301,7 +298,7 @@ around BUILDARGS => sub {
         # unambigous related to the expected data
         if ($request =~ m{\AM([[:print:]]|\s)+\z}) {
             ##! 64: 'base64 request without boundaries, decoding...'
-            $request = decode_base64($request);            
+            $request = decode_base64($request);
         }
         my $outer = OpenXPKI::Crypt::PKCS7->new($request);
         ##! 128: $outer->parsed()
@@ -455,7 +452,7 @@ sub __get_cbc {
         OpenXPKI::Exception->throw( message => 'Unknown content encryption algorithm',
             params => { enc_alg => $enc_alg } );
     }
-    ##! 64: "IV: " . encode_base64($content_iv) . " - Key: " . encode_base64($content_key)
+    ##! 64: "IV: " . encode_base64($content_iv,'') . " - Key: " . encode_base64($content_key,'')
 
     my $cbc = Crypt::CBC->new(
         -cipher => $cipher,
@@ -486,7 +483,7 @@ sub __generate_response {
     my $asn1 = $self->_asn1;
 
     my $payload_digest = digest_data( uc($self->digest_alg()), $content->{response} || '');
-    ##! 32: "Payload built - digest " . encode_base64($payload_digest)
+    ##! 32: "Payload built - digest " . encode_base64($payload_digest,'')
     my @authAttr = (
         { 'type' => '2.16.840.1.113733.1.9.2', 'values' => [ encode_tag( '3', 'PrintableString') ] }, # messageType
         { 'type' => '2.16.840.1.113733.1.9.7', 'values' => [ encode_tag( $self->transaction_id(), 'PrintableString') ] }, # transactionID
@@ -498,7 +495,7 @@ sub __generate_response {
     my %payload;
     if ($content->{response}) {
         ##! 32: 'Response'
-        ##! 128: 'PKCS7 Payload' . encode_base64($content->{response})
+        ##! 128: 'PKCS7 Payload' . encode_base64($content->{response},'')
         push @authAttr, {
             'type' => '2.16.840.1.113733.1.9.3',
             'values' => [ encode_tag( '0', 'PrintableString') ]
@@ -586,9 +583,9 @@ sub __generate_response {
     # we already have the binary data from the helper so we just need to
     # add the outer "set of" tag (0x11 + 0x20 as it is constructed)
     my $attributeContent = encode_tag( join('', (map { $_->{asn1} } @authAttr) ), 0x31 );
-    ##! 128: 'attribute content ' . encode_base64($attributeContent)
+    ##! 128: 'attribute content ' . encode_base64($attributeContent,'')
 
-    ##! 128: 'Attribute Content ' . encode_base64($attributeContent)
+    ##! 128: 'Attribute Content ' . encode_base64($attributeContent,'')
 
     my $skey = $self->ratoken_key();
     my $racert = $self->ratoken();
@@ -607,7 +604,7 @@ sub __generate_response {
 
         ##! 64: 'Token API'
         my $attribute_digest = digest_data( uc($self->digest_alg()), $attributeContent);
-        ##! 128: 'Attribute Content ' . encode_base64($attribute_digest)
+        ##! 128: 'Attribute Content ' . encode_base64($attribute_digest,'')
         $signature = $skey->command({
             COMMAND => 'sign_digest',
             DIGEST => $attribute_digest,
@@ -645,7 +642,7 @@ sub __generate_response {
             }]},
         }
     }) || die $parser->error;
-    ##! 128: 'response ' . encode_base64($pkcs7sig)
+    ##! 128: 'response ' . encode_base64($pkcs7sig,'')
     return $pkcs7sig;
 
 }

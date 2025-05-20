@@ -4,17 +4,18 @@ use OpenXPKI -client_plugin;
 # TODO - this is not protected but does not need a realm as its local...
 command_setup
     parent_namespace_role => 1,
-    protected => 1,
 ;
 
 =head1 NAME
 
 OpenXPKI::Client::API::Command::config::verify
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
-Show information of the (running) OpenXPKI configuration or
-validate a configuration tree.
+Verify the content of a directory holding a YAML system configuration.
+
+Contrary to I<config show> this works on a local copy and does not query
+the running instance!
 
 =cut
 
@@ -25,7 +26,7 @@ use Mojo::Loader;
 use OpenXPKI::Config::Backend;
 
 command "verify" => {
-    config => { isa => 'ReadableDir', label => 'Path to local config tree', default => '/etc/openxpki/config.d' },
+    config => { isa => 'ReadableDir', label => 'Path to local config tree', default => $OpenXPKI::Defaults::SERVER_CONFIG_DIR },
     path => { isa => 'Str', label => 'Path to dump' },
     module => { isa => 'Str', label => 'Optional linter module' },
 } => sub ($self, $param) {
@@ -52,7 +53,9 @@ command "verify" => {
         $res = { digest => $conf->checksum, $param->module => $res_lint };
 
     } else {
+
         $res = { digest => $conf->checksum };
+
     }
 
     return $res;

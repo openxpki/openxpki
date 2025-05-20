@@ -3,9 +3,8 @@ Docker Setup to Build OpenXPKI for Debian
 
 This directory provides a docker setup to build and sign packages for debian.
 
-The default is to build the top commit of the current branch. You can set
-OPENXPKI_BUILD_TAG to a commit or tag to build instead of HEAD but the
-target must be in the current branch.
+The default is to build the top commit of the current branch.
+You can set OPENXPKI_BUILD_TAG to a commit or tag to build instead of HEAD.
 
 Step 1 - Container
 ------------------

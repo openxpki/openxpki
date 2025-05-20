@@ -1,5 +1,9 @@
 package OpenXPKI::Server::API2::Plugin::Crypto::password_quality::CheckEntropyRole;
-use feature 'unicode_strings';
+use OpenXPKI -role;
+
+requires 'register_check';
+requires 'password';
+requires 'enable';
 
 =head1 NAME
 
@@ -20,24 +24,15 @@ L<OpenXPKI::Server::API2::Plugin::Crypto::password_quality>.
 
 =cut
 
-use Moose::Role;
-
 # Core modules
 use POSIX ();
-
-# Project modules
-use OpenXPKI::Debug;
-
-
-requires 'register_check';
-requires 'password';
-requires 'enable';
-
 
 use constant {
     OTHER => '__unlisted character class',
     UNICODE_ASSIGNED_CHARACTERS => 143924,
 };
+
+use feature 'unicode_strings';
 
 
 has min_entropy => (

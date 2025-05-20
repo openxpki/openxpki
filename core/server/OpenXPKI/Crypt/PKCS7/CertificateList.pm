@@ -1,14 +1,10 @@
 package OpenXPKI::Crypt::PKCS7::CertificateList;
-use Moose;
-
-use English;
+use OpenXPKI -class;
 
 use MIME::Base64;
 use Digest::SHA qw(sha256);
 use Convert::ASN1 ':tag';
 
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Crypt::PKCS7;
 
 =head1 NAME

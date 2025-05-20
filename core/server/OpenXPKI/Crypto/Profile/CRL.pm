@@ -1,25 +1,17 @@
+package OpenXPKI::Crypto::Profile::CRL;
+use OpenXPKI;
+
+use parent qw(OpenXPKI::Crypto::Profile::Base);
+
 =head1 Name
 
 OpenXPKI::Crypto::Profile::CRL - cryptographic profile for CRLs.
 
 =cut
 
-use strict;
-use warnings;
-
-package OpenXPKI::Crypto::Profile::CRL;
-
-use base qw(OpenXPKI::Crypto::Profile::Base);
-
 use OpenXPKI::Server::Context qw( CTX );
 
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
-use English;
-
 use DateTime;
-#use Smart::Comments;
-
 
 =head2 new ( { CA, [ID, VALIDITY, CA_VALIDITY, CACERTIFICATE] } )
 

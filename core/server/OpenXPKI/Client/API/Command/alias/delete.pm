@@ -11,7 +11,7 @@ command_setup
 
 OpenXPKI::Client::API::Command::alias::delete
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Delete an alias
 

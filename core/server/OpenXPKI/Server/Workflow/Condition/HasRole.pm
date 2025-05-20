@@ -1,12 +1,10 @@
 package OpenXPKI::Server::Workflow::Condition::HasRole;
+use OpenXPKI;
 
-use strict;
-use warnings;
-use base qw( Workflow::Condition );
+use parent qw( Workflow::Condition );
+
 use Workflow::Exception qw( condition_error configuration_error );
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Debug;
-use English;
 
 __PACKAGE__->mk_accessors( 'expected_roles' );
 

@@ -1,19 +1,12 @@
 package OpenXPKI::Service;
+use OpenXPKI -class_std;
 
-use strict;
-use warnings;
-use English;
-
-use Class::Std;
 # the following is more secure than the standard $SIG{ALRM} code,
 # see http://search.cpan.org/~lbaxter/Sys-SigAction/dbd-oracle-timeout.POD
 use Sys::SigAction qw( set_sig_handler );
 
-## used modules
-
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
+
 
 my %transport              : ATTR( :init_arg<TRANSPORT> );
 my %serialization          : ATTR( :init_arg<SERIALIZATION> );

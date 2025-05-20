@@ -1,12 +1,11 @@
 package OpenXPKI::Client::CLI;
+use OpenXPKI -class;
 
-use Moose;
 extends 'OpenXPKI::Client';
 with 'OpenXPKI::Role::Logger';
 
 use Crypt::JWT qw(encode_jwt);
 use Crypt::PK::ECC;
-use Data::Dumper;
 
 use OpenXPKI::DTO::Message;
 
@@ -22,7 +21,7 @@ C<OpenXPKI::Service::CLI>.
 =cut
 
 has '+socketfile' => (
-    default => '/var/openxpki/openxpki.socket',
+    default => $OpenXPKI::Defaults::SERVER_SOCKET,
 );
 
 has '+service' => (

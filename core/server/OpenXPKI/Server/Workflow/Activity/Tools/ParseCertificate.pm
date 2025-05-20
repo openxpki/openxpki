@@ -1,13 +1,10 @@
 
 package OpenXPKI::Server::Workflow::Activity::Tools::ParseCertificate;
+use OpenXPKI;
 
-use strict;
-use base qw( OpenXPKI::Server::Workflow::Activity );
+use parent qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
-use English;
 use OpenXPKI::DN;
 use OpenXPKI::Crypt::X509;
 use OpenXPKI::Serialization::Simple;

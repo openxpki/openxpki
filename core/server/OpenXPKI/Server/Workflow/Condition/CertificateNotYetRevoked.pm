@@ -1,17 +1,12 @@
-# OpenXPKI::Server::Workflow::Condition::CertificateNotYetRevoked
-# Written by Alexander Klink for the OpenXPKI project 2007
-# Copyright (c) 2007 by The OpenXPKI Project
 package OpenXPKI::Server::Workflow::Condition::CertificateNotYetRevoked;
+use OpenXPKI;
 
-use strict;
-use warnings;
-use base qw( Workflow::Condition );
+use parent qw( Workflow::Condition );
+
 use Workflow::Exception qw( condition_error configuration_error );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Serialization::Simple;
-use OpenXPKI::Debug;
-use English;
-use OpenXPKI::Exception;
+
 
 sub evaluate {
     ##! 1: 'start'

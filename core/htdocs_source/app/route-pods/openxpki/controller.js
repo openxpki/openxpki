@@ -1,9 +1,8 @@
 import Controller from '@ember/controller'
 import { tracked } from '@glimmer/tracking'
-import { action, set as emSet } from '@ember/object'
+import { action } from '@ember/object'
 import { service } from '@ember/service'
 import { A } from '@ember/array'
-import { debug } from '@ember/debug'
 import { detect } from 'detect-browser'
 import lite from 'caniuse-lite'
 import copy from 'copy-text-to-clipboard'
@@ -42,7 +41,7 @@ export default class OpenXpkiController extends Controller {
             return Link.fromHash({
                 label: this.intl.t('button.workflow.copy_id.label', { id: this.model.top.page.workflow_id }),
                 tooltip: this.intl.t('button.workflow.copy_id.tooltip'),
-                format: 'none',
+                format: 'info',
                 onClick: this.copyWorkflowIdToClipboard,
             })
         } else {
@@ -105,16 +104,6 @@ export default class OpenXpkiController extends Controller {
         return `${agent.browser} ${known_version}`
     }
 
-    // We don't use <ddm.LinkTo> but our own method to navigate to target page.
-    // This way we can force Ember to do a transition even if the new page is
-    // the same page as before by setting parameter "force" a timestamp.
-    @action
-    navigateTo(page, navbarCollapseFunc, event) {
-        if (event) { event.stopPropagation(); event.preventDefault() }
-        if (navbarCollapseFunc) navbarCollapseFunc()
-        this.content.openPage({ name: page, target: this.content.TARGET.TOP, force: true, params: { trigger: 'nav' } })
-    }
-
     @action
     logout(event) {
         if (event) { event.stopPropagation(); event.preventDefault() }
@@ -136,7 +125,8 @@ export default class OpenXpkiController extends Controller {
     async copyWorkflowIdToClipboard(/*event*/) {
         // target = DOM element where the temporary textarea will be appended,
         // to stay within a focus trap, like in a modal.
-        copy(this.model.top.page.workflow_id, { target: this.tempCopyElement })
+        // Conversion from number to string is required because copy() checks the type.
+        copy(this.model.top.page.workflow_id+'', { target: this.tempCopyElement })
 
         /* eslint-disable-next-line no-console */
         console.info("Contents copied to clipboard")

@@ -23,10 +23,10 @@ use Test::More tests => 6;
 package main;
 
 BEGIN {
-    use_ok( 'OpenXPKI::Client::UI' );
+    use_ok( 'OpenXPKI::Client::Service::WebUI' );
 }
 
-require_ok( 'OpenXPKI::Client::UI' );
+require_ok( 'OpenXPKI::Client::Service::WebUI' );
 
 my $result;
 my $client = MockUI::factory();

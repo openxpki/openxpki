@@ -1,9 +1,9 @@
 package OpenXPKI::Server::Workflow::Activity::Sleep;
+use OpenXPKI;
 
-use warnings;
-use strict;
+use parent qw( OpenXPKI::Server::Workflow::Activity );
+
 use Workflow::Exception qw(configuration_error);
-use base qw( OpenXPKI::Server::Workflow::Activity );
 
 sub execute {
     my ($self) = @_;

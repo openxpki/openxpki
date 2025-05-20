@@ -10,7 +10,7 @@ command_setup
 
 OpenXPKI::Client::API::Command::workflow::resume
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Resume a workflow from an exception state.
 

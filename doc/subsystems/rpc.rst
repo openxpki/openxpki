@@ -15,7 +15,7 @@ The default wrapper looks for its config file at ``/etc/openxpki/rpc/default.con
 The config uses plain ini format, a default is deployed by the package::
 
   [global]
-  socket = /var/openxpki/openxpki.socket
+  socket = /run/openxpkid/openxpkid.sock
   locale_directory: /usr/share/locale
   default_language: en_US
 

@@ -1,12 +1,9 @@
 package OpenXPKI::Server::Workflow::Validator;
+use OpenXPKI qw( -class -nonmoose );
 
-use Moose;
-use MooseX::NonMoose;
 extends 'Workflow::Validator';
 
-use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
 use OpenXPKI::Template;
 
 has 'params' => (

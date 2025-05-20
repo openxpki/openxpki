@@ -1,4 +1,4 @@
-import { debug } from '@ember/debug'
+import { warn } from '@ember/debug'
 
 /**
  * Base class for data transfer objects ("DTOs": objects with minimal behaviour).
@@ -47,23 +47,22 @@ export default class Base {
         let theirProps = sourceHash instanceof Base ? sourceHash.getPropertyNames() : Object.keys(sourceHash)
         let unknownProps = []
 
+        /* HACK:
+         * We use another instance to check the property types because even a
+         * check via "typeof" on this.* would already trigger an Ember error:
+         * "You attempted to update `pagesizes` on `Pager`, but it had already
+         * been used previously in the same computation.
+         * Attempting to update a value after using it in a computation can
+         * cause logical errors, infinite revalidation bugs, and performance
+         * issues, and is not supported." */
+        let dummy = new this.constructor()
+
         for (const prop of theirProps) {
             if (ourProps.has(prop) === false) {
                 unknownProps.push(prop)
                 continue
             }
             let val = sourceHash[prop]
-
-            /* HACK:
-             * We use another instance to check the property types because
-             * even a check via "typeof" on this.* would already trigger this
-             * Ember error:
-             * "You attempted to update `pagesizes` on `Pager`, but it had
-             * already been used previously in the same computation.
-             * Attempting to update a value after using it in a computation
-             * can cause logical errors, infinite revalidation bugs, and
-             * performance issues, and is not supported." */
-            let dummy = new this.constructor()
 
             if (typeof dummy[prop] === 'string') {
                 this[prop] = ''+val
@@ -80,9 +79,10 @@ export default class Base {
         }
 
         if (unknownProps.length > 0) {
-            debug(
+            warn(
                 `Attempt to set unknown properties in ${this.constructor.name} instance "${sourceHash[this.constructor._idField] ?? '<unknown>'}": ${unknownProps.join(', ')}. `
-                +`If you need to process these backend properties, please add them to ${this.constructor._type}.js or one of its ancestors.`
+                +`If you need to process these backend properties, please add them to ${this.constructor._type}.js or one of its ancestors.`,
+                { id: 'oxi.data.base' }
             )
         }
 

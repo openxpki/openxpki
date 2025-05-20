@@ -1,15 +1,9 @@
-# OpenXPKI::Server::Workflow::Activity::CRLIsssuance::CreateQueue
-# Written by Oliver Welter for the OpenXPKI project 2012
-# Copyright (c) 2012 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Activity::CRLIssuance::CreateQueue;
+use OpenXPKI;
 
-use strict;
-use base qw( OpenXPKI::Server::Workflow::Activity );
+use parent qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 
 use OpenXPKI::Server::Workflow::WFObject::WFArray;
 

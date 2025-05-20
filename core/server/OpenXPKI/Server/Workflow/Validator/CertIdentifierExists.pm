@@ -1,11 +1,9 @@
 package OpenXPKI::Server::Workflow::Validator::CertIdentifierExists;
+use OpenXPKI -class;
 
-use Moose;
 extends 'OpenXPKI::Server::Workflow::Validator';
 
 use Workflow::Exception qw( validation_error );
-use OpenXPKI::Debug;
-use Data::Dumper;
 use OpenXPKI::Server::Context qw( CTX );
 
 

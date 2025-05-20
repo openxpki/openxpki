@@ -1,13 +1,11 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::CalculateArgon2Key;
+use OpenXPKI;
 
-use warnings;
-use strict;
-use OpenXPKI::Debug;
+use parent qw( OpenXPKI::Server::Workflow::Activity );
+
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Password;
 use Workflow::Exception qw(configuration_error workflow_error);
-
-use base qw( OpenXPKI::Server::Workflow::Activity );
 
 sub execute {
 

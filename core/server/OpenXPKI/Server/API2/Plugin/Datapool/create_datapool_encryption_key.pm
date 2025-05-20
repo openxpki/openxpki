@@ -38,8 +38,7 @@ B<Parameters>
 =item * C<expiration_date> I<Int> - UNIX epoch timestamp when the entry shall be
 deleted. Optional, default: keep entry infinitely.
 
-=item * C<dynamic-iv> I<Bool> - set to 1 if you wish the entry to be encrypted.
-Optional, default: 0
+=item * C<dynamic-iv> I<Bool> - set to 0 to enforce a fixed IV
 
 =back
 
@@ -47,7 +46,7 @@ Optional, default: 0
 command "create_datapool_encryption_key" => {
     pki_realm       => { isa => 'AlphaPunct' },
     expiration_date => { isa => 'Int', matching => sub { $_ > time }, },
-    dynamic_iv      => { isa => 'Bool', default => 0 },
+    dynamic_iv      => { isa => 'Bool', default => 1 },
 } => sub {
     my ($self, $params) = @_;
 

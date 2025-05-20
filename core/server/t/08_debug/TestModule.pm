@@ -1,10 +1,7 @@
 package TestModule;
-
-use strict;
-use warnings;
+use OpenXPKI -class_std;
 
 use OpenXPKI::Debug 'TestModule';
-use Class::Std;
 
 sub START {
     ##! 1: 'loglevel 1'

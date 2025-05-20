@@ -1,18 +1,14 @@
 package DatabaseTest;
-use Moose;
+use OpenXPKI qw( -class -typeconstraints );
 
 use Test::More;
 use Test::Exception;
 use Log::Log4perl;
-use Moose::Util::TypeConstraints; # PLEASE NOTE: this enables all warnings via Moose::Exporter
 use Module::Load ();
-use Type::Params qw( signature_for );
 
 use FindBin qw( $Bin );
 require "$Bin/DatabaseTestConnection.pm";
 
-# should be done after imports to safely disable warnings in Perl < 5.36
-use experimental 'signatures';
 
 has 'columns' => (
     is => 'rw',

@@ -1,29 +1,27 @@
 package OpenXPKI::Log4perl::MojoLogger;
-use Moose;
-use MooseX::NonMoose;
-use feature 'state';
+use OpenXPKI qw( -class -nonmoose );
 
 extends 'Mojo::EventEmitter';
 
 use Log::Log4perl;
 use Mojo::Util qw( monkey_patch );
-use Mojo::Log;
+
+Log::Log4perl->wrapper_register(__PACKAGE__); # make Log4perl step up to the next call frame
 
 our $LOGGERS_BY_NAME = {};
 
 has category => (
-    is => 'rw',
+    is => 'ro',
     isa => 'Str',
     required => 1,
-    trigger => sub {
-        my ($self, $new, $old) = @_;
-        $self->_logger(Log::Log4perl->get_logger($new)) if (not $old or $old ne $new);
-    },
 );
 
 has _logger => (
     is => 'rw',
     isa => 'Log::Log4perl::Logger',
+    init_arg => undef,
+    lazy => 1,
+    default => sub { Log::Log4perl->get_logger(shift->category) },
 );
 
 has history => (
@@ -40,78 +38,38 @@ has max_history_size => (
     default => 10,
 );
 
-
-# create log methods which will emit "message" events
-{
-    no strict 'refs';
-    for my $method (
-      qw{ trace
-          debug
-          info
-          warn
-          error
-          fatal
-          logwarn
-          logdie
-          error_warn
-          error_die
-          logcarp
-          logcluck
-          logcroak
-          logconfess
-        } ) {
-
-        *{ __PACKAGE__ . "::$method" } = sub { shift->emit( message => ($method, @_) ) }; # handled in _message() below
-    }
-}
-
+# Static method: constructor replacement
 sub get_logger {
     my ($class, $category) = @_;
+
+    # todo - check why we get requests without category
+    $category //= 'fallback';
 
     # Have we created it previously?
     return $LOGGERS_BY_NAME->{$category} if exists $LOGGERS_BY_NAME->{$category};
 
-    my $logger;
-
-    # Mojolicious "production" mode (or legacy use): use our Mojo::Log compatible logger
-    if (not exists $ENV{MOJO_MODE} or ($ENV{MOJO_MODE}//'') eq 'production') {
-        $logger = $class->new( category => $category );
-
-    # Mojolicious "development" mode: use a modified Mojolicious screen logger until we will have a
-    # unified Log4perl config for all services and a mechanism to output log messages of the root category ('')
-    } else {
-        state $patched = 0;
-        if (not $patched) {
-            # make Mojo::Log compatible to Log::Log4perl::Logger
-            monkey_patch 'Mojo::Log',
-              is_trace => sub { shift->is_level('trace') },
-              is_debug => sub { shift->is_level('debug') },
-              is_info =>  sub { shift->is_level('info') },
-              is_warn =>  sub { shift->is_level('warn') },
-              is_error => sub { shift->is_level('error') },
-              is_fatal => sub { shift->is_level('fatal') };
-            $patched = 1;
-        }
-        $logger = Mojo::Log->new;
-    }
-
-    # Save it in global structure
-    $LOGGERS_BY_NAME->{$category} = $logger;
+    # Instantiate ourself
+    my $logger = $class->new( category => $category );
+    $LOGGERS_BY_NAME->{$category} = $logger; # save it in global structure
 
     return $logger;
 }
 
-sub BUILD {
-    my $self = shift;
-
-    $self->on( message => \&_message );
+# create log methods which will emit "message" events
+for my $method ( qw{
+    fatal error warn info debug trace
+    logdie logwarn error_die error_warn
+    logconfess logcroak logcluck logcarp
+} ) {
+    monkey_patch __PACKAGE__, $method => sub { shift->emit( message => ($method, @_) ) }
 }
 
-sub _message {
-    my ($self, $method, @message) = @_;
-    my $depth = 3;
-    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + $depth;
+sub BUILD ($self, $args) {
+    # consume "message" events
+    $self->on( message => $self->can('_message') );
+}
 
+sub _message ($self, $method, @message) {
     if ($self->_logger->$method( @message )) {
         my $hist = $self->history;
         my $max = $self->max_history_size;
@@ -144,8 +102,7 @@ sub is_warn  { shift->_logger->is_warn  }
 sub is_error { shift->_logger->is_error }
 sub is_fatal { shift->_logger->is_fatal }
 
-sub is_level {
-    my ($self, $level) = @_;
+sub is_level ($self, $level = undef) {
     return 0 unless $level;
 
     if ($level =~ m/^(?:trace|debug|info|warn|error|fatal)$/o) {
@@ -157,9 +114,7 @@ sub is_level {
     }
 }
 
-sub level {
-    my ($self, $level) = @_;
-
+sub level ($self, $level = undef) {
     require Log::Log4perl::Level;
     if ($level) {
         return $self->_logger->level( Log::Log4perl::Level::to_priority(uc $level) );
@@ -171,8 +126,6 @@ sub level {
 
 __PACKAGE__->meta->make_immutable;
 
-__END__
-
 =head1 NAME
 
 OpenXPKI::Log4perl::MojoLogger - Log::Log4perl and Mojo::Log compatible logger
@@ -181,7 +134,7 @@ OpenXPKI::Log4perl::MojoLogger - Log::Log4perl and Mojo::Log compatible logger
 
   use OpenXPKI::Log4perl::MojoLogger;
 
-  $c->log( OpenXPKI::Log4perl::MojoLogger->new( category => 'openxpki.x' ) );
+  $c->log( OpenXPKI::Log4perl::MojoLogger->get_logger('openxpki.x') );
 
 =head1 DESCRIPTION:
 
@@ -330,10 +283,3 @@ This returns the last few logged messages as an array reference in the format:
 =head2 C<max_history_size>
 
 Maximum number of messages to be kept in the history buffer (see above). Defaults to 10.
-
-=head1 COPYRIGHT & LICENSE
-
-Original code copyright 2009-2019 Breno G. de Oliveira, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.

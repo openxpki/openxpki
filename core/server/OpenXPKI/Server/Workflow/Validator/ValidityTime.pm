@@ -1,13 +1,12 @@
 package OpenXPKI::Server::Workflow::Validator::ValidityTime;
+use OpenXPKI;
 
-use strict;
-use warnings;
-use base qw( Workflow::Validator );
+use parent qw( Workflow::Validator );
+
 use Workflow::Exception qw( validation_error );
 use OpenXPKI::Server::Context qw( CTX );
-use English;
 
-# @TODO: unused / untested
+# TODO unused / untested
 
 sub validate {
     my ( $self, $wf, $time ) = @_;

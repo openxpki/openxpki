@@ -1,9 +1,7 @@
-use strict;
-use warnings;
-
 package OpenXPKI::Crypto::Backend::OpenSSL::Engine::AWSCloudHSM;
+use OpenXPKI;
 
-use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Engine);
+use parent qw(OpenXPKI::Crypto::Backend::OpenSSL::Engine);
 
 sub get_engine
 {

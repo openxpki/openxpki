@@ -5,8 +5,8 @@ requires 'declare_routes';
 
 =head1 NAME
 
-OpenXPKI::Client::Service::Role::Info - Role for the classes that provide
-basic service info, i.e. Mojolicious route declarations.
+OpenXPKI::Client::Service::Role::Info - Role to provide basic service info,
+i.e. Mojolicious route declarations.
 
 =head1 DESCRIPTION
 
@@ -25,12 +25,13 @@ A consuming class looks like this:
 
 =head2 REQUIRED METHODS
 
-The consuming class needs to implement the following methods.
+The consuming class needs to implement the following methods:
 
 =head3 declare_routes
 
-Called by L<OpenXPKI::Client::Web>, this static subroutine must set up all
-Mojolicious URL routes belonging to the service.
+Static subroutine to set up all Mojolicious URL routes belonging to the service.
+
+Called by L<OpenXPKI::Client::Web/startup>.
 
     # e.g. in package OpenXPKI::Client::Service::RPC
 
@@ -41,20 +42,20 @@ Mojolicious URL routes belonging to the service.
         );
     }
 
-The implementing service class must set OpenXPKI's special Mojolicious stash
-parameters:
+For every route OpenXPKI's special Mojolicious stash parameters must be set:
 
 =over
 
-=item * C<service_class> = the service class that consumes
-L<OpenXPKI::Client::Service::Role::Base> (usually C<__PACKAGE__>).
+=item * C<service_class> = the class which consumes
+L<OpenXPKI::Client::Service::Role::Base> and processes the request (usually the
+same class, i.e. C<__PACKAGE__>).
 
 =item * C<endpoint> = the service endpoint (e.g. statically set to C<"default">
 or dynamically set via URL path).
 
 =back
 
-B<Passed parameters>
+B<Parameters>
 
 =over
 

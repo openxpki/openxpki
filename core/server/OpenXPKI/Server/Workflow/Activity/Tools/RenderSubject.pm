@@ -1,20 +1,12 @@
-# OpenXPKI::Server::Workflow::Activity::Tools::RenderSubject
-# Written by Oliver Welterfor the OpenXPKI Project 2013
-# Copyright (c) 2013 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Activity::Tools::RenderSubject;
+use OpenXPKI;
 
-use strict;
+use parent qw( OpenXPKI::Server::Workflow::Activity );
 
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Context qw( CTX );
-use English;
 use Template;
-use Data::Dumper;
 
-use base qw( OpenXPKI::Server::Workflow::Activity );
 
 sub execute {
     my $self     = shift;
@@ -71,7 +63,8 @@ sub execute {
     my $cert_subject = CTX('api2')->render_subject_from_template(
         profile => $profile,
         style   => $style,
-        vars    => $subject_vars
+        vars    => $subject_vars,
+        sanitize => 1
     );
 
     if (!$cert_subject) {

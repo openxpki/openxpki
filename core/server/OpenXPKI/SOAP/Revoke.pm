@@ -1,14 +1,9 @@
+package OpenXPKI::SOAP::Revoke;
+use OpenXPKI;
+
 # SOAP service implementing a certificate revocation interface
 
-use strict;
-use warnings;
-
-package OpenXPKI::SOAP::Revoke;
-
-use English;
 use Config::Std;
-use OpenXPKI::Exception;
-use Data::Dumper;
 use OpenXPKI::Client::Simple;
 use OpenXPKI::Serialization::Simple;
 

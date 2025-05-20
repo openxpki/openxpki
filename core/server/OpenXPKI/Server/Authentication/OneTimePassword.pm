@@ -1,15 +1,13 @@
 package OpenXPKI::Server::Authentication::OneTimePassword;
+use OpenXPKI -class;
 
-use Moose;
 extends 'OpenXPKI::Server::Authentication::Base';
 
-use OpenXPKI::Debug;
-use OpenXPKI::Server::Authentication::Handle;
-use OpenXPKI::Server::Context qw( CTX );
-
-use Data::Dumper;
 use Digest::SHA;
 use MIME::Base64;
+
+use OpenXPKI::Server::Authentication::Handle;
+use OpenXPKI::Server::Context qw( CTX );
 
 
 has namespace => (

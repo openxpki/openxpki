@@ -1,15 +1,9 @@
-# OpenXPKI::Server::Workflow::Activity::Tools::Notify
-# Written by Oliver Welter for the OpenXPKI project 2013
-# Copyright (c) 2013 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Activity::Tools::Notify;
+use OpenXPKI;
 
-use strict;
-use base qw( OpenXPKI::Server::Workflow::Activity );
+use parent qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Notification::Handler;
 

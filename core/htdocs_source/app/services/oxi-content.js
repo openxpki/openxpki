@@ -4,9 +4,8 @@ import { tracked } from '@glimmer/tracking'
 import { later, next, cancel } from '@ember/runloop'
 import { isArray } from '@ember/array'
 import { action, set as emSet } from '@ember/object'
-import { debug } from '@ember/debug'
+import { debug, warn } from '@ember/debug'
 import { guidFor } from '@ember/object/internals'
-import fetch from 'fetch'
 import Page from 'openxpki/data/page'
 
 /**
@@ -520,10 +519,28 @@ export default class OxiContentService extends Service {
     @action
     setFocus() {
         this.#willSetFocusOnNextRunLoop = false
-
-        if (this.#focusFavourite && !this.#focusFavourite.element) this.#focusFavourite = null
-        if (this.#focusFavourite && !this.isElementVisible(this.#focusFavourite.element)) this.#focusFavourite = null
         if (!this.#focusFavourite) return
+
+        if (!this.#focusFavourite.element) {
+            warn('NOT setting focus as favourite element does not exist (anymore?)', { id: 'oxi.services.oxi-content' })
+            this.#focusFavourite = null
+            return
+        }
+        if (!this.isElementVisible(this.#focusFavourite.element)) {
+            /*
+              This is a workaround for cases where the originally created
+              element [1] gets replaced (hidden) e.g. by a Javascript module.
+              By sending our own "oxi-focus" event we allow the original elemen
+              to redirect the focus even if it is invisible itself.
+
+              [1]: the one that receives {{on-init @setFocusInfo true}} from
+              OxiSection::Form::Field::xxx via "...attributes" and thus fires
+              setFocusInfo(element, true) with itself as the first argument
+            */
+            warn('Trying to set focus via custom event "oxi-focus" as favourite element is not visible', { id: 'oxi.services.oxi-content' })
+            this.#focusFavourite.element.dispatchEvent(new Event("oxi-focus"))
+            return
+        }
 
         debug('Setting focus to current favourite element')
         this.#focusFavourite.element.focus()
@@ -624,7 +641,7 @@ export default class OxiContentService extends Service {
     // Apply custom exception handler for given status code if one was set up
     // (bootstrap parameter 'on_exception').
     #handleServerException(status_code) {
-        debug(`Exception - handling server HTTP status code: ${status_code}`)
+        warn(`Exception - handling server HTTP status code: ${status_code}`, { id: 'oxi.services.oxi-content' })
         // Check custom exception handlers
         for (let handler of this.serverExceptions) {
             let codes = isArray(handler.status_code) ? handler.status_code : [ handler.status_code ]
@@ -678,7 +695,7 @@ export default class OxiContentService extends Service {
         let breadcrumb
 
         if (ignoreBreadcrumbs) {
-            debug('#setBreadcrumbs(): ignoring server-sent breadcrumbs during breadcrumb-initiated navigation')
+            warn('#setBreadcrumbs(): ignoring server-sent breadcrumbs during breadcrumb-initiated navigation', { id: 'oxi.services.oxi-content' })
             return
         }
 
@@ -698,7 +715,7 @@ export default class OxiContentService extends Service {
         }
 
         // Breadcrumb may be suppressed by setting empty workflow label.
-        // See OpenXPKI::Client::UI::Workflow->__get_breadcrumb()
+        // See OpenXPKI::Client::Service::WebUI::Page::Workflow->__get_breadcrumb()
         let suppressBreadcrumb = (Object.keys(page).length == 0) || (bc.suppress??0 == 1)
         if (suppressBreadcrumb) debug('#setBreadcrumbs(): server sent empty hash - suppressing new breadcrumb')
 

@@ -1,5 +1,5 @@
 import { tracked } from '@glimmer/tracking'
-import { debug } from '@ember/debug'
+import { warn } from '@ember/debug'
 import Base from './base'
 
 /*
@@ -20,7 +20,7 @@ export default class Field extends Base {
     name
     _refName // internal use: original name, needed for dynamic input fields where 'name' can change
     _id = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER) // internal use: random ID
-    value
+    @tracked value
     label
     is_optional
     tooltip
@@ -55,6 +55,7 @@ export default class Field extends Base {
      */
     options = []
     editable
+    inline
     _guardian        // reference to the parent Field object (if current field is a dependant)
     /*
      * oxisection/form/field/static
@@ -86,7 +87,7 @@ export default class Field extends Base {
 
     validate() {
         if (this.editable && this.hasDependants) {
-            debug(`${this.constructor.name} instance "${this[this.constructor._idField] ?? '<unknown>'}": attribute "enabled" cannot be set while field has dependants.`)
+            warn(`${this.constructor.name} instance "${this[this.constructor._idField] ?? '<unknown>'}": attribute "enabled" cannot be set while field has dependants.`, { id: 'oxi.data.field' })
             this.editable = false
         }
     }

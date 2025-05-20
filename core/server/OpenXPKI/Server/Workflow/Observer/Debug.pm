@@ -1,12 +1,6 @@
-# OpenXPKI::Server::Workflow::Observer::Debug
-# Written by Alexander Klink for the OpenXPKI project 2006
-# Copyright (c) 2006 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Observer::Debug;
+use OpenXPKI;
 
-use strict;
-
-use OpenXPKI::Debug;
 
 sub update {
     my ($class, $workflow, $action, $old_state, $action_name) = @_;

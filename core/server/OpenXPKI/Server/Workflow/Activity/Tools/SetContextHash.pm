@@ -1,14 +1,11 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::SetContextHash;
+use OpenXPKI;
 
-use strict;
-use base qw( OpenXPKI::Server::Workflow::Activity );
+use parent qw( OpenXPKI::Server::Workflow::Activity );
 
-use English;
 use Workflow::Exception qw( configuration_error );
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 
 

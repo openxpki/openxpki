@@ -10,7 +10,7 @@ requires 'prepare_enrollment_result';
 
 =head1 NAME
 
-OpenXPKI::Client::Service::Role::Base - Base role for all service classes (i.e.
+OpenXPKI::Client::Service::Role::Base - Base role for all HTTP services (i.e.
 protocol implementations)
 
 =head1 DESCRIPTION
@@ -34,22 +34,23 @@ A consuming class that implements a service generally looks like this:
 =cut
 
 # Core modules
-use Carp;
+use Carp ();
 use MIME::Base64;
 use Digest::SHA qw( sha1_hex );
 use List::Util qw( any );
 
 # CPAN modules
+use Connector;
+use Connector::Builtin::Inline;
 use Crypt::PKCS10;
 use Log::Log4perl qw( :nowarn );
 use Mojo::Message::Request;
+use Mojo::Util qw( url_unescape );
 
 # Project modules
-use OpenXPKI::Exception;
 use OpenXPKI::Client::Simple;
 use OpenXPKI::Client::Service::Response;
 use OpenXPKI::Log4perl;
-use OpenXPKI::i18n qw( i18nTokenizer );
 
 
 =head2 ATTRIBUTES
@@ -69,6 +70,7 @@ Internal name of the service that the class implements. Used e.g.
 =back
 
 =cut
+sub service_name; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
 has service_name => (
     is => 'ro',
     isa => 'Str',
@@ -93,61 +95,38 @@ L</handle_property_request>.
 B<Needs to be set by the consuming class, most likely in its L</prepare> method.>
 
 =cut
+sub operation; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
 has operation => (
     is => 'rw',
     isa => 'Str',
     lazy => 1,
     predicate => 'has_operation',
-    default => sub { die "Attribute 'operation' has not been set" },
+    default => sub {
+        local $Carp::CarpLevel = 1;
+        Carp::confess "Attempt to read empty attribute 'operation'\n";
+    },
 );
 
 =head2 REQUIRED METHODS
 
-The consuming class needs to implement the following methods.
-
-=head3 declare_routes
-
-Called by L<OpenXPKI::Client::Web>, this method must set up all Mojolicious
-URL routes belonging to the service.
-
-    # in package OpenXPKI::Client::Service::RPC
-    sub declare_routes ($r) {
-        # RPC urls look like
-        #   /rpc/enroll?method=IssueCertificate
-        #   /rpc/enroll/IssueCertificate
-        $r->any('/rpc/<endpoint>/<method>')->to(
-            service_class => __PACKAGE__,
-            method => '',
-        );
-    }
-
-The implementing service class must ensure that OpenXPKI's special Mojolicious
-stash parameter C<service_class> is set to the package that processes the
-route and consumes L<OpenXPKI::Client::Service::Role::Base>
-(usually C<__PACKAGE__>).
-
-B<Passed parameters>
-
-=over
-
-=item * C<$r> - L<Mojolicious::Routes>
-
-=back
+The consuming class needs to implement the following methods:
 
 =head3 prepare
 
-Should be used to set the L</operation> attribute. May also be used for checks
-and preparations before the request / operation handling defined in
-L</op_handlers> starts.
+Might contain checks and preparations common to all service operations before
+the request handling starts (as defined in L</op_handlers>).
+
+Must set the L</operation> attribute.
+
+Example:
 
     sub prepare ($self, $c) {
-        # e.g.
         $self->operation($c->stash('operation'));
         # or
         $self->operation($self->request_param('operation') // '');
     }
 
-B<Passed parameters>
+B<Parameters>
 
 =over
 
@@ -157,7 +136,9 @@ B<Passed parameters>
 
 =head3 send_response
 
-Sends the response back to the HTTP client via a passed Mojolicious controller.
+Convert the L<OpenXPKI::Client::Service::Response> object into a service
+specific HTTP response and send it to the browser via the Mojolicious
+controller.
 
     sub send_response ($self, $c, $response) {
         $self->disconnect_backend;
@@ -171,7 +152,21 @@ Sends the response back to the HTTP client via a passed Mojolicious controller.
         }
     }
 
-B<Passed parameters>
+Please note that the following attributes of the response object are automatically
+injected into the Mojolicious response (i.e. C<$c-E<gt>resp>) before C<send_response>
+is called:
+
+=over
+
+=item * L<$response-E<gt>extra_headers|OpenXPKI::Client::Service::Response/extra_headers>
+
+=item * L<$response-E<gt>http_status_code|OpenXPKI::Client::Service::Response/http_status_code>
+
+=item * L<$response-E<gt>http_status_message|OpenXPKI::Client::Service::Response/http_status_message>
+
+=back
+
+B<Parameters>
 
 =over
 
@@ -183,7 +178,7 @@ B<Passed parameters>
 
 =head3 op_handlers
 
-Defines the mapping between requested operation and the handler methods.
+Define the mapping between requested operation and the handler methods.
 
 Must return an I<ArrayRef> where the odd items are either an operation name
 (I<Str>) or a list of operation names (I<ArrayRef>) and the even items are
@@ -225,7 +220,7 @@ Must return an L<OpenXPKI::Client::Service::Response>.
         );
     }
 
-B<Passed parameters>
+B<Parameters>
 
 =over
 
@@ -242,23 +237,41 @@ L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/
 These attributes will be set by L<OpenXPKI::Client::Web::Controller> so that
 the consuming service class does not need to care about setting them.
 
-=head3 config_obj
 
-An instance of L<OpenXPKI::Client::Config>.
+=head3 config
+
+I<Connector> pointing to the endpoint configuration for the service.
+
+In legacy use (FCGI) this is auto generated via L</config_obj>.
 
 =cut
-has config_obj => (
-    is => 'ro',
-    isa => 'OpenXPKI::Client::Config',
-    required => 1,
+sub config; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+has config => (
+    is => 'rw',
+    isa => 'Connector',
+    lazy => 1,
+    # FIXME replace builder with required after cgi decomm
+    #required => 1,
+    builder => '_build_config',
 );
+sub _build_config ($self) {
+    my $obj = $self->config_obj || die "No config object set";
+    state $configs = {};
+    my $endpoint = $self->endpoint;
+    unless ($configs->{$endpoint}) {
+        $self->log->trace("Load configuration for endpoint '$endpoint'");
+        $configs->{$endpoint} = Connector::Builtin::Inline->new( data => $obj->endpoint_config($endpoint) );
+    }
+    return $configs->{$endpoint};
+}
 
-=head3 apache_env
+=head3 webserver_env
 
-I<HashRef> containing the Apache environment variables (NOT the shell environment).
+I<HashRef> containing the webserver environment variables (NOT the shell environment).
 
 =cut
-has apache_env => (
+sub webserver_env; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+has webserver_env => (
     is => 'ro',
     isa => 'HashRef',
     required => 1,
@@ -269,17 +282,19 @@ has apache_env => (
 IP address of the client that sent the request.
 
 =cut
+sub remote_address; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
 has remote_address => (
     is => 'ro',
     isa => 'Str',
     required => 1,
 );
 
-=head3 remote_address
+=head3 request
 
 L<Mojo::Message::Request> object encapsulating the request.
 
 =cut
+sub request; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
 has request => (
     is => 'ro',
     isa => 'Mojo::Message::Request',
@@ -292,6 +307,7 @@ has request => (
 The endpoint I<Str> extracted from the URL.
 
 =cut
+sub endpoint; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
 has endpoint => (
     is => 'ro',
     isa => 'Str',
@@ -316,22 +332,26 @@ has take_pickup_value_from_request => (
     default => 0,
 );
 
-=head2 Other readonly attributes
+=head3 config_obj
 
-=head3 config
-
-L<HashRef> containing the endpoint configuration as returned by
-L<OpenXPKI::Client::Config/endpoint_config>.
+An instance of L<OpenXPKI::Client::Config>.
+Required for legacy mode (using cgi scripts with file based config),
+Used to bootstrap the I<config> object.
 
 =cut
-has config => (
-    is => 'rw',
-    isa => 'HashRef',
-    lazy => 1,
-    init_arg => undef,
-    builder => '_build_config',
+sub config_obj; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+has config_obj => (
+    is => 'ro',
+    isa => 'OpenXPKI::Client::Config',
+    required => 0,
+    predicate => 'has_legacy_config',
 );
-sub _build_config ($self) { $self->config_obj->endpoint_config($self->endpoint) }
+
+=head2 Other readonly attributes
+
+=head3 config_env_keys
+
+=cut
 
 has config_env_keys => (
     is => 'rw',
@@ -342,8 +362,8 @@ has config_env_keys => (
 );
 sub _config_env_keys ($self) {
     my %keys;
-    if (my $keys_str = $self->config->{$self->operation}->{env}) {
-        %keys = map { $_ => 1 } split /\s*,\s*/, $keys_str;
+    if (my @keys = $self->get_list_from_legacy_config([$self->operation, 'env'])) {
+        %keys = map { $_ => 1 } @keys;
         $self->log->trace('Configured ENV keys: ' . join(', ', keys %keys)) if $self->log->is_trace;
     }
     return \%keys;
@@ -351,10 +371,10 @@ sub _config_env_keys ($self) {
 
 =head3 log
 
-A logger object, per default set
-C<OpenXPKI::Log4perl-E<gt>get_logger('openxpki.client.' . $self-E<gt>service_name)>.
+A logger object, per default set to C<OpenXPKI::Log4perl-E<gt>get_logger>.
 
 =cut
+sub log; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
 has log => (
     is => 'rw',
     isa => duck_type( [qw(
@@ -364,31 +384,71 @@ has log => (
     lazy => 1,
     builder => '_build_log',
 );
-sub _build_log ($self) { $self->config_obj->log }
+sub _build_log ($self) { OpenXPKI::Log4perl->get_logger }
 
-=head3 backend
+=head3 client_simple
+
+An instance of L<OpenXPKI::Client>.
+
+=cut
+sub client; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+has client => (
+    is => 'rw',
+    isa => 'OpenXPKI::Client',
+    builder  => '_build_client',
+    predicate => 'has_client',
+    lazy => 1,
+);
+sub _build_client ($self) {
+    my $cc;
+    try {
+        my $socket = $self->config->get('global.socket');
+        my $timeout = $self->config->get('global.timeout');
+        $cc = OpenXPKI::Client->new(
+            ($socket ? (socketfile => $socket) : ()),
+            ($timeout ? (timeout => $timeout) : ()),
+        );
+    }
+    catch ($err) {
+        die $self->new_response( 50002 => "Could not create client object: $err" );
+    }
+
+    # The constructor does not check if the backend is there
+    # so we now run a ping and bail out with a backend error if not
+    die $self->new_response( 50001 => "Could not talk to backend" )
+        unless($cc->ping());
+
+    return $cc;
+
+}
+
+=head3 client_simple
 
 An instance of L<OpenXPKI::Client::Simple> initialized with the current
 endpoint configuration.
 
 =cut
-has backend => (
+sub client_simple; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+has client_simple => (
     is => 'rw',
     isa => 'Object|Undef',
     init_arg => undef,
     lazy => 1,
-    predicate => 'has_backend',
-    builder => '_build_backend',
+    predicate => 'has_client_simple',
+    builder => '_build_client_simple',
 );
-sub _build_backend ($self) {
+sub _build_client_simple ($self) {
     try {
-        return OpenXPKI::Client::Simple->new({
+        $self->log->debug('creating new socket connection for pid '.$PID);
+        return OpenXPKI::Client::Simple->new(
             logger => $self->log,
-            config => $self->config->{global}, # realm and locale
-            auth => $self->config->{auth} || {}, # auth config
-        });
+            config => $self->config->get_hash('global'), # realm and locale
+            auth => $self->config->get_hash('auth') || {}, # auth config
+            client => $self->client,
+        );
     }
     catch ($err) {
+        die $err if ($err->isa('OpenXPKI::Client::Service::Response'));
         die $self->new_response( 50002 => "Could not create client object: $err" );
     }
 }
@@ -407,32 +467,40 @@ has is_enrollment => (
     default => 0,
 );
 
-=head3 wf_params
+=head3 default_wf_params
 
-Readonly I<HashRef> with workflow parameters, incl. L</custom_wf_params>, that
-is automatically build.
+Readonly I<HashRef> with default workflow parameters that is build
+automatically.
 
 =cut
-has wf_params => (
+has default_wf_params => (
     is => 'ro',
     isa => 'HashRef',
+    traits => [ 'Hash' ],
     lazy => 1,
     init_arg => undef,
-    builder => '_build_wf_params',
+    builder => '_build_default_wf_params',
+    handles => {
+        default_wf_param => 'get',
+    },
+
 );
-sub _build_wf_params ($self) {
+sub _build_default_wf_params ($self) {
     try {
-        my $p = {};
+
         my $operation = $self->operation;
         my $conf = $self->config;
 
-        # look for preset params
-        foreach my $key (keys %{$conf->{$operation}}) {
+        # init $p from preset
+        my $p = $conf->get_hash([$operation,'preset']) // {};
+
+        # legacy config has the params "inline" with prefix
+        foreach my $key ($conf->get_keys([$operation])) {
             next unless ($key =~ m{preset_(\w+)});
-            $p->{$1} = $conf->{$operation}->{$key};
+            $p->{$1} = $conf->get([$operation,$key]);
         }
 
-        my $servername = $conf->{$operation}->{servername} || $conf->{global}->{servername};
+        my $servername = $conf->get([$operation, 'servername']) || $conf->get(['global', 'servername']);
         if ($servername) {
             $p->{server} = $servername;
             $p->{interface} = $self->service_name;
@@ -456,10 +524,10 @@ sub _build_wf_params ($self) {
         # gather data from TLS session
         if ( $self->request->is_secure ) {
             $self->log->debug("Calling context is HTTPS");
-            $self->log->trace('Apache ENV keys: ' . join(', ', sort keys $self->apache_env->%*)) if $self->log->is_trace;
+            $self->log->trace('Webserver ENV keys: ' . join(', ', sort keys $self->webserver_env->%*)) if $self->log->is_trace;
 
-            my $auth_dn = $self->apache_env->{SSL_CLIENT_S_DN};
-            my $auth_pem = $self->apache_env->{SSL_CLIENT_CERT};
+            my $auth_dn = $self->webserver_env->{SSL_CLIENT_S_DN};
+            my $auth_pem = $self->webserver_env->{SSL_CLIENT_CERT};
             if ( defined $auth_dn ) {
                 $self->log->info("Authenticated client DN: $auth_dn");
                 if ($self->config_env_keys->{signer_dn}) {
@@ -475,12 +543,39 @@ sub _build_wf_params ($self) {
             $self->log->debug("Calling context is plain HTTP");
         }
 
+        return $p;
+    }
+    catch ($err) {
+        if (blessed $err and $err->isa('OpenXPKI::Client::Service::Response')) {
+            die $err;
+        } else {
+            $self->log->error("$err"); # stringification
+            die $self->new_response( 50010 );
+        }
+    }
+}
+
+=head3 wf_params
+
+Readonly I<HashRef> with workflow parameters, incl. L</custom_wf_params>, that
+is automatically build.
+
+=cut
+has wf_params => (
+    is => 'ro',
+    isa => 'HashRef',
+    lazy => 1,
+    init_arg => undef,
+    builder => '_build_wf_params',
+);
+sub _build_wf_params ($self) {
+    try {
         # legacy CGI mode
         $self->cgi_set_custom_wf_params if ($ENV{GATEWAY_INTERFACE} and $ENV{REMOTE_ADDR});
 
         # merge custom parameters set by consuming class
-        $p = {
-            $p->%*,
+        my $p = {
+            $self->default_wf_params->%*,
             $self->custom_wf_params->%*,
         };
 
@@ -514,6 +609,49 @@ has custom_wf_params => (
     },
 );
 
+=head3 json
+
+Helper to uniformly access an instance of L<JSON:PP> with the following configuration:
+
+=over
+
+=item * UTF-8 enabled
+
+=item * Use plain scalars as boolean values (when decoding a JSON string)
+
+=back
+
+=cut
+sub json; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+has json => (
+    is => 'ro',
+    isa => 'Object',
+    init_arg => undef,
+    lazy => 1,
+    default => sub {
+        my $json = JSON::PP->new->utf8;
+        # Use plain scalars as boolean values. The default representation as
+        # JSON::PP::Boolean would cause the values to be serialized later on.
+        # A JSON false would be converted to a trueish scalar "OXJSF1:false".
+        $json->boolean_values(0,1);
+        return $json;
+    },
+);
+
+=head3 request_url
+
+L<Mojo::URL> object encapsulating the absolute request URL.
+
+=cut
+sub request_url; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+has request_url => (
+    is => 'ro',
+    isa => 'Mojo::URL',
+    init_arg => undef,
+    lazy => 1,
+    default => sub { shift->request->url->to_abs },
+);
+
 =head1 METHODS
 
 =cut
@@ -525,9 +663,7 @@ has custom_wf_params => (
 # Please note that "around 'build'" is only allowed in roles.
 # https://metacpan.org/dist/Moose/view/lib/Moose/Manual/Construction.pod#BUILD-and-parent-classes
 sub BUILD {}
-after 'BUILD' => sub ($self, $args) {
-    Log::Log4perl::MDC->put('endpoint', $self->endpoint);
-};
+after 'BUILD' => sub ($self, $args) {};
 
 =head2 request_param
 
@@ -566,7 +702,7 @@ B<Returns> an L<OpenXPKI::Client::Service::Response> and does not throw exceptio
 
 =cut
 sub handle_request ($self) {
-    $self->log->debug(sprintf('Incoming %s request "%s" on endpoint "%s"', uc($self->service_name), $self->operation, $self->endpoint)) if $self->log->is_debug;
+    $self->log->debug(sprintf('%s request "%s" on endpoint "%s"', uc($self->service_name), $self->operation, $self->endpoint)) if $self->log->is_debug;
 
     my $response;
     try {
@@ -602,7 +738,7 @@ sub handle_request ($self) {
                 die sprintf('Return value of operation handler for "%s" specified in %s->op_handlers() is not an instance of "OpenXPKI::Client::Service::Response"', $self->operation, $self->meta->name)
                   unless blessed $response && $response->isa('OpenXPKI::Client::Service::Response');
 
-                $response->add_debug_headers if (lc($self->config->{output}->{headers}//'') eq 'all');
+                $response->add_debug_headers if (lc($self->config->get('output.headers')//'') eq 'all');
 
                 last;
             }
@@ -618,7 +754,6 @@ sub handle_request ($self) {
 
     $self->log->debug('Status: ' . $response->http_status_line);
     $self->log->error($response->error_message) if $response->has_error;
-    $self->log->trace('Response: ' . Dumper $response) if $self->log->is_trace;
 
     return $response;
 }
@@ -632,86 +767,13 @@ L</prepare>.
 
 =head2 new_response
 
-Helper to create a new L<OpenXPKI::Client::Service::Response> with shortcut
-syntax and an error message filter.
+Helper to create an C<OpenXPKI::Client::Service::Response> object.
 
-The error may be given as an internal code only:
-
-    $self->new_response( 40080 );
-    # is equal to:
-    $self->new_response(
-        error => 40080,
-    );
-    # and results in:
-    OpenXPKI::Client::Service::Response->new(
-        error => 40080
-    );
-
-An additional custom error message may also be specified.
-
-If B<error_message> is given and starts with C<"I18N_OPENXPKI_UI_">
-it will be translated:
-
-    $self->new_response( 500 => 'I18N_OPENXPKI_UI_BLAH' );
-    # is equal to:
-    $self->new_response(
-        error => 500,
-        error_message => 'I18N_OPENXPKI_UI_BLAH',
-    );
-    # and results in:
-    $self->log->error('I18N_OPENXPKI_UI_BLAH');
-    OpenXPKI::Client::Service::Response->new(
-        error => 500,
-        error_message => i18nTokenizer('I18N_OPENXPKI_UI_BLAH'),
-    );
-
-If it starts with C<"urn:ietf:params:acme:error">
-it will be kept as is:
-
-    $self->new_response( 400 => 'urn:ietf:params:acme:error:rejectedIdentifier' );
-    # results in:
-    $self->log->error('urn:ietf:params:acme:error:rejectedIdentifier');
-    OpenXPKI::Client::Service::Response->new(
-        error => 400,
-        error_message => 'urn:ietf:params:acme:error:rejectedIdentifier',
-    );
-
-Otherwise it will be logged and removed:
-
-    $self->new_response( 500 => 'Something bad happened');
-    # results in:
-    $self->log->error('Something bad happened');
-    OpenXPKI::Client::Service::Response->new(
-        error => 500,
-    );
+See L<OpenXPKI::Client::Service::Response/new> for syntax details.
 
 =cut
 sub new_response ($self, @args) {
-    # shortcut with only error code or code+message
-    if (scalar @args < 3 and $args[0] =~ /^\A\d+\z/) {
-        @args = (
-            error => $args[0],
-            $args[1] ? (error_message => $args[1]) : (),
-        );
-    }
-
-    my %args_hash = @args;
-
-    # only send translated I18N_OPENXPKI_UI_ messages (and ACME error codes) to client
-    if (my $msg = $args_hash{error_message}) {
-        chomp $msg;
-        if ($msg =~ /I18N_OPENXPKI_UI_/) {
-            # keep I18N string (but translate)
-            $args_hash{error_message} = i18nTokenizer($msg) if $self->config_obj->language;
-        } elsif ($msg =~ m{\Aurn:ietf:params:acme:error}) {
-            # keep ACME error code
-        } else {
-            # delete (but log) other internal message
-            $self->log->error($msg);
-            delete $args_hash{error_message};
-        }
-    }
-    return OpenXPKI::Client::Service::Response->new(%args_hash);
+    return OpenXPKI::Client::Service::Response->new(@args);
 }
 
 =head2 new_error_response
@@ -827,40 +889,15 @@ sub handle_enrollment_request ($self) {
     #
     my $conf = {
         workflow => 'certificate_enroll',
-        pickup => 'pkcs10',
-        pickup_attribute => 'transaction_id',
-        %{ $self->config->{$self->operation} || {} },
+        %{ $self->config->get_hash($self->operation) || {} },
     };
     $self->log->trace("Resulting pickup config: " . Dumper $conf) if $self->log->is_trace;
 
     my $pickup_failed;
-    my $workflow;
-    try {
-        if (my $wf_type = $conf->{pickup_workflow}) {
-            $workflow = $self->pickup_via_workflow($wf_type, $conf->{pickup});
-
-        } elsif (my $ns = $conf->{pickup_namespace}) {
-            $workflow = $self->pickup_via_datapool($ns, $self->wf_params->{transaction_id});
-
-        } elsif (my $key = $conf->{pickup_attribute}) {
-            $workflow = $self->pickup_via_attribute($conf->{workflow}, $key, $self->wf_params->{transaction_id});
-        }
-        # only if pickup was done at all and did not die
-        if ($workflow) {
-            $self->check_workflow_error($workflow);
-        }
-    }
-    catch ($error) {
-        if (blessed $error and $error->isa('OpenXPKI::Exception::WorkflowPickupFailed')) {
-            $pickup_failed = 1;
-        }
-        else {
-            die $error;
-        }
-    }
+    my $workflow = $self->pickup_request($conf->{pickup}, $conf->{workflow});
 
     # exception if pickup failed and there is no PKCS#10 parameter
-    if ($pickup_failed and not $self->wf_params->{pkcs10}) {
+    if (not defined $workflow and not $self->wf_params->{pkcs10}) {
         $self->log->debug('Workflow pickup failed and no PKCS#10 given');
         die $self->new_response( 40005 );
     }
@@ -901,6 +938,112 @@ sub handle_enrollment_request ($self) {
     }
 }
 
+
+=head2 pickup_request
+
+Process pickup configuration and delegate to the pickup method.
+
+Runs C<pickup_via_workflow> if I<workflow> is set, requires I<input>,
+must be a list reference.
+
+Runs C<pickup_via_datapool> if I<namespace> is set, input parameter can
+be provided via I<input> (must be scalar), default is to use the same
+name as given to I<namespace>.
+
+If neither one is set, run C<pickup_via_attribute>, requires I<wf_type>
+given as second argument. Attribute key can be given via I<attribute>,
+defaults to I<transaction_id>. Input parameter can be provided via
+I<input> (must be scalar), default is to use the name given to I<attribute>.
+
+Support for old legacy configuration is builtin and triggered if the
+argument given in key I<pickup> is a string.
+
+B<Parameters>
+
+=over
+
+=item * C<pickup_config> I<HashRef> - pickup configuration
+
+=item * C<wf_type> I<Str> - workflow to pickup, required in attribute mode
+
+=back
+
+B<Returns> the workflow object if pickup was successfully handled or
+undef if pickup did not find a workflow to resume.
+
+=cut
+
+sub pickup_request ($self, $pickup_config, $wf_type) {
+
+    my $pickup_keys;
+    my $pickup_attribute;
+    my $pickup_workflow;
+    my $pickup_namespace;
+
+    if (ref $pickup_config eq 'HASH') {
+        $pickup_keys = $pickup_config->{input};
+        $pickup_workflow = $pickup_config->{workflow};
+        $pickup_namespace = $pickup_config->{namespace};
+        $pickup_attribute = $pickup_config->{attribute};
+    } elsif ($pickup_config) {
+        # Map from legacy config via config object
+        my $config = $self->config->get_hash($self->operation) || {};
+        $pickup_attribute = $config->{pickup_attribute};
+        $pickup_namespace = $config->{pickup_namespace};
+        $pickup_workflow  = $config->{pickup_workflow};
+        my @keys = split /\s*,\s*/, $pickup_config;
+        if (scalar @keys == 1) {
+            $pickup_keys = $keys[0];
+        } else {
+            $pickup_keys = \@keys;
+        }
+    }
+
+    my $wf_id;
+    # pickup via workflow - workflow and keys are required
+    if ($pickup_workflow) {
+        die "pickup input is mandatory in workflow mode" unless($pickup_keys);
+        die "pickup input must be list in workflow mode" unless(ref $pickup_keys eq 'ARRAY');
+        $wf_id = $self->pickup_via_workflow($pickup_workflow, $pickup_keys);
+
+    # pickup via datapool
+    } elsif ($pickup_namespace) {
+
+        # require keys to be scalar (undef is fine)
+        die "pickup input must be scalar in namespace mode" if (ref $pickup_keys);
+
+        # use namespace as parameter name as default
+        $pickup_keys ||= $pickup_namespace;
+
+        # run pickup
+        $wf_id = $self->pickup_via_datapool($pickup_namespace, $self->request_param($pickup_keys));
+
+    # pickup via workflow attribute search
+    } else {
+
+        # mandatory
+        $wf_type || die "pickup in attribute mode without main workflow";
+
+        # require keys to be scalar (undef is fine)
+        die "pickup input must be scalar in namespace mode" if (ref $pickup_keys);
+
+        # default attribute
+        $pickup_attribute ||= 'transaction_id';
+
+        # default use attribute also as parameter name
+        $pickup_keys ||= $pickup_attribute;
+
+        # run pickup
+        $wf_id = $self->pickup_via_attribute($wf_type, $pickup_attribute, $self->request_param($pickup_keys));
+    }
+    # only if pickup was done at all and did not die
+    if ($wf_id) {
+        $self->check_workflow_error($wf_id);
+    }
+    return $wf_id;
+
+}
+
 =head2 pickup_via_workflow
 
 Resume a workflow by retrieving its ID via a pickup workflow.
@@ -911,8 +1054,8 @@ B<Parameters>
 
 =item * C<$wf_type> I<Str> - Workflow type of the pickup workflow
 
-=item * C<$keys_str> I<Str> - Comma separated list of parameter names to read
-from C<$self-E<gt>wf_params> or the request parameters and pass to the pickup
+=item * C<$keys> I<ArrayRef> - list of parameter names to read from
+C<$self-E<gt>wf_params> or the request parameters and pass to the pickup
 workflow
 
 =back
@@ -923,21 +1066,22 @@ The I<HashRef> equals the item C<workflow> in the I<HashRef> returned by
 L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info>.
 
 =cut
-sub pickup_via_workflow ($self, $wf_type, $keys_str) {
+sub pickup_via_workflow ($self, $wf_type, $keys) {
     my $params;
-    my @keys = split /\s*,\s*/, $keys_str;
-    foreach my $key (@keys) {
+
+    foreach my $key ($keys->@*) {
         # take value from param hash if defined, this makes data
         # from the environment available to the pickup workflow
         my $val = $self->wf_params->{$key} // $self->request_param($key);
         $params->{$key} = $val if defined $val;
+        $self->log->trace(sprintf('pickup key %s is value %s', $key, $val // '<undef>'));
     }
 
     if (not scalar keys $params->%*) {
         $self->log->debug('Ignoring pickup via workflow: all pickup keys are empty');
         return;
     }
-    $self->log->debug(sprintf 'Pickup via workflow "%s" with keys: %s', $wf_type, join(',', @keys));
+    $self->log->debug(sprintf 'Pickup via workflow "%s" with keys: %s', $wf_type, join(',', $keys->@*));
 
     my $result = $self->run_workflow(
         type => $wf_type,
@@ -977,7 +1121,7 @@ sub pickup_via_datapool ($self, $namespace, $key) {
     }
     $self->log->debug("Pickup via datapool: $namespace.$key" );
 
-    my $wfl = $self->backend->run_command('get_data_pool_entry', {
+    my $wfl = $self->client_simple->run_command('get_data_pool_entry', {
         namespace => $namespace,
         key => $key,
     });
@@ -1015,7 +1159,7 @@ sub pickup_via_attribute ($self, $wf_type, $key, $value) {
     }
     $self->log->debug("Pickup via attribute: $key = $value" );
 
-    my $wfl = $self->backend->run_command('search_workflow_instances', {
+    my $wfl = $self->client_simple->run_command('search_workflow_instances', {
         type => $wf_type,
         attribute => { $key => $value },
         limit => 2
@@ -1025,10 +1169,11 @@ sub pickup_via_attribute ($self, $wf_type, $key, $value) {
     return $self->_pickup(@$wfl == 1 ? $wfl->[0]->{workflow_id} : undef);
 }
 
+
 sub _pickup ($self, $wf_id) {
     if (not $wf_id) {
         $self->log->trace("Cannot pick up workflow: query did not return workflow ID");
-        OpenXPKI::Exception::WorkflowPickupFailed->throw;
+        return undef;
     }
 
     if (ref $wf_id or $wf_id !~ m{\A\d+\z}) {
@@ -1039,7 +1184,7 @@ sub _pickup ($self, $wf_id) {
 
     $self->log->debug("Pick up workflow #${wf_id}");
 
-    my $wf_info = $self->backend->run_command(get_workflow_info => { id => $wf_id });
+    my $wf_info = $self->client_simple->run_command(get_workflow_info => { id => $wf_id });
     if (not $wf_info) {
         $self->log->error("Could not fetch workflow info for workflow #$wf_id");
         OpenXPKI::Exception::WorkflowPickupFailed->throw;
@@ -1079,7 +1224,7 @@ B<Returns> an L<OpenXPKI::Client::Service::Response>.
 =cut
 sub handle_property_request ($self, $operation = $self->operation) {
     # TODO - we need to consolidate the workflows for the different protocols
-    my $workflow_type = $self->config->{$operation}->{workflow} ||
+    my $workflow_type = $self->config->get([$operation, 'workflow']) ||
         $self->service_name.'_'.lc($operation);
 
     my $response = $self->new_response(
@@ -1119,7 +1264,7 @@ Throws an L<OpenXPKI::Client::Service::Response> in case of errors.
 =cut
 sub run_workflow ($self, %args) {
     # create the client object
-    my $client = $self->backend;
+    my $client = $self->client_simple;
     my $wf_info;
 
     try {
@@ -1161,7 +1306,7 @@ sub check_workflow_error ($self, $workflow, $error = '') {
         or ($workflow->{'proc_state'} ne 'finished' and not $workflow->{id})
         or ($workflow->{'proc_state'} eq 'exception')
     ) {
-        my $reply = $self->backend->last_reply || {};
+        my $reply = $self->client_simple->last_reply || {};
         # this is assembled in OpenXPKI::Service::Default->__send_error():
         if (my $err = $reply->{ERROR}) {
             if (my $class = $err->{CLASS}) {
@@ -1181,7 +1326,7 @@ sub check_workflow_error ($self, $workflow, $error = '') {
             }
         }
 
-        my $msg = $self->backend->last_error || $error;
+        my $msg = $self->client_simple->last_error || $error;
         die $self->new_response(
             error => 50003,
             $msg ? (error_message => $msg) : (),
@@ -1198,8 +1343,8 @@ B<Returns> nothing and does not throw exceptions.
 
 =cut
 sub disconnect_backend ($self) {
-    return unless $self->has_backend;
-    eval { $self->backend->disconnect if $self->backend };
+    return unless $self->has_client_simple;
+    eval { $self->client_simple->disconnect };
 }
 
 =head2 set_pkcs10_and_tid
@@ -1274,6 +1419,8 @@ always an L<OpenXPKI::Client::Service::Response> is returned.
 
 =cut
 sub cgi_safe_sub :prototype($&) ($self, $handler_sub) {
+    OpenXPKI::Log4perl->set_default_facility( $self->config_obj->log_facility );
+
     my $response;
     try {
         $response = $handler_sub->();
@@ -1283,7 +1430,6 @@ sub cgi_safe_sub :prototype($&) ($self, $handler_sub) {
     }
 
     $self->log->debug('HTTP status: [' . $response->http_status_line . ']');
-    $self->log->trace(Dumper $response) if $self->log->is_trace;
     $self->log->error($response->error_message) if $response->has_error;
 
     return $response;
@@ -1321,6 +1467,39 @@ sub cgi_headers ($self, $headers) {
     return \%cgi_headers;
 }
 
-1;
 
-__END__;
+=head2 get_list_from_legacy_config
+
+Read a list of item from the config layer at the given path
+If the class is used with a legacy config (via config_obj), the method
+will read the path using C<get> and split the result at the comma.
+If the class is used with the new service config, a C<get_list> call is
+made.
+
+B<Parameters>
+
+=over
+
+=item * C<$path> I<String|ArrayRef> - config path
+
+=back
+
+B<Returns> a I<Array> found at the given config path
+
+=cut
+# A helper to convert paramter lists from old format
+sub get_list_from_legacy_config {
+    my $self = shift;
+    my @path =  @_;
+    my @list;
+    if ($self->has_legacy_config) {
+        my $items = $self->config->get(@path)//'';
+        @list = split /\s*,\s*/, $items;
+    } else {
+        @list = $self->config->get_list(@path);
+    }
+    return @list;
+}
+
+
+1;

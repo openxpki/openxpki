@@ -34,25 +34,14 @@ sub _load_directory {
 
 OpenXPKI::CLI::Command::acme
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Handle account registrations for the NICE ACME backend.
 
-=head1 USAGE
-
-Feed me!
-
-=head2 Subcommands
-
-=over
-
-=item list
-
-=item show
-
-=item create
-
-=back
+B<NOTE>: This manages the account key in situations where OpenXPKI is
+used as ACME client to enroll certficates with an external CA. To
+manage the ACME clients enrolling against OpenXPKI you have to use the
+ACME client registration process via the endpoints and workflows.
 
 =cut
 

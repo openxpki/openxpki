@@ -74,7 +74,7 @@ while (my $cgi = CGI::Fast->new("")) {
     my $client = OpenXPKI::Client::Service::SCEP->new(
         service_name => 'scep',
         config_obj => $config,
-        apache_env => \%ENV,
+        webserver_env => \%ENV,
         remote_address => $ENV{REMOTE_ADDR},
         request => $req,
         endpoint => $endpoint,
@@ -92,15 +92,15 @@ while (my $cgi = CGI::Fast->new("")) {
             }
             catch ($err) {
                 # something is wrong, TODO we might try to branch request vs. server errors
-                die OpenXPKI::Client::Service::Response->new_error( 50010 );
+                die OpenXPKI::Client::Service::Response->new( 50010 );
             }
 
             if (!$client->attr()->{alias}) {
                 $log->info('Unable to find RA certficate');
-                die OpenXPKI::Client::Service::Response->new_error ( 40002 );
+                die OpenXPKI::Client::Service::Response->new( 40002 );
             } elsif (!$client->signer) {
                 $log->info('Unable to extract signer certficate');
-                die OpenXPKI::Client::Service::Response->new_error ( 40001 );
+                die OpenXPKI::Client::Service::Response->new( 40001 );
             # Enrollment request
             } elsif ($client->message_type =~ m{(PKCSReq|RenewalReq|GetCertInitial|CertPoll)}) {
                 $log->debug("Handle enrollment");

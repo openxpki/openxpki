@@ -24,7 +24,7 @@ my $oxitest = OpenXPKI::Test->new(
 
 #
 # We have to test API command "control_watchdog" via a client due to the
-# way OpenXPKI::Control->get_pids() collects process informations.
+# way OpenXPKI::Control::Server->get_pids() collects process informations.
 # If we directly called the API command, get_pids() would not see the watchdog
 # processes started by the server as they would be in another process group as
 # the test process (that calls the API).

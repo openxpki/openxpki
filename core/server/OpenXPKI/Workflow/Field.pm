@@ -1,12 +1,7 @@
 package OpenXPKI::Workflow::Field;
-use Moose;
-
-# Core modules
-use Data::Dumper;
+use OpenXPKI -class;
 
 # Project modules
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 
 has 'config' => (

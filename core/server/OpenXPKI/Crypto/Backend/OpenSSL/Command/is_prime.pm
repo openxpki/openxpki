@@ -1,13 +1,7 @@
-## OpenXPKI::Crypto::Backend::OpenSSL::Command::is_prime
-## Written 2006 by Alexander Klink for the OpenXPKI project
-## (C) Copyright 2006 by The OpenXPKI Project
-
-use strict;
-use warnings;
-
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::is_prime;
+use OpenXPKI;
 
-use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
+use parent qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 
 sub get_command
 {

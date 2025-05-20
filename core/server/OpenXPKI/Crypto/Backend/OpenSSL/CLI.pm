@@ -1,18 +1,7 @@
-## OpenXPKI::Crypto::Backend::OpenSSL::CLI
-## Written 2005 by Michael Bell for the OpenXPKI project
-## Rewritten 2006 by Michael Bell for the OpenXPKI project
-## Rewritten to use the OpenXPKI::Crypto::CLI base class
-## 2006 by Alexander Klink for the OpenXPKI project
-## (C) Copyright 2005-2006 by The OpenXPKI Project
 package OpenXPKI::Crypto::Backend::OpenSSL::CLI;
-use base qw( OpenXPKI::Crypto::CLI );
+use OpenXPKI -class_std;
 
-use strict;
-use warnings;
-use English;
-use Class::Std;
-
-use OpenXPKI::Debug;
+use parent qw( OpenXPKI::Crypto::CLI );
 
 my %config_of :ATTR( :init_arg<CONFIG> ); # the config object
 

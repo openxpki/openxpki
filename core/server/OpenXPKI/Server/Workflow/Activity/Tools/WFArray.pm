@@ -1,18 +1,12 @@
-# OpenXPKI::Server::Workflow::Activity::Tools::WFArray
-# Written by Scott Hardin for the OpenXPKI project 2010
-# Copyright (c) 2010 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Activity::Tools::WFArray;
+use OpenXPKI;
 
-use strict;
-use base qw( OpenXPKI::Server::Workflow::Activity );
+use parent qw( OpenXPKI::Server::Workflow::Activity );
+
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
 use OpenXPKI::Serialization::Simple;
-use OpenXPKI::Debug;
 use OpenXPKI::Server::Workflow::WFObject::WFArray;
 
-#use Data::Dumper;
 
 my @REQ_PROPS = qw( array_name function );
 my @OPT_PROPS = qw( context_key index_key index );

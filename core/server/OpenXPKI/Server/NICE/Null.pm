@@ -1,6 +1,6 @@
 package OpenXPKI::Server::NICE::Null;
+use OpenXPKI -class;
 
-use Moose;
 extends 'OpenXPKI::Server::NICE';
 
 __PACKAGE__->meta->make_immutable;

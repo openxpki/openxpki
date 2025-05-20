@@ -9,6 +9,7 @@ with qw(
 # Core modules
 use Exporter qw( import );
 use JSON::PP;
+use List::Util qw(any);
 
 # CPAN modules
 use Crypt::JWT qw( decode_jwt );
@@ -16,27 +17,12 @@ use Crypt::JWT qw( decode_jwt );
 # Project modules
 use OpenXPKI::Client::Service::Response;
 use OpenXPKI::Serialization::Simple;
-use OpenXPKI::i18n qw( i18n_walk );
+use OpenXPKI::i18n qw( i18n_walk get_language );
 
 # Symbols to export by default
 # (we avoid Moose::Exporter's import magic because that switches on all warnings again)
 our @EXPORT = qw( cgi_safe_sub ); # provided by OpenXPKI::Client::Service::Role::Base
 
-has json => (
-    is => 'ro',
-    isa => 'Object',
-    init_arg => undef,
-    lazy => 1,
-    default => sub {
-        my $json = JSON::PP->new->utf8;
-        # Use plain scalars as boolean values. The default representation as
-        # JSON::PP::Boolean would cause the values to be serialized later on.
-        # A JSON false would be converted to a trueish scalar "OXJSF1:false".
-        $json->boolean_values(0,1);
-
-        return $json;
-    },
-);
 
 has json_data => (
     is => 'rw',
@@ -72,7 +58,7 @@ has use_status_codes => (
     isa => 'Bool',
     lazy => 1,
     init_arg => undef,
-    default => sub ($self) { $self->config->{output}->{use_http_status_codes} ? 1 : 0 },
+    default => sub ($self) { $self->config->get('output.use_http_status_codes') ? 1 : 0 },
 );
 
 has openapi_mode => (
@@ -109,8 +95,8 @@ sub prepare ($self, $c) {
     #
     # Gather data from TLS session
     if ($self->request->is_secure) {
-        my $auth_dn = $self->apache_env->{SSL_CLIENT_S_DN};
-        my $auth_pem = $self->apache_env->{SSL_CLIENT_CERT};
+        my $auth_dn = $self->webserver_env->{SSL_CLIENT_S_DN};
+        my $auth_pem = $self->webserver_env->{SSL_CLIENT_CERT};
 
         # TODO tls_client_dn / tls_client_cert always have the same value as signer_dn / signer_cert
         if (defined $auth_dn) {
@@ -120,11 +106,11 @@ sub prepare ($self, $c) {
                 $self->add_wf_param(tls_client_cert => $auth_pem) if $self->config_env_keys->{tls_client_cert};
                 if (
                     ($self->config_env_keys->{signer_chain} or $self->config_env_keys->{tls_client_chain})
-                    and $self->apache_env->{SSL_CLIENT_CERT_CHAIN_0}
+                    and $self->webserver_env->{SSL_CLIENT_CERT_CHAIN_0}
                 ) {
                     my @chain;
                     for (my $cc=0; $cc<=3; $cc++)   {
-                        my $chaincert = $self->apache_env->{'SSL_CLIENT_CERT_CHAIN_' . $cc};
+                        my $chaincert = $self->webserver_env->{'SSL_CLIENT_CERT_CHAIN_' . $cc};
                         last unless $chaincert;
                         push @chain, $chaincert;
                     }
@@ -147,9 +133,7 @@ sub prepare ($self, $c) {
     # Only parameters which are whitelisted in the config are mapped!
     # This is crucial to prevent injection of server-only parameters
     # like the autoapprove flag...
-    if ($self->config->{$self->operation}->{param}) {
-        my @keys;
-        @keys = split /\s*,\s*/, $self->config->{$self->operation}->{param};
+    if (my @keys = $self->config->get_list([$self->operation,'input'])) {
         foreach my $key (@keys) {
             my $val = $self->request_param($key);
             next unless (defined $val);
@@ -167,7 +151,7 @@ sub prepare ($self, $c) {
 sub send_response ($self, $c, $response) {
     if ($self->use_status_codes) {
         if ($response->is_pending) {
-            $c->res->headers->add('-retry-after' => $response->retry_after);
+            $c->res->headers->add('Retry-After' => $response->retry_after);
         }
     } else {
         $c->res->code('200');
@@ -194,6 +178,59 @@ sub send_response ($self, $c, $response) {
 
         return $c->render(text => $output);
 
+
+    # endpoint should send content directly
+    } elsif ($self->config->exists([$self->operation,'download'])) {
+
+        my $download = $self->config->get_hash([$self->operation,'download']);
+
+        $self->log->debug('Direct download configured');
+        # the payload of the workflow
+        my $data = $response->result->{data} || {};
+
+        $self->log->trace(Dumper $data) if $self->log->is_trace;
+
+        my $payload;
+        my $mime = $download->{mime} || 'application/octet-stream';
+        my $filename = $download->{filename};
+
+        # download config must specify a field to read the data from
+        # or a template string to be applied on the data hash
+        if (my $template = $download->{template}) {
+            $self->log->debug('Rendering template using context '. $template);
+            $payload  = OpenXPKI::Template->new()->render($template, $data);
+        } else {
+            my $field = $download->{field} || 'output';
+            $self->log->debug('Read payload from '. $field);
+            $payload = $data->{$field} // '';
+
+            # support download field format from UI (hash with data and header)
+            if (ref $payload eq 'HASH') {
+                $filename = $payload->{filename} if ($payload->{filename});
+                $mime = $payload->{mime} if ($payload->{mime});
+                $payload = $payload->{data};
+            }
+
+            # support for array of certificates/crls
+            if (ref $payload eq 'ARRAY') {
+                $payload = join("\n", $payload->@*);
+            }
+        }
+
+        if (!$payload) {
+            $c->res->code('404');
+            $c->res->message('Not found');
+            return $c->render();
+        }
+
+        $self->log->trace(Dumper $payload);
+
+        $c->res->headers->content_type($download->{mime} || 'application/octet-stream');
+        $c->res->headers->content_disposition("attachment;filename=".$download->{filename})
+            if ($download->{filename});
+
+        return $c->render(text => $payload);
+
     # JSON
     } else {
         my $data;
@@ -203,13 +240,14 @@ sub send_response ($self, $c, $response) {
                 error => {
                     code => $response->error,
                     message => $response->error_message,
-                    $response->has_error_details ? (data => $response->error_details) : (),
+                    $response->has_error_details ?
+                        (data => (get_language() ? i18n_walk($response->error_details) : $response->error_details)) : (),
                 }
             };
 
         } else {
             # run i18n tokenzier on output if a language is set
-            $data = $self->config_obj->language ? i18n_walk($response->result) : $response->result;
+            $data = get_language() ? i18n_walk($response->result) : $response->result;
             # wrap in "result" hash item
             if (not $self->openapi_mode) {
                 $data = {
@@ -235,7 +273,7 @@ sub op_handlers {
     return [
         'openapi-spec' => sub ($self) {
             $self->openapi_mode(1);
-            my $url = $self->request->url->to_abs;
+            my $url = $self->request_url;
             my $baseurl = sprintf "%s://%s%s", $url->protocol, $url->host_port, $url->path->to_abs_string;
             my $spec = $self->openapi_spec($baseurl) or die $self->new_response( 50082 );
             return $self->new_response(result => $spec);
@@ -252,9 +290,7 @@ sub cgi_set_custom_wf_params ($self) {
     # Only parameters which are whitelisted in the config are mapped!
     # This is crucial to prevent injection of server-only parameters
     # like the autoapprove flag...
-    if ($self->config->{$self->operation}->{param}) {
-        my @keys;
-        @keys = split /\s*,\s*/, $self->config->{$self->operation}->{param};
+    if (my @keys = $self->get_list_from_legacy_config([$self->operation,'param'])) {
         foreach my $key (@keys) {
             my $val = $self->request_param($key);
             next unless (defined $val);
@@ -269,8 +305,8 @@ sub cgi_set_custom_wf_params ($self) {
 
     # Gather data from TLS session
     if ($self->request->is_secure) {
-        my $auth_dn = $self->apache_env->{SSL_CLIENT_S_DN};
-        my $auth_pem = $self->apache_env->{SSL_CLIENT_CERT};
+        my $auth_dn = $self->webserver_env->{SSL_CLIENT_S_DN};
+        my $auth_pem = $self->webserver_env->{SSL_CLIENT_CERT};
 
         # TODO tls_client_dn / tls_client_cert always have the same value as signer_dn / signer_cert
         if (defined $auth_dn) {
@@ -280,11 +316,11 @@ sub cgi_set_custom_wf_params ($self) {
                 $self->add_wf_param(tls_client_cert => $auth_pem) if $self->config_env_keys->{tls_client_cert};
                 if (
                     ($self->config_env_keys->{signer_chain} or $self->config_env_keys->{tls_client_chain})
-                    and $self->apache_env->{SSL_CLIENT_CERT_CHAIN_0}
+                    and $self->webserver_env->{SSL_CLIENT_CERT_CHAIN_0}
                 ) {
                     my @chain;
                     for (my $cc=0; $cc<=3; $cc++)   {
-                        my $chaincert = $self->apache_env->{'SSL_CLIENT_CERT_CHAIN_' . $cc};
+                        my $chaincert = $self->webserver_env->{'SSL_CLIENT_CERT_CHAIN_' . $cc};
                         last unless $chaincert;
                         push @chain, $chaincert;
                     }
@@ -347,10 +383,8 @@ around new_response => sub ($orig, $self, @args) {
             ));
 
             # Add context parameters to the response if requested
-            if (my $output = $self->config->{$self->operation}->{output}) {
-                my @keys = split /\s*,\s*/, $output;
+            if (my @keys = $self->get_list_from_legacy_config([$self->operation,'output'])) {
                 $self->log->debug(sprintf 'Configured output keys for operation "%s": %s', $self->operation, join(', ', @keys));
-
                 for my $key (@keys) {
                     my $val = $wf->{context}->{$key};
                     next unless defined $val;
@@ -414,7 +448,7 @@ sub parse_rpc_request_body ($self) {
         return; # no parsing required: Mojolicious already decoded the request parameters
     }
 
-    die $self->new_response( 40083 ) unless $self->config->{input}->{allow_raw_post};
+    die $self->new_response( 40083 ) unless $self->config->get('input.allow_raw_post');
 
     return unless $self->request->body;
 
@@ -423,7 +457,10 @@ sub parse_rpc_request_body ($self) {
     # application/jose
     #
     if ($content_type =~ m{\Aapplication/jose}) {
-        die $self->new_response( 40087 ) unless $self->config->{jose};
+
+        # exist does not work here as the section is currently empty/undef
+        die $self->new_response( 40087 )
+            unless (any { $_ eq 'jose' } $self->config->get_keys());
 
         # The cert_identifier used to sign the token must be set as kid
         # First run - set ignore_signature to just get the header with the kid
@@ -464,7 +501,7 @@ sub parse_rpc_request_body ($self) {
         my $op = $jwt_header->{method} or die $self->new_response( 40089 );
         $self->operation($op);
 
-        my $backend = $self->backend; # call outside the following try-catch block so OpenXPKI::Exception is not mangled
+        my $backend = $self->client_simple; # call outside the following try-catch block so OpenXPKI::Exception is not mangled
         try {
             # this will die if the certificate was not found
             # TOOD - this call fails if no backend connection can be made which gives a misleading
@@ -480,7 +517,11 @@ sub parse_rpc_request_body ($self) {
 
             $jwt_header->{signer_cert} = $cert;
         }
-        catch ($err) {
+        catch ($error) {
+
+            # rethrow error reponse
+            die $error if ($error->isa('OpenXPKI::Client::Service::Response'));
+
             die $self->new_response( 40088, $cert ? 'JWT signature could not be verified' : 'Given key id was not found' );
         }
 
@@ -489,11 +530,14 @@ sub parse_rpc_request_body ($self) {
     # application/pkcs7
     #
     } elsif ($content_type =~ m{\Aapplication/pkcs7}) {
-        die $self->new_response( 40091 ) unless $self->config->{pkcs7};
+
+        # exist does not work here as the section is currently empty/undef
+        die $self->new_response( 40091 )
+            unless (any { $_ eq 'pkcs7' } $self->config->get_keys());
 
         $self->pkcs7($self->request->body);
 
-        my $backend = $self->backend; # call outside the following try-catch block so OpenXPKI::Exception is not mangled
+        my $backend = $self->client_simple; # call outside the following try-catch block so OpenXPKI::Exception is not mangled
         try {
             my $pkcs7_content = $backend->run_command('unwrap_pkcs7_signed_data', {
                 pkcs7 => $self->pkcs7,
@@ -503,6 +547,9 @@ sub parse_rpc_request_body ($self) {
             $json_str = $pkcs7_content->{value} or die $self->new_response( 50080 );
         }
         catch ($error) {
+            # rethrow error reponse
+            die $error if ($error->isa('OpenXPKI::Client::Service::Response'));
+
             die $self->new_response( 50080, $error );
         }
 
@@ -532,7 +579,7 @@ sub parse_rpc_request_body ($self) {
 
     # TODO - evaluate security implications regarding blessed objects
     # and consider to filter out serialized objects for security reasons
-    $self->json->max_depth( $self->config->{input}->{parse_depth} || 5 );
+    $self->json->max_depth( $self->config->get('input.parse_depth') || 5 );
 
     # decode JSON
     try {
@@ -548,7 +595,7 @@ sub parse_rpc_request_body ($self) {
 }
 
 sub handle_rpc_request ($self) {
-    my $conf = $self->config->{$self->operation}
+    my $conf = $self->config->get_hash($self->operation)
         or die $self->new_response( 40480 => sprintf 'RPC method "%s" not found', $self->operation );
 
     # "workflow" is required even though with "execute_action" we don't need it.
@@ -557,46 +604,15 @@ sub handle_rpc_request ($self) {
     die $self->new_response( 40480 => sprintf 'Configuration of RPC method "%s" must contain "workflow" entry', $self->operation )
       unless $conf->{workflow};
 
-    $self->log->trace(
-        sprintf 'Incoming RPC request "%s" on endpoint "%s" with parameters: %s',
-        $self->operation, $self->endpoint, Dumper $self->wf_params,
-    ) if $self->log->is_trace;
+    $self->log->trace("RPC workflow config: " . Dumper $conf)  if $self->log->is_trace;
 
     my $wf;
 
     #
     # Try pickup
     #
-    my $pickup_key = $conf->{pickup};
-    if ($pickup_key) {
-        try {
-            # pickup via workflow
-            if (my $wf_type = $conf->{pickup_workflow}) {
-                $wf = $self->pickup_via_workflow($wf_type, $pickup_key);
-
-            # pickup via datapool
-            } elsif (my $ns = $conf->{pickup_namespace}) {
-                $wf = $self->pickup_via_datapool($ns, $self->request_param($pickup_key));
-
-            # pickup via workflow attribute search
-            } else {
-                my $key = $conf->{pickup_attribute} || $pickup_key;
-                my $value = $self->request_param($pickup_key);
-                $wf = $self->pickup_via_attribute($conf->{workflow}, $key, $value);
-            }
-            # only if pickup was done at all and did not die
-            if ($wf) {
-                $self->check_workflow_error($wf);
-            }
-        }
-        catch ($error) {
-            if (blessed $error and $error->isa('OpenXPKI::Exception::WorkflowPickupFailed')) {
-                $self->log->debug('Workflow pickup failed');
-            }
-            else {
-                die $error;
-            }
-        }
+    if ($conf->{pickup}) {
+        $wf = $self->pickup_request($conf->{pickup}, $conf->{workflow});
     }
 
     # Endpoint has a "resume and execute" definition so run action if possible
@@ -611,7 +627,7 @@ sub handle_rpc_request ($self) {
             die $self->new_response( error => 40482, workflow => $wf );
 
         } else {
-            my $actions_avail = $self->backend->run_command('get_workflow_activities', { id => $wf->{id} });
+            my $actions_avail = $self->client_simple->run_command('get_workflow_activities', { id => $wf->{id} });
             if (!(grep { $_ eq $action } @{$actions_avail})) {
                 die $self->new_response( error => 40483, workflow => $wf );
             } else {
@@ -645,7 +661,7 @@ sub handle_rpc_request ($self) {
     # ) if (not $pickup_key and $wf->{proc_state} ne 'finished');
 
     # Workflow paused - send "request pending" / ask client to retry
-    if ($pickup_key and $wf->{proc_state} ne 'finished') {
+    if ($conf->{pickup} and $wf->{proc_state} ne 'finished') {
         return $self->new_pending_response($wf);
 
     } else {
@@ -679,7 +695,7 @@ sub openapi_spec {
         openapi => "3.0.0",
         info => {
             title => "OpenXPKI RPC API",
-            $conf->{openapi} ? ($conf->{openapi}->%*) : (),
+            %{$conf->get_hash('openapi')//{}}
         },
         servers => [ { url => $openapi_server_url, description => "OpenXPKI server" } ],
         paths => $paths,
@@ -732,33 +748,46 @@ sub openapi_spec {
     });
 
     try {
-        my $client = $self->backend()
-          or die "Could not create OpenXPKI client\n";
-
         if (!$openapi_spec->{info}->{version}) {
-            my $server_version = $client->run_command('version');
+            my $server_version = $self->client_simple->run_command('version');
             $openapi_spec->{info}->{version} = $server_version->{config}->{api} || 'unknown';
         }
 
-        for my $method (sort keys %$conf) {
+        for my $method (sort $conf->get_keys()) {
             next if $method =~ /^[a-z]/; # small letters means: no RPC method but a config group
-            my $wf_type = $conf->{$method}->{workflow}
+            my $wf_type = $conf->get([$method, 'workflow'])
               or die "Missing parameter 'workflow' in RPC method '$method'\n";
-            my $in = $conf->{$method}->{param} || '';
-            my $out = $conf->{$method}->{output} || '';
-            my $action = $conf->{$method}->{execute_action};
 
-            my $pickup_workflow = $conf->{$method}->{pickup_workflow};
-            my $pickup_input = $conf->{$method}->{pickup};
+            my @in = $conf->get_list([$method,'input']);
+            if (!@in) {
+                # legacy config uses atrribute "param"
+                @in = $self->get_list_from_legacy_config([$method, 'param']);
+            }
 
-            my $method_spec = $client->run_command('get_rpc_openapi_spec', {
+            my @out = $self->get_list_from_legacy_config([$method, 'output']);
+            my $action = $conf->get([$method, 'execute_action']);
+
+            # the structure for pickup has changed so we need some more glue code here
+            my $pickup_workflow;
+            my @pickup_input;
+
+            if ($self->has_legacy_config) {
+                $pickup_workflow = $conf->get([$method, 'pickup_workflow']);
+                @pickup_input = $self->get_list_from_legacy_config([$method, 'pickup']);
+            } else {
+                $pickup_workflow = $conf->get([$method, 'pickup', 'workflow']);
+                @pickup_input = $conf->get_list([$method, 'pickup', 'input']);
+            }
+
+            $self->log->debug("Fetch openapi-spec for $method / $wf_type");
+            my $method_spec = $self->client_simple->run_command('get_rpc_openapi_spec', {
                 rpc_method => $method,
                 workflow => $wf_type,
                 ($action ? (action => $action) : ()),
-                input => [ split /\s*,\s*/, $in ],
-                output => [ split /\s*,\s*/, $out ],
+                input => \@in,
+                output => \@out,
                 $pickup_workflow ? (pickup_workflow => $pickup_workflow) : (),
-                $pickup_input ? (pickup_input => [ split /\s*,\s*/, $pickup_input ]) : (),
+                @pickup_input ? (pickup_input => \@pickup_input) : (),
             });
 
             my $responses = {
@@ -823,7 +852,7 @@ sub openapi_spec {
             $add_component->($_, $method_spec->{components}->{$_}) for keys $method_spec->{components}->%*;
         }
 
-        $client->disconnect();
+        $self->client_simple->disconnect();
     }
     catch ($err) {
         $self->log->error("Unable to query OpenAPI specification from OpenXPKI server: $err");

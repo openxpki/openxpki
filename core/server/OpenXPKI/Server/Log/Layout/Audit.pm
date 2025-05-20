@@ -1,11 +1,9 @@
 package OpenXPKI::Server::Log::Layout::Audit;
+use OpenXPKI qw( -class -nonmoose );
 
-use Moose;
-use MooseX::NonMoose;
 extends 'Log::Log4perl::Layout::PatternLayout';
 
 use Log::Log4perl;
-use Data::Dumper;
 
 sub render {
     my $self = shift;

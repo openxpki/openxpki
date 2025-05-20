@@ -23,14 +23,14 @@ my @allowed_methods;
 # set from ENV via apache
 @allowed_methods = split /\W+/, $ENV{OPENXPKI_HEALTHCHECK} if ($ENV{OPENXPKI_HEALTHCHECK});
 
-my $socketfile = $ENV{OPENXPKI_CLIENT_SOCKETFILE} || '/var/openxpki/openxpki.socket';
+my $socketfile = $ENV{OPENXPKI_CLIENT_SOCKETFILE};
 
 sub __client {
     if (!$client) {
         eval{
-            $client = OpenXPKI::Client->new({
-                SOCKETFILE => $socketfile,
-            });
+            $client = OpenXPKI::Client->new(
+                ($socketfile ? (socketfile => $socketfile) : ())
+            );
             $client->init_session();
             DEBUG("Got new client: " . $client->session_id());
         };

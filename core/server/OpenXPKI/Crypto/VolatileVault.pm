@@ -1,18 +1,6 @@
-## OpenXPKI::Crypto::VolatileVault.pm
-##
-## Written 2006 by Martin Bartosch for the OpenXPKI project
-## Copyright (C) 2005-2006 by The OpenXPKI Project
-
 package OpenXPKI::Crypto::VolatileVault;
+use OpenXPKI -class_std;
 
-use Class::Std;
-
-use strict;
-use warnings;
-use English;
-
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Random;
 
 use MIME::Base64;

@@ -1,6 +1,6 @@
 package OpenXPKI::Server::Workflow::Validator::BasicFieldType;
+use OpenXPKI -class;
 
-use Moose;
 extends 'OpenXPKI::Server::Workflow::Validator';
 
 # Core modules
@@ -10,7 +10,6 @@ use Encode;
 use Workflow::Exception qw( validation_error );
 
 # Project modules
-use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Serialization::Simple;
 

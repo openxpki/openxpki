@@ -1,7 +1,7 @@
 package OpenXPKI::Server::Session::Driver::Volatile;
+use OpenXPKI -class;
 
-use Moose;
-with "OpenXPKI::Server::Session::DriverRole";
+with 'OpenXPKI::Server::Session::DriverRole';
 
 =head1 NAME
 
@@ -9,8 +9,6 @@ OpenXPKI::Server::Session::Driver::Volatile - Session implementation that does
 not persist data
 
 =cut
-
-use OpenXPKI::Exception;
 
 ################################################################################
 # Methods required by OpenXPKI::Server::Session::DriverRole

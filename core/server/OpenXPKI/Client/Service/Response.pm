@@ -5,8 +5,9 @@ use OpenXPKI qw( -class -typeconstraints );
 use Mojo::Message::Response;
 
 # Project modules
-use OpenXPKI::i18n qw( i18nGettext );
+use OpenXPKI::i18n qw( i18nGettext i18nTokenizer );
 use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Log4perl;
 
 # Use predefined numeric codes for dedicated problems
 our %named_messages = (
@@ -22,6 +23,7 @@ our %named_messages = (
     40006 => 'Request was rejected',
     40007 => 'Unknown operation',
     40008 => 'No operation specified',
+    40009 => 'Invalid content type',
     # RPC
     40080 => 'No method set in request',
     40081 => 'Decoding of JSON encoded POST data failed',
@@ -50,7 +52,7 @@ our %named_messages = (
     # Server errors
     #
     50000 => 'Server error',
-    50001 => 'Unable to fetch configuration from server - connect failed',
+    50001 => 'Unable to connect to backend',
     50002 => 'Unable to initialize client',
     50003 => 'Unexpected response from backend',
     50005 => 'ENV variable "server" and servername are both set but are mutually exclusive',
@@ -83,11 +85,11 @@ Response incl. workflow details:
 
 Error response:
 
-    die OpenXPKI::Client::Service::Response->new_error( 50002 );
+    die OpenXPKI::Client::Service::Response->new( 50002 );
 
 Error response with custom error message:
 
-    die OpenXPKI::Client::Service::Response->new_error(
+    die OpenXPKI::Client::Service::Response->new(
         400 => 'urn:ietf:params:acme:error:alreadyRevoked'
     );
 
@@ -97,11 +99,15 @@ Error response with custom error message:
         error_message => 'urn:ietf:params:acme:error:alreadyRevoked',
     );
 
+Error response with predefined plus custom error message:
+
+    die OpenXPKI::Client::Service::Response->new( 50002 => 'We have had a problem' );
+
 =head1 ATTRIBUTES
 
 =head2 result
 
-Service specific result I<Str> or I<HashRef>.
+Service specific result I<Str>, I<HashRef> or I<Object>.
 
     OpenXPKI::Client::Service::Response->new(
         result => json_encode(...),
@@ -110,7 +116,7 @@ Service specific result I<Str> or I<HashRef>.
 =cut
 has result => (
     is => 'rw',
-    isa => 'Str|HashRef',
+    isa => 'Str|HashRef|Object',
     lazy => 1,
     default => '',
     predicate => 'has_result',
@@ -133,6 +139,10 @@ has extra_headers => (
     isa => 'HashRef',
     lazy => 1,
     default => sub { {} },
+    traits => ['Hash'],
+    handles => {
+        add_header => 'set',
+    }
 );
 
 =head2 error
@@ -193,11 +203,15 @@ the C<error_code> item.
 
 =cut
 # Please not there is a method error_message() below
+my $str_or_any = subtype as 'Str';
+coerce $str_or_any, from 'Any', via { "$_" };
 has custom_error_message => (
     is => 'rw',
-    isa => 'Str',
+    isa => $str_or_any,
+    coerce => 1,
     init_arg  => 'error_message',
     predicate => 'has_custom_error_message',
+    clearer => 'clear_custom_error_message',
 );
 
 =head2 retry_after
@@ -324,6 +338,25 @@ sub __build_http_status_line ($self) {
     );
 }
 
+=head2 redirect_url
+
+Extra HTTP headers to be added (I<HashRef>).
+
+    OpenXPKI::Client::Service::Response->new(
+        ...
+        redirect_url => 'https://www.openxpki.org',
+    );
+
+=cut
+has redirect_url => (
+    is => 'rw',
+    isa => 'HashRef',
+    lazy => 1,
+    default => sub { {} },
+    traits => ['Hash'],
+    predicate => 'is_redirect',
+);
+
 =head2 state
 
 Readonly workflow C<state> I<Str>, automatically set if L</workflow> was set.
@@ -360,61 +393,138 @@ has transaction_id => (
     predicate => 'has_transaction_id',
 );
 
+=head2 log
 
-# this allows a constructor with the error code as scalar
-around BUILDARGS => sub {
+A logger object, per default set to C<OpenXPKI::Log4perl-E<gt>get_logger>.
 
-    my $orig = shift;
-    my $class = shift;
-
-    return $class->$orig( error => $_[0] ) if (@_ == 1 and not ref $_[0]);
-    return $class->$orig( @_ );
-
-};
+=cut
+has log => (
+    is => 'rw',
+    isa => duck_type( [qw(
+           trace    debug    info    warn    error    fatal
+        is_trace is_debug is_info is_warn is_error is_fatal
+    )] ),
+    lazy => 1,
+    default => sub ($self) { OpenXPKI::Log4perl->get_logger },
+);
 
 =head1 METHODS
 
-=head2 new_error
+=head2 new
 
-Alternate constructor to specify HTTP error codes and error messages.
+Constructor with shortcut syntax and an error message filter.
 
-    OpenXPKI::Client::Service::Response->new_error( 500 );
-    # is equal to:
+An error code may be given as an internal code only:
+
+    OpenXPKI::Client::Service::Response->new( 40080 );
+    # equal to:
     OpenXPKI::Client::Service::Response->new(
-        error => 500
+        error => 40080
     );
 
-    OpenXPKI::Client::Service::Response->new_error( 500 => 'Something bad happened');
-    # is equal to:
+An additional custom error message may also be specified:
+
+=over
+
+=item * if B<error_message> is given and starts with C<"I18N_OPENXPKI_UI_">
+it will be translated:
+
+    OpenXPKI::Client::Service::Response->new( 500 => 'I18N_OPENXPKI_UI_BLAH' );
+    # equal to:
     OpenXPKI::Client::Service::Response->new(
         error => 500,
-        error_message => 'Something bad happened',
+        error_message => i18nTokenizer('I18N_OPENXPKI_UI_BLAH'),
     );
 
-=cut
-sub new_error ($class, @args) {
-    die 'new_error() requires an error code' unless @args > 0;
-    return $class->new(
-        error => $args[0],
-        defined $args[1] ? ( error_message => $args[1] ) : (),
+=item * if it starts with C<"urn:ietf:params:acme:error"> it will be kept as is:
+
+    OpenXPKI::Client::Service::Response->new( 400 => 'urn:ietf:params:acme:error:rejectedIdentifier' );
+    # equal to:
+    OpenXPKI::Client::Service::Response->new(
+        error => 400,
+        error_message => 'urn:ietf:params:acme:error:rejectedIdentifier',
     );
+
+=item * otherwise it will be logged and removed:
+
+    OpenXPKI::Client::Service::Response->new( 500 => 'Something bad happened');
+    # equal to:
+    $self->log->error('Something bad happened');
+    OpenXPKI::Client::Service::Response->new(
+        error => 500,
+    );
+
+=back
+
+=cut
+
+around BUILDARGS => sub ($orig, $class, @args) {
+    # shortcut: only scalar error code or code+message
+    if (scalar 0 < @args < 3 and not blessed $args[0] and $args[0] =~ /^\A\d+\z/) {
+        @args = (
+            error => $args[0],
+            $args[1] ? (error_message => $args[1]) : (),
+        );
+    }
+
+    return $class->$orig( @args );
+};
+
+sub BUILD ($self, $args) {
+    # don't send internal error messages to client except:
+    # - ACME error codes and
+    # - translated I18N_OPENXPKI_UI_* messages
+    if ($self->has_custom_error_message) {
+        my $msg = $self->custom_error_message;
+        chomp $msg;
+        if ($msg =~ /I18N_OPENXPKI_UI_/) {
+            # keep I18N string (but translate)
+            $self->custom_error_message(i18nTokenizer($msg));
+        } elsif ($msg =~ m{\Aurn:ietf:params:acme:error}) {
+            # keep ACME error code
+            $self->custom_error_message($msg);
+        } else {
+            # delete (but log) other internal message
+            $self->log->error($msg);
+            $self->clear_custom_error_message;
+        }
+    }
 }
+
+=head2 new_error
+
+Alias for L</new>.
+
+=cut
+sub new_error { shift->new(@_) }
 
 =head2 error_message
 
-Returns the custom error message if set:
+Returns error message depending on the error details:
 
-    my $r = OpenXPKI::Client::Service::Response->new_error( 500 => 'Something bad happened');
+=over
+
+=item * custom error message if it was given
+
+    my $r = OpenXPKI::Client::Service::Response->new( 500 => 'Something bad happened');
     say $r->error_message;
-    # Server error: Something bad happened
+    # "Something bad happened"
 
-...or a predefined message if a known internal error code was used:
+=item * predefined message if only internal error code was given
 
-    my $r = OpenXPKI::Client::Service::Response->new_error( 50002 );
+    my $r = OpenXPKI::Client::Service::Response->new( 50002 );
     say $r->error_message;
-    # Unable to initialize client
+    # "Unable to initialize client"
 
-Returns the empty string if L</error> was not set.
+=item * predefined + custom error message if both were given
+
+    my $r = OpenXPKI::Client::Service::Response->new( 50002 => 'Something bad happened');
+    say $r->error_message;
+    # "Unable to initialize client: Something bad happened"
+
+=item * the empty string if L</error> was not set
+
+=back
 
 =cut
 sub error_message ($self) {
@@ -489,14 +599,14 @@ sub add_debug_headers ($self) {
     my $workflow = $self->workflow or return;
 
     if ($workflow->{id}) {
-        $self->extra_headers->{'X-OpenXPKI-Workflow-Id'} = $workflow->{id};
+        $self->add_header('X-OpenXPKI-Workflow-Id' => $workflow->{id});
     }
     if ($self->has_transaction_id) {
         my $tid = $self->transaction_id;
         # this should usually be a hexadecimal string but to avoid any surprise
         # we check this here and encoded if needed.
         $tid = Encode::encode("MIME-B", $tid) if $tid =~ m{\W};
-        $self->extra_headers->{'X-OpenXPKI-Transaction-Id'} = $tid;
+        $self->add_header('X-OpenXPKI-Transaction-Id' => $tid);
     }
     if (my $error = $workflow->{context}->{error_code}) {
         # header must not be any longer than 76 chars in total
@@ -504,10 +614,56 @@ sub add_debug_headers ($self) {
         # use mime encode if header is non-us-ascii, 42 chars plus tags is the
         # maximum to stay below 76 chars (starts to wrap otherwise)
         $error = Encode::encode("MIME-B", substr($error,0,42)) if $error =~ m{\W};
-        $self->extra_headers->{'X-OpenXPKI-Error'} = $error;
+        $self->add_header('X-OpenXPKI-Error' => $error);
     }
+}
+
+=head2 redirect_to
+
+HTTP redirect to the given URL.
+
+    $response->redirect_to('https://www.openxpki.org');
+
+B<Parameters>
+
+=over
+
+=item * I<Str> C<$target> - URL
+
+=back
+
+=cut
+sub redirect_to ($self, $target) {
+    $self->redirect_url($target);
+    $self->http_status_code(302);
 }
 
 __PACKAGE__->meta->make_immutable;
 
- __END__;
+=pod
+
+=head2 add_header
+
+Sets the given HTTP header.
+
+    $response->add_header('content-type' => 'text/plain');
+
+B<Parameters>
+
+=over
+
+=item * I<Str> C<$name> - header name.
+
+=item * I<Str> C<$value> - header value.
+
+=back
+
+=cut
+### add_header() is an accessor for "extra_headers" (see attribute above)
+
+=head2 is_redirect
+
+Returns TRUE if L</redirect_to> was called, FALSE otherwise.
+
+=cut
+### is_redirect() is an accessor for "redirect_url" (see attribute above)

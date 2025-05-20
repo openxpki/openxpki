@@ -1,11 +1,9 @@
 package OpenXPKI::Server::Workflow::Activity;
+use OpenXPKI;
 
-use strict;
-use base qw( Workflow::Action );
+use parent qw( Workflow::Action );
 
-use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
 use OpenXPKI::Server::Workflow::Pause;
 use OpenXPKI::Server::Workflow::Helpers;
 use OpenXPKI::Server::Workflow::Field; # Workflow::Action calls $class->new() without require'ing the module first
@@ -17,10 +15,8 @@ sub init {
     my ( $self, $wf, $params ) = @_;
 
     my $action_name = $params->{name};
-    ##! 1: 'start ' . $action_name
-    ##! 32: $params
-    ##! 64: $self
-    ##! 128: $wf
+    ##! 1: "Start activity '$action_name'"
+    ##! 32: "Parameters: " . Dumper $params
 
     $self->{PKI_REALM} = CTX('session')->data->pki_realm;
     ##! 16: 'self->{PKI_REALM} = ' . $self->{PKI_REALM}
@@ -58,9 +54,9 @@ sub init {
 
     $self->_map( $_map );
 
-    ##! 32: $params_merged
-    ##! 32: $_map
-    ##! 1: 'end'
+    ##! 32: "Merged parameters: " . Dumper $params_merged
+    ##! 32: "Mapping: " . Dumper $_map
+    ##! 1: 'End of activity'
     return 1;
 }
 
@@ -144,7 +140,7 @@ sub param {
         my $map = $self->_map();
 
         my %params = %{ $self->{PARAMS} };
-        ##! 64: \%params
+        ##! 64: 'Params: ' . Dumper \%params
         if (wantarray) {
             my @keys = keys %params;
             push @keys, (keys %{ $map });

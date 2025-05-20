@@ -35,6 +35,7 @@ to the configuration repository at the time of package build. For a production
 setup we recommend to remove the `/etc/openxpki` folder created by the package
 and replace it with a checkout of the `community` branch of the configuration
 repository available at https://github.com/openxpki/openxpki-config.
+
 Please also have a look at
 `README.md <https://github.com/openxpki/openxpki-config/blob/community/README.md>`_ and
 `QUICKSTART.md <https://github.com/openxpki/openxpki-config/blob/community/QUICKSTART.md>`_
@@ -43,8 +44,9 @@ which have some more detailed instructions how to setup the system.
 **Note**: The configuration is (usually) backward compatible but most releases
 introduce new components and new configuration that can not be used with
 old releases. Make sure your code version is recent enough to run the config!
-Starting with v3.12, the code checks its compatibility with the config itself
-via the `system.version.depend` node. We recommend to keep and maintain this
+
+Starting with v3.22, there is mandatory cross check of config, database schema and
+code via the `system.version.depend` node. We recommend to keep and maintain this
 in your config!
 
 
@@ -68,8 +70,8 @@ To avoid an "untrusted package" warning, you should add our package signing key
 The https connection is protected by a Let's Encrypt certificate but
 if you want to validate the key on your own, the fingerprint is::
 
-    gpg --print-md sha256 Release.key (Updated 2023-06-21)
-    F88C6BFC 07ACE167 9399CDE5 21BD9148 4F9DA3EB B38E1BFC DA670B1C C96EB501
+    $ gpg --print-md sha256 Release.key (Updated 2025-05-16)
+    3FEB1721 48F53252 A6644B65 AD06304F 4751E129 510081E0 042E4E80 1175E3F8
 
 You can also find the key on the github repository in `package/debian/Release.key`.
 
@@ -85,27 +87,23 @@ As OpenXPKI can run with different RDBMS, the package does not list any of them 
 dependency. You therefore need to install the required perl bindings and server
 software yourself::
 
-    apt install mariadb-server libdbd-mysql-perl
+    apt install mariadb-server libdbd-mariadb-perl
 
-We strongly recommend to use a fastcgi module as it speeds up the UI, we recommend
-mod_fcgid as it is in the official main repository (mod_fastcgi will also work but
-is only available in the non-free repo)::
+Starting with v3.32 the webfrontend uses its own process and no longer uses FCGI.
+The distributed configuration file is for the apache server but you can run this
+with any server that has reverse proxy support. The required mods are enabled by
+the package install.
 
-    apt install apache2 libapache2-mod-fcgid
-
-Note, fastcgi module should be enabled explicitly, otherwise, .fcgi file will be
-treated as plain text (this is usually done by the installer already)::
-
-    a2enmod fcgid
+    apt install apache2
 
 Now install the OpenXPKI core package, session driver and the translation package::
 
     apt install libopenxpki-perl openxpki-cgi-session-driver openxpki-i18n
 
-use the openxpkiadm command to verify if the system was installed correctly::
+use the oxi command to verify if the system was installed correctly::
 
-    openxpkiadm version
-    Version (core): 3.28.0
+    $ oxi --version
+    OpenXPKI Community Edition v3.32.0
 
 Now, create an empty database and assign a database user::
 
@@ -118,10 +116,10 @@ Now, create an empty database and assign a database user::
 
     main:
        debug: 0
-       type: MariaDB
+       type: MariaDB2
        name: openxpki
-       host: localhost
-       port: 3306
+       #host: localhost
+       #port: 3306
        user: openxpki
        passwd: openxpki
 
@@ -129,10 +127,6 @@ Starting with the v3.8 release we added a MariaDB driver that makes use of Maria
 sequences instead of the emulation code and we recommend any new installations to use it!
 While the ``MariaDB``drivers uses the old mysql binding the newer ``MariaDB2`` uses the
 modern mariadb perl module which is the recommended driver on modern operating systems.
-*Note:* It looks like the DBD::MariaDB module shipped with bookworm has an issue with reference
-counters leading to very messy log output and **might** also have implications on security or
-system stability - we therefore recommend to stick with the ``MariaDB`` module in combination
-with the old ``libdbd-mysql-perl`` driver until there is a fixed version available.
 
 Please create the empty database schema from the provided schema file. mariadb/mysql and
 postgresql should work out of the box, the oracle schema is good for testing but needs some
@@ -146,7 +140,23 @@ Example call when debian packages are installed::
 If you do not use debian packages, you can get a copy from ``contrib/sql/`` in the
 config repository https://github.com/openxpki/openxpki-config.
 
-Please also read `Session Storage`__ as you might need an additonal SQL user there.
+
+Now create a user for the UI session storage
+
+    CREATE USER 'openxpki_session'@'localhost' IDENTIFIED BY 'mysecret';
+    GRANT SELECT, INSERT, UPDATE, DELETE ON openxpki.frontend_session TO 'openxpki_session'@'localhost';
+    flush privileges;
+
+...and put the used credentials into /etc/openxpki/client.d/service/webui/default.yaml::
+
+    # Properties of the session storage to manage the frontend session
+    session:
+      driver: driver:openxpki
+      params:
+       DataSource: dbi:MariaDB:dbname=openxpki;host=localhost
+       User:  openxpki_session
+       Password: mysecret
+
 
 System Setup
 ------------
@@ -175,7 +185,7 @@ Follow the steps in the README and QUICKSTART document to setup your production 
 Testdrive
 ^^^^^^^^^
 
-Navigate your browser to *https://yourhost/openxpki/*. If your browser asks you to present a certificate
+Navigate your browser to *https://yourhost/webui/index/. If your browser asks you to present a certificate
 for authentication, skip it. You should now see the main authentication page.
 
 The sample configuration comes with a predefined handler for a local user database and also a set of
@@ -189,7 +199,7 @@ user database have a look at the files in the auth directory and the
 
 #. Login as User (Username: bob, Password: <see above>)
 #. Go to "Request", select "Request new certificate"
-#. Complete the pages until you get to the status "PENDING" (gray box on the right)
+#. Complete the pages until you get to the status "PENDING"
 #. Logout and re-login as RA Operator (Username: raop, Password: <see above> )
 #. Select "Home / My tasks", there should be a table with one request pending
 #. Select your Request by clicking the line, change the request or use the "approve" button
@@ -207,7 +217,7 @@ be helpful to use the browsers developer console (F12 or CTRL+F12 on most browse
 If you get an internal server error, make sure you have the *en_US.utf8* locale installed
 (``locale -a | grep en_US``)!
 
-For further investigation, check `/var/log/openxpki/webui.log` and `/var/log/apache/error.log`.
+For further investigation, check `/var/log/openxpki-ui/webui.log` and `/var/log/apache/error.log`.
 
 
 Enabling the SCEP service
@@ -220,34 +230,32 @@ Create a certificate to be used as SCEP RA, this is usually a TLS Server
 certificate from the CA itself or signed by an external CA. Import the
 certificate and register it as SCEP RA token::
 
-    openxpkiadm alias --realm democa --token scep \
-        --file scep.crt --key scep.pem
+    oxi token add --realm democa --type scep --cert scep.crt --key scep.key
 
-**Note**: Each realm needs his own SCEP token so you need to run this command
-any realm that provides an SCEP service. It is possible to use the same SCEP
-token in multiple realms.
+**Note**: Each realm needs its own SCEP token so you need to run this command
+for any realm that provides an SCEP service. It is possible to use the same
+SCEP token in multiple realms.
 
 Setup SCEP Endpoint
 ^^^^^^^^^^^^^^^^^^^
 
 The SCEP setup is already included in the core distribution and example
-configuration. The package installs a wrapper script and creates a suitable alias
-redirecting all requests to ``http://host/scep/<any value>`` to the wrapper.
-While the default config found at ``/etc/openxpki/scep/default.conf`` maps all
-requests, you need make sure the used URL path maps to an endpoint policy file
-in the backend. The demo configuration contains one with the name ``generic``
-so for a testdrive call ``http://host/scep/generic``.
+configuration.
 
-The system supports getcacert, getcert, getcacaps, getnextca and enroll/renew - the
-shipped workflow is configured to allow enrollment with password or signer on behalf.
-The password (and all other policy settings) can be found in the file
-``config.d/realm/democa/scep/generic.yaml``, the default is 'SecretChallenge'.
-For signing on behalf, use the UI to create a certificate with the 'TLS Client'
-profile - there is no password necessary. Advanced configuration is described in the
-scep workflow section.
+OpenXPKI requires an *endpoint* to be defined in your configuration, the
+address of each endpoint is ``http://yourhost/scep/<endpoint>``.
 
-The best way for testing the service is the sscep command line tool (available at
-e.g. https://github.com/certnanny/sscep).
+The path equals to the file name in the `client.d/service/scep/` directory,
+the default confiuration deploys `generic.yaml` so you have to point your
+SCEP client to `http://yourhost/scep/generic`. Please note that any endpoint
+also requires an internal definiton inside the realm configuration, a verbose
+example can be found in the file ``config.d/realm/democa/scep/generic.yaml``.
+
+SCEP supports enrollment via challenge password as well as signing on behalf.
+Advanced configuration is described in the scep workflow section.
+
+The best way for testing the service is the sscep command line tool (available
+ at e.g. https://github.com/certnanny/sscep).
 
 Check if the service is working properly at all::
 
@@ -266,7 +274,7 @@ To test an enrollment::
         -t 10 -n 1
 
 Make sure you set the challenge password when prompted (default: 'SecretChallenge').
-On current desktop hardware the issue workflow will take approx. 15 seconds to
+On current desktop hardware the issue workflow will take approx. 10 seconds to
 finish and you should end up with a certificate matching your request in the tmp
 folder.
 
@@ -279,3 +287,6 @@ a recent version of java ``keytool`` installed. On debian, this is
 provided by the package ``openjdk-7-jre``. Note: You can set the
 location of the keytool binary in ``system.crypto.token.javajks``, the
 default is /usr/bin/keytool.
+
+Hint: Most modern java applications work without any issues with standard
+PKCS12 containers so you might want to try this as an alternative.

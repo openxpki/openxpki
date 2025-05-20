@@ -42,7 +42,7 @@ The name of the global config file must be ``default.conf`` and consists
 of three section holding information on logger, auth and socket::
 
     [global]
-    socket = /var/openxpki/openxpki.socket
+    socket = /run/openxpkid/openxpkid.sock
 
     [logger]
     log_level = WARN

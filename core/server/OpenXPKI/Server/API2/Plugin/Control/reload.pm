@@ -10,7 +10,7 @@ OpenXPKI::Server::API2::Plugin::Control::reload
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Types;
-use OpenXPKI::Control;
+use OpenXPKI::Control::Server;
 
 =head1 COMMANDS
 
@@ -18,7 +18,7 @@ use OpenXPKI::Control;
 
 Send a reload command to the server which will terminate all childs.
 
-This is the same as "openxpkictl reload".
+This is the same as "openxpkictl reload server".
 
 B<Parameters>
 
@@ -30,7 +30,7 @@ command "reload" => {
 
     my ($self, $params) = @_;
 
-    OpenXPKI::Control::reload();
+    OpenXPKI::Control::Server->new->cmd_reload;
     return 1;
 
 };

@@ -8,8 +8,6 @@ OpenXPKI::Server::API2::Plugin::Token::handle_alias
 =cut
 
 # Project modules
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Types;
 
@@ -31,11 +29,16 @@ The notbefore/notafter values are copied from the certificate unless
 given, expected format is epoch, values must be inside the validity
 interval of the certificate.
 
+To create an alias outside a group, pass the expected literal name of
+the alias using I<alias>.
+
 B<Parameters>
 
 =over
 
 =item * C<identifier> I<Str> - the certificate identifier to create the alias for
+
+=item * C<alias> I<Str> - the name of the alias
 
 =item * C<alias_group> I<Str> - the name of the alias group
 
@@ -52,9 +55,10 @@ B<Parameters>
 =cut
 
 protected_command "create_alias" => {
-    identifier  => { isa => 'Base64', required => 1, },
-    alias_group => { isa => 'AlphaPunct', required => 1, },
-    generation  => { isa => 'Int', default => 0, },
+    identifier  => { isa => 'Base64', required => 0, },
+    alias_group => { isa => 'AlphaPunct', required => 0, },
+    alias       => { isa => 'AlphaPunct', required => 0, },
+    generation  => { isa => 'Int' },
     global      => { isa => 'Bool', default => 0 },
     notbefore   => { isa => 'Int', },
     notafter    => { isa => 'Int', },
@@ -94,60 +98,96 @@ protected_command "create_alias" => {
         $notafter = $params->notafter;
     }
 
+    OpenXPKI::Exception::Command->throw(
+        message => 'alias and alias_group are mutually exclusive'
+    ) if ($params->has_alias_group && $params->has_alias);
+
+    OpenXPKI::Exception::Command->throw(
+        message => 'alias and generation are mutually exclusive - use alias_group with generation instead'
+    ) if ($params->has_generation && $params->has_alias);
+
+    my $alias = $params->alias;
     my $group = $params->alias_group;
     my $generation = $params->generation;
-    if ($generation) {
+
+    # direct alias (no group)
+    if ($alias) {
+
         my $exists = $dbi->select_one(
             from   => 'aliases',
             columns => ['identifier'],
             where => {
                 pki_realm => $pki_realm,
-                group_id => $group,
-                generation => $generation
+                alias => $alias,
             },
         );
         OpenXPKI::Exception::Command->throw(
             message => 'given alias already exists',
             params => {
-                identifer => $exists->{identifer},
-                alias_group => $group,
-                generation => $generation
+                identifer => $exists->{identifer}
             }
         ) if ($exists);
+
+        $group = undef;
+
     } else {
-        # query aliases to get next generation id
-        my $res_nextgen = $dbi->select_one(
+
+        if ($generation) {
+            my $exists = $dbi->select_one(
+                from   => 'aliases',
+                columns => ['identifier'],
+                where => {
+                    pki_realm => $pki_realm,
+                    group_id => $group,
+                    generation => $generation
+                },
+            );
+            OpenXPKI::Exception::Command->throw(
+                message => 'given alias already exists',
+                params => {
+                    identifer => $exists->{identifer},
+                    alias_group => $group,
+                    generation => $generation
+                }
+            ) if ($exists);
+
+
+        } else {
+            # query aliases to get next generation id
+            my $res_nextgen = $dbi->select_one(
+                from   => 'aliases',
+                columns => ['generation'],
+                where => {
+                    pki_realm => $pki_realm,
+                    group_id => $group,
+                },
+                order_by => '-generation',
+            );
+            $generation = ($res_nextgen->{generation} || 0) + 1;
+        }
+        $alias = sprintf "%s-%01d", $group, $generation;
+
+        my $identifier_exists = $dbi->select_one(
             from   => 'aliases',
-            columns => ['generation'],
+            columns => ['alias'],
             where => {
                 pki_realm => $pki_realm,
                 group_id => $group,
-            },
-            order_by => '-generation',
+                identifier => $params->identifier,
+            }
         );
-        $generation = ($res_nextgen->{generation} || 0) + 1;
+
+        OpenXPKI::Exception::Command->throw(
+            message => 'given identifier already exists in group',
+            params => {
+                alias => $identifier_exists->{alias},
+                alias_group => $group,
+                identifier => $params->identifier,
+            }
+        ) if ($identifier_exists);
+
     }
 
-    my $identifier_exists = $dbi->select_one(
-        from   => 'aliases',
-        columns => ['alias'],
-        where => {
-            pki_realm => $pki_realm,
-            group_id => $group,
-            identifier => $params->identifier,
-        }
-    );
-
-    OpenXPKI::Exception::Command->throw(
-        message => 'given identifier already exists in group',
-        params => {
-            alias => $identifier_exists->{alias},
-            alias_group => $group,
-            identifier => $params->identifier,
-        }
-    ) if ($identifier_exists);
-
-    my $alias = sprintf "%s-%01d", $group, $generation;
     $dbi->insert(
         into => 'aliases',
         values  => {

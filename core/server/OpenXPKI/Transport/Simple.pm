@@ -1,15 +1,8 @@
-use strict;
-use warnings;
-use Encode;
-
 package OpenXPKI::Transport::Simple;
+use OpenXPKI;
 
 use OpenXPKI::VERSION;
 our $VERSION = $OpenXPKI::VERSION::VERSION;
-
-use English;
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 
 # If you encounter problems with corrupted transports, try enabling
 # the base64 encode/decode in the read/write methods

@@ -1,7 +1,8 @@
 package OpenXPKI::Role::Logger;
+use OpenXPKI -role;
 
 use Log::Log4perl qw(:easy);
-use Moose::Role;
+
 use OpenXPKI::Server::Context qw(CTX);
 
 =head1 Attributes

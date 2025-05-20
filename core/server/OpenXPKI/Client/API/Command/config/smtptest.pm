@@ -10,7 +10,7 @@ command_setup
 
 OpenXPKI::Client::API::Command::config::smtptest
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Send a test message for the selected realm to validate SMTP is working.
 

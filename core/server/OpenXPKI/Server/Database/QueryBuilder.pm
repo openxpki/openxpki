@@ -1,5 +1,6 @@
 package OpenXPKI::Server::Database::QueryBuilder;
-use Moose;
+use OpenXPKI -class;
+
 use namespace::autoclean;
 
 =head1 Name
@@ -10,14 +11,9 @@ OpenXPKI::Server::Database::QueryBuilder - Programmatic interface to SQL queries
 
 # CPAN modules
 use SQL::Abstract::More; # TODO Use SQL::Maker instead of SQL::Abstract::More? (but the former only supports Oracle type LIMITs)
-use Type::Params qw( signature_for );
 
 # Project modules
-use OpenXPKI::Debug;
 use OpenXPKI::Server::Database::Query;
-
-# should be done after imports to safely disable warnings in Perl < 5.36
-use experimental 'signatures';
 
 ################################################################################
 # Attributes

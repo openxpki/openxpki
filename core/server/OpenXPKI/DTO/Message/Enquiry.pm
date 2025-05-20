@@ -1,6 +1,6 @@
 package OpenXPKI::DTO::Message::Enquiry;
+use OpenXPKI -class;
 
-use Moose;
 with 'OpenXPKI::DTO::Message';
 
 =head1 SYNOPSIS
@@ -21,4 +21,4 @@ has topic => (
     required => 1,
 );
 
-1;
+__PACKAGE__->meta->make_immutable;

@@ -1,16 +1,13 @@
 package OpenXPKI::Server::Workflow::Condition::IsWrappedRequest;
+use OpenXPKI;
 
-use strict;
-use warnings;
-use English;
+use parent qw( OpenXPKI::Server::Workflow::Condition );
 
-use base qw( OpenXPKI::Server::Workflow::Condition );
 use Convert::ASN1 ':tag';
 use Crypt::PKCS10;
 use MIME::Base64;
 use Workflow::Exception qw( condition_error configuration_error );
 
-use OpenXPKI::Debug;
 use OpenXPKI::Crypt::PKCS7;
 use OpenXPKI::Server::Context qw( CTX );
 

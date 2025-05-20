@@ -1,3 +1,4 @@
+etc/openxpki
 var/openxpki
 var/log/openxpki
-etc/openxpki
+var/log/openxpki-ui

@@ -1,5 +1,5 @@
 package OpenXPKI::Config::Lint::RealmRole;
-use Moose::Role;
+use OpenXPKI -role;
 
 with 'OpenXPKI::Config::Lint::Role';
 

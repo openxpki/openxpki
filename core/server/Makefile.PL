@@ -238,6 +238,7 @@ WriteMakefile(
         'SQL::Abstract::More'           => '1.38',      # OpenXPKI::Server::Database
         'Sys::SigAction'                => '0.06',
         'Template'                      => '2.15',
+        'Term::ReadKey'                 => 0,
         'Test::More'                    => '1.001008',
         'Test::Pod::Coverage'           => '1.00',
         'Test::Pod'                     => '1.00',
@@ -246,7 +247,7 @@ WriteMakefile(
         'Type::Tiny'                    => '2.000001',
         'URI::Escape'                   => 0,           # should be part of the core modules but who knows
         'Workflow'                      => '1.60',
-        'YAML::Tiny'                    => '1.69',
+        'YAML::PP'                      => '0.38.0',
     },
     'test' => {
         'TESTS' => 't/*/*.t',

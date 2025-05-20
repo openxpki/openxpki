@@ -10,7 +10,7 @@ command_setup
 
 OpenXPKI::Client::API::Command::alias::show
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Show the alias entry for a given alias name
 

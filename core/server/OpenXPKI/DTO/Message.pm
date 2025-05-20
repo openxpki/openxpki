@@ -1,6 +1,5 @@
 package OpenXPKI::DTO::Message;
-
-use Moose::Role;
+use OpenXPKI -role;
 
 use Module::Load ();
 

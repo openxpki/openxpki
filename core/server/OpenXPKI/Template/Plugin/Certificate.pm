@@ -1,4 +1,7 @@
 package OpenXPKI::Template::Plugin::Certificate;
+use OpenXPKI;
+
+use parent qw( Template::Plugin );
 
 =head1 OpenXPKI::Template::Plugin::Certificate
 
@@ -26,16 +29,8 @@ Will result in
 
 =cut
 
-use strict;
-use warnings;
-use base qw( Template::Plugin );
-use Template::Plugin;
-
-
 use DateTime;
 use OpenXPKI::DateTime;
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
 

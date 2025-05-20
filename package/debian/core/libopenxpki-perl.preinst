@@ -6,14 +6,22 @@
 set -e
 
 case "$1" in
-    install)
+    install|upgrade)
         COUNT=`grep '^openxpki:' /etc/group | wc -l`;
         if [ $COUNT -eq 0 ]; then
             addgroup --system openxpki;
         fi;
+        COUNT=`grep '^openxpkiclient:' /etc/group | wc -l`;
+        if [ $COUNT -eq 0 ]; then
+            addgroup --system openxpkiclient;
+        fi;
         COUNT=`grep '^openxpki:' /etc/passwd | wc -l`;
         if [ $COUNT -eq 0 ]; then
             adduser --system --no-create-home --disabled-password --disabled-login --ingroup openxpki openxpki;
+        fi;
+        COUNT=`grep '^openxpkiclient:' /etc/passwd | wc -l`;
+        if [ $COUNT -eq 0 ]; then
+            adduser --system --no-create-home --disabled-password --disabled-login --ingroup openxpkiclient openxpkiclient;
         fi;
     ;;
 

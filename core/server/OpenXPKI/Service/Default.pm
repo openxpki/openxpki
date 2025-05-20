@@ -1,28 +1,17 @@
 package OpenXPKI::Service::Default;
+use OpenXPKI -class_std;
 
-use base qw( OpenXPKI::Service );
+use parent qw( OpenXPKI::Service );
 
-use strict;
-use warnings;
-use English;
 use List::Util qw( first );
-
-use Class::Std;
-
 use Sys::SigAction qw( sig_alarm set_sig_handler );
-
-use Data::Dumper;
-
-## used modules
+use Log::Log4perl::MDC;
+use Data::UUID;
 
 use OpenXPKI::i18n qw(set_language);
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Server;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
-use Log::Log4perl::MDC;
-use Data::UUID;
 
 
 my %state_of :ATTR;     # the current state of the service
@@ -103,6 +92,8 @@ sub __is_valid_message : PRIVATE {
     my $valid_messages = {
         'NEW' => [
             'PING',
+            'GET_LOGOUT_MENU',
+            'LOGOUT',
             'CONTINUE_SESSION',
             'NEW_SESSION',
             'DETACH_SESSION',
@@ -111,24 +102,31 @@ sub __is_valid_message : PRIVATE {
         ],
         'SESSION_ID_SENT' => [
             'PING',
+            'GET_LOGOUT_MENU',
+            'LOGOUT',
             'SESSION_ID_ACCEPTED',
             'CONTINUE_SESSION',
             'DETACH_SESSION',
         ],
         'SESSION_ID_SENT_FROM_CONTINUE' => [
             'PING',
+            'GET_LOGOUT_MENU',
+            'LOGOUT',
             'SESSION_ID_ACCEPTED',
             'CONTINUE_SESSION',
             'DETACH_SESSION',
         ],
         'SESSION_ID_SENT_FROM_RESET' => [
             'PING',
+            'GET_LOGOUT_MENU',
+            'LOGOUT',
             'SESSION_ID_ACCEPTED',
             'CONTINUE_SESSION',
             'DETACH_SESSION',
         ],
         'WAITING_FOR_PKI_REALM' => [
             'PING',
+            'GET_LOGOUT_MENU',
             'LOGOUT',
             'GET_PKI_REALM',
             'NEW_SESSION',
@@ -137,14 +135,17 @@ sub __is_valid_message : PRIVATE {
         ],
         'WAITING_FOR_AUTHENTICATION_STACK' => [
             'PING',
+            'GET_LOGOUT_MENU',
             'LOGOUT',
             'GET_AUTHENTICATION_STACK',
             'NEW_SESSION',
             'CONTINUE_SESSION',
             'DETACH_SESSION',
+            'GET_REALM_LIST',
         ],
         'WAITING_FOR_LOGIN' => [
             'PING',
+            'GET_LOGOUT_MENU',
             'LOGOUT',
             'GET_PASSWD_LOGIN',
             'GET_CLIENT_LOGIN',
@@ -511,18 +512,21 @@ sub __handle_LOGOUT : PRIVATE {
     my $ident   = ident $self;
     my $message = shift;
 
-    my $old_session = CTX('session');
+    my $old_session;
 
-    ##! 8: "logout received - terminate session " . $old_session->id,
-    CTX('log')->system->debug('Terminating session ' . $old_session->id);
+    if (OpenXPKI::Server::Context::hascontext('session')) {
+        $old_session = CTX('session');
+        ##! 8: "logout received - terminate session " . $old_session->id,
+        CTX('log')->system->debug('Terminating session ' . $old_session->id);
+    }
 
     $self->__change_state({ STATE => 'NEW' });
 
-    OpenXPKI::Server::Context::killsession();
+    OpenXPKI::Server::Context::killsession;
 
-    Log::Log4perl::MDC->remove();
+    Log::Log4perl::MDC->remove;
 
-    if (!$old_session->delete()) {
+    if ($old_session and not $old_session->delete) {
         CTX('log')->system->warn('Error terminating session!');
     }
 
@@ -586,6 +590,12 @@ sub __handle_GET_REALM_LIST : PRIVATE {
     return { PARAMS => CTX('api2')->get_realm_list() };
 }
 
+sub __handle_GET_LOGOUT_MENU : PRIVATE {
+    ##! 1: 'start'
+    my $self    = shift;
+    my $ident   = ident $self;
+    return { PARAMS => CTX('api2')->get_menu() };
+}
 
 sub __handle_COMMAND : PRIVATE {
     ##! 1: 'start'

@@ -1,16 +1,7 @@
-## OpenXPKI::Crypto::Tool::CreateJavaKeystore::Command::create_keystore.pm
-## Written 2006 by Alexander Klink for the OpenXPKI project
-## (C) Copyright 2006 by The OpenXPKI Project
 package OpenXPKI::Crypto::Tool::CreateJavaKeystore::Command::create_keystore;
+use OpenXPKI -class_std;
 
-use strict;
-use warnings;
-
-use Class::Std;
-
-use OpenXPKI::Debug;
 use OpenXPKI::FileUtils;
-use English;
 
 my %fu_of       :ATTR; # a FileUtils instance
 my %outfile_of  :ATTR;

@@ -10,7 +10,7 @@ command_setup
 
 OpenXPKI::Client::API::Command::workflow::list
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 List workflow ids based on given filter criteria.
 

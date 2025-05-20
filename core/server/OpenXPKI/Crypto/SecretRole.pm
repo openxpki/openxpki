@@ -1,8 +1,7 @@
 package OpenXPKI::Crypto::SecretRole;
-use Moose::Role;
+use OpenXPKI -role;
 
 # Project modules
-use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 
 

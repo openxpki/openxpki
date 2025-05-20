@@ -128,11 +128,11 @@ SKIP: {
         } "part group A: retrieve correct secret";
 
         lives_and {
-            # clear_secret() calls OpenXPKI::Control::reload which wants to read
+            # clear_secret() calls OpenXPKI::Control::Server::cmd_reload which wants to read
             # some (non-existing) config and kill the (non-running) server...
             no warnings 'redefine';
-            local *OpenXPKI::Control::reload = sub {
-                note "intercepted call to OpenXPKI::Control::reload()";
+            local *OpenXPKI::Control::Server::cmd_reload = sub {
+                note "intercepted call to OpenXPKI::Control::Server::cmd_reload()";
             };
             $tm->clear_secret($secret_name);
             is $tm->is_secret_complete($secret_name), 0;
@@ -153,11 +153,11 @@ SKIP: {
         } "part group B: retrieve correct secret";
 
         lives_and {
-            # clear_secret() calls OpenXPKI::Control::reload which wants to read
+            # clear_secret() calls OpenXPKI::Control::Server::cmd_reload which wants to read
             # some (non-existing) config and kill the (non-running) server...
             no warnings 'redefine';
-            local *OpenXPKI::Control::reload = sub {
-                note "intercepted call to OpenXPKI::Control::reload()";
+            local *OpenXPKI::Control::Server::cmd_reload = sub {
+                note "intercepted call to OpenXPKI::Control::Server::cmd_reload()";
             };
             $tm->clear_secret($secret_name);
             is $tm->is_secret_complete($secret_name), 0;

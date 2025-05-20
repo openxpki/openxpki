@@ -1,12 +1,10 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::ExportToFile;
+use OpenXPKI;
 
-use strict;
-use base qw( OpenXPKI::Server::Workflow::Activity );
+use parent qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
 use OpenXPKI::Template;
-use OpenXPKI::Debug;
 use File::Temp;
 use MIME::Base64;
 use Workflow::Exception qw(configuration_error);
@@ -57,7 +55,7 @@ sub execute {
                 params => { FILENAME => $target_name }
             );
         }
-        open $fh, ">", $target_name";
+        open $fh, ">", $target_name;
     }
 
     if (!$fh || !$target_name) {

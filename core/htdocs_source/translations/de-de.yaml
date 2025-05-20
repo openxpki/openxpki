@@ -22,9 +22,9 @@ userinfo:
 error_popup:
   header: "Anwendungsfehler"
   message:
-    server: "Der Server lieferte nicht die erwarteten Daten.<br>Eventuell ist Ihre Sitzung abgelaufen oder es liegt ein interner Fehler vor.<br>HTTP-Code: {code}"
-    network: "Die Verbindung zum Server scheint nicht zu bestehen:<br>\"{reason}\""
-    client: "Es trat ein Fehler beim Verarbeiten der empfangenen Serverdaten auf:<br>\"{reason}\""
+    server: "Der Webserver lieferte nicht die erwarteten Daten.<br>Mögliche Ursachen: OpenXPKI-Client läuft nicht; ihre Sitzung ist abgelaufen; ein interner Fehler.<br>HTTP-Code: {code}"
+    network: "Die Verbindung zum Webserver scheint nicht zu bestehen:<br>\"{reason}\""
+    client: "Es trat ein Fehler beim Verarbeiten der vom Webserver empfangenen Daten auf:<br>\"{reason}\""
   reload: "Anwendung neu laden"
 
 pagination:
@@ -48,6 +48,7 @@ component:
     date_format: "d.m.Y H:i" # see https://flatpickr.js.org/formatting/
   oxifield_select:
     custom_value: "Angepasst"
+    default_placeholder: "…"
   oxifield_cert_identifier:
     no_matches: "Keine Zertifikate gefunden"
   oxifield_textarea:
@@ -75,6 +76,10 @@ component:
     copy: "Doppelklick markiert gesamten Text"
   oxifield_static:
     unset: "<nicht gesetzt>"
+  oxibase_select:
+    search: "Auswahl filtern:"
+    no_choices: "Keine Optionen vorhanden"
+    no_results: "Keine Suchergebnisse"
 
 autofill:
   button: "{target} abfragen"

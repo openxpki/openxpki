@@ -7,14 +7,10 @@ OpenXPKI::Server::API2::Plugin::Crypto::scep_message_handler
 
 =cut
 
-use strict;
-use English;
 use MIME::Base64;
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Types;
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Crypt::PKCS7::SCEP;
 use OpenXPKI::Crypt::X509;
 

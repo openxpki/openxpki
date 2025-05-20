@@ -5,21 +5,13 @@ use OpenXPKI -plugin;
 
 OpenXPKI::Server::API2::Plugin::Token::get_ca_list
 
-=head1 COMMANDS
-
 =cut
 
 # Project modules
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Plugin::Token::Util;
 
-# CPAN modules
-
-# Feature::Compat::Try should be done last to safely disable warnings
-use Feature::Compat::Try;
-
+=head1 COMMANDS
 
 =head2 get_ca_list
 
@@ -50,6 +42,8 @@ B<Parameters>
 
 =item * C<pki_realm> I<Str> - PKI realm to query, defaults to the session realm
 
+=item * C<with_pem> I<Bool> - Add PEM block to output (key I<pem>)
+
 =item * C<check_online> I<Bool> - Set to 1 to get the token online status
 (L<is_token_usable|OpenXPKI::Server::API2::Plugin::Token::is_token_usable/is_token_usable> is
 called for each alias). The status check is only possible from within the
@@ -62,6 +56,7 @@ always C<UNKNOWN>. Default: 0
 command "get_ca_list" => {
     pki_realm => { isa => 'AlphaPunct', },
     check_online => { isa => 'Bool', default => 0 },
+    with_pem    => { isa => 'Bool', default => 0 },
 } => sub {
     my ($self, $params) = @_;
 
@@ -105,6 +100,10 @@ command "get_ca_list" => {
             notafter    => $row->{notafter},
             status      => 'UNKNOWN'
         };
+
+        if ($params->with_pem) {
+            $item->{pem} = $row->{data};
+        }
 
         # Check if the token is still valid - dates are already unix timestamps
         my $now = time;

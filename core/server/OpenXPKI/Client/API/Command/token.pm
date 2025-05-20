@@ -3,34 +3,15 @@ use OpenXPKI -role;
 
 # Core modules
 use List::Util qw( none );
+use File::Basename;
 
 =head1 NAME
 
 OpenXPKI::Client::API::Command::token
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
-Show and handle OpenXPKI token configuarion
-
-=head1 USAGE
-
-Feed me!
-
-=head2 Subcommands
-
-=over
-
-=item show
-
-=item add
-
-=item create
-
-=item list
-
-=item remove
-
-=back
+Show and handle token configuration.
 
 =cut
 

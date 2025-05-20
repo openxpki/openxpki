@@ -21,9 +21,8 @@ has allowed_commands => (
     handles => {
         add_allowed_command => 'push',
     },
-    default => sub { [ 'ping' ] },
+    default => sub { [ '' ] },
 );
-
 
 # required by OpenXPKI::Client::Service::Role::Info
 sub declare_routes ($r) {
@@ -39,6 +38,9 @@ sub declare_routes ($r) {
 sub prepare ($self, $c) {
     my $command = $c->stash('command');
     $self->operation($command);
+
+    # Add commands defined in the config file
+    $self->add_allowed_command($self->config->get_keys());
 
     # more allowed commands in OPENXPKI_HEALTHCHECK ?
     if ($ENV{OPENXPKI_HEALTHCHECK}) {
@@ -70,10 +72,11 @@ sub op_handlers {
         },
         'ping' => sub ($self) {
             # try backend connection
-            my $socketfile = $ENV{OPENXPKI_CLIENT_SOCKETFILE} || '/var/openxpki/openxpki.socket';
             my $client;
             try {
-                $client = OpenXPKI::Client->new({ SOCKETFILE => $socketfile });
+                $client = $self->client;
+                my $reply = $self->client->send_receive_service_msg('PING');
+
                 $client->init_session;
                 $self->log->debug("Got new client: " . $client->session_id);
             }

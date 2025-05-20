@@ -1,27 +1,20 @@
 package OpenXPKI::i18n;
-use strict;
-use warnings;
+use OpenXPKI;
+
+use parent 'Exporter';
+our @EXPORT_OK = qw( i18nGettext i18nTokenizer i18n_walk set_locale_prefix set_language get_language );
 
 # Core modules
-use English;
 use Encode;
 use Locale::gettext_pp qw (:locale_h :libintl_h nl_putenv);
 use POSIX qw (setlocale);
 use Scalar::Util qw(blessed reftype refaddr);
 use Memoize;
 
-# Project modules
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
-
-
 our $language = "";
 our $locale_prefix = "";
 our %_translated_refs;
 
-use vars qw (@ISA @EXPORT_OK);
-use base qw( Exporter );
-@EXPORT_OK = qw (i18nGettext i18nTokenizer i18n_walk set_locale_prefix set_language get_language);
 
 sub set_locale_prefix {
     $locale_prefix = shift;
@@ -33,6 +26,7 @@ sub set_locale_prefix {
 sub i18nGettext {
     my $text = shift;
     warn "Parameter expansion with i18nGettext() is no longer supported" if @_;
+    return $text unless $language;
 
     # translate
     return _i18n_gettext($text);
@@ -61,6 +55,7 @@ sub i18nTokenizer {
     my $text = shift;
 
     return unless defined $text;
+    return $text unless $language;
 
     $text =~ s/(I18N_OPENXPKI_UI_[A-Z0-9a-z\_-]+)/_i18n_gettext($1)/ge;
     return $text;
@@ -69,6 +64,7 @@ sub i18nTokenizer {
 sub i18n_walk {
     my $data = shift;
     die 'Parameter must be either HashRef or ArrayRef' unless (ref $data eq 'HASH' or ref $data eq 'ARRAY');
+    return $data unless $language;
 
     local %_translated_refs;
     return _walk($data);
@@ -148,27 +144,16 @@ sub get_language {
 
 __END__
 
-=head1 Name
+=head1 NAME
 
-OpenXPKI::i18n - internationalization (i18n) handling class.
+OpenXPKI::i18n - internationalization (i18n) handling
 
-=head1 Exported functions
+=head1 DESCRIPTION
 
-Exported function are function which can be imported by every other
-object. All i18n functions are static functions and work in global
-context.
+This module does all i18n related work. Main task is the translation function
+and the storage of the activated language.
 
-=head1 Description
-
-This module manages all i18n stuff for the L<OpenXPKi> system.
-The main job is the implementation of the translation function and
-the storage of the activated language.
-
-All functions work in static mode (static member functions).
-This means that they are to be invoked directly and not via an object
-instance.
-
-=head1 Functions
+=head1 FUNCTIONS
 
 =head2 set_locale_prefix
 

@@ -7,7 +7,7 @@ const _testButton = {
     disabled: false,
 }
 
-export default [
+let buttons = [
     ContainerButton.fromHash({
         label: "External link",
         format: "failure",
@@ -40,5 +40,31 @@ export default [
         ..._testButton,
         label: "Disabled",
         disabled: true,
+        break_after: 1,
     }),
 ]
+
+for (const format of [
+    'primary',
+    'submit',
+    'loading',
+    'cancel',
+    'reset',
+    'expected',
+    'failure',
+    'optional',
+    'alternative',
+    'exceptional',
+    'terminate',
+    'tile',
+    'card',
+    'info',
+]) {
+    buttons.push(ContainerButton.fromHash({
+        ..._testButton,
+        format,
+        label: format,
+    }))
+}
+
+export default buttons

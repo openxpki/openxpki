@@ -21,7 +21,8 @@ EXTERNAL=				\
 	DBIx__TransactionManager \
 	Log__Log4perl__Layout__JSON \
 	Proc__SafeExec \
-	Workflow
+	Workflow \
+	YAML__PP
 
 # Bookworm ships with v0.55 so as long as we dont update
 # (or debian keeps pace) we dont need to build this ourselves

@@ -1,0 +1,18 @@
+#!/bin/bash
+# <info> Show the application log in the database
+
+watch -n1 "mysql"\
+    "-u$OXI_TEST_DB_MYSQL_USER "\
+    "-p$OXI_TEST_DB_MYSQL_PASSWORD "\
+    "-h127.0.0.1 $OXI_TEST_DB_MYSQL_NAME "\
+    "-e '"\
+        "("\
+            "SELECT "\
+                "FROM_UNIXTIME(logtimestamp) as timestamp_with_milliseconds,"\
+                "workflow_id as id,"\
+                "priority as prio,"\
+                "message "\
+            "FROM application_log "\
+            "ORDER BY logtimestamp DESC LIMIT 40"\
+        ") ORDER BY timestamp_with_milliseconds ASC"\
+    "'; echo; echo 'CTRL-C to quit'"

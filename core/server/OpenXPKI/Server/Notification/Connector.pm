@@ -1,18 +1,13 @@
 package OpenXPKI::Server::Notification::Connector;
+use OpenXPKI -class;
 
-use Moose;
 extends 'OpenXPKI::Server::Notification::Base';
 
-use English;
-
-use Data::Dumper;
 use JSON;
-use YAML::Loader;
+use YAML::PP;
 use DateTime;
 use Module::Load ();
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 
 has 'backend' => (
     is => 'ro',
@@ -116,7 +111,7 @@ sub notify {
                 ##! 32: "Using template file $template_file"
                 my $yaml = $self->_render_template_file( $template_file.'.yaml', $template_vars );
                 ##! 64: $yaml
-                $data = YAML::Loader->new->load($yaml);
+                $data = YAML::PP->new->load_string($yaml);
             } elsif (my $content = CTX('config')->get_hash( "$msgconfig.$handle.content" )) {
                 my %vars = %{$template_vars};
                 ##! 32: "Using content hash with key " . join(", ", keys %($content))
@@ -139,8 +134,10 @@ sub notify {
             ##! 32: $data
             ##! 64: "Notify to path " . join(".", @path)
             ##! 64: $data
-            CTX('log')->system()->trace(sprintf("Notify to %s with payload %s",
-                join(".", @path), Dumper $data)) if (CTX('log')->system()->is_trace());
+            CTX('log')->system->trace(
+                sprintf("Notify to %s with payload %s",
+                join(".", @path), Dumper $data)
+            ) if CTX('log')->system->is_trace;
 
             my $json = $self->_json()->encode($data);
             die "Unable to encode to json" unless($json);

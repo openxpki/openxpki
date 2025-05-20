@@ -1,10 +1,6 @@
 package OpenXPKI::Server::Database::Legacy;
-use strict;
-use warnings;
+use OpenXPKI;
 
-use Data::Dumper;
-
-use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
 =head1 Name

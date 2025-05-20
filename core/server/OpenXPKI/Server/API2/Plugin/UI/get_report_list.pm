@@ -11,16 +11,15 @@ OpenXPKI::Server::API2::Plugin::UI::get_report_list
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Types;
 
-
-
 =head1 COMMANDS
 
 =head2 get_report_list
 
-Return a list of reports, both parameters are optionsal.
-I<NAME> is evaluated using SQL Like so it can be used to filter for a
-name pattern. I<MAXAGE> must be a definition parsable by
-OpenXPKI::DateTime, items older than MAXAGE or not returned.
+Return a list of reports, both parameters are optional.
+
+I<name> is evaluated using SQL Like so it can be used to filter for a
+name pattern. I<maxage> must be a definition parsable by
+L<OpenXPKI::DateTime>, items older than I<maxage> or not returned.
 
 Returns an I<ArrayRef> of I<ArrayRef> with the selected values in the given
 column order.

@@ -1,9 +1,8 @@
-import Component from '@glimmer/component';
-import { service } from '@ember/service';
-import { action, set as emSet } from '@ember/object';
-import { tracked } from '@glimmer/tracking';
-import { debug } from '@ember/debug';
-import { A } from '@ember/array'
+import Component from '@glimmer/component'
+import { service } from '@ember/service'
+import { action, set as emSet } from '@ember/object'
+import { tracked } from '@glimmer/tracking'
+import { debug } from '@ember/debug'
 import ContainerButton from 'openxpki/data/container-button'
 import GridButton from 'openxpki/data/grid-button'
 import GridAction from 'openxpki/data/grid-action'
@@ -288,7 +287,8 @@ export default class OxiSectionGridComponent extends Component {
     // (de-)select all rows
     @action
     selectAll() {
-        this.rawData.forEach(i => emSet(i, "checked", !this.allChecked)) // FIXME turn rawData into object that extends Base and use @tracked properties instead of emSet()
+        const wasAllChecked = this.allChecked;
+        this.rawData.forEach(i => emSet(i, "checked", !wasAllChecked)) // FIXME turn rawData into object that extends Base and use @tracked properties instead of emSet()
         this.rawData = this.rawData // eslint-disable-line no-self-assign -- trigger Ember update
         this.updateButtonState()
     }

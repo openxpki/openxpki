@@ -17,6 +17,7 @@ use Data::Dumper;
 use Config::Std;
 use OpenXPKI::Log4perl;
 use OpenXPKI::Client::Simple;
+use OpenXPKI::Defaults;
 
 my $configfile = '/etc/openxpki/webui/default.conf';
 
@@ -34,7 +35,7 @@ OpenXPKI::Log4perl->init_or_fallback( $config{global}{log_config} );
 my $log = Log::Log4perl->get_logger();
 
 # set defaults
-$config{global}{socket} ||= '/var/openxpki/openxpki.socket';
+$config{global}{socket} ||= $OpenXPKI::Defaults::SERVER_SOCKET;
 
 $log->info('Start fcgi loop ' . $$. ', config: ' . $configfile);
 
@@ -91,7 +92,7 @@ while (my $cgi = CGI::Fast->new()) {
         my $opts = {
             logger => $log,
             config => {
-                socket => $config{global}{socket},
+                socket => $config{global}{socket}//'',
                 realm => $pki_realm
             }
         };

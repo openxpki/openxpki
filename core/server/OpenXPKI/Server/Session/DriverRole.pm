@@ -1,9 +1,5 @@
 package OpenXPKI::Server::Session::DriverRole;
-
-use Moose::Role;
-
-# Project modules
-use OpenXPKI::Exception;
+use OpenXPKI -role;
 
 =head1 NAME
 

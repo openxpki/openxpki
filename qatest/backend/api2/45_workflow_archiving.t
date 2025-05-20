@@ -14,7 +14,7 @@ use FindBin qw( $Bin );
 use Test::More;
 use Test::Deep ':v1';
 use Test::Exception;
-use Try::Tiny;
+use Feature::Compat::Try;
 use DateTime;
 
 # Project modules
@@ -26,9 +26,10 @@ try {
     require OpenXPKI::Server::Workflow::Persister::Archiver;
     # plan tests => 14; WE CANNOT PLAN tests as there is a while loop that sends commands (which are tests)
 }
-catch {
-    plan skip_all => "persister 'Archiver' no available";
-};
+catch ($err) {
+    plan skip_all => "persister 'Archiver' (EE code) not available" if $err =~ /^Can't locate/;
+    die $err;
+}
 
 
 my $workflow_type = "TESTWORKFLOW".int(rand(2**32));

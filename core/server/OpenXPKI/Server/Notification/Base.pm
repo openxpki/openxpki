@@ -1,6 +1,5 @@
 package OpenXPKI::Server::Notification::Base;
-
-use Moose;
+use OpenXPKI -class;
 
 =head1 NAME
 
@@ -12,12 +11,8 @@ Base class for all notifications handlers.
 
 =cut
 
-use English;
-
 use DateTime;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use OpenXPKI::FileUtils;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Template;

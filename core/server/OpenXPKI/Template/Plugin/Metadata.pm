@@ -1,4 +1,7 @@
 package OpenXPKI::Template::Plugin::Metadata;
+use OpenXPKI;
+
+use parent qw( Template::Plugin );
 
 =head1 OpenXPKI::Template::Plugin::Metadata
 
@@ -16,11 +19,6 @@ export the methods, you need to address them with the plugin name, e.g.
     [% Metadata.get(prefix, value, suffix) %]
 
 =cut
-
-use strict;
-use warnings;
-use base qw( Template::Plugin );
-use Template::Plugin;
 
 use OpenXPKI::Server::Context qw( CTX );
 

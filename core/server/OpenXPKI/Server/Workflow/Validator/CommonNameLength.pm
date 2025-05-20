@@ -1,14 +1,13 @@
 package OpenXPKI::Server::Workflow::Validator::CommonNameLength;
+use OpenXPKI -class;
 
-use Moose;
 extends 'OpenXPKI::Server::Workflow::Validator';
 
 use Workflow::Exception qw( validation_error );
-use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Debug;
-use OpenXPKI::Serialization::Simple;
-use English;
 use Template;
+
+use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Serialization::Simple;
 
 
 sub _validate {
@@ -33,7 +32,8 @@ sub _validate {
     my $cert_subject = CTX('api2')->render_subject_from_template(
         profile => $profile,
         style   => $style,
-        vars    => $subject_parts
+        vars    => $subject_parts,
+        sanitize => 1
     );
 
     ##! 32: "Subject $cert_subject"

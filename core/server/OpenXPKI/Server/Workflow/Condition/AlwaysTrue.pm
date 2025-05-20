@@ -1,11 +1,8 @@
-# OpenXPKI::Server::Workflow::Condition::AlwaysTrue.pm
-# Written by Alexander Klink for the OpenXPKI project 2006
-# Copyright (c) 2006 by The OpenXPKI Project
 package OpenXPKI::Server::Workflow::Condition::AlwaysTrue;
+use OpenXPKI;
 
-use strict;
-use warnings;
-use base qw( Workflow::Condition );
+use parent qw( Workflow::Condition );
+
 use Workflow::Exception qw( condition_error configuration_error );
 
 sub evaluate {

@@ -1,28 +1,18 @@
 package OpenXPKI::Server::Workflow;
+use OpenXPKI;
 
-use base qw( Workflow );
-
-use strict;
-use warnings;
+use parent qw( Workflow );
 
 # Core modules
-use English;
 use Carp qw( croak carp );
-use Scalar::Util qw( blessed );
 
 # CPAN modules
 use Workflow::Exception qw( workflow_error );
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::DateTime;
-use OpenXPKI::Util;
-
-# Feature::Compat::Try should be done last to safely disable warnings
-use Feature::Compat::Try;
 
 
 my @PERSISTENT_FIELDS = qw( proc_state count_try wakeup_at reap_at archive_at );

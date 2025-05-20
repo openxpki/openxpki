@@ -28,8 +28,14 @@ OpenXPKI - Base module to reduce boilerlate code in our packages.
     # Moose role
     use OpenXPKI -role;
 
+    # Class::Std class
+    use OpenXPKI -class_std;
+
     # API plugin
     use OpenXPKI -plugin;
+
+    # WebUI Data Transfer Object
+    use OpenXPKI -dto;
 
 =cut
 
@@ -39,22 +45,31 @@ sub import {
 
     my %flags;
     while (my $flag = shift) {
+        # -base must be followed by the name of the base class
         $flags{$flag} = $flag eq '-base' ? shift : 1;
     }
 
-    my $poc_base = delete $flags{-base};
-    my $moose_class = delete $flags{-class};
+    my $poc_base;
+    if (exists $flags{-base}) {
+        $poc_base = delete $flags{-base} # $poc_base = name of base class
+          or die sprintf 'Missing base class after "use OpenXPKI -base" called at %s line %s'."\n", $caller_file, $caller_line;
+    }
+
+    my $dto = delete $flags{-dto}; # WebUI DTO
+    my $moose_class = delete $flags{-class} || $dto;
     my $moose_exporter = delete $flags{-exporter};
     my $moose_typeconstraints = delete $flags{-typeconstraints};
+    my $moose_strictconstructor = delete $flags{-strictconstructor} || $dto;
     my $moose_nonmoose = delete $flags{-nonmoose};
     my $moose_role = delete $flags{-role};
+    my $class_std = delete $flags{-class_std};
     my $plugin = delete $flags{-plugin};
     my $client_plugin = delete $flags{-client_plugin};
     my $types = delete $flags{-types};
     $moose_class = 1 if (($plugin or $client_plugin) and not $moose_role);
 
     die sprintf(
-        'Unknown options: "use OpenXPKI qw( ... %s )" (called at %s line %s)',
+        'Unknown options in "use OpenXPKI qw( ... %s )" called at %s line %s'."\n",
         join(' ', keys %flags), $caller_file, $caller_line
     ) if scalar keys %flags;
 
@@ -76,12 +91,20 @@ sub import {
         warnings->import::into(1);
     }
 
+    Class::Std->import::into(1) if $class_std;
+
     Moose::Util::TypeConstraints->import::into(1) if $moose_typeconstraints;
+    MooseX::StrictConstructor->import::into(1) if $moose_strictconstructor;
 
     # API plugin
     if ($plugin or $client_plugin) {
         OpenXPKI::Base::API::Plugin->import::into(1);
         OpenXPKI::Client::API::Plugin->import::into(1) if $client_plugin;
+    }
+
+    # WebUI Data Transfer Object
+    if ($dto) {
+        OpenXPKI::Client::Service::WebUI::Response::DTO->import::into(1);
     }
 
     utf8->import::into(1);
@@ -100,8 +123,10 @@ sub import {
     feature->unimport::out_of(1, qw(
         indirect
         multidimensional
-        bareword_filehandles
     ));
+    feature->unimport::out_of(1, qw(
+        bareword_filehandles
+    )) if "$]" > 5.036;
 
     # Core modules
     Data::Dumper->import::into(1);
@@ -116,6 +141,7 @@ sub import {
     OpenXPKI::Exception->import::into(1);
     OpenXPKI::Util->import::into(1);
     OpenXPKI::Types->import::into(1) if $types;
+    OpenXPKI::Defaults->import::into(1);
 
     # Disable "experimental" warnings: should be done after other imports to safely disable warnings in Perl < 5.36
     warnings->unimport::out_of(1, qw(
@@ -132,8 +158,6 @@ sub import {
 
 When using this package various pragmas and modules are imported into the
 calling package via L<Import::Into>.
-
-=head2 Plain Perl package/class
 
     use OpenXPKI;
 
@@ -152,7 +176,7 @@ This is equivalent to adding the following imports to the calling package:
     use feature "state";
     no feature "indirect";
     no feature "multidimensional";
-    no feature "bareword_filehandles";
+    no feature "bareword_filehandles"; # only if Perl version >= 5.36.0
 
     # Core modules
     use Data::Dumper;
@@ -166,48 +190,115 @@ This is equivalent to adding the following imports to the calling package:
     use OpenXPKI::Debug;
     use OpenXPKI::Exception;
     use OpenXPKI::Util;
+    use OpenXPKI::Defaults;
+
+Various options allow to import additional modules:
 
 =head2 Perl class with inheritance
 
     use OpenXPKI -base => 'Net::Server::MultiType';
 
-adds C<use base qw( Net::Server::MultiType )> to the list of imports.
+additionally adds the imports
+
+    use parent qw( Net::Server::MultiType );
 
 =head2 Moose class
 
     use OpenXPKI -class;
 
-This adds C<use Moose> to the list of imports.
+additionally adds the imports
+
+    use Moose;
 
 =head2 Moose class with type constraints
 
     use OpenXPKI qw( -class -typeconstraints );
 
-This adds C<use Moose> and C<Moose::Util::TypeConstraints> to the list of imports.
+additionally adds the imports
+
+    use Moose;
+    use Moose::Util::TypeConstraints;
+
+=head2 Moose class with strict constructor
+
+    use OpenXPKI qw( -class -strictconstructor );
+
+additionally adds the imports
+
+    use Moose;
+    use MooseX::StrictConstructor;
 
 =head2 Moose exporter class
 
     use OpenXPKI qw( -class -exporter );
 
-This adds C<use Moose> and C<use MooseX::Exporter> to the list of imports.
+additionally adds the imports
+
+    use Moose;
+    use Moose::Exporter;
 
 =head2 Moose class extending a non-Moose class
 
     use OpenXPKI qw( -class -nonmoose );
 
-This adds C<use Moose> and C<use MooseX::NonMoose> to the list of imports.
+additionally adds the imports
+
+    use Moose;
+    use MooseX::NonMoose;
 
 =head2 Moose role
 
     use OpenXPKI -role;
 
-This adds C<use Moose::Role> to the list of imports.
+additionally adds the imports
+
+    use Moose::Role;
 
 =head2 Moose exporter role
 
     use OpenXPKI qw( -role -exporter );
 
-This adds C<use Moose::Role> and C<use MooseX::Exporter> to the list of imports.
+additionally adds the imports
+
+    use Moose::Role;
+    use MooseX::Exporter;
+
+=head2 C<Class::Std> class
+
+    use OpenXPKI -class_std;
+
+additionally adds the imports
+
+    use Class::Std;
+
+=head2 API plugin
+
+    use OpenXPKI -plugin;
+
+additionally adds the imports
+
+    use Moose;
+    use OpenXPKI::Base::API::Plugin;
+
+=head2 Client API plugin
+
+    use OpenXPKI -client_plugin;
+
+additionally adds the imports
+
+    use Moose;
+    use OpenXPKI::Base::API::Plugin;
+    use OpenXPKI::Client::API::Plugin;
+
+=head2 WebUI Data Transfer Object
+
+    use OpenXPKI -dto;
+
+additionally adds the imports
+
+    use Moose;
+    use MooseX::StrictConstructor;
+    use OpenXPKI::Client::Service::WebUI::Response::DTO;
 
 =head2 Imports
 

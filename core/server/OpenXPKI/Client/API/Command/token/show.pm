@@ -13,7 +13,7 @@ use OpenXPKI::Serialization::Simple;
 
 OpenXPKI::Client::API::Command::token::show
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Show the alias for a given alias name
 

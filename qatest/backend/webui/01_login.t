@@ -11,6 +11,7 @@ use English;
 use Data::Dumper;
 use Log::Log4perl qw(:easy);
 use MockUI;
+use OpenXPKI::Defaults;
 
 #Log::Log4perl->easy_init($DEBUG);
 Log::Log4perl->easy_init($ERROR);
@@ -20,10 +21,10 @@ use Test::More tests => 7;
 package main;
 
 BEGIN {
-    use_ok( 'OpenXPKI::Client::UI' );
+    use_ok( 'OpenXPKI::Client::Service::WebUI' );
 }
 
-require_ok( 'OpenXPKI::Client::UI' );
+require_ok( 'OpenXPKI::Client::Service::WebUI' );
 
 my $log = Log::Log4perl->get_logger();
 
@@ -36,7 +37,7 @@ my $result;
 my $client = MockUI->new({
     session => $session,
     logger => $log,
-    config => { socket => '/var/openxpki/openxpki.socket' }
+    config => { socket => $OpenXPKI::Defaults::SERVER_SOCKET }
 });
 
 $client->update_rtoken();

@@ -1,4 +1,7 @@
 package OpenXPKI::Template::Plugin::Workflow;
+use OpenXPKI;
+
+use parent qw( Template::Plugin );
 
 =head1 OpenXPKI::Template::Plugin::Workflow
 
@@ -25,14 +28,7 @@ Will result in
 
 =cut
 
-use strict;
-use warnings;
-use base qw( Template::Plugin );
-use Template::Plugin;
-
-use Data::Dumper;
 use Digest::SHA qw(sha1_hex);
-use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
 

@@ -4,13 +4,13 @@ use warnings;
 
 # Core modules
 use FindBin qw( $Bin );
-use YAML::Tiny;
 use File::Temp qw( tempfile );
 
 # CPAN modules
 use Test::More tests => 6;
 use Test::Deep ':v1';
 use Test::Exception;
+use YAML::PP;
 
 #use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Workflow::Validator::PasswordQuality.*'} = 100;
 
@@ -30,7 +30,7 @@ sub create_wf_config {
 
     my $workflow_type = "testwf".int(rand(2**32));
 
-    my $base_config = YAML::Tiny->read_string("
+    my $base_config = YAML::PP->new->load_string("
         head:
             prefix: $workflow_type
             persister: OpenXPKI
@@ -52,9 +52,9 @@ sub create_wf_config {
                 class: OpenXPKI::Server::Workflow::Validator::PasswordQuality
                 arg:
                     - \$password
-    ")->[0];
+    ");
 
-    $base_config->{validator}->{password_quality}->{param} = YAML::Tiny->read_string($param_yaml)->[0]
+    $base_config->{validator}->{password_quality}->{param} = YAML::PP->new->load_string($param_yaml)
         if $param_yaml;
 
     return ($workflow_type, {

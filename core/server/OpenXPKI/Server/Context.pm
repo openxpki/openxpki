@@ -1,21 +1,11 @@
-# OpenXPKI::Server::Context (Singleton)
-# Written by Martin Bartosch for the OpenXPKI project 2005
-# Copyright (c) 2005-2006 by The OpenXPKI Project
-
 package OpenXPKI::Server::Context;
+use OpenXPKI;
 
-use strict;
-use base qw( Exporter );
+use parent qw( Exporter );
 
 use Storable qw(dclone);
 
-use OpenXPKI::Debug;
-
 our @EXPORT_OK = qw( CTX );
-
-#use Smart::Comments;
-
-use OpenXPKI::Exception;
 
 my $context;
 sub reset {

@@ -1,16 +1,9 @@
-# OpenXPKI::Server::Workflow::Activity::Tools::Connector::GetValue
-# Written by Oliver Welter for the OpenXPKI project 2012
-# Copyright (c) 2012 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Activity::Tools::Connector::GetValue;
+use OpenXPKI;
 
-use strict;
-use English;
-use base qw( OpenXPKI::Server::Workflow::Activity );
+use parent qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use Workflow::Exception qw( configuration_error workflow_error );
 

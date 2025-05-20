@@ -1,12 +1,10 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::BuildPKCS7CertList;
+use OpenXPKI;
 
-use strict;
-use base qw( OpenXPKI::Server::Workflow::Activity );
+use parent qw( OpenXPKI::Server::Workflow::Activity );
 
 use MIME::Base64;
-use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
 use OpenXPKI::Crypt::PKCS7::CertificateList;
 use Workflow::Exception qw(configuration_error);
 

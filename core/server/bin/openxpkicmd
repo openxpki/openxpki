@@ -17,6 +17,7 @@ use Data::Dumper;
 use Log::Log4perl qw(:easy);
 
 use OpenXPKI::Client;
+use OpenXPKI::Defaults;
 #use OpenXPKI::Serialization::Simple;
 
 binmode(STDOUT, ':encoding(UTF-8)');
@@ -164,20 +165,18 @@ foreach my $entry (@wf_parameters) {
     }
 }
 
-if($params{instance}){
-    $params{socketfile} = sprintf '/var/openxpki/%s/openxpki.socket', $params{instance};
-} elsif(!$params{socketfile}){
-    $params{socketfile} = '/var/openxpki/openxpki.socket';
+if(!$params{socketfile}){
+    $params{socketfile} = $OpenXPKI::Defaults::SERVER_SOCKET;
 }
 
 debug(sprintf("Socketfile: %s", $params{socketfile}));
 
 my $reply;
-my $client = OpenXPKI::Client->new({
-    SOCKETFILE => $params{socketfile},
-    TIMEOUT  => $params{timeout},
-    API_VERSION => 2,
-});
+my $client = OpenXPKI::Client->new(
+    ($params{socketfile} ? (socketfile => $params{socketfile}) : ()),
+    (defined $params{timeout} ? (timeout  => $params{timeout}) : ()),
+    api_version => 2,
+);
 
 
 if (! defined $client) {
@@ -366,5 +365,5 @@ only wfid and no action, a list of possible actions is shown.
 
 =head1 EXAMPLES
 
-openxpkicmd --socketfile /var/openxpki/openxpki.socket --realm "Server CA" I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE
+openxpkicmd --socketfile /run/openxpkid/openxpkid.sock --realm "Server CA" I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE
 

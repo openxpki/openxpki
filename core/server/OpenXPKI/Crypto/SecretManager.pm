@@ -1,5 +1,5 @@
 package OpenXPKI::Crypto::SecretManager;
-use Moose;
+use OpenXPKI -class;
 
 # Core modules
 use Digest::SHA qw(sha256_hex sha1_base64);
@@ -10,16 +10,11 @@ use Crypt::PK::ECC;
 use Template;
 
 # Project modules
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
-use OpenXPKI::Control;
+use OpenXPKI::Control::Server;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Crypto::VolatileVault;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::FileUtils;
-
-# Feature::Compat::Try should be done last to safely disable warnings
-use Feature::Compat::Try;
 
 =head1 NAME
 
@@ -200,6 +195,7 @@ sub _create_object {
         require OpenXPKI::Crypto::Secret::Plain;
         my $secret = OpenXPKI::Crypto::Secret::Plain->new(
             part_count => 1,
+            ($secret_def->{kcv} ? (kcv => $secret_def->{kcv}) : ()),
         );
         if (defined $secret_def->{value}) {
             $secret->set_secret($secret_def->{value});
@@ -211,8 +207,21 @@ sub _create_object {
     elsif ('plain' eq $method) {
         require OpenXPKI::Crypto::Secret::Plain;
         return OpenXPKI::Crypto::Secret::Plain->new(
+            # KCV and Multi-Part is not yet working
             part_count => ($secret_def->{total_shares} || 1),
+            ($secret_def->{kcv} ? (kcv => $secret_def->{kcv}) : ()),
         );
+    }
+    elsif ('kdf' eq $method) {
+        require OpenXPKI::Crypto::Secret::KDF;
+        ##! 32: $secret_def->{kdf_param}
+        my $secret = OpenXPKI::Crypto::Secret::KDF->new(
+            ($secret_def->{kcv} ? (kcv => $secret_def->{kcv}) : ()),
+            kdf => $secret_def->{kdf},
+            salt => $secret_def->{salt},
+            kdf_param => ($secret_def->{kdf_param} || {}),
+        );
+        return $secret;
     }
     elsif ('split' eq $method) {
         my %split_secret_args = (
@@ -461,7 +470,7 @@ sub _clear_cache {
         );
         ##! 4: "reload OpenXPKI"
         # Deletes secret objects from child processes
-        OpenXPKI::Control::reload();
+        OpenXPKI::Control::Server->new->cmd_reload;
     }
     else {
         OpenXPKI::Exception->throw (
@@ -621,16 +630,6 @@ sub set_part {
 
     ##! 2: "setting $alias" . (defined $part ? ", part $part" : "")
     $obj->set_secret($value, $part); # $part might be undef
-
-    if ($def->{kcv} and $obj->is_complete) {
-        my $password = $obj->get_secret;
-        if (!Crypt::Argon2::argon2id_verify($def->{kcv}, $password)) {
-            $obj->thaw($old_secret);
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_UI_SECRET_UNLOCK_KCV_MISMATCH",
-            );
-        }
-    }
 
     $self->_save_to_cache($def->{_realm}, $alias, $def->{cache}, $obj->freeze);
     ##! 1: "finished"

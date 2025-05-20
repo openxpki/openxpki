@@ -7,37 +7,9 @@ use OpenXPKI::Serialization::Simple;
 
 OpenXPKI::CLI::Command::workflow
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
-Show and interact with workflows in OpenXPKI
-
-=head1 USAGE
-
-Feed me!
-
-=head2 Subcommands
-
-=over
-
-=item list
-
-=item show
-
-=item create
-
-=item execute
-
-=item wakeup
-
-=item resume
-
-=item reset
-
-=item fail
-
-=item archive
-
-=back
+Show and interact with workflows.
 
 =cut
 

@@ -1,7 +1,5 @@
 import Component from '@glimmer/component'
 import { tracked } from '@glimmer/tracking'
-import { action, set as emSet } from "@ember/object"
-import { debug } from '@ember/debug'
 import { service } from '@ember/service'
 import Clickable from 'openxpki/data/clickable'
 //import ow from 'ow'
@@ -70,20 +68,20 @@ import Clickable from 'openxpki/data/clickable'
 */
 let format2css = {
     none:           "", // to allow formatting via <OxiBase::Button class="..."> without adding fallback defaults
-    primary:        "btn-primary",
-    submit:         "btn-light oxi-btn-submit",
-    loading:        "btn-light oxi-btn-loading",
-    cancel:         "btn-light oxi-btn-cancel",
-    reset:          "btn-light oxi-btn-reset",
-    expected:       "btn-light oxi-btn-expected",
-    failure:        "btn-light oxi-btn-failure",
-    optional:       "btn-light oxi-btn-optional",
-    alternative:    "btn-light oxi-btn-alternative",
-    exceptional:    "btn-light oxi-btn-exceptional",
-    terminate:      "btn-light oxi-btn-terminate",
-    tile:           "btn-light oxi-btn-tile",
-    card:           "oxi-btn-card",
-    info:           "btn-light oxi-btn-info",
+    primary:        "btn-primary bg-primary",
+    submit:         "btn-secondary oxi-btn-submit",
+    loading:        "btn-secondary oxi-btn-loading",
+    cancel:         "btn-secondary oxi-btn-cancel",
+    reset:          "btn-secondary oxi-btn-reset",
+    expected:       "btn-secondary oxi-btn-expected",
+    failure:        "btn-secondary oxi-btn-failure",
+    optional:       "btn-secondary oxi-btn-optional",
+    alternative:    "btn-secondary oxi-btn-alternative",
+    exceptional:    "btn-secondary oxi-btn-exceptional",
+    terminate:      "btn-secondary oxi-btn-terminate",
+    tile:           "btn-secondary oxi-btn-tile",
+    card:           "btn-secondary oxi-btn-card",
+    info:           "btn-secondary oxi-btn-info",
 }
 
 export default class OxiClickableComponent extends Component {

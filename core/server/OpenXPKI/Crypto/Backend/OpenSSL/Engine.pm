@@ -1,16 +1,9 @@
-## OpenXPKI::Crypto::Backend::OpenSSL::Engine
-## Copyright (C) 2003-2005 Michael Bell
-
-use strict;
-use warnings;
-
 package OpenXPKI::Crypto::Backend::OpenSSL::Engine;
+use OpenXPKI;
 
 use File::Basename;
+
 use OpenXPKI::FileUtils;
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
-use English;
 use OpenXPKI::Server::Context qw( CTX );
 
 

@@ -1,16 +1,13 @@
 package OpenXPKI::Workflow::Context;
+use OpenXPKI;
 
-use strict;
-use warnings;
-use English;
+use parent qw( Workflow::Context );
+
 use Workflow 1.39;
 
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Context qw( CTX );
 
-use base qw( Workflow::Context );
 
 sub init {
 

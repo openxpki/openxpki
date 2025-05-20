@@ -1,15 +1,12 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::Approve;
+use OpenXPKI;
 
-use strict;
-use base qw( OpenXPKI::Server::Workflow::Activity );
+use parent qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
 use OpenXPKI::Serialization::Simple;
-use OpenXPKI::Debug;
 use Workflow::Exception qw(configuration_error);
 
-use English;
 use Digest::SHA qw( sha1_hex );
 
 sub execute

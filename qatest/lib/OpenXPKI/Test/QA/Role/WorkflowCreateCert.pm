@@ -1,5 +1,9 @@
 package OpenXPKI::Test::QA::Role::WorkflowCreateCert;
-use Moose::Role;
+use OpenXPKI -role;
+
+requires 'also_init';
+requires 'create_workflow_ok'; # effectively requires 'OpenXPKI::Test::QA::Role::Workflows'
+requires 'session';
 
 =head1 NAME
 
@@ -31,11 +35,6 @@ use Test::Exception;
 use OpenXPKI::Server::Context;
 use OpenXPKI::Test::QA::Role::Workflows::CertParams;
 use OpenXPKI::Serialization::Simple;
-
-
-requires 'also_init';
-requires 'create_workflow_ok'; # effectively requires 'OpenXPKI::Test::QA::Role::Workflows'
-requires 'session';
 
 
 before 'init_server' => sub {

@@ -1,16 +1,11 @@
 package OpenXPKI::Crypto::TokenManager;
-use strict;
-use warnings;
+use OpenXPKI;
 
 # Core modules
 use Carp;
-use Data::Dumper;
-use English;
 use Module::Load ();
 
 # Project modules
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Crypto::SecretManager;
 
@@ -231,6 +226,16 @@ sub __add_token {
         $backend_class = $config->get_inherit("crypto.token.$config_name_group.backend");
     }
 
+
+    # The new vault handler is used as a starting point for the new token layer implementation
+    # New config layout does not use api and backend but a single class attribute
+    if ($config->exists(['crypto','token',$name,'class']) ||
+        $config->exists(['crypto','token',$config_name_group,'class'])) {
+        my $token = $self->__create_token( $name );
+        $self->{TOKEN}->{$realm}->{$type}->{$name} = $token;
+        return $token;
+    }
+
     OpenXPKI::Exception->throw (
         message  => "No backend class set for token $name",
         params => { TYPE => $type, NAME => $name, GROUP => $config_name_group}
@@ -294,6 +299,53 @@ sub __add_token {
 
     ##! 2: "$type token $name for $realm successfully added"
     return $self->{TOKEN}->{$realm}->{$type}->{$name};
+}
+
+
+sub __create_token {
+
+    my $self = shift;
+    my $name = shift;
+
+    my ($group, $generation) = $name =~ m{\A(.+)-(\d+)\z};
+
+    my $config = CTX('config');
+
+    # read alias config and fall back to group config
+    my $token_config = $config->get_hash(['crypto','token',$name])
+        || $config->get_hash(['crypto','token',$group]);
+
+    OpenXPKI::Exception::InvalidConfig->throw(
+        message => "TokenManager failed to find configuration for $name"
+    ) unless ($token_config && $token_config->{class});
+
+    my $backend_class = $token_config->{class};
+
+    eval { Module::Load::load($backend_class); };
+    OpenXPKI::Exception->throw (
+        message => "Unable to load backend class for token $name",
+        params => { class_name => $backend_class, message => $@ }
+    ) if $@;
+
+    ##! 16: "Token backend: $backend_class, Secret group: $token_config->{secret}"
+
+    my %param;
+    if ($token_config->{secret}) {
+        ##! 4: "secret is configured: "
+        $param{secret} = $self->{secret_manager}->_get_secret_def($token_config->{secret})->{_ref};
+    }
+
+    ##! 16: \%param
+
+    my $instance;
+    eval { $instance = $backend_class->new( %param ); };
+    OpenXPKI::Exception->throw (
+        message => "Unable to create backend class for token $name",
+        params => { class_name => $backend_class, message => $@ }
+    ) if $@;
+
+    return $instance;
+
 }
 
 sub __use_token {

@@ -1,9 +1,15 @@
 package OpenXPKI::Util;
-use OpenXPKI;
+use strict;
+use warnings;
+use English;
+use feature 'state';
 
 # Core modules
 use MIME::Base64;
+use File::Spec;
+use IO::Dir 1.03;
 use Exporter qw( import );
+use Digest::SHA qw( sha1_base64 );
 
 # Symbols to export by default
 our @EXPORT = qw( AUTO_ID );
@@ -74,6 +80,7 @@ sub resolve_user_group {
 
     # convert user name to ID if neccessary
     if (not $allow_empty or (defined $user and $user ne '')) {
+        $user //= '';
         $uid = $user =~ /^\d+$/ ? $user : (getpwnam($user))[2];
         $uid // die "Unknown user '$user'" . ($label ? " specified for $label" : '') . "\n";
         $u = (getpwuid($uid))[0];
@@ -81,6 +88,7 @@ sub resolve_user_group {
 
     # convert group name to ID if neccessary
     if (not $allow_empty or (defined $group and $group ne '')) {
+        $group //= '';
         $gid = $group =~ /^\d+$/ ? $group : (getgrnam($group))[2];
         $gid // die "Unknown group '$group'" . ($label ? " specified for $label" : '') . "\n";
         $g = (getgrgid($gid))[0];
@@ -118,8 +126,8 @@ sub asterisk_to_sql_wildcard {
 
 =head2 filter_hash
 
-Filters the given I<HashRef> so that at maximum the resulting hash only the given
-keys.
+Filters the given I<HashRef> so that at maximum the resulting hash only contains
+the given keys.
 
 B<Parameters>
 
@@ -210,7 +218,7 @@ sub is_regular_workflow {
     return 1;
 }
 
-=head3 AUTO_ID
+=head2 AUTO_ID
 
 Used in database C<INSERT>s to automatically set a primary key to the next
 serial number (i.e. sequence associated with the table).
@@ -223,6 +231,129 @@ See L<OpenXPKI::Server::Database/insert> for details.
 sub AUTO_ID :prototype() {
     state $obj = bless {}, "OpenXPKI::Server::Database::AUTOINCREMENT";
     return $obj;
+}
+
+=head2 list_modules
+
+Lists all modules below the given namespace.
+
+Returns a I<HashRef> that maps the found module names to the file paths.
+
+B<Parameters>
+
+=over
+
+=item * C<$namespace> I<Str> - Perl namespace (e.g. C<OpenXPKI::Base::API::Plugin>)
+
+=item * C<$with_subdirs> I<Bool> - whether to dive into subdirectories
+
+=back
+
+=cut
+# Taken from Module::List
+
+sub list_modules {
+    shift if ($_[0] // '') eq __PACKAGE__; # support call via -> and ::
+    my ($prefix, $with_subdirs) = @_;
+
+    my $root_rx = qr/[a-zA-Z_][0-9a-zA-Z_]*/;
+    my $notroot_rx = qr/[0-9a-zA-Z_]+/;
+
+    die "Bad module name '$prefix' given to list_modules()"
+        unless (
+            $prefix =~ /\A(?:${root_rx}::(?:${notroot_rx}::)*)?\z/x
+            and $prefix !~ /(?:\A|[^:]::)\.\.?::/
+        );
+
+    my @prefixes = ($prefix);
+    my %seen_prefixes;
+    my %results;
+
+    while(@prefixes) {
+        my $prefix = pop(@prefixes);
+        my @dir_suffix = split(/::/, $prefix);
+        my $module_rx = $prefix eq "" ? $root_rx : $notroot_rx;
+        my $pmc_rx = qr/\A($module_rx)\.pmc\z/;
+        my $pm_rx = qr/\A($module_rx)\.pm\z/;
+        my $dir_rx = $prefix eq "" ? $root_rx : $notroot_rx;
+        $dir_rx = qr/\A$dir_rx\z/;
+        # Reverse @INC so that modules paths listed earlier win (by overwriting
+        # previously found modules in $results{...}.
+        # This is similar to Perl's behaviour when including modules.
+        for my $incdir (reverse @INC) {
+            my $dir = File::Spec->catdir($incdir, @dir_suffix);
+            my $dh = IO::Dir->new($dir) or next;
+            my @entries = $dh->read;
+            $dh->close;
+            # list modules
+            for my $pmish_rx ($pmc_rx, $pm_rx) {
+                for my $entry (@entries) {
+                    if($entry =~ $pmish_rx) {
+                        my $name = $prefix.$1;
+                        $results{$name} = File::Spec->catdir($dir, $entry);
+                    }
+                }
+            }
+
+            next unless $with_subdirs;
+            # recurse
+            for my $entry (@entries) {
+                my $dir = File::Spec->catdir($dir, $entry);
+                next unless (
+                    File::Spec->no_upwards($entry)
+                    and $entry =~ $dir_rx
+                    and -d $dir
+                );
+                my $newpfx = $prefix.$entry."::";
+                if (!exists($seen_prefixes{$newpfx})) {
+                    push @prefixes, $newpfx;
+                    $seen_prefixes{$newpfx} = undef;
+                }
+            }
+        }
+    }
+    return \%results;
+}
+
+=head2 generate_uid
+
+Generate a random uid (RFC 3548 URL and filename safe base64)
+
+=cut
+sub generate_uid {
+    shift if ($_[0] // '') eq __PACKAGE__; # support call via -> and ::
+
+    my $uid = sha1_base64(time.rand.$$);
+    ## RFC 3548 URL and filename safe base64
+    $uid =~ tr/+\//-_/;
+    return $uid;
+}
+
+=head2 is_systemd
+
+Checks if we are running under systemd and returns a I<TRUE> value in that case,
+I<FALSE> otherwise.
+
+=cut
+sub is_systemd {
+    shift if ($_[0] // '') eq __PACKAGE__; # support call via -> and ::
+
+    # check 1: INVOCATION_ID
+    return 1 if defined $ENV{INVOCATION_ID};
+
+    # check 2: cgroup
+    return 1 if eval {
+        my $content = do {
+            local $INPUT_RECORD_SEPARATOR;
+            my $fh;
+            open $fh, '<', "/proc/$$/cgroup" or return;
+            <$fh>;
+        };
+        chomp $content;
+        return 1 if $content =~ /system\.slice/;
+    };
+
+    return 0;
 }
 
 1;

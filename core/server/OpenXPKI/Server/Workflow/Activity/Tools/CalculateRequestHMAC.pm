@@ -1,14 +1,12 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::CalculateRequestHMAC;
+use OpenXPKI;
 
-use warnings;
-use strict;
-use OpenXPKI::Debug;
+use parent qw( OpenXPKI::Server::Workflow::Activity );
+
 use OpenXPKI::Server::Context qw( CTX );
 use MIME::Base64 qw(decode_base64);
 use Digest::SHA qw(hmac_sha256_hex);
 use Workflow::Exception qw(configuration_error workflow_error);
-
-use base qw( OpenXPKI::Server::Workflow::Activity );
 
 sub execute {
 

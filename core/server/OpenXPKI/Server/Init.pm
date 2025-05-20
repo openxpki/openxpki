@@ -1,21 +1,16 @@
 package OpenXPKI::Server::Init;
-
-use strict;
-use warnings;
+use OpenXPKI;
 
 # Core modules
-use English;
 use Errno;
 use File::Spec;
 
 # CPAN modules
 use Log::Log4perl;
+use List::Util 'none';
 
 # Project modules
-use OpenXPKI::Debug;
 use OpenXPKI::i18n qw(set_language set_locale_prefix);
-use OpenXPKI::Exception;
-
 use OpenXPKI::Config;
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::VolatileVault;
@@ -30,8 +25,6 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Bedroom;
 use OpenXPKI::Metrics;
-
-use Feature::Compat::Try; # should be done after other imports to safely disable warnings
 
 # define an array of hash refs mapping the task id to the corresponding
 # init code. the order of the array elements is also the default execution
@@ -114,10 +107,7 @@ sub init {
                 $err->rethrow;
             } else {
                 log_wrapper("Error during initialization task '$task': $err", "fatal");
-                OpenXPKI::Exception->throw(
-                    message => "I18N_OPENXPKI_SERVER_INIT_TASK_INIT_FAILURE",
-                    params  => { task => $task, ERROR => $err },
-                );
+                die "$err";
             }
         }
 
@@ -126,7 +116,7 @@ sub init {
         log_wrapper("Initialization task '$task' finished", "debug") unless $keys->{SILENT};
     }
 
-    log_wrapper("OpenXPKI initialization finished") unless $keys->{SILENT};
+    print "OpenXPKI initialization finished\n" unless $keys->{SILENT};
 
     OpenXPKI::Server::Context::killsession();
 
@@ -285,12 +275,15 @@ sub __do_init_dbi {
     OpenXPKI::Server::Context::setcontext({
         'dbi' => get_database("main", ($keys->{CLI} ? 1 : 0) )
     });
-    my $db_version = CTX('dbi')->version();
-    if (!$db_version) {
-        warn "Please set database schema version!";
+    my $db_version = CTX('dbi')->version() || '';
+    my @accepted = $OpenXPKI::Defaults::DATABASE_SCHEMA->@*;
+    if (none { $_ eq $db_version } @accepted) {
+        die "current database schema '$db_version' is not compatible with this release\n".
+             "accepted version are " .join(",", @accepted) . "\n";
     }
+
     ##! 32: 'db schema version is ' . $db_version
-    CTX('config')->set('system.version.dbschema', $db_version );
+    CTX('config')->set('system.version.dbschema', $db_version || 0 );
 }
 
 sub __do_init_acl {
@@ -307,6 +300,7 @@ sub __do_init_api {
 sub __do_init_api2 {
     ##! 1: "init api2"
     my $api = OpenXPKI::Server::API2->new(
+        disable_protection => 1,
         enable_acls => 0,
         # acl_rule_accessor => sub { CTX('config')->get_hash('acl.rules.' . CTX('session')->data->role ) },
         log => CTX('log')->system,
@@ -432,7 +426,7 @@ sub get_log {
     ## init logging
     ##! 64: 'before Log->new'
 
-    my $log = OpenXPKI::Server::Log->new (CONFIG => $config_file);
+    my $log = OpenXPKI::Server::Log->new (config => $config_file);
 
     ##! 64: 'log during get_log: ' . $log
 

@@ -1,8 +1,6 @@
 package OpenXPKI::Server::Workflow::Pause;
+use OpenXPKI;
 
-use strict;
-use warnings;
-use OpenXPKI::Debug;
 use OpenXPKI::Server::Context;
 
 use Exception::Class (

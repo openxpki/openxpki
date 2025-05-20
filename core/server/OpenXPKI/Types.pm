@@ -232,6 +232,17 @@ coerce 'ArrayRefOrCommaList',
     via { [ split /\s*,\s*/, $_ ] };
 
 
+=head2 ConfigPath
+=cut
+
+subtype 'ConfigPath',
+    as 'ArrayRef[Str]';
+
+coerce 'ConfigPath',
+    from 'Str',
+    via { [ split /\./, $_ ] };
+
+
 =head2 Tenant
 =cut
 

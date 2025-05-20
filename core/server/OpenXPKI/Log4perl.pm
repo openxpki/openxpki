@@ -1,4 +1,5 @@
 package OpenXPKI::Log4perl;
+use OpenXPKI;
 
 # Core modules
 use List::Util qw( none );
@@ -6,9 +7,13 @@ use List::Util qw( none );
 # CPAN modules
 use Log::Log4perl;
 use Log::Log4perl::Level;
+use Log::Log4perl::Logger;
 
 # Project modules
 use OpenXPKI::Log4perl::MojoLogger;
+
+our $spec_added = 0;
+our $default_facility;
 
 =head1 NAME
 
@@ -56,75 +61,123 @@ B<Parameters:>
 
 =item * C<$config>
 
-configuration: file path, ScalarRef, HashRef or empty string
-
-=item * C<$fallback_prio>
-
-log priority (level) to use for output to STDERR if there is a problem with
-the given config (optional, default: WARN)
+Log4perl configuration: file path, ScalarRef, HashRef. (optional, default: log
+to STDERR via L</init_screen_logger>).
 
 =back
 
-If the first parameter is undef or the config file is not found, the
-constructor will print a warning message. So if you are fine with the default
-screen logger, pass an empty string as C<$config> and, optionally, the desired
-log level as C<$fallback_prio>.
+If the first parameter is undef or the config file is not found a warning
+message will be logged.
 
 =cut
 
-sub init_or_fallback {
-    my ($class, @args) = @_;
-    # if someone called ::init instead of ->init, $class contains the first
-    # argument instead of the class name
+sub init_or_fallback ($class, @args) {
+    # if someone calls us with :: instead of ->, $class contains first argument instead of class name
     unshift(@args, $class) if $class ne __PACKAGE__;
 
-    _add_patternlayout_spec();
-
     my $config = shift @args;
-    my $fallback_prio = shift(@args) // "WARN";
-
     my @warnings = ();
+
+    _add_patternlayout_spec();
 
     # Error checks
     if ($config) { # config is set and not empty
         if (not ref $config) {
             if (not -f $config) {
-                push @warnings, "Log4perl configuration file $config not found";
+                push @warnings, "Log4perl configuration file '$config' not found";
                 $config = undef;
             }
         } elsif (ref $config ne 'SCALAR' and ref $config ne 'HASH') {
             push @warnings, "Unsupported format for Log4perl configuration (expected: filename, ScalarRef or HashRef)";
             $config = undef;
         }
-    } elsif (not defined $config) {
+    } else {
         # if not initialized: complain and init screen logger
         push @warnings, "Initializing Log4perl in fallback mode (output to STDERR)";
     }
 
-    # Fallback default
-    $config = {
-        "log4perl.rootLogger" => uc($fallback_prio).", SCREEN",
-        "log4perl.appender.SCREEN" => "Log::Log4perl::Appender::Screen",
-        "log4perl.appender.SCREEN.layout" => "Log::Log4perl::Layout::PatternLayout",
-        "log4perl.appender.SCREEN.layout.ConversionPattern" => "%d [%p] %i %m%n",
-    } unless($config);
+    # use config if given
+    if ($config) {
+        Log::Log4perl::Logger->reset if Log::Log4perl->initialized; # avoid re-initialization warning
+        Log::Log4perl->init($config);
+    # or fall back on screen logger unless there is a running config
+    } elsif (not Log::Log4perl->initialized) {
+        $class->init_screen_logger;
+    }
 
-    Log::Log4perl->init($config);
-    Log::Log4perl->get_logger('')->warn($_) for @warnings;
+    Log::Log4perl->get_logger($default_facility // '')->warn($_) for @warnings;
+}
 
+=head2 init_screen_logger
+
+Initialize Log4perl with a basic screen (or journald) logger configuration.
+
+B<Parameters:>
+
+=over
+
+=item * C<$prio>
+
+log priority (level) to use for output to STDERR (optional, default: WARN)
+
+=back
+
+=cut
+
+sub init_screen_logger ($class, @args) {
+    # if someone calls us with :: instead of ->, $class contains first argument instead of class name
+    unshift(@args, $class) if $class ne __PACKAGE__;
+
+    _add_patternlayout_spec();
+
+    Log::Log4perl::Logger->reset if Log::Log4perl->initialized; # avoid re-initialization warning
+
+    my $prio = uc(shift(@args)) // 'WARN';
+    my $appender = OpenXPKI::Util->is_systemd ? 'Journald' : 'Screen';
+
+    my $pattern = ($prio eq 'DEBUG' or $prio eq 'TRACE')
+        ? '%p{3} [%c] %m [%i{verbose}]%n'
+        : '%m%n';
+
+    my $config = <<"EOF";
+        log4perl.rootLogger = $prio, $appender
+        log4perl.category.connector = ERROR, $appender
+        log4perl.appender.Screen                          = Log::Log4perl::Appender::Screen
+        log4perl.appender.Screen.layout                   = Log::Log4perl::Layout::PatternLayout
+        log4perl.appender.Screen.layout.ConversionPattern = $pattern
+        log4perl.appender.Journald        = OpenXPKI::Log4perl::Appender::Journald
+        log4perl.appender.Journald.layout = Log::Log4perl::Layout::NoopLayout
+EOF
+
+    Log::Log4perl->init(\$config);
 }
 
 # Add custom PatternLayout placeholder %i which shows all MDC variables
 sub _add_patternlayout_spec {
+    return if $spec_added;
     Log::Log4perl::Layout::PatternLayout::add_global_cspec('i', sub {
         my $layout = shift;
-        my @order = qw( pid user role sid rid wftype wfid scepid pki_realm );
-        my @hide = qw( command_id );
+        my %names = (
+            endpoint => 'ep',
+            wftype => 'wf',
+            pki_realm => 'realm',
+        );
+        my @order = qw( rid user role sid ssid endpoint wftype wfid scepid pki_realm pid );
+        my %hide = ( command_id => 1 );
         my $mdc = Log::Log4perl::MDC->get_context;
-        $mdc->{pid} = $$ if ($layout->{curlies}//'') eq 'with_pid';
+
+        if (($layout->{curlies}//'') eq 'verbose') {
+            $mdc->{pid} = $$;
+        } else {
+            # hide everything but endpoint and sid in non-verbose mode
+            $hide{$_} = 1 for keys $mdc->%*;
+            $hide{endpoint} = 0;
+            $hide{sid} = 0;
+        }
+
         my %filtered = (
             map { $_ => $_ }
-            grep { my $k = $_; none { $k eq $_ } @hide }
+            grep { not $hide{$_} }
             grep { defined $mdc->{$_} }
             sort keys $mdc->%*
         );
@@ -134,19 +187,29 @@ sub _add_patternlayout_spec {
             push @keys_ordered, delete($filtered{$k}) if $filtered{$k};
         }
         # Add remaining existing keys (those we did not list in @order)
-        push @keys_ordered, keys(%filtered);
+        push @keys_ordered, sort keys(%filtered);
         # present the result
-        return join("|", map { $_.'='.$mdc->{$_} } @keys_ordered);
+        return join("|", map { sprintf '%s=%s', $names{$_}//$_, $mdc->{$_} } @keys_ordered);
     });
+    $spec_added = 1;
 }
 
 sub get_logger {
     my ($class, @args) = @_;
-    # if someone called ::get_logger() instead of ->get_logger(), $class contains the first
-    # argument instead of the class name
+    # if someone calls us with :: instead of ->, $class contains first argument instead of class name
     unshift (@args, $class) if $class ne __PACKAGE__;
 
+    @args = ($default_facility) if (not scalar @args and $default_facility);
     return OpenXPKI::Log4perl::MojoLogger->get_logger(@args);
+}
+
+sub set_default_facility {
+    my ($class, @args) = @_;
+    # if someone calls us with :: instead of ->, $class contains first argument instead of class name
+    unshift (@args, $class) if $class ne __PACKAGE__;
+
+    my $default = $args[0] or return;
+    $default_facility = $default;
 }
 
 1;

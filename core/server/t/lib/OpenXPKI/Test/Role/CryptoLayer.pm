@@ -1,5 +1,9 @@
 package OpenXPKI::Test::Role::CryptoLayer;
-use Moose::Role;
+use OpenXPKI -role;
+
+requires 'config_writer';
+requires 'testenv_root';
+requires 'also_init';
 
 =head1 NAME
 
@@ -11,16 +15,6 @@ to be able to test the crypto layer
 This role expects the OpenSSL binary to be available at C</usr/bin/openssl>.
 
 =cut
-
-# Core modules
-
-# CPAN modules
-
-# Project modules
-
-requires "config_writer";
-requires "testenv_root";
-requires 'also_init';
 
 before 'init_user_config' => sub { # ... so we do not overwrite user supplied configs
     my $self = shift;

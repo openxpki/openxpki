@@ -1,17 +1,10 @@
-## OpenXPKI::Server::Workflow::Validator::RelativeDate.pm
-##
-## Written 2012 by Oliver Welter <openxpki@oliwel.de> for the OpenXPKI project
-## (C) Copyright 2012 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Validator::RelativeDate;
+use OpenXPKI;
 
-use strict;
-use warnings;
-use base qw( Workflow::Validator );
+use parent qw( Workflow::Validator );
+
 use Workflow::Exception qw( validation_error );
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Debug;
-use English;
 
 __PACKAGE__->mk_accessors( qw( emptyok ) );
 

@@ -1,5 +1,6 @@
 package OpenXPKI::Test::QA::DBI;
-use Moose;
+use OpenXPKI -class;
+
 =head1 NAME
 
 OpenXPKI::Test::QA::DBI - Test helper to get a database handle
@@ -33,6 +34,6 @@ sub BUILD {
         CLI => 1,
     });
 }
- 
+
 
 __PACKAGE__->meta->make_immutable;

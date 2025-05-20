@@ -1,11 +1,7 @@
 package OpenXPKI::Server::Authentication;
-
-use strict;
-use warnings;
-use English;
+use OpenXPKI;
 
 # Core modules
-use Data::Dumper;
 use Digest::SHA qw(sha1);
 use MIME::Base64 qw(encode_base64url decode_base64);
 use Module::Load ();
@@ -14,14 +10,9 @@ use Module::Load ();
 use Crypt::JWT qw(decode_jwt);
 
 # Project modules
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Authentication::Handle;
 use OpenXPKI::Server::Authentication::Base; # preload to get debug working
-
-# Feature::Compat::Try should be done last to safely disable warnings
-use Feature::Compat::Try;
 
 ## constructor and destructor stuff
 
@@ -163,7 +154,7 @@ sub __load_handler
 
     $self->{PKI_REALM}->{$realm}->{HANDLER}->{$handler} = $class->new( "auth.handler.$handler" );
 
-    CTX('log')->auth()->info('Loaded auth handler ' . $handler);
+    CTX('log')->auth->debug("Loaded auth handler $handler");
 
     ##! 4: "end"
     return 1;

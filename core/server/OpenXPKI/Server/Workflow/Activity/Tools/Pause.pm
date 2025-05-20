@@ -1,13 +1,10 @@
-# OpenXPKI::Server::Workflow::Activity::Tools::Pause
-# Written by Oliver Welterfor the OpenXPKI Project 2014
-# Copyright (c) 2014 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Activity::Tools::Pause;
+use OpenXPKI;
 
-use strict;
-use OpenXPKI::Exception;
-use base qw( OpenXPKI::Server::Workflow::Activity );
+use parent qw( OpenXPKI::Server::Workflow::Activity );
+
 use OpenXPKI::Server::Context qw( CTX );
+
 
 sub execute {
     my $self     = shift;

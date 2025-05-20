@@ -1,13 +1,12 @@
 package OpenXPKI::Server::Workflow::Validator::ValidCertificate;
+use OpenXPKI;
 
-use strict;
-use warnings;
-use base qw( OpenXPKI::Server::Workflow::Validator );
+use parent qw( OpenXPKI::Server::Workflow::Validator );
+
 use Workflow::Exception qw( validation_error );
 use OpenXPKI::Crypt::X509;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Debug;
-use English;
+
 
 sub _validate {
 

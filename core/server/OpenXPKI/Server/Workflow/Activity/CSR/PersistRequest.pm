@@ -1,12 +1,11 @@
 package OpenXPKI::Server::Workflow::Activity::CSR::PersistRequest;
+use OpenXPKI;
 
-use strict;
-use base qw( OpenXPKI::Server::Workflow::Activity );
+use parent qw( OpenXPKI::Server::Workflow::Activity );
 
 use Crypt::PKCS10 1.8;
 use Workflow::Exception qw( workflow_error configuration_error );
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 
 

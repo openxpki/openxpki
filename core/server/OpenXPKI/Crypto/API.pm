@@ -1,18 +1,7 @@
-## OpenXPKI::Crypto::API.pm
-## Written 2006 by Alexander Klink for the OpenXPKI project
-## (C) Copyright 2006 by The OpenXPKI Project
-
 package OpenXPKI::Crypto::API;
+use OpenXPKI -class_std;
 
-use strict;
-use warnings;
-use English;
-
-use Class::Std;
 use Module::Load ();
-
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 
 # The instance of the corresponding Backend/Tool class
 my %instance_of       :ATTR( :get<instance> );
@@ -45,8 +34,9 @@ sub START {
     if ($EVAL_ERROR) {
         ##! 4: "compilation of driver " . $class . " failed\n$EVAL_ERROR"
         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_CRYPTO_API_EVAL_ERROR',
+            message => 'Unable to load backend class for crypto api',
             params  => {
+                class => $class,
                 error_message => $EVAL_ERROR,
             },
         );
