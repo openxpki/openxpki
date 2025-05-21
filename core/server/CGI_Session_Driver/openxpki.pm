@@ -11,7 +11,7 @@ use Log::Log4perl::MDC;
 use Crypt::CBC;
 
 sub init ($self) {
-    Log::Log4perl->initialized() || Log::Log4perl->easy_init($ERROR);
+    Log::Log4perl->initialized or Log::Log4perl->easy_init($ERROR);
 
     $self->{IdColName} = 'session_id';
     $self->{DataColName} = 'data';
@@ -30,8 +30,6 @@ sub init ($self) {
         );
     }
 
-    Log::Log4perl->get_logger('session')->trace('Session driver initalized');
-
     if (! defined $self->{Handle} )  {
         # copy from CGI::S::D::DBI as we need to add LongReadLen for Oracle
         $self->{Handle} = DBI->connect(
@@ -41,12 +39,11 @@ sub init ($self) {
                 AutoCommit => 1,
                 LongReadLen => $self->{LongReadLen} ?  $self->{LongReadLen} : 100000,
             }
-        );
-        unless ( $self->{Handle} ) {
-            return $self->set_error( "init(): couldn't connect to database: " . DBI->errstr );
-        }
+        ) or return $self->set_error("Couldn't connect to database: " . DBI->errstr);
         $self->{_disconnect} = 1;
     }
+
+    Log::Log4perl->get_logger('session')->debug('Frontend session driver initialized');
 
     return 1;
 }
@@ -60,8 +57,8 @@ sub retrieve ($self, $sid) {
 
     my $datastr = $self->SUPER::retrieve($sid);
 
-    if (!$datastr) {
-        $log->trace("Retrieve session $sid (was empty)");
+    if (not $datastr) {
+        $log->trace("Retrieved session $sid was empty");
         return '';
     }
 
@@ -101,10 +98,10 @@ sub store ($self, $sid, $datastr) {
 
     if ( $rc ) {
         $action_sth = $dbh->prepare_cached("UPDATE ".$self->{TableName}." SET ".$self->{DataColName}." = ?, modified = ?, ip_address = ? WHERE ".$self->{IdColName}." = ?", undef, 3);
-        $log->debug("Store session $sid (update)");
+        $log->debug("store() - session $sid (update)");
     } else {
         $action_sth = $dbh->prepare_cached("INSERT INTO ".$self->{TableName}." (".$self->{DataColName}.", modified,  ip_address, ".$self->{IdColName}.", created) VALUES(?, ?, ?, ?, ?)", undef, 3);
-        $log->debug("Store session $sid (create)");
+        $log->debug("store() - session $sid (create)");
         push @args, time();
     }
     unless ( defined $action_sth ) {
