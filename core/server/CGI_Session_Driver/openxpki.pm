@@ -1,19 +1,16 @@
 package CGI::Session::Driver::openxpki;
+use OpenXPKI -base => 'CGI::Session::Driver::DBI';
 
-use English;
-use warnings;
+# Core modules
+use MIME::Base64;
+use Digest::SHA qw(hmac_sha256_hex);
+
+# CPAN modules
 use Log::Log4perl qw(:easy);
 use Log::Log4perl::MDC;
-use Data::Dumper;
-use MIME::Base64;
 use Crypt::CBC;
-use Digest::SHA qw(hmac_sha256_hex);
-use parent qw( CGI::Session::Driver::DBI );
 
-sub init {
-
-    my $self = shift;
-
+sub init ($self) {
     Log::Log4perl->initialized() || Log::Log4perl->easy_init($ERROR);
 
     $self->{IdColName} = 'session_id';
@@ -52,11 +49,7 @@ sub init {
     return 1;
 }
 
-sub retrieve {
-
-    my $self = shift;
-    my $sid = shift;
-
+sub retrieve ($self, $sid) {
     my $log = Log::Log4perl->get_logger('session');
 
     if ($self->{EncryptKey}) {
@@ -81,34 +74,23 @@ sub retrieve {
     return $datastr;
 }
 
-sub store {
-
-    my $self = shift;
-    my ($sid, $datastr) = @_;
-
+sub store ($self, $sid, $datastr) {
     my $log = Log::Log4perl->get_logger('session');
 
-    $log->trace($datastr) if ($log->is_trace);
+    $log->trace("store() - data = $datastr") if $log->is_trace;
 
-    if (!($sid && $datastr)) {
-        die "Session store without data/sid";
-    }
-
-    if ($self->{_crypt}) {
-        $datastr = encode_base64( $self->{_crypt}->encrypt($datastr) );
-    }
-
-    if ($self->{EncryptKey}) {
-        $sid = hmac_sha256_hex( $sid, $self->{EncryptKey});
-    }
+    $datastr = encode_base64($self->{_crypt}->encrypt($datastr)) if $self->{_crypt};
+    $sid = hmac_sha256_hex($sid, $self->{EncryptKey}) if $self->{EncryptKey};
 
     my $dbh = $self->{Handle};
     my $sth = $dbh->prepare_cached("SELECT ".$self->{IdColName}." FROM ".$self->{TableName}." WHERE ".$self->{IdColName}." = ?", undef, 3);
     unless ( defined $sth ) {
-        return $self->set_error( "store(): \$dbh->prepare failed with message " . $sth->errstr );
+        return $self->set_error( 'store() - $dbh->prepare failed: ' . $sth->errstr );
     }
 
-    $sth->execute( $sid ) or return $self->set_error( "store(): \$sth->execute failed with message " . $sth->errstr );
+    $sth->execute( $sid )
+      or return $self->set_error( 'store() - $sth->execute failed: ' . $sth->errstr );
+
     my $rc = $sth->fetchrow_array;
     $sth->finish;
 
@@ -123,48 +105,32 @@ sub store {
         $log->debug("Store session $sid (create)");
         push @args, time();
     }
-
     unless ( defined $action_sth ) {
-        return $self->set_error( "store(): \$dbh->prepare failed with message " . $dbh->errstr );
+        return $self->set_error( 'store() - $dbh->prepare failed: ' . $dbh->errstr );
     }
+
     $action_sth->execute(@args)
-        or return $self->set_error( "store(): \$action_sth->execute failed " . $action_sth->errstr );
+        or return $self->set_error( 'store() - $action_sth->execute failed: ' . $action_sth->errstr );
 
     $action_sth->finish;
 
     return 1;
 }
 
-sub remove {
-
-    my $self = shift;
-    my $sid = shift;
-
-    if ($self->{EncryptKey}) {
-        $sid = hmac_sha256_hex( $sid, $self->{EncryptKey});
-    }
-
+sub remove ($self, $sid) {
+    $sid = hmac_sha256_hex( $sid, $self->{EncryptKey}) if $self->{EncryptKey};
     return $self->SUPER::remove($sid);
-
 }
 
 sub dump { 1 }
 
-sub traverse {
-    my $self = shift;
+sub traverse ($self, @args) {
     die "traverse() is not supported";
 }
 
-sub set_error {
-
-    my $self = shift;
-    my $error = shift;
-
+sub set_error ($self, $error = '') {
     Log::Log4perl->get_logger('session')->error($error);
-    $self->SUPER::set_error();
-
-    die $error;
-
+    return $self->SUPER::set_error();
 }
 
 1;
