@@ -1,4 +1,3 @@
 etc/openxpki
-var/openxpki
 var/log/openxpki
 var/log/openxpki-ui
