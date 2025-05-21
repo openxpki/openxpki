@@ -35,9 +35,11 @@ sub init ($self) {
     if (! defined $self->{Handle} )  {
         # copy from CGI::S::D::DBI as we need to add LongReadLen for Oracle
         $self->{Handle} = DBI->connect(
-            $self->{DataSource}, $self->{User}, $self->{Password}, {
-                RaiseError=>1, PrintError=>1, AutoCommit=>1,
-                LongReadLen => $self->{LongReadLen} ?  $self->{LongReadLen} : 100000
+            $self->{DataSource}, $self->{User}, $self->{Password},
+            {
+                PrintError => 1,
+                AutoCommit => 1,
+                LongReadLen => $self->{LongReadLen} ?  $self->{LongReadLen} : 100000,
             }
         );
         unless ( $self->{Handle} ) {
@@ -130,7 +132,11 @@ sub traverse ($self, @args) {
 
 sub set_error ($self, $error = '') {
     Log::Log4perl->get_logger('session')->error($error);
-    return $self->SUPER::set_error();
+    return $self->SUPER::set_error($error);
+}
+
+sub DESTROY ($self) {
+    eval { $self->{Handle}->disconnect if ($self->{Handle} and $self->{_disconnect}) };
 }
 
 1;
