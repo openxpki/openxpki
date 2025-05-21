@@ -16,7 +16,8 @@ OpenXPKI - Base module to reduce boilerlate code in our packages.
     use OpenXPKI;
 
     # Inheritance
-    use OpenXPKI -base => 'Net::Server::MultiType';
+    use OpenXPKI -base   => 'Net::Server::MultiType';
+    use OpenXPKI -parent => 'Net::Server::MultiType'; # alias for -base
     use OpenXPKI qw ( -base Net::Server::MultiType );
 
     # Moose class
@@ -48,6 +49,9 @@ sub import {
         # -base must be followed by the name of the base class
         $flags{$flag} = $flag eq '-base' ? shift : 1;
     }
+
+    # -parent is an alias for -base
+    $flags{-base} = delete $flags{-parent} if exists $flags{-parent};
 
     my $poc_base;
     if (exists $flags{-base}) {
@@ -196,7 +200,8 @@ Various options allow to import additional modules:
 
 =head2 Perl class with inheritance
 
-    use OpenXPKI -base => 'Net::Server::MultiType';
+    use OpenXPKI -base   => 'Net::Server::MultiType';
+    use OpenXPKI -parent => 'Net::Server::MultiType'; # alias for -base
 
 additionally adds the imports
 
