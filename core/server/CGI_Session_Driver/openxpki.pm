@@ -48,10 +48,8 @@ sub init {
         }
         $self->{_disconnect} = 1;
     }
+
     return 1;
-
-
-    return $self->SUPER::init();
 }
 
 sub retrieve {
