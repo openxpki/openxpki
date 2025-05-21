@@ -3,6 +3,12 @@ use OpenXPKI qw( -class -nonmoose );
 
 extends 'CGI::Session';
 
+# Core modules
+use Module::Load ();
+
+# CPAN modules
+use Log::Log4perl qw(:easy);
+
 =head1 NAME
 
 OpenXPKI::Client::Service::WebUI::Session
@@ -39,6 +45,23 @@ around BUILDARGS => sub ($orig, $class, @args) {
         unless scalar @args == 3;
     die "Second argument to ".__PACKAGE__."->new() must be either a SID or undef\n"
         if (defined $args[1] and ref $args[1]);
+
+    if (my $dsn = $args[0]) {
+        my $dsn_args = $class->parse_dsn($dsn);
+        if (my $driver = $dsn_args->{driver}) {
+            Log::Log4perl->initialized or Log::Log4perl->easy_init($ERROR);
+            my $log = Log::Log4perl->get_logger('');
+            $log->debug("Checking frontend session driver '$driver' availability");
+            try {
+                Module::Load::load("CGI::Session::Driver::$driver");
+            }
+            catch ($err) {
+                my $msg = "Could not load frontend session driver '$driver': $err";
+                $log->error($msg); # logdie() would result in broadcast message on terminals
+                die "$msg\n";
+            }
+        }
+    }
 
     return $class->$orig(); # call Moose::Object->BUILDARGS
 };
