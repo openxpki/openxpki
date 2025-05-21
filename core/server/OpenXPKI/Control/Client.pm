@@ -106,8 +106,15 @@ sub getopt_params ($self, $command) {
 sub cmd_start ($self) {
     my $pid = $self->__get_pid;
     if (defined $pid and $self->status(silent => 1) == 0) {
-        warn "OpenXPKI Client already running. PID: $pid\n";
-        return 0;
+
+        # Workaround for docker - PID is always 1 and pid_file is not
+        # removed on a crash so we will never start again....
+        if ($PID == 1 and $pid == $PID) {
+            warn "OpenXPKI Client skipping old PID == 1\n";
+        } else {
+            warn "OpenXPKI Client already running. PID: $pid\n";
+            return 0;
+        }
     }
 
     OpenXPKI::Log4perl->set_default_facility('openxpki.client.server');
@@ -176,7 +183,7 @@ sub cmd_start ($self) {
 
     # manually configured sockets
     } else {
-        my $pid_file = $self->opts->{pid_file} || $self->cfg->{pid_file}
+        my $pid_file = $self->__get_pid_file
             or die "Missing config entry: system.client.pid_file\n";
         my $socket_file = $self->opts->{socket_file} || $self->cfg->{socket_file}
             or die "Missing config entry: system.client.socket_file\n";
@@ -254,7 +261,7 @@ sub cmd_stop ($self) {
         silent => $self->silent,
     );
 
-    eval { unlink $self->cfg->{pid_file} } if $code == 0;
+    eval { unlink $self->__get_pid_file } if $code == 0;
 
     return $code;
 }
@@ -308,8 +315,13 @@ sub status ($self, $arg) {
 }
 
 sub __get_pid ($self) {
-    die "Missing config entry: system.client.pid_file\n" unless $self->cfg->{pid_file};
-    return $self->slurp_if_exists($self->cfg->{pid_file});
+    my $pid_file = $self->__get_pid_file() ||
+        die "Missing config entry: system.client.pid_file\n";
+    return $self->slurp_if_exists($pid_file);
+}
+
+sub __get_pid_file ($self) {
+    return $self->opts->{pid_file} || $self->cfg->{pid_file};
 }
 
 sub __file_url ($self, $path) {
