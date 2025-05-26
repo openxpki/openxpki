@@ -11,7 +11,7 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os, re, sphinx_rtd_theme
+import sys, os, re
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -94,18 +94,12 @@ pygments_style = 'sphinx'
 # a list of builtin themes.
 # html_theme = 'default'
 
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-
 html_theme = 'sphinx_rtd_theme'
 html_logo = 'openxpki.svg'
 
 html_theme_options = {
     "logo_only": True,
 }
-
-if not on_rtd:  # only import and set the theme if we're building docs locally
-    import sphinx_rtd_theme
-    html_theme_path = ["_themes", sphinx_rtd_theme.get_html_theme_path()]
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
