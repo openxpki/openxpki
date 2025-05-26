@@ -1,9 +1,9 @@
-# Quickstart guide {#quickstart}
+# Quickstart guide
 
 OpenXPKI is an easy-to-deploy and easy-to-use RA/CA software that makes
 handling of certificates easy but nevertheless you should **really**
 have some basic knowledge on what a PKI is. If you just want to see
-\"OpenXPKI in action\" for a first impression of the tool, use the
+*OpenXPKI in action* for a first impression of the tool, use the
 public demo at <https://demo.openxpki.org>.
 
 ## Support
@@ -25,9 +25,9 @@ docker-compose file, see <https://github.com/openxpki/openxpki-docker>.
 
 The debian package come with a sample configuration which is identical
 to the configuration repository at the time of package build. For a
-production setup we recommend to remove the [/etc/openxpki]{.title-ref}
+production setup we recommend to remove the `/etc/openxpki`
 folder created by the package and replace it with a checkout of the
-[community]{.title-ref} branch of the configuration repository available
+`community` branch of the configuration repository available
 at <https://github.com/openxpki/openxpki-config>.
 
 Please also have a look at
@@ -42,7 +42,7 @@ used with old releases. Make sure your code version is recent enough to
 run the config!
 
 Starting with v3.22, there is mandatory cross check of config, database
-schema and code via the [system.version.depend]{.title-ref} node. We
+schema and code via the `system.version.depend` node. We
 recommend to keep and maintain this in your config!
 
 ## Debian Builds
