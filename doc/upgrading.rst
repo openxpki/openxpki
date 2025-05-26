@@ -64,14 +64,14 @@ YAML Update
 ###########
 
 OpenXPKI uses the pattern `+YYMMDD...` to specify relative dates in several
-places. In the old configuration those are given as plain strings, e.g.
+places. In the old configuration those are given as plain strings, e.g.::
 
     validity:
         notafter: +01
 
 The new YAML parser interpretes this as number and strips the leading
 zeros which leads to unexpected behaviour and malformat errors. Please
-review your configuration and add quotes around:
+review your configuration and add quotes around::
 
     validity:
         notafter: "+01"

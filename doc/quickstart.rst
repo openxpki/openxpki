@@ -92,7 +92,7 @@ software yourself::
 Starting with v3.32 the webfrontend uses its own process and no longer uses FCGI.
 The distributed configuration file is for the apache server but you can run this
 with any server that has reverse proxy support. The required mods are enabled by
-the package install.
+the package install::
 
     apt install apache2
 
