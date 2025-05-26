@@ -1,7 +1,7 @@
 Introduction
 ============
 
-This manual describes the installation and use of the OpenXPKI software, an Open Source trustcenter solution written by The OpenXPKI Project. 
+This manual describes the installation and use of the OpenXPKI software, an Open Source trustcenter solution written by The OpenXPKI Project.
 
 The intended audience are CA administrators and operators. We assume that readers are familiar working on a Unix shell and have enough background knowledge about Public Key Infrastructures to understand the relevant terms.
 
@@ -26,9 +26,8 @@ and builds on the experience gained while developing it as well as on our experi
 * *Private key support both in hardware and software:* OpenXPKI has support for professional Hardware Security Modules such as the nCipher nShield or the Safenet Luna CA modules. If such modules are not available, access to a key can be protected by using a threshold secret sharing algorithm.
 * *Professional database support:* The user can choose from a range of database backends, including commercial ones such as Oracle which are typically used in enterprise scenarios.
 * *Many different interfaces to the server:* Humans can access the CA server using a web-interface. Embedded devices such as routers can also use the Simple Certificate Enrollment Protocol (SCEP) to talk to the server and apply for certificates - including automatic renewal. If integration into existing systems is required, REST and SOAP interfaces are also available.
-* *Workflow Engine:* OpenXPKI aims to be extremely customizable by allowing the definition of workflows for any process you can think of in the PKI area. Typical workflows such as editing and approving certificate signing requests, certificate and CRL issuance are already implemented. Implementing your own idea is normally pretty easy by defining a workflow in a YAML configuration file and (maybe) implementing a few lines in Perl. 
+* *Workflow Engine:* OpenXPKI aims to be extremely customizable by allowing the definition of workflows for any process you can think of in the PKI area. Typical workflows such as editing and approving certificate signing requests, certificate and CRL issuance are already implemented. Implementing your own idea is normally pretty easy by defining a workflow in a YAML configuration file and (maybe) implementing a few lines in Perl.
 * *I18N:* Localization of the application and interfaces is easily possible.
-* *Self-Service application for smartcard/token personalization:* A web application which allows a user to easily create and install certificates to a smartcard is available (commercial third-party component required).
 * *Template-based certificate details:* Contrary to the typical CA system, your users do not need to know about how you would like the subject to look like - you can just ask them for the information they know (for example a hostname and port) and OpenXPKI will create the corresponding subject and subjectAlternativeNames for you. Regular expression support allows you to enforce certificate naming conventions easily.
-* *Interchangeble notifation backends* We can of course send eMail notifications to customers and operators but if you have a heavy load of certificate requests that need additional communication with the requesters, you can attach a ticket system like [http://www.bestpractical.com/rt/ Request Tracker], which will receive updates on the certificate status.
+* *Interchangeble notifation backends* We can of course send eMail notifications to customers and operators but if you have a heavy load of certificate requests that need additional communication with the requesters, you can easily attach ticket system like, which will receive updates on the certificate status.
 
