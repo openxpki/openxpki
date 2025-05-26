@@ -18,6 +18,8 @@ The configuration for the default URL is done via the file
 ``<myrealm>/est/default.yaml``, you can load another configuration by using a
 ``calabel`` which loads the policy from ``est/<calabel>.yaml``.
 
+The *empty* calabel is internally mapped to the endpoint name *generic* which
+is installed by the example configuration.
 
 Default Configuration
 ======================
