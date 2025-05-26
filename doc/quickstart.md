@@ -53,29 +53,35 @@ otherwise! The packages do NOT work on Ubuntu or 32bit systems. Packages
 for SLES/CentOS/RHEL/Ubuntu are available via an enterprise
 subscription**
 
-Start with a debian minimal install, we recommend to add \"SSH Server\"
-and \"Web Server\" in the package selection menu, as this will speed up
+Start with a debian minimal install, we recommend to add *SSH Server*
+and *Web Server* in the package selection menu, as this will speed up
 the installation later.
 
 To avoid an \"untrusted package\" warning, you should add our package
 signing key (you might need to install gpg before):
 
-    wget https://packages.openxpki.org/v3/bookworm/Release.key -O - 2>/dev/null | \
+```bash
+wget https://packages.openxpki.org/v3/bookworm/Release.key -O - 2>/dev/null | \
     tee Release.key | gpg -o /usr/share/keyrings/openxpki.pgp --dearmor
+```
 
 The https connection is protected by a Let\'s Encrypt certificate but if
 you want to validate the key on your own, the fingerprint is:
 
-    $ gpg --print-md sha256 Release.key (Updated 2025-05-16)
-    3FEB1721 48F53252 A6644B65 AD06304F 4751E129 510081E0 042E4E80 1175E3F8
+```bash
+$ gpg --print-md sha256 Release.key (Updated 2025-05-16)
+3FEB1721 48F53252 A6644B65 AD06304F 4751E129 510081E0 042E4E80 1175E3F8
+```
 
 You can also find the key on the github repository in
-[package/debian/Release.key]{.title-ref}.
+[package/debian/Release.key`.
 
 Add the repository to your source list (bookworm):
 
-    echo -e "Types: deb\nURIs: https://packages.openxpki.org/v3/bookworm/\nSuites: bookworm\nComponents: release\nSigned-By: /usr/share/keyrings/openxpki.pgp" > /etc/apt/sources.list.d/openxpki.sources
-    apt update
+```bash
+echo -e "Types: deb\nURIs: https://packages.openxpki.org/v3/bookworm/\nSuites: bookworm\nComponents: release\nSigned-By: /usr/share/keyrings/openxpki.pgp" > /etc/apt/sources.list.d/openxpki.sources
+apt update
+```
 
 Please do not disable the installation of \"recommend\" packages as this
 will very likely leave you with an unusable system.
@@ -84,47 +90,58 @@ As OpenXPKI can run with different RDBMS, the package does not list any
 of them as dependency. You therefore need to install the required perl
 bindings and server software yourself:
 
-    apt install mariadb-server libdbd-mariadb-perl
+```bash
+apt install mariadb-server libdbd-mariadb-perl
+```
 
 Starting with v3.32 the webfrontend uses its own process and no longer
 uses FCGI. The distributed configuration file is for the apache server
 but you can run this with any server that has reverse proxy support. The
 required mods are enabled by the package install:
 
-    apt install apache2
+```bash
+apt install apache2
+```
 
 Now install the OpenXPKI core package, session driver and the
 translation package:
 
-    apt install libopenxpki-perl openxpki-cgi-session-driver openxpki-i18n
+```bash
+apt install libopenxpki-perl openxpki-cgi-session-driver openxpki-i18n
+```
 
 use the oxi command to verify if the system was installed correctly:
 
-    $ oxi --version
-    OpenXPKI Community Edition v3.32.0
+```bash
+$ oxi --version
+OpenXPKI Community Edition v3.32.0
+```
 
 Now, create an empty database and assign a database user:
 
-    CREATE DATABASE openxpki CHARSET utf8;
-    CREATE USER 'openxpki'@'localhost' IDENTIFIED BY 'openxpki';
-    GRANT ALL ON openxpki.* TO 'openxpki'@'localhost';
-    flush privileges;
+```sql
+CREATE DATABASE openxpki CHARSET utf8;
+CREATE USER 'openxpki'@'localhost' IDENTIFIED BY 'openxpki';
+GRANT ALL ON openxpki.* TO 'openxpki'@'localhost';
+flush privileges;
+```
 
-\...and put the used credentials into
-/etc/openxpki/config.d/system/database.yaml:
+...and put the used credentials into `/etc/openxpki/config.d/system/database.yaml`:
 
-    main:
-       debug: 0
-       type: MariaDB2
-       name: openxpki
-       #host: localhost
-       #port: 3306
-       user: openxpki
-       passwd: openxpki
+```yaml
+main:
+   debug: 0
+   type: MariaDB2
+   name: openxpki
+   #host: localhost
+   #port: 3306
+   user: openxpki
+   passwd: openxpki
+```
 
 Starting with the v3.8 release we added a MariaDB driver that makes use
 of MariaDB internal sequences instead of the emulation code and we
-recommend any new installations to use it! While the `MariaDB`drivers
+recommend any new installations to use it! While the `MariaDB` drivers
 uses the old mysql binding the newer `MariaDB2` uses the modern mariadb
 perl module which is the recommended driver on modern operating systems.
 
@@ -144,21 +161,27 @@ If you do not use debian packages, you can get a copy from
 
 Now create a user for the UI session storage
 
-> CREATE USER \'openxpki_session\'@\'localhost\' IDENTIFIED BY
-> \'mysecret\'; GRANT SELECT, INSERT, UPDATE, DELETE ON
-> openxpki.frontend_session TO \'openxpki_session\'@\'localhost\'; flush
-> privileges;
+```sql
+CREATE USER 'openxpki_session'@'localhost' IDENTIFIED BY 'mysecret'; 
+GRANT SELECT, INSERT, UPDATE, DELETE ON openxpki.frontend_session 
+TO 'openxpki_session'@'localhost'; 
+flush privileges;
+```
+
+
 
 \...and put the used credentials into
 /etc/openxpki/client.d/service/webui/default.yaml:
 
-    # Properties of the session storage to manage the frontend session
-    session:
-      driver: driver:openxpki
-      params:
-       DataSource: dbi:MariaDB:dbname=openxpki;host=localhost
-       User:  openxpki_session
-       Password: mysecret
+```yaml
+# Properties of the session storage to manage the frontend session
+session:
+  driver: driver:openxpki
+  params:
+   DataSource: dbi:MariaDB:dbname=openxpki;host=localhost
+   User:  openxpki_session
+   Password: mysecret
+```
 
 ## System Setup
 
@@ -181,29 +204,29 @@ and no policy/crl, etc config ).
 ### Production Configuration
 
 For a production setup we recommend to remove the
-[/etc/openxpki]{.title-ref} folder that was installed by the package and
+`/etc/openxpki`  folder that was installed by the package and
 use a checkout of the [openxpki-config repository
-at](https://github.com/openxpki/openxpki-config).
+at https://github.com/openxpki/openxpki-config](https://github.com/openxpki/openxpki-config).
 
 Follow the steps in the README and QUICKSTART document to setup your
 production realms.
 
 ### Testdrive
 
-Navigate your browser to \*<https://yourhost/webui/index/>. If your
+Navigate your browser to <https://yourhost/webui/index/>. If your
 browser asks you to present a certificate for authentication, skip it.
 You should now see the main authentication page.
 
 The sample configuration comes with a predefined handler for a local
 user database and also a set of tests accounts. If you start with the
 configuration repository, the password for all accounts is
-[openxpki]{.title-ref}, if you start with the debian package the
+`openxpki`, if you start with the debian package the
 password is randomized during setup, you will see it on the console
 during install and can find it in clear text in
-[/etc/openxpki/config.d/realm.tpl/auth/handler.yaml]{.title-ref}
+`/etc/openxpki/config.d/realm.tpl/auth/handler.yaml`
 
-The usernames are [alice]{.title-ref} and [bob]{.title-ref} (users) and
-[rob]{.title-ref}, [rose]{.title-ref} and [raop]{.title-ref}
+The usernames are [alice` and [bob` (users) and
+[rob`, [rose` and [raop`
 (operators). To setup your local user database have a look at the files
 in the auth directory and the
 [reference/configuration/realm.html#authentication](reference/configuration/realm.html#authentication)
@@ -233,8 +256,8 @@ If you get an internal server error, make sure you have the *en_US.utf8*
 locale installed (`locale -a | grep en_US`)!
 
 For further investigation, check
-[/var/log/openxpki-ui/webui.log]{.title-ref} and
-[/var/log/apache/error.log]{.title-ref}.
+`/var/log/openxpki-ui/webui.log` and
+`/var/log/apache/error.log`
 
 ## Enabling the SCEP service
 
@@ -244,7 +267,9 @@ Create a certificate to be used as SCEP RA, this is usually a TLS Server
 certificate from the CA itself or signed by an external CA. Import the
 certificate and register it as SCEP RA token:
 
-    oxi token add --realm democa --type scep --cert scep.crt --key scep.key
+```bash
+oxi token add --realm democa --type scep --cert scep.crt --key scep.key
+```
 
 **Note**: Each realm needs its own SCEP token so you need to run this
 command for any realm that provides an SCEP service. It is possible to
@@ -259,9 +284,9 @@ OpenXPKI requires an *endpoint* to be defined in your configuration, the
 address of each endpoint is `http://yourhost/scep/<endpoint>`.
 
 The path equals to the file name in the
-[client.d/service/scep/]{.title-ref} directory, the default confiuration
-deploys [generic.yaml]{.title-ref} so you have to point your SCEP client
-to [http://yourhost/scep/generic]{.title-ref}. Please note that any
+`client.d/service/scep/` irectory, the default confiuration
+deploys `generic.yaml` so you have to point your SCEP client
+to `http://yourhost/scep/generic`. Please note that any
 endpoint also requires an internal definiton inside the realm
 configuration, a verbose example can be found in the file
 `config.d/realm/democa/scep/generic.yaml`.
@@ -270,29 +295,31 @@ SCEP supports enrollment via challenge password as well as signing on
 behalf. Advanced configuration is described in the scep workflow
 section.
 
-The best way for testing the service is the sscep command line tool (available
-
-:   at e.g. <https://github.com/certnanny/sscep>).
+The best way for testing the service is the sscep command line tool (available at e.g. <https://github.com/certnanny/sscep>).
 
 Check if the service is working properly at all:
 
-    mkdir tmp
-    ./sscep getca -c tmp/cacert -u http://yourhost/scep/generic
+```bash
+mkdir tmp
+./sscep getca -c tmp/cacert -u http://yourhost/scep/generic
+```
 
 Should show and download a list of the root certificates to the tmp
 folder.
 
 To test an enrollment:
 
-    openssl req -new -keyout tmp/scep-test.key -out tmp/scep-test.csr -newkey rsa:2048 -nodes
-    ./sscep enroll -u http://yourhost/scep/generic \
-        -k tmp/scep-test.key -r tmp/scep-test.csr \
-        -c tmp/cacert-0 \
-        -l tmp/scep-test.crt \
-        -t 10 -n 1
+```bash
+openssl req -new -keyout tmp/scep-test.key -out tmp/scep-test.csr -newkey rsa:2048 -nodes
+./sscep enroll -u http://yourhost/scep/generic \
+    -k tmp/scep-test.key -r tmp/scep-test.csr \
+    -c tmp/cacert-0 \
+    -l tmp/scep-test.crt \
+    -t 10 -n 1
+```
 
 Make sure you set the challenge password when prompted (default:
-\'SecretChallenge\'). On current desktop hardware the issue workflow
+'SecretChallenge'). On current desktop hardware the issue workflow
 will take approx. 10 seconds to finish and you should end up with a
 certificate matching your request in the tmp folder.
 
