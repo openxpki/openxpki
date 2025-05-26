@@ -11,7 +11,7 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os
+import sys, os, re
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -41,14 +41,14 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'OpenXPKI'
-copyright = u'2019, The OpenXPKI Project'
+copyright = u'2025, The OpenXPKI Project'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 # The short X.Y version.
-version = '3.25'
+version = re.sub('^v', '', os.popen('git describe').read().strip())
 # The full version, including alpha/beta/rc tags.
 release = version
 
@@ -96,9 +96,15 @@ pygments_style = 'sphinx'
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
+html_theme = 'sphinx_rtd_theme'
+html_logo = 'openxpki.svg'
+
+html_theme_options = {
+    "logo_only": True,
+}
+
 if not on_rtd:  # only import and set the theme if we're building docs locally
     import sphinx_rtd_theme
-    html_theme = 'sphinx_rtd_theme'
     html_theme_path = ["_themes", sphinx_rtd_theme.get_html_theme_path()]
 
 # Theme options are theme-specific and customize the look and feel of a theme
