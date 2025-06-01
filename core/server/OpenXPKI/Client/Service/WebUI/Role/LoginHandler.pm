@@ -13,6 +13,7 @@ requires qw(
     has_auth
     current_realm
     is_realm_selection_page
+    webserver_env
 
     url_path_for
     param
@@ -365,8 +366,8 @@ sub handle_login ($self, $page, $action, $reply) {
             }
 
         } elsif ( $login_type eq 'X509' ) {
-            my $user = $self->request->env->{'SSL_CLIENT_S_DN_CN'} || $self->request->env->{'SSL_CLIENT_S_DN'};
-            my $cert = $self->request->env->{'SSL_CLIENT_CERT'} || '';
+            my $user = $self->webserver_env->{SSL_CLIENT_S_DN_CN} || $self->webserver_env->{SSL_CLIENT_S_DN};
+            my $cert = $self->webserver_env->{SSL_CLIENT_CERT} || '';
 
             $self->log->trace('ENV is ' . Dumper \%ENV) if $self->log->is_trace;
 
@@ -375,7 +376,7 @@ sub handle_login ($self, $page, $action, $reply) {
                 my @chain;
                 # larger chains are very unlikely and we dont support stupid clients
                 for (my $cc=0;$cc<=3;$cc++)   {
-                    my $chaincert = $self->request->env->{'SSL_CLIENT_CERT_CHAIN_'.$cc};
+                    my $chaincert = $self->webserver_env->{'SSL_CLIENT_CERT_CHAIN_'.$cc};
                     last unless ($chaincert);
                     push @chain, $chaincert;
                 }
