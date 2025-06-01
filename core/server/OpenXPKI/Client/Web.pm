@@ -16,7 +16,7 @@ use OpenXPKI::Client::Config;
 use OpenXPKI::Util;
 
 # List of webserver ENV vars that will be read from the X-ReverseProxy-ENV-*
-# HTTP headers (if transmitted).
+# or X-ReverseProxy-ENVPLAIN-* HTTP headers (if transmitted).
 #
 # ATTENTION!
 # All relating HTTP headers must be deleted as an early step in the web server
@@ -298,13 +298,17 @@ sub startup ($self) {
             my $webserver_env = {};
             for my $key ($c->req->headers->names->@*) {
                 # inject forwarded webserver ENV into Mojo::Request
-                if (my ($env_key) = $key =~ /^X-ReverseProxy-ENV-(.*)/) {
+                if (my ($plain, $env_key) = $key =~ /^X-ReverseProxy-ENV(PLAIN)?-(.*)/) {
                     if (not any { $env_key eq $_ } @webserver_env_vars) {
                         $self->log->debug("Ignoring unknown ENV variable received via header '$key'");
                         next;
                     };
-                    $webserver_env->{$env_key} = decode_base64($c->req->headers->header($key));
-                    $self->log->trace("Webserver ENV variable received via header: $env_key");
+                    $webserver_env->{$env_key} = $plain
+                        ? url_unescape($c->req->headers->header($key))
+                        : decode_base64($c->req->headers->header($key));
+
+                    my $len = length($webserver_env->{$env_key});
+                    $self->log->debug("Webserver ENV variable received via header: $env_key ($len bytes)");
                 }
             }
             $c->stash(webserver_env => $webserver_env);
