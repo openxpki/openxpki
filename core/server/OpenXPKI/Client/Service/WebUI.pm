@@ -11,6 +11,7 @@ with qw(
 
 # Core modules
 use MIME::Base64;
+use List::Util qw ( max );
 
 # CPAN modules
 use Crypt::JWT qw( encode_jwt decode_jwt );
@@ -435,18 +436,40 @@ sub _get_cipher ($self) {
     # Sets the Crypt::CBC cipher to use for cookie encryption if session.cookey
     # config entry is defined.
     my $key = $self->config->get('session.cookey') || $self->config->get('session.cookie');
+
     # Fingerprint: a list of ENV variables, added to the cookie passphrase,
     # binds the cookie encyption to the system environment.
     # Even though Crypt::CBC will run a hash on the passphrase we still use
     # sha256 here to preprocess the input data one by one to keep the memory
     # footprint as small as possible.
     if (my @fingerprint = $self->get_list_from_legacy_config('session.fingerprint')) {
-        $self->log->trace('Fingerprint for cookie encryption = ' . join(', ', @fingerprint));
         my $sha = Digest::SHA->new('sha256');
         $sha->add($key) if $key;
-        map { $sha->add($self->request->env->{$_}) if $self->request->env->{$_} } @fingerprint;
+
+        $self->log->debug('Fingerprint for cookie encryption = ' . join(', ', @fingerprint));
+        my $spacer = max(map { length } @fingerprint) + 3;
+        for my $key (@fingerprint) {
+            my $msg_key = "- $key " . ('.' x ($spacer-length($key)));
+            # variable available as is in webserver ENV
+            if (my $env = $self->webserver_env->{$key}) {
+                $sha->add($env);
+                $self->log->trace("$msg_key found in webserver ENV");
+            # variable is an Apache name for an HTTP header
+            } elsif ($key =~ /^HTTP_(.*)/) {
+                my $header_name = $1; $header_name =~ s/_/-/g;
+                if (my $header = $self->request->headers->header($header_name)) {
+                    $sha->add($header);
+                    $self->log->trace("$msg_key found as HTTP header");
+                }
+            # variable not found
+            } else {
+                $self->log->trace("$msg_key not found");
+            }
+        }
+
         $key = $sha->digest;
     }
+
     return unless $key;
 
     $self->log->trace(sprintf('Cookie encryption key: %*vx', '', $key)) if $self->log->trace;
