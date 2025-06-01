@@ -319,14 +319,16 @@ sub startup ($self) {
             if (my $query_b64 = $c->req->headers->header('X-ReverseProxy-QueryString')) {
                 my $query = decode_base64($query_b64);
                 $c->req->url->query($query);
-                $self->log->trace("Webserver QUERY_STRING received via header: $query");
+                $self->log->trace("Query string (via custom header): $query");
+            } else {
+                $self->log->trace('Query string: ' . $c->req->url->query);
             }
 
             if ($self->log->is_debug) {
                 my $msg = sprintf('%s request: %s %s ',
                     uc($c->req->url->base->scheme),
                     $c->req->method,
-                    $c->req->url->path,
+                    $c->req->url->path, # NOT ->to_abs() so we can spot differences in webserver configs
                 );
                 $self->log->debug($msg . '-' x max(80-length($msg), 0));
             }

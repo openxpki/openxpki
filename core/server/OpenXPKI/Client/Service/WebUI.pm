@@ -114,7 +114,7 @@ sub _build_session ($self) {
 
     if ($id) {
         Log::Log4perl::MDC->put('sid', substr($id,0,4));
-        $self->log->debug("Previous frontend session ID read from cookie = $id");
+        $self->log->debug("Previous frontend session ID (read from cookie) = $id");
     } else {
         $self->log->debug("No previous frontend session ID found in cookie (or no cookie)");
     }
@@ -122,12 +122,13 @@ sub _build_session ($self) {
     #
     # Frontend session
     #
+    my $session_dsn = $self->config->get('session.driver') // undef;
     my $session_config = $self->config->get_hash('session.params'); # new format
     $session_config //= $self->config->get_hash('session_driver'); # old format
     $session_config //= { Directory => '/tmp' }; # default for file driver
 
     my $session = OpenXPKI::Client::Service::WebUI::Session->new(
-        $self->config->get('session.driver')//undef,
+        $session_dsn, # may be undef
         $id, # may be undef
         $session_config
     );
@@ -135,10 +136,13 @@ sub _build_session ($self) {
         if $self->config->exists('session.timeout');
 
     Log::Log4perl::MDC->put('sid', substr($session->id,0,4));
-    $self->log->debug(
-        'Frontend session ID = ' . $session->id .
-        ($session->expire ? ', expiration = ' . $session->expire : '')
-    );
+
+    if ($self->log->is_debug) {
+        my %info = (dsn => $session_dsn, ID => $session->id);
+        $info{expires} = $session->expire if $session->expire;
+        $self->log->debug('Frontend session: ' . join(', ', map { "$_ = $info{$_}" } sort keys %info));
+    }
+
     return $session;
 }
 
