@@ -68,12 +68,12 @@ has 'cipher' => (
 
 =head2 path
 
-Cookie path (only relevant for L</build>).
+Cookie path (I<Mojo::Path>).
 
 =cut
 has 'path' => (
     is => 'rw',
-    isa => 'Str',
+    isa => 'Mojo::Path',
     predicate => 'has_path',
 );
 
@@ -115,7 +115,7 @@ sub as_mojo_cookies ($self, $session) {
 
     # common attributes
     my %common = (
-        $self->has_path ? (path => $self->path) : (),
+        $self->has_path ? (path => $self->path->to_abs_string) : (), # to_abs_string() = enforce leading slash
         samesite => 'Strict',
         secure => (($self->request->is_secure and not $self->insecure) ? 1 : 0),
     );

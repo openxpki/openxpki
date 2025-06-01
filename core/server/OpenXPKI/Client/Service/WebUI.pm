@@ -83,7 +83,7 @@ sub _build_session ($self) {
     # OIDC session
     # TODO - we might want to embed this into the session handler
     if (
-        $self->request_url->path->parts->[-1] eq 'oidc_redirect'
+        $self->normalized_request_url->path->parts->[-1] eq 'oidc_redirect'
         and (my $oidc_state = $self->request->param('state'))
     ) {
         try {
@@ -243,7 +243,7 @@ has url_path => (
     isa => 'Mojo::Path',
     lazy => 1,
     default => sub ($self) {
-        my $path = $self->request_url->path->clone->trailing_slash(0); # remove trailing slash
+        my $path = $self->normalized_request_url->path->clone;
 
         # Strip off /cgi-bin/xxx
         my $i = firstidx { $_ eq 'cgi-bin' } $path->parts->@*;
@@ -489,7 +489,7 @@ sub prepare ($self, $c) {
     if ("path" eq $realm_mode) {
         # Set the path to the directory component of the script, this
         # automagically creates seperate cookies for path based realms
-        $self->session_cookie->path($self->url_path->to_string);
+        $self->session_cookie->path($self->url_path);
 
         # Interpret last part of the URL path as realm
         my $realm = $c->stash('realm');
@@ -524,7 +524,7 @@ sub prepare ($self, $c) {
 
     # HOSTNAME mode
     } elsif ("hostname" eq $realm_mode) {
-        my $host = $self->request_url->host // '';
+        my $host = $self->normalized_request_url->host // '';
         $self->log->debug("- looking for rule to match host '$host'");
         my $realm_map = $self->config->get_hash('realm.map');
 

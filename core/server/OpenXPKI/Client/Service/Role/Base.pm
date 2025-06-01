@@ -638,18 +638,25 @@ has json => (
     },
 );
 
-=head3 request_url
+=head3 normalized_request_url
 
-L<Mojo::URL> object encapsulating the absolute request URL.
+L<Mojo::URL> object encapsulating a normalized absolute request URL incl. a path
+with a leading but no trailing slash.
 
 =cut
-sub request_url; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
-has request_url => (
+sub normalized_request_url; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+has normalized_request_url => (
     is => 'ro',
     isa => 'Mojo::URL',
     init_arg => undef,
     lazy => 1,
-    default => sub { shift->request->url->to_abs },
+    default => sub ($self) {
+        my $url = $self->request->url->to_abs;
+        $url->path
+            ->leading_slash(1)   # e.g. OpenAPI and Cookies need leading slash
+            ->trailing_slash(0);
+        return $url;
+    },
 );
 
 =head1 METHODS
