@@ -407,11 +407,6 @@ sub BUILD ($self, $args) {
         $self->auth(\$pk);
     }
 
-    # set AUTH stack
-    if (my $stack = $self->config->get('login.stack')) {
-        $self->request->env->{OPENXPKI_AUTH_STACK} = $stack;
-    }
-
     if ($self->config->get('session.ip_match')) {
         $CGI::Session::IP_MATCH = 1;
     }
