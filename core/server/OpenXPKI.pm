@@ -25,6 +25,7 @@ OpenXPKI - Base module to reduce boilerlate code in our packages.
     use OpenXPKI qw( -class -nonmoose );
     use OpenXPKI qw( -class -typeconstraints );
     use OpenXPKI qw( -class -exporter );
+    use OpenXPKI qw( -class -insideout );
 
     # Moose role
     use OpenXPKI -role;
@@ -65,6 +66,7 @@ sub import {
     my $moose_typeconstraints = delete $flags{-typeconstraints};
     my $moose_strictconstructor = delete $flags{-strictconstructor} || $dto;
     my $moose_nonmoose = delete $flags{-nonmoose};
+    my $moose_insideout = delete $flags{-insideout};
     my $moose_role = delete $flags{-role};
     my $class_std = delete $flags{-class_std};
     my $plugin = delete $flags{-plugin};
@@ -83,22 +85,32 @@ sub import {
     if ($moose_class or $moose_role) {
         if ($moose_class) {
             Moose->import::into(1);
-            MooseX::NonMoose->import::into(1) if $moose_nonmoose;
+            if ($moose_insideout) {
+                if ($moose_nonmoose) {
+                    MooseX::NonMoose::InsideOut->import::into(1);
+                } else {
+                    MooseX::InsideOut->import::into(1);
+                }
+            } else {
+                MooseX::NonMoose->import::into(1) if $moose_nonmoose;
+            }
         } else {
             Moose::Role->import::into(1);
         }
         Moose::Exporter->import::into(1) if $moose_exporter;
+        MooseX::StrictConstructor->import::into(1) if $moose_strictconstructor;
+
     # Plain old Perl package / class
     } else {
+        Class::Std->import::into(1) if $class_std;
         base->import::into(1, $poc_base) if $poc_base;
         strict->import::into(1);
         warnings->import::into(1);
     }
 
-    Class::Std->import::into(1) if $class_std;
-
+    # -typeconstraints may be used standalone without -class in a pure
+    # type container package (looking at you, OpenXPKI::Types).
     Moose::Util::TypeConstraints->import::into(1) if $moose_typeconstraints;
-    MooseX::StrictConstructor->import::into(1) if $moose_strictconstructor;
 
     # API plugin
     if ($plugin or $client_plugin) {
@@ -137,7 +149,7 @@ sub import {
     Scalar::Util->import::into(1, qw( blessed ));
 
     # CPAN modules
-    Type::Params->import::into(1, qw( signature_for ));
+    Type::Params->import::into(1, qw( signature_for signature ));
 
     # Project modules
     OpenXPKI::Debug->import::into(1);
@@ -187,7 +199,7 @@ This is equivalent to adding the following imports to the calling package:
     use Scalar::Util "blessed";
 
     # CPAN modules
-    use Type::Params "signature_for";
+    use Type::Params qw( signature_for signature );
     use Feature::Compat::Try;
 
     # Project modules
@@ -250,6 +262,24 @@ additionally adds the imports
 
     use Moose;
     use MooseX::NonMoose;
+
+=head2 Moose inside-out class
+
+    use OpenXPKI qw( -class -insideout );
+
+additionally adds the imports
+
+    use Moose;
+    use MooseX::InsideOut;
+
+while
+
+    use OpenXPKI qw( -class -nonmoose -insideout );
+
+additionally adds the imports
+
+    use Moose;
+    use MooseX::NonMoose::InsideOut;
 
 =head2 Moose role
 
