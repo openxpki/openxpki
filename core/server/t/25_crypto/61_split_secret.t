@@ -1,12 +1,11 @@
 #!/usr/bin/perl
-use strict;
-use warnings;
+use OpenXPKI;
 
 # Core modules
-use English;
 use FindBin qw( $Bin );
 use File::Temp qw( tempdir );
 use Module::Load ();
+use MIME::Base64;
 
 # CPAN modules
 use Test::More;
@@ -20,14 +19,17 @@ use DateTime;
 use lib "$Bin/../lib";
 use OpenXPKI::Test;
 
-plan tests => 10;
+plan tests => 11;
 
 SKIP: {
-    eval {
+    try {
         Module::Load::load("OpenXPKI::Crypto::Secret::Split");
         Module::Load::load("OpenXPKI::Crypto::Secret::SplitEncrypted");
-    };
-    skip 'EE only test', 10 if $@;
+    }
+    catch ($error) {
+        skip 'EE only test', 10 if $error =~ /^Can't locate/;
+        die $error;
+    }
 
     my $temp_tokenmanager = tempdir( CLEANUP => 1 );
     my $temp_sharedir = tempdir( CLEANUP => 1 );
@@ -51,6 +53,17 @@ SKIP: {
                 },
                 # Split secret with encrypted shares stored in file system
                 hidden_monkey_island => {
+                    export => 1,
+                    method => "split",
+                    share_type => "encrypted",
+                    share_store => "filesystem",
+                    share_name => "$temp_sharedir/[% ALIAS %]-[% INDEX %]",
+                    total_shares => 5,
+                    required_shares => 3,
+                    cache => "daemon",
+                },
+                # Split secret with encrypted shares stored in file system
+                hidden_monkey_island_legacy => {
                     export => 1,
                     method => "split",
                     share_type => "encrypted",
@@ -218,28 +231,50 @@ SKIP: {
     # ...share store "FILESYSTEM"
     #
     sub write_share_file {
-        my ($index, $share) = @_;
-        my $fh; open $fh, '>', "$temp_sharedir/hidden_monkey_island-$index";
+        my ($group, $index, $share) = @_;
+        my $fh; open $fh, '>', "$temp_sharedir/$group-$index";
         print $fh $share, "\n";
         close $fh;
     }
 
+    my $group = 'hidden_monkey_island';
+
     throws_ok {
-        $tm->set_secret_part({ GROUP => "hidden_monkey_island", VALUE => "dummy" });
+        $tm->set_secret_part({ GROUP => $group, VALUE => "dummy" });
     } qr/I18N_OPENXPKI_UI_CRYPTO_SECRET_SPLITENCRYPTED_UNABLE_TO_LOAD_ENCRYPTED_SHARE/,
       "fail if share does not exist";
 
     my $i = 0;
-    write_share_file($i++ => $_) for @enc_shares;
+    write_share_file($group, $i++ => $_) for @enc_shares;
 
     # tests
     throws_ok {
-        $tm->set_secret_part({ GROUP => "hidden_monkey_island", VALUE => "dummy" });
+        $tm->set_secret_part({ GROUP => $group, VALUE => "dummy" });
     } qr/I18N_OPENXPKI_UI_CRYPTO_SECRET_SPLITENCRYPTED_WRONG_SHARE_PASSPHRASE/,
       "encrypted shared secret no.1: set wrong passphrase";
 
     subtest "encrypted shared secret, shares in filesystem" => sub {
-        test_shared_secret_3_of_5($tm, "hidden_monkey_island", $split_secret_enc->get_secret, @share_passphrases);
+        test_shared_secret_3_of_5($tm, $group, $split_secret_enc->get_secret, @share_passphrases);
+    };
+
+    #
+    # ...share store "FILESYSTEM", secrets with legacy encryption:
+    # Crypt::CBC->new(-key => $key, -cipher => 'Rijndael', -salt => 1)
+    #
+    $group = 'hidden_monkey_island_legacy';
+
+    my $legacy_enc_secret = 'cyL2PJ4oIQaOd17tXv3QZg==';
+    my $legacy_enc_shares = {
+        0 => 'VTJGc2RHVmtYMS9lR2liMmNPSVo3Z0VpTnpRRS9ER1Ftd2cxMnh5OGdWVzgzYWZWK0hiNDhpb0lkNE5KNExrZA==',
+        1 => 'VTJGc2RHVmtYMThUVGlMOUhIalBsdk9SWG9WZXpmbDNId3JscEZib1hLNHlpUUpVbnU5RTdpNDdZR2poRVRSdw==',
+        2 => 'VTJGc2RHVmtYMTkrbHlHZjk2SVJrS0ZYN1Z0QTR2a1krdXhTVVJ6dCtEbE01alMwMDVVT2EyTXhiSXJPNXd3TA==',
+        3 => 'VTJGc2RHVmtYMThldS9ralhZZHo2R0FCSFNWa203U2VTb1AyMmJUTmM1Z0xiVUNNeGdLSWZYVkdncWdhTllVNA==',
+        4 => 'VTJGc2RHVmtYMTh4TFNScUV5TEwwc2JmYXFUTkZzemk2NmFnVHl4VStzRjA2RjBKOWFoTXNoS25GOWdISTU5eQ==',
+    };
+    write_share_file($group, $_ => decode_base64($legacy_enc_shares->{$_})) for keys $legacy_enc_shares->%*;
+
+    subtest "encrypted shared secret (legacy encryption), shares in filesystem" => sub {
+        test_shared_secret_3_of_5($tm, $group, $legacy_enc_secret, @share_passphrases);
     };
 
     #
