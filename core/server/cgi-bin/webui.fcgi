@@ -255,6 +255,23 @@ while (my $cgi = CGI::Fast->new("")) {
             }
         }
 
+        # default security related headers, may be overwritten by config.
+        # Also see https://owasp.org/www-project-secure-headers/ci/headers_add.json
+        $webui->response->set_header('Strict-Transport-Security' => 'max-age=31536000');
+        $webui->response->set_header('X-Content-Type-Options' => 'nosniff');
+        $webui->response->set_header('Content-Security-Policy' =>
+            "default-src 'self'; "
+            ."form-action 'self'; "
+            ."base-uri 'self'; "
+            ."object-src 'none'; "
+            ."script-src 'self'; "
+            ."style-src 'self'; "
+            ."img-src 'self' data:; "
+            ."font-src 'self'; "
+            ."connect-src 'self'; "
+            ."frame-ancestors 'none'; "
+        );
+
         # custom HTTP headers from config
         $webui->response->set_header($_ => $webui->config->{header}->{$_}) for keys $webui->config->{header}->%*;
         # default mime-type
