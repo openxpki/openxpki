@@ -1,18 +1,10 @@
 package OpenXPKI::Crypto::Secret::Plain;
-use Moose;
-use MooseX::InsideOut;
-
-# Core modules
-use English;
-
-# Project modules
-use OpenXPKI::Debug;
-use OpenXPKI::Exception;
-use OpenXPKI::Serialization::Simple;
-use OpenXPKI::Server::Context qw( CTX );
-
+use OpenXPKI qw( -class -insideout );
 
 with 'OpenXPKI::Crypto::SecretRole';
+
+# CPAN modules
+use Crypt::Argon2;
 
 
 =head1 NAME
@@ -138,7 +130,7 @@ sub set_secret {
     ) if ($index < 1 or $index > $self->required_part_count);
 
 
-    # does not yet work for multipart secrets
+    # TODO KCV validation does not yet work for multipart secrets
     if ($self->has_kcv) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_UI_SECRET_UNLOCK_KCV_MISMATCH",
