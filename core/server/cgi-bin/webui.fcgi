@@ -256,9 +256,9 @@ while (my $cgi = CGI::Fast->new("")) {
         }
 
         # custom HTTP headers from config
-        $webui->response->add_header($_ => $webui->config->{header}->{$_}) for keys $webui->config->{header}->%*;
+        $webui->response->set_header($_ => $webui->config->{header}->{$_}) for keys $webui->config->{header}->%*;
         # default mime-type
-        $webui->response->add_header('content-type' => 'application/json; charset=UTF-8');
+        $webui->response->set_header('content-type' => 'application/json; charset=UTF-8');
 
         my $page = $webui->handle_ui_request; # isa OpenXPKI::Client::Service::WebUI::Page
         $webui->response->result($page);

@@ -676,9 +676,9 @@ sub op_handlers {
         'default' => sub ($self) {
             # custom HTTP headers from config
             my $headers = $self->config->get_hash('header');
-            $self->response->add_header( $_ => $headers->{$_} ) for keys %$headers;
+            $self->response->set_header( $_ => $headers->{$_} ) for keys %$headers;
             # default mime-type
-            $self->response->add_header('content-type' => 'application/json; charset=UTF-8');
+            $self->response->set_header('content-type' => 'application/json; charset=UTF-8');
 
             my $page = $self->handle_ui_request; # isa OpenXPKI::Client::Service::WebUI::Page
             $self->response->result($page);

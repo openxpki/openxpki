@@ -141,7 +141,7 @@ has extra_headers => (
     default => sub { {} },
     traits => ['Hash'],
     handles => {
-        add_header => 'set',
+        set_header => 'set',
     }
 );
 
@@ -599,14 +599,14 @@ sub add_debug_headers ($self) {
     my $workflow = $self->workflow or return;
 
     if ($workflow->{id}) {
-        $self->add_header('X-OpenXPKI-Workflow-Id' => $workflow->{id});
+        $self->set_header('X-OpenXPKI-Workflow-Id' => $workflow->{id});
     }
     if ($self->has_transaction_id) {
         my $tid = $self->transaction_id;
         # this should usually be a hexadecimal string but to avoid any surprise
         # we check this here and encoded if needed.
         $tid = Encode::encode("MIME-B", $tid) if $tid =~ m{\W};
-        $self->add_header('X-OpenXPKI-Transaction-Id' => $tid);
+        $self->set_header('X-OpenXPKI-Transaction-Id' => $tid);
     }
     if (my $error = $workflow->{context}->{error_code}) {
         # header must not be any longer than 76 chars in total
@@ -614,7 +614,7 @@ sub add_debug_headers ($self) {
         # use mime encode if header is non-us-ascii, 42 chars plus tags is the
         # maximum to stay below 76 chars (starts to wrap otherwise)
         $error = Encode::encode("MIME-B", substr($error,0,42)) if $error =~ m{\W};
-        $self->add_header('X-OpenXPKI-Error' => $error);
+        $self->set_header('X-OpenXPKI-Error' => $error);
     }
 }
 
@@ -642,11 +642,11 @@ __PACKAGE__->meta->make_immutable;
 
 =pod
 
-=head2 add_header
+=head2 set_header
 
 Sets the given HTTP header.
 
-    $response->add_header('content-type' => 'text/plain');
+    $response->set_header('content-type' => 'text/plain');
 
 B<Parameters>
 
@@ -659,7 +659,7 @@ B<Parameters>
 =back
 
 =cut
-### add_header() is an accessor for "extra_headers" (see attribute above)
+### set_header() is an accessor for "extra_headers" (see attribute above)
 
 =head2 is_redirect
 
