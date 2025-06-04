@@ -146,10 +146,10 @@ sub handle_login ($self, $page, $action, $reply) {
             # This is not an ember request so we need to redirect
             # back to the ember page - check if the session has a baseurl
             my $url = $self->session->param('baseurl');
-            # if not, get the path from the referer
+            # if not, get the path from the referrer
             if (not $url and (($self->request->headers->referrer//'') =~ m{https?://[^/]+(/[\w/]*[\w])/?}i)) {
                 $url = $1;
-                $self->log->debug('Restore redirect from referer');
+                $self->log->debug('Restore redirect from referrer');
             }
             $url .= '/#/openxpki/login';
             $self->log->debug('Redirect to login page: ' . $url);
