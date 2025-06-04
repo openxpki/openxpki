@@ -581,6 +581,23 @@ sub cleanup ($self) {
 }
 
 # required by OpenXPKI::Client::Service::Role::Base
+sub op_handlers {
+    return [
+        'default' => sub ($self) {
+            # custom HTTP headers from config
+            my $headers = $self->config->get_hash('header');
+            $self->response->set_header( $_ => $headers->{$_} ) for keys %$headers;
+            # default mime-type
+            $self->response->set_header('content-type' => 'application/json; charset=UTF-8');
+
+            my $page = $self->handle_ui_request; # isa OpenXPKI::Client::Service::WebUI::Page
+            $self->response->result($page);
+            return $self->response;
+        },
+    ];
+}
+
+# required by OpenXPKI::Client::Service::Role::Base
 sub send_response ($self, $c, $response) {
     if ($response->has_error) {
         if ($self->request->headers->header('X-OPENXPKI-Client')) {
@@ -668,23 +685,6 @@ EOF
         $c->res->code(302);
         return $c->redirect_to($url);
     }
-}
-
-# required by OpenXPKI::Client::Service::Role::Base
-sub op_handlers {
-    return [
-        'default' => sub ($self) {
-            # custom HTTP headers from config
-            my $headers = $self->config->get_hash('header');
-            $self->response->set_header( $_ => $headers->{$_} ) for keys %$headers;
-            # default mime-type
-            $self->response->set_header('content-type' => 'application/json; charset=UTF-8');
-
-            my $page = $self->handle_ui_request; # isa OpenXPKI::Client::Service::WebUI::Page
-            $self->response->result($page);
-            return $self->response;
-        },
-    ];
 }
 
 # required by OpenXPKI::Client::Service::Role::Base
