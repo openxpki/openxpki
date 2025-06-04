@@ -340,6 +340,9 @@ export default class OxiContentService extends Service {
 
         let doc = await this.#request({
             page: "bootstrap!structure",
+            // We send the URL to the backend because the Ember web UI (index.html)
+            // may have a different URL than the asynchronously called backend.
+            // This is equivalent to the "Referer" HTTP header which may be disabled.
             baseurl: window.location.pathname,
         })
 

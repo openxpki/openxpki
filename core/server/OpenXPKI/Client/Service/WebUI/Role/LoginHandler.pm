@@ -137,21 +137,14 @@ sub handle_login ($self, $page, $action, $reply) {
 
         } elsif ( $self->request->headers->header('X-OPENXPKI-Client') ) {
 
-            # Session is gone but we are still in the ember application
+            # Session is gone but we are still in the Ember application
             $self->log->debug("Ember UI request with invalid backend session - redirect to login page");
             $uilogin->redirect->to('login');
 
         } else {
 
-            # This is not an ember request so we need to redirect
-            # back to the ember page - check if the session has a baseurl
-            my $url = $self->session->param('baseurl');
-            # if not, get the path from the referrer
-            if (not $url and (($self->request->headers->referrer//'') =~ m{https?://[^/]+(/[\w/]*[\w])/?}i)) {
-                $url = $1;
-                $self->log->debug('Restore redirect from referrer');
-            }
-            $url .= '/#/openxpki/login';
+            # This is not an Ember request so we need to redirect back to the Ember page
+            my $url = $self->base_url . '/#/openxpki/login';
             $self->log->debug('Redirect to login page: ' . $url);
             $uilogin->redirect->to($url);
         }
@@ -351,7 +344,7 @@ sub handle_login ($self, $page, $action, $reply) {
 
                 # the login url might contain a backlink to the running instance
                 $loginurl = OpenXPKI::Template->new->render( $loginurl,
-                    { baseurl => $self->session->param('baseurl') } );
+                    { baseurl => $self->base_url } );
 
                 $self->log->debug("No auth data in environment - redirect found $loginurl");
                 $uilogin->redirect->external($loginurl);
@@ -423,7 +416,7 @@ sub handle_login ($self, $page, $action, $reply) {
                 my $uri_pattern = $auth->{redirect_uri} || 'https://[% host _ baseurl %]';
                 my $redirect_uri = $tt->render( $uri_pattern, {
                     host => $self->normalized_request_url->host,
-                    baseurl => $self->session->param('baseurl'),
+                    baseurl => $self->base_url,
                     realm => $pki_realm,
                     stack => $auth_stack,
                 });
@@ -537,14 +530,15 @@ sub handle_login ($self, $page, $action, $reply) {
 
             my $session_info = $reply->{PARAMS};
 
-            # merge baseurl to authinfo links
+            # merge base URL to authinfo links
             # (we need to get the baseurl before recreating the session below)
             my $auth_info = {};
-            my $baseurl = $self->session->param('baseurl');
             if (my $ai = $session_info->{authinfo}) {
                 my $tt = OpenXPKI::Template->new;
-                for my $key (keys %{$ai}) {
-                    $auth_info->{$key} = $tt->render( $ai->{$key}, { baseurl => $baseurl } );
+                for my $key (keys $ai->%*) {
+                    $auth_info->{$key} = $tt->render(
+                        $ai->{$key}, { baseurl => $self->base_url }
+                    );
                 }
             }
             delete $session_info->{authinfo};

@@ -255,6 +255,51 @@ has url_path => (
     },
 );
 
+=head2 base_url
+
+Base website URL as sent by the Ember UI (index.html). This may differ from the
+URL of the asynchronously called OpenXPKI client, e.g.:
+
+    Ember UI:        https://localhost/webui/democa/
+    OpenXPKI Client: https://localhost/cgi-bin/webui.fcgi
+
+This attribute is set from the frontend session parameter C<baseurl> or the
+request parameter C<baseurl> in L</prepare>.
+
+The base URL allows us to e.g. issue internal UI redirects (without specifying
+the full URL every time).
+
+=cut
+sub base_url; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+has base_url => (
+    init_arg => undef,
+    is => 'rw',
+    isa => 'Str',
+    lazy => 1,
+    default => sub ($self) {
+        my $baseurl = $self->session->param('baseurl');
+        if ($baseurl) {
+            $self->log->debug('Base URL obtained from client session');
+        } else {
+            if ($baseurl = $self->request_param('baseurl')) {
+                $self->log->debug('Base URL obtained from "baseurl" request parameter');
+            } elsif (($self->request->headers->referrer//'') =~ m{https?://[^/]+(/[\w/]*[\w])/?}i) {
+                $self->log->debug('Base URL obtained from HTTP referrer header');
+                $baseurl = $1;
+            } else {
+                $self->log->warn('Base URL could not be obtained from request parameter or referrer header - using fallback "/openxpki"');
+                $baseurl = '/openxpki'; # default is mainly relevant for tests
+            }
+            $baseurl =~ s{(\A\s+|\s+\z|/\z)}{}g;    # strip spaces and trailing slash
+            $baseurl =~ s{\w+://[^/]+}{};           # prevent injection of external urls
+
+            $self->session->param('baseurl', $baseurl);
+            $self->session->flush;
+        }
+        return $baseurl;
+    }
+);
+
 has response => (
     init_arg => undef,
     is => 'ro',
@@ -569,7 +614,6 @@ sub prepare ($self, $c) {
             $self->current_auth_stack($stack);
         }
     }
-
 }
 
 # optionally called by OpenXPKI::Client::Service::Role::Base
@@ -676,7 +720,7 @@ EOF
 
         # if url does not start with http or slash, prepend baseurl + route name
         if ($url !~ m{\A http|/}x) {
-            my $baseurl = $self->session->param('baseurl') || $self->request->param('baseurl');
+            my $baseurl = $self->base_url;
             $self->log->debug("Adding baseurl $baseurl");
             $url = sprintf("%s/#/openxpki/%s", $baseurl, $url);
         }

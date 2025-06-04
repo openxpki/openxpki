@@ -105,6 +105,10 @@ B<Parameters>
 
 URL path of the script (i.e. self reference) from config.
 
+=head3 base_url
+
+Base website URL as sent by the Ember UI (index.html).
+
 =cut
 
 has webui => (
@@ -117,6 +121,7 @@ has webui => (
         secure_param
         encrypt_jwt
         script_url
+        base_url
     ) ],
 );
 
