@@ -90,7 +90,7 @@ IS_FULLCONFIG=0
 TENANT_SUPPORT=0
 oxi_install_params=()
 # Bash string manipulation: use # to strip text off $@ and see if string still equals original $@
-[[ "${@#--no-restart}" != "$@" ]] && IS_RESTART=0
+[[ "${@#--no-restart}" != "$@" || "${@#--norestart}" != "$@" ]] && IS_RESTART=0
 [[ "${@#--fast}" != "$@" ]]       && oxi_install_params+=(--fast)
 [[ "${@#--full}" != "$@" ]]       && IS_FULLCONFIG=1
 [[ "${@#--no-i18n}" != "$@" ]]    && oxi_install_params+=(--no-i18n)
