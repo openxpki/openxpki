@@ -202,7 +202,7 @@ while (my $cgi = CGI::Fast->new("")) {
         if ("path" eq $realm_mode) {
             # Set the path to the directory component of the script, this
             # automagically creates seperate cookies for path based realms
-            $session_cookie->path($webui->url_path->to_string);
+            $session_cookie->path($webui->url_path);
 
             # Interpret last part of the URL path as realm
             my $script_realm = $webui->url_path->parts->[-1];
