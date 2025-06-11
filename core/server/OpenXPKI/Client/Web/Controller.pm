@@ -78,6 +78,7 @@ sub index ($self) {
     my $config;
     my %backend;
     try {
+        $self->log->trace("Load configuration for '$service_name.$endpoint'");
         # FIXME - send 404 for unknown endpoints
         $config = $self->oxi_service_config($service_name, $endpoint)
             || die "No configuration found for this service";
@@ -89,7 +90,9 @@ sub index ($self) {
         }
     }
     catch ($error) {
-        die sprintf("Error while loading configuration for service '%s': %s", $service_name, $error);
+        my $msg = sprintf("Error while loading configuration for service '%s': %s", $service_name, $error);
+        $self->log->fatal($error);
+        die "$error\n";
     }
 
     Log::Log4perl::MDC->put('endpoint', $endpoint);
@@ -100,6 +103,7 @@ sub index ($self) {
     $self->stash('mojo.log' => undef); # reset DefaultHelper "log" (i.e. $self->log) which accesses stash "mojo.log"
 
     try {
+        $self->log->trace("Load service class $class");
         Module::Load::load($class);
         $service = $class->new(
             service_name => $service_name,
@@ -114,7 +118,7 @@ sub index ($self) {
           unless $service->DOES('OpenXPKI::Client::Service::Role::Base');
     }
     catch ($error) {
-        die sprintf("Error loading service class '%s': %s", $class, $error);
+        die sprintf("Error loading service class %s: %s", $class, $error);
     }
 
     # Setup locale if defined
@@ -126,8 +130,6 @@ sub index ($self) {
         $self->log->trace('Set language to '.$language);
         set_language($language);
     }
-
-    $self->log->trace("Service class $class instantiated");
 
     # preparations and checks
     $self->log->trace("Request handling (1/3): preparations and checks");
