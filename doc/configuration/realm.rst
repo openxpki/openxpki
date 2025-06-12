@@ -12,6 +12,7 @@ When finished add a new section in the file ``system/realms.yaml`` where
 the new section key is identical to the new realm directory name used for
 the realm directory. Change the new realm section entries to match the
 desired values for the new realm.
+Also make sure to add your new realm in ``client.d/service/webui/default.yaml`` under ``realm.map`` and add your own realm so it shows up when selecting a realm.
 
 Please note that you might need to perform additional steps based on the
 overall configuration options such as creating templates, static content
