@@ -57,7 +57,7 @@ DESCRIPTION
 
 OPTIONS
     --no-restart
-        Skip restarting OpenXPKI and Apache.
+        Skip restarting OpenXPKI and Apache/nginx.
 
     --no-i18n
         Skip updating internationalization files.
@@ -77,6 +77,12 @@ OPTIONS
 
     --tenant
         Activate Tenant support for user "raop".
+
+    --apache
+        Switch to apache2 (disable nginx)
+
+    --nginx
+        Switch to nginx (disable apache2)
 __HELP
 
 trap '_exit $?' EXIT
@@ -88,7 +94,11 @@ set -e
 IS_RESTART=1
 IS_FULLCONFIG=0
 TENANT_SUPPORT=0
+IS_APACHE=0
+FORCE_APACHE=0
+FORCE_NGINX=0
 oxi_install_params=()
+
 # Bash string manipulation: use # to strip text off $@ and see if string still equals original $@
 [[ "${@#--no-restart}" != "$@" || "${@#--norestart}" != "$@" ]] && IS_RESTART=0
 [[ "${@#--fast}" != "$@" ]]       && oxi_install_params+=(--fast)
@@ -97,17 +107,49 @@ oxi_install_params=()
 [[ "${@#--no-compile}" != "$@" ]] && oxi_install_params+=(--no-compile)
 [[ "${@#--no-ee}" != "$@" ]]      && oxi_install_params+=(--no-ee)
 [[ "${@#--tenant}" != "$@" ]]     && TENANT_SUPPORT=1
+[[ "${@#--apache}" != "$@" ]]     && FORCE_APACHE=1
+[[ "${@#--nginx}" != "$@" ]]      && FORCE_NGINX=1
 
-echo "[$([ "$IS_FULLCONFIG" -eq 1 ] && echo "X" || echo " ")] Recreate DB and certs, wipe config"
-echo "[$([ "$IS_RESTART" -eq 1 ] && echo "X" || echo " ")] Restart OpenXPKI & Apache"
+if [[ $FORCE_NGINX == 1 ]]; then
+    echo -e "Switching to nginx\n"
+    systemctl disable apache2   >>$LOG 2>&1
+    systemctl stop apache2      >>$LOG 2>&1
+    systemctl enable nginx      >>$LOG 2>&1
+elif [[ $FORCE_APACHE == 1 ]]; then
+    echo -e "Switching to Apache2\n"
+    systemctl disable nginx     >>$LOG 2>&1
+    systemctl stop nginx        >>$LOG 2>&1
+    systemctl enable apache2    >>$LOG 2>&1
+fi
+if [[ $(systemctl is-enabled apache2) == "enabled" ]]; then IS_APACHE=1; fi
+
+IS_LEGACY_FCGI=0
+if [[ $IS_APACHE == 1 ]]; then
+    set +e
+    IS_LEGACY_FCGI=$(grep -c '^\s*Define NoMojolicious' $OXI_TEST_SAMPLECONFIG_DIR/contrib/apache2-openxpki-site.conf)
+    set -e
+fi
+
+echo "[$([[ $IS_FULLCONFIG == 1 ]]  && echo "X" || echo " ")] Recreate DB and certs, wipe config"
+echo "[$([[ $IS_RESTART == 1 ]]     && echo "X" || echo " ")] Restart OpenXPKI & webserver"
+echo -n "    Webserver: "
+if [[ $IS_APACHE == 1 ]]; then
+    echo -n "Apache"
+    [[ $IS_LEGACY_FCGI == 1 ]] && echo " (with legacy FCGI client)" || echo " (with Mojolicious client)"
+else
+    echo "nginx"
+fi
 echo
 
 # stop OpenXPKI early to prevent crashes due to DB access problems etc.
 if [[ $IS_RESTART -eq 1 ]]; then
     set +e
     # service unit might not yet exist if this is a freshly installed system
+    if systemctl list-unit-files openxpkid.service >/dev/null; then
+        systemctl stop openxpkid.service
+    fi
     if systemctl list-unit-files openxpki-clientd.service >/dev/null; then
-        systemctl stop openxpkid.service >>$LOG 2>&1
+        systemctl stop openxpki-clientd.service
     fi
     set -e
 fi
@@ -186,6 +228,7 @@ fi
 
 # add "tenant: { type: Base }" to "RA Operator"
 if [ $TENANT_SUPPORT -eq 1 ]; then
+    echo "- add tenant config"
     sed -zri 's/(RA Operator[^\n]+\n([\t ]+[^\n]+\n)+)/\1    tenant:\n        type: Base\n/' /etc/openxpki/config.d/realm/democa/auth/roles.yaml
 fi
 
@@ -193,6 +236,7 @@ fi
 sed -zri 's/(TestAccounts:\n([\t ]+[^\n]+\n|\n)+)//' /etc/openxpki/config.d/realm.tpl/auth/handler.yaml
 
 # add our TestAccounts
+echo "- add OpenXPKI test accounts"
 cat <<__HANDLER >> /etc/openxpki/config.d/realm/democa/auth/handler.yaml
 
 TestAccounts:
@@ -235,6 +279,14 @@ main:
     passwd: $OXI_TEST_DB_MYSQL_PASSWORD
 __DB
 
+if [[ $IS_LEGACY_FCGI == 0 ]]; then
+    echo -e "- client config: allow webserver user to connect to client socket"
+    perl -pe 's{^(socket_group)\s*:.*}{$1: www-data}g;' -i /etc/openxpki/client.d/system/server.yaml
+else
+    echo -e "- legacy FCGI client config: allow FCGI user to connect to server socket"
+    perl -pe 's{^(socket_group)\s*:.*}{$1: www-data}g;' -i /etc/openxpki/config.d/system/server.yaml
+fi
+
 #
 # Compile and install OpenXPKI
 #
@@ -249,17 +301,19 @@ ver=$(perl -I $OXI_CORE_DIR/server -e 'use OpenXPKI::VERSION; print join ".", (s
 echo -e "\nModify version check for core: $ver"
 perl -pe "s{^(\s+core):.*}{\$1: $ver}g;" -i /etc/openxpki/config.d/system/version.yaml
 
-# Set user and group to root (allows to e.g. run under a /root/.plenv environment)
-echo -e "Client config: set client socket_group to 'root'"
-perl -pe 's{^(socket_group)\s*:.*}{$1: www-data}g;' -i /etc/openxpki/client.d/system/server.yaml
-
 # configure web server
-echo -e "Configure Apache web server"
-cat $OXI_TEST_SAMPLECONFIG_DIR/contrib/apache2-openxpki-site.conf \
- | perl -pe 's{^(\s*RewriteRule \^\.\*\$ https://)}{#$1}'\
- > /etc/apache2/sites-available/openxpki.conf
-/usr/sbin/a2ensite openxpki > /dev/null
-/usr/sbin/a2enmod ssl cgid fcgid headers rewrite proxy proxy_http macro > /dev/null
+if [[ $IS_APACHE == 1 ]]; then
+    echo -e "Configure Apache web server"
+    cat $OXI_TEST_SAMPLECONFIG_DIR/contrib/apache2-openxpki-site.conf \
+    | perl -pe 's{^(\s*RewriteRule \^\.\*\$ https://)}{#$1}'\
+    > /etc/apache2/sites-available/openxpki.conf
+    /usr/sbin/a2ensite openxpki > /dev/null
+    /usr/sbin/a2enmod ssl cgid fcgid headers rewrite proxy proxy_http macro > /dev/null
+else
+    echo -e "Configure nginx web server"
+    cp $OXI_TEST_SAMPLECONFIG_DIR/contrib/nginx-openxpki-site /etc/nginx/sites-available/openxpki
+    nginx -t 2>&1 | sed 's/^/ > /'
+fi
 
 # create SSL keys and certificates and import them into OpenXPKI
 if [[ $IS_FULLCONFIG -eq 1 ]]; then
@@ -272,17 +326,33 @@ if [[ $IS_RESTART -eq 1 ]]; then
 
     # oxi-initdb (above) already restarts OpenXPKI
     if [[ $IS_FULLCONFIG -ne 1 ]]; then
-        echo "Restart OpenXPKI"
-        systemctl restart openxpkid.service openxpki-clientd.service            >>$LOG 2>&1
-
+        echo "Restart OpenXPKI server"
+        systemctl restart openxpkid.service
         if ! systemctl status openxpkid.service > /dev/null; then
-            echo -e "\nERROR: Could not start OpenXPKI. Please see logs in /var/log/openxpki"
+            echo -e "\nERROR: Could not start server. Please see logs in /var/log/openxpki"
             exit 333
+        fi
+
+        if [[ $IS_LEGACY_FCGI == 0 ]]; then
+            echo "Restart OpenXPKI Mojolicious client"
+            systemctl restart openxpki-clientd.service
+            if ! systemctl status openxpki-clientd.service > /dev/null; then
+                echo -e "\nERROR: Could not start client. Please see logs in /var/log/openxpki-ui"
+                exit 333
+            fi
+        else
+            echo "Legacy FCGI: disable OpenXPKI Mojolicious client"
+            systemctl disable openxpki-clientd.service
         fi
     fi
 
-    echo "Restart Apache"
-    systemctl restart apache2                                                   >>$LOG 2>&1
+    if [[ $IS_APACHE == 1 ]]; then
+        echo "Restart Apache"
+        systemctl restart apache2
+    else
+        echo "Restart nginx"
+        systemctl restart nginx
+    fi
 fi
 
 echo -e "\nDone."
