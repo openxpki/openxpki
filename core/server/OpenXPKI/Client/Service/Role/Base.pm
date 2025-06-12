@@ -1034,7 +1034,9 @@ sub pickup_request ($self, $pickup_config, $wf_type) {
         $pickup_keys ||= $pickup_attribute;
 
         # run pickup
-        $wf_id = $self->pickup_via_attribute($wf_type, $pickup_attribute, $self->request_param($pickup_keys));
+        # use wf_params to fetch attribute value, as request_param may be unset in workflow context
+        $wf_id = $self->pickup_via_attribute($wf_type, $pickup_attribute, $self->wf_params->{$pickup_keys});
+
     }
     # only if pickup was done at all and did not die
     if ($wf_id) {
