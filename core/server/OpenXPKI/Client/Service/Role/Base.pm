@@ -1022,8 +1022,9 @@ sub pickup_request ($self, $pickup_config, $wf_type) {
         # use namespace as parameter name as default
         $pickup_keys ||= $pickup_namespace;
 
-        # run pickup
-        $wf_id = $self->pickup_via_datapool($pickup_namespace, $self->request_param($pickup_keys));
+        # run pickup - we look into wf_params to catch injected values like set_pkcs10_tid
+        my $pickup_value = $self->wf_params->{$pickup_keys} // $self->request_param($pickup_keys);
+        $wf_id = $self->pickup_via_datapool($pickup_namespace, $pickup_value);
 
     # pickup via workflow attribute search
     } else {
@@ -1032,7 +1033,7 @@ sub pickup_request ($self, $pickup_config, $wf_type) {
         $wf_type || die "pickup in attribute mode without main workflow";
 
         # require keys to be scalar (undef is fine)
-        die "pickup input must be scalar in namespace mode" if (ref $pickup_keys);
+        die "pickup input must be scalar in attribute mode" if (ref $pickup_keys);
 
         # default attribute
         $pickup_attribute ||= 'transaction_id';
@@ -1040,8 +1041,9 @@ sub pickup_request ($self, $pickup_config, $wf_type) {
         # default use attribute also as parameter name
         $pickup_keys ||= $pickup_attribute;
 
-        # run pickup
-        $wf_id = $self->pickup_via_attribute($wf_type, $pickup_attribute, $self->request_param($pickup_keys));
+        # run pickup - we look into wf_params to catch injected values like set_pkcs10_tid
+        my $pickup_value = $self->wf_params->{$pickup_keys} // $self->request_param($pickup_keys);
+        $wf_id = $self->pickup_via_attribute($wf_type, $pickup_attribute, $pickup_value);
     }
     # only if pickup was done at all and did not die
     if ($wf_id) {
