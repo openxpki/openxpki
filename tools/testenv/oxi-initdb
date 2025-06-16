@@ -38,6 +38,11 @@ chown -R openxpki:root /etc/openxpki/local/keys/
 chmod -R 750 /etc/openxpki/local/keys/
 chown -R www-data:www-data /etc/openxpki/tls/
 
+# Make Root cert known to Debian so e.g. "curl https://$(hostname)/rpc/kwtbackdoor/openapi-spec/" works
+echo -e "- import root certificate into Debian"
+cp /etc/openxpki/tls/chain/OpenXPKI_Root_CA.crt /usr/local/share/ca-certificates/
+update-ca-certificates > /dev/null
+
 echo -e "- start OpenXPKI"
 systemctl start openxpkid.service                                               >$LOG 2>&1
 
