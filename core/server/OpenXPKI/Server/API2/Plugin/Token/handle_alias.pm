@@ -110,30 +110,60 @@ protected_command "create_alias" => {
     my $group = $params->alias_group;
     my $generation = $params->generation;
 
+
+    my $exists;
+
     # direct alias (no group)
     if ($alias) {
 
-        my $exists = $dbi->select_one(
+        $exists = $dbi->select_one(
             from   => 'aliases',
-            columns => ['identifier'],
+            columns => ['alias','identifier','notbefore','notafter'],
             where => {
                 pki_realm => $pki_realm,
                 alias => $alias,
             },
         );
+
+        # accept setting the same alias again
         OpenXPKI::Exception::Command->throw(
             message => 'given alias already exists',
             params => {
                 identifer => $exists->{identifer}
             }
-        ) if ($exists);
+        ) if ($exists && $exists->{identifer} ne $params->identifer);
 
         $group = undef;
 
     } else {
 
-        if ($generation) {
-            my $exists = $dbi->select_one(
+        $exists = $dbi->select_one(
+            from   => 'aliases',
+            columns => ['alias','identifier','notbefore','notafter','generation'],
+            where => {
+                pki_realm => $pki_realm,
+                group_id => $group,
+                identifier => $params->identifier,
+            }
+        );
+
+        # Item exists and explicit generation was requested which does not match
+        OpenXPKI::Exception::Command->throw(
+            message => 'given identifier already exists in group with different generation',
+            params => {
+                alias => $exists->{alias},
+                alias_group => $group,
+                identifier => $params->identifier,
+                generation => $exists->{generation},
+            }
+        ) if ($exists && $generation && $generation != $exists->{generation});
+
+
+        # if explicit generation is given we check if alias is already
+        # assigned to a different certificate (same cert would be in
+        # exist already)
+        if (!$exists && $generation) {
+            my $alias_exists = $dbi->select_one(
                 from   => 'aliases',
                 columns => ['identifier'],
                 where => {
@@ -143,16 +173,21 @@ protected_command "create_alias" => {
                 },
             );
             OpenXPKI::Exception::Command->throw(
-                message => 'given alias already exists',
+                message => 'given alias is already assigned to a different certificate',
                 params => {
                     identifer => $exists->{identifer},
                     alias_group => $group,
                     generation => $generation
                 }
-            ) if ($exists);
+            ) if ($alias_exists);
+        }
 
+        if ($exists && !$generation) {
+            $generation = $exists->{generation};
+        }
 
-        } else {
+        # no duplicate and auto-generation required
+        if (!$exists && !$generation) {
             # query aliases to get next generation id
             my $res_nextgen = $dbi->select_one(
                 from   => 'aliases',
@@ -166,28 +201,29 @@ protected_command "create_alias" => {
             $generation = ($res_nextgen->{generation} || 0) + 1;
         }
         $alias = sprintf "%s-%01d", $group, $generation;
-
-        my $identifier_exists = $dbi->select_one(
-            from   => 'aliases',
-            columns => ['alias'],
-            where => {
-                pki_realm => $pki_realm,
-                group_id => $group,
-                identifier => $params->identifier,
-            }
-        );
-
-        OpenXPKI::Exception::Command->throw(
-            message => 'given identifier already exists in group',
-            params => {
-                alias => $identifier_exists->{alias},
-                alias_group => $group,
-                identifier => $params->identifier,
-            }
-        ) if ($identifier_exists);
-
     }
 
+
+    # We might now either have an existing alias so we check if the
+    # notbefore/notafter dates match
+    if ($exists) {
+        OpenXPKI::Exception::Command->throw(
+            message => 'given identifier already exists with different validity',
+            params => {
+                alias => $exists->{alias},
+                identifier => $params->identifier,
+                notbefore => $exists->{notbefore},
+                notafter => $exists->{notafter},
+            }
+        ) if ($notbefore != $exists->{notbefore} || $notafter != $exists->{notafter});
+
+        # alias exists and has the same validity
+        # this is a noop so we just return the existing alias
+        return { alias => $exists->{alias} };
+    }
+
+
+    # we really need to create a new item - here it is
     $dbi->insert(
         into => 'aliases',
         values  => {
@@ -200,7 +236,9 @@ protected_command "create_alias" => {
             notafter => $notafter,
         }
     );
+
     return { alias => $alias };
+
 };
 
 
