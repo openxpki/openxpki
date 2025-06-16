@@ -179,7 +179,7 @@ WriteMakefile(
         'Class::Std'                    => '0.0.8',
         'Config::Merge'                 => '1',
         'Config::Std'                   => 0,
-        'Connector'                     => '1.43',
+        'Connector'                     => '1.55',
         'Crypt::Argon2'                 => 0,
         'Crypt::CBC'                    => '2.29',
         'Crypt::OpenSSL::AES'           => '0.02',      # e.g. OpenXPKI::Crypto::VolatileVault
