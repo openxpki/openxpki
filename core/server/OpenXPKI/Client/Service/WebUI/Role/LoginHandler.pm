@@ -13,7 +13,6 @@ requires qw(
     has_auth
     current_realm
     is_realm_selection_page
-    webserver_env
 
     url_path_for
     param
@@ -315,20 +314,19 @@ sub handle_login ($self, $page, $action, $reply) {
 
         # SSO Login uses data from the ENV, so no need to render anything
         if ( $login_type eq 'CLIENT' ) {
-
-            $self->log->trace('ENV is ' . Dumper \%ENV) if $self->log->is_trace;
+            $self->log->trace('Available webserver ENV: ' . join(', ', sort keys $self->request->env->%*)) if $self->log->is_trace;
             my $data;
             if ($auth->{envkeys}) {
                 foreach my $key (keys %{$auth->{envkeys}}) {
                     my $envkey = $auth->{envkeys}->{$key};
-                    $self->log->debug("Try to load $key from $envkey");
+                    $self->log->debug("Try to load '$key' from webserver ENV '$envkey'");
                     next unless defined $self->request->env->{$envkey};
                     $data->{$key} = Encode::decode('UTF-8', $self->request->env->{$envkey}, Encode::LEAVE_SRC | Encode::FB_CROAK);
                 }
             # legacy support
-            } elsif (my $user = $self->request->env->{'OPENXPKI_USER'} || $self->request->env->{'REMOTE_USER'} || '') {
+            } elsif (my $user = $self->request->env->{OPENXPKI_USER} || $self->request->env->{REMOTE_USER}) {
                 $data->{username} = $user;
-                $data->{role} = $self->request->env->{'OPENXPKI_GROUP'} if($self->request->env->{'OPENXPKI_GROUP'});
+                $data->{role} = $self->request->env->{OPENXPKI_GROUP} if $self->request->env->{OPENXPKI_GROUP};
             }
 
             # at least some items were found so we send them to the backend
@@ -359,8 +357,8 @@ sub handle_login ($self, $page, $action, $reply) {
             }
 
         } elsif ( $login_type eq 'X509' ) {
-            my $user = $self->webserver_env->{SSL_CLIENT_S_DN_CN} || $self->webserver_env->{SSL_CLIENT_S_DN};
-            my $cert = $self->webserver_env->{SSL_CLIENT_CERT} || '';
+            my $user = $self->request->env->{SSL_CLIENT_S_DN_CN} || $self->request->env->{SSL_CLIENT_S_DN};
+            my $cert = $self->request->env->{SSL_CLIENT_CERT} || '';
 
             $self->log->trace('ENV is ' . Dumper \%ENV) if $self->log->is_trace;
 
@@ -369,7 +367,7 @@ sub handle_login ($self, $page, $action, $reply) {
                 my @chain;
                 # larger chains are very unlikely and we dont support stupid clients
                 for (my $cc=0;$cc<=3;$cc++)   {
-                    my $chaincert = $self->webserver_env->{'SSL_CLIENT_CERT_CHAIN_'.$cc};
+                    my $chaincert = $self->request->env->{'SSL_CLIENT_CERT_CHAIN_'.$cc};
                     last unless ($chaincert);
                     push @chain, $chaincert;
                 }

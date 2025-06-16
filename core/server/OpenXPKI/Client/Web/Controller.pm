@@ -108,7 +108,6 @@ sub index ($self) {
         $service = $class->new(
             service_name => $service_name,
             config => $config,
-            webserver_env => $self->stash('webserver_env'),
             remote_address => $self->tx->remote_address,
             request => $self->req,
             endpoint => $endpoint,

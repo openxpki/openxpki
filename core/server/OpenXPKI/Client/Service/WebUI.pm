@@ -505,7 +505,7 @@ sub _get_cipher ($self) {
         for my $key (@fingerprint) {
             my $msg_key = "- $key " . ('.' x ($spacer-length($key)));
             # variable available as is in webserver ENV
-            if (my $env = $self->webserver_env->{$key}) {
+            if (my $env = $self->request->env->{$key}) {
                 $sha->add($env);
                 $self->log->trace("$msg_key found in webserver ENV");
             # variable is an Apache name for an HTTP header

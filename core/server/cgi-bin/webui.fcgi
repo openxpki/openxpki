@@ -157,7 +157,6 @@ while (my $cgi = CGI::Fast->new("")) {
     my $webui = OpenXPKI::Client::Service::WebUI->new(
         service_name => 'webui',
         config_obj => $config,
-        webserver_env => \%ENV,
         remote_address => $ENV{REMOTE_ADDR},
         request => $mojo_req,
         endpoint => '',

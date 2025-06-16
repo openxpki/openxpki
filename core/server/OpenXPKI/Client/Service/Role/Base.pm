@@ -265,18 +265,6 @@ sub _build_config ($self) {
     return $configs->{$endpoint};
 }
 
-=head3 webserver_env
-
-I<HashRef> containing the webserver environment variables (NOT the shell environment).
-
-=cut
-sub webserver_env; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
-has webserver_env => (
-    is => 'ro',
-    isa => 'HashRef',
-    required => 1,
-);
-
 =head3 remote_address
 
 IP address of the client that sent the request.
@@ -524,10 +512,10 @@ sub _build_default_wf_params ($self) {
         # gather data from TLS session
         if ( $self->request->is_secure ) {
             $self->log->debug("Calling context is HTTPS");
-            $self->log->trace('Webserver ENV keys: ' . join(', ', sort keys $self->webserver_env->%*)) if $self->log->is_trace;
+            $self->log->trace('Webserver ENV keys: ' . join(', ', sort keys $self->request->env->%*)) if $self->log->is_trace;
 
-            my $auth_dn = $self->webserver_env->{SSL_CLIENT_S_DN};
-            my $auth_pem = $self->webserver_env->{SSL_CLIENT_CERT};
+            my $auth_dn = $self->request->env->{SSL_CLIENT_S_DN};
+            my $auth_pem = $self->request->env->{SSL_CLIENT_CERT};
             if ( defined $auth_dn ) {
                 $self->log->info("Authenticated client DN: $auth_dn");
                 if ($self->config_env_keys->{signer_dn}) {
