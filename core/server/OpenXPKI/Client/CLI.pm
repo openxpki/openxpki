@@ -56,7 +56,7 @@ sub send_message {
         $header{pki_realm} = $auth->pki_realm();
     }
 
-    $self->log->trace(Dumper $auth);
+    $self->log->trace(Dumper $auth) if ($self->log()->is_trace);
 
     my $payload = $message->to_hash();
     $self->log()->trace(Dumper $payload) if ($self->log()->is_trace);
@@ -78,7 +78,7 @@ sub send_message {
             extra_headers => { %header, stack => $auth->stack(), %{$auth->credentials()} },
         );
     }
-    $self->log()->debug($msg) if ($self->log()->is_debug);
+    $self->log()->trace($msg) if ($self->log()->is_trace);
     my $res = $self->talk($msg);
     $self->log()->trace(Dumper $res) if ($self->log()->is_trace);
     return OpenXPKI::DTO::Message::from_hash($res);

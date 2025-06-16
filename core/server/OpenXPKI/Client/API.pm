@@ -92,6 +92,13 @@ has client => (
     predicate => 'has_client',
 );
 
+has is_privileged => (
+    is => 'ro',
+    isa => 'Bool',
+    lazy => 1,
+    default => sub { return shift->client->authenticator()->has_account_key(); },
+);
+
 my %internal_command_attributes = (
     payload => { isa => 'ArrayRef[Str]' },
     positional_args => { isa => 'ArrayRef[Str]' }

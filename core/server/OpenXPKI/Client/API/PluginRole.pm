@@ -67,6 +67,9 @@ sub run_enquiry ($self, $topic, $params = undef) {
 
 =head2 run_command I<command>, I<params>
 
+Run a regular command, requires a "regular" authenticated session
+within a realm (usually done anonymously via the _System stack).
+
 =cut
 
 sub run_command ($self, $command, $params = undef) {
@@ -81,6 +84,11 @@ sub run_command ($self, $command, $params = undef) {
 
 =head2 run_protected_command I<command>, I<params>
 
+Run a protected command, will set the realm if one was given as
+argument, otherwise runs in the _void realm.
+
+Requires authentication via an admin key pair.
+
 =cut
 
 sub run_protected_command ($self, $command, $params = undef) {
@@ -92,6 +100,24 @@ sub run_protected_command ($self, $command, $params = undef) {
 
     return $self->_send_message($msg);
 }
+
+=head2 run_realm_command I<pki_realm>, I<command>, I<params>
+
+Run a protected command and enforce the pki_realm to run this command.
+
+=cut
+
+sub run_realm_command ($self, $pki_realm, $command, $params = undef) {
+    $self->log->debug("Running command '$command' in protected mode");
+    my $msg = OpenXPKI::DTO::Message::ProtectedCommand->new(
+        command => $command,
+        pki_realm => $pki_realm,
+        defined $params ? (params => $params) : ()
+    );
+
+    return $self->_send_message($msg);
+}
+
 
 sub _send_message ($self, $msg) {
     my $resp = $self->rawapi->client->send_message($msg);

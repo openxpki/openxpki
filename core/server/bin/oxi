@@ -305,7 +305,7 @@ if ($auth_args{account_key}) {
     $auth_args{account_key} = Crypt::PK::ECC->new($auth_args{account_key}, $pass);
 }
 
-INFO('Enable operator mode using keyfile '. $auth_args{account_key})
+INFO('Enable privileged mode using keyfile '. $auth_args{account_key})
     if ($auth_args{account_key});
 
 my $client = OpenXPKI::Client::CLI->new(

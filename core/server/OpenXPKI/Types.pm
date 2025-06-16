@@ -242,6 +242,16 @@ coerce 'ConfigPath',
     from 'Str',
     via { [ split /\./, $_ ] };
 
+=head2 PKIRealm
+
+The name of a realm (syntax check only)
+
+=cut
+
+subtype 'PKIRealm',
+    as 'Str';
+    where { $_ =~ qr{ \A [ \w \- \. ]* \z }xms },
+    message { sprintf "'%s' is not a valid realm name", ($_ ? "'$_'" : '<undef>') };
 
 =head2 Tenant
 =cut

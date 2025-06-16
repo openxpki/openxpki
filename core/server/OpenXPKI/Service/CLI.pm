@@ -174,15 +174,21 @@ sub _process_operator_command {
     CTX('session')->data->user('kid:'.$kid);
     CTX('session')->data->role($self->kid2role->{$kid});
 
-    if ($header->{pki_realm}) {
+    my $method = '__handle_' . lc($hash->{class});
+    my $message = OpenXPKI::DTO::Message::from_hash($hash);
+
+    if ($message->has_pki_realm) {
+        ##! 32: 'set realm from message'
+        CTX('session')->data->pki_realm($message->pki_realm);
+    } elsif ($header->{pki_realm}) {
+        ##! 32: 'set realm from header'
         CTX('session')->data->pki_realm($header->{pki_realm});
     } else {
+        ##! 32: 'set realm to _void'
         # special realm for admin tasks
         CTX('session')->data->pki_realm('_void');
     }
 
-    my $method = '__handle_' . lc($hash->{class});
-    my $message = OpenXPKI::DTO::Message::from_hash($hash);
     ##! 32: $message
     return $self->$method($message);
 
