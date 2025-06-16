@@ -300,6 +300,7 @@ has base_url => (
     }
 );
 
+sub response; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
 has response => (
     init_arg => undef,
     is => 'ro',
@@ -446,7 +447,7 @@ sub BUILD ($self, $args) {
         $self->cipher($cipher);
     }
 
-    # to be reworked
+    # TODO Rework auth.sign.key handling
     if (my $key = $self->config->get(['auth','sign.key'])) {
         my $pk = decode_base64($key);
         $self->auth(\$pk);
