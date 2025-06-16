@@ -599,14 +599,14 @@ sub add_debug_headers ($self) {
     my $workflow = $self->workflow or return;
 
     if ($workflow->{id}) {
-        $self->set_header('X-OpenXPKI-Workflow-Id' => $workflow->{id});
+        $self->set_header('x-openxpki-workflow-id' => $workflow->{id});
     }
     if ($self->has_transaction_id) {
         my $tid = $self->transaction_id;
         # this should usually be a hexadecimal string but to avoid any surprise
         # we check this here and encoded if needed.
         $tid = Encode::encode("MIME-B", $tid) if $tid =~ m{\W};
-        $self->set_header('X-OpenXPKI-Transaction-Id' => $tid);
+        $self->set_header('x-openxpki-transaction-id' => $tid);
     }
     if (my $error = $workflow->{context}->{error_code}) {
         # header must not be any longer than 76 chars in total
@@ -614,7 +614,7 @@ sub add_debug_headers ($self) {
         # use mime encode if header is non-us-ascii, 42 chars plus tags is the
         # maximum to stay below 76 chars (starts to wrap otherwise)
         $error = Encode::encode("MIME-B", substr($error,0,42)) if $error =~ m{\W};
-        $self->set_header('X-OpenXPKI-Error' => $error);
+        $self->set_header('x-openxpki-error' => $error);
     }
 }
 

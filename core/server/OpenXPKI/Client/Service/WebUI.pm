@@ -644,9 +644,9 @@ sub op_handlers {
         'default' => sub ($self) {
             # default security related headers, may be overwritten by config.
             # Also see https://owasp.org/www-project-secure-headers/ci/headers_add.json
-            $self->response->set_header('Strict-Transport-Security' => 'max-age=31536000');
-            $self->response->set_header('X-Content-Type-Options' => 'nosniff');
-            $self->response->set_header('Content-Security-Policy' =>
+            $self->response->set_header('strict-transport-security' => 'max-age=31536000');
+            $self->response->set_header('x-content-type-options' => 'nosniff');
+            $self->response->set_header('content-security-policy' =>
                 "default-src 'self'; "
                 ."form-action 'self'; "
                 ."base-uri 'self'; "
@@ -661,9 +661,9 @@ sub op_handlers {
 
             # custom HTTP headers from config
             my $headers = $self->config->get_hash('header');
-            $self->response->set_header( $_ => $headers->{$_} ) for keys %$headers;
+            $self->response->set_header( lc($_) => $headers->{$_} ) for keys %$headers;
             # default mime-type
-            $self->response->set_header('Content-Type' => 'application/json; charset=UTF-8');
+            $self->response->set_header('content-type' => 'application/json; charset=UTF-8');
 
             my $page = $self->handle_ui_request; # isa OpenXPKI::Client::Service::WebUI::Page
             $self->response->result($page);
