@@ -53,12 +53,20 @@ command "update" => {
 
     # update the key - the handle_key method will die if the alias is not a token
     if ($param->has_key) {
-        my $token = $self->handle_key($alias, $param->key->$*); # type "FileContents" is a ScalarRef
+        # type "FileContents" is a ScalarRef
+        my $token = $self->handle_key(
+            alias => $alias,
+            key => $param->key->$*
+        );
         $self->log->debug("Key for '$alias' was added");
         $res->params->{key_name} = $token->param('key_name');
     # set force for update mode (overwrites exising key)
     } elsif ($param->has_key_update) {
-        my $token = $self->handle_key($alias, $param->key_update->$*, 1); # type "FileContents" is a ScalarRef
+        my $token = $self->handle_key(
+            alias => $alias,
+            key => $param->key_update->$*,
+            force => 1,
+        );
         $self->log->debug("Key for '$alias' was updated");
         $res->params->{key_name} = $token->param('key_name');
     }

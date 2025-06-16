@@ -89,7 +89,8 @@ sub show_help ($arg) {
         $pod.= "=back\n\n";
     }
 
-    $pod.= $api->get_pod(__FILE__, 'OPTIONS');
+    # might be useful to have something like "fullhelp"?
+    #$pod.= $api->get_pod(__FILE__, 'OPTIONS');
 
     $api->show_pod(-oxi_pod => $pod);
 }

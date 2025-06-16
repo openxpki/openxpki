@@ -74,8 +74,11 @@ command "add" => {
 
     # we now add the key
     if ($param->has_key) {
-        my $token = $self->handle_key($alias, $param->key->$*); # type "FileContents" is a ScalarRef
-        $res->params->{key_name} = $token->{key_name};
+        my $token = $self->handle_key({
+            alias => $alias,
+            key => $param->key->$*,
+        }); # type "FileContents" is a ScalarRef
+        $res->params->{key_name} = $token->param('key_name');
     }
 
     return $res;
