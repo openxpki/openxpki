@@ -273,29 +273,27 @@ the full URL every time).
 sub base_url; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
 has base_url => (
     init_arg => undef,
-    is => 'rw',
+    is => 'ro',
     isa => 'Str',
     lazy => 1,
     default => sub ($self) {
-        my $baseurl = $self->session->param('baseurl');
-        if ($baseurl) {
-            $self->log->debug('Base URL obtained from client session');
+        my $baseurl;
+        # query client session
+        if ($baseurl = $self->session->param('baseurl')) {
+            $self->log->debug("Base URL obtained from client session: $baseurl");
+        # fallback to "Referer" header (Mojolicious provides a method with correct spelling...)
+        } elsif (($self->request->headers->referrer//'') =~ m{https?://[^/]+(/[\w/]*[\w])/?}i) {
+            $baseurl = $1;
+            $self->log->debug("Base URL obtained from HTTP referrer header: $baseurl");
+        # default
         } else {
-            if ($baseurl = $self->request_param('baseurl')) {
-                $self->log->debug('Base URL obtained from "baseurl" request parameter');
-            } elsif (($self->request->headers->referrer//'') =~ m{https?://[^/]+(/[\w/]*[\w])/?}i) {
-                $self->log->debug('Base URL obtained from HTTP referrer header');
-                $baseurl = $1;
-            } else {
-                $self->log->warn('Base URL could not be obtained from request parameter or referrer header - using fallback "/openxpki"');
-                $baseurl = '/openxpki'; # default is mainly relevant for tests
-            }
-            $baseurl =~ s{(\A\s+|\s+\z|/\z)}{}g;    # strip spaces and trailing slash
-            $baseurl =~ s{\w+://[^/]+}{};           # prevent injection of external urls
-
-            $self->session->param('baseurl', $baseurl);
-            $self->session->flush;
+            $baseurl = '/openxpki'; # default is mainly relevant for tests
+            $self->log->warn("Base URL set to default: $baseurl");
         }
+        # We do the fallback and default handling here and not in BUILD()
+        # (where request parameter "baseurl" is queried) to avoid setting
+        # the session parameter to a default too early because a later
+        # request might provide the "baseurl".
         return $baseurl;
     }
 );
@@ -470,6 +468,21 @@ sub BUILD ($self, $args) {
     } else {
         Log::Log4perl::MDC->put('name', undef);
         Log::Log4perl::MDC->put('role', undef);
+    }
+
+    # Query base URL from request parameter sent by app/services/oxi-content.js (window.location.pathname)
+    # and store it in client session.
+    # It is then read by $self->base_url's default method upon access.
+    #
+    # NOTE: We cannot do this in $self->base_url's attribute default method
+    # because the "baseurl" request parameter might not be available in the same
+    # request loop when $self->base_url is accessed.
+    if (not $self->session->param('baseurl') and my $baseurl = $self->request_param('baseurl')) {
+        $baseurl =~ s{(\A\s+|\s+\z|/\z)}{}g;    # strip spaces and trailing slash
+        $baseurl =~ s{\w+://[^/]+}{};           # prevent injection of external urls
+        $self->log->debug("Store base URL from request parameter in client session: $baseurl");
+        $self->session->param('baseurl', $baseurl);
+        $self->session->flush;
     }
 }
 
