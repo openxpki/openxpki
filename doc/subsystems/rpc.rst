@@ -3,7 +3,7 @@ RPC Server API
 
 The RPC Service provides a simple HTTP-Based API to the OpenXPKI backend.
 The builtin REST Server provides methods to request, renew and revoke
-certificates. The service is implemented using a cgi-wrapper script.
+certificates.
 
 Server-Side Configuration
 =========================
@@ -11,50 +11,40 @@ Server-Side Configuration
 Wrapper Configuration
 ---------------------
 
-The default wrapper looks for its config file at ``/etc/openxpki/rpc/default.conf``.
-The config uses plain ini format, a default is deployed by the package::
+An example configuration looks like::
 
-  [global]
-  socket = /run/openxpkid/openxpkid.sock
-  locale_directory: /usr/share/locale
-  default_language: en_US
+    global:
+        realm: democa
 
-  [logger]
-  log_level = WARN
+    locale:
+        language: en_US
 
-  [auth]
-  stack = _System
+    auth:
+        stack: _System
 
-  [input]
-  allow_raw_post = 1
-  parse_depth = 5
+    input:
+        allow_raw_post: 1
+        parse_depth: 5
 
-  [output]
-  use_http_status_codes=0
+    output:
+        use_http_status_codes: 1
+
+    openapi:
+        title: Public Certificate API
+
+    SearchCertificate:
+        workflow: certificate_search
+        input:
+        - common_name
+        # Append "certificate" if you want the full PEM block in the result
+        output:
+        - cert_identifier
+        - notbefore
+        - notafter
+        - status
 
 The global/auth/logger parameters are described in the common wrapper
-documentation (:ref:`subsystem-wrapper`). Config path extension and
-TLS Authentication is supported.
-
-
-TLS Authentication
--------------------
-
-In case you want to use TLS Client authentication you must tell the
-webserver to pass the client certificate to the script. For apache,
-put the following lines into your SSL Host section::
-
-    <Location /rpc>
-        SSLVerifyClient optional
-        SSLOptions +StdEnvVars +ExportCertData
-    </Location>
-
-Note: We need the apache just to check if the client has access to the
-private key of the certificate. Trust and /revocation checking is done
-inside of OpenXPKI so you can also use "optional_no_ca" if you dont
-want to deal with setting up the correct chains in apache.
-Blocking clients on TLS level might be a good idea if your service is
-exposed to "unfriendly users".
+documentation (:ref:`subsystem-wrapper`).
 
 Input Handling
 ==============
@@ -98,14 +88,19 @@ Example: Revoke Certificate by Certificate Identifier
 The endpoint is configured in ``/etc/openxpki/rpc/enroll.conf`` with
 the following::
 
-    [RevokeCertificate]
-    workflow = certificate_revocation_request_v2
-    param = cert_identifier, reason_code, comment, invalidity_time
-    env = signer_cert, signer_dn, server
-    output = error_code
-
-See ``core/server/cgi-bin/rpc.cgi`` for mapping additional parameters,
-if needed.
+    RevokeCertificate:
+      workflow: certificate_revocation_request_v2
+      input:
+       - cert_identifier,
+       - reason_code
+       - comment,
+       - invalidity_time
+      env:
+       - signer_cert
+       - signer_dn
+       - server
+      output:
+       - error_code
 
 Certificates are revoked by specifying the certificate identifier::
 
@@ -140,8 +135,8 @@ two digits for unambiguousness.
 
 To let the wrapper send the error code on HTTP layer, you need to set::
 
-  [output]
-  use_http_status_codes=1
+  output:
+    use_http_status_codes=1
 
 in the wrapper configuration. This will return 4xx and 5xx status codes
 together with the above mentioned error structures as body.
@@ -158,12 +153,21 @@ If you have a workflow that does not return the final result immediately,
 you can define a search pattern to pickup existing workflows based on
 worflow_attributes::
 
-    [RequestCertificate]
-    workflow = certificate_enroll
-    param = pkcs10, comment
-    output = cert_identifier, error_code, transaction_id
-    env = signer_cert, enroll
-    pickup = transaction_id
+    RequestCertificate:
+      workflow: certificate_enroll
+      input:
+       - pkcs10,
+       - comment
+    output:
+     - cert_identifier,
+     - error_code
+     - transaction_id
+    env:
+     - signer_cert,
+     - enroll
+    pickup:
+      input:
+       - transaction_id
 
 With a properly prepared workflow, this allows you access an existing
 workflow based on the transaction_id. For now it is only possible to
@@ -172,12 +176,17 @@ read existing workflows, there is no option to interact with them, yet.
 Examples
 ========
 
-The default.conf configuration file defines an endpoint SearchCertificate::
+The public.yaml configuration file defines an endpoint SearchCertificate::
 
-    [SearchCertificate]
-    workflow = certificate_search
-    param = common_name
-    output = cert_identifier, notbefore, notafter, status
+    SearchCertificate
+        workflow: certificate_search
+        param:
+         - common_name
+        output:
+         - cert_identifier,
+         - notbefore,
+         - notafter,
+         - status
 
 To utilize this endpoint the following curl command may be used::
 
@@ -208,8 +217,3 @@ There is a special RPC method *openapi-spec*::
 This will return an OpenAPI compliant specification of all possible OpenXPKI RPC method calls in JSON format.
 
 For an OpenAPI overview please see :ref:`openapi-overview`.
-
-See Also
-========
-
-See also ``core/server/cgi-bin/rpc.cgi``.

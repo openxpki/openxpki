@@ -1,52 +1,13 @@
 SCEP Server
 ===========
 
-The communication with your scep clients requires the deployment of a cgi wrapper
-script with your webserver. The script will parse the HTTP related parts and
-pass the data to the openxpki daemon and vice versa.
+In general the SCEP server does not need a lot of configuration, the
+example repository provides an endpoint named ``generic`` with a
+minimal configuration.
 
-Decommission and Upgrade Notice
---------------------------------
-
-With v3.26 the old SCEP wrappers based on a dedicated service layer are
-no longer supported. You need to remove the service related items from
-``system.server.service``, ``system.crypto.tokenapi`` and point the
-``/scep`` alias rules in the apache wrapper to the ``scepv3.fcgi`` script.
-You also need to update the wrapper configurations in the
-``/etc/openxpki/scep`` folder and the workflow configurations in the
-realms.
-
-
-Wrapper Configuration
----------------------
-
-The default wrapper looks for its config file at ``/etc/openxpki/scep/default.conf``.
-The config uses plain ini format, a default is deployed by the package::
-
-  [global]
-  socket=/run/openxpkid/openxpkid.sock
-  realm=democa
-  servername=generic
-
-  [logger]
-  # A loglevel of DEBUG MIGHT disclose sensitive user input data
-  # A loglevel of TRACE WILL dump any communication unfiltered
-  log_level = INFO
-
-  [auth]
-  stack=_System
-
-  # OpenXPKI supports mapping additional URL Parameters to the workflow
-  # Those must be whitelisted here for security reasons
-  [PKIOperation]
-  param = signature
-
-
-Config Path Expansion
-^^^^^^^^^^^^^^^^^^^^^
-
-Is supported by the SCEP wrapper, the service name is ``scep``. See the
-common wrapper documentation (:ref:`subsystem-wrapper`) for details.
+To create additional endpoints just create a copy with the expected
+endpoint name and do not forget to add a matching backend configuration
+inside the realm.
 
 Caveats
 -------

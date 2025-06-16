@@ -36,13 +36,13 @@ Development releases will be tagged with an odd number (3.3.x), those releases s
 
 A public demo is available at https://demo.openxpki.org/.
 
-To run OpenXPKI yourself get a Debian box (Current release is v3 for Bookworm) ready and download the packages from the [package mirror](http://packages.openxpki.org). The packages come with a full-featured sample config and a sample setup script - this gets your PKI up in less than 5 minutes! Just follow our [Quickstart Instructions](https://openxpki.readthedocs.io/en/latest/quickstart.html).
+To run OpenXPKI yourself get a Debian box (Current release is v3 for Bookworm) ready and download the packages from the [package mirror](http://packages.openxpki.org). The packages come with a full-featured sample config and a sample setup script - this gets your PKI up in less than 5 minutes! Just follow our [Quickstart Instructions](https://openxpki.readthedocs.io/en/master/quickstart.html).
 
 There is also a ready-to-use docker image *whiterabbitsecurity/openxpki3*, see https://github.com/openxpki/openxpki-docker.
 
 ## Support / Issue Tracker
 
-Check out the documentation on [readthedocs](http://openxpki.readthedocs.org/). There is also a [complete quickstart manual](http://openxpki.readthedocs.org/en/latest/quickstart.html).
+Check out the documentation on [readthedocs](http://openxpki.readthedocs.org/). There is also a [complete quickstart manual](http://openxpki.readthedocs.org/en/master/quickstart.html).
 
 Please use the [projects mailing lists](https://lists.sourceforge.net/lists/listinfo/openxpki-users) to get support. Please do **NOT** use the github issue tracker for general support and ask on the list before filing an issue. If you file an issue, add sufficient information to reproduce the problem.
 
