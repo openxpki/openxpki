@@ -94,7 +94,7 @@ sub op_handlers {
             # TODO this should be merged with the stuff in Base without having protocol specific items in the core code
             $self->add_wf_param(server => $self->endpoint) unless $self->default_wf_param('server');
             $self->add_wf_param(interface => $self->service_name);
-            if (my $signer = $self->webserver_env->{SSL_CLIENT_CERT}) {
+            if (my $signer = $self->request->env->{SSL_CLIENT_CERT}) {
                 $self->add_wf_param(signer_cert => $signer);
             }
 
@@ -120,7 +120,7 @@ sub cgi_set_custom_wf_params ($self) {
     if (any { $self->operation eq $_ } qw( simpleenroll simplereenroll simplerevoke )) {
         $self->add_wf_param(server => $self->endpoint) unless $self->default_wf_param('server');
         $self->add_wf_param(interface => $self->service_name);
-        if (my $signer = $self->webserver_env->{SSL_CLIENT_CERT}) {
+        if (my $signer = $self->request->env->{SSL_CLIENT_CERT}) {
             $self->add_wf_param(signer_cert => $signer);
         }
     }

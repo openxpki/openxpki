@@ -74,7 +74,6 @@ while (my $cgi = CGI::Fast->new("")) {
     my $client = OpenXPKI::Client::Service::SCEP->new(
         service_name => 'scep',
         config_obj => $config,
-        webserver_env => \%ENV,
         remote_address => $ENV{REMOTE_ADDR},
         request => $req,
         endpoint => $endpoint,
