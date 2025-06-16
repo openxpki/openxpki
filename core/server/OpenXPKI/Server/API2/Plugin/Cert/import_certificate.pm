@@ -92,7 +92,7 @@ command "import_certificate" => {
         where => { identifier => $cert_identifier },
     );
 
-    return if ($existing_cert && $params->ignore_existing);
+    return $existing_cert if ($existing_cert && $params->ignore_existing);
 
     OpenXPKI::Exception->throw(
         message => 'Certificate already exists in database',
