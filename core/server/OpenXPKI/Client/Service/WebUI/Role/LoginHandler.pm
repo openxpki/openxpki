@@ -631,10 +631,16 @@ sub _jwt_signature ($self, $data, $jws) {
 
     $self->log->debug('Sign data using key id ' . $jws->{keyid} );
     my $pkey = $self->auth;
-    return encode_jwt(payload => {
-        param => $data,
-        sid => $self->client->get_session_id,
-    }, key=> $pkey, auto_iat => 1, alg=>'ES256');
+
+    return encode_jwt(
+        payload => {
+            param => $data,
+            sid => $self->client->get_session_id,
+        },
+        key => $pkey,
+        auto_iat => 1,
+        alg => 'ES256',
+    );
 }
 
 sub _recreate_frontend_session {
