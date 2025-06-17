@@ -38,13 +38,18 @@ has cipher => (
     predicate => 'has_cipher',
 );
 
-# holds key object to sign socket communication
+=head2 auth
+
+Key I<Str> for JWT token used to sign socket communication during auth requests.
+(see L<OpenXPKI::Client::Service::WebUI::Role::LoginHandler/handle_login>)
+
+=cut
 sub auth; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
 sub has_auth;
 has auth => (
     init_arg => undef, # set in BUILD
     is => 'rw',
-    isa => 'Ref',
+    isa => 'Str',
     predicate => 'has_auth',
 );
 
@@ -444,9 +449,12 @@ sub BUILD ($self, $args) {
     }
 
     # TODO Rework auth.sign.key handling
+    # The key is used to sign non-password auth requests.
+    # Create the key using "openssl ecparam -name secp256r1 -genkey -noout"
+    # Put the public key into auth/stack.yaml where required.
     if (my $key = $self->config->get(['auth','sign.key'])) {
         my $pk = decode_base64($key);
-        $self->auth(\$pk);
+        $self->auth($pk);
     }
 
     if ($self->config->get('session.ip_match')) {

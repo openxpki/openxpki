@@ -637,7 +637,7 @@ sub _jwt_signature ($self, $data, $jws) {
             param => $data,
             sid => $self->client->get_session_id,
         },
-        key => $pkey,
+        key => \$pkey,
         auto_iat => 1,
         alg => 'ES256',
     );
