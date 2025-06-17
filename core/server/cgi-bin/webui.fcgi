@@ -189,6 +189,9 @@ while (my $cgi = CGI::Fast->new("")) {
 
         $webui->client($backend_client);
 
+        # set the method to generate URL paths
+        $webui->_url_path_for( sub ($realm) { "/webui/$realm" } );
+
         #
         # Detect realm
         #

@@ -413,10 +413,8 @@ has is_realm_selection_page => (
 
 =head2 url_path_for
 
-Assembles the URL path for the given realm using the pattern of the Mojolicious
-route of the current request (= the one defined in L</declare_routes>).
-
-Returns a L<Mojo::URL> object.
+Return the URL path L<Str> for the given realm using the pattern of the current
+Mojolicious request's route (= the one defined in L</declare_routes>).
 
 =cut
 
@@ -550,9 +548,8 @@ sub prepare ($self, $c) {
     $self->operation('default');
 
     # set the method to generate URL paths
-    $self->_url_path_for( sub ($realm) {
-        return $c->url_for(realm => $realm); # https://metacpan.org/pod/Mojolicious::Controller#url_for
-    } );
+    # https://metacpan.org/pod/Mojolicious::Controller#url_for
+    $self->_url_path_for( sub($r) { $c->url_for(realm => $r)->to_string } );
 
     #
     # Detect realm
