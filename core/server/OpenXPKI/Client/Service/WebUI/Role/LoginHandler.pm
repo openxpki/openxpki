@@ -76,7 +76,7 @@ sub _build_realm_path_map ($self) {
         my ($realm, $stack) = split (/\s*;\s*/, $realm_map->{$url_alias});
         $map->{$realm} //= [];
         push $map->{$realm}->@*, {
-            url => $self->url_path_for($url_alias)->to_string . '/',
+            url => $self->url_path_for($url_alias) . '/',
             stack => $stack,
         }
     };
