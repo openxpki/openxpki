@@ -43,6 +43,9 @@ fi
 mkdir -p /run/openxpkid
 chown -R openxpki:openxpki /run/openxpkid
 
+mkdir -p /run/openxpki-terminal
+chown -R openxpki:openxpki /run/openxpki-terminal
+
 mkdir -p /run/openxpki-clientd
 chown -R openxpkiclient:openxpkiclient /run/openxpki-clientd
 

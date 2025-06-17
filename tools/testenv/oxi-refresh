@@ -280,12 +280,27 @@ main:
 __DB
 
 if [[ $IS_LEGACY_FCGI == 0 ]]; then
-    echo -e "- client config: allow webserver user to connect to client socket"
+    echo "- client config: allow webserver user to connect to client socket"
     perl -pe 's{^(socket_group)\s*:.*}{$1: www-data}g;' -i /etc/openxpki/client.d/system/server.yaml
 else
-    echo -e "- legacy FCGI client config: allow FCGI user to connect to server socket"
+    echo "- legacy FCGI client config: allow FCGI user to connect to server socket"
     perl -pe 's{^(socket_group)\s*:.*}{$1: www-data}g;' -i /etc/openxpki/config.d/system/server.yaml
 fi
+
+echo "- inject HSM terminal simulation config"
+cat <<__EOF > /etc/openxpki/config.d/system/terminal.yaml
+ncipher:
+    internal: 1
+    command: /bin/bash -c $OXI_SOURCE_DIR/tools/testenv/hsm-sim.sh
+    pid_file: /run/openxpki-terminal/terminal-intproc.pid
+    socket_file: /run/openxpki-terminal/terminal-intproc.sock
+__EOF
+
+cat <<__EOF >> "/etc/openxpki/config.d/realm/democa/uicontrol/RA Operator/main.yaml"
+- key:   ncipher
+  label: nCipher Sim
+  icon: glyphicon-lock
+__EOF
 
 #
 # Compile and install OpenXPKI
