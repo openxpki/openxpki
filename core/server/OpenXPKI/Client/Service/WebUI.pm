@@ -9,6 +9,12 @@ with qw(
     OpenXPKI::Client::Service::WebUI::Role::LoginHandler
 );
 
+=head1 NAME
+
+OpenXPKI::Client::Service::WebUI - service to deliver web page contents via JSON
+
+=cut
+
 # Core modules
 use MIME::Base64;
 use List::Util qw ( max );
@@ -29,8 +35,16 @@ use OpenXPKI::Client::Service::WebUI::Session;
 use OpenXPKI::Client::Service::WebUI::SessionCookie;
 use OpenXPKI::i18n qw( i18n_walk );
 
+=head1 ATTRIBUTES
 
-# cipher object to encryt/decrypt protected values
+=head2 cipher
+
+L<Crypt::CBC> cipher object to encryt/decrypt protected values. Auto-set if
+config value is set.
+
+Config values: C<session.cookey> aka. C<session.cookie_secret>
+
+=cut
 has cipher => (
     init_arg => undef, # set in BUILD
     is => 'rw',
@@ -40,7 +54,7 @@ has cipher => (
 
 =head2 auth
 
-Key I<Str> for JWT token used to sign socket communication during auth requests.
+Key I<Str> for JWT token used to sign socket communication during auth requests
 (see L<OpenXPKI::Client::Service::WebUI::Role::LoginHandler/handle_login>)
 
 =cut
@@ -53,7 +67,14 @@ has auth => (
     predicate => 'has_auth',
 );
 
-# session cookie
+=head2 session_cookie
+
+HTTP session cookie encapsulation (L<OpenXPKI::Client::Service::WebUI::SessionCookie>).
+Auto-created.
+
+The cookie will be encrypted if L</cipher> is set.
+
+=cut
 has session_cookie => (
     init_arg => undef,
     is => 'rw',
@@ -74,7 +95,14 @@ sub _build_session_cookie ($self) {
     );
 }
 
-# frontend session
+=head2 session
+
+Frontend/client session (L<OpenXPKI::Client::Service::WebUI::Session>).
+Auto-created.
+
+Config values: C<session.driver>, C<session.params>, C<session.timeout>
+
+=cut
 sub session; # "stub" subroutine to satisfy OpenXPKI::Client::Service::WebUI::Role::Base; will be overwritten by attribute accessor later on
 has session => (
     init_arg => undef,
@@ -153,6 +181,14 @@ sub _build_session ($self) {
     return $session;
 }
 
+=head2 client
+
+L<OpenXPKI::Client::Service::Role::Base/client> is overwritten to add a Moose
+trigger. The trigger will read client session parameter C<backend_session_id>
+and try to re-use this session. If that fails or no ID was stored then a new
+backend session is created.
+
+=cut
 # Overwrite attribute from OpenXPKI::Client::Service::Role::Base
 has '+client' => (
     trigger => \&_init_client,
@@ -203,6 +239,12 @@ sub _init_client ($self, $client) {
     Log::Log4perl::MDC->put('ssid', substr($id,0,4));
 }
 
+=head2 realm_mode
+
+Shortcut for config value C<realm.mode> to determine the current realm:
+C<"select">, C<"path"> or C<"hostname">. Default: C<"select">
+
+=cut
 sub realm_mode; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
 has realm_mode => (
     init_arg => undef,
@@ -213,9 +255,17 @@ has realm_mode => (
         hostname
     )]),
     lazy => 1,
-    default => sub ($self) { $self->config->get('realm.mode') || $self->config->get('global.realm_mode') || 'select' },
+    default => sub ($self) {
+        $self->config->get('realm.mode') || $self->config->get('global.realm_mode') || 'select'
+},
 );
 
+=head2 realm_layout
+
+Shortcut for config value C<realm.layout> that defines how to show the realm selection:
+C<"card"> or C<"list">. Default: C<"card">
+
+=cut
 has realm_layout => (
     init_arg => undef,
     is => 'ro',
@@ -227,6 +277,12 @@ has realm_layout => (
     default => sub ($self) { $self->config->get('realm.layout') || $self->config->get('global.realm_layout') || 'card' },
 );
 
+=head2 script_url
+
+In Mojolicious this is fixed: C<"/cgi-bin/webui.fcgi">. The only usage is to
+distinct the request from static assets access in the webserver.
+
+=cut
 has script_url => (
     init_arg => undef,
     is => 'ro',
@@ -235,6 +291,12 @@ has script_url => (
     default => sub ($self) { $self->config->get('global.scripturl') // '/cgi-bin/webui.fcgi' },
 );
 
+=head2 static_dir
+
+Shortcut for config value C<realm.layout> that defines how to show the realm selection:
+C<"card"> or C<"list">. Default: C<"card">
+
+=cut
 has static_dir => (
     init_arg => undef,
     is => 'ro',
@@ -243,6 +305,14 @@ has static_dir => (
     default => sub ($self) { $self->config->get('global.staticdir') || '/var/www' },
 );
 
+=head2 url_path
+
+Normalized request URL path (leading, but no trailing slash) with
+C</cgi-bin/xxx> stripped off.
+
+E.g. C<"/webui/democa">
+
+=cut
 sub url_path; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
 has url_path => (
     init_arg => undef,
@@ -304,6 +374,12 @@ has base_url => (
     }
 );
 
+=head2 response
+
+Generic HTTP response encapsulation (L<OpenXPKI::Client::Service::Response>).
+Auto-created.
+
+=cut
 sub response; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
 has response => (
     init_arg => undef,
@@ -315,8 +391,12 @@ has response => (
     },
 );
 
-# PRIVATE ATTRIBUTES
+=head2 ui_response
 
+L<OpenXPKI::Client::Service::WebUI::Response> object encapsulating the web UI
+specific JSON response. Auto-created, L</session_cookie> gets passed.
+
+=cut
 # Response structure (JSON or some raw bytes) and HTTP headers
 sub ui_response; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
 has ui_response => (
@@ -334,8 +414,8 @@ has ui_response => (
 =head2 action
 
 Returns the value of the request parameter L<action> if set and the XSRFtoken is
-valid. If the token is invalid, returns an empty string and sets the response
-status to an error message.
+valid. If the token is invalid, returns an empty string and sets the
+L</ui_response> status to an error message.
 
 If the parameter is empty or not set an empty string is returned.
 

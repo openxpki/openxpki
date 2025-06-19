@@ -374,9 +374,13 @@ has log => (
 );
 sub _build_log ($self) { OpenXPKI::Log4perl->get_logger }
 
-=head3 client_simple
+=head3 client
 
-An instance of L<OpenXPKI::Client>.
+Client that talks to the server backend (L<OpenXPKI::Client>).
+
+Auto-created if not specified via constructor.
+
+Config values (auto-creation): C<global.socket>, C<global.timeout>
 
 =cut
 sub client; # "stub" subroutine to satisfy "requires" method checks of other consumed roles

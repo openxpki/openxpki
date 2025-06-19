@@ -2,6 +2,12 @@ package OpenXPKI::Client::Service::WebUI::Page;
 use OpenXPKI qw( -class -typeconstraints );
 use namespace::autoclean;
 
+=head1 NAME
+
+OpenXPKI::Client::Service::WebUI::Page - base class for web UI pages
+
+=cut
+
 # Core modules
 use Digest::SHA qw(sha1_base64);
 use MIME::Base64;
@@ -20,7 +26,7 @@ use OpenXPKI::Log4perl;
 
 =pod
 
-=head1 METHODS
+=head1 METHODS AND ATTRIBUTES
 
 =head2 log
 
@@ -43,7 +49,7 @@ has log => (
 
 =head3 param
 
-Returns a single input parameter value, i.e.
+Return a single input parameter value, i.e.
 
 =over
 
@@ -70,7 +76,7 @@ B<Parameters>
 
 =head3 secure_param
 
-Returns an input parameter that was encrypted via JWT and can thus be trusted.
+Return an input parameter that was encrypted via JWT and can thus be trusted.
 
 Encryption might happen either by calling the special virtual page
 C<encrypted!JWT_TOKEN> or with a form field of C<type: encrypted>.
@@ -88,7 +94,7 @@ B<Parameters>
 
 =head3 multi_param
 
-Returns a list with an input parameters' values (multi-value field, most
+Return a list with an input parameters' values (multi-value field, most
 likely a clonable field).
 
 B<Parameters>

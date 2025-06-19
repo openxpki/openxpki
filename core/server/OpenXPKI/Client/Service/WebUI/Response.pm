@@ -11,8 +11,8 @@ OpenXPKI::Client::UI::Response
 This is a data transfer object encapsulating the contents of the JSON response
 that will be sent to the Javascript web UI.
 
-Most of the methods of this class are available in C<OpenXPKI::Client::UI::Result>
-and L<documented there|OpenXPKI::Client::UI::Result/RESPONSE RELATED ATTRIBUTES AND METHODS>.
+Most of the methods of this class are available in C<OpenXPKI::Client::Service::WebUI::Page>
+and L<documented there|OpenXPKI::Client::Service::WebUI::Page/JSON RESPONSE>.
 
 =cut
 
