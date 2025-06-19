@@ -65,6 +65,7 @@ sub _build_session_cookie ($self) {
         request => $self->request,
         $self->has_cipher ? (cipher => $self->cipher) : (),
         insecure => $insecure_cookie, # flag to skip "secure" option in cookie
+        path => $self->url_path,
     );
 }
 

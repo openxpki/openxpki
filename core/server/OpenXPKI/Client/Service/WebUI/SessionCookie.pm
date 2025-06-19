@@ -146,6 +146,21 @@ sub as_mojo_cookies ($self, $session) {
         );
     }
 
+    # Expire cookies with path .../cgi-bin that were set due to a bug.
+    # FIXME v4.0: remove temporary cookie cleanup
+    if ($self->has_path) {
+        my %come_on = (
+            %common,
+            path => $common{path} . '/cgi-bin',
+            max_age => 0, # expire cookie immediately
+            value => '',
+        );
+        push @result,
+            Mojo::Cookie::Response->new(name => 'oxisess-webui', %come_on, httponly => 1),
+            Mojo::Cookie::Response->new(name => 'oxi-login-timestamp', %come_on),
+            Mojo::Cookie::Response->new(name => 'oxi-extid', %come_on, httponly => 1, samesite => 'Lax');
+    }
+
     return \@result;
 }
 
