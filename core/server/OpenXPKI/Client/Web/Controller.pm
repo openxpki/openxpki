@@ -154,13 +154,18 @@ sub index ($self) {
     # service specific HTTP headers
     $self->res->headers->add($_ => $response->extra_headers->{$_}) for keys $response->extra_headers->%*;
 
-    # TODO -- needs to be overwritten in CertEP - it always returns 200
+    # status specific code / message
     $self->res->code($response->http_status_code);
     $self->res->message($response->http_status_message);
 
     # HTTP response
     $self->log->trace("Request handling (3/3): send response");
-    $service->send_response($self, $response);
+    try {
+        $service->send_response($self, $response);
+    }
+    catch ($err) {
+        $self->log->error($err);
+    }
 
     $service->cleanup if $service->can('cleanup');
 }
