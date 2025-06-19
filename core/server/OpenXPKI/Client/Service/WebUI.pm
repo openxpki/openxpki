@@ -494,8 +494,8 @@ sub BUILD ($self, $args) {
 
 sub _get_cipher ($self) {
     # Sets the Crypt::CBC cipher to use for cookie encryption if session.cookey
-    # config entry is defined.
-    my $key = $self->config->get('session.cookey') || $self->config->get('session.cookie');
+    # config entry is defined. (cookey = COOkie encryption KEY)
+    my $key = $self->config->get('session.cookey') || $self->config->get('session.cookie_secret');
 
     # Fingerprint: a list of ENV variables, added to the cookie passphrase,
     # binds the cookie encyption to the system environment.
