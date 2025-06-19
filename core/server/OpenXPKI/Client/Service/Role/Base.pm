@@ -350,7 +350,7 @@ has config_env_keys => (
 );
 sub _config_env_keys ($self) {
     my %keys;
-    if (my @keys = $self->get_list_from_legacy_config([$self->operation, 'env'])) {
+    if (my @keys = $self->get_list_from_config([$self->operation, 'env'])) {
         %keys = map { $_ => 1 } @keys;
         $self->log->trace('Configured ENV keys: ' . join(', ', keys %keys)) if $self->log->is_trace;
     }
@@ -1465,13 +1465,15 @@ sub cgi_headers ($self, $headers) {
 }
 
 
-=head2 get_list_from_legacy_config
+=head2 get_list_from_config
 
-Read a list of item from the config layer at the given path
-If the class is used with a legacy config (via config_obj), the method
-will read the path using C<get> and split the result at the comma.
-If the class is used with the new service config, a C<get_list> call is
-made.
+Read a list of item from the config layer at the given path.
+
+If the class is used with a legacy config (via L<config_obj>) the method will
+read the path using L<Connector/get> and split the result at the comma.
+
+If the class is used with the new YAML service config, a C<Connector/get_list>
+call is made.
 
 B<Parameters>
 
@@ -1481,22 +1483,20 @@ B<Parameters>
 
 =back
 
-B<Returns> a I<Array> found at the given config path
+B<Returns> a list of items found at the given config path
 
 =cut
 # A helper to convert paramter lists from old format
-sub get_list_from_legacy_config {
-    my $self = shift;
-    my @path =  @_;
-    my @list;
+sub get_list_from_config ($self, @path) {
     if ($self->has_legacy_config) {
         my $items = $self->config->get(@path)//'';
-        @list = split /\s*,\s*/, $items;
+        return (split /\s*,\s*/, $items);
     } else {
-        @list = $self->config->get_list(@path);
+        return ($self->config->get_list(@path));
     }
-    return @list;
 }
 
+# FIXME v4.0: remove alias for old method name
+sub get_list_from_legacy_config { shift->get_list_from_config(@_) }
 
 1;

@@ -494,7 +494,7 @@ sub _get_cipher ($self) {
     # Even though Crypt::CBC will run a hash on the passphrase we still use
     # sha256 here to preprocess the input data one by one to keep the memory
     # footprint as small as possible.
-    if (my @fingerprint = $self->get_list_from_legacy_config('session.fingerprint')) {
+    if (my @fingerprint = $self->get_list_from_config('session.fingerprint')) {
         my $sha = Digest::SHA->new('sha256');
         $sha->add($key) if $key;
 

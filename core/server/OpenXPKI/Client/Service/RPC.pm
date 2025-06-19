@@ -290,7 +290,7 @@ sub cgi_set_custom_wf_params ($self) {
     # Only parameters which are whitelisted in the config are mapped!
     # This is crucial to prevent injection of server-only parameters
     # like the autoapprove flag...
-    if (my @keys = $self->get_list_from_legacy_config([$self->operation,'param'])) {
+    if (my @keys = $self->get_list_from_config([$self->operation,'param'])) {
         foreach my $key (@keys) {
             my $val = $self->request_param($key);
             next unless (defined $val);
@@ -383,7 +383,7 @@ around new_response => sub ($orig, $self, @args) {
             ));
 
             # Add context parameters to the response if requested
-            if (my @keys = $self->get_list_from_legacy_config([$self->operation,'output'])) {
+            if (my @keys = $self->get_list_from_config([$self->operation,'output'])) {
                 $self->log->debug(sprintf 'Configured output keys for operation "%s": %s', $self->operation, join(', ', @keys));
                 for my $key (@keys) {
                     my $val = $wf->{context}->{$key};
@@ -761,10 +761,10 @@ sub openapi_spec {
             my @in = $conf->get_list([$method,'input']);
             if (!@in) {
                 # legacy config uses atrribute "param"
-                @in = $self->get_list_from_legacy_config([$method, 'param']);
+                @in = $self->get_list_from_config([$method, 'param']);
             }
 
-            my @out = $self->get_list_from_legacy_config([$method, 'output']);
+            my @out = $self->get_list_from_config([$method, 'output']);
             my $action = $conf->get([$method, 'execute_action']);
 
             # the structure for pickup has changed so we need some more glue code here
@@ -773,7 +773,7 @@ sub openapi_spec {
 
             if ($self->has_legacy_config) {
                 $pickup_workflow = $conf->get([$method, 'pickup_workflow']);
-                @pickup_input = $self->get_list_from_legacy_config([$method, 'pickup']);
+                @pickup_input = $self->get_list_from_config([$method, 'pickup']);
             } else {
                 $pickup_workflow = $conf->get([$method, 'pickup', 'workflow']);
                 @pickup_input = $conf->get_list([$method, 'pickup', 'input']);
