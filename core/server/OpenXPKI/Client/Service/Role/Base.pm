@@ -250,7 +250,7 @@ has config => (
     is => 'rw',
     isa => 'Connector',
     lazy => 1,
-    # FIXME replace builder with required after cgi decomm
+    # FIXME Legacy CGI support - replace builder with "required" after CGI decommission
     #required => 1,
     builder => '_build_config',
 );
@@ -558,7 +558,7 @@ has wf_params => (
 );
 sub _build_wf_params ($self) {
     try {
-        # legacy CGI mode
+        # FIXME Legacy CGI support
         $self->cgi_set_custom_wf_params if ($ENV{GATEWAY_INTERFACE} and $ENV{REMOTE_ADDR});
 
         # merge custom parameters set by consuming class

@@ -22,7 +22,7 @@ sub init_structure ($self, $args) {
 
     $self->language(get_language());
 
-    # add PKI realm if CGI session contains one
+    # add PKI realm if client session contains one
     if (my $realm = $self->session_param('pki_realm')) {
         $self->pki_realm($realm);
     }

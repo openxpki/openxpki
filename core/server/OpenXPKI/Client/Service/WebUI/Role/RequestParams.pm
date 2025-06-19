@@ -233,7 +233,7 @@ sub _params ($self, $key) {
     unless (defined $self->_param_cache->{$key}) {
         my $prefix_b64 = PREFIX_BASE64;
         my @queries = (
-            # Try CGI parameters (and strip leading/trailing whitespaces)
+            # Try request parameters (and strip leading/trailing whitespaces)
             sub {
                 return map { my $v = $_; $v =~ s/ ^\s+ | \s+$ //gx; $v } $self->request->every_param($key)->@*
             },
@@ -241,7 +241,7 @@ sub _params ($self, $key) {
             sub {
                 return map { decode_base64($_) } $self->_get_param_cache($prefix_b64.$key)
             },
-            # Try Base64 encoded CGI parameters
+            # Try Base64 encoded request parameters
             sub {
                 return map { decode_base64($_) } $self->request->every_param($prefix_b64.$key)->@*
             },
