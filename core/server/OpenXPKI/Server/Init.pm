@@ -275,15 +275,19 @@ sub __do_init_dbi {
     OpenXPKI::Server::Context::setcontext({
         'dbi' => get_database("main", ($keys->{CLI} ? 1 : 0) )
     });
-    my $db_version = CTX('dbi')->version() || '';
-    my @accepted = $OpenXPKI::Defaults::DATABASE_SCHEMA->@*;
-    if (none { $_ eq $db_version } @accepted) {
-        die "current database schema '$db_version' is not compatible with this release\n".
-             "accepted version are " .join(",", @accepted) . "\n";
+    my $db_version = CTX('dbi')->version() || '0';
+    if ($db_version) {
+        my @accepted = $OpenXPKI::Defaults::DATABASE_SCHEMA->@*;
+        if (none { $_ eq $db_version } @accepted) {
+            die "current database schema '$db_version' is not compatible with this release\n".
+                "accepted version are " .join(",", @accepted) . "\n";
+        }
+    } else {
+        warn "database schema identifier not set - skipping check\n";
     }
 
     ##! 32: 'db schema version is ' . $db_version
-    CTX('config')->set('system.version.dbschema', $db_version || 0 );
+    CTX('config')->set('system.version.dbschema', $db_version);
 }
 
 sub __do_init_acl {
