@@ -216,8 +216,6 @@ while (my $cgi = CGI::Fast->new("")) {
             # Prepare realm selection
             if ('index' eq $script_realm) {
                 $log->debug('Special path detected - showing realm selection page');
-
-                $session_front->flush;
                 $backend_client->detach; # enforce new backend session to get rid of selected realm etc.
             }
 

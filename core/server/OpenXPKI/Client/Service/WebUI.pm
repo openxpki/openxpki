@@ -569,7 +569,6 @@ sub BUILD ($self, $args) {
         $baseurl =~ s{\w+://[^/]+}{};           # prevent injection of external urls
         $self->log->debug("Store base URL from request parameter in client session: $baseurl");
         $self->session->param('baseurl', $baseurl);
-        $self->session->flush;
     }
 }
 
@@ -718,7 +717,7 @@ sub prepare ($self, $c) {
 
 # optionally called by OpenXPKI::Client::Service::Role::Base
 sub cleanup ($self) {
-    # write session changes
+    # write session changes to storage + close DB connection (if DBI handler)
     $self->session->flush if $self->has_session;
     # detach backend
     $self->client->detach if $self->has_client;
