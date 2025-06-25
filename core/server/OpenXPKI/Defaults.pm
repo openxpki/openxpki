@@ -10,6 +10,7 @@ our $CONFIG_SCHEMA  = [1,2];
 our $DATABASE_SCHEMA  = [1,2,3];
 
 our $SERVER_SOCKET  = '/run/openxpkid/openxpkid.sock';
+our $SERVER_LEGACY_SOCKET = '/var/openxpki/openxpki.socket';
 our $SERVER_PID     = '/run/openxpkid/openxpkid.pid';
 our $SERVER_CONFIG_DIR = '/etc/openxpki/config.d/';
 
