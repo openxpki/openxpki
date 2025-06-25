@@ -160,9 +160,11 @@ sub index ($self) {
 
     # HTTP response
     $self->log->trace("Request handling (3/3): send response");
-    $service->send_response($self, $response);
+    try { $service->send_response($self, $response) }
+    catch ($err) { $self->log->error($err) }
 
-    $service->cleanup if $service->can('cleanup');
+    try { $service->cleanup if $service->can('cleanup') }
+    catch ($err) { $self->log->error($err) }
 }
 
 1;
