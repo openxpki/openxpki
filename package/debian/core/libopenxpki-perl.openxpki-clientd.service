@@ -1,7 +1,7 @@
 [Unit]
 Description=OpenXPKI Trustcenter Frontend
-After=network.target apache2.service openxpkid.service
-Requires=openxpkid.service
+After=network.target apache2.service openxpki-serverd.service
+Requires=openxpki-serverd.service
 
 [Service]
 Type=exec

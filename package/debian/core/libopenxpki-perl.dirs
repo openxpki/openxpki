@@ -1,3 +1,3 @@
 etc/openxpki
-var/log/openxpki
+var/log/openxpki-server
 var/log/openxpki-client
