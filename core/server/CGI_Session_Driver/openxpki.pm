@@ -30,26 +30,39 @@ sub init ($self) {
         );
     }
 
-    if (! defined $self->{Handle} )  {
-        # copy from CGI::S::D::DBI as we need to add LongReadLen for Oracle
-        $self->{Handle} = DBI->connect(
-            $self->{DataSource}, $self->{User}, $self->{Password},
-            {
-                PrintError => 1,
-                AutoCommit => 1,
-                LongReadLen => $self->{LongReadLen} ?  $self->{LongReadLen} : 100000,
-            }
-        ) or return $self->set_error("Couldn't connect to database: " . DBI->errstr);
-        $self->{_disconnect} = 1;
-    }
-
-    Log::Log4perl->get_logger('session')->debug('Frontend session driver initialized');
+    $self->log->trace('Frontend session driver initialized');
 
     return 1;
 }
 
+sub _get_handle ($self) {
+    if (not $self->{Handle})  {
+        my $dbi = DBI->connect(
+            $self->{DataSource}, $self->{User}, $self->{Password},
+            {
+                PrintError => 1,
+                AutoCommit => 1,
+                # LongReadLen for Oracle
+                LongReadLen => $self->{LongReadLen} ? $self->{LongReadLen} : 100000,
+            }
+        );
+        if ($dbi) {
+            $self->{Handle} = $dbi;
+        } else {
+            $self->set_error("Couldn't connect to database: " . DBI->errstr);
+        }
+    }
+    return $self->{Handle};
+}
+
+sub log ($self) {
+    $self->{_logger} = Log::Log4perl->get_logger('openxpki.client.service.webui.session')
+        unless $self->{_logger};
+    return $self->{_logger};
+}
+
 sub retrieve ($self, $sid) {
-    my $log = Log::Log4perl->get_logger('session');
+    $self->_get_handle or return;
 
     if ($self->{EncryptKey}) {
         $sid = hmac_sha256_hex( $sid, $self->{EncryptKey});
@@ -58,33 +71,33 @@ sub retrieve ($self, $sid) {
     my $datastr = $self->SUPER::retrieve($sid);
 
     if (not $datastr) {
-        $log->trace("Retrieved session $sid was empty");
+        return if not defined $datastr; # pass through undef = error
+        $self->log->debug("Frontend session was empty: $sid");
         return '';
     }
 
-    $log->trace("Retrieve session $sid");
+    $self->log->debug("Frontend session retrieved: $sid");
 
     if ($self->{_crypt}) {
         $datastr = $self->{_crypt}->decrypt( decode_base64($datastr) );
     }
 
-    $log->trace($datastr) if $log->is_trace;
+    $self->log->trace("data = $datastr") if $self->log->is_trace;
 
     return $datastr;
 }
 
-sub store ($self, $sid, $datastr) {
-    my $log = Log::Log4perl->get_logger('session');
+sub store ($self, $sid, $datastr, $etime = undef) {
+    $self->log->trace("Store frontend session data = $datastr") if $self->log->is_trace;
 
-    $log->trace("store() - data = $datastr") if $log->is_trace;
+    my $dbh = $self->_get_handle or return;
 
     $datastr = encode_base64($self->{_crypt}->encrypt($datastr)) if $self->{_crypt};
     $sid = hmac_sha256_hex($sid, $self->{EncryptKey}) if $self->{EncryptKey};
 
-    my $dbh = $self->{Handle};
     my $sth = $dbh->prepare_cached("SELECT ".$self->{IdColName}." FROM ".$self->{TableName}." WHERE ".$self->{IdColName}." = ?", undef, 3);
     unless ( defined $sth ) {
-        return $self->set_error( 'store() - $dbh->prepare failed: ' . $sth->errstr );
+        return $self->set_error( 'store() - $dbh->prepare_cached failed: ' . $sth->errstr );
     }
 
     $sth->execute( $sid )
@@ -98,10 +111,10 @@ sub store ($self, $sid, $datastr) {
 
     if ( $rc ) {
         $action_sth = $dbh->prepare_cached("UPDATE ".$self->{TableName}." SET ".$self->{DataColName}." = ?, modified = ?, ip_address = ? WHERE ".$self->{IdColName}." = ?", undef, 3);
-        $log->debug("store() - session $sid (update)");
+        $self->log->debug("Frontend session updated: $sid");
     } else {
         $action_sth = $dbh->prepare_cached("INSERT INTO ".$self->{TableName}." (".$self->{DataColName}.", modified,  ip_address, ".$self->{IdColName}.", created) VALUES(?, ?, ?, ?, ?)", undef, 3);
-        $log->debug("store() - session $sid (create)");
+        $self->log->debug("Frontend session created: $sid");
         push @args, time();
     }
     unless ( defined $action_sth ) {
@@ -113,10 +126,16 @@ sub store ($self, $sid, $datastr) {
 
     $action_sth->finish;
 
+    $self->{Handle}->disconnect;
+    $self->{Handle} = undef;
+
     return 1;
 }
 
 sub remove ($self, $sid) {
+    $self->log->debug("Frontend session removal: $sid");
+
+    $self->_get_handle or return;
     $sid = hmac_sha256_hex( $sid, $self->{EncryptKey}) if $self->{EncryptKey};
     return $self->SUPER::remove($sid);
 }
@@ -128,12 +147,12 @@ sub traverse ($self, @args) {
 }
 
 sub set_error ($self, $error = '') {
-    Log::Log4perl->get_logger('session')->error($error);
+    $self->log->error($error);
     return $self->SUPER::set_error($error);
 }
 
 sub DESTROY ($self) {
-    eval { $self->{Handle}->disconnect if ($self->{Handle} and $self->{_disconnect}) };
+    eval { $self->{Handle}->disconnect if $self->{Handle} };
 }
 
 1;

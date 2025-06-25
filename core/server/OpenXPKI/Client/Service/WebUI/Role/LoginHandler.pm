@@ -682,9 +682,6 @@ sub _recreate_frontend_session {
 
     # Set menu
     $self->_set_menu;
-
-    $self->session->flush;
-
 }
 
 sub _set_menu ($self) {
