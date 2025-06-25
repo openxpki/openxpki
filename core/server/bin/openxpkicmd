@@ -165,12 +165,6 @@ foreach my $entry (@wf_parameters) {
     }
 }
 
-if(!$params{socketfile}){
-    $params{socketfile} = $OpenXPKI::Defaults::SERVER_SOCKET;
-}
-
-debug(sprintf("Socketfile: %s", $params{socketfile}));
-
 my $reply;
 my $client = OpenXPKI::Client->new(
     ($params{socketfile} ? (socketfile => $params{socketfile}) : ()),
@@ -178,6 +172,7 @@ my $client = OpenXPKI::Client->new(
     api_version => 2,
 );
 
+debug(sprintf("Socketfile: %s", $client->socketfile));
 
 if (! defined $client) {
     die "Could not instantiate OpenXPKI client. Stopped";

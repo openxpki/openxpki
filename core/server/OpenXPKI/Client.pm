@@ -18,7 +18,14 @@ $OUTPUT_AUTOFLUSH = 1;
 has socketfile => (
     is      => 'ro',
     isa     => 'Str',
-    default => $OpenXPKI::Defaults::SERVER_SOCKET,
+    default => sub {
+        # Automated fallback to legacy socket location
+        return $OpenXPKI::Defaults::SERVER_LEGACY_SOCKET
+            if (! -e $OpenXPKI::Defaults::SERVER_SOCKET &&
+                -e $OpenXPKI::Defaults::SERVER_LEGACY_SOCKET);
+
+        return $OpenXPKI::Defaults::SERVER_SOCKET;
+    }
 );
 
 has timeout => (

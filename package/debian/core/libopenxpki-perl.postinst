@@ -73,14 +73,6 @@ case "$1" in
         # Apply chown to main folder
         chown -R openxpki:root /etc/openxpki/
 
-        # If this is an existing install we create a symlink to the new socket
-        # location to not break things.
-        # Works only if the system is not running!
-        # Note that -e is false if symlink exists but linked file does not.
-        if [ -d /var/openxpki -a ! -e /var/openxpki/openxpki.socket -a ! -h /var/openxpki/openxpki.socket ]; then
-            ln -s /run/openxpkid/openxpkid.sock /var/openxpki/openxpki.socket
-        fi
-
         # Create the pkiadm user
         COUNT=`grep '^pkiadm:' /etc/passwd | wc -l`;
         if [ $COUNT -eq 0 ]; then
