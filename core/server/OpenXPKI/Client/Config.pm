@@ -147,7 +147,7 @@ expanded with the value of I<service>.
 
     [logger]
     log_level = WARN
-    filename  = /var/log/openxpki-ui/%s.log
+    filename  = /var/log/openxpki/%s.log
 
 =cut
 
@@ -157,7 +157,7 @@ has 'logconf' => (
     default => sub { return {
         recreate    => 1,
         recreate_check_interval => 120,
-        filename    => '/var/log/openxpki-ui/%s.log',
+        filename    => '/var/log/openxpki/%s.log',
         layout      => 'Log::Log4perl::Layout::PatternLayout',
         'layout.ConversionPattern' => '%d %p{3} %m [MDC]%n',
         syswrite    => 1,

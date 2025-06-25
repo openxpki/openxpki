@@ -178,7 +178,8 @@ Password is `openxpki` (config repo) or shown during package install. If you mis
 ### Troubleshooting
 
 * Use journalctl to check the systemd units
-* check the logs in the log folders `/var/log/openxpki` and `/var/log/openxpki-ui`
+* check the logs in the log folders `/var/log/openxpki-server` and
+  `/var/log/openxpki-client`
 * check the error log of the apache webserver
 
 ## Enabling the SCEP Service

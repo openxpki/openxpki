@@ -371,7 +371,7 @@ if [[ $IS_RESTART -eq 1 ]]; then
         echo "Restart OpenXPKI client (Mojolicious)"
         systemctl restart openxpki-clientd.service
         if ! systemctl status openxpki-clientd.service > /dev/null; then
-            echo -e "\nERROR: Could not start client. Please see logs in /var/log/openxpki-ui"
+            echo -e "\nERROR: Could not start client. Please see logs in /var/log/openxpki-client"
             exit 333
         fi
     else
