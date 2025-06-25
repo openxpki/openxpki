@@ -220,7 +220,11 @@ sub render_system_status ($self, $args, $wf_action, $param = undef) {
 
     push @fields, {
         label  => 'I18N_OPENXPKI_UI_CONFIG_STATUS_LABEL',
-        value  => [ map {  +{ label => $_, value => $status->{config}->{$_} } unless ($_ eq 'depend' || $status->{config}->{$_} eq ''); } sort keys %{$status->{config}} ],
+        value  => [
+            map { +{ label => $_, value => $status->{config}->{$_} } }
+            grep { $_ ne 'depend' and ($status->{config}->{$_}//'') ne '' }
+            sort keys $status->{config}->%*
+        ],
         format => 'deflist',
     } if ($status->{config});
 
