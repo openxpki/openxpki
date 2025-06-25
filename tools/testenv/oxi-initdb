@@ -22,17 +22,34 @@ trap '_exit $?' EXIT
 echo -e "Recreate database and certificates"
 
 echo -e "- stop OpenXPKI"
-systemctl stop openxpkid.service                                                >$LOG 2>&1
+systemctl stop openxpkid.service
 
 set -e
 
 echo -e "- recreate database and tables"
-$OXI_SOURCE_DIR/tools/testenv/mysql-create-db.sh                       >$LOG 2>&1
-$OXI_SOURCE_DIR/tools/testenv/mysql-create-schema.sh                   >$LOG 2>&1
+$OXI_SOURCE_DIR/tools/testenv/mysql-create-db.sh >$LOG 2>&1
+$OXI_SOURCE_DIR/tools/testenv/mysql-create-schema.sh >$LOG 2>&1
+
+echo -e "- start OpenXPKI"
+systemctl start openxpkid.service
+
+set +e
+sec=0; error=1; sock=$(perl -e 'use OpenXPKI::Defaults; print $OpenXPKI::Defaults::SERVER_SOCKET')
+while [ $error -ne 0 -a $sec -lt 20 ]; do
+    test -e $sock; error=$?; sec=$[$sec+1]
+    sleep 1
+done
+set -e
+
+if [ $error -ne 0 ]; then
+    echo -e "\nERROR: Could not start server. Please see logs in /var/log/openxpki"
+    exit 333
+fi
 
 echo -e "- create and import sample certificates (takes a while!)"
 rm -rf /etc/openxpki/ca/
 rm -rf /etc/openxpki/local/keys/
+# sampleconfig.sh now needs a running server
 $OXI_TEST_SAMPLECONFIG_DIR/contrib/sampleconfig.sh                >$LOG 2>&1
 chown -R openxpki:root /etc/openxpki/local/keys/
 chmod -R 750 /etc/openxpki/local/keys/
@@ -42,11 +59,3 @@ chown -R www-data:www-data /etc/openxpki/tls/
 echo -e "- import root certificate into Debian"
 cp /etc/openxpki/tls/chain/OpenXPKI_Root_CA.crt /usr/local/share/ca-certificates/
 update-ca-certificates > /dev/null
-
-echo -e "- start OpenXPKI"
-systemctl start openxpkid.service                                               >$LOG 2>&1
-
-if [[ $(openxpkictl status server 2>&1) != *"is running"* ]]; then
-    echo -e "\nERROR: Could not start OpenXPKI. Please see logs in /var/log/openxpki"
-    exit 333
-fi
