@@ -28,7 +28,7 @@ upgrading:
 
 This release also introduces a new technical layer for the web frontend
 which comes with a new configuration layout and is the default when you
-install the system from scratch. We recommend to migrate you existing
+install the system from scratch. We recommend to migrate your existing
 configuration to the new system. The old layer is still supported but
 you need to make some minor adjustments to your configuration to run it.
 
@@ -83,7 +83,7 @@ validity:
 ### Logfiles
 
 The default logger configuration for the webfrontend / client parts is
-now `/var/log/openxpki-ui`. As the installer creates this
+now `/var/log/openxpki-client`. As the installer creates this
 with permissions set for the new layout you need to change this to run
 the old frontend. Unability to write to this folder will crash the
 frontend immediately.

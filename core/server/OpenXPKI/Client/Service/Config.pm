@@ -174,7 +174,7 @@ The following client configuration nodes are read:
         level: DEBUG
 
         # Target for service logs (server always logs to "console")
-        #   "file"    = (default) /var/log/openxpki-ui/<service>.log
+        #   "file"    = (default) /var/log/openxpki-client/<service>.log
         #   "console" = journald if running as systemd unit, STDOUT otherwise
         target: console
 
@@ -294,7 +294,7 @@ EOF
                 log4perl.appender.$appender                          = Log::Log4perl::Appender::File
                 log4perl.appender.$appender.recreate                 = 1
                 log4perl.appender.$appender.recreate_check_interval  = 120
-                log4perl.appender.$appender.filename                 = /var/log/openxpki-ui/$service.log
+                log4perl.appender.$appender.filename                 = /var/log/openxpki-client/$service.log
                 log4perl.appender.$appender.layout                   = Log::Log4perl::Layout::PatternLayout
                 log4perl.appender.$appender.layout.ConversionPattern = %d %p{3} %m [%i{verbose}]%n
                 log4perl.appender.$appender.syswrite                 = 1

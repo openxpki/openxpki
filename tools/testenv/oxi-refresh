@@ -145,8 +145,8 @@ echo
 if [[ $IS_RESTART -eq 1 ]]; then
     set +e
     # service unit might not yet exist if this is a freshly installed system
-    if systemctl list-unit-files openxpkid.service >/dev/null; then
-        systemctl stop openxpkid.service
+    if systemctl list-unit-files openxpki-serverd.service >/dev/null; then
+        systemctl stop openxpki-serverd.service
     fi
     if systemctl list-unit-files openxpki-clientd.service >/dev/null; then
         systemctl stop openxpki-clientd.service
@@ -280,12 +280,27 @@ main:
 __DB
 
 if [[ $IS_LEGACY_FCGI == 0 ]]; then
-    echo -e "- client config: allow webserver user to connect to client socket"
+    echo "- client config: allow webserver user to connect to client socket"
     perl -pe 's{^(socket_group)\s*:.*}{$1: www-data}g;' -i /etc/openxpki/client.d/system/server.yaml
 else
-    echo -e "- legacy FCGI client config: allow FCGI user to connect to server socket"
+    echo "- legacy FCGI client config: allow FCGI user to connect to server socket"
     perl -pe 's{^(socket_group)\s*:.*}{$1: www-data}g;' -i /etc/openxpki/config.d/system/server.yaml
 fi
+
+echo "- inject HSM terminal simulation config"
+cat <<__EOF > /etc/openxpki/config.d/system/terminal.yaml
+ncipher:
+    internal: 1
+    command: /bin/bash -c $OXI_SOURCE_DIR/tools/testenv/hsm-sim.sh
+    pid_file: /run/openxpki-terminal/terminal-intproc.pid
+    socket_file: /run/openxpki-terminal/terminal-intproc.sock
+__EOF
+
+cat <<__EOF >> "/etc/openxpki/config.d/realm/democa/uicontrol/RA Operator/main.yaml"
+- key:   ncipher
+  label: nCipher Sim
+  icon: glyphicon-lock
+__EOF
 
 #
 # Compile and install OpenXPKI
@@ -315,6 +330,17 @@ else
     nginx -t 2>&1 | sed 's/^/ > /'
 fi
 
+# Enable "Keyword Tests"
+kwt_bin=$(command -v openxpkikwt)
+if [[ -e $OXI_TEST_SAMPLECONFIG_DIR/contrib/test/test.yaml && -n $kwt_bin ]]; then
+    echo "Enable Keyword Test config overlay"
+    export OPENXPKI_BACKDOOR_ENABLED=1
+    pushd $OXI_TEST_SAMPLECONFIG_DIR/contrib/test >/dev/null
+    rm -f test.yaml && ln -s test.yaml.tpl test.yaml
+    openxpkikwt prepare | sed 's/^/ > /'
+    popd >/dev/null
+fi
+
 # create SSL keys and certificates and import them into OpenXPKI
 if [[ $IS_FULLCONFIG -eq 1 ]]; then
     echo ""
@@ -327,23 +353,30 @@ if [[ $IS_RESTART -eq 1 ]]; then
     # oxi-initdb (above) already restarts OpenXPKI
     if [[ $IS_FULLCONFIG -ne 1 ]]; then
         echo "Restart OpenXPKI server"
-        systemctl restart openxpkid.service
-        if ! systemctl status openxpkid.service > /dev/null; then
+        systemctl restart openxpki-serverd.service
+        set +e
+        sec=0; error=1; sock=$(perl -e 'use OpenXPKI::Defaults; print $OpenXPKI::Defaults::SERVER_SOCKET')
+        while [ $error -ne 0 -a $sec -lt 20 ]; do
+            test -e $sock; error=$?; sec=$[$sec+1]
+            sleep 1
+        done
+        set -e
+        if [ $error -ne 0 ]; then
             echo -e "\nERROR: Could not start server. Please see logs in /var/log/openxpki"
             exit 333
         fi
+    fi
 
-        if [[ $IS_LEGACY_FCGI == 0 ]]; then
-            echo "Restart OpenXPKI Mojolicious client"
-            systemctl restart openxpki-clientd.service
-            if ! systemctl status openxpki-clientd.service > /dev/null; then
-                echo -e "\nERROR: Could not start client. Please see logs in /var/log/openxpki-ui"
-                exit 333
-            fi
-        else
-            echo "Legacy FCGI: disable OpenXPKI Mojolicious client"
-            systemctl disable openxpki-clientd.service
+    if [[ $IS_LEGACY_FCGI == 0 ]]; then
+        echo "Restart OpenXPKI client (Mojolicious)"
+        systemctl restart openxpki-clientd.service
+        if ! systemctl status openxpki-clientd.service > /dev/null; then
+            echo -e "\nERROR: Could not start client. Please see logs in /var/log/openxpki-client"
+            exit 333
         fi
+    else
+        echo "Legacy FCGI: disable OpenXPKI Mojolicious client"
+        systemctl disable openxpki-clientd.service
     fi
 
     if [[ $IS_APACHE == 1 ]]; then

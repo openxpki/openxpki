@@ -29,9 +29,12 @@ echo "Create users, directories and set up logrotate + log files"
 bash $OXI_SOURCE_DIR/package/debian/core/libopenxpki-perl.preinst install
 
 mkdir -p /etc/openxpki
-mkdir -p /var/log/openxpki
-mkdir -p /var/log/openxpki-ui
+mkdir -p /var/log/openxpki-server
+mkdir -p /var/log/openxpki-client
 mkdir -p /var/www/openxpki
+
+# keep for tests with legacy config
+mkdir -p /var/log/openxpki
 
 # logrotate
 if [ -e /etc/logrotate.d/ ]; then
@@ -66,9 +69,9 @@ bash $OXI_SOURCE_DIR/package/debian/core/libopenxpki-perl.postinst configure
 
 # client log files
 for f in webui acme certep cmc est rpc scep soap; do
-    touch /var/log/openxpki-ui/${f}.log
-    chown openxpkiclient:pkiadm /var/log/openxpki-ui/${f}.log
-    chmod 660 /var/log/openxpki-ui/${f}.log
+    touch /var/log/openxpki-client/${f}.log
+    chown openxpkiclient:pkiadm /var/log/openxpki-client/${f}.log
+    chmod 660 /var/log/openxpki-client/${f}.log
 done
 
 # Apache configuration

@@ -256,7 +256,7 @@ If you get an internal server error, make sure you have the *en_US.utf8*
 locale installed (`locale -a | grep en_US`)!
 
 For further investigation, check
-`/var/log/openxpki-ui/webui.log` and
+`/var/log/openxpki-client/webui.log` and
 `/var/log/apache/error.log`
 
 ## Enabling the SCEP service
