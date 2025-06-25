@@ -15,8 +15,8 @@ OpenXPKI::Client::Service::WebUI::Session
 
 =head1 DESCRIPTION
 
-This is a thin wrapper around L<CGI::Session> that disables C<use CGI> in the
-parent class and any code where the CGI object is accessed afterwards.
+A thin wrapper around L<CGI::Session> that disables C<use CGI> in the parent
+class and any code where the CGI object is accessed afterwards.
 
 The following methods of the parent class are not implemented (i.e. overwritten
 with non-functional code):
@@ -51,7 +51,7 @@ around BUILDARGS => sub ($orig, $class, @args) {
         if (my $driver = $dsn_args->{driver}) {
             Log::Log4perl->initialized or Log::Log4perl->easy_init($ERROR);
             my $log = Log::Log4perl->get_logger('');
-            $log->debug("Checking frontend session driver '$driver' availability");
+            $log->debug("Check frontend session driver '$driver' availability");
             try {
                 Module::Load::load("CGI::Session::Driver::$driver");
             }
