@@ -50,7 +50,7 @@ around BUILDARGS => sub ($orig, $class, @args) {
         my $dsn_args = $class->parse_dsn($dsn);
         if (my $driver = $dsn_args->{driver}) {
             Log::Log4perl->initialized or Log::Log4perl->easy_init($ERROR);
-            my $log = Log::Log4perl->get_logger('');
+            my $log = Log::Log4perl->get_logger('openxpki.client.service.webui.session');
             $log->debug("Check frontend session driver '$driver' availability");
             try {
                 Module::Load::load("CGI::Session::Driver::$driver");
@@ -81,9 +81,10 @@ object instance with the same settings but a new SID etc.
 
 =cut
 sub clone ($self) {
-    # delete old instance data
-    $self->delete;
-    $self->flush;
+    Log::Log4perl->get_logger('openxpki.client.service.webui.session')->debug('Clone frontend session');
+
+    $self->delete;  # delete old instance data
+    $self->flush;   # write changes
 
     # now calling CGI::Session->new() as instance method generates a new object
     # with the same settings but a new SID etc.
