@@ -351,25 +351,32 @@ if [[ $IS_RESTART -eq 1 ]]; then
     echo ""
 
     # oxi-initdb (above) already restarts OpenXPKI
-    if [[ $IS_FULLCONFIG -ne 1 ]]; then
+    if [[ $IS_FULLCONFIG -eq 1 ]]; then
         echo "Restart OpenXPKI server"
         systemctl restart openxpkid.service
-        if ! systemctl status openxpkid.service > /dev/null; then
+        set +e
+        sec=0; error=1; sock=$(perl -e 'use OpenXPKI::Defaults; print $OpenXPKI::Defaults::SERVER_SOCKET')
+        while [ $error -ne 0 -a $sec -lt 20 ]; do
+            test -e $sock; error=$?; sec=$[$sec+1]
+            sleep 1
+        done
+        set -e
+        if [ $error -ne 0 ]; then
             echo -e "\nERROR: Could not start server. Please see logs in /var/log/openxpki"
             exit 333
         fi
+    fi
 
-        if [[ $IS_LEGACY_FCGI == 0 ]]; then
-            echo "Restart OpenXPKI Mojolicious client"
-            systemctl restart openxpki-clientd.service
-            if ! systemctl status openxpki-clientd.service > /dev/null; then
-                echo -e "\nERROR: Could not start client. Please see logs in /var/log/openxpki-ui"
-                exit 333
-            fi
-        else
-            echo "Legacy FCGI: disable OpenXPKI Mojolicious client"
-            systemctl disable openxpki-clientd.service
+    if [[ $IS_LEGACY_FCGI == 0 ]]; then
+        echo "Restart OpenXPKI client (Mojolicious)"
+        systemctl restart openxpki-clientd.service
+        if ! systemctl status openxpki-clientd.service > /dev/null; then
+            echo -e "\nERROR: Could not start client. Please see logs in /var/log/openxpki-ui"
+            exit 333
         fi
+    else
+        echo "Legacy FCGI: disable OpenXPKI Mojolicious client"
+        systemctl disable openxpki-clientd.service
     fi
 
     if [[ $IS_APACHE == 1 ]]; then
