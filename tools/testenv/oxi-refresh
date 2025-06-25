@@ -330,6 +330,17 @@ else
     nginx -t 2>&1 | sed 's/^/ > /'
 fi
 
+# Enable "Keyword Tests"
+kwt_bin=$(command -v openxpkikwt)
+if [[ -e $OXI_TEST_SAMPLECONFIG_DIR/contrib/test/test.yaml && -n $kwt_bin ]]; then
+    echo "Enable Keyword Test config overlay"
+    export OPENXPKI_BACKDOOR_ENABLED=1
+    pushd $OXI_TEST_SAMPLECONFIG_DIR/contrib/test >/dev/null
+    rm -f test.yaml && ln -s test.yaml.tpl test.yaml
+    openxpkikwt prepare | sed 's/^/ > /'
+    popd >/dev/null
+fi
+
 # create SSL keys and certificates and import them into OpenXPKI
 if [[ $IS_FULLCONFIG -eq 1 ]]; then
     echo ""
