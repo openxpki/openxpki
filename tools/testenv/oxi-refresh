@@ -145,8 +145,8 @@ echo
 if [[ $IS_RESTART -eq 1 ]]; then
     set +e
     # service unit might not yet exist if this is a freshly installed system
-    if systemctl list-unit-files openxpkid.service >/dev/null; then
-        systemctl stop openxpkid.service
+    if systemctl list-unit-files openxpki-serverd.service >/dev/null; then
+        systemctl stop openxpki-serverd.service
     fi
     if systemctl list-unit-files openxpki-clientd.service >/dev/null; then
         systemctl stop openxpki-clientd.service
@@ -351,9 +351,9 @@ if [[ $IS_RESTART -eq 1 ]]; then
     echo ""
 
     # oxi-initdb (above) already restarts OpenXPKI
-    if [[ $IS_FULLCONFIG -eq 1 ]]; then
+    if [[ $IS_FULLCONFIG -ne 1 ]]; then
         echo "Restart OpenXPKI server"
-        systemctl restart openxpkid.service
+        systemctl restart openxpki-serverd.service
         set +e
         sec=0; error=1; sock=$(perl -e 'use OpenXPKI::Defaults; print $OpenXPKI::Defaults::SERVER_SOCKET')
         while [ $error -ne 0 -a $sec -lt 20 ]; do

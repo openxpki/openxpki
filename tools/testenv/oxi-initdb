@@ -22,7 +22,7 @@ trap '_exit $?' EXIT
 echo -e "Recreate database and certificates"
 
 echo -e "- stop OpenXPKI"
-systemctl stop openxpkid.service
+systemctl stop openxpki-serverd.service
 
 set -e
 
@@ -31,7 +31,7 @@ $OXI_SOURCE_DIR/tools/testenv/mysql-create-db.sh >$LOG 2>&1
 $OXI_SOURCE_DIR/tools/testenv/mysql-create-schema.sh >$LOG 2>&1
 
 echo -e "- start OpenXPKI"
-systemctl start openxpkid.service
+systemctl start openxpki-serverd.service
 
 set +e
 sec=0; error=1; sock=$(perl -e 'use OpenXPKI::Defaults; print $OpenXPKI::Defaults::SERVER_SOCKET')

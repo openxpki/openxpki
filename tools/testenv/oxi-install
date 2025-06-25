@@ -193,7 +193,7 @@ fi
 
 # Overwrite EE systemd units with Debian units
 echo -e "- copy Debian systemd units"
-cp $OXI_SOURCE_DIR/package/debian/core/libopenxpki-perl.openxpkid.service /usr/lib/systemd/system/openxpkid.service >$LOG 2>&1
+cp $OXI_SOURCE_DIR/package/debian/core/libopenxpki-perl.openxpkid.service /usr/lib/systemd/system/openxpki-serverd.service >$LOG 2>&1
 cp $OXI_SOURCE_DIR/package/debian/core/libopenxpki-perl.openxpki-clientd.service /usr/lib/systemd/system/openxpki-clientd.service >$LOG 2>&1
 
 # finish systemd unit setup after EE code was copied
