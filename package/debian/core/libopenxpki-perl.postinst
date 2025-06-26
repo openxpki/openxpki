@@ -63,6 +63,7 @@ case "$1" in
 
             # static home
             if [ ! -d /var/www/static ]; then
+                # shellcheck disable=SC2174
                 mkdir -p -m755 /var/www/static/_global/
                 chown www-data:www-data /var/www/static/_global/
                 cp /usr/share/doc/libopenxpki-perl/examples/home.html /var/www/static/_global/home.html
@@ -74,20 +75,20 @@ case "$1" in
         chown -R openxpki:root /etc/openxpki/
 
         # Create the pkiadm user
-        COUNT=`grep '^pkiadm:' /etc/passwd | wc -l`;
-        if [ $COUNT -eq 0 ]; then
+        if [ -z "$(getent passwd pkiadm)" ]; then
             # Use useradd here as we need an additonal group
             useradd --create-home -G openxpki pkiadm;
 
             # In case somebody decided to change the home base
-            HOME=`grep pkiadm /etc/passwd | cut -d":" -f6`
-            chown pkiadm:openxpki $HOME
-            chmod 750 $HOME
+            HOME=$(grep pkiadm /etc/passwd | cut -d":" -f6)
+            chown pkiadm:openxpki "$HOME"
+            chmod 750 "$HOME"
         fi;
 
         # Create the sudo file to restart oxi from pkiadm
         if [ ! -e /etc/sudoers.d/pkiadm ] && [ -d /etc/sudoers.d ]; then
-            echo "pkiadm ALL=(ALL) NOPASSWD:/usr/sbin/service openxpkid" > /etc/sudoers.d/pkiadm
+            echo "pkiadm ALL=(ALL) NOPASSWD:/usr/sbin/service openxpki-serverd" > /etc/sudoers.d/pkiadm
+            echo "pkiadm ALL=(ALL) NOPASSWD:/usr/sbin/service openxpki-clientd" >> /etc/sudoers.d/pkiadm
         fi;
 
         # Logs for client (Mojolicious process)
@@ -95,8 +96,8 @@ case "$1" in
         chmod 750 /var/log/openxpki-client
 
         # Logs for backend process
-        chown openxpki:pkiadm /var/log/openxpki
-        chmod 750 /var/log/openxpki
+        chown openxpki:pkiadm /var/log/openxpki-server
+        chmod 750 /var/log/openxpki-server
 
         # create index.html as symlink to default.html
         test -e /var/www/openxpki/index.html || ln -s default.html /var/www/openxpki/index.html
@@ -106,6 +107,7 @@ case "$1" in
 
         # default download directory for CRLs
         if [ ! -d /var/www/download ]; then
+            # shellcheck disable=SC2174
             mkdir -p -m755 /var/www/download
             chown openxpki:www-data /var/www/download
         fi;
@@ -115,7 +117,7 @@ case "$1" in
             cp /usr/share/doc/libopenxpki-perl/examples/logrotate.conf /etc/logrotate.d/openxpki
         fi;
 
-        if [ -e "/run/openxpkid/openxpkid.sock" ]; then
+        if [ -e "/run/openxpkid/openxpkid.sock" ] || [ -e "/run/openxpki-clientd/openxpki-clientd.sock" ]; then
             echo "OpenXPKI seems to be running! You should restart it NOW to avoid any";
             echo "compatibility issues. You usually also need to restart the webserver"
             echo "process."

@@ -73,8 +73,8 @@ $ gpg --print-md sha256 Release.key (Updated 2025-05-16)
 3FEB1721 48F53252 A6644B65 AD06304F 4751E129 510081E0 042E4E80 1175E3F8
 ```
 
-You can also find the key on the github repository in
-[package/debian/Release.key`.
+You can also find the key on the [github repository](https://github.com/openxpki/openxpki) in
+`package/debian/Release.key`.
 
 Add the repository to your source list (bookworm):
 
@@ -162,15 +162,13 @@ If you do not use debian packages, you can get a copy from
 Now create a user for the UI session storage
 
 ```sql
-CREATE USER 'openxpki_session'@'localhost' IDENTIFIED BY 'mysecret'; 
-GRANT SELECT, INSERT, UPDATE, DELETE ON openxpki.frontend_session 
-TO 'openxpki_session'@'localhost'; 
+CREATE USER 'openxpki_session'@'localhost' IDENTIFIED BY 'mysecret';
+GRANT SELECT, INSERT, UPDATE, DELETE ON openxpki.frontend_session
+TO 'openxpki_session'@'localhost';
 flush privileges;
 ```
 
-
-
-\...and put the used credentials into
+...and put the used credentials into
 /etc/openxpki/client.d/service/webui/default.yaml:
 
 ```yaml
@@ -188,25 +186,29 @@ session:
 ### Sample / Demo Configuration
 
 The debian package comes with a shell script `sampleconfig.sh` that does
-all the work for you (look in
-/usr/share/doc/libopenxpki-perl/examples/). The script will create a
-two-stage ca with a root ca certificate and below your issuing ca and
-certs for SCEP and the internal datasafe.
+all the work for you (look in /usr/share/doc/libopenxpki-perl/examples/).
+The script will create a two-stage ca with a root ca certificate and below
+your issuing ca and certs for SCEP and the internal datasafe.
 
-It will also start the required services, you should be able to log into
-the system via the webbrowser using the default credentials (see section
+It is required that the backend service is already up and running:
+
+```bash
+systemctl start openxpki-serverd
+```
+
+If successful, the script will start the webserver and OpenXPKI application server and you should be able to log into
+the system via your webbrowser using the default credentials (see section
 [Testdrive](#testdrive) below).
 
 This script provides a quickstart but should **never be used for
-production systems** (it has the fixed passphrase *root* for all keys ;)
-and no policy/crl, etc config ).
+production systems** (it has the fixed passphrase *root* for all keys
+and no policy/crl, etc configured ).
 
 ### Production Configuration
 
-For a production setup we recommend to remove the
-`/etc/openxpki`  folder that was installed by the package and
-use a checkout of the [openxpki-config repository
-at https://github.com/openxpki/openxpki-config](https://github.com/openxpki/openxpki-config).
+For a production setup we recommend to remove the `/etc/openxpki`
+folder that was installed by the package and use a checkout of the
+[openxpki-config repository](https://github.com/openxpki/openxpki-config).
 
 Follow the steps in the README and QUICKSTART document to setup your
 production realms.
@@ -225,11 +227,9 @@ password is randomized during setup, you will see it on the console
 during install and can find it in clear text in
 `/etc/openxpki/config.d/realm.tpl/auth/handler.yaml`
 
-The usernames are [alice` and [bob` (users) and
-[rob`, [rose` and [raop`
-(operators). To setup your local user database have a look at the files
-in the auth directory and the
-[reference/configuration/realm.html#authentication](reference/configuration/realm.html#authentication)
+The usernames are `alice` and `bob` (users) and `rob`, `rose` and `raop` (operators).
+To setup your local user database have a look at the files in the `auth` directory and the
+[authentication section in the realm configuration](reference/configuration/realm.html#authentication)
 
 1.  Login as User (Username: bob, Password: \<see above\>)
 2.  Go to \"Request\", select \"Request new certificate\"
