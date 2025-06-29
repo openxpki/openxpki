@@ -132,6 +132,7 @@ has 'log' => (
     init_arg => undef,
     lazy => 1,
     default => sub ($self) {
+        # TODO Remove log_facility after CGI removal because set_default_facility() is done in OpenXPKI::Client::Web::Controller->index()
         OpenXPKI::Log4perl->set_default_facility($self->log_facility);
         return OpenXPKI::Log4perl->get_logger();
     },
@@ -172,7 +173,7 @@ has 'log_facility' => (
     lazy => 1,
     default => sub ($self) {
         $self->default->{logger}
-            ? 'openxpki.client.' . $self->service # the logger for this is defined in __init_log4perl()
+            ? 'openxpki.client.service.' . $self->service # the logger for this is defined in __init_log4perl()
             : ($self->default->{global}->{log_facility} || '')
     },
 );
