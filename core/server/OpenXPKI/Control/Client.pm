@@ -211,7 +211,7 @@ sub cmd_start ($self) {
 
     my $daemon = Mojo::Server::Prefork->new(
         %server_params,
-        reverse_proxy => 1,
+        reverse_proxy => 1, # makes Mojolicious process "X-Forwarded-For" ($request->remote_address) and "X-Forwarded-Proto"
         cleanup => 0, # don't try to delete PID file (would fail for non-root user and PID file e.g. below /run )
     );
 
