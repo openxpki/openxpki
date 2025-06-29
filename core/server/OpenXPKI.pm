@@ -6,6 +6,7 @@ use OpenXPKI::VERSION;
 our $VERSION = $OpenXPKI::VERSION::VERSION;
 
 use Import::Into;
+use List::Util qw( any );
 
 =head1 NAME
 
@@ -47,8 +48,8 @@ sub import {
 
     my %flags;
     while (my $flag = shift) {
-        # -base must be followed by the name of the base class
-        $flags{$flag} = $flag eq '-base' ? shift : 1;
+        # -base and -parent must be followed by the name of the base class
+        $flags{$flag} = (any { $flag eq $_ } ('-base', '-parent')) ? shift : 1;
     }
 
     # -parent is an alias for -base
