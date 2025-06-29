@@ -7,7 +7,7 @@ use Module::Load ();
 
 # CPAN modules
 use Net::Server::Daemonize qw( set_uid set_gid );
-use Log::Log4perl qw(:levels);
+use Log::Log4perl qw( :levels :no_extra_logdie_message );
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
@@ -518,12 +518,22 @@ sub do_process_request {
     ##! 16: 'connection to database successful'
 
     # this is run until the user has logged in successfully
-    ##! 16: 'calling OpenXPKI::Service::*->init()'
-    $service->init();
+    ##! 16: 'calling '.blessed($service).'->init()'
+    try {
+        $service->init;
+    }
+    catch ($err) {
+        $log->logdie(blessed($service)."->init() failed: $err");
+    }
 
     ## use user interface
-    ##! 16: 'calling OpenXPKI::Service::*->run()'
-    $service->run();
+    ##! 16: 'calling '.blessed($service).'->run()'
+    try {
+        $service->run;
+    }
+    catch ($err) {
+        $log->logdie(blessed($service)."->run() failed: $err");
+    }
 
     OpenXPKI::Server::__set_process_name("worker: wfc");
 
