@@ -56,15 +56,6 @@ sub get_logger {
     return $logger;
 }
 
-# create log methods which will emit "message" events
-for my $method ( qw{
-    fatal error warn info debug trace
-    logdie logwarn error_die error_warn
-    logconfess logcroak logcluck logcarp
-} ) {
-    monkey_patch __PACKAGE__, $method => sub { shift->emit( message => ($method, @_) ) }
-}
-
 sub BUILD ($self, $args) {
     # consume "message" events
     $self->on( message => $self->can('_message') );
@@ -80,6 +71,20 @@ sub _message ($self, $method, @message) {
     return $self;
 }
 
+# create log methods which will emit "message" events
+sub log ($self, $method, @args) {
+    $self->emit( message => (lc($method), @args) );
+}
+for my $method ( qw{
+    fatal error warn info debug trace
+    logdie logwarn error_die error_warn
+    logconfess logcroak logcluck logcarp
+} ) {
+    monkey_patch __PACKAGE__, $method => sub ($self, @args) {
+        $self->emit( message => ($method, @args) );
+    }
+}
+
 # Mojo::Log provides 'path' 'handle' and 'format' to handle log location and
 # formatting. Those make no sense in Log4perl environment.
 sub path   { warn 'path() is not implemented' }
@@ -93,8 +98,6 @@ sub format {
 
 # Mojolicious 8.23 adds method context which needs to be implemented.
 sub context { shift }
-
-sub log { shift->emit('message', lc(shift), @_) }
 
 sub is_trace { shift->_logger->is_trace }
 sub is_debug { shift->_logger->is_debug }
