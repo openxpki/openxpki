@@ -188,7 +188,7 @@ sub send_response ($self, $c, $response) {
         # the payload of the workflow
         my $data = $response->result->{data} || {};
 
-        $self->log->trace(Dumper $data) if $self->log->is_trace;
+        $self->log->trace('data = ' . Dumper $data) if $self->log->is_trace;
 
         my $payload;
         my $mime = $download->{mime} || 'application/octet-stream';
@@ -223,7 +223,7 @@ sub send_response ($self, $c, $response) {
             return $c->render();
         }
 
-        $self->log->trace(Dumper $payload);
+        $self->log->trace('payload = ' . Dumper $payload) if $self->log->is_trace;
 
         $c->res->headers->content_type($download->{mime} || 'application/octet-stream');
         $c->res->headers->content_disposition("attachment;filename=".$download->{filename})
