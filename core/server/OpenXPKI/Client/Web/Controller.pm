@@ -73,6 +73,13 @@ sub index ($self) {
     my $endpoint = $self->stash('endpoint') or die "Missing or empty parameter 'endpoint' in Mojolicious stash";
     my $no_config = $self->stash('no_config');
 
+    # Replace Mojolicious logger by our own.
+    # The default_facility will be used e.g. when OpenXPKI::Client::Service::Role::Base->log's
+    # builder calls OpenXPKI::Log4perl->get_logger()
+    Log::Log4perl::MDC->put('endpoint', $endpoint);
+    OpenXPKI::Log4perl->set_default_facility("openxpki.client.service.$service_name.$endpoint");
+    $self->stash('mojo.log' => OpenXPKI::Log4perl->get_logger); # DefaultHelper "log" (i.e. $self->log) accesses stash "mojo.log"
+
     # load and instantiate service class
     my $service;
     my $config;
@@ -85,22 +92,13 @@ sub index ($self) {
         # for the WebUI we create a reusable backend instance via the factory
         # FIXME we need to rework the O:C:Simple to make it reusable too
         if (any { $service_name eq $_ } ('webui','healthcheck')) {
+            $self->log->debug('Create reusable (cross-request) client to handle server socket communication');
             %backend = ( client => $self->oxi_client() );
-            $self->log->debug("Adding backend for $service_name in $$");
         }
     }
     catch ($error) {
-        my $msg = sprintf("Error while loading configuration for service '%s': %s", $service_name, $error);
-        $self->log->fatal($error);
-        die "$error\n";
+        $self->log->logdie(sprintf("Error while loading configuration for service '%s': %s", $service_name, $error));
     }
-
-    Log::Log4perl::MDC->put('endpoint', $endpoint);
-    OpenXPKI::Log4perl->set_default_facility("openxpki.client.service.$service_name.$endpoint");
-
-    # replace Mojolicious logger by our own
-    $self->app->log(OpenXPKI::Log4perl->get_logger);
-    $self->stash('mojo.log' => undef); # reset DefaultHelper "log" (i.e. $self->log) which accesses stash "mojo.log"
 
     try {
         $self->log->trace("Load service class $class");
