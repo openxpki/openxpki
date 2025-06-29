@@ -253,6 +253,7 @@ EOF
         log4perl.logger.connector = ERROR, Console
         log4perl.logger.openxpki.client.system.server = $server_level, Console
         log4perl.additivity.openxpki.client.system.server = 0
+        log4perl.filter.SkipMojolicious = OpenXPKI::Log4perl::Filter::SkipMojolicious
 EOF
 
         # show category if services also log to console (to distinct messages)
@@ -266,12 +267,14 @@ EOF
         if (OpenXPKI::Util->is_systemd) {
             # journald
             $conf_appenders.= <<"EOF";
-            log4perl.appender.Console                              = OpenXPKI::Log4perl::Appender::Journald
-            log4perl.appender.Console.layout                       = Log::Log4perl::Layout::PatternLayout
-            log4perl.appender.Console.layout.ConversionPattern     = ${cat_server}%m [%i{verbose}]
-            log4perl.appender.ConsoleSvc                           = OpenXPKI::Log4perl::Appender::Journald
-            log4perl.appender.ConsoleSvc.layout                    = Log::Log4perl::Layout::PatternLayout
-            log4perl.appender.ConsoleSvc.layout.ConversionPattern  = ${cat}%m [%i{verbose}]
+            log4perl.appender.Console                             = OpenXPKI::Log4perl::Appender::Journald
+            log4perl.appender.Console.Filter                      = SkipMojolicious
+            log4perl.appender.Console.layout                      = Log::Log4perl::Layout::PatternLayout
+            log4perl.appender.Console.layout.ConversionPattern    = ${cat_server}%m [%i{verbose}]
+            log4perl.appender.ConsoleSvc                          = OpenXPKI::Log4perl::Appender::Journald
+            log4perl.appender.ConsoleSvc.Filter                   = SkipMojolicious
+            log4perl.appender.ConsoleSvc.layout                   = Log::Log4perl::Layout::PatternLayout
+            log4perl.appender.ConsoleSvc.layout.ConversionPattern = ${cat}%m [%i{verbose}]
 EOF
         } else {
             # screen
@@ -295,6 +298,7 @@ EOF
                 log4perl.appender.$appender.recreate                 = 1
                 log4perl.appender.$appender.recreate_check_interval  = 120
                 log4perl.appender.$appender.filename                 = /var/log/openxpki-client/$service.log
+                log4perl.appender.$appender.Filter                   = SkipMojolicious
                 log4perl.appender.$appender.layout                   = Log::Log4perl::Layout::PatternLayout
                 log4perl.appender.$appender.layout.ConversionPattern = %d %p{3} %m [%i{verbose}]%n
                 log4perl.appender.$appender.syswrite                 = 1
