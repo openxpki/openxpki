@@ -167,20 +167,19 @@ sub startup ($self) {
         if ($pid != $PID) {
             $client = undef;
             $pid = $PID;
-            $self->log->warn('Fork detected with active client handle');
+            $self->log->warn('Fork detected with active server communication client');
         }
 
         try {
             unless ($client and $client->is_connected) {
-                $self->log->debug('creating new socket connection for pid '.$PID) unless $client;
                 $client = OpenXPKI::Client->new(
                     ($socket ? (socketfile => $socket) : ()),
                     timeout => ($config_obj->get('system.backend.timeout') || 30),
                 );
             }
         } catch ($error) {
-            $self->log->error(sprintf("Unable to connect to backend (%s)", $error));
-            die "Unable to connect to backend";
+            $self->log->error("Unable to instantiate server communication client: $error");
+            die "Unable to instantiate server communication client";
         }
         return $client;
     });
@@ -309,18 +308,18 @@ sub startup ($self) {
             if (my $query_b64 = $c->req->headers->header('X-ReverseProxy-QueryString')) {
                 my $query = decode_base64($query_b64);
                 $c->req->url->query($query);
-                $self->log->trace("Query string (via custom header): $query");
-            } else {
-                $self->log->trace('Query string: ' . $c->req->url->query);
+                $self->log->trace("Query string received via custom header: $query");
             }
 
             if ($self->log->is_debug) {
-                my $msg = sprintf('%s request: %s %s ',
+                my $query = $c->req->url->query->to_string;
+                my $msg = sprintf('%s request: %s %s%s',
                     uc($c->req->url->base->scheme),
                     $c->req->method,
                     $c->req->url->path, # NOT ->to_abs() so we can spot differences in webserver configs
+                    $query ? "?$query" : '',
                 );
-                $self->log->debug($msg . '-' x max(80-length($msg), 0));
+                $self->log->debug($msg);
             }
         }
         catch ($error) {

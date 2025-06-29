@@ -4,7 +4,7 @@ use OpenXPKI -base => 'Mojolicious::Controller';
 # Core modules
 use Module::Load ();
 use List::Util 'any';
-use Log::Log4perl;
+use Log::Log4perl qw( :no_extra_logdie_message );
 use Log::Log4perl::MDC;
 
 # Project modules
@@ -115,7 +115,7 @@ sub index ($self) {
           unless $service->DOES('OpenXPKI::Client::Service::Role::Base');
     }
     catch ($error) {
-        die sprintf("Error loading service class %s: %s", $class, $error);
+        $self->log->logdie(sprintf("Error loading service class %s: %s", $class, $error));
     }
 
     # Setup locale if defined
@@ -143,7 +143,7 @@ sub index ($self) {
 
     if (not $response) {
         # request handling
-        $self->log->trace("Request handling (2/3): process request");
+        $self->log->trace("Request handling (2/3): processing");
         $response = $service->handle_request;
         die "Result of $class->handle_request() is not an instance of OpenXPKI::Client::Service::Response"
           unless $response->isa('OpenXPKI::Client::Service::Response');
@@ -157,7 +157,7 @@ sub index ($self) {
     $self->res->message($response->http_status_message);
 
     # HTTP response
-    $self->log->trace("Request handling (3/3): send response");
+    $self->log->trace("Request handling (3/3): response");
     try { $service->send_response($self, $response) }
     catch ($err) { $self->log->error($err) }
 

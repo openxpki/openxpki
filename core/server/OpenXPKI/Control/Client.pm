@@ -152,7 +152,7 @@ sub cmd_start ($self) {
         if ($self->config->system_logger_target eq 'none') {
             $log->warn('Logging will be disabled according to config (system.logger.target: none)')
         } else {
-            $log->info('Setup logging according to config in ' . $self->config_path);
+            $log->info('Set up logging according to config in ' . $self->config_path);
         };
 
         OpenXPKI::Log4perl->init_or_fallback( \$log4perl_conf );

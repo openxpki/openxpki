@@ -394,6 +394,7 @@ has client => (
 sub _build_client ($self) {
     my $cc;
     try {
+        $self->log->debug('Create client to handle server socket communication');
         my $socket = $self->config->get('global.socket');
         my $timeout = $self->config->get('global.timeout');
         $cc = OpenXPKI::Client->new(
@@ -431,7 +432,7 @@ has client_simple => (
 );
 sub _build_client_simple ($self) {
     try {
-        $self->log->debug('creating new socket connection for pid '.$PID);
+        $self->log->debug('Create simple client to handle server socket communication');
         return OpenXPKI::Client::Simple->new(
             logger => $self->log,
             config => $self->config->get_hash('global'), # realm and locale
