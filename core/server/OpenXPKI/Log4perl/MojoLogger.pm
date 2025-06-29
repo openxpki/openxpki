@@ -7,6 +7,7 @@ use Log::Log4perl;
 use Mojo::Util qw( monkey_patch );
 
 Log::Log4perl->wrapper_register(__PACKAGE__); # make Log4perl step up to the next call frame
+Log::Log4perl->wrapper_register('Mojo::EventEmitter');
 
 our $LOGGERS_BY_NAME = {};
 
