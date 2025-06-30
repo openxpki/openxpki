@@ -173,8 +173,11 @@ sub _build_session ($self) {
     Log::Log4perl::MDC->put('sid', substr($session->id,0,4));
 
     if ($self->log->is_debug) {
-        my %info = (dsn => $session_dsn, ID => $session->id);
-        $info{expires} = $session->expire if $session->expire;
+        my %info = (
+            ID => $session->id,
+            $session_dsn ? (dsn => $session_dsn) : (),
+            $session->expire ? (expires => $session->expire) : (),
+        );
         $self->log->debug('Frontend session: ' . join(', ', map { "$_ = $info{$_}" } sort keys %info));
     }
 
