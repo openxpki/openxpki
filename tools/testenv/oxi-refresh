@@ -327,6 +327,12 @@ if [[ $IS_APACHE == 1 ]]; then
 else
     echo -e "Configure nginx web server"
     cp $OXI_TEST_SAMPLECONFIG_DIR/contrib/nginx-openxpki-site /etc/nginx/sites-available/openxpki
+    if [ ! -e /etc/nginx/sites-enabled/openxpki ]; then
+        ln -s /etc/nginx/sites-available/openxpki /etc/nginx/sites-enabled/openxpki
+    fi
+    if [ -e /etc/nginx/sites-enabled/default ]; then
+        rm /etc/nginx/sites-enabled/default
+    fi
     nginx -t 2>&1 | sed 's/^/ > /'
 fi
 
