@@ -62,7 +62,7 @@ install-stamp: build
 	dh_installdirs
 	$(MAKE) install PREFIX=$(CURDIR)/debian/libopenxpki-perl/usr
 	dh_makeshlibs
-	dh_installsystemd --no-start --no-enable --name=openxpkid
+	dh_installsystemd --no-start --no-enable --name=openxpki-serverd
 	dh_installsystemd --no-start --no-enable --name=openxpki-clientd
 	touch install-stamp
 
