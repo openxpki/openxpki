@@ -1,6 +1,8 @@
 package OpenXPKI::Crypto::Token::Vault;
 use OpenXPKI -class;
 
+with 'OpenXPKI::Crypto::TokenStaticRole';
+
 # Project modules
 use OpenXPKI::Crypto::VolatileVault;
 use OpenXPKI::Server::Context qw( CTX );

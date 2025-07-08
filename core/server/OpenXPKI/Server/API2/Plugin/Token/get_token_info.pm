@@ -37,7 +37,7 @@ command "get_token_info" => {
 
     my $alias = $params->alias;
     # strip off the generation number
-    $alias =~ /^(.*)-(\d+)$/;
+    $alias =~ m{^(.*?)(-(\d+))?$};
     if (not $1 or not $types{$1}) {
         OpenXPKI::Exception->throw (
             message => 'Unable to determine token type by alias',

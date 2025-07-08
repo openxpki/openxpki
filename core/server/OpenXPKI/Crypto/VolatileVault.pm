@@ -211,7 +211,7 @@ use Digest::SHA qw( sha1_base64 );
         # check if we created this cookie
         if ($self->get_key_id() ne $creator_ident) {
             OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_DECRYPT_INVALID_VAULT_INSTANCE");
+            message => "vault instance id does not match id of encypted data");
         }
 
         if (($encoding eq 'base64') || ($encoding eq 'base64-oneline')) {
