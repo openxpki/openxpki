@@ -38,17 +38,18 @@ sub BUILD {
     my $self = shift;
 
     my $kid2role = {};
-    my $keys = CTX('config')->get_hash(['system','cli','auth']);
+    my @keys = CTX('config')->get_keys(['system','cli','auth']);
 
     my @key_list = map {
-        my $item = $keys->{$_};
+        my $item = CTX('config')->get_hash(['system','cli','auth',$_]);
+        next unless ($item->{key});
         my $pubkey = Crypt::PK::ECC->new(\$item->{key});
         my $jwk_hash = $pubkey->export_key_jwk('public', 1);
         $jwk_hash->{kid} = $pubkey->export_key_jwk_thumbprint();
         $kid2role->{$jwk_hash->{kid}} = $item->{role} || '_System';
         $jwk_hash->{name} = $_;
         $jwk_hash;
-    } keys %$keys;
+    } @keys;
 
     $self->kid_list(\@key_list);
     $self->kid2role($kid2role);
