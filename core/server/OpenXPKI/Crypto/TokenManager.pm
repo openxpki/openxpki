@@ -327,6 +327,19 @@ sub __create_token {
         params => { class_name => $backend_class, message => $@ }
     ) if $@;
 
+
+    if ($backend_class->DOES('OpenXPKI::Crypto::TokenStaticRole')) {
+        OpenXPKI::Exception->throw (
+            message => 'Request for diversified token but class is static',
+            params => { class_name => $backend_class, alias => $name }
+        ) if ($group);
+    } else {
+        OpenXPKI::Exception->throw (
+            message => 'Request for static token but class is not static',
+            params => { class_name => $backend_class, alias => $name }
+        ) if (!$group);
+    }
+
     ##! 16: "Token backend: $backend_class, Secret group: $token_config->{secret}"
 
     my %param;

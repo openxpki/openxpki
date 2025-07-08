@@ -9,6 +9,8 @@ OpenXPKI::Server::API2::Plugin::Token::get_token_alias_by_x
 
 =cut
 
+use Mojo::Loader;
+
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Plugin::Token::Util;
@@ -98,6 +100,19 @@ command "list_token_groups" => {
 #
 sub _token_alias_by_group {
     my ($self, $group, $validity) = @_;
+
+    # Support for "static" tokens (direct configuration without alias)
+    # For the moment this is only the vault class so we hard code it
+    # should be moved to a class property / role
+    if (my $class = CTX('config')->get_inherit(["crypto","token",$group,"class"])) {
+        if (Mojo::Loader::load_class($class)) {
+            die "Unable to load implementation class for token group $group\n";
+        }
+        if ($class->DOES('OpenXPKI::Crypto::TokenStaticRole')) {
+            ##! 16: "Looks like $group is static"
+            return $group;
+        }
+    }
 
     my $pki_realm = CTX('session')->data->pki_realm;
     ##! 16: "Find token for group $params->group in realm $pki_realm"
