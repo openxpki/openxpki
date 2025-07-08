@@ -276,7 +276,7 @@ if (my $keyfile = $opt{'auth-key'}) {
 # Explicit auth config
 } elsif ($opt{'auth-config'}) {
 
-} elsif (my $keyfile = $ENV{OPENXPKI_CLIENT_KEY_FILE}) {
+} elsif ($keyfile = $ENV{OPENXPKI_CLIENT_KEY_FILE}) {
     if (!-r $keyfile) {
         LOGDIE('Unable to find/read keyfile from ENV at ' . $keyfile);
     }
@@ -294,6 +294,8 @@ if (my $keyfile = $opt{'auth-key'}) {
     }
 }
 
+INFO('Enable privileged mode using keyfile '. $auth_args{account_key})
+    if ($auth_args{account_key});
 
 # if we have a keyfile we check if the password flag was given
 if ($auth_args{account_key}) {
