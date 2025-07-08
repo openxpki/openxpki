@@ -5,6 +5,8 @@ use OpenXPKI -role;
 use List::Util qw( none );
 use File::Basename;
 
+use Digest::SHA qw(sha256_hex);
+
 =head1 NAME
 
 OpenXPKI::Client::API::Command::token

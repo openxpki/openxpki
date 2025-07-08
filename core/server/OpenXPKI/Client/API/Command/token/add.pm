@@ -36,7 +36,7 @@ command "add" => {
 
     my $type = $param->type;
     my $groups = $self->run_command('list_token_groups');
-    die "Token group '$type' is not a valid selection" unless ($groups->params->{$type});
+    die "Token group '$type' is not a valid selection\n" unless ($groups->params->{$type});
 
     my $group = $groups->params->{$type};
     my $cert_identifier;
@@ -54,7 +54,8 @@ command "add" => {
         $cert_identifier = $param->identifier
 
     } else {
-        die "You must provide either a PEM encoded certificate or an existing identifier";
+
+        die "You must provide either a PEM encoded certificate\nor a valid certificate identifier\n";
     }
 
     my $cmd_param = {

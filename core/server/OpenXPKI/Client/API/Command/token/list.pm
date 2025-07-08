@@ -30,6 +30,7 @@ command "list" => {
 
     foreach my $group (@names) {
         my $entries = $self->run_command('list_active_aliases', { group => $group });
+        next unless ($entries->result->@*);
         my $grp = {
             count => (scalar @{$entries->result}),
             active => $entries->result->[0]->{alias},
