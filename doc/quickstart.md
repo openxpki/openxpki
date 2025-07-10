@@ -255,6 +255,11 @@ browsers developer console (F12 or CTRL+F12 on most browsers).
 If you get an internal server error, make sure you have the *en_US.utf8*
 locale installed (`locale -a | grep en_US`)!
 
+If you encounter "Received ProtectedCommand without proper authentication"
+errors when using the `oxi` command line tool, see the [CLI authentication 
+setup documentation](operation/cli.html#authentication-setup) for instructions 
+on configuring the necessary authentication keys.
+
 For further investigation, check
 `/var/log/openxpki-client/webui.log` and
 `/var/log/apache/error.log`
@@ -274,6 +279,16 @@ oxi token add --realm democa --type scep --cert scep.crt --key scep.key
 **Note**: Each realm needs its own SCEP token so you need to run this
 command for any realm that provides an SCEP service. It is possible to
 use the same SCEP token in multiple realms.
+
+You can also use the legacy command to add the scep token:
+
+**Note**: You'll need to add the token twice (the first time for for cmcra and once for scep)
+
+```bash
+openxpkiadm alias --realm democa --token scep --file scep.crt --key scep.key
+openxpkiadm alias --realm democa --token scep --file scep.crt --key scep.key
+```
+
 
 ### Setup SCEP Endpoint
 
@@ -295,6 +310,11 @@ SCEP supports enrollment via challenge password as well as signing on
 behalf. Advanced configuration is described in the scep workflow
 section.
 
+**Important**: The default SCEP configuration uses `SecretChallenge` as the 
+challenge password and requires the certificate Common Name (CN) to end with 
+`openxpki.test` to receive automated approval. If your certificate CN does not 
+end with `openxpki.test`, the request will require manual approval by an operator.
+
 The best way for testing the service is the sscep command line tool (available at e.g. <https://github.com/certnanny/sscep>).
 
 Check if the service is working properly at all:
@@ -310,7 +330,8 @@ folder.
 To test an enrollment:
 
 ```bash
-openssl req -new -keyout tmp/scep-test.key -out tmp/scep-test.csr -newkey rsa:2048 -nodes
+openssl req -new -keyout tmp/scep-test.key -out tmp/scep-test.csr -newkey rsa:2048 -nodes \
+    -subj "/CN=scep-test.openxpki.test"
 ./sscep enroll -u http://yourhost/scep/generic \
     -k tmp/scep-test.key -r tmp/scep-test.csr \
     -c tmp/cacert-0 \
@@ -319,9 +340,10 @@ openssl req -new -keyout tmp/scep-test.key -out tmp/scep-test.csr -newkey rsa:20
 ```
 
 Make sure you set the challenge password when prompted (default:
-'SecretChallenge'). On current desktop hardware the issue workflow
-will take approx. 10 seconds to finish and you should end up with a
-certificate matching your request in the tmp folder.
+'SecretChallenge'). Note that the example above uses `scep-test.openxpki.test` 
+as the CN, which ends with `openxpki.test` and will receive automated approval.
+On current desktop hardware the issue workflow will take approx. 10 seconds to 
+finish and you should end up with a certificate matching your request in the tmp folder.
 
 ## Support for Java Keystore
 
