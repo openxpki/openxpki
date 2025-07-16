@@ -267,14 +267,6 @@ sub startup ($self) {
             Log::Log4perl::MDC->remove;
             Log::Log4perl::MDC->put('rid', $c->req->request_id);
 
-            # Normally e.g. Apache should be configured to forward the "Host" header
-            # (via "ProxyPreserveHost On"). But if X-Forwarded-Host is set we use
-            # this because "Host" may contain the local webserver host.
-            if (my $host_port = $c->req->headers->header('X-Forwarded-Host')) {
-                $self->log->trace("Use info from header X-Forwarded-Host = $host_port");
-                $c->req->url->host_port($host_port);
-            }
-
             if ($self->mode eq 'development') {
                 $self->log->debug('Enforce HTTPS because of Mojolicious development mode');
                 $c->req->url->base->scheme('https');
