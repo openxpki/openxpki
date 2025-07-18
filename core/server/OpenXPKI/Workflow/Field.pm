@@ -37,9 +37,8 @@ has 'log' => (
 
 
 # B<Please note>: this will modify the given C<$field> I<HashRef> in-place!
-sub process {
-    my $class = shift;
-    my $self = $class->new(@_);
+sub process ($class, @args) {
+    my $self = $class->new(@args);
 
     # default "type"
     $self->field->{type} //= 'text';
@@ -69,23 +68,24 @@ sub process {
 }
 
 # TODO - Backward compatibility: up to v3.1 select fields in form elements only had a list directly attached
-sub legacy_options {
-    my $self = shift;
-
+sub legacy_options ($self) {
     return 0 unless ref $self->field->{option} eq 'ARRAY';
+    my @items = $self->field->{option}->@*;
+
+    # treat empty first item as flag for placeholder for required fields
+    if ($items[0] =~ /^\s*$/ and $self->field->{required} and not $self->field->{placeholder}) {
+        shift @items;
+        $self->field->{placeholder} = '_default'; # magic value processed in htdocs_source/app/components/oxi-section/form/field/select/index.js
+    }
 
     $self->field->{option} = [
-        map {
-            { label => $_, value => $_ }
-        } @{$self->field->{option}}
+        map { { label => $_, value => $_ } } @items
     ];
     return 1;
 }
 
 # "option" attribute: do explicit calls to ensure recursive config resolving.
-sub resolve_options {
-    my $self = shift;
-
+sub resolve_options ($self) {
     my $mode = $self->config->get( [ @{$self->path}, 'option', 'mode' ] ) || 'list';
     my @options;
 
@@ -127,9 +127,7 @@ sub resolve_options {
 
 # "keys" attribute: do explicit calls to ensure recursive config resolving.
 # (e.g. for SAN fields with dynamic key/value assignment)
-sub resolve_keys {
-    my $self = shift;
-
+sub resolve_keys ($self) {
     return unless $self->field->{keys};
 
     my @keys;
@@ -145,9 +143,7 @@ sub resolve_keys {
 # Tries to convert the Perl RegEx in 'match' into an ECMA compatible version.
 # Returns nothing if the Perl RegEx contains special sequences that cannot be
 # translated.
-sub perlre_to_ecma {
-    my $self = shift;
-
+sub perlre_to_ecma ($self) {
     my $perl_re = $self->field->{match}
         or return;
 
@@ -172,10 +168,7 @@ Translate legacy and profile-only field attributes (e.g. C<keep>, C<default>
 for placeholder, etc.) to get a definition that matches workflow fields.
 
 =cut
-sub transform_profile_field {
-    my $self = shift;
-    my $parent_name = shift;
-
+sub transform_profile_field ($self) {
     $self->log->trace("Field '".$self->field->{id}."': profile spec = " . Dumper $self->field) if $self->log->is_trace;
 
     # type "freetext" -> "text"
