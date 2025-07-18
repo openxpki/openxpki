@@ -728,6 +728,8 @@ cgi-bin/healthcheck.fcgi
 #   core/htdocs_source/update-manifest.pl will update the list below.
 #   UPDATE_MANIFEST_UI_LIST - do not remove this comment
 htdocs/assets/chunk.04b5e769fbf1d1409605.js
+htdocs/assets/chunk.05840597bc2c10747a75.js
+htdocs/assets/chunk.05840597bc2c10747a75.js.LICENSE.txt
 htdocs/assets/chunk.09010993f92343c86200.js
 htdocs/assets/chunk.09e17b3536a32796d42c.js
 htdocs/assets/chunk.13992ceb042add1f44f2.js
@@ -757,8 +759,6 @@ htdocs/assets/chunk.594049e0da81b4b55398.js
 htdocs/assets/chunk.595a2af1a2b94ba45805.js
 htdocs/assets/chunk.5a5c4ac407a51ceeb244.js
 htdocs/assets/chunk.662680e59ad07d18c925.js
-htdocs/assets/chunk.6d41bebc609529f112ae.js
-htdocs/assets/chunk.6d41bebc609529f112ae.js.LICENSE.txt
 htdocs/assets/chunk.7971cf8539d2826a6631.js
 htdocs/assets/chunk.79f62618ec578a275ca8.js
 htdocs/assets/chunk.84adb6e166a4ced92552.js
