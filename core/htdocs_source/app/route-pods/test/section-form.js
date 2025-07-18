@@ -134,6 +134,16 @@ export default [
                 },
                 {
                     type: "select",
+                    name: "select_no_preset_default_placeholder",
+                    label: "Select, no preset, default placeholder",
+                    options: [
+                        { value: 1, label: "Major" },
+                        { value: 2, label: "Tom" },
+                    ],
+                    placeholder: "_default",
+                },
+                {
+                    type: "select",
                     name: "select_no_preset_no_placeholder",
                     label: "Select, no preset, no placeholder",
                     options: [
