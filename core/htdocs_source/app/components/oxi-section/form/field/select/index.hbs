@@ -35,11 +35,12 @@
         {{/if}}
         {{#if @content.editable}}
             <BsButton
-                @type=""
+                @type="sm"
                 @active={{this.customMode}}
                 @onClick={{this.toggleCustomMode}}
                 class="bg-secondary-subtle border-secondary"
             >
+                <span class="bi {{if this.customMode "bi-check-circle-fill" "bi-circle"}}"></span>
                 {{t 'component.oxifield_select.custom_value'}}
             </BsButton>
         {{/if}}
