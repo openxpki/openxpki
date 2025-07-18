@@ -22,7 +22,7 @@ export default class OxiFieldSelectComponent extends Component {
 
     get placeholder() {
         let label = this.args.content.placeholder
-        if (!label && this.args.content.is_optional) {
+        if (label == '_default' || (!label && this.args.content.is_optional)) {
             label = this.intl.t('component.oxifield_select.default_placeholder')
         }
         return label
