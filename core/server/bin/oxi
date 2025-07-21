@@ -140,7 +140,7 @@ my %opt = ('verbose' => \$verbose);
 # pass_through: anything unknown, ambiguous or invalid will be passed through to @ARGV
 Getopt::Long::Configure('pass_through','bundling');
 
-GetOptions( \%opt, ('verbose|v+','json','json-pretty','auth-key|k=s','auth-config|c=s','pass|p:s','no-auth','help','version|V'));
+GetOptions( \%opt, ('verbose|v+','json','json-pretty','auth-key|k=s','auth-config|c=s','pass|p:s','no-auth','socket=s','help','version|V'));
 
 if ($opt{version}) {
     if (!Mojo::Loader::load_class('OpenXPKI::Enterprise::VERSION')) {
@@ -313,8 +313,14 @@ if ($auth_args{account_key}) {
     $auth_args{account_key} = Crypt::PK::ECC->new($auth_args{account_key}, $pass);
 }
 
+INFO('Enable privileged mode using keyfile '. $auth_args{account_key})
+    if ($auth_args{account_key});
+
+DEBUG('Using non-standard socket: '.$opt{socket}) if($opt{socket});
+
 my $client = OpenXPKI::Client::CLI->new(
-    authenticator => OpenXPKI::DTO::Authenticator->new(%auth_args)
+    authenticator => OpenXPKI::DTO::Authenticator->new(%auth_args),
+    ($opt{socket} ? (socketfile => $opt{socket}) : ()),
 );
 $api->client($client);
 
@@ -430,6 +436,12 @@ checked and used as password.
 =item --no-auth
 
 Do not authenticate even if a login key/config was found.
+
+=item --socket
+
+Location of the socket to connect to the server.
+
+Default /run/openxpkid/openxpkid.sock
 
 =back
 
