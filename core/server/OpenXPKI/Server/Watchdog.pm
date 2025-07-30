@@ -215,6 +215,19 @@ has interval_auto_archiving => (
     default => 0,
 );
 
+=item interval_scheduler_run
+
+Seconds between two attempts to run the builtin scheduler (EE component)
+
+default: 0 (do not use scheduler)
+
+=cut
+has interval_scheduler_run  => (
+    is => 'rw',
+    isa => 'Int',
+    default => 0,
+);
+
 =item userid
 
 User ID to run the forked child process as.
@@ -296,10 +309,23 @@ has _next_crl_purge => (
     init_arg => undef,
 );
 
+has _next_scheduler_run => (
+    is => 'rw',
+    isa => 'Int',
+    init_arg => undef,
+);
+
 has _session_purge_handler => (
     is => 'rw',
     isa => 'OpenXPKI::Server::Session',
     predicate => 'do_session_purge',
+    init_arg => undef,
+);
+
+has _scheduler_handler => (
+    is => 'rw',
+    isa => 'Object',
+    predicate => 'run_scheduler',
     init_arg => undef,
 );
 
@@ -471,6 +497,16 @@ sub run {
             CTX('log')->system->info("Watchdog: initialize session purge with interval " . $self->interval_session_purge);
         }
 
+        if ($self->interval_scheduler_run) {
+            # try to load the class
+            OpenXPKI::Exception->throw(
+                message => 'Unable to load scheduler class'
+            ) if (Mojo::Loader::load_class('OpenXPKI::Server::Scheduler'));
+            $self->_scheduler_handler( OpenXPKI::Server::Scheduler->new() );
+            $self->_next_scheduler_run( time );
+            CTX('log')->system->info("Watchdog: initialize scheduler with interval " . $self->interval_scheduler_run);
+        }
+
         if ($self->interval_auto_archiving) {
             $self->_next_auto_archiving( time );
             CTX('log')->system->info("Watchdog: initialize auto-archiving with interval " . $self->interval_auto_archiving);
@@ -522,6 +558,7 @@ sub __main_loop {
             $self->__purge_expired_sessions;
             $self->__auto_archive_workflows;
             $self->__purge_crl;
+            $self->__run_scheduler;
 
             # if slots_avail_count is zero, do a recalculation
             if (!$slots_avail_count) {
@@ -629,6 +666,21 @@ sub __purge_expired_sessions {
     CTX('log')->system()->debug("Watchdog: init session purge");
     $self->_session_purge_handler->purge_expired;
     $self->_next_session_cleanup( time + $self->interval_session_purge );
+}
+
+=head2 __run_scheduler
+
+Run the builtin scheduler to check outstanding actions
+
+=cut
+sub __run_scheduler {
+    my $self = shift;
+
+    return unless $self->run_scheduler and time > $self->_next_scheduler_run;
+
+    CTX('log')->system()->debug("Watchdog: execute scheduler");
+    $self->_scheduler_handler->run;
+    $self->_next_scheduler_run( time + $self->interval_scheduler_run );
 }
 
 =head2 __purge_crl

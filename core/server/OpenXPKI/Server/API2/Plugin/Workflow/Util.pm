@@ -281,6 +281,10 @@ sub _execute_activity_async {
             Log::Log4perl::MDC->put('role', $session->data->role );
         }
 
+        # as the fork as closed any open dbi connections and execute_action
+        # does an implicit commit after execution we need to open a transation
+        # to avoid a "commit without start" error, see #948
+        CTX('dbi')->start_txn;
         # run activity
         $self->_run_activity($workflow, $activity);
 
