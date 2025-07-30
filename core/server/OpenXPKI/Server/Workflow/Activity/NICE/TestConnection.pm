@@ -17,15 +17,16 @@ sub execute {
     my $nice_backend = OpenXPKI::Server::NICE::Factory->getHandler( $self );
 
     my $set_context;
-    eval{
-        $set_context = $nice_backend->testConnection();
-    };
 
     my $error;
-    if ($EVAL_ERROR) {
+    try {
+        $set_context = $nice_backend->testConnection();
+        if (!$set_context) {
+            $error = $nice_backend->get_last_error() || 'I18N_OPENXPKI_UI_NICE_BACKEND_ERROR';
+        }
+    } catch ($err) {
         $error = 'I18N_OPENXPKI_UI_NICE_BACKEND_ERROR';
-    } elsif(!$set_context) {
-        $error = $nice_backend->get_last_error() || 'I18N_OPENXPKI_UI_NICE_BACKEND_ERROR';
+        CTX('log')->application()->error("Got error on NICE connection test: $err");
     }
 
     $context->param( 'error_code' => $error );
