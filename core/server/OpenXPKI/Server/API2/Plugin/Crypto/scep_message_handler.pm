@@ -92,9 +92,13 @@ command "scep_unwrap_message" => {
 
     ##! 16: $token_alias
     my $token = CTX('crypto_layer')->get_token({ TYPE => 'scep', NAME => $token_alias });
-    if (my $key_object = $token->get_key_object()) {
+
+    # this was experimental and the idea is deprecated
+    # so we can make a hard check on the class
+
+    if ($token->isa('OpenXPKI::Crypto::Backend::OpenSSL::Engine::Inline')) {
         ##! 32: 'Using internal rsa object'
-        $req->ratoken_key( $key_object );
+        $req->ratoken_key( $token->get_key_object() );
     } else {
         $req->ratoken_key( $token );
     }

@@ -8,6 +8,7 @@ use Module::Load ();
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Crypto::SecretManager;
+use OpenXPKI::Crypt::X509;
 
 =head1 Name
 
@@ -338,6 +339,12 @@ sub __create_token {
             message => 'Request for static token but class is not static',
             params => { class_name => $backend_class, alias => $name }
         ) if (!$group);
+
+        # non static tokens must have an alias entry
+        my $certificate = CTX('api2')->get_certificate_for_alias( 'alias' => $name );
+        $param{group} = $group;
+        $param{generation} = $generation;
+        $param{certificate} = OpenXPKI::Crypt::X509->new( $certificate->{data} );
     }
 
     ##! 16: "Token backend: $backend_class, Secret group: $token_config->{secret}"
@@ -345,6 +352,13 @@ sub __create_token {
     if ($token_config->{secret}) {
         ##! 4: "secret is configured: "
         $param{secret} = $self->{secret_manager}->_get_secret_def($token_config->{secret})->{_ref};
+    }
+
+    # map attributes to the class constructor
+    # likely to be improved by reading from class/role
+    foreach my $attr ('key_name','key_store','export') {
+        next unless defined $token_config->{$attr};
+        $param{$attr} = $token_config->{$attr};
     }
 
     ##! 16: \%param

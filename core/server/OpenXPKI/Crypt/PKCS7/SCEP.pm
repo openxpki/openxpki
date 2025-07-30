@@ -379,6 +379,12 @@ sub __extract_payload {
         } else {
             $content_key = $skey->decrypt( $sym_key_enc, 'v1.5' );
         }
+
+    } elsif ($skey->isa('OpenXPKI::Crypto::Token')) {
+        $content_key = $skey->decrypt(
+            message => $sym_key_enc,
+            padding => ($key_alg eq 'rsaesOaep' ? 'oaep' : 'v1.5')
+        );
     } else {
         OpenXPKI::Exception->throw( message => 'Invalid encryption key type', params => { skey => ref $skey } );
     }
@@ -609,6 +615,11 @@ sub __generate_response {
             COMMAND => 'sign_digest',
             DIGEST => $attribute_digest,
         });
+    } elsif ($skey->isa('OpenXPKI::Crypto::Token')) {
+        $signature = $skey->sign(
+            message => $attributeContent,
+            digest => uc($self->digest_alg())
+        );
     } elsif (ref $skey eq 'Crypt::PK::RSA') {
         ##! 64: 'RSA soft key'
         $signature = $skey->sign_message($attributeContent, uc($self->digest_alg()), 'v1.5');
