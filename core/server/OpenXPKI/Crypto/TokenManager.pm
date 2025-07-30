@@ -106,15 +106,11 @@ sub get_token {
 
     croak("parameter must be hash ref, but got '$keys'") unless ref($keys) eq 'HASH';
 
-    #my $name   = $keys->{ID};
-    my $type   = $keys->{TYPE};
     my $name   = $keys->{NAME};
 
     my $realm = CTX('session')->data->pki_realm;
 
-    ##! 32: "Load token $name of type $type"
-    OpenXPKI::Exception->throw(message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_MISSING_TYPE")
-        unless $type;
+    ##! 32: "Load token $name"
     OpenXPKI::Exception->throw(message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_MISSING_NAME")
         unless $name;
     OpenXPKI::Exception->throw(message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_MISSING_PKI_REALM")
@@ -122,17 +118,17 @@ sub get_token {
     ##! 2: "$realm: $type -> $name"
 
     $self->__add_token($keys)
-        unless $self->{TOKEN}->{$realm}->{$type}->{$name};
+        unless $self->{TOKEN}->{$realm}->{$name};
 
     OpenXPKI::Exception->throw(message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_NOT_EXIST")
-        unless $self->{TOKEN}->{$realm}->{$type}->{$name};
+        unless $self->{TOKEN}->{$realm}->{$name};
     ##! 2: "token is present"
 
     OpenXPKI::Exception->throw(message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_NOT_USABLE")
-        unless $self->__use_token(TYPE => $type, NAME => $name, PKI_REALM => $realm);
+        unless $self->__use_token(NAME => $name, PKI_REALM => $realm);
     ##! 2: "token is usable"
 
-    return $self->{TOKEN}->{$realm}->{$type}->{$name};
+    return $self->{TOKEN}->{$realm}->{$name};
 }
 
 =head2 get_system_token( { TYPE } )
@@ -198,7 +194,7 @@ sub __add_token {
     my ($self, $keys) = @_;
     ##! 1: "start"
 
-    my $type   = $keys->{TYPE};
+    my $type   = $keys->{TYPE} // '';
     my $name   = $keys->{NAME};
     my $realm = CTX('session')->data->pki_realm;
     my $config = CTX('config');
@@ -232,7 +228,7 @@ sub __add_token {
     if ($config->exists(['crypto','token',$name,'class']) ||
         $config->exists(['crypto','token',$config_name_group,'class'])) {
         my $token = $self->__create_token( $name );
-        $self->{TOKEN}->{$realm}->{$type}->{$name} = $token;
+        $self->{TOKEN}->{$realm}->{$name} = $token;
         return $token;
     }
 
@@ -262,7 +258,7 @@ sub __add_token {
 
     eval {
         ##! 16: 'instantiating token, API class: ' . $backend_api_class . ' using backend ' . $backend_class
-        $self->{TOKEN}->{$realm}->{$type}->{$name} =
+        $self->{TOKEN}->{$realm}->{$name} =
             $backend_api_class->new ({
                 CLASS       => $backend_class,
                 TMP         => $self->{tmp},
@@ -273,8 +269,8 @@ sub __add_token {
             });
     };
     if (my $exc = OpenXPKI::Exception->caught()) {
-        delete $self->{TOKEN}->{$realm}->{$type}->{$name}
-            if (exists $self->{TOKEN}->{$realm}->{$type}->{$name});
+        delete $self->{TOKEN}->{$realm}->{$name}
+            if (exists $self->{TOKEN}->{$realm}->{$name});
         OpenXPKI::Exception->throw (
             message  => "TokenManager failed to create token for $name",
             children => [ $exc ],
@@ -289,16 +285,16 @@ sub __add_token {
         );
     }
 
-    if (! defined $self->{TOKEN}->{$realm}->{$type}->{$name}) {
-        delete $self->{TOKEN}->{$realm}->{$type}->{$name}
-            if (exists $self->{TOKEN}->{$realm}->{$type}->{$name});
+    if (! defined $self->{TOKEN}->{$realm}->{$name}) {
+        delete $self->{TOKEN}->{$realm}->{$name}
+            if (exists $self->{TOKEN}->{$realm}->{$name});
         OpenXPKI::Exception->throw (
             message => "TokenManager failed to init token for $name",
         );
     }
 
     ##! 2: "$type token $name for $realm successfully added"
-    return $self->{TOKEN}->{$realm}->{$type}->{$name};
+    return $self->{TOKEN}->{$realm}->{$name};
 }
 
 
@@ -375,7 +371,7 @@ sub __use_token {
         $instance = $self->{TOKEN}->{system}->{$type};
     }
     else {
-        $instance = $self->{TOKEN}->{$realm}->{$type}->{$name};
+        $instance = $self->{TOKEN}->{$realm}->{$name};
     }
 
     ## the token must be present

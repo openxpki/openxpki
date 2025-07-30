@@ -135,13 +135,11 @@ sub __load_config_realm_token {
 
     my $name = $arg_ref->{NAME};
 
-    my $type = $token_type_of{$ident};
-
     $params_of{$ident}->{TMP} = $tmp_dir_of{$ident};
 
     my $config = CTX('config');
     # Load "real" crypto tokens (those with key material)
-    ##! 16: "Load realm token of type $type, name $name"
+    ##! 16: "Load realm token with name $name"
 
     # Add the secret
     $params_of{$ident}->{SECRET} = $arg_ref->{SECRET} if ($arg_ref->{SECRET});
@@ -183,7 +181,6 @@ sub __load_config_realm_token {
                 message  => "I18N_OPENXPKI_CRYPTO_TOOLKIT_INCOMPLETE_CONFIGURATION",
                 params   => {
                     "NAME" => $name,
-                    "TYPE" => $type,
                     "ATTRIBUTE" => $key,
             });
         }
