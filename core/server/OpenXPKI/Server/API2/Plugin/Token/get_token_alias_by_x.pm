@@ -105,10 +105,10 @@ sub _token_alias_by_group {
     # For the moment this is only the vault class so we hard code it
     # should be moved to a class property / role
     if (my $class = CTX('config')->get_inherit(["crypto","token",$group,"class"])) {
-        if (Mojo::Loader::load_class($class)) {
-            die "Unable to load implementation class for token group $group\n";
+        if (my $err =Mojo::Loader::load_class($class)) {
+            die "Unable to load implementation class for token group $group\n$err\n";
         }
-        if ($class->DOES('OpenXPKI::Crypto::TokenStaticRole')) {
+        if ($class->DOES('OpenXPKI::Crypto::Token::Role::Static')) {
             ##! 16: "Looks like $group is static"
             return $group;
         }

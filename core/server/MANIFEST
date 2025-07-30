@@ -219,9 +219,9 @@ OpenXPKI/Crypto/Profile/Certificate.pm
 OpenXPKI/Crypto/Profile/CRL.pm
 OpenXPKI/Crypto/SecretManager.pm
 OpenXPKI/Crypto/SecretRole.pm
-OpenXPKI/Crypto/TokenStaticRole.pm
 OpenXPKI/Crypto/Secret/Plain.pm
 OpenXPKI/Crypto/TokenManager.pm
+OpenXPKI/Crypto/Token/Role/Static.pm
 OpenXPKI/Crypto/Token/Vault.pm
 OpenXPKI/Crypto/Toolkit.pm
 OpenXPKI/Crypto/VolatileVault.pm

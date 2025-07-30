@@ -1,7 +1,9 @@
 package OpenXPKI::Crypto::Token::Vault;
 use OpenXPKI -class;
 
-with 'OpenXPKI::Crypto::TokenStaticRole';
+extends 'OpenXPKI::Crypto::Token';
+
+with 'OpenXPKI::Crypto::Token::Role::Static';
 
 # Project modules
 use OpenXPKI::Crypto::VolatileVault;
