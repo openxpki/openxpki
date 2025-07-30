@@ -36,7 +36,7 @@ command "show" => {
     });
 
     if (not $param->has_metadata) {
-        $res = { result => $res->param('value') };
+        $res = { result => $res->param('value')//undef };
     }
 
     return $res;
