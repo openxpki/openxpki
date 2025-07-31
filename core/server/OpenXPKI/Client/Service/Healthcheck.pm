@@ -68,7 +68,10 @@ sub op_handlers {
     return [
         # Do NOT expose this unless you are in a test environment.
         'showenv' => sub ($self) {
-            return $self->new_response(result => \%ENV);
+            return $self->new_response( result => {
+                system => \%ENV,
+                mapped => $self->request->env,
+            });
         },
         'ping' => sub ($self) {
             # try backend connection
