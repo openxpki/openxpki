@@ -37,6 +37,12 @@ has 'certificate' => (
     required => 1,
 );
 
+has 'chain' => (
+    is => 'ro',
+    isa => 'ArrayRef[Str]',
+    default => sub {[]}
+);
+
 has 'certificate_file' => (
     is => 'ro',
     isa => 'Str',
@@ -45,6 +51,17 @@ has 'certificate_file' => (
     default => sub {
         my $self = shift;
         return $self->fileutil->write_temp_file($self->certificate->pem);
+    },
+);
+
+has 'certificate_chain_file' => (
+    is => 'ro',
+    isa => 'Str',
+    lazy => 1,
+    reader => 'get_certificate_chain_file',
+    default => sub {
+        my $self = shift;
+        return $self->fileutil->write_temp_file(join("\n", $self->certificate->pem, $self->chain->@*));
     },
 );
 

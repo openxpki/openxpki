@@ -341,10 +341,26 @@ sub __create_token {
         ) if (!$group);
 
         # non static tokens must have an alias entry
-        my $certificate = CTX('api2')->get_certificate_for_alias( 'alias' => $name );
+
+        my $alias = CTX('api2')->show_alias( 'alias' => $name );
+        OpenXPKI::Exception->throw (
+            message => 'No alias entry found for given alias name',
+            params => { alias => $name }
+        ) unless ($alias->{identifier});
+
+        my $chain = CTX('api2')->get_chain(
+            start_with => $alias->{identifier},
+            format => 'PEM'
+        );
+        OpenXPKI::Exception->throw (
+            message => 'Unable to load chain for given alias name',
+            params => { alias => $name }
+        ) unless ($chain->{certificates});
+
         $param{group} = $group;
         $param{generation} = $generation;
-        $param{certificate} = OpenXPKI::Crypt::X509->new( $certificate->{data} );
+        $param{certificate} = OpenXPKI::Crypt::X509->new( shift $chain->{certificates}->@* );
+        $param{chain} = $chain->{certificates} if (scalar $chain->{certificates}->@*);
     }
 
     ##! 16: "Token backend: $backend_class, Secret group: $token_config->{secret}"
