@@ -21,12 +21,21 @@ Returns C<1> if everything went fine, C<undef> otherwise.
 
 =cut
 signature_for is_token_usable => (
-    method => 1,
-    positional => [
-        'OpenXPKI::Crypto::API',
-        'Str', { default => 'sign' },
-        'HashRef|Undef', { default => undef },
-    ],
+    multiple => [{
+        method => 1,
+        positional => [
+            'OpenXPKI::Crypto::API',
+            'Str', { default => 'sign' },
+            'HashRef|Undef', { default => undef },
+        ],
+    },{
+        method => 1,
+        positional => [
+            'OpenXPKI::Crypto::Token',
+            'Str', { default => 'sign' },
+            'HashRef|Undef', { default => undef },
+        ],
+    }]
 );
 sub is_token_usable ($self, $token, $check, $padding_config) {
     ##! 1: 'start'
@@ -38,8 +47,14 @@ sub is_token_usable ($self, $token, $check, $padding_config) {
 
         if ($check eq 'sign') {
 
-            my $pkcs7 = $token->command({ COMMAND => 'pkcs7_sign', CONTENT =>$base });
-            my $verified = $token->command({ COMMAND => 'pkcs7_verify', PKCS7   => $pkcs7, NO_CHAIN => 1 });
+            my $verified;
+            if ($token->isa('OpenXPKI::Crypto::Token')) {
+                my $signature = $token->sign( message => $base );
+                $verified = $token->verify( signature => $signature, message => $base );
+            } else {
+                my $pkcs7 = $token->command({ COMMAND => 'pkcs7_sign', CONTENT =>$base });
+                $verified = $token->command({ COMMAND => 'pkcs7_verify', PKCS7   => $pkcs7, NO_CHAIN => 1 });
+            }
 
             if (!$verified) {
                 OpenXPKI::Exception->throw (
@@ -50,15 +65,22 @@ sub is_token_usable ($self, $token, $check, $padding_config) {
 
         } elsif ($check eq 'encrypt') {
 
-            # Padding is only supported for pkcs7_encrypt for now
-            my %PADDING;
-            if ($padding_config && ($padding_config->{mode}//'') eq 'oaep') {
-                $PADDING{PADDING} = 'oaep';
-                $PADDING{PADDING_OPTIONS} = $padding_config // {};
-            }
+            my $decrypted;
+            if ($token->isa('OpenXPKI::Crypto::Token')) {
+                my $encrypted = $token->encrypt( message => $base );
+                $decrypted = $token->decrypt( message => $encrypted );
+            } else {
 
-            my $encrypted = $token->command({ COMMAND => 'pkcs7_encrypt', CONTENT => $base, %PADDING });
-            my $decrypted = $token->command({ COMMAND => 'pkcs7_decrypt', PKCS7 => $encrypted });
+                # Padding is only supported for pkcs7_encrypt for now
+                my %PADDING;
+                if ($padding_config && ($padding_config->{mode}//'') eq 'oaep') {
+                    $PADDING{PADDING} = 'oaep';
+                    $PADDING{PADDING_OPTIONS} = $padding_config // {};
+                }
+
+                my $encrypted = $token->command({ COMMAND => 'pkcs7_encrypt', CONTENT => $base, %PADDING });
+                $decrypted = $token->command({ COMMAND => 'pkcs7_decrypt', PKCS7 => $encrypted });
+            }
 
             ##! 16: "pkcs7 roundtrip done"
             if ($decrypted ne $base) {
@@ -78,6 +100,7 @@ sub is_token_usable ($self, $token, $check, $padding_config) {
     }
     catch ($err) {
         ##! 8: 'pkcs7 roundtrip failed'
+        CTX('log')->application()->error("token usable check failed with error: $err");
         return undef;
     }
 }

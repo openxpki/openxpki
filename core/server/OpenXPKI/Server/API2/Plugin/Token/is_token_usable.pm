@@ -63,38 +63,44 @@ command "is_token_usable" => {
 } => sub {
     my ($self, $params) = @_;
 
-    my %types = reverse %{ CTX('config')->get_hash('crypto.type') };
-
     my $alias = $params->alias;
-    # strip off the generation number
-    $alias =~ m{^(.*?)(-(\d+))?$};
-    if (not $1 or not $types{$1}) {
-        OpenXPKI::Exception->throw (
-            message => 'Unable to determine token type by alias',
-            params => { alias => $alias },
-        );
-    }
-    my $token_type = $types{$1};
 
     my $token;
-    eval { $token = CTX('crypto_layer')->get_token({ TYPE => $token_type, NAME => $params->alias }); };
+    eval { $token = CTX('crypto_layer')->get_token({ NAME => $params->alias }); };
     if (!$token) {
         CTX('log')->application()->error('Unable to get token from TokenManager');
         return;
     }
 
-    my $operation;
+    my $operation = $params->operation || 'sign';
     my $padding_config = {};
+
+
     if ($params->engine) {
         $operation = 'engine';
-    } elsif ($params->operation) {
-        $operation = $params->operation;
-    } elsif ($token_type eq 'datasafe') {
+
+    # new vault token - hardcoded for now
+    } elsif ($token->isa('OpenXPKI::Crypto::Token::Vault')) {
         $operation = 'encrypt';
-        $padding_config = CTX('config')->get_hash(["system","datavault","padding"]) // {};
-    } else {
-        $operation = 'sign';
+
+    # old api token - determine by type
+    } elsif ($token->isa('OpenXPKI::Crypto::API')) {
+        # strip off the generation number
+        my %types = reverse %{ CTX('config')->get_hash('crypto.type') };
+        $alias =~ m{^(.*?)(-(\d+))?$};
+        OpenXPKI::Exception->throw (
+            message => 'Unable to determine token type by alias',
+            params => { alias => $alias },
+        ) unless ($1 && $types{$1});
+
+        if ($types{$1} eq 'datasafe') {
+            $operation = 'encrypt';
+            $padding_config = CTX('config')->get_hash(["system","datavault","padding"]) // {};
+        } else {
+            $operation = 'sign';
+        }
     }
+
 
     # Shortcut method, ask the token engine
     if ($operation eq 'engine') {

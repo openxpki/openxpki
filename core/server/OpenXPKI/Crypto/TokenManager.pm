@@ -216,13 +216,11 @@ sub __add_token {
     $backend_class = $config->get_inherit("crypto.token.$name.backend");
 
     # Nothing found with the full token name, so try to load from the group name
-    if (!$backend_class) {
-        $config_name_group =~ /^(.+)-(\d+)$/;
+    if (!$backend_class && ($config_name_group =~ /^(.+)-(\d+)$/)) {
         $config_name_group = $1;
         ##! 16: 'use group config ' . $config_name_group
         $backend_class = $config->get_inherit("crypto.token.$config_name_group.backend");
     }
-
 
     # The new vault handler is used as a starting point for the new token layer implementation
     # New config layout does not use api and backend but a single class attribute
