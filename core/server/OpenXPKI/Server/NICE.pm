@@ -104,7 +104,6 @@ sub __persistCertificateInformation {
     ##! 64: 'certificate information: ' . Dumper ( $cert_info )
 
     my $pki_realm = CTX('api2')->get_pki_realm();
-    my $default_token = CTX('api2')->get_default_token();
 
     my $x509 = OpenXPKI::Crypt::X509->new( $cert_info->{certificate} );
 
