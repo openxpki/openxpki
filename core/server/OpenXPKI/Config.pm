@@ -239,6 +239,10 @@ sub get_inherit {
     ##! 16: "split path $prefix - $section - inherit"
 
     $section = $self->get( [ @prefix , $section, 'inherit' ] );
+
+    CTX('log')->deprecated()->error("Using 'inherit' is deprecated - use YAML merge operator (<<:) instead")
+        if ($section);
+
     while ($section) {
         ##! 16: 'Section ' . $section
         $val = $self->get( [ @prefix , $section, $key ]);

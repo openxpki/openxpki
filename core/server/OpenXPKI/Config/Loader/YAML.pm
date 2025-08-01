@@ -32,7 +32,7 @@ Attempts to load C<$file> as a YAML file.
 =cut
 
 sub load ($class, $file) {
-    return YAML::PP->new->load_file($file);
+    return YAML::PP->new( schema => [qw/ + Merge /] )->load_file($file);
 }
 
 1;
