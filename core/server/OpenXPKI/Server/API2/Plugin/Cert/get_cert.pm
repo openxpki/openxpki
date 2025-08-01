@@ -7,11 +7,13 @@ OpenXPKI::Server::API2::Plugin::Cert::get_cert
 
 =cut
 
+use MIME::Base64;
+
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Types;
 use OpenXPKI::Crypt::X509;
-use MIME::Base64;
+use OpenXPKI::Crypt::PKCS7::CertificateList;
 
 =head1 COMMANDS
 
@@ -119,13 +121,9 @@ command "get_cert" => {
     };
 
     if ('PKCS7' eq $format) {
-        my $result = $self->api->get_default_token->command({
-            COMMAND          => 'convert_cert',
-            DATA             => [ $cert->{data} ],
-            OUT              => 'PEM',
-            CONTAINER_FORMAT => 'PKCS7',
-        });
-        return $result;
+        my $p7 = OpenXPKI::Crypt::PKCS7::CertificateList->new();
+        $p7->add_cert( $cert->{data} );
+        return $p7->pem();
     }
 
     # Hex Serial

@@ -11,6 +11,7 @@ OpenXPKI::Server::API2::Plugin::Cert::get_chain
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Types;
 use OpenXPKI::Crypt::X509;
+use OpenXPKI::Crypt::PKCS7::CertificateList;
 
 =head1 COMMANDS
 
@@ -148,14 +149,14 @@ command "get_chain" => {
         # we do NOT include the root in p7 bundles
         pop @$cert_list if ($complete and !$params->keeproot);
 
-        $default_token = $self->api->get_default_token unless($default_token);
-        my $result = $default_token->command({
-            COMMAND          => 'convert_cert',
-            DATA             => $cert_list,
-            OUT              => (($params->has_format and $params->format eq 'DER') ? 'DER' : 'PEM'),
-            CONTAINER_FORMAT => 'PKCS7',
-        });
-        return $result;
+        my $p7 = OpenXPKI::Crypt::PKCS7::CertificateList->new();
+        foreach my $cert ($cert_list->@*) {
+            $p7->add_cert( $cert );
+        }
+        if ($params->has_format && $params->format eq 'DER') {
+            return $p7->data();
+        }
+        return $p7->pem();
     }
 
     return {
