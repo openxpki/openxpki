@@ -1705,7 +1705,7 @@ if ($cmd eq 'initdb') {
                 $hash = $hash->{$item};
             }
         }
-        print YAML::PP->new->dump_string($hash);
+        print Dumper $hash;
     }
 
     if ($ret == 0) {
