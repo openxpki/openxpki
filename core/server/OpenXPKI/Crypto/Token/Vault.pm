@@ -67,20 +67,30 @@ sub _create_vault {
 }
 
 
-sub encrypt {
-    my $self = shift;
+signature_for encrypt => (
+    method => 1,
+    named => [
+        message => 'Str',
+    ],
+);
+sub encrypt ($self, $arg) {
 
     return unless ($self->_secret->is_complete);
 
-    return $self->_vault->encrypt( shift );
+    return $self->_vault->encrypt( $arg->message );
 }
 
-sub decrypt {
-    my $self = shift;
+signature_for decrypt => (
+    method => 1,
+    named => [
+        message => 'Str',
+    ],
+);
+sub decrypt ($self, $arg) {
 
     return unless ($self->_secret->is_complete);
 
-    return $self->_vault->decrypt( shift );
+    return $self->_vault->decrypt( $arg->message );
 }
 
 # required for the "usable" check of the current tokenmanager API

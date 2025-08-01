@@ -383,7 +383,7 @@ sub encrypt_passwordsafe ($self, $safe_id, $value) {
             message => 'vault token is not online',
             params => { alias => $safe_id }
         ) unless($token->online());
-        return $token->encrypt( $value );
+        return $token->encrypt( message => $value );
     }
 
     # support OAEP padding mode - IMHO superfluous but required by some HSM vendors
@@ -433,7 +433,7 @@ sub decrypt_passwordsafe ($self, $safe_id, $enc_value) {
             message => 'vault token is not online',
             params => { alias => $safe_id }
         ) unless($token->online());
-        return $token->decrypt( $enc_value );
+        return $token->decrypt( message => $enc_value );
     }
 
     ##! 16: "asymmetric decryption via passwordsafe '$safe_id'"
