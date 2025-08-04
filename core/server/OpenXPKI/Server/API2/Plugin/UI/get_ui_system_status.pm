@@ -102,6 +102,8 @@ command "get_ui_system_status" => {
 
     # Vault Token
     if ($groups->{datasafe}) {
+
+        $result->{dv_expiry} = 0;
         my $db_datavault = CTX('dbi')->select_one(
             columns => [ 'notafter' ],
             from  => 'aliases',
@@ -111,12 +113,18 @@ command "get_ui_system_status" => {
             },
             order_by => '-notafter',
         );
-        if (!$db_datavault) {
-            $result->{dv_expiry} = 0;
-        } elsif (CTX('config')->get(["system","datavault","ignore_validity"])) {
-            $result->{dv_expiry} = -1;
-        } else {
-            $result->{dv_expiry} = $db_datavault->{notafter};
+        if ($db_datavault) {
+            $result->{dv_alias} = $db_datavault->{alias};
+            if (CTX('config')->get(["system","datavault","ignore_validity"])) {
+                $result->{dv_expiry} = -1;
+            } else {
+                $result->{dv_expiry} = $db_datavault->{notafter};
+            }
+
+        } elsif (my $alias = $self->api->get_token_alias_by_group( group => $groups->{datasafe} )) {
+            $result->{dv_alias} = $alias;
+            my $token_info = $self->api->get_token_info( alias => $alias );
+            $result->{dv_expiry} = -1 if ($token_info && $token_info->{vault_id});
         }
     };
 

@@ -233,7 +233,7 @@ sub __add_token {
 
     OpenXPKI::Exception->throw (
         message  => "No backend class set for token $name",
-        params => { TYPE => $type, NAME => $name, GROUP => $config_name_group}
+        params => { NAME => $name, GROUP => $config_name_group }
     ) unless $backend_class;
 
     eval { Module::Load::load($backend_class); Module::Load::load($backend_api_class); };

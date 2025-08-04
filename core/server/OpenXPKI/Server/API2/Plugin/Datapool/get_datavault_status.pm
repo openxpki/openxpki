@@ -89,8 +89,9 @@ command "get_datavault_status" => {
     if ($params->check_online) {
         if ($key_info->{datapool_value}) {
             ##! 32: 'Do online check '
-            my $safe_token = CTX('crypto_layer')->get_token({ TYPE => 'datasafe', 'NAME' => $safe_id});
+            my $safe_token = CTX('crypto_layer')->get_token({'NAME' => $safe_id});
 
+            ##! 64: $safe_token
             OpenXPKI::Exception->throw(
                 message => 'Token for safe_id not available',
                 params => { token_id  => $safe_id }
@@ -99,9 +100,11 @@ command "get_datavault_status" => {
             # without using any caches so we can be sure that the token works
             my $decrypted;
             my $key_enc = $self->get_entry( $pki_realm, 'sys.datapool.keys', $key_info->{datapool_value} );
-            eval{
-                $decrypted = $safe_token->command({ COMMAND => 'pkcs7_decrypt', PKCS7 => $key_enc->{datapool_value} });
+            ##! 64: $key_enc
+            eval {
+                $decrypted = $self->decrypt_passwordsafe($safe_id, $key_enc->{datapool_value} );
             };
+            ##! 32: $EVAL_ERROR
             $ret->{online} = ($EVAL_ERROR || !$decrypted) ? 0 : 1;
         } else {
             $ret->{online} = $self->api->is_token_usable(alias => $safe_id) ? 1 : 0;

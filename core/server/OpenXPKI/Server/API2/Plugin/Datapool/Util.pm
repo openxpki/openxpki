@@ -429,6 +429,7 @@ sub decrypt_passwordsafe ($self, $safe_id, $enc_value) {
         );
 
     if (ref $token eq 'OpenXPKI::Crypto::Token::Vault') {
+        ##! 16: 'symmetric decryption using svault'
         OpenXPKI::Exception->throw(
             message => 'vault token is not online',
             params => { alias => $safe_id }
