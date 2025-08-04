@@ -93,27 +93,6 @@ sub decrypt ($self, $arg) {
     return $self->_vault->decrypt( $arg->message );
 }
 
-# required for the "usable" check of the current tokenmanager API
-sub login {
-
-    my $self = shift;
-
-    return $self->_secret->is_complete;
-
-}
-
-sub online {
-
-    my $self = shift;
-
-    return 0 unless ($self->_secret->is_complete);
-
-    # build vault if not already loaded
-    $self->is_available || $self->_vault;
-
-    return 1;
-}
-
 sub get_key_info {
 
     my $self = shift;
@@ -121,6 +100,7 @@ sub get_key_info {
         'is_online' => ($self->online ? 1 : 0),
         'vault_id' => $self->vault_id(),
         'key_id' => substr($self->vault_id(), 0, 8),
+        'key_alg' => 'aes256',
     }
 
 }

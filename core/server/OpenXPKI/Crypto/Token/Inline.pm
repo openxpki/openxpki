@@ -137,35 +137,14 @@ sub decrypt ($self, $arg) {
 
 }
 
-# required for the "usable" check of the current tokenmanager API
-sub login {
-
-    my $self = shift;
-
-    return $self->_secret->is_complete;
-
-}
-
-sub online {
-
-    my $self = shift;
-
-    return 0 unless ($self->_secret->is_complete);
-
-    # build vault if not already loaded
-    $self->is_available || $self->_key;
-
-    return 1;
-}
-
 sub get_key_info {
 
     my $self = shift;
     return {
-        'is_online' => ($self->online ? 1 : 0),
         'token_id' => $self->certificate->get_cert_identifier,
         'key_name' => $self->key_name,
-        'key_cert' => $self->certificate,
+        'key_alg' => $self->certificate->get_public_key_alg,
+        'key_cert' => $self->certificate->pem,
         'key_engine' => 'none',
         'key_store' => $self->key_store,
         'key_secret' => ($self->get_passwd() ? 1 : 0),
