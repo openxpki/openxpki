@@ -1834,7 +1834,7 @@ msgid "I18N_OPENXPKI_UI_TOKEN_ALIAS"
 msgstr "Token Alias"
 
 msgid "I18N_OPENXPKI_UI_TOKEN_OF_TYPE"
-msgstr "Token vom Typ:"
+msgstr "Token vom Typ"
 
 msgid "I18N_OPENXPKI_UI_TOKEN_STATUS"
 msgstr "Token-Status"

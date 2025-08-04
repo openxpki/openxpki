@@ -1829,7 +1829,7 @@ msgid "I18N_OPENXPKI_UI_TOKEN_ALIAS"
 msgstr "Token Alias"
 
 msgid "I18N_OPENXPKI_UI_TOKEN_OF_TYPE"
-msgstr "Tokens of type:"
+msgstr "Tokens of type"
 
 msgid "I18N_OPENXPKI_UI_TOKEN_STATUS"
 msgstr "Token Status"
