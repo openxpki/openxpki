@@ -158,6 +158,18 @@ has public_key_hash => (
     }
 );
 
+has public_key_alg => (
+    is => 'ro',
+    init_arg => undef,
+    isa => 'Str',
+    reader => 'get_public_key_alg',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        return $self->_cert()->PubKeyAlg();
+    }
+);
+
 has authority_key_id => (
     is => 'rw',
     init_arg => undef,

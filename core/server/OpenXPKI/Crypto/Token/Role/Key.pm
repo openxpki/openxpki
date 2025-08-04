@@ -53,7 +53,7 @@ has '_key_file' => (
     },
 );
 
- sub __load_key {
+sub __load_key {
     my $self = shift;
 
     if ($self->key_store eq 'OPENXPKI') {
@@ -61,7 +61,7 @@ has '_key_file' => (
     }
 
     OpenXPKI::Exception->throw (
-            message => "Unsupported storage backend",
+        message => "Unsupported storage backend",
     ) unless ($self->key_store eq 'DATAPOOL');
 
     my $dp = CTX('api2')->get_data_pool_entry(
