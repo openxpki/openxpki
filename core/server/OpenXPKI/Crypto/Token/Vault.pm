@@ -52,7 +52,7 @@ sub _create_vault {
     ##! 1: 'creating vault'
     my $literal = uc($self->_secret->get_secret());
     OpenXPKI::Exception->throw (
-        message => "Vault requires a 256 bit length secret value encoded in 64 uppercase hex characters - is $literal"
+        message => "Vault requires a 256 bit length secret value encoded in 64 uppercase hex characters "
     ) unless($literal =~ m{\A[0-9A-F]{64}\z});
 
     # create volatile vault using shared secret
