@@ -43,7 +43,7 @@ command "update" => {
     }
 
     my $res;
-    if ((scalar keys %$param) > 1) {
+    if ((scalar keys $cmd_param->%*) > 1) {
         $res = $self->run_protected_command('update_alias', $cmd_param );
         $self->log->debug("Alias '$alias' was updated");
     } else {
@@ -54,19 +54,19 @@ command "update" => {
     # update the key - the handle_key method will die if the alias is not a token
     if ($param->has_key) {
         # type "FileContents" is a ScalarRef
-        my $token = $self->handle_key(
+        my $token = $self->handle_key({
             alias => $alias,
             key => $param->key->$*
-        );
+        });
         $self->log->debug("Key for '$alias' was added");
         $res->params->{key_name} = $token->param('key_name');
     # set force for update mode (overwrites exising key)
     } elsif ($param->has_key_update) {
-        my $token = $self->handle_key(
+        my $token = $self->handle_key({
             alias => $alias,
             key => $param->key_update->$*,
             force => 1,
-        );
+        });
         $self->log->debug("Key for '$alias' was updated");
         $res->params->{key_name} = $token->param('key_name');
     }

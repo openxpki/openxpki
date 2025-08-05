@@ -31,6 +31,7 @@ sub _assert_no_token_group ($self, $field_name, $group) {
     return unless $group;
 
     my $groups = $self->run_command('list_token_groups');
+    return unless $groups;
 
     if (any { $_ eq $group } values %{$groups->params}) {
         die OpenXPKI::DTO::ValidationException->new(
