@@ -47,6 +47,34 @@ my @options_spec = ('config=s','instance|i=s','verbose','debug:s');
 my $cmd = shift || 'help';
 my $ret = 255;
 
+sub process_refs {
+    my ($item) = @_;
+
+    if (ref($item) eq 'SCALAR') {
+        return "REFERENCE to: $$item";
+    }
+    elsif (ref($item) eq 'REF') {
+        return "REFERENCE to: $$item";
+    }
+    elsif (ref($item) eq 'ARRAY') {
+        for my $i (0..$#$item) {
+            if (ref($item->[$i])) {
+                $item->[$i] = process_refs($item->[$i]);
+            }
+        }
+    }
+    elsif (ref($item) eq 'HASH') {
+        for my $key (keys %$item) {
+            if (ref($item->{$key})) {
+                $item->{$key} = process_refs($item->{$key});
+            }
+        }
+    }
+    # Add handling for other reference types if needed
+
+    return $item;
+}
+
 
 sub certificate_id {
 
@@ -1679,15 +1707,15 @@ if ($cmd eq 'initdb') {
 
     -e $conf || die "Given config path $conf does not exist!";
 
-    print "Checking config at $conf\n";
+    print STDERR "Checking config at $conf\n";
     my $c = OpenXPKI::Config::Backend->new( LOCATION => $conf );
 
     # YAML was ok but there is no system node
     if ($c->get_hash('system')) {
-        printf "Config is valid YAML (%s)\n", $c->checksum();
+        printf STDERR "Config is valid YAML (%s)\n", $c->checksum();
         $ret = 0;
     } else {
-        print "No 'system' node was found\n";
+        print STDERR "No 'system' node was found\n";
         $ret = 2;
     }
 
@@ -1705,7 +1733,8 @@ if ($cmd eq 'initdb') {
                 $hash = $hash->{$item};
             }
         }
-        print Dumper $hash;
+        process_refs($hash);
+        print YAML::PP->new->dump_string($hash);
     }
 
     if ($ret == 0) {
