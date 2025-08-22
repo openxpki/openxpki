@@ -1125,6 +1125,9 @@ msgstr "Meine Aufgaben"
 msgid "I18N_OPENXPKI_UI_MENU_MY_WORKFLOW"
 msgstr "Meine Workflows"
 
+msgid "I18N_OPENXPKI_UI_MENU_NICE_CONNECT"
+msgstr "Verbindung zur CA Testen"
+
 msgid "I18N_OPENXPKI_UI_MENU_PKI_OPERATION"
 msgstr "PKI-Operationen"
 
@@ -1421,6 +1424,10 @@ msgstr "Geben Sie bitte den FQDN (Hostname) des Systems an."
 
 msgid "I18N_OPENXPKI_UI_PROFILE_IMPORTED_LABEL"
 msgstr "Importiertes Zertifikat"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_LABEL"
+msgstr "IoT Geräte"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_STYLE_DESC"
 msgstr ""
@@ -2008,6 +2015,9 @@ msgstr "Willkommen zu ihrem OpenXPKI Trustcenter"
 
 msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"
 msgstr "Nachricht des Tages"
+
+msgid "I18N_OPENXPKI_UI_WF_TYPE_NICE_CONNECT_LABEL"
+msgstr "RA-CA Verbindung testen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ABORT_BUTTON"
 msgstr "Abbrechen"
@@ -4175,6 +4185,23 @@ msgstr ""
 "Sie können die Daten weiter bearbeiten oder die Daten mit <i>Änderungen "
 "speichern</i> übernehmen. Falls Sie den Workflow abbrechen werden ihre "
 "Änderungen verworfen."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_NICE_CONNECT_FAILURE_DESC"
+msgstr ""
+"Die Verbindung zur CA ist konnte nicht hergestellt werden. Weitere Details "
+"zum Fehler finden Sie in der nachfolgenden Tabelle."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_NICE_CONNECT_REJECTED_DESC"
+msgstr ""
+"Die physikalische Verbindung zur CA konnte hergestellt werden, das "
+"verwendete Zertifikate wurde jedoch abgelehnt. Weitere Details zum Fehler "
+"finden Sie in der nachfolgenden Tabelle."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_NICE_CONNECT_REJECTED_LABEL"
+msgstr "Autorisierung fehlgeschlagen"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_NICE_CONNECT_SUCCESS_LABEL"
+msgstr "Verbindung erfolgreich"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PAUSE_DESC"
 msgstr ""

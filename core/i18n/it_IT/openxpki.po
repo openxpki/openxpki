@@ -1449,6 +1449,11 @@ msgstr "Task"
 msgid "I18N_OPENXPKI_UI_MENU_MY_WORKFLOW"
 msgstr "Workflow"
 
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_NICE_CONNECT"
+msgstr "Mostra Liste Revoche (CRL)"
+
 msgid "I18N_OPENXPKI_UI_MENU_PKI_OPERATION"
 msgstr "Operazioni PKI"
 
@@ -1802,6 +1807,10 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_IMPORTED_LABEL"
 msgstr "Token Datasafe"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_LABEL"
+msgstr "Extended naming (expert use only)"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_STYLE_DESC"
@@ -2489,6 +2498,10 @@ msgstr "Curva Ellittica"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"
+msgstr "Tipo"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WF_TYPE_NICE_CONNECT_LABEL"
 msgstr "Tipo"
 
 #, fuzzy
@@ -4864,6 +4877,24 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_UPDATE_PENDING_DESC"
 msgstr "Questa Richiesta di Revoca è in attesa di approvazione."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_NICE_CONNECT_FAILURE_DESC"
+msgstr "Questo Workflow è definitivamente fallito."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_NICE_CONNECT_REJECTED_DESC"
+msgstr ""
+"La Richiesta di revoca è stata definitivamente rifiutata e non può essere "
+"riavviata."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_NICE_CONNECT_REJECTED_LABEL"
+msgstr "Revoca Rifiutata"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_NICE_CONNECT_SUCCESS_LABEL"
+msgstr "Certificato Revocato"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PAUSE_DESC"

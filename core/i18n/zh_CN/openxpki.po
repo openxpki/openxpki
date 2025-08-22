@@ -1240,6 +1240,10 @@ msgstr "我的任务"
 msgid "I18N_OPENXPKI_UI_MENU_MY_WORKFLOW"
 msgstr "我的工作流程"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_NICE_CONNECT"
+msgstr "请求检查器"
+
 msgid "I18N_OPENXPKI_UI_MENU_PKI_OPERATION"
 msgstr "PKI操作"
 
@@ -1572,6 +1576,10 @@ msgstr "输入系统的完全限定主机名（域名）。"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_IMPORTED_LABEL"
 msgstr "人员（安全电子邮件/身份验证）"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_LABEL"
+msgstr "扩展命名（仅限专家使用）"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_STYLE_DESC"
@@ -2180,6 +2188,10 @@ msgid "I18N_OPENXPKI_UI_WELCOME_PAGE"
 msgstr "欢迎来到您的 OpenXPKI 信任中心"
 
 msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"
+msgstr "每日消息"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WF_TYPE_NICE_CONNECT_LABEL"
 msgstr "每日消息"
 
 #, fuzzy
@@ -4277,6 +4289,22 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_UPDATE_PENDING_DESC"
 msgstr "此吊销请求需要批准。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_NICE_CONNECT_FAILURE_DESC"
+msgstr "此工作流程最终失败。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_NICE_CONNECT_REJECTED_DESC"
+msgstr "吊销请求最终被拒绝，无法重新启动。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_NICE_CONNECT_REJECTED_LABEL"
+msgstr "拒绝吊销"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_NICE_CONNECT_SUCCESS_LABEL"
+msgstr "证书已吊销"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PAUSE_DESC"
 msgstr ""

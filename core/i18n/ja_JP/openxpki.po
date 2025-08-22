@@ -1193,6 +1193,10 @@ msgstr "自分のタスク"
 msgid "I18N_OPENXPKI_UI_MENU_MY_WORKFLOW"
 msgstr "自分のワークフロー"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_NICE_CONNECT"
+msgstr "リクエストチェック"
+
 msgid "I18N_OPENXPKI_UI_MENU_PKI_OPERATION"
 msgstr "PKIオペレーション"
 
@@ -1504,6 +1508,10 @@ msgstr "システムに最も適したホスト名（ドメイン名）を入力
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_IMPORTED_LABEL"
 msgstr "RA/SCEPトークン"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_LABEL"
+msgstr "拡張プロファイル（エキスパート）"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_STYLE_DESC"
@@ -2111,6 +2119,10 @@ msgid "I18N_OPENXPKI_UI_WELCOME_PAGE"
 msgstr "OpenXPKI Trustcenter へようこそ"
 
 msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"
+msgstr "今日のメッセージ"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WF_TYPE_NICE_CONNECT_LABEL"
 msgstr "今日のメッセージ"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ABORT_BUTTON"
@@ -4224,6 +4236,22 @@ msgstr ""
 "ベースにデータを書き戻すことができます。ワークフローをキャンセルすると、変更"
 "内容が失われます。"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_NICE_CONNECT_FAILURE_DESC"
+msgstr "このワークフローは失敗しました。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_NICE_CONNECT_REJECTED_DESC"
+msgstr "最終的に失効リクエストが拒否されました。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_NICE_CONNECT_REJECTED_LABEL"
+msgstr "失効拒否"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_NICE_CONNECT_SUCCESS_LABEL"
+msgstr "失効した証明書"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PAUSE_DESC"
 msgstr ""
 "このワークフローは一時停止され、システムによって後で継続されます。一時停止の"
@@ -6197,9 +6225,6 @@ msgstr "はい"
 #~ msgstr ""
 #~ "このワークフローは不測の事態により中断されました。サポートチームにご連絡く"
 #~ "ださい。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_DESC"
-#~ msgstr "このワークフローは失敗しました。"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_LABEL"
 #~ msgstr "失敗"

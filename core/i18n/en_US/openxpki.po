@@ -1130,6 +1130,9 @@ msgstr "My Tasks"
 msgid "I18N_OPENXPKI_UI_MENU_MY_WORKFLOW"
 msgstr "My Workflows"
 
+msgid "I18N_OPENXPKI_UI_MENU_NICE_CONNECT"
+msgstr "Test CA connection"
+
 msgid "I18N_OPENXPKI_UI_MENU_PKI_OPERATION"
 msgstr "PKI Operation"
 
@@ -1417,6 +1420,10 @@ msgstr "Enter the fully qualified hostname (domain name) of your system."
 
 msgid "I18N_OPENXPKI_UI_PROFILE_IMPORTED_LABEL"
 msgstr "Imported Certificate"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_LABEL"
+msgstr "IoT Device"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_STYLE_DESC"
 msgstr ""
@@ -1992,6 +1999,9 @@ msgstr "Welcome to your OpenXPKI Trustcenter"
 
 msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"
 msgstr "Message of the Day"
+
+msgid "I18N_OPENXPKI_UI_WF_TYPE_NICE_CONNECT_LABEL"
+msgstr "Test RA-CA connection"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ABORT_BUTTON"
 msgstr "Cancel"
@@ -4101,6 +4111,22 @@ msgstr ""
 "below. You can continue to make changes using the buttons below, use "
 "<i>persist data</i> to write back the data to the certificate database. If "
 "you cancel the workflow, your changes will be lost."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_NICE_CONNECT_FAILURE_DESC"
+msgstr ""
+"Unable to connect to the CA interface. Please find further details in the "
+"table below."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_NICE_CONNECT_REJECTED_DESC"
+msgstr ""
+"The connection could be established but the presented authorization was not "
+"accepted."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_NICE_CONNECT_REJECTED_LABEL"
+msgstr "Authorization failed"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_NICE_CONNECT_SUCCESS_LABEL"
+msgstr "Connection successful"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PAUSE_DESC"
 msgstr ""
