@@ -220,11 +220,17 @@ OpenXPKI/Crypto/Profile/CRL.pm
 OpenXPKI/Crypto/SecretManager.pm
 OpenXPKI/Crypto/SecretRole.pm
 OpenXPKI/Crypto/Secret/Plain.pm
+
+OpenXPKI/Crypto/Token.pm
+
+
 OpenXPKI/Crypto/TokenManager.pm
-OpenXPKI/Crypto/Token/Role/Static.pm
-OpenXPKI/Crypto/Token/Vault.pm
 OpenXPKI/Crypto/Toolkit.pm
 OpenXPKI/Crypto/VolatileVault.pm
+OpenXPKI/Crypto/Token/Inline.pm
+OpenXPKI/Crypto/Token/Vault.pm
+OpenXPKI/Crypto/Token/Role/Key.pm
+OpenXPKI/Crypto/Token/Role/Static.pm
 
 OpenXPKI/Crypto/Tool/CreateJavaKeystore.pm
 OpenXPKI/Crypto/Tool/CreateJavaKeystore/API.pm
@@ -288,6 +294,7 @@ OpenXPKI/DTO/ValidationException.pm
 # Collection of reusable items as Moose::Role
 OpenXPKI/Role/ACME.pm
 OpenXPKI/Role/DNSValidation.pm
+OpenXPKI/Role/FileUtil.pm
 OpenXPKI/Role/IssuerSerial.pm
 OpenXPKI/Role/Logger.pm
 OpenXPKI/Role/RevocationReasonCode.pm
