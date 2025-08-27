@@ -2,9 +2,11 @@
 
 OpenXPKI is an easy-to-deploy and easy-to-use RA/CA software that makes
 handling of certificates easy but nevertheless you should **really**
-have some basic knowledge on what a PKI is. If you just want to see
-*OpenXPKI in action* for a first impression of the tool, use the
-public demo at <https://demo.openxpki.org>.
+have some basic knowledge on what a PKI is.
+
+> [!TIP]
+>
+> If you just want to see *OpenXPKI in action* for a first impression of the tool, use the public demo at <https://demo.openxpki.org>.
 
 ## Support
 
@@ -36,22 +38,28 @@ and
 [QUICKSTART.md](https://github.com/openxpki/openxpki-config/blob/community/QUICKSTART.md)
 which have some more detailed instructions how to setup the system.
 
-**Note**: The configuration is (usually) backward compatible but most
-releases introduce new components and new configuration that can not be
-used with old releases. Make sure your code version is recent enough to
-run the config!
+> [!NOTE] 
+>
+> The configuration is (usually) backward compatible but most
+> releases introduce new components and new configuration that can not be
+> used with old releases. Make sure your code version is recent enough to
+> run the config!
 
-Starting with v3.22, there is mandatory cross check of config, database
-schema and code via the `system.version.depend` node. We
-recommend to keep and maintain this in your config!
+> [!IMPORTANT]
+>
+> Starting with v3.22, there is mandatory cross check of config, database
+> schema and code via the `system.version.depend` node. We
+> recommend to keep and maintain this in your config!
 
 ## Debian Builds
 
-**Packages are for Debian 12 (Bookworm) / 64bit (arch amd64). The
-en_US.utf8 locale must be installed as the translation system will crash
-otherwise! The packages do NOT work on Ubuntu or 32bit systems. Packages
-for SLES/CentOS/RHEL/Ubuntu are available via an enterprise
-subscription**
+> [!CAUTION]
+>
+> **Packages are for Debian 12 (Bookworm) / 64bit (arch amd64). The
+> en_US.utf8 locale must be installed as the translation system will crash
+> otherwise! The packages do NOT work on Ubuntu or 32bit systems. Packages
+> for SLES/RHEL/Ubuntu are available via an enterprise
+> subscription**
 
 Start with a debian minimal install, we recommend to add *SSH Server*
 and *Web Server* in the package selection menu, as this will speed up
@@ -61,7 +69,7 @@ To avoid an \"untrusted package\" warning, you should add our package
 signing key (you might need to install gpg before):
 
 ```bash
-wget https://packages.openxpki.org/v3/bookworm/Release.key -O - 2>/dev/null | \
+ $ wget https://packages.openxpki.org/v3/bookworm/Release.key -O - 2>/dev/null | \
     tee Release.key | gpg -o /usr/share/keyrings/openxpki.pgp --dearmor
 ```
 
@@ -76,10 +84,10 @@ $ gpg --print-md sha256 Release.key (Updated 2025-05-16)
 You can also find the key on the [github repository](https://github.com/openxpki/openxpki) in
 `package/debian/Release.key`.
 
-Add the repository to your source list (bookworm):
+Add the repository to your source list:
 
 ```bash
-echo -e "Types: deb\nURIs: https://packages.openxpki.org/v3/bookworm/\nSuites: bookworm\nComponents: release\nSigned-By: /usr/share/keyrings/openxpki.pgp" > /etc/apt/sources.list.d/openxpki.sources
+$ echo -e "Types: deb\nURIs: https://packages.openxpki.org/v3/bookworm/\nSuites: bookworm\nComponents: release\nSigned-By: /usr/share/keyrings/openxpki.pgp" > /etc/apt/sources.list.d/openxpki.sources
 apt update
 ```
 
@@ -91,7 +99,7 @@ of them as dependency. You therefore need to install the required perl
 bindings and server software yourself:
 
 ```bash
-apt install mariadb-server libdbd-mariadb-perl
+$ apt install mariadb-server libdbd-mariadb-perl
 ```
 
 Starting with v3.32 the webfrontend uses its own process and no longer
@@ -100,14 +108,14 @@ but you can run this with any server that has reverse proxy support. The
 required mods are enabled by the package install:
 
 ```bash
-apt install apache2
+$ apt install apache2
 ```
 
 Now install the OpenXPKI core package, session driver and the
 translation package:
 
 ```bash
-apt install libopenxpki-perl openxpki-cgi-session-driver openxpki-i18n
+$ apt install libopenxpki-perl openxpki-cgi-session-driver openxpki-i18n
 ```
 
 use the oxi command to verify if the system was installed correctly:
@@ -152,14 +160,16 @@ properly.
 
 Example call when debian packages are installed:
 
-    cat /usr/share/doc/libopenxpki-perl/examples/schema-mariadb.sql | \
-         mysql -u root --password --database  openxpki
+```bash
+$ cat /usr/share/doc/libopenxpki-perl/examples/schema-mariadb.sql | \
+     mysql -u root --password --database openxpki
+```
 
 If you do not use debian packages, you can get a copy from
 `contrib/sql/` in the config repository
 <https://github.com/openxpki/openxpki-config>.
 
-Now create a user for the UI session storage
+Now create a user for the UI session storage:
 
 ```sql
 CREATE USER 'openxpki_session'@'localhost' IDENTIFIED BY 'mysecret';
@@ -186,23 +196,17 @@ session:
 ### Sample / Demo Configuration
 
 The debian package comes with a shell script `sampleconfig.sh` that does
-all the work for you (look in /usr/share/doc/libopenxpki-perl/examples/).
-The script will create a two-stage ca with a root ca certificate and below
-your issuing ca and certs for SCEP and the internal datasafe.
+all the work for you (look in `/usr/share/doc/libopenxpki-perl/examples/`).
+The script will setup the command line authentication for the `root` user, generate the datapool encryption key and creates a two-stage ca with a root ca certificate and below
+your issuing ca.
 
-It is required that the backend service is already up and running:
-
-```bash
-systemctl start openxpki-serverd
-```
-
-If successful, the script will start the webserver and OpenXPKI application server and you should be able to log into
+If successful, the script will start the webserver and OpenXPKI frontend
+and backend server and you should be able to log into
 the system via your webbrowser using the default credentials (see section
 [Testdrive](#testdrive) below).
 
 This script provides a quickstart but should **never be used for
-production systems** (it has the fixed passphrase *root* for all keys
-and no policy/crl, etc configured ).
+production systems** (it has the fixed passphrase *root* for all keys, no policy/crl, etc. configured and uses the root user as operator).
 
 ### Production Configuration
 
@@ -210,7 +214,9 @@ For a production setup we recommend to remove the `/etc/openxpki`
 folder that was installed by the package and use a checkout of the
 [openxpki-config repository](https://github.com/openxpki/openxpki-config).
 
-Follow the steps in the README and QUICKSTART document to setup your
+Follow the steps in the [README.md](https://github.com/openxpki/openxpki-config/blob/community/README.md)
+and
+[QUICKSTART.md](https://github.com/openxpki/openxpki-config/blob/community/QUICKSTART.md) document to setup your
 production realms.
 
 ### Testdrive
@@ -248,8 +254,8 @@ To setup your local user database have a look at the files in the `auth` directo
 ### Troubleshooting
 
 If you only get the \"Open Source Trustcenter\" banner without a login
-prompt, make sure that the fcgi module is properly loaded and available.
-To see the output of the wrapper script, it might be helpful to use the
+prompt, make sure that the application server is started. To see the output
+of the wrapper script, it might be helpful to use the
 browsers developer console (F12 or CTRL+F12 on most browsers).
 
 If you get an internal server error, make sure you have the *en_US.utf8*
@@ -271,9 +277,11 @@ certificate and register it as SCEP RA token:
 oxi token add --realm democa --type scep --cert scep.crt --key scep.key
 ```
 
-**Note**: Each realm needs its own SCEP token so you need to run this
-command for any realm that provides an SCEP service. It is possible to
-use the same SCEP token in multiple realms.
+> [!NOTE]
+>
+> Each realm needs its own SCEP token so you need to run this
+> command for any realm that provides an SCEP service. It is possible to
+> use the same SCEP token in multiple realms.
 
 ### Setup SCEP Endpoint
 
@@ -284,15 +292,14 @@ OpenXPKI requires an *endpoint* to be defined in your configuration, the
 address of each endpoint is `http://yourhost/scep/<endpoint>`.
 
 The path equals to the file name in the
-`client.d/service/scep/` irectory, the default confiuration
+`client.d/service/scep/` directory, the default configuration
 deploys `generic.yaml` so you have to point your SCEP client
 to `http://yourhost/scep/generic`. Please note that any
-endpoint also requires an internal definiton inside the realm
-configuration, a verbose example can be found in the file
-`config.d/realm/democa/scep/generic.yaml`.
+endpoint also requires an internal definition inside the realm
+configuration, a verbose example can be found in the file `config.d/realm/democa/scep/generic.yaml`.
 
 SCEP supports enrollment via challenge password as well as signing on
-behalf. Advanced configuration is described in the scep workflow
+behalf. Advanced configuration is described in the SCEP workflow
 section.
 
 The best way for testing the service is the sscep command line tool (available at e.g. <https://github.com/certnanny/sscep>).
