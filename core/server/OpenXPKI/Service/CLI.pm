@@ -6,6 +6,7 @@ use List::Util qw( first );
 
 use Crypt::JWT qw(decode_jwt);
 use Crypt::PK::ECC;
+use MIME::Base64 qw(decode_base64);
 
 use Sys::SigAction qw( sig_alarm set_sig_handler );
 
@@ -43,7 +44,12 @@ sub BUILD {
     my @key_list = map {
         my $item = CTX('config')->get_hash(['system','cli','auth',$_]);
         next unless ($item->{key});
-        my $pubkey = Crypt::PK::ECC->new(\$item->{key});
+
+        # key can be given as regular PEM or base64 encoded DER without headers
+        my $key = ($item->{key} =~ m{\A\s*-----BEGIN}) ?
+            $item->{key} : decode_base64($item->{key});
+
+        my $pubkey = Crypt::PK::ECC->new(\$key);
         my $jwk_hash = $pubkey->export_key_jwk('public', 1);
         $jwk_hash->{kid} = $pubkey->export_key_jwk_thumbprint();
         $kid2role->{$jwk_hash->{kid}} = $item->{role} || '_System';
