@@ -55,7 +55,7 @@ case "$1" in
 
             if [ -d /etc/apache2/sites-available/ ]; then
                 if [ ! -e /etc/apache2/sites-available/openxpki.conf ]; then
-                    cp /usr/share/doc/libopenxpki-perl/examples/apache2-openxpki-site.conf /etc/apache2/sites-available/openxpki.conf
+                    ln -s /usr/share/doc/libopenxpki-perl/examples/apache2-openxpki-site.conf /etc/apache2/sites-available/openxpki.conf
                     /usr/sbin/a2enmod headers macro proxy proxy_http rewrite ssl
                     /usr/sbin/a2ensite openxpki
                 fi;

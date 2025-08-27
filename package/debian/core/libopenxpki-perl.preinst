@@ -22,7 +22,7 @@ case "$1" in
         fi;
     ;;
 
-    abort-upgrade|abort-remove|abort-deconfigure|upgrade)
+    abort-upgrade|abort-remove|abort-deconfigure)
     ;;
 
     *)
