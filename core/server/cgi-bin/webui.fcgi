@@ -177,7 +177,8 @@ while (my $cgi = CGI::Fast->new("")) {
         try {
             if (not $backend_client or not $backend_client->is_connected) {
                 $backend_client = OpenXPKI::Client->new(
-                    ($conf->{global}->{socket} ? (socketfile => $conf->{global}->{socket}) : ())
+                    ($conf->{global}->{socket} ? (socketfile => $conf->{global}->{socket}) : ()),
+                    ($conf->{global}->{backend_timeout} ? (timeout => $conf->{global}->{backend_timeout}) : ())
                 );
                 $backend_client->send_receive_service_msg('PING');
             }
