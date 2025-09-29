@@ -135,7 +135,7 @@ while (my $cgi = CGI::Fast->new("")) {
 
         # special handling for requests for OpenAPI (Swagger) spec
         if ($client->operation eq 'openapi-spec') {
-            my $url = $client->request_url;
+            my $url = $client->normalized_request_url;
             my $baseurl = sprintf "%s://%s%s", $url->protocol, $url->host_port, $url->path->to_abs_string;
             my $spec = $client->openapi_spec($baseurl) or die $client->new_response( 50082 );
             $openapi_mode = 1;
