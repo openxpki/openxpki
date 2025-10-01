@@ -111,12 +111,12 @@ oxi_install_params=()
 [[ "${@#--nginx}" != "$@" ]]      && FORCE_NGINX=1
 
 if [[ $FORCE_NGINX == 1 ]]; then
-    echo -e "Switching to nginx\n"
+    echo -e "Switch to nginx (stop+disable Apache2)\n"
     systemctl disable apache2   >>$LOG 2>&1
     systemctl stop apache2      >>$LOG 2>&1
     systemctl enable nginx      >>$LOG 2>&1
 elif [[ $FORCE_APACHE == 1 ]]; then
-    echo -e "Switching to Apache2\n"
+    echo -e "Switch to Apache2 (stop+disable nginx)\n"
     systemctl disable nginx     >>$LOG 2>&1
     systemctl stop nginx        >>$LOG 2>&1
     systemctl enable apache2    >>$LOG 2>&1
@@ -145,12 +145,20 @@ echo
 if [[ $IS_RESTART -eq 1 ]]; then
     set +e
     # service unit might not yet exist if this is a freshly installed system
-    if systemctl list-unit-files openxpki-serverd.service >/dev/null; then
-        systemctl stop openxpki-serverd.service
-    fi
     if systemctl list-unit-files openxpki-clientd.service >/dev/null; then
+        if [[ $IS_LEGACY_FCGI == 1 ]]; then
+            echo "Legacy FCGI: disable OpenXPKI Mojolicious client"
+            systemctl disable openxpki-clientd.service
+        fi
+        echo "Stop OpenXPKI Mojolicious client"
         systemctl stop openxpki-clientd.service
     fi
+    # service unit might not yet exist if this is a freshly installed system
+    if systemctl list-unit-files openxpki-serverd.service >/dev/null; then
+        echo "Stop OpenXPKI server"
+        systemctl stop openxpki-serverd.service
+    fi
+    echo
     set -e
 fi
 
@@ -353,13 +361,64 @@ if [[ $IS_FULLCONFIG -eq 1 ]]; then
     $(dirname $0)/oxi-initdb
 fi
 
+if [[ $IS_LEGACY_FCGI == 1 ]]; then
+    if [[ ! -d /var/log/openxpki ]]; then
+        mkdir -p /var/log/openxpki
+        chmod 0777 /var/log/openxpki
+    fi
+    LEGACY_CONF=/etc/openxpki/webui/default.conf
+    if [[ ! -e $LEGACY_CONF ]]; then
+        echo -e "\nCreate legacy FCGI config: $LEGACY_CONF"
+        mkdir -p /etc/openxpki/webui
+        cat <<'EOF' > $LEGACY_CONF
+[global]
+socket = /var/openxpki/openxpki.socket
+scripturl = cgi-bin/webui.fcgi
+staticdir = /var/www/static/
+realm_mode = path
+realm_layout = card
+locale_directory: /usr/share/locale/
+default_language: en_US
+[logger]
+log_level = INFO
+[session]
+driver = driver:openxpki
+fingerprint = HTTP_ACCEPT_ENCODING, HTTP_USER_AGENT, HTTP_ACCEPT_LANGUAGE, REMOTE_USER, SSL_CLIENT_CERT
+cookey = OpenXPKI-Cookey-Secret
+[session_driver]
+Directory = /tmp
+NameSpace = openxpki
+DataSource = dbi:MariaDB:dbname=openxpki;host=127.0.0.1
+User = openxpki_session
+Password = mysecret
+EncryptKey = SecretSessionKey
+[realm]
+democa = democa
+rootca = rootca
+[header]
+Strict-Transport-Security = max-age=31536000;
+X-Frame-Options = SAMEORIGIN;
+X-XSS-Protection = 1; mode=block;
+EOF
+    fi
+fi
+
 if [[ $IS_RESTART -eq 1 ]]; then
     echo ""
 
     # oxi-initdb (above) already restarts OpenXPKI
     if [[ $IS_FULLCONFIG -ne 1 ]]; then
-        echo "Restart OpenXPKI server"
-        systemctl restart openxpki-serverd.service
+        if [[ $IS_LEGACY_FCGI == 0 ]]; then
+            echo "Start OpenXPKI client (Mojolicious) which also starts server"
+            systemctl restart openxpki-clientd.service
+            if ! systemctl status openxpki-clientd.service > /dev/null; then
+                echo -e "\nERROR: Could not start client. Please see logs in /var/log/openxpki-client"
+                exit 333
+            fi
+        else
+            echo "Restart OpenXPKI server"
+            systemctl restart openxpki-serverd.service
+        fi
         set +e
         sec=0; error=1; sock=$(perl -e 'use OpenXPKI::Defaults; print $OpenXPKI::Defaults::SERVER_SOCKET')
         while [ $error -ne 0 -a $sec -lt 20 ]; do
@@ -368,21 +427,14 @@ if [[ $IS_RESTART -eq 1 ]]; then
         done
         set -e
         if [ $error -ne 0 ]; then
-            echo -e "\nERROR: Could not start server. Please see logs in /var/log/openxpki"
+            echo -e "\nERROR: Could not start server (Socket file $sock not found)."
+            if [[ $IS_LEGACY_FCGI == 1 ]]; then
+                echo "Please see logs in /var/log/openxpki"
+            else
+                echo "Please see logs in /var/log/openxpki-server"
+            fi
             exit 333
         fi
-    fi
-
-    if [[ $IS_LEGACY_FCGI == 0 ]]; then
-        echo "Restart OpenXPKI client (Mojolicious)"
-        systemctl restart openxpki-clientd.service
-        if ! systemctl status openxpki-clientd.service > /dev/null; then
-            echo -e "\nERROR: Could not start client. Please see logs in /var/log/openxpki-client"
-            exit 333
-        fi
-    else
-        echo "Legacy FCGI: disable OpenXPKI Mojolicious client"
-        systemctl disable openxpki-clientd.service
     fi
 
     if [[ $IS_APACHE == 1 ]]; then
