@@ -109,7 +109,10 @@ sub init ($self) {
         -nodeprecate => 1,
     ) if $self->{EncryptKey};
 
-    $self->log->trace('Frontend session driver initialized');
+    $self->log->trace(
+        sprintf('Frontend session driver initialized: datasource = %s, tablename = %s, user = %s',
+        $self->{DataSource}, $self->{TableName}, $self->{User},
+    ));
     return 1;
 }
 
