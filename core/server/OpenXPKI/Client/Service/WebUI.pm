@@ -653,7 +653,7 @@ sub prepare ($self, $c) {
     # PATH mode
     if ("path" eq $realm_mode) {
         # Set the path to the directory component of the script, this
-        # automagically creates seperate cookies for path based realms
+        # automagically creates separate cookies for path based realms
         $self->session_cookie->path($self->url_path);
 
         # Interpret last part of the URL path as realm
@@ -712,8 +712,10 @@ sub prepare ($self, $c) {
         $self->log->debug("- detected realm: '$realm'");
         $self->current_realm($realm);
         if ($stack) {
-            $self->log->debug("- auto-selected auth stack based on realm config: '$stack'");
+            $self->log->debug("- auto-select fixed auth stack based on config: '$stack'");
             $self->current_auth_stack($stack);
+            # mark auth stack so it will be carried over in session renewals
+            $self->session->param('is_fixed_auth_stack', 1);
         }
     }
 }
@@ -968,10 +970,16 @@ only preserved data is the C<pki_realm>.
 
 sub new_frontend_session ($self) {
     my $pki_realm = $self->session->param('pki_realm');
+    my $auth_stack = $self->session->param('auth_stack');
+    my $is_fixed_auth_stack = $self->session->param('is_fixed_auth_stack');
 
     # create new session object but reuse old settings
     $self->session($self->session->clone);
     $self->session->param(pki_realm => $pki_realm) if $pki_realm;
+    if ($auth_stack and $is_fixed_auth_stack) {
+        $self->session->param(auth_stack => $auth_stack);
+        $self->session->param(is_fixed_auth_stack => 1);
+    }
 
     Log::Log4perl::MDC->put('sid', substr($self->session->id,0,4));
     $self->log->debug('New frontend session: ID = '. $self->session->id);

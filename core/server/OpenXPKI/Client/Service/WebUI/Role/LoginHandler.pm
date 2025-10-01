@@ -589,7 +589,7 @@ sub handle_logout ($self, $page) {
         my $goto = $authinfo->{logout};
 
         # create new frontend and backend sessions
-        $self->logout_session; # pki_realm will be preserved
+        $self->logout_session; # this will preserve "pki_realm" and "auth_stack" (if fixed)
 
         # make sure backend session knows realm and frontend session knows
         # backend session so e.g. "get_menu" returns the proper logout menu from
@@ -597,11 +597,15 @@ sub handle_logout ($self, $page) {
         $self->_init_client($self->client); # initialize backend session and store its ID in frontend session
 
         if (my $pki_realm = $self->session->param('pki_realm')) {
+            my $auth_stack = $self->session->param('is_fixed_auth_stack') # auth_stack shouldn't be there after session renewal if it's not fixed, but we check anyways
+                ? $self->session->param('auth_stack')
+                : undef;
             # store realm in backend session
             my $reply = $self->ping_client;
             if ($reply->{SERVICE_MSG} eq 'GET_PKI_REALM') {
                 $self->client->send_receive_service_msg('GET_PKI_REALM', {
                     PKI_REALM => $pki_realm,
+                    $auth_stack ? (AUTHENTICATION_STACK => $auth_stack) : (),
                 });
             }
         }

@@ -252,6 +252,8 @@ while (my $cgi = CGI::Fast->new("")) {
             if ($stack) {
                 $log->debug("Auto-select auth stack '$stack' based on realm detection");
                 $session_front->param('auth_stack', $stack);
+                # mark auth stack so it will be carried over in session renewals
+                $session_front->param('is_fixed_auth_stack', 1);
             }
         }
 
