@@ -290,6 +290,9 @@ sub startup ($self) {
                 }
             }
 
+            # Inject SSL related headers into ENV for e.g. OpenXPKI::Client::Simple
+            $ENV{$_} = $c->req->env->{$_} for grep { /^SSL_CLIENT_/ } keys $c->req->env->%*;
+
             # Inject query parameters forwarded by webserver into Mojo::Request.
             # NOTE:
             # We need this workaround because Apache reverse proxy cannot forward
