@@ -855,6 +855,10 @@ sub openapi_spec {
         $self->client_simple->disconnect();
     }
     catch ($err) {
+        if (ref $err && $err->isa('OpenXPKI::Client::Service::Response')) {
+            $self->log->trace(Dumper $err) if $self->log->is_trace;
+            $err = $err->error_message();
+        }
         $self->log->error("Unable to query OpenAPI specification from OpenXPKI server: $err");
         return;
     }
