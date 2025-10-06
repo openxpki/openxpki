@@ -2,6 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenXPKI 3.32.7\n"
 "Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2004-09-08 14:02+0200\n"
 "PO-Revision-Date: 2025-08-29 13:30+0900\n"
 "Last-Translator: Shogo Mori <smori@designet.co.jp>\n"
 "Language-Team: DesigNET.inc\n"
@@ -9,6 +10,14 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ACCOUNT_AUTOREGISTRATION_LABEL"
+msgstr "アカウント状態"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ACCOUNT_AUTOREGISTRATION_TRUE"
+msgstr "連絡先情報"
 
 msgid "I18N_OPENXPKI_UI_ACCOUNT_CONTACT_INFORMATION_LABEL"
 msgstr "連絡先情報"
@@ -57,6 +66,10 @@ msgstr "再ログインしてください"
 
 msgid "I18N_OPENXPKI_UI_BACKEND_UNREACHABLE"
 msgstr "バックエンドサービスに到達できない、または応答しませんでした"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BLAH"
+msgstr "いいえ"
 
 msgid "I18N_OPENXPKI_UI_BULK_APPROVE_CRR_LABEL"
 msgstr "失効の承認"
@@ -473,6 +486,18 @@ msgid "I18N_OPENXPKI_UI_CSR_KEY_GENERATION_FAILED"
 msgstr "キー生成の失敗"
 
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION"
+msgstr "証明書を失効する理由を指定します。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT"
+msgstr "証明書を失効する理由を指定します。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
+msgstr "証明書を失効する理由を指定します。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
 msgstr "証明書を失効する理由を指定します。"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_ACME_REGISTRATION_LABEL"
@@ -992,8 +1017,8 @@ msgstr "必要な情報がありません。"
 msgid "I18N_OPENXPKI_UI_LOGIN_NO_DATA_PAGE"
 msgstr ""
 "選択したログイン方法でログインするために必要な情報を提示できませんでした。"
-"<br>異なるタイプの認証を選択してください。<a href=\"#/openxpki/redirect!login"
-"\">ログインページに戻る</a>"
+"<br>異なるタイプの認証を選択してください。<a href=\"#/openxpki/redirect!"
+"login\">ログインページに戻る</a>"
 
 msgid "I18N_OPENXPKI_UI_LOGIN_PASSWORD"
 msgstr "パスワード"
@@ -1102,6 +1127,10 @@ msgstr "自分のタスク"
 
 msgid "I18N_OPENXPKI_UI_MENU_MY_WORKFLOW"
 msgstr "自分のワークフロー"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_NICE_CONNECT"
+msgstr "リクエストチェック"
 
 msgid "I18N_OPENXPKI_UI_MENU_PKI_OPERATION"
 msgstr "PKIオペレーション"
@@ -1391,6 +1420,10 @@ msgstr "システムに最も適したホスト名（ドメイン名）を入力
 
 msgid "I18N_OPENXPKI_UI_PROFILE_IMPORTED_LABEL"
 msgstr "インポート済み証明書"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_LABEL"
+msgstr "IoTデバイス"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_STYLE_DESC"
 msgstr ""
@@ -1965,6 +1998,10 @@ msgid "I18N_OPENXPKI_UI_WELCOME_PAGE"
 msgstr "OpenXPKI Trustcenter へようこそ"
 
 msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"
+msgstr "今日のメッセージ"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WF_TYPE_NICE_CONNECT_LABEL"
 msgstr "今日のメッセージ"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ABORT_BUTTON"
@@ -2557,6 +2594,14 @@ msgstr "フィールド仕様で定義された入力データ。"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_BULKDATA_LABEL"
 msgstr "バルクデータ"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_BULKDATA_PLACEHOLDER"
+msgstr "バルクデータ"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_BULKDATA_TOOLTIP"
+msgstr "バルクデータ"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_ALIAS_LABEL"
 msgstr "CAの別名"
 
@@ -2719,6 +2764,10 @@ msgstr "このSCEPリクエストのトランザクションID"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHAIN_LABEL"
 msgstr "チェーン証明書"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHAIN_PLACEHOLDER"
+msgstr "my.name@mycompany.com"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHAIN_TOOLTIP"
 msgstr "必要なチェーン証明書を連結したPEMまたはPKCS7バンドルとしてコピーします"
 
@@ -2872,6 +2921,12 @@ msgstr "使用するインベントリのタイプ。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVENTORY_LABEL"
 msgstr "インベントリ"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVENTORY_TOOLTIP"
+msgstr ""
+"カレンダーアイコンを使用するか、MM.DD.YYYY形式で日付を入力し、デフォルトを使"
+"用するには0を入力します。日付けはUTCの時間帯です。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_DESC"
 msgstr ""
@@ -4036,6 +4091,24 @@ msgstr ""
 "変更を行うことができます。また、<i>データの永続化</i>を使用して、証明書データ"
 "ベースにデータを書き戻すことができます。ワークフローをキャンセルすると、変更"
 "内容が失われます。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_NICE_CONNECT_FAILURE_DESC"
+msgstr ""
+"This certificate can not be renewed as the preconditions for renewal are not "
+"met. See the output below for more details."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_NICE_CONNECT_REJECTED_DESC"
+msgstr "最終的に失効リクエストが拒否されました。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_NICE_CONNECT_REJECTED_LABEL"
+msgstr "失効拒否"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_NICE_CONNECT_SUCCESS_LABEL"
+msgstr "失効した証明書"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PAUSE_DESC"
 msgstr ""

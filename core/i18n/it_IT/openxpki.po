@@ -21,6 +21,14 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_ACCOUNT_AUTOREGISTRATION_LABEL"
+msgstr "Stato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ACCOUNT_AUTOREGISTRATION_TRUE"
+msgstr "Azione"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_ACCOUNT_CONTACT_INFORMATION_LABEL"
 msgstr "Azione"
 

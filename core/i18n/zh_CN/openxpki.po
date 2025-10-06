@@ -16,6 +16,14 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_ACCOUNT_AUTOREGISTRATION_LABEL"
+msgstr "配置版本"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ACCOUNT_AUTOREGISTRATION_TRUE"
+msgstr "操作"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_ACCOUNT_CONTACT_INFORMATION_LABEL"
 msgstr "操作"
 

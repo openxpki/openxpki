@@ -18,6 +18,14 @@ msgstr ""
 "X-Generator: Poedit 1.5.4\n"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_ACCOUNT_AUTOREGISTRATION_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ACCOUNT_AUTOREGISTRATION_TRUE"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_ACCOUNT_CONTACT_INFORMATION_LABEL"
 msgstr "Родительский технологический процесс"
 
