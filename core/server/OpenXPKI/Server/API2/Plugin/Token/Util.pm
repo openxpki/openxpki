@@ -78,7 +78,7 @@ sub is_token_usable ($self, $token, $check, $padding_config) {
                     $PADDING{PADDING_OPTIONS} = $padding_config // {};
                 }
 
-                my $encrypted = $token->command({ COMMAND => 'pkcs7_encrypt', CONTENT => $base, %PADDING });
+                my $encrypted = $self->api->get_default_token->command({ COMMAND => 'pkcs7_encrypt', CONTENT => $base, %PADDING });
                 $decrypted = $token->command({ COMMAND => 'pkcs7_decrypt', PKCS7 => $encrypted });
             }
 

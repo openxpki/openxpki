@@ -408,7 +408,7 @@ sub encrypt_passwordsafe ($self, $safe_id, $value) {
     }
 
     ##! 16: 'asymmetric encryption via passwordsafe ' . $safe_id
-    return $token->command({
+    return $self->api->get_default_token->command({
         COMMAND => 'pkcs7_encrypt',
         CONTENT => $value,
         %PADDING
