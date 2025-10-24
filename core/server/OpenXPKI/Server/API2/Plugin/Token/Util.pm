@@ -1,5 +1,6 @@
 package OpenXPKI::Server::API2::Plugin::Token::Util;
 use OpenXPKI -class;
+use OpenXPKI::FileUtils;
 
 =head1 NAME
 
@@ -77,8 +78,19 @@ sub is_token_usable ($self, $token, $check, $padding_config) {
                     $PADDING{PADDING} = 'oaep';
                     $PADDING{PADDING_OPTIONS} = $padding_config // {};
                 }
+		
+		# test encryption/decryption with current datapool certificate
+		# for encryption use default token to avoid OpenSSL problems when 
+		# passing HSM configuration to non-HSM operations
 
-                my $encrypted = $self->api->get_default_token->command({ COMMAND => 'pkcs7_encrypt', CONTENT => $base, %PADDING });
+		# obtain the certificate contents of the currently used datavault certificate
+		my $certfile = $token->get_instance()->get_certfile();
+		my $certcontents = OpenXPKI::FileUtils->read_file($certfile);
+                my $encrypted = CTX('api2')->get_default_token->command({ 
+		    COMMAND => 'pkcs7_encrypt', 
+		    CERT => $certcontents, 
+		    CONTENT => $base, 
+		    %PADDING });
                 $decrypted = $token->command({ COMMAND => 'pkcs7_decrypt', PKCS7 => $encrypted });
             }
 

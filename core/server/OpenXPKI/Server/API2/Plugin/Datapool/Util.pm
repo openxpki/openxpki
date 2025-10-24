@@ -408,9 +408,13 @@ sub encrypt_passwordsafe ($self, $safe_id, $value) {
     }
 
     ##! 16: 'asymmetric encryption via passwordsafe ' . $safe_id
+    # encrypt for current datapool certificate, using default token to avoid
+    # OpenSSL problems when passing HSM configuration to non-HSM operations
+    my $cert = $self->api->get_certificate_for_alias(alias => $safe_id);
     return $self->api->get_default_token->command({
         COMMAND => 'pkcs7_encrypt',
         CONTENT => $value,
+	CERT => $cert->{data},
         %PADDING
     });
 }
