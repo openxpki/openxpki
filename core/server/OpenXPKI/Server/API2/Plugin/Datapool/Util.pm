@@ -392,13 +392,10 @@ sub encrypt_passwordsafe ($self, $safe_id, $value) {
     my %PADDING;
     my $padding_config = CTX('config')->get_hash(["system","datavault","padding"]);
     if ($padding_config && $padding_config->{mode}) {
-        my $mode = $padding_config->{mode};
-        delete $padding_config->{mode};
+        my $mode = delete $padding_config->{mode};
         if ($mode eq 'oaep') {
             $PADDING{PADDING} = 'oaep';
-            if (keys %{$padding_config}) {
-                $PADDING{PADDING_OPTIONS} = $padding_config
-            }
+            $PADDING{PADDING_OPTIONS} = $padding_config if keys $padding_config->%*;
         } elsif ($mode ne 'pkcs1') {
             OpenXPKI::Exception->throw(
                 message => 'Unsupported padding mode for DataVault',
@@ -414,8 +411,8 @@ sub encrypt_passwordsafe ($self, $safe_id, $value) {
     return $self->api->get_default_token->command({
         COMMAND => 'pkcs7_encrypt',
         CONTENT => $value,
-	CERT => $cert->{data},
-        %PADDING
+	    CERT => $cert->{data},
+        %PADDING,
     });
 }
 
