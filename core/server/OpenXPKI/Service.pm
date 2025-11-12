@@ -131,7 +131,7 @@ sub __get_error {
         }
         else {
             ## this is an exception
-            if (ref($error) eq "OpenXPKI::Exception") {
+            if (blessed $error and $error->isa('OpenXPKI::Exception')) {
                 ## openxpki exception
                 my %hash = (LABEL => $error->message());
                 $hash{PARAMS} = $error->params()

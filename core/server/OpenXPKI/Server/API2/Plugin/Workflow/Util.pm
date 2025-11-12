@@ -179,7 +179,7 @@ sub _execute_activity_sync {
         Log::Log4perl::MDC->put('wftype', undef);
 
         ## normal OpenXPKI exception
-        $eval_err->rethrow() if (ref $eval_err eq "OpenXPKI::Exception");
+        $eval_err->rethrow() if (blessed $eval_err and $eval_err->isa("OpenXPKI::Exception"));
 
         ## workflow exception
         my $error = $workflow->context->param('__error');

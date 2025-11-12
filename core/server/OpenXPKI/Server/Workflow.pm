@@ -269,13 +269,12 @@ sub execute_action {
 
         CTX('metrics')->inc(workflow_state_count =>  {  type => $self->type, state => 'exception' });
         $e = OpenXPKI::Exception->caught();
-        if ( (ref $e eq 'OpenXPKI::Exception') &&
-            ( $e->message_code() eq 'I18N_OPENXPKI_SERVER_WORKFLOW_ERROR_ON_EXECUTE') ) {
-
+        if (blessed $e
+            and $e->isa('OpenXPKI::Exception')
+            and $e->message_code eq 'I18N_OPENXPKI_SERVER_WORKFLOW_ERROR_ON_EXECUTE'
+        ) {
             ##! 16: 'bubbled up error - rethrow'
             CTX('log')->application()->debug("Bubble up error from nested action");
-
-
             $e->rethrow;
         }
 

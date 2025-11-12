@@ -62,8 +62,8 @@ sub get_command
     push @command, '-engine', $engine if ($engine);
 
     if ($self->{ENGINE}->get_engine() eq "pkcs11" and
-        (ref $self->{ENGINE}) =~ m{^OpenXPKI::Crypto::Backend::OpenSSL::Engine::SafeNetProtectServer$}xms)
-    {
+        $self->{ENGINE}->isa('OpenXPKI::Crypto::Backend::OpenSSL::Engine::SafeNetProtectServer')
+    ) {
         ## The OpenSSL patch for the SafeNet ProtectServer requires
         ## that the option -keyfile is used.
         push @command, '-keyfile', $self->{KEYFILE};

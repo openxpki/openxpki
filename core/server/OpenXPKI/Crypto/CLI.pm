@@ -18,6 +18,7 @@ my %fu_of      :ATTR; # FileUtils
 sub START {
     my ($self, $ident, $arg_ref) = @_;
 
+    # We CANNOT check with blessed/isa here because we explicitely only want to match the base class
     if (ref $self eq 'OpenXPKI::Crypto::CLI') {
         # somebody tried to instantiate us, but we are supposed to be abstract.
         OpenXPKI::Exception->throw(

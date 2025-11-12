@@ -855,7 +855,7 @@ sub openapi_spec {
         $self->client_simple->disconnect();
     }
     catch ($err) {
-        if (ref $err && $err->isa('OpenXPKI::Client::Service::Response')) {
+        if (blessed $err and $err->isa('OpenXPKI::Client::Service::Response')) {
             $self->log->trace(Dumper $err) if $self->log->is_trace;
             $err = $err->error_message();
         }

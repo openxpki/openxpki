@@ -1020,7 +1020,7 @@ sub set_user {
         },
     });
 
-    die "Could not set user to '$user' " unless(ref $reply eq 'OpenXPKI::Server::Authentication::Handle');
+    die "Could not set user to '$user' " unless(blessed $reply and $reply->isa('OpenXPKI::Server::Authentication::Handle'));
 
     my $userid = $reply->userid;
     my $role = $reply->role;

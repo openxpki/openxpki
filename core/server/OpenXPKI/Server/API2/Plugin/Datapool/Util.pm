@@ -378,7 +378,7 @@ sub encrypt_passwordsafe ($self, $safe_id, $value) {
     my $token = CTX('crypto_layer')->get_token({ TYPE => 'datasafe', NAME => $safe_id });
     # Glue code to switch between old and new token layer
     # this is a symmetric key token
-    if (ref $token eq 'OpenXPKI::Crypto::Token::Vault') {
+    if (blessed $token and $token->isa('OpenXPKI::Crypto::Token::Vault')) {
         OpenXPKI::Exception->throw(
             message => 'vault token is not online',
             params => { alias => $safe_id }
@@ -429,7 +429,7 @@ sub decrypt_passwordsafe ($self, $safe_id, $enc_value) {
             params => { token_id  => $safe_id }
         );
 
-    if (ref $token eq 'OpenXPKI::Crypto::Token::Vault') {
+    if (blessed $token and $token->isa('OpenXPKI::Crypto::Token::Vault')) {
         ##! 16: 'symmetric decryption using svault'
         OpenXPKI::Exception->throw(
             message => 'vault token is not online',
@@ -445,7 +445,7 @@ sub decrypt_passwordsafe ($self, $safe_id, $enc_value) {
         $value = $token->command({ COMMAND => 'pkcs7_decrypt', PKCS7 => $enc_value });
     }
     catch ($err) {
-        if ($err->isa('OpenXPKI::Exception')) {
+        if (blessed $err and $err->isa('OpenXPKI::Exception')) {
             if ($err->message eq 'I18N_OPENXPKI_TOOLKIT_COMMAND_FAILED') {
                 OpenXPKI::Exception->throw(
                     message => 'Encryption key needed to decrypt password safe entry is unavailable',

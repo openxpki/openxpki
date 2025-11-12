@@ -361,7 +361,7 @@ sub __extract_payload {
 
     my $sym_key_enc = $ri->{encryptedKey};
     my $content_key;
-    if (ref $skey eq 'OpenXPKI::Crypto::Backend::API') {
+    if (blessed $skey and $skey->isa('OpenXPKI::Crypto::Backend::API')) {
         ##! 64: 'Token api'
         my %padding;
         $padding{PADDING} = 'oaep' if ($key_alg eq 'rsaesOaep');
@@ -600,7 +600,7 @@ sub __generate_response {
     # ECC is very uncommon so we allow RSA only for now
     $sigAlg = '1.2.840.113549.1.1.1'; # rsa
 
-    if (ref $skey eq 'OpenXPKI::Crypto::Backend::API') {
+    if (blessed $skey and $skey->isa('OpenXPKI::Crypto::Backend::API')) {
         # as we are unable to get the key details from the token we
         # check the signer certificate for the used pubkey algorithm
         my $pkAlg = $racert->_cert()->PubKeyAlg();

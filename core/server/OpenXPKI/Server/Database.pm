@@ -455,7 +455,7 @@ sub insert ($self, $arg) {
     # Replace AUTO_ID with value of next_id()
     for (keys %{ $arg->{values} }) {
         $arg->{values}->{$_} = $self->next_id($arg->{into})
-            if (ref $arg->{values}->{$_} eq "OpenXPKI::Server::Database::AUTOINCREMENT"); # ::AUTOINCREMENT is a "virtual" package
+            if (blessed $arg->{values}->{$_} and $arg->{values}->{$_}->isa("OpenXPKI::Server::Database::AUTOINCREMENT")); # ::AUTOINCREMENT is a "virtual" package
     }
 
     my $query = $self->query_builder->insert($arg->%*);

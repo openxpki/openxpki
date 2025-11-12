@@ -174,7 +174,7 @@ sub build_config
         # some req related dummy data here
         push @config, $self->__get_req_section();
 
-    } elsif (ref $self->{PROFILE} eq 'OpenXPKI::Crypto::Profile::CSR') {
+    } elsif (blessed $self->{PROFILE} and $self->{PROFILE}->isa('OpenXPKI::Crypto::Profile::CSR')) {
 
         push @config, $self->__get_req_section();
 

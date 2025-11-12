@@ -15,6 +15,7 @@ sub START {
 
     ##! 32: 'Args ' . Dumper ( $arg_ref )
 
+    # We CANNOT check with blessed/isa here because we explicitely only want to match the base class
     if (ref $self eq 'OpenXPKI::Crypto::API') {
         # somebody tried to instantiate us, but we are supposed to be abstract.
         OpenXPKI::Exception->throw(

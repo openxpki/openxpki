@@ -252,12 +252,10 @@ sub _process_login {
     # returns an instance of OpenXPKI::Server::Authentication::Handle
     # if the login was successful, auth failure throws an exception
     # returns a hash ref with stack information when auth data was incomplete
-    if (!ref $auth_reply eq 'OpenXPKI::Server::Authentication::Handle') {
-        OpenXPKI::Exception::Authentication->throw(
-            message => 'Insufficient information to authenticate',
-            stack => $stack
-        );
-    }
+    OpenXPKI::Exception::Authentication->throw(
+        message => 'Insufficient information to authenticate',
+        stack => $stack
+    ) unless (blessed $auth_reply and $auth_reply->isa('OpenXPKI::Server::Authentication::Handle'));
 
     ##! 4: 'login successful'
     ##! 16: 'user: ' . $auth_reply->userid

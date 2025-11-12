@@ -807,7 +807,7 @@ sub __handle_login {
 
     # returns an instance of OpenXPKI::Server::Authentication::Handle
     # if the login was successful, auth failure throws an exception
-    if (ref $auth_reply eq 'OpenXPKI::Server::Authentication::Handle') {
+    if (blessed $auth_reply and $auth_reply->isa('OpenXPKI::Server::Authentication::Handle')) {
 
         ##! 4: 'login successful'
         ##! 16: 'user: ' . $auth_reply->userid

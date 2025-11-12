@@ -31,6 +31,7 @@ Instead, use L<Type::Params>:
 
 =cut
 
+use Scalar::Util qw( blessed );
 use MooseX::Params::Validate ();
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
@@ -84,7 +85,7 @@ sub named_args {
     # Catch e.g. parameter validation errors
     if (my $e = $@) {
         ##! 1: "Exception caught: $e"
-        $e->rethrow() if ref $e eq 'OpenXPKI::Exception';
+        $e->rethrow() if (blessed $e and $e->isa('OpenXPKI::Exception'));
         OpenXPKI::Exception->throw(message => $e);
     }
     return ($object, @result);
@@ -121,7 +122,7 @@ sub positional_args {
     # Catch e.g. parameter validation errors
     if (my $e = $@) {
         ##! 1: "Exception caught: $e"
-        $e->rethrow() if ref $e eq 'OpenXPKI::Exception';
+        $e->rethrow() if (blessed $e and $e->isa('OpenXPKI::Exception'));
         OpenXPKI::Exception->throw(message => $e);
     }
     return ($object, @result);
