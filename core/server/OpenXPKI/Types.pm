@@ -8,6 +8,8 @@ use Math::BigInt;
 use OpenXPKI::FileUtils;
 use OpenXPKI::DateTime;
 
+# objects for coerce
+use OpenXPKI::Crypt::X509;
 =head1 NAME
 
 OpenXPKI::Types - Collection of Moose types used for API command
@@ -120,6 +122,13 @@ subtype 'PEMCert',
     as 'PEM',
     where { $_ =~ m{ \A -----BEGIN\ ([\w\s]*)CERTIFICATE----- [^-]+ -----END\ \1CERTIFICATE----- \Z }msx },
     message { sprintf "'%s' is not a PEM encoded certificate", ($_ ? "'$_'" : '<undef>') };
+
+subtype 'X509CertObject',
+    as 'OpenXPKI::Crypt::X509';
+
+coerce 'X509CertObject',
+    from 'PEMCert',
+    via { OpenXPKI::Crypt::X509->new($_) };
 
 =head2 PEMCertChain
 

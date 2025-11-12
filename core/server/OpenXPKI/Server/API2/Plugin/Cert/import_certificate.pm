@@ -58,7 +58,7 @@ must exist but its settings are not checked against the imported certificate.
 
 =cut
 command "import_certificate" => {
-    data           => { isa => 'PEMCert', required => 1, },
+    data           => { isa => 'X509CertObject', required => 1, },
     issuer         => { isa => 'AlphaPunct', },
     pki_realm      => { isa => 'AlphaPunct', },
     force_nochain  => { isa => 'Bool', default => 0, },
@@ -81,7 +81,7 @@ command "import_certificate" => {
 
     my $dbi = CTX('dbi');
 
-    my $x509 = OpenXPKI::Crypt::X509->new( $params->data );
+    my $x509 = $params->data;
 
     my $cert_identifier = $x509->get_cert_identifier();
 
