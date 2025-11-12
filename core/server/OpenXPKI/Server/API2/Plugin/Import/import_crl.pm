@@ -41,7 +41,7 @@ Returns a I<HashRef> with the CRL informations inserted into the database, e.g.:
 
     {
         crl_key => '6655',
-        profile => undef, 
+        profile => undef,
         issuer_identifier => 'RE35XR3XIBXiIbAu8P5aGMCmH7o',
         last_update => 1521556123,
         next_update => 3098356123,
@@ -92,7 +92,7 @@ command "import_crl" => {
     if ($params->nosigner) {
         $issuer = $dbi->select_one(
             from => 'certificate',
-            columns => [ 'identifier' ],
+            columns => [ 'identifier', 'pki_realm' ],
             where => {
                 $issuer_aik
                     ? ('subject_key_identifier' => $issuer_aik)
@@ -102,6 +102,8 @@ command "import_crl" => {
             message => 'I18N_OPENXPKI_UI_IMPORT_CRL_ISSUER_NOT_FOUND',
             params => { issuer_dn => $issuer_dn , issuer_aik => $issuer_aik },
         );
+
+        $pki_realm = $issuer->{pki_realm} // '';
 
     } else {
 
@@ -133,15 +135,11 @@ command "import_crl" => {
     my $ca_identifier = $issuer->{identifier};
 
     my $data = {
+        %{$crl->db_hash()},
         pki_realm         => $pki_realm,
         issuer_identifier => $ca_identifier,
         crl_key           => $serial,
-        crl_number        => $crl->crl_number() // '',
-        last_update       => $crl->last_update(),
-        next_update       => $crl->next_update(),
         publication_date  => 0,
-        items             => $crl->itemcnt(),
-        data              => $crl->pem(),
     };
 
     if ( $params->profile ) {

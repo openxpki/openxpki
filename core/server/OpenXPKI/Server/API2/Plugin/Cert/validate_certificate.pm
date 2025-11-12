@@ -7,6 +7,7 @@ OpenXPKI::Server::API2::Plugin::Cert::validate_certificate
 
 =cut
 
+use List::Util qw( any );
 
 # Project modules
 use OpenXPKI::Debug;
@@ -31,6 +32,9 @@ is taken as entity, the remaining certificates are used to build the chain.
 The recommended use is to pass the entity via I<pem> and any extra chain
 certificates via I<chain>, where chain can be omitted if the required
 chain certificates are all in the database.
+
+Given extra certificates used in the chain are persisted in the database
+if the chain ends up to a known root unless I<volatile> is set.
 
 If I<anchor> is set, the resulting chain is tested against the list. If any
 of the given certificates is found in the chain, the result is I<TRUSTED>.
@@ -94,6 +98,11 @@ I<crl_check> parameter with one of the following values (default is I<none>).
 There is currently no special return value for CRL checks, failure to
 validate will just return the status "BROKEN".
 
+For details on CRL checking see C<handle_external_crl>, I<import> and
+I<autoupdate> will be set to true unless I<volatile> is set.
+
+B<NOTE>: Feature is only available with the enterprise extensions installed.
+
 =over
 
 =item none
@@ -117,6 +126,9 @@ exception if there is no fresh CRL information for any element.
 
 =back
 
+=item * C<volatile> I<Bool> - do not persist chain certificates
+
+
 B<Changes compared to API v1:>
 
 The new parameter C<chain> is used to specify a chain (instead of passing an
@@ -135,6 +147,7 @@ command "validate_certificate" => {
     anchor => { isa => 'ArrayRef[Str]', },
     novalidity => { isa => 'Bool', default => 0 },
     crl_check => { isa => 'AlphaPunct', matching => qr{ \A ( none | soft | leaf | all ) \Z }x, default => "none" },
+    volatile => { isa => 'Bool', default => 0 },
 
 } => sub {
     my ($self, $params) = @_;
@@ -218,6 +231,8 @@ command "validate_certificate" => {
         my $cert = $x509;
 
         my $MAX_DEPTH = 16;
+        # receive chain certificates that are not yet in the db
+        my @import_cert;
         while ($cert && $MAX_DEPTH--) {
 
             push @signer_chain, $cert->pem;
@@ -246,7 +261,6 @@ command "validate_certificate" => {
 
             # if the certificate is in the database, we expect that we can
             # resolve the chain using the database
-            my $next_id;
             if ($db_cert) {
                 ##! 32: 'Issuer found in database ' . $db_cert->{identifier}
                 my $db_chain = $self->api->get_chain(
@@ -267,24 +281,55 @@ command "validate_certificate" => {
                     ##! 16: 'Chain in database but incomplete'
                     CTX('log')->application()->warn('Incomplete chain in database during validate certificate');
                     my $cc = OpenXPKI::Crypt::X509->new( pop @{$db_chain->{certificates}} );
-                    $next_id = $cc->get_cert_identifier();
+                    my $next_id = $cc->get_cert_identifier();
                     if (!$byIdentifier->{ $next_id }) {
                         $byIdentifier->{ $next_id } = $cc;
                         $bySubject->{ $cc->get_subject } = $next_id;
                         $byKeyId->{ $cc->get_subject_key_id } = $next_id;
                     }
+                    $cert = $byIdentifier->{ $next_id };
                     # remove as the certificate is added at the top of the loop
                     pop @signer_chain;
                 }
             # issuer is not in the database, check the input lists
-            } elsif (!$aki || !$byKeyId->{$aki}) {
-                ##! 32: 'Lookup using subject '  . $cert->get_issuer
-                $next_id  = $bySubject->{ $cert->get_issuer };
-            } else {
+            } elsif ($aki && $byKeyId->{$aki}) {
+
                 ##! 32: 'Lookup using AKI ' . $aki
-                $next_id = $byKeyId->{$aki};
+                $cert = $byIdentifier->{ $byKeyId->{$aki} };
+                push @import_cert, $cert if ($cert);
+
+            } elsif ($bySubject->{ $cert->get_issuer }) {
+
+                ##! 32: 'Lookup using subject '  . $cert->get_issuer
+                $cert = $byIdentifier->{ $bySubject->{ $cert->get_issuer } };
+                push @import_cert, $cert if ($cert);
+            } else {
+
+                ##! 32: 'no more certificates - aborting'
+                # unable to proceed as no more certifcates were found
+                last;
             }
-            $cert = $next_id ? $byIdentifier->{ $next_id } : undef;
+        }
+
+        # chain building using extra certificates is done
+        # check if we need to import stuff
+        if ($chain_status eq 'VALID' && @import_cert && !$params->volatile) {
+            ##! 32: 'got certs for auto import'
+            ##! 64: \@import_cert
+            try {
+                foreach my $cert (@import_cert) {
+                    my $db_insert = $self->api->import_certificate(
+                        data  => $cert,
+                        ignore_existing => 1,
+                    );
+                    CTX('log')->system()->info('automated import of chain certificate ' . $cert->get_cert_identifier);
+                }
+            }
+            catch ($err) {
+                my $msg = $err;
+                $msg = $err->message if ref $err eq 'OpenXPKI::Exception';
+                CTX('log')->system->warn("automated import of chain certificate failed with: $msg");
+            }
         }
     }
 
@@ -300,8 +345,8 @@ command "validate_certificate" => {
 
     my $root = pop @work_chain;
 
-    ##! 32: 'Root ' . $root
-    ##! 32: 'Entity' . $entity
+    ##! 64: 'Root ' . $root
+    ##! 64: 'Entity' . $entity
 
     my $command = {
         COMMAND => 'verify_cert',
@@ -312,44 +357,50 @@ command "validate_certificate" => {
         CHAIN => join "\n", @work_chain,
     };
 
-
-    if ($params->crl_check eq 'soft') {
-        ##! 16: 'CRL soft check for leaf'
-        my $issuer_identifier = CTX('api2')->get_cert_identifier( cert => $signer_chain[1] );
-        ##! 32: 'need crl for ' . $issuer_identifier
-        my $crl_list = CTX('api2')->get_crl_list(
-            issuer_identifier => $issuer_identifier,
-            limit => 1,
-            expires_after => time()
-        );
-        ##! 64: $crl_list
-        if (@$crl_list) {
-            $command->{CRL} = CTX('api2')->get_crl( crl_serial => $crl_list->[0]->{crl_key} );
-            $command->{CRL_CHECK} = 'leaf';
-        } else {
-            ##! 16: 'No crl found'
-            CTX('log')->system()->debug('Skipping CRL check as no valid CRL was found for ' .$issuer_identifier);
-        }
-    } elsif ($params->crl_check eq 'leaf') {
-        ##! 32: 'CRL check for leaf'
-        my $issuer_identifier = CTX('api2')->get_cert_identifier( cert => $signer_chain[1] );
-        ##! 64: 'need crl for ' . $issuer_identifier
-        $command->{CRL} = CTX('api2')->get_crl( issuer_identifier => $issuer_identifier );
+    my @cert_to_fetch_crl;
+    if (any { $params->crl_check eq $_ } ('soft','leaf')) {
+        ##! 32: 'CRL check for leaf only'
+        @cert_to_fetch_crl = ($signer_chain[0], $signer_chain[1]);
         $command->{CRL_CHECK} = 'leaf';
-    } elsif ($params->crl_check ne 'none') {
+    } elsif ($params->crl_check eq 'all') {
         ##! 32: 'CRL check for full chain'
-        my @crls;
-        for (my $ii=1; $ii<@signer_chain;$ii++) {
-            my $issuer_identifier = CTX('api2')->get_cert_identifier( cert => $signer_chain[$ii] );
-            ##! 64: 'need crl for ' . $issuer_identifier
-            push @crls, CTX('api2')->get_crl( issuer_identifier => $issuer_identifier );
-        }
-        $command->{CRL} = join "\n", @crls;
+        @cert_to_fetch_crl = @signer_chain;
         $command->{CRL_CHECK} = 'all';
+    } elsif ($params->crl_check ne 'none') {
+        OpenXPKI::Exception->throw(
+            message => 'Unexpected value for crl_check: ' .$params->crl_check
+        );
     }
 
+    my @crls;
+    for (my $ii=1; $ii<@cert_to_fetch_crl;$ii++) {
+        my $issuer_identifier = CTX('api2')->get_cert_identifier( cert => $signer_chain[$ii] );
+        ##! 16 'start crl lookup for ' . $issuer_identifier
+        my $pem_crl = $self->api->handle_external_crl(
+            cert  => $signer_chain[$ii - 1],
+            issuer_identifier => $issuer_identifier,
+            import  => 1,
+            autoupdate => 1,
+        );
+        OpenXPKI::Exception->throw(
+            message => 'Unable to fetch CRL when crl_check is mandatory',
+            params => {
+                issuer_identifier => $issuer_identifier,
+            }
+        ) unless ($pem_crl || $params->crl_check eq 'soft');
+
+        ##! 32: 'got crl for ' . $issuer_identifier
+        push @crls, $pem_crl;
+    }
+    $command->{CRL} = join "\n", @crls if (@crls);
+
     my $valid;
-    eval{ $valid = $default_token->command($command); };
+    try{
+        $valid = $default_token->command($command);
+    } catch ($err) {
+        ##! 32: $err
+        CTX('log')->system->debug("certificate validation failed with $err");
+    }
 
     ##! 64: 'Validation result ' . Dumper $valid
 

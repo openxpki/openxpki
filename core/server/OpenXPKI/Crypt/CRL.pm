@@ -142,6 +142,13 @@ has oidmap => (
     }}
 );
 
+has db_hash => (
+    is => 'ro',
+    isa => 'HashRef',
+    lazy => 1,
+    builder => '_to_db_hash',
+);
+
 around BUILDARGS => sub {
 
     my $orig  = shift;
@@ -458,6 +465,18 @@ sub to_hash {
         'serial' => $self->crl_number(),
     };
 
+}
+
+sub _to_db_hash  {
+
+    my $self = shift;
+    return {
+        crl_number        => $self->crl_number() // '',
+        last_update       => $self->last_update(),
+        next_update       => $self->next_update(),
+        items             => $self->itemcnt(),
+        data              => $self->pem(),
+    };
 }
 
 __PACKAGE__->meta->make_immutable;
