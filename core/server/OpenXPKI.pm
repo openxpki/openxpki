@@ -104,7 +104,16 @@ sub import {
     # Plain old Perl package / class
     } else {
         Class::Std->import::into(1) if $class_std;
-        parent->import::into(1, $poc_base) if $poc_base;
+        if ($poc_base) {
+            # "use Mojo::Base ..." for Mojolicious parents so that e.g.
+            # Mojolicious' has() is imported.
+            if ($poc_base =~ /^Mojolicious::/) {
+                Mojo::Base->import::into(1, $poc_base);
+            # otherwise: "use parent ..."
+            } else {
+                parent->import::into(1, $poc_base);
+            }
+        }
         strict->import::into(1);
         warnings->import::into(1);
     }
