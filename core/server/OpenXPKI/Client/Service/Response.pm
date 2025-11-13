@@ -644,9 +644,14 @@ __PACKAGE__->meta->make_immutable;
 
 =head2 set_header
 
-Sets the given HTTP header.
+Sets the given HTTP header. The name is case insensitive.
 
     $response->set_header('content-type' => 'text/plain');
+
+To set a multivalue header (header with more than one occurance / line) just pass
+an I<ArrayRef>:
+
+    $response->set_header('Accept' => [ 'text/plain', 'application/xhtml+xml' ])
 
 B<Parameters>
 

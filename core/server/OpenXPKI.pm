@@ -104,7 +104,7 @@ sub import {
     # Plain old Perl package / class
     } else {
         Class::Std->import::into(1) if $class_std;
-        base->import::into(1, $poc_base) if $poc_base;
+        parent->import::into(1, $poc_base) if $poc_base;
         strict->import::into(1);
         warnings->import::into(1);
     }
