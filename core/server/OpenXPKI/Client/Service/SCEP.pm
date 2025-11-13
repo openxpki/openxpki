@@ -70,10 +70,13 @@ sub prepare ($self, $c) {
 
 # required by OpenXPKI::Client::Service::Role::Base
 sub send_response ($self, $c, $response) {
+    $c->set_response_headers($response);
+    my $headers = $c->res->headers;
+
     # Server errors are never encoded with PKCS7
     if ($response->is_server_error) {
         $self->disconnect_backend;
-        $c->res->headers->content_type('text/plain');
+        $headers->content_type('text/plain');
         return $c->render(text => $response->error_message);
 
     # PKCS7 response (incl. client errors) - only after successful decoding of PKCS7 request
@@ -83,13 +86,13 @@ sub send_response ($self, $c, $response) {
         $self->log->trace('PKCS7 response: ' . $out) if $self->log->is_trace;
         $out = decode_base64($out);
 
-        $c->res->headers->content_type('application/x-pki-message');
+        $headers->content_type('application/x-pki-message');
         return $c->render(data => $out);
 
     # non-PKCS7 client errors
     } elsif ($response->is_client_error) {
         $self->disconnect_backend;
-        $c->res->headers->content_type('text/plain');
+        $headers->content_type('text/plain');
         return $c->render(text => $response->error_message);
 
     } else {
@@ -97,15 +100,15 @@ sub send_response ($self, $c, $response) {
         $self->log->trace('Response: ' . $response->result) if $self->log->is_trace;
 
         if ('GetCACaps' eq $self->operation) {
-            $c->res->headers->content_type('text/plain');
+            $headers->content_type('text/plain');
             return $c->render(text => $response->result);
 
         } elsif ('GetCACert' eq $self->operation) {
-            $c->res->headers->content_type('application/x-x509-ca-ra-cert');
+            $headers->content_type('application/x-x509-ca-ra-cert');
             return $c->render(data => decode_base64($response->result));
 
         } elsif ('GetNextCACert' eq $self->operation) {
-            $c->res->headers->content_type('application/x-x509-next-ca-cert');
+            $headers->content_type('application/x-x509-next-ca-cert');
             return $c->render(data => decode_base64($response->result));
         }
     }
@@ -139,7 +142,7 @@ sub op_handlers {
                 $message = encode_base64($self->request->body, '');
                 if (not $message) {
                     $self->log->error("POSTDATA is empty - check documentation on required setup for Content-Type headers!");
-                    $self->log->debug("Content-Type is: " . ($self->request->headers->content_type || 'undefined'));
+                    $self->log->debug("Content-Type: " . ($self->request->headers->content_type || 'undefined'));
                     return $self->new_response( 40003 );
                 }
                 $self->log->debug("Got PKIOperation via POST");

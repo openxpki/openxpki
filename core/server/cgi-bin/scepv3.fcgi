@@ -113,7 +113,7 @@ while (my $cgi = CGI::Fast->new("")) {
         };
 
         $response->add_debug_headers if $client->config->{output}->{headers};
-        my @extra_header = %{ $client->cgi_headers($response->extra_headers) };
+        my @extra_header = $client->cgi_headers($response)->%*;
 
         if (!$response->is_server_error()) {
             my $out = $client->generate_pkcs7_response( $response );
@@ -156,7 +156,7 @@ while (my $cgi = CGI::Fast->new("")) {
     };
 
     $response->add_debug_headers if $client->config->{output}->{headers};
-    my @extra_header = %{ $client->cgi_headers($response->extra_headers) };
+    my @extra_header = $client->cgi_headers($response)->%*;
 
     if ($response->is_server_error()) {
         print $cgi->header(

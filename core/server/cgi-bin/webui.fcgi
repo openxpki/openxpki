@@ -90,7 +90,7 @@ EOF
 
     # helper to print HTTP headers
     my $print_headers = sub {
-        my @headers = $ui->cgi_headers($response->extra_headers)->%*;
+        my @headers = $ui->cgi_headers($response)->%*;
         push @headers, -cookie => [ map { $_->to_string } $ui->session_cookie->as_mojo_cookies($ui->session)->@* ];
         print $cgi->header(@headers);
     };
@@ -257,11 +257,13 @@ while (my $cgi = CGI::Fast->new("")) {
             }
         }
 
+
+        my $headers = $webui->response->headers;
         # default security related headers, may be overwritten by config.
         # Also see https://owasp.org/www-project-secure-headers/ci/headers_add.json
-        $webui->response->set_header('strict-transport-security' => 'max-age=31536000');
-        $webui->response->set_header('x-content-type-options' => 'nosniff');
-        $webui->response->set_header('content-security-policy' =>
+        $headers->add('X-Content-Type-Options' => 'nosniff');
+        $headers->strict_transport_security('max-age=31536000');
+        $headers->content_security_policy(
             "default-src 'self'; "
             ."form-action 'self'; "
             ."base-uri 'self'; "
@@ -275,9 +277,9 @@ while (my $cgi = CGI::Fast->new("")) {
         );
 
         # custom HTTP headers from config
-        $webui->response->set_header( lc($_) => $webui->config->{header}->{$_}) for keys $webui->config->{header}->%*;
+        $headers->add($_ => $webui->config->{header}->{$_}) for keys $webui->config->{header}->%*;
         # default mime-type
-        $webui->response->set_header('content-type' => 'application/json; charset=UTF-8');
+        $headers->content_type('application/json');
 
         my $page = $webui->handle_ui_request; # isa OpenXPKI::Client::Service::WebUI::Page
         $webui->response->result($page);

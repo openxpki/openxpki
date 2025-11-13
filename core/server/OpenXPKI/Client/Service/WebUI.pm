@@ -801,11 +801,12 @@ sub cleanup ($self) {
 sub op_handlers {
     return [
         'default' => sub ($self) {
+            my $headers = $self->response->headers;
             # default security related headers, may be overwritten by config.
             # Also see https://owasp.org/www-project-secure-headers/ci/headers_add.json
-            $self->response->set_header('strict-transport-security' => 'max-age=31536000');
-            $self->response->set_header('x-content-type-options' => 'nosniff');
-            $self->response->set_header('content-security-policy' =>
+            $headers->add('X-Content-Type-Options' => 'nosniff');
+            $headers->strict_transport_security('max-age=31536000');
+            $headers->content_security_policy(
                 "default-src 'self'; "
                 ."form-action 'self'; "
                 ."base-uri 'self'; "
@@ -819,10 +820,10 @@ sub op_handlers {
             );
 
             # custom HTTP headers from config
-            my $headers = $self->config->get_hash('header');
-            $self->response->set_header( lc($_) => $headers->{$_} ) for keys %$headers;
+            my $to_add = $self->config->get_hash('header');
+            $headers->add($_ => $to_add->{$_}) for keys %$to_add;
             # default mime-type
-            $self->response->set_header('content-type' => 'application/json; charset=UTF-8');
+            $headers->content_type('application/json');
 
             my $page = $self->handle_ui_request; # isa OpenXPKI::Client::Service::WebUI::Page
             $self->response->result($page);
@@ -833,6 +834,8 @@ sub op_handlers {
 
 # required by OpenXPKI::Client::Service::Role::Base
 sub send_response ($self, $c, $response) {
+    $c->set_response_headers($response);
+
     if ($response->has_error) {
         if ($self->request->headers->header('X-OPENXPKI-Client')) {
             return $c->render(

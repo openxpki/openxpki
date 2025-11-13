@@ -142,6 +142,7 @@ controller.
 
     sub send_response ($self, $c, $response) {
         $self->disconnect_backend;
+        $c->set_response_headers;
 
         if ($response->has_error) {
             return $c->render(text => $response->error_message."\n");
@@ -158,13 +159,16 @@ is called:
 
 =over
 
-=item * L<$response-E<gt>extra_headers|OpenXPKI::Client::Service::Response/extra_headers>
-
 =item * L<$response-E<gt>http_status_code|OpenXPKI::Client::Service::Response/http_status_code>
 
 =item * L<$response-E<gt>http_status_message|OpenXPKI::Client::Service::Response/http_status_message>
 
 =back
+
+The HTTP headers in L<$response-E<gt>headers|OpenXPKI::Client::Service::Response/headers>
+must be inserted into the Mojolicious response by calling
+L<$c-E<gt>set_response_headers|OpenXPKI::Client::Web::Controller/set_response_headers>
+somewhen before C<render()> is called.
 
 B<Parameters>
 
@@ -1439,33 +1443,82 @@ sub cgi_safe_sub :prototype($&) ($self, $handler_sub) {
 
 =head2 cgi_headers
 
-Converts standard HTTP header names to parameters that can be passed to
-L<CGI/header>.
+Converts a I<Mojo::Headers> collection of HTTP headers to parameters that can be
+passed to L<CGI/header>.
 
 B<Parameters>
 
 =over
 
-=item * C<$headers> I<HashRef> - headers where the keys are HTTP standard names (i.e. C<"content-type">)
+=item * C<$headers> I<Mojo::Headers> - headers
 
 =back
 
 B<Returns> a I<HashRef> with headers where the keys are L<CGI> specific names (i.e. C<"-type">)
 
 =cut
-sub cgi_headers ($self, $headers) {
-    my @keys = keys $headers->%*;
-    my @values = values $headers->%*;
+
+# Headers that allow multiple values to be added as comma separated list.
+# From https://github.com/curlconverter/curlconverter/blob/master/src/Headers.ts
+my @comma_separated_headers = (
+    "a-im",
+    "accept",
+    "accept-charset",
+    "accept-encoding",
+    "accept-language",
+    "access-control-request-headers",
+    "cache-control",
+    "connection",
+    "content-encoding",
+    "expect",
+    "forwarded",
+    "if-match",
+    "if-none-match",
+    "range",
+    "te",
+    "trailer",
+    "transfer-encoding",
+    "upgrade",
+    "via",
+    "warning",
+);
+signature_for cgi_headers => (
+    method => 1,
+    positional => [
+        'OpenXPKI::Client::Service::Response',
+    ],
+);
+sub cgi_headers ($self, $response) {
+    my $headers = $response->headers->to_hash(1); # each value is an ArrayRef
 
     my @cgi_keys =
         map { ($_ eq '-content_type') ? '-type' : $_ }
         map { lc }
         map { "-$_" }
         map { s/-/_/g; $_ }
-        @keys;
+        keys $headers->%*;
 
     my %cgi_headers;
-    @cgi_headers{@cgi_keys} = @values;
+    @cgi_headers{@cgi_keys} = values $headers->%*;
+
+    # The CGI module cannot handle multiple values given as an ArrayRef except
+    # for -set_cookie so we resolve the ArrayRef values if possible.
+    for my $name (keys %cgi_headers) {
+        next if $name eq '-set_cookie'; # only header where CGI accepts ArrayRef
+
+        # Header with multiple values?
+        # RFC 2616 section 4.2 allows multiple values to be appended as a
+        # comma-separated list. This is only possible for some HTTP headers.
+        if (scalar $cgi_headers{$name}->@* > 1) {
+            die "HTTP header '$name' does not allow multiple comma-separated values and CGI module does not support multiple headers"
+                unless (any { lc($name) eq $_ } @comma_separated_headers);
+            $cgi_headers{$name} = join ', ', $cgi_headers{$name}->@*;
+        } else {
+            $cgi_headers{$name} = $cgi_headers{$name}->[0];
+        }
+    }
+
+    $self->log->trace('CGI headers = ' . Dumper \%cgi_headers) if $self->log->is_trace;
     return \%cgi_headers;
 }
 

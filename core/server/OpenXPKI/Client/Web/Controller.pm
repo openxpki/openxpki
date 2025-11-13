@@ -11,6 +11,9 @@ use Log::Log4perl::MDC;
 use OpenXPKI::Log4perl;
 use OpenXPKI::i18n qw( set_language set_locale_prefix);
 
+
+has response_headers_done => 0;
+
 =head1 NAME
 
 OpenXPKI::Client::Web::Controller - Common Mojolicious controller
@@ -149,20 +152,38 @@ sub index ($self) {
           unless $response->isa('OpenXPKI::Client::Service::Response');
     }
 
-    # service specific HTTP headers
-    $self->res->headers->add($_ => $response->extra_headers->{$_}) for keys $response->extra_headers->%*;
-
     # status specific code / message
     $self->res->code($response->http_status_code);
     $self->res->message($response->http_status_message);
 
     # HTTP response
-    $self->log->trace("Request handling (3/3): response");
+    $self->log->trace("Request handling (3/3): response (render)");
     try { $service->send_response($self, $response) }
     catch ($err) { $self->log->error($err) }
 
+    $self->log->error('OpenXPKI::Client::Web::Controller->set_response_headers() has not been called before response was sent')
+      unless $self->response_headers_done;
+
     try { $service->cleanup if $service->can('cleanup') }
     catch ($err) { $self->log->error($err) }
+}
+
+=head2 set_response_headers
+
+Adds to this controller's HTTP response the response headers that of the given
+L<OpenXPKI::Client::Service::Response> object (via C<$self-E<gt>res-E<gt>headers-E<gt>add>).
+
+=cut
+signature_for set_response_headers => (
+    method => 1,
+    positional => [
+        'OpenXPKI::Client::Service::Response',
+    ],
+);
+sub set_response_headers ($self, $response) {
+    # service specific HTTP headers
+    $self->res->headers->from_hash($response->headers->to_hash(1));
+    $self->response_headers_done(1);
 }
 
 1;

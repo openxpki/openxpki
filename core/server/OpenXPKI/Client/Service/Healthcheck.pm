@@ -56,6 +56,7 @@ sub prepare ($self, $c) {
 
 # required by OpenXPKI::Client::Service::Role::Base
 sub send_response ($self, $c, $response) {
+    $c->set_response_headers($response);
     return $c->render(
         json => $response->has_result
             ? $response->result

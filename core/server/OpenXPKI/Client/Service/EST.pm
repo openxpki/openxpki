@@ -43,13 +43,13 @@ sub prepare ($self, $c) {
         $self->log->error('EST request via insecure connection (plain HTTP)');
         die $self->new_response( 40300 );
     }
-
-    $c->res->headers->content_type("application/pkcs7-mime; smime-type=certs-only"); # default
 }
 
 # required by OpenXPKI::Client::Service::Role::Base
 sub send_response ($self, $c, $response) {
     $self->disconnect_backend;
+
+    $c->set_response_headers($response);
 
     if ($response->has_error) {
         return $c->render(text => $response->error_message."\n");
@@ -63,11 +63,19 @@ sub send_response ($self, $c, $response) {
         return $c->rendered;
 
     } else {
-        # Default is base64 encoding, but we can turn on binary
+        # Content-Type
+        if ('csrattrs' eq $self->operation) {
+            $c->res->headers->content_type('application/csrattrs');
+        } else {
+            $c->res->headers->content_type('application/pkcs7-mime; smime-type=certs-only'); # default
+        }
+
+        # Encoding: default is base64, but we can turn on binary
         my $is_binary = $self->config->get('output.encoding')//'' eq 'binary';
         my $data = $is_binary ? decode_base64($response->result) : $response->result;
-        $c->res->headers->add('content-transfer-encoding' => ($is_binary ? 'binary' : 'base64'));
-        $data =~ s/(.{1,64})/$1\n/g if ($self->config->get('output.wrap'));
+        $c->res->headers->add('Content-Transfer-Encoding' => ($is_binary ? 'binary' : 'base64'));
+
+        $data =~ s/(.{1,64})/$1\n/g if $self->config->get('output.wrap');
         return $c->render(data => $data);
     }
 }
@@ -87,7 +95,6 @@ sub op_handlers {
             return $response;
         },
         'csrattrs' => sub ($self) {
-            $self->content_type("application/csrattrs"); # default
             return $self->handle_property_request;
         },
         ['simpleenroll', 'simplereenroll', 'simplerevoke'] => sub ($self) {

@@ -124,25 +124,38 @@ has result => (
 
 =head2 extra_headers
 
-Extra HTTP headers to be added (I<HashRef>).
+I<HashRef> of HTTP headers to be added.
 
     OpenXPKI::Client::Service::Response->new(
         ...
         extra_headers => {
-            'content-type' => 'application/x-pem-file',
+            'Content-Type' => 'application/x-pem-file',
         },
     );
 
+Header names are case insensitive.
+
+The headers are stored in attribute L</headers>.
+
+=head2 headers
+
+I<Mojo::Headers> object containing extra HTTP headers to be added.
+
 =cut
-has extra_headers => (
+
+subtype 'OpenXPKI::Client::Service::Response::headers',
+    as 'Mojo::Headers';
+coerce 'OpenXPKI::Client::Service::Response::headers',
+    from 'HashRef',
+    via { Mojo::Headers->new->from_hash($_) };
+
+has headers => (
+    init_arg => 'extra_headers',
     is => 'rw',
-    isa => 'HashRef',
+    isa => 'OpenXPKI::Client::Service::Response::headers',
+    coerce => 1,
     lazy => 1,
-    default => sub { {} },
-    traits => ['Hash'],
-    handles => {
-        set_header => 'set',
-    }
+    default => sub { Mojo::Headers->new },
 );
 
 =head2 error
@@ -599,14 +612,14 @@ sub add_debug_headers ($self) {
     my $workflow = $self->workflow or return;
 
     if ($workflow->{id}) {
-        $self->set_header('x-openxpki-workflow-id' => $workflow->{id});
+        $self->headers->add('X-OpenXPKI-Workflow-ID' => $workflow->{id});
     }
     if ($self->has_transaction_id) {
         my $tid = $self->transaction_id;
         # this should usually be a hexadecimal string but to avoid any surprise
         # we check this here and encoded if needed.
         $tid = Encode::encode("MIME-B", $tid) if $tid =~ m{\W};
-        $self->set_header('x-openxpki-transaction-id' => $tid);
+        $self->headers->add('X-OpenXPKI-Transaction-ID' => $tid);
     }
     if (my $error = $workflow->{context}->{error_code}) {
         # header must not be any longer than 76 chars in total
@@ -614,7 +627,7 @@ sub add_debug_headers ($self) {
         # use mime encode if header is non-us-ascii, 42 chars plus tags is the
         # maximum to stay below 76 chars (starts to wrap otherwise)
         $error = Encode::encode("MIME-B", substr($error,0,42)) if $error =~ m{\W};
-        $self->set_header('x-openxpki-error' => $error);
+        $self->headers->add('X-OpenXPKI-Error' => $error);
     }
 }
 
@@ -641,30 +654,6 @@ sub redirect_to ($self, $target) {
 __PACKAGE__->meta->make_immutable;
 
 =pod
-
-=head2 set_header
-
-Sets the given HTTP header. The name is case insensitive.
-
-    $response->set_header('content-type' => 'text/plain');
-
-To set a multivalue header (header with more than one occurance / line) just pass
-an I<ArrayRef>:
-
-    $response->set_header('Accept' => [ 'text/plain', 'application/xhtml+xml' ])
-
-B<Parameters>
-
-=over
-
-=item * I<Str> C<$name> - header name.
-
-=item * I<Str> C<$value> - header value.
-
-=back
-
-=cut
-### set_header() is an accessor for "extra_headers" (see attribute above)
 
 =head2 is_redirect
 

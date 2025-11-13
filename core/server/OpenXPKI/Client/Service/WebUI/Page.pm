@@ -447,11 +447,10 @@ sub attachment ($self, $arg) {
     die "attachment(): one of 'bytes' or 'bytes_callback' must be given"
         unless (defined $arg->bytes or $arg->bytes_callback);
 
-    $self->webui->response->set_header(
-        'content-type' => $arg->mimetype,
-        'content-disposition' => sprintf('attachment; filename="%s"', $arg->filename),
-        $arg->expires ? ('expires' => '1m') : (),
-    );
+    my $headers = $self->webui->response->headers;
+    $headers->content_type($arg->mimetype);
+    $headers->content_disposition(sprintf 'attachment; filename="%s"', $arg->filename);
+    $headers->expires('1m') if $arg->expires;
 
     $self->raw_bytes($arg->bytes) if (defined $arg->bytes);
     $self->raw_bytes_callback($arg->bytes_callback) if $arg->bytes_callback;

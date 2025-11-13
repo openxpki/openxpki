@@ -150,13 +150,16 @@ sub prepare ($self, $c) {
 # required by OpenXPKI::Client::Service::Role::Base
 sub send_response ($self, $c, $response) {
     if ($self->use_status_codes) {
+        # the code/message itself are set in OpenXPKI::Client::Web::Controller->index()
         if ($response->is_pending) {
-            $c->res->headers->add('Retry-After' => $response->retry_after);
+            $response->headers->add('Retry-After' => $response->retry_after);
         }
     } else {
         $c->res->code('200');
         $c->res->message('OK');
     }
+
+    $c->set_response_headers($response);
 
     # plain text
     if (($c->req->headers->accept//'') eq 'text/plain') {

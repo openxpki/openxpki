@@ -99,7 +99,7 @@ while (my $cgi = CGI::Fast->new("")) {
     $client->disconnect_backend;
 
     $response->add_debug_headers if $client->config->{output}->{headers};
-    my @extra_header = %{ $client->cgi_headers($response->extra_headers) };
+    my @extra_header = $client->cgi_headers($response)->%*;
 
     if ($response->has_error()) {
         print $cgi->header(
