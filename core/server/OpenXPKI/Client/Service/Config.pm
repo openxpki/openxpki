@@ -256,38 +256,28 @@ EOF
         log4perl.filter.SkipMojolicious = OpenXPKI::Log4perl::Filter::SkipMojolicious
 EOF
 
-        # show category if services also log to console (to distinct messages)
-        my $cat_server = '';
-        my $cat = '';
-        if ('console' eq $target) {
-            $cat_server = '[%c{1}] ';
-            $cat        = '[%c{2}] ';
-        }
+        for my $appcfg (
+            {name => 'Console',    cat_format_console => '[%c{1}] '},
+            {name => 'ConsoleSvc', cat_format_console => '[%c{2}] '},
+        ) {
+            my $app_name = $appcfg->{name};
+            my $app_class = OpenXPKI::Util->is_systemd
+                ? "OpenXPKI::Log4perl::Appender::Journald"
+                : "Log::Log4perl::Appender::Screen";
+            # to distinct message sources, show category for server messages and also
+            # for services if they do additional logging to the console
+            my $cat = 'console' eq $target ? $appcfg->{cat_format_console} : '';
+            # log pattern (with prio and newline for non-journald output)
+            my $pattern = "$cat%m [%i{verbose}]";
+            $pattern = "%p{3} $pattern%n" if (not OpenXPKI::Util->is_systemd);
 
-        if (OpenXPKI::Util->is_systemd) {
-            # journald
             $conf_appenders.= <<"EOF";
-            log4perl.appender.Console                             = OpenXPKI::Log4perl::Appender::Journald
-            log4perl.appender.Console.Filter                      = SkipMojolicious
-            log4perl.appender.Console.layout                      = Log::Log4perl::Layout::PatternLayout
-            log4perl.appender.Console.layout.ConversionPattern    = ${cat_server}%m [%i{verbose}]
-            log4perl.appender.ConsoleSvc                          = OpenXPKI::Log4perl::Appender::Journald
-            log4perl.appender.ConsoleSvc.Filter                   = SkipMojolicious
-            log4perl.appender.ConsoleSvc.layout                   = Log::Log4perl::Layout::PatternLayout
-            log4perl.appender.ConsoleSvc.layout.ConversionPattern = ${cat}%m [%i{verbose}]
-EOF
-        } else {
-            # screen
-            $conf_appenders.= <<"EOF";
-            log4perl.appender.Console                             = Log::Log4perl::Appender::Screen
-            log4perl.appender.Console.layout                      = Log::Log4perl::Layout::PatternLayout
-            log4perl.appender.Console.layout.ConversionPattern    = %p{3} ${cat_server}%m [%i{verbose}]%n
-            log4perl.appender.ConsoleSvc                          = Log::Log4perl::Appender::Screen
-            log4perl.appender.ConsoleSvc.layout                   = Log::Log4perl::Layout::PatternLayout
-            log4perl.appender.ConsoleSvc.layout.ConversionPattern = %p{3} ${cat}%m [%i{verbose}]%n
+                log4perl.appender.$app_name                          = $app_class
+                log4perl.appender.$app_name.Filter                   = SkipMojolicious
+                log4perl.appender.$app_name.layout                   = Log::Log4perl::Layout::PatternLayout
+                log4perl.appender.$app_name.layout.ConversionPattern = $pattern
 EOF
         }
-
         for my $service ($self->services->@*) {
             my $appender = 'ConsoleSvc';
 
