@@ -178,9 +178,8 @@ sub send_response ($self, $c, $response) {
 
         return $c->render(text => $output);
 
-
     # endpoint should send content directly
-    } elsif ($self->config->exists([$self->operation,'download'])) {
+    } elsif ($self->has_operation and $self->config->exists([$self->operation,'download'])) {
 
         my $download = $self->config->get_hash([$self->operation,'download']);
 
