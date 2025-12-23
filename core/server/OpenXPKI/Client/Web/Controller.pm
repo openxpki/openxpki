@@ -144,6 +144,7 @@ sub index ($self) {
         $self->log->warn("Request handling (2/3) skipped due to error " . $response->error . ": " . $response->error_message);
     }
 
+    # if no error message (=response) is set
     if (not $response) {
         # request handling
         $self->log->trace("Request handling (2/3): processing");
