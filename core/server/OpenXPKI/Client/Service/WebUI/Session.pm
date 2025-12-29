@@ -1,7 +1,13 @@
 package OpenXPKI::Client::Service::WebUI::Session;
 use OpenXPKI qw( -class -nonmoose );
 
-extends 'CGI::Session';
+# Fix CGI::Session's error handling: turn "undef" return value into die()
+use Mojo::Util qw( monkey_patch );
+monkey_patch 'CGI::Session', new_patched => sub ($class, @args) {
+    return $class->new(@args) // die 'Error creating webui session: ' . $class->errstr;
+};
+
+extends 'CGI::Session' => { -constructor_name => 'new_patched' };
 
 # Core modules
 use Module::Load ();
@@ -88,7 +94,7 @@ sub clone ($self) {
 
     # now calling CGI::Session->new() as instance method generates a new object
     # with the same settings but a new SID etc.
-    return $self->SUPER::new();
+    return $self->SUPER::new_patched();
 }
 
 sub query       { die __PACKAGE__."->query() is not implemented\n" }
