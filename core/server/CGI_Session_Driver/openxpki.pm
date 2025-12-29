@@ -127,7 +127,7 @@ sub get_handle ($self) {
         my $dbi = DBI->connect(
             $self->{DataSource}, $self->{User}, $self->{Password},
             {
-                PrintError => 1,
+                PrintError => 0,
                 AutoCommit => 1,
                 ($self->{dbi_connect_attrs} // {})->%*,
             }
@@ -135,7 +135,7 @@ sub get_handle ($self) {
         if ($dbi) {
             $self->{Handle} = $dbi;
         } else {
-            $self->set_error("Couldn't connect to database: " . DBI->errstr);
+            $self->set_error("Could not connect to database. " . DBI->errstr);
         }
     }
     return $self->{Handle};
