@@ -70,10 +70,14 @@ method.
 
 =cut
 sub index ($self) {
-    # read target service class
-    my $class = $self->stash('service_class') or die "Missing parameter 'service_class' in Mojolicious stash";
-    my $service_name = $self->stash('service_name') or die "Missing parameter 'service_class' in Mojolicious stash";
-    my $endpoint = $self->stash('endpoint') or die "Missing or empty parameter 'endpoint' in Mojolicious stash";
+    #
+    # Error handling for the this method takes place in the "around_dispatch"
+    # hook in OpenXPKI::Client::Web->startup()
+    #
+
+    my $class = $self->stash('service_class')       or die "Missing 'service_class' in Mojolicious stash";
+    my $service_name = $self->stash('service_name') or die "Missing 'service_name' in Mojolicious stash";
+    my $endpoint = $self->stash('endpoint')         or die "Missing/empty 'endpoint' in Mojolicious stash";
     my $no_config = $self->stash('no_config');
 
     # Replace Mojolicious logger by our own.
@@ -83,43 +87,37 @@ sub index ($self) {
     OpenXPKI::Log4perl->set_default_facility("openxpki.client.service.$service_name.$endpoint");
     $self->stash('mojo.log' => OpenXPKI::Log4perl->get_logger); # DefaultHelper "log" (i.e. $self->log) accesses stash "mojo.log"
 
-    # load and instantiate service class
     my $service;
     my $config;
     my %backend;
-    try {
-        $self->log->trace("Load configuration for '$service_name.$endpoint'");
-        # FIXME - send 404 for unknown endpoints
-        $config = $self->oxi_service_config($service_name, $endpoint)
-            || die "No configuration found for this service";
-        # for the WebUI we create a reusable backend instance via the factory
-        # FIXME we need to rework the O:C:Simple to make it reusable too
-        if (any { $service_name eq $_ } ('webui','healthcheck')) {
-            $self->log->debug('Create reusable (cross-request) client to handle server socket communication');
-            %backend = ( client => $self->oxi_client() );
-        }
-    }
-    catch ($error) {
-        $self->log->logdie(sprintf("Error while loading configuration for service '%s': %s", $service_name, $error));
+
+    # Load service config
+    $self->log->trace("Load configuration for '$service_name.$endpoint'");
+    $config = $self->oxi_service_config($service_name, $endpoint)
+        or die "404 No configuration found for service endpoint '$service_name.$endpoint'\n";
+
+    # Load class
+    $self->log->trace("Load service class $class");
+    Module::Load::load($class);
+
+    # Create reusable backend instance via factory for WebUI / Healthcheck
+    # FIXME we need to rework the O:C:Simple to make it reusable too
+    if (any { $service_name eq $_ } ('webui','healthcheck')) {
+        $self->log->debug('Create reusable (cross-request) client to handle server socket communication');
+        %backend = ( client => $self->oxi_client() );
     }
 
-    try {
-        $self->log->trace("Load service class $class");
-        Module::Load::load($class);
-        $service = $class->new(
-            service_name => $service_name,
-            config => $config,
-            remote_address => $self->tx->remote_address,
-            request => $self->req,
-            endpoint => $endpoint,
-            %backend
-        );
-        die "Service class $class does not consume role OpenXPKI::Client::Service::Role::Base"
-          unless $service->DOES('OpenXPKI::Client::Service::Role::Base');
-    }
-    catch ($error) {
-        $self->log->logdie(sprintf("Error loading service class %s: %s", $class, $error));
-    }
+    # Instantiate object
+    $service = $class->new(
+        service_name => $service_name,
+        config => $config,
+        remote_address => $self->tx->remote_address,
+        request => $self->req,
+        endpoint => $endpoint,
+        %backend
+    );
+    die "Service class $class does not consume role OpenXPKI::Client::Service::Role::Base"
+        unless $service->DOES('OpenXPKI::Client::Service::Role::Base');
 
     # Setup locale if defined
     if (my $prefix = ($config->get('locale.prefix') // $config->get('global.locale_directory'))) {
@@ -131,7 +129,7 @@ sub index ($self) {
         set_language($language);
     }
 
-    # preparations and checks
+    # Preparations and checks
     $self->log->trace("Request handling (1/3): preparations and checks");
 
     my $response;
@@ -141,11 +139,12 @@ sub index ($self) {
     }
     catch ($err) {
         $response = $service->new_error_response($err);
-        $self->log->warn("Request handling (2/3) skipped due to error " . $response->error . ": " . $response->error_message);
     }
 
-    # if no error message (=response) is set
-    if (not $response) {
+    # Process request if no error message (=response) is set
+    if ($response) {
+        $self->log->warn("Request handling (2/3) skipped due to error " . $response->error . ": " . $response->error_message);
+    } else {
         # request handling
         $self->log->trace("Request handling (2/3): processing");
         $response = $service->handle_request;
@@ -153,20 +152,18 @@ sub index ($self) {
           unless $response->isa('OpenXPKI::Client::Service::Response');
     }
 
-    # status specific code / message
+    # Status specific code / message
     $self->res->code($response->http_status_code);
     $self->res->message($response->http_status_message);
 
     # HTTP response
-    $self->log->trace("Request handling (3/3): response (render)");
-    try { $service->send_response($self, $response) }
-    catch ($err) { $self->log->error($err) }
+    $self->log->trace("Request handling (3/3): render response");
+    $service->send_response($self, $response);
 
     $self->log->error('OpenXPKI::Client::Web::Controller->set_response_headers() has not been called before response was sent')
       unless $self->response_headers_done;
 
-    try { $service->cleanup if $service->can('cleanup') }
-    catch ($err) { $self->log->error($err) }
+    $service->cleanup if $service->can('cleanup');
 }
 
 =head2 set_response_headers

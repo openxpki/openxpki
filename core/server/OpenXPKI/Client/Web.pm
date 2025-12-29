@@ -322,6 +322,32 @@ sub startup ($self) {
             die $error;
         }
     });
+
+    #
+    # Top level exception handling (errors within O:C:Web::Controller etc.)
+    #
+    $self->hook(around_dispatch => sub ($next, $c) {
+        try {
+            $next->()
+        } catch ($err) {
+            my $svc = '';
+            # prepend service name if logger was not yet replaced by service-specific logger
+            if ($self->log == $c->log) {
+                $svc = join '.', $c->stash('service_name')//(), $c->stash('endpoint')//();
+            }
+            my $logmsg = $svc ? "Service '$svc': $err" : $err;
+            $c->log->error($logmsg);
+            # Handle special string "XXX Error message"
+            if (my ($status, $message) = $err =~ /^(\d\d\d) (.*)/) {
+                $c->res->code($status);
+                $c->res->message($message);
+                return $c->render(text => $message);
+            } else {
+                # default handler
+                return $c->reply->exception($err);
+            }
+        }
+    });
 }
 
 sub _chown_socket ($self, $file, $user, $group, $mode) {
