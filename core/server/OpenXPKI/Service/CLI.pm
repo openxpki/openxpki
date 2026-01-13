@@ -197,9 +197,9 @@ sub _process_operator_command {
         ##! 32: 'set realm from header'
         CTX('session')->data->pki_realm($header->{pki_realm});
     } else {
-        ##! 32: 'set realm to _void'
+        ##! 32: 'set realm to <undef>'
         # special realm for admin tasks
-        CTX('session')->data->pki_realm('_void');
+        CTX('session')->data->pki_realm(undef);
     }
 
     ##! 32: $message

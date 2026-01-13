@@ -85,7 +85,7 @@ sub run_command ($self, $command, $params = undef) {
 =head2 run_protected_command I<command>, I<params>
 
 Run a protected command, will set the realm if one was given as
-argument, otherwise runs in the _void realm.
+argument, otherwise runs in the <undef> realm.
 
 Requires authentication via an admin key pair.
 

@@ -50,7 +50,7 @@ my %ATTR_TYPES = (
     primary_tenant       => { isa => 'Tenant|Undef' },
     userinfo             => { isa => 'HashRef|Undef' },
     authinfo             => { isa => 'HashRef|Undef' },  # login / refresh links for SSO
-    pki_realm            => { isa => 'Str', },
+    pki_realm            => { isa => 'Str|Undef', },
     challenge            => { isa => 'Str', },
     authentication_stack => { isa => 'Str', },
     language             => { isa => 'Str', },
