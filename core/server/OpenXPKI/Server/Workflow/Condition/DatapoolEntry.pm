@@ -21,10 +21,10 @@ sub _evaluate
     };
 
     if (!$params->{namespace}) {
-        configuration_error('Datapool::GetEntry requires the namespace parameter');
+        configuration_error('Condition::DatapoolEntry requires the namespace parameter');
     }
     if (!$params->{key}) {
-        configuration_error('Datapool::GetEntry requires the key parameter');
+        configuration_error('Condition::DatapoolEntry requires the key parameter');
     }
 
     if ($self->param('pki_realm')) {
