@@ -84,7 +84,8 @@ runtest() {
     GRANT ALL ON openxpki.* TO 'openxpki'@'localhost';
     flush privileges;" | mysql -u root
 
-    zcat "/usr/share/doc/libopenxpki-perl/examples/schema-mariadb.sql.gz" | mysql -u root openxpki
+    zcat "/usr/share/doc/libopenxpki-perl/examples/mariadb-backend-schema.sql.gz" | mysql -u root openxpki
+    zcat "/usr/share/doc/libopenxpki-perl/examples/mariadb-frontend-schema.sql.gz" | mysql -u root openxpki
 
     /usr/bin/openxpkictl start server
 

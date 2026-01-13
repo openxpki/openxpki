@@ -103,7 +103,7 @@ but needs some extra indices to perform properly. SQLite is only for testing
 and must not be used in production.
 
 ```bash
-cat /usr/share/doc/libopenxpki-perl/examples/schema-mariadb.sql | \
+cat /usr/share/doc/libopenxpki-perl/examples/mariadb-backend-user.sql | \
 mysql -u root -p --database openxpki
 ```
 

@@ -10,9 +10,11 @@ if [ -z $OXI_TEST_SAMPLECONFIG_DIR ]; then
     exit 1
 fi
 
-SCHEMA="$OXI_TEST_SAMPLECONFIG_DIR/contrib/sql/schema-mariadb.sql"
+BACKEND_SCHEMA="$OXI_TEST_SAMPLECONFIG_DIR/contrib/sql/mariadb-backend-schema.sql"
+FRONTEND_SCHEMA="$OXI_TEST_SAMPLECONFIG_DIR/contrib/sql/mariadb-frontend-schema.sql"
 
-mysql "${DB_OPTS_ROOT[@]}" $OXI_TEST_DB_MYSQL_NAME < "$SCHEMA"
+mysql "${DB_OPTS_ROOT[@]}" $OXI_TEST_DB_MYSQL_NAME < "$BACKEND_SCHEMA"
+mysql "${DB_OPTS_ROOT[@]}" $OXI_TEST_DB_MYSQL_NAME < "$FRONTEND_SCHEMA"
 
 # Give privileges to hardcoded frontend session user (must be done after table creation)
 cat <<__SQL | mysql "${DB_OPTS_ROOT[@]}"

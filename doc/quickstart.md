@@ -161,7 +161,9 @@ properly.
 Example call when debian packages are installed:
 
 ```bash
-$ cat /usr/share/doc/libopenxpki-perl/examples/schema-mariadb.sql | \
+$ cat /usr/share/doc/libopenxpki-perl/examples/mariadb-backend-schema.sql | \
+     mysql -u root --password --database openxpki
+$ cat /usr/share/doc/libopenxpki-perl/examples/mariadb-frontend-schema.sql | \
      mysql -u root --password --database openxpki
 ```
 
