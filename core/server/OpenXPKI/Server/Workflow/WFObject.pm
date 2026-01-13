@@ -87,12 +87,7 @@ sub write {
     my ($self)  = @_;
     my $id      = ident $self;
     my $context = $workflow_of{$id}->{context};
-
-    #        if ( $need_update{ $id } ) {
-    my $raw = $serializer{$id}->serialize( $data_ref{$id} );
-    $context->param( $context_key_of{$id}, $raw );
-
-    #        }
+    $context->param( $context_key_of{$id}, $data_ref{$id} );
 
 }
 
@@ -102,8 +97,7 @@ sub DEMOLISH {
     my $context = $workflow_of{$id}->{context};
 
     if ( $need_update{$id} ) {
-        my $raw = $serializer{$id}->serialize( $data_ref{$id} );
-        $context->param( $context_key_of{$id}, $raw );
+        $context->param( $context_key_of{$id}, $data_ref{$id} );
     }
 }
 
