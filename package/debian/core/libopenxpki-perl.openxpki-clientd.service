@@ -4,7 +4,9 @@ After=network.target apache2.service openxpki-serverd.service
 Requires=openxpki-serverd.service
 
 [Service]
-Type=exec
+type=notify
+NotifyAccess=main
+TimeoutStartSec=30s
 PIDFile=/run/openxpki-clientd/openxpki-clientd.pid
 EnvironmentFile=-/etc/sysconfig/openxpki
 ExecStart=/usr/bin/openxpkictl start client --nd $OPENXPKI_CLIENT_OPTS

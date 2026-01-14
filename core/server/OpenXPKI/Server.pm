@@ -58,7 +58,11 @@ sub start {
         CTX('log')->system->debug(sprintf(" - %s = %s", $_, $ENV{$_})) for sort keys %ENV;
     }
 
+
+    OpenXPKI::Util->sd_notify_status('server startup - activate user interfaces');
     $self->__init_user_interfaces;
+
+    OpenXPKI::Util->sd_notify_status('server startup - activate main server');
     $self->__init_net_server;
 
     ##! 1: "server is up (type = " . $self->{TYPE} . ")"
@@ -273,12 +277,15 @@ sub pre_loop_hook {
     # they happen in the same process in this case).
     my $is_forking = $self->{TYPE} eq 'Fork' || $self->{TYPE} eq 'PreFork';
 
+    OpenXPKI::Util->sd_notify_status('starting watchdog');
+
     # Start watchdog late in Net::Server startup phase so that Net::Server's
     # SIGCHLD handler has been set.
     OpenXPKI::Server::Watchdog->start_or_reload(keep_parent_sigchld => $is_forking);
 
     # Start metrics server
     if (CTX('config')->get(['system','metrics','enabled'])) {
+        OpenXPKI::Util->sd_notify_status('starting metrics');
         try {
             my $agent = CTX('config')->get_hash(['system','metrics','agent']) // {};
             require OpenXPKI::Metrics::Prometheus; # this is EE code
@@ -299,6 +306,9 @@ sub pre_loop_hook {
             }
         }
     }
+
+    OpenXPKI::Util->sd_notify_status('server is up');
+    OpenXPKI::Util->sd_notify_ready();
 }
 
 # calles with PreFork when child is forked
@@ -685,7 +695,7 @@ sub __get_server_config {
     }
     else {
         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER__GET_SERVER_CONFIG_UNKNOWN_SERVER_TYPE',
+            message => 'I18N_OPENXPKI_SERVER_GET_SERVER_CONFIG_UNKNOWN_SERVER_TYPE',
             params  => { TYPE => $self->{TYPE}, },
             log => {
                 message => "Unknown Net::Server type '$self->{TYPE}'",

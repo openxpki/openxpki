@@ -3,7 +3,9 @@ Description=OpenXPKI Trustcenter Backend
 After=network.target apache2.service
 
 [Service]
-Type=exec
+type=notify
+NotifyAccess=main
+TimeoutStartSec=120s
 PIDFile=/run/openxpkid/openxpkid.pid
 ExecStart=/usr/bin/openxpkictl start server --nd
 ExecStop=/usr/bin/openxpkictl stop server

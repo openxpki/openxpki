@@ -8,6 +8,7 @@ use feature 'state';
 use MIME::Base64;
 use File::Spec;
 use IO::Dir 1.03;
+use IO::Socket::UNIX;
 use Exporter qw( import );
 use Digest::SHA qw( sha1_base64 );
 
@@ -355,5 +356,109 @@ sub is_systemd {
 
     return 0;
 }
+
+
+
+
+=head2 sd_notify
+
+Send a message to systemd using the sd_notify interface.
+
+return 1 if message was send or 0 it sending failed,
+return undef if NOTIFY_SOCKET is not set
+
+B<Parameters>
+
+=over
+
+=item * C<$message> I<Str> - Status string to send to systemd
+
+=back
+
+You can use these wrapper methods to send the standard messages:
+
+=over
+
+=item sd_notify_ready
+
+=item sd_notify_stopping
+
+=item sd_notify_reloading
+
+=item sd_notify_watchdog
+
+=item sd_notify_status
+
+Expects the content status message to send as argument
+
+=back
+
+=cut
+
+sub sd_notify {
+
+    shift if ($_[0] // '') eq __PACKAGE__; # support call via -> and ::
+    my $message = shift;
+
+    return undef unless ($ENV{NOTIFY_SOCKET});
+
+    # Unix Domain Socket öffnen
+    my $sock = IO::Socket::UNIX->new(
+        Type => SOCK_DGRAM,
+        Peer => $ENV{NOTIFY_SOCKET},
+    );
+
+    unless ($sock) {
+        warn "unable to connect to NOTIFY_SOCKET: $!\n";
+        return 0;
+    }
+
+    ##! 16: sd_notify: $message
+    my $bytes = $sock->send($message);
+    $sock->close();
+
+    if (defined $bytes) {
+        return 1;
+    } else {
+        warn "unable to send message via sd_notify: $!\n";
+        return 0;
+    }
+}
+
+sub sd_notify_ready {
+    my ($self) = @_;
+    return sd_notify("READY=1");
+}
+
+sub sd_notify_stopping {
+    my ($self) = @_;
+    return sd_notify("STOPPING=1");
+}
+
+sub sd_notify_reloading {
+    my ($self) = @_;
+    return sd_notify("RELOADING=1");
+}
+
+sub sd_notify_watchdog {
+    my ($self) = @_;
+    return sd_notify("WATCHDOG=1");
+}
+
+sub sd_notify_status {
+    my ($self, $status) = @_;
+    return sd_notify("STATUS=$status");
+}
+
+=head2 want_sd_notify
+
+Returns true if systemd notification is expected
+
+=cut
+
+sub want_sd_notify() {
+    return defined $ENV{NOTIFY_SOCKET};
+}
+
 
 1;

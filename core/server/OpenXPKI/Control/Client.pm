@@ -23,6 +23,7 @@ use Mojo::File;
 
 # Project modules
 use OpenXPKI::Log4perl;
+use OpenXPKI::Util;
 use OpenXPKI::Client::Service::Config;
 
 has cfg => (
@@ -176,6 +177,8 @@ sub cmd_start ($self) {
         die "LISTEN_FDS is not set but required in systemd mode\n" unless $ENV{LISTEN_FDS};
         die "LISTEN_PID contains different process ID: $ENV{LISTEN_PID} != $$\n" unless $ENV{LISTEN_PID} eq $$;
 
+        OpenXPKI::Util->sd_notify_status('starting up...');
+
         %server_params = (
             listen => [
                 map { sprintf 'http+unix://%s?fd=%i', $self->__file_url_from_fd($_), $_ }
@@ -234,6 +237,8 @@ sub cmd_start ($self) {
     my $start_client = sub {
         $daemon->start;
         $daemon->daemonize unless $self->foreground;
+        OpenXPKI::Util->sd_notify_status('server is running');
+        OpenXPKI::Util->sd_notify_ready;
         $daemon->run;
     };
 

@@ -277,6 +277,8 @@ sub start ($self, $arg) {
         }
     }
 
+    OpenXPKI::Util->sd_notify_status('starting up...');
+
     if (not $arg->silent) {
         my $version = $self->get_version;
         print "Starting $version\n";
