@@ -1,8 +1,6 @@
 package OpenXPKI::Server::Database::Legacy;
 use OpenXPKI;
 
-use OpenXPKI::Server::Context qw( CTX );
-
 =head1 Name
 
 OpenXPKI::Server::Database::Legacy - Compatibility functions for the old database layer
