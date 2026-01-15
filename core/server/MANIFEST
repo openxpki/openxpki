@@ -664,6 +664,7 @@ OpenXPKI/Server/Workflow/Validator/CertIdentifierExists.pm
 OpenXPKI/Server/Workflow/Validator/CertSubjectFields.pm
 OpenXPKI/Server/Workflow/Validator/CommonNameLength.pm
 OpenXPKI/Server/Workflow/Validator/Connector.pm
+OpenXPKI/Server/Workflow/Validator/DatapoolEntry.pm
 OpenXPKI/Server/Workflow/Validator/InvalidityTime.pm
 OpenXPKI/Server/Workflow/Validator/KeyGenerationParams.pm
 OpenXPKI/Server/Workflow/Validator/KeyParams.pm
