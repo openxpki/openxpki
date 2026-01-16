@@ -42,3 +42,9 @@ apt-get upgrade --assume-yes --with-new-pkgs >$LOG 2>&1
 
 systemctl stop unattended-upgrades >$LOG 2>&1
 apt-get purge -y unattended-upgrades >$LOG 2>&1
+
+# yq
+VERSION=v4.50.1
+PLATFORM=linux_amd64
+wget https://github.com/mikefarah/yq/releases/download/${VERSION}/yq_${PLATFORM} -O /usr/local/bin/yq && \
+    chmod +x /usr/local/bin/yq
