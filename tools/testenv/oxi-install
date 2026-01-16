@@ -199,7 +199,7 @@ cp $OXI_SOURCE_DIR/package/debian/core/libopenxpki-perl.openxpki-clientd.service
 # finish systemd unit setup after EE code was copied
 echo "- replacements in systemd units: apache -> www-data; /usr/bin -> /usr/local/bin"
 find /usr/lib/systemd/system/ -name 'openxpki*' | \
-    xargs perl -pe 's{^(User|Group)=openxpki$}{$1=root}g; s{(User|Group)=apache}{$1=www-data}g; s{/usr/bin/openxpkictl}{/usr/local/bin/openxpkictl}g;' -i >$LOG 2>&1
+    xargs perl -pe 's{(User|Group)=apache}{$1=www-data}g; s{/usr/bin/openxpkictl}{/usr/local/bin/openxpkictl}g;' -i >$LOG 2>&1
 
 echo "- reload systemd"
 systemctl daemon-reload
