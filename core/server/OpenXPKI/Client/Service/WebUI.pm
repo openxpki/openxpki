@@ -157,15 +157,84 @@ sub _build_session ($self) {
     #
     # Frontend session
     #
-    my $session_dsn = $self->config->get('session.driver') // undef;
-    my $session_config = $self->config->get_hash('session.params'); # new format
-    $session_config //= $self->config->get_hash('session_driver'); # old format
-    $session_config //= { Directory => '/tmp' }; # default for file driver
+    my $driver;
+    my $conf = {};
+
+    #
+    # Before v4.0 we map the new config syntax to the old syntax and feed
+    # it to our CGI::Session based implementation.
+    #
+
+    # TODO Remove legacy session config parsing once we use our own non-CGI::Session based class
+
+    # Existence of session.database tells us to use DB driver
+    if (my $db_conf = $self->config->get_hash('session.database')) {
+        $driver = 'driver:openxpki';
+        if (my $old_driver = $self->config->get('session.driver')) {
+            die "Session config ambiguous: 'session.database' is set but legacy parameter 'session.driver' is set to '$old_driver'\n"
+                if $old_driver ne $driver;
+        }
+
+        my $type = delete $db_conf->{type} or die "Session config: missing parameter 'session.database.type'\n";
+        my $db = delete $db_conf->{name}   or die "Session config: missing parameter 'session.database.name'\n";
+
+        # Map OpenXPKI type names to DBI names
+        my $type_map = {
+            MySQL => 'mysql',
+            MariaDB2 => 'MariaDB',
+            # We do explicitely NOT map MariaDB => 'mysql' as this could lead to
+            # confusion if someone already enters the DBI name into the config
+            # instead of our internal driver name.
+            PostgreSQL => 'Pg',
+        };
+
+        # DataSource is passed as first argument to DBI->connect()
+        $conf->{DataSource} = "dbi:$type:" . join(';',
+            sprintf('database=%s', $db),
+            $db_conf->{host} ? sprintf('host=%s', delete $db_conf->{host}) : (),
+            $db_conf->{port} ? sprintf('port=%s', delete $db_conf->{port}) : (),
+        );
+
+        # Additional attributes: 4th parameter to DBI->connect($data_source, $user, $pass, $attrs)
+        if (my $driver = delete $db_conf->{driver}) {
+            die "Session config: parameter 'session.database.driver' must be a mapping (keys + values)\n"
+                unless ref $driver eq 'HASH';
+            $conf->{dbi_connect_attrs} = $driver;
+        }
+
+        # Map config parameters to legacy names
+        my %map = (
+            namespace => 'NameSpace',
+            user => 'User',
+            password => 'Password',
+            passwd   => 'Password', # compatibility with 'password' alias in server DB config
+            log_ip => 'LogIP',
+            encrypt_key => 'EncryptKey',
+        );
+
+        for my $key (keys $db_conf->%*) {
+            next unless $map{$key};
+            $conf->{$map{$key}} = delete $db_conf->{$key};
+        }
+
+        die "Session config contains unknown parameters:\n" . join('', map { "- session.database.$_\n"} keys $db_conf->%*)
+            if scalar $db_conf->%*;
+
+    # Old config syntax (pre 2026-01)
+    } else {
+        $driver = $self->config->get('session.driver');
+        $conf = $self->config->get_hash('session.params');   # new format (.yaml)
+        $conf //= $self->config->get_hash('session_driver'); # old format (.conf)
+        # Default for file driver
+        $conf //= { Directory => '/tmp' } if ($driver//'') ne 'driver:openxpki';
+        # Default LongReadLen for Oracle
+        $conf->{LongReadLen} = $conf->{LongReadLen} // 100000;
+    }
 
     my $session = OpenXPKI::Client::Service::WebUI::Session->new(
-        $session_dsn, # may be undef
+        $driver, # may be undef
         $id, # may be undef
-        $session_config
+        $conf
     );
     $session->expire($self->config->get('session.timeout'))
         if $self->config->exists('session.timeout');
@@ -174,8 +243,8 @@ sub _build_session ($self) {
 
     if ($self->log->is_debug) {
         my %info = (
-            ID => $session->id,
-            $session_dsn ? (dsn => $session_dsn) : (),
+            id => $session->id,
+            $driver ? (driver => $driver) : (),
             $session->expire ? (expires => $session->expire) : (),
         );
         $self->log->debug('Frontend session: ' . join(', ', map { "$_ = $info{$_}" } sort keys %info));

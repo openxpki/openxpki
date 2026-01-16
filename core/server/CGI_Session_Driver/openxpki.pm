@@ -12,7 +12,7 @@ use Crypt::CBC;
 
 =head1 NAME
 
-CGI::Session::Driver::openxpki - C<CGI:Session> driver using DBI for openxpki
+CGI::Session::Driver::openxpki - C<CGI:Session> driver for OpenXPKI using DBI
 
 =head1 DESCRIPTION
 
@@ -34,25 +34,26 @@ names and adds some security options.
 =head2 Config Options
 
     session:
-        driver: driver:openxpki
-
-        params:
-            DataSource: dbi:mysql:dbname=openxpki;host=db.example.com
-            NameSpace: openxpki
-            User: openxpki_session
-            Password: mypass
-            EncryptKey: mysecretkey
-            LogIP: 1
+        database:
+            type: MariaDB
+            name: openxpki
+            host: db.example.com
+            #port: 3306
+            #namespace: openxpki
+            user: openxpki_session
+            password: mypass
+            encrypt_key: mysecretkey
+            log_ip: 1
 
 =over
 
-=item NameSpace
+=item namespace
 
-The I<TableName> options is set to the fixed value C<"frontend_session">.
+The DBI I<TableName> option is set to the fixed value C<"frontend_session">.
 In case you have a RDBMS that requires namespaces, e.g. Oracle, you can pass an
-additional I<NameSpace> which is prefixed to the tablename.
+additional I<namespace> which is prefixed to the tablename.
 
-=item EncryptKey
+=item encrypt_key
 
 This is an optional parameter that adds some extra security against
 attackers or curious server/database admins.
@@ -65,7 +66,7 @@ In additon, the session ID passed to the access methods is hashed with an
 HMAC function using this key to prevent users from stealing sessions if they
 are able to traverse through the session table.
 
-=item LogIP
+=item log_ip
 
 Boolean, default is C<0>. If set to C<1> the environment variable C<REMOTE_ADDR>
 is logged into the C<ip_address> column. This is mainly meant for debugging or
@@ -128,8 +129,7 @@ sub get_handle ($self) {
             {
                 PrintError => 1,
                 AutoCommit => 1,
-                # LongReadLen for Oracle
-                LongReadLen => $self->{LongReadLen} ? $self->{LongReadLen} : 100000,
+                ($self->{dbi_connect_attrs} // {})->%*,
             }
         );
         if ($dbi) {
