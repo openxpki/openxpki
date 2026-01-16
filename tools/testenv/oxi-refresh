@@ -200,21 +200,31 @@ chown -R root:openxpki /etc/openxpki/local
 mv /tmp/openxpki-keys /etc/openxpki/local/keys
 
 # set en_US as default language to get correct I18N translations (e.g. in rpc.fcgi)
-sed -ri 's/^(\s*default_language:).*/\1 en_US/' /etc/openxpki/config.d/system/server.yaml
+yq -i '.i18n.default_language = "en_US"' /etc/openxpki/config.d/system/server.yaml
 
 # set plain datavault password "root"
-sed -zri 's/(secret:\s+default:\s+.*?)value@?:[^\n]+/\1value: root/' /etc/openxpki/config.d/system/crypto.yaml
+yq -i '
+    .secret.default.value = "root" |
+    del(.secret.default.value@)
+' /etc/openxpki/config.d/system/crypto.yaml
 
 # Specify hostname to force MySQL connection via TCP, not socket
 webui_conf=/etc/openxpki/client.d/service/webui/default.yaml
 if [ -e $webui_conf ]; then
     echo "- set WebUI session driver to database"
-    sed -ri 's/^(\s*)(#\s*)?(driver)\s*:.*/\1\3: driver:openxpki/'                                $webui_conf
-    sed -ri 's/^(\s*)(#\s*)?(DataSource)\s*:.*/\1\3: dbi:MariaDB:dbname=openxpki;host=127.0.0.1/' $webui_conf
-    sed -ri 's/^(\s*)(#\s*)?(User)@?\s*:.*/\1\3: openxpki_session/'                               $webui_conf
-    sed -ri 's/^(\s*)(#\s*)?(Password)@?\s*:.*/\1\3: mysecret/'                                   $webui_conf
-    sed -ri 's/^(\s*)(#\s*)?(EncryptKey)@?\s*:.*/\1\3: mysecret/'                                 $webui_conf
+    yq -i '
+      .session.database.type = "MariaDB" |
+      .session.database.host = "127.0.0.1" |
+      .session.database.name = "openxpki" |
+      .session.database.user = "openxpki_session" |
+      .session.database.password = "mysecret" |
+      .session.database.encrypt_key = "mysecret" |
+      del(.session.database.user@) |
+      del(.session.database.password@) |
+      del(.session.database.encrypt_key@)
+    ' $webui_conf
 fi
+
 legacy_webui_conf=/etc/openxpki/webui/default.conf
 if [ -e $legacy_webui_conf ]; then
     echo "- set legacy WebUI session driver to database"
@@ -224,24 +234,20 @@ if [ -e $legacy_webui_conf ]; then
     sed -ri 's/^(#\s*)?(Password\s*=).*/\2 mysecret/'                                     $legacy_webui_conf
 fi
 
-set +e
-test_auth_exists=$(grep -c "Testing:" /etc/openxpki/config.d/realm/democa/auth/stack.yaml)
-set -e
-
-if [ $test_auth_exists -eq 0 ]; then
-    echo "- add authentication stack 'Testing'"
-    # add test auth stack (e.g. user: raop / password: openxpki)
-    sed -zri 's/^/Testing:\n    handler: TestAccounts\n    type: passwd\n\n/' /etc/openxpki/config.d/realm/democa/auth/stack.yaml
-fi
+# add test auth stack (e.g. user: raop / password: openxpki)
+yq -i '
+    .Testing.handler = "TestAccounts" |
+    .Testing.type = "passwd"
+' /etc/openxpki/config.d/realm/democa/auth/stack.yaml
 
 # add "tenant: { type: Base }" to "RA Operator"
 if [ $TENANT_SUPPORT -eq 1 ]; then
     echo "- add tenant config"
-    sed -zri 's/(RA Operator[^\n]+\n([\t ]+[^\n]+\n)+)/\1    tenant:\n        type: Base\n/' /etc/openxpki/config.d/realm/democa/auth/roles.yaml
+    yq -i '.["RA Operator"].tenant.type = "Base"' /etc/openxpki/config.d/realm/democa/auth/roles.yaml
 fi
 
 # remove probably existing TestAccounts
-sed -zri 's/(TestAccounts:\n([\t ]+[^\n]+\n|\n)+)//' /etc/openxpki/config.d/realm.tpl/auth/handler.yaml
+yq -i 'del(.TestAccounts)' /etc/openxpki/config.d/realm/democa/auth/handler.yaml
 
 # add our TestAccounts
 echo "- add OpenXPKI test accounts"
@@ -272,7 +278,7 @@ TestAccounts:
 __HANDLER
 
 # set /var/tmp instead of /tmp (where only root has write access)
-sed -ri 's/(LOCATION:)\s*\/tmp.*/\1 \/var\/tmp/g' /etc/openxpki/config.d/realm/democa/publishing.yaml
+yq -i '.connectors.local.LOCATION = "/var/tmp"' /etc/openxpki/config.d/realm/democa/publishing.yaml
 
 # database setup
 echo "- configure MariaDB as database"
@@ -289,10 +295,10 @@ __DB
 
 if [[ $IS_LEGACY_FCGI == 0 ]]; then
     echo "- client config: allow webserver user to connect to client socket"
-    perl -pe 's{^(socket_group)\s*:.*}{$1: www-data}g;' -i /etc/openxpki/client.d/system/server.yaml
+    yq -i '.socket_group = "www-data"' /etc/openxpki/client.d/system/server.yaml
 else
     echo "- legacy FCGI client config: allow FCGI user to connect to server socket"
-    perl -pe 's{^(socket_group)\s*:.*}{$1: www-data}g;' -i /etc/openxpki/config.d/system/server.yaml
+    yq -i '.socket_group = "www-data"' /etc/openxpki/config.d/system/server.yaml
 fi
 
 echo "- inject HSM terminal simulation config"
@@ -322,7 +328,7 @@ ver=$(perl -I $OXI_CORE_DIR/server -e 'use OpenXPKI::VERSION; print join ".", (s
 
 # Modify version in config dependency
 echo -e "\nModify version check for core: $ver"
-perl -pe "s{^(\s+core):.*}{\$1: $ver}g;" -i /etc/openxpki/config.d/system/version.yaml
+yq -i ".depend.core = \"$ver\"" /etc/openxpki/config.d/system/version.yaml
 
 # configure web server
 if [[ $IS_APACHE == 1 ]]; then
