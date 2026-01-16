@@ -10,6 +10,7 @@ use List::Util qw( any );
 use FindBin qw( $Script );
 use Module::Load ();
 use Module::Metadata;
+use Cwd qw( abs_path );
 
 # CPAN modules
 use Log::Log4perl qw( :easy :no_extra_logdie_message );
@@ -71,6 +72,53 @@ sub get_file_pod ($filename) {
     return $pod || "=head1 USAGE\n\nNo specific help available\n";
 }
 
+sub dir_key ($path) {
+    my @st = stat($path) or return;
+    return "$st[0]:$st[1]"; # dev:ino
+}
+
+sub find_recursions ($path) {
+    state %seen_inodes; # "dev:ino" -> "path" (only for dirs on current directory path)
+    my @recursions;
+
+    $path =~ s{/$}{};
+    my $key = dir_key($path) or return;
+
+    # Paranoia - this should have been caught earlier (below)
+    return if exists $seen_inodes{$key};
+
+    # Mark directory as being on the current path
+    $seen_inodes{$key} = $path;
+
+    # Check directory contents
+    opendir my $dh, $path or do { delete $seen_inodes{$key}; return };
+    my @entries = grep { $_ ne '.' && $_ ne '..' } readdir $dh;
+    closedir $dh;
+
+    for my $entry (@entries) {
+        my $subdir = "$path/$entry";
+        next unless -d $subdir; # only check directories (including symlinks)
+        # check symlink
+        if ( -l $subdir ) {
+            my $subdir_abs = abs_path($subdir);
+            next unless defined $subdir_abs; # ignore dangling symlinks
+
+            my $subdir_key = dir_key($subdir_abs);
+            next unless defined $subdir_key;
+
+            # loop = target dir was already seen on the current path hierarchy
+            if ( exists $seen_inodes{$subdir_key} ) {
+                push @recursions, [ $subdir, $seen_inodes{$subdir_key} ];
+                next;
+            }
+        }
+        # Recurse into subdir (normal or symlink)
+        push @recursions, find_recursions($subdir);
+    }
+    delete $seen_inodes{$key};
+    return @recursions;
+}
+
 # Help
 show_pod(-verbose => 1) unless @ARGV;
 
@@ -110,17 +158,29 @@ OpenXPKI::Log4perl->init_screen_logger($global_opts{l4p_level});
 #
 # Attributes defined by OpenXPKI::Control::Role
 #
-my %role_attrs = ();
+my $config_path;
 if ($global_opts{config}) {
-    $role_attrs{config_path} = File::Spec->rel2abs($global_opts{config});
+    $config_path = File::Spec->rel2abs($global_opts{config});
 } elsif ($global_opts{instance}) {
-    $role_attrs{config_path} = sprintf '/etc/openxpki/%s/config.d/', $global_opts{instance};
+    $config_path = sprintf '/etc/openxpki/%s/config.d/', $global_opts{instance};
+}
+
+#
+# Check config path for recursive symlinks (can cause huge delays or crash Config::Merge)
+#
+my $check_dir = $config_path // $OpenXPKI::Defaults::SERVER_CONFIG_DIR;
+if (my @rec = find_recursions($check_dir)) {
+    my $findings = join "----\n", map { sprintf "      symlink: %s\njumps back to: %s\n", $_->[0], $_->[1] } @rec;
+    LOGDIE("Recursive directory symlinks found in $check_dir:\n$findings");
 }
 
 #
 # Command processing
 #
 my $command = shift;
+
+my %role_attrs;
+$role_attrs{config_path} = $config_path if $config_path;
 
 if ($command eq 'version') {
     my $ver = OpenXPKI::Control::Server->new(%role_attrs)->get_version;
