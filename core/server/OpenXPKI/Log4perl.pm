@@ -3,14 +3,12 @@ use OpenXPKI;
 
 # Core modules
 use List::Util qw( none );
+use Module::Load ();
 
 # CPAN modules
 use Log::Log4perl;
 use Log::Log4perl::Level;
 use Log::Log4perl::Logger;
-
-# Project modules
-use OpenXPKI::Log4perl::MojoLogger;
 
 our $spec_added = 0;
 our $default_facility;
@@ -25,10 +23,7 @@ provide some custom enhancements
     use OpenXPKI::Log4perl;
 
     OpenXPKI::Log4perl->init_or_fallback($cfg_file);
-    my $log = Log::Log4perl->get_logger(...);
-
-Please note that you do NOT have to additionally C<use Log::Log4perl> as it's
-already loaded by C<OpenXPKI::Log4perl>.
+    my $log = OpenXPKI::Log4perl->get_logger(...);
 
 =head1 DESCRIPTION
 
@@ -199,8 +194,19 @@ sub get_logger {
     # if someone calls us with :: instead of ->, $class contains first argument instead of class name
     unshift (@args, $class) if $class ne __PACKAGE__;
 
-    @args = ($default_facility) if (not scalar @args and $default_facility);
-    return OpenXPKI::Log4perl::MojoLogger->get_logger(@args);
+    # Mojolicious (client code)
+    if ($ENV{OPENXPKI_MOJO}) {
+        Module::Load::load('OpenXPKI::Log4perl::MojoLogger');
+        return OpenXPKI::Log4perl::MojoLogger->get_logger(
+            @args ? @args : ($default_facility // ())
+        );
+    }
+    # Server code (or legacy FCGI client)
+    else {
+        return Log::Log4perl->get_logger(
+            @args ? @args : ($default_facility // 'openxpki.system')
+        );
+    }
 }
 
 sub set_default_facility {

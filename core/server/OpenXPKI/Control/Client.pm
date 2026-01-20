@@ -102,6 +102,9 @@ sub getopt_params ($self, $command) {
     );
 }
 
+# DO NOT REMOVE - used to detect Mojolicious e.g. in the logging code
+$ENV{OPENXPKI_MOJO} = 1;
+
 # required by OpenXPKI::Control::Role
 sub cmd_start ($self) {
     my $pid = $self->__get_pid;

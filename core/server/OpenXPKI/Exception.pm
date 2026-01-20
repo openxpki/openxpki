@@ -1,15 +1,19 @@
 package OpenXPKI::Exception;
-
 use strict;
 use warnings;
 
+# Core modules
 use Scalar::Util qw(blessed);
 
-use OpenXPKI::Debug;
-use OpenXPKI::Server::Context;
+# CPAN modules
 use Log::Log4perl;
 
+# Project modules
+use OpenXPKI::Debug;
+use OpenXPKI::Server::Context;
 use OpenXPKI::i18n qw( i18nGettext );
+use OpenXPKI::Log4perl;
+
 use Exception::Class (
     'OpenXPKI::Exception' => {
         fields => [ 'children', 'params', '__is_logged' ],
@@ -56,74 +60,38 @@ my $log4perl_logger;
 sub full_message {
     my ($self) = @_;
 
-    ## respect child errors
-    if (ref $self->{children}) {
-        foreach my $child (@{$self->{children}}) {
-            next if (not $child); ## empty array
-            $self->{params}->{"ERRVAL"} .= " " if ($self->{params}->{"ERRVAL"});
-            if (ref $child) {
-                $self->{params}->{"ERRVAL"} .= $child->as_string();
+    # create cached value
+    if (not exists $self->{full_message}) {
+        my $params = $self->params; # yes, we modify them as a side-effect. old code relies on this.
+
+        # add child errors to ERRVAL
+        my @errval = exists $params->{ERRVAL} ? $params->{ERRVAL} : ();
+        if (ref $self->{children} eq 'ARRAY') {
+            foreach my $child ($self->{children}->@*) {
+                push @errval, "$child" if $child; # stringify exceptions, skip empty arrays
             }
-            else {
-                $self->{params}->{"ERRVAL"} .= $child;
-            }
+        }
+        $params->{ERRVAL} = join ' ', @errval if @errval;
+
+        # enforce __NAME__ scheme for "params"
+        foreach my $key (sort keys $params->%*) {
+            my $value = delete $params->{$key};
+            $key =~s/^_*/__/;
+            $key =~s/_*$/__/;
+            $params->{$key} = $value;
+        }
+
+        # translate message
+        $self->{full_message} = OpenXPKI::i18n::i18nGettext($self->{message});
+
+        # append all "params" if NO translation took place
+        if ($self->{full_message} eq $self->{message} and scalar keys $params->%*) {
+            $self->{full_message}.= '; ' . $self->__format_params($params);
         }
     }
 
-    ## enforce __NAME__ scheme
-    foreach my $param (sort keys %{$self->{params}}) {
-        my $value = $self->{params}->{$param};
-        delete $self->{params}->{$param};
-        $param =~s/^_*/__/;
-        $param =~s/_*$/__/;
-        $self->{params}->{$param} = $value;
-    }
-
-    ## put together and translate message
-    my $msg = OpenXPKI::i18n::i18nGettext($self->{message} );
-
-    # append all parameters if message was not translated
-    if ($msg eq $self->{message} and scalar keys %{$self->{params}}) {
-        my $max_item_length = 50;
-        my $params_formatted =
-            join ", ",
-            map {
-                my $val = $self->{params}->{$_};
-                my $formatted;
-                if (not defined $val) {
-                    $formatted = "EMPTY";
-                }
-                elsif (ref $val eq 'ARRAY') {
-                    # special hack for the validator field list which is an array of hashes
-                    if ($_ eq 'FIELDS') {
-                        $formatted = join(",", map { ref $_ ? $_->{name} : $_ } @{$val});
-                    } else {
-                        my $items = join(",", @$val);
-                        $items = substr($items, 0, $max_item_length-3) . "..." if length $items > $max_item_length;
-                        $formatted = "Array($items)";
-                    }
-                }
-                elsif (ref $val eq 'HASH') {
-                    my $items = join ",", map { "$_=".($val->{$_} // '') } sort keys %$val;
-                    $items = substr($items, 0, $max_item_length-3) . "..." if length $items > $max_item_length;
-                    $formatted = "Hash($items)";
-                }
-                else {
-                    $formatted = $val;
-                }
-                sprintf "%s => %s", $_, $formatted;
-            }
-            sort keys %{$self->{params}};
-
-        $msg = "$msg; $params_formatted";
-    }
-    ## this is only for debugging of OpenXPKI::Exception
-    ## and creates a lot of noise
-    ## print STDERR "$msg\n";
-
     ##! 1: "exception thrown: $msg"
-
-    return $msg;
+    return $self->{full_message};
 }
 
 sub message_code {
@@ -136,7 +104,7 @@ sub throw {
 
     $proto->rethrow if ref $proto;
 
-    # lazy mode -  message string given as single argument
+    # lazy mode - message string given as single argument
     my %args;
     if (scalar @_ == 1) {
         %args = (message => shift);
@@ -144,68 +112,98 @@ sub throw {
         %args = (@_);
     }
 
-    # If an error is given and the error is an OpenXPKI::Exception
-    # we do NOT create a new exeption but rethrow it
-    if ($args{error} && blessed($args{error}) && $args{error}->isa('OpenXPKI::Exception')) {
+    # If a given error is an OpenXPKI::Exception we just rethrow it
+    if (blessed $args{error} and $args{error}->isa('OpenXPKI::Exception')) {
         ##! 32: 'rethrow existing exception'
-        $args{error}->rethrow();
+        $args{error}->rethrow;
     }
 
     my %exception_args = %args;
     delete $exception_args{log};
 
-    #    # This is a bit of an evil hack until Exception::Class supports
-    #    # turning off stack traces, see
-    #    # http://rt.cpan.org/Ticket/Display.html?id=26489
-    #    # for a bug report and patch
-    #    # It fakes the Devel::StackTrace calls that are used in
-    #    # Exception::Class to be nearly empty, which massively speeds up
-    #    # Exception throwing
-    #    local *Devel::StackTrace::new
-    #        = *OpenXPKI::Exception::__fake_stacktrace_new;
-    #    local *Devel::StackTrace::frame
-    #        = *OpenXPKI::Exception::__fake_stacktrace_frame;
-
     my $self = $proto->new(%exception_args);
 
-    # suppress logging if "log => undef" or L4p is not initialized
-    if ((exists $args{log} && !defined $args{log}) || !Log::Log4perl->initialized()) {
-        die $self;
-    }
+    # log exception unless "log => undef" or Log4perl is not initialized
+    if (
+        not (exists $args{log} and not defined $args{log}) # no active suppression
+        and Log::Log4perl->initialized
+    ) {
+        my $message = $args{log}->{message} || $self->full_message;
+        my $facility = $args{log}->{facility};
+        my $priority = $args{log}->{priority} || 'error';
+        my $log;
 
-    my $message = $args{log}->{message} || $self->full_message(%args);
-    my $facility = $args{log}->{facility} || 'system';
-    my $priority = $args{log}->{priority} || 'error';
+        # append fields from subclass exceptions
+        my $fields = $self->field_hash;
+        for (keys $fields->%*) {
+            delete $fields->{$_} unless defined $fields->{$_};
+        }
+        delete $fields->{params};       # remove some fields that are already
+        delete $fields->{children};     # handled in full_message()
+        delete $fields->{__is_logged};
+        if (scalar keys $fields->%*) {
+            $message = sprintf '%s (%s)', $message, $self->__format_params($fields);
+        }
 
-    eval {
-        if (OpenXPKI::Server::Context::hascontext('log')) {
-            my $log = OpenXPKI::Server::Context::CTX('log');
-            $log->$facility()->$priority( $message );
-            $self->{__is_logged} = 1;
-        } else {
-            my $log = Log::Log4perl->get_logger('openxpki.'. $facility );
+        # actual logging
+        eval {
+            # Server with CTX('log')
+            if (OpenXPKI::Server::Context::hascontext('log')) {
+                $facility ||= 'system';
+                $log = OpenXPKI::Server::Context::CTX('log')->$facility;
+            } else {
+                $log = OpenXPKI::Log4perl->get_logger(
+                    $facility
+                    ? ($ENV{OPENXPKI_MOJO}
+                        # Mojolicious client
+                        ? $facility
+                        # Server without CTX or legacy client
+                        : "openxpki.$facility") # $facility is only used by server code
+                    : ()
+                );
+            }
             $log->$priority( $message );
             $self->{__is_logged} = 1;
-        }
-    };
-
+        };
+    }
     die $self;
 }
 
-sub __fake_stacktrace_new {
-    ##! 16: 'fake_stacktrace_new called'
-    my $that  = shift;
-    my $class = ref($that) || $that;
+sub __format_params {
+    my ($self, $params) = @_;
 
-    my $self = {};
-    bless $self, $class;
+    my $max_item_length = 50;
+    my $params_formatted =
+        join ", ",
+        map {
+            my $val = $params->{$_};
+            my $formatted;
+            if (not defined $val) {
+                $formatted = "EMPTY";
+            }
+            elsif (ref $val eq 'ARRAY') {
+                # special hack for the validator field list which is an array of hashes
+                if ($_ eq 'FIELDS') {
+                    $formatted = join(",", map { ref $_ ? $_->{name} : $_ } @{$val});
+                } else {
+                    my $items = join(",", @$val);
+                    $items = substr($items, 0, $max_item_length-3) . "..." if length $items > $max_item_length;
+                    $formatted = "Array($items)";
+                }
+            }
+            elsif (ref $val eq 'HASH') {
+                my $items = join ",", map { "$_=".($val->{$_} // '') } sort keys %$val;
+                $items = substr($items, 0, $max_item_length-3) . "..." if length $items > $max_item_length;
+                $formatted = "Hash($items)";
+            }
+            else {
+                $formatted = $val;
+            }
+            sprintf "%s => %s", $_, $formatted;
+        }
+        sort keys $params->%*;
 
-    return $self;
-}
-
-sub __fake_stacktrace_frame {
-    ##! 16: 'fake_stacktrace_frame called'
-    return 0;
+    return $params_formatted;
 }
 
 1;
