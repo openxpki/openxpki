@@ -273,9 +273,14 @@ sub init_session ($self, $arg = {}) {
     }
 
     if (not defined $msg->{SESSION_ID}) {
+        # reduce log level if session continuation failed
+        my $prio = (($msg->{ERROR}//{})->{LABEL}//'') eq 'I18N_OPENXPKI_SERVICE_DEFAULT_HANDLE_CONTINUE_SESSION_SESSION_CONTINUE_FAILED'
+            ? 'debug'
+            : 'error';
         OpenXPKI::Exception->throw(
             message => "I18N_OPENXPKI_CLIENT_INIT_SESSION_FAILED",
             params => { MESSAGE_FROM_SERVER => Dumper $msg },
+            log => { priority => $prio }
         );
     }
 
