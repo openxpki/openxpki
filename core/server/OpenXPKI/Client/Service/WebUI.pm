@@ -231,7 +231,7 @@ sub _build_session ($self) {
         $conf->{LongReadLen} = $conf->{LongReadLen} // 100000;
     }
 
-    my $session = OpenXPKI::Client::Service::WebUI::Session->new(
+    my $session = OpenXPKI::Client::Service::WebUI::Session->new_patched(
         $driver, # may be undef
         $id, # may be undef
         $conf
