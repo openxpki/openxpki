@@ -272,16 +272,16 @@ sub _init_client ($self, $client) {
     my $old_id = $self->session->param('backend_session_id') || undef;
 
     if ($old_id and $id and $old_id eq $id) {
-        $self->log->debug('Backend session already loaded');
+        $self->log->trace('Backend session already loaded');
     } else {
         eval {
-            $self->log->debug('Backend session: try re-init with ID = ' . ($old_id || '<undef>'));
+            $self->log->trace('Backend session: try re-init with ID = ' . ($old_id || '<undef>'));
             $client->init_session({ SESSION_ID => $old_id }); # initialize backend session
         };
         if (my $eval_err = $EVAL_ERROR) {
             my $exc = OpenXPKI::Exception->caught;
             if ($exc && $exc->message eq 'I18N_OPENXPKI_CLIENT_INIT_SESSION_FAILED') {
-                $self->log->debug('Backend session was gone - start a new one');
+                $self->log->trace('Backend session was gone - start a new one');
                 # The session has gone - start a new one - might happen if the GUI
                 # was idle too long or the server was flushed
                 $client->init_session({ SESSION_ID => undef }); # initialize backend session
@@ -658,7 +658,7 @@ sub _get_cipher ($self) {
         my $sha = Digest::SHA->new('sha256');
         $sha->add($key) if $key;
 
-        $self->log->debug('Fingerprint for cookie encryption = ' . join(', ', @fingerprint));
+        $self->log->trace('Fingerprint for cookie encryption = ' . join(', ', @fingerprint));
         my $spacer = max(map { length } @fingerprint) + 3;
         for my $key (@fingerprint) {
             my $msg_key = "- $key " . ('.' x ($spacer-length($key)));

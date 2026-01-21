@@ -15,7 +15,7 @@ sub init_structure ($self, $args) {
 
     # create CSRF token
     if (!$self->session_param('rtoken')) {
-        $self->log->debug('Generate rtoken');
+        $self->log->debug('Generate rtoken (once per frontend session)');
         $self->session_param('rtoken', Digest::SHA::sha1_hex($$ . $self->session->id . rand(2**32)));
     }
     $self->rtoken($self->session_param('rtoken'));
