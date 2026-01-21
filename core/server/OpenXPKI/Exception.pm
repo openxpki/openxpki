@@ -65,7 +65,7 @@ sub full_message {
                 $self->{params}->{"ERRVAL"} .= $child->as_string();
             }
             else {
-                $self->{params}->{"ERRVAL"} = $self->{child};
+                $self->{params}->{"ERRVAL"} .= $child;
             }
         }
     }
