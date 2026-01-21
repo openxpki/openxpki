@@ -7,10 +7,12 @@ monkey_patch 'CGI::Session', new_patched => sub ($class, @args) {
     return $class->new(@args) // die 'Error creating webui session: ' . $class->errstr;
 };
 
+# The Moose constructor will also get the name "new_patched"!
 extends 'CGI::Session' => { -constructor_name => 'new_patched' };
 
 # Core modules
 use Module::Load ();
+use Carp;
 
 # CPAN modules
 use Log::Log4perl qw(:easy);
@@ -76,7 +78,7 @@ around BUILDARGS => sub ($orig, $class, @args) {
 sub FOREIGNBUILDARGS ($class, @args) {
     # Convert second argument (SID): turn Undef into 0 so CGI::Session->load()
     # will find it's defined (= not attempt to fetch SID via CGI->cookie or CGI->param)
-    # but also find it's not TRUE (= not attempt to load a session)
+    # but also find it's not TRUE (which would make it try and load a session)
     return ($args[0], $args[1] // 0, $args[2]);
 }
 
@@ -97,10 +99,12 @@ sub clone ($self) {
     return $self->SUPER::new_patched();
 }
 
-sub query       { die __PACKAGE__."->query() is not implemented\n" }
-sub http_header { die __PACKAGE__."->http_header() is not implemented\n" }
-sub cookie      { die __PACKAGE__."->cookie() is not implemented\n" }
-sub save_param  { die __PACKAGE__."->save_param() is not implemented\n" }
-sub load_param  { die __PACKAGE__."->load_param() is not implemented\n" }
+# query() is used by CGI::Session->load() if the requested session ID is invalid.
+# By returning a dummy we make sure the code in load() does not die too early.
+sub query { bless { }, __PACKAGE__ . '::DummyQuery' }
+sub http_header { confess __PACKAGE__."->http_header() is not implemented\n" }
+sub cookie      { confess __PACKAGE__."->cookie() is not implemented\n" }
+sub save_param  { confess __PACKAGE__."->save_param() is not implemented\n" }
+sub load_param  { confess __PACKAGE__."->load_param() is not implemented\n" }
 
 __PACKAGE__->meta->make_immutable;
