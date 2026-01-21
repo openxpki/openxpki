@@ -210,7 +210,7 @@ sub _decrypt ($self, $enc_value) {
 
     my $plain;
     eval { $plain = $self->cipher->decrypt(decode_base64($enc_value)) };
-    die "Unable to decrypt cookie ($EVAL_ERROR)" unless $plain;
+    die "Unable to decrypt cookie ($EVAL_ERROR)\n" unless $plain;
 
     return $plain;
 }

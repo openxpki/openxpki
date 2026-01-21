@@ -143,7 +143,7 @@ sub _build_session ($self) {
             $id = $self->session_cookie->fetch_id;
         }
         catch ($err) {
-            $self->log->error($err);
+            $self->log->info($err);
         }
     }
 
