@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 use OpenXPKI;
 
 # If you are unable to run under FastCGI, you can use this script unmodified
@@ -27,7 +27,6 @@ use OpenXPKI::Client;
 use OpenXPKI::Client::Config;
 use OpenXPKI::Client::Service::Response;
 use OpenXPKI::Client::Service::WebUI;
-use OpenXPKI::Client::Service::WebUI::Session;
 
 
 my $conf;
