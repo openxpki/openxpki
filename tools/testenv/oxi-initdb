@@ -49,8 +49,15 @@ fi
 echo -e "- create and import sample certificates (takes a while!)"
 rm -rf /etc/openxpki/ca/
 rm -rf /etc/openxpki/local/keys/
-# sampleconfig.sh now needs a running server
-$OXI_TEST_SAMPLECONFIG_DIR/contrib/sampleconfig.sh                >$LOG 2>&1
+
+# Run sampleconfig
+# We disable the old asymmetric datavault key generation as we now use
+# realm.democa.crypto.type.datasafe = svault, see oxi-refresh
+my_sample_config=$(mktemp)
+sed -r 's/^(.*openxpkiadm.*DATAVAULT_CERTIFICATE.*)/# \1/' $OXI_TEST_SAMPLECONFIG_DIR/contrib/sampleconfig.sh > $my_sample_config
+cat $my_sample_config
+. $my_sample_config >$LOG 2>&1
+
 chown -R openxpki:root /etc/openxpki/local/keys/
 chmod -R 750 /etc/openxpki/local/keys/
 chown -R www-data:www-data /etc/openxpki/tls/

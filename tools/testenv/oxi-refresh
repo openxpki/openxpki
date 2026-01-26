@@ -216,6 +216,9 @@ yq -i '
     del(.secret.default.value@)
 ' /etc/openxpki/config.d/system/crypto.yaml
 
+# set datavault modue to symmetric key (AES)
+yq -i '.type.datasafe = "svault"' /etc/openxpki/config.d/realm/democa/crypto.yaml
+
 # CLIENT CONFIG
 
 if [[ $IS_LEGACY_FCGI == 1 ]]; then
