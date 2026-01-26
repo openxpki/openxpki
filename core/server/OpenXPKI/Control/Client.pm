@@ -17,6 +17,7 @@ this class implements all methods required by L<OpenXPKI::Control::Role>.
 =cut
 
 # CPAN modules
+use File::Basename;
 use Mojo::Server::Prefork;
 use Mojo::Util qw( extract_usage getopt url_escape monkey_patch );
 use Mojo::File;
@@ -198,6 +199,14 @@ sub cmd_start ($self) {
             pid_file => $pid_file,
             listen => [ sprintf 'http+unix://%s', $self->__file_url($socket_file) ],
         );
+
+        my $directory = dirname($socket_file);
+        unless (-d $directory) {
+            mkdir($directory, 0755) or do {
+                die "unable to create socket directory: $!\n";
+            };
+            ##! 32: 'created socket directory ' . $directory
+        }
 
         # each parameter might be undef:
         %web_params = (
