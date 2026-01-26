@@ -357,15 +357,13 @@ sub is_systemd {
     return 0;
 }
 
-
-
-
 =head2 sd_notify
 
-Send a message to systemd using the sd_notify interface.
+Send a message to systemd using the I<sd_notify> interface.
 
-return 1 if message was send or 0 it sending failed,
-return undef if NOTIFY_SOCKET is not set
+Returns C<1> if message was sent or C<0> if sending failed.
+
+Returns C<undef> if environment variable C<NOTIFY_SOCKET> is not set.
 
 B<Parameters>
 
@@ -375,21 +373,19 @@ B<Parameters>
 
 =back
 
-You can use these wrapper methods to send the standard messages:
+You can use the following wrapper methods to send the standard messages:
 
 =over
 
-=item sd_notify_ready
+=item C<sd_notify_ready>
 
-=item sd_notify_stopping
+=item C<sd_notify_stopping>
 
-=item sd_notify_reloading
+=item C<sd_notify_reloading>
 
-=item sd_notify_watchdog
+=item C<sd_notify_watchdog>
 
-=item sd_notify_status
-
-Expects the content status message to send as argument
+=item C<sd_notify_status ($message)> - expects the content status message to send as argument
 
 =back
 
