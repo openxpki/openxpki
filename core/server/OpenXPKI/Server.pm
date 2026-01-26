@@ -6,6 +6,7 @@ use Socket;
 use Module::Load ();
 
 # CPAN modules
+use File::Basename;
 use Net::Server::Daemonize qw( set_uid set_gid );
 use Log::Log4perl qw( :levels :no_extra_logdie_message );
 
@@ -138,6 +139,26 @@ sub write_to_log_hook {
     my %syslog_to_l4p = ( 0 => $ERROR, 1 => $WARN, 2 => $INFO, 3 => $DEBUG, 4 => $TRACE );
 
     CTX('log')->system->log($syslog_to_l4p{$syslog_level}, $msg);
+}
+
+sub configure_hook {
+
+    my $self = shift;
+    ##! 1: 'start'
+
+    # ensure that the socket directory exists - we only create ONE level
+    # which is sufficient when working with the standard patterns
+    my $socketfile = $self->{PARAMS}->{socketfile};
+    my $directory = dirname($socketfile);
+
+    unless (-d $directory) {
+        mkdir($directory, 0755) or do {
+            die "unable to create socket directory: $!\n";
+        };
+        ##! 32: 'created socket directory ' . $directory
+    }
+
+    return 1;
 }
 
 # from Net::Server:
