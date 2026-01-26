@@ -32,7 +32,7 @@ B<Parameters>
 
 =item * C<id> I<Int> - workflow ID
 
-=item * C<limit> I<Int> - limit the log entries. Default: 0 = unlimited
+=item * C<limit> I<Int> - limit the log entries. Special value: 0 = unlimited. Default: 50
 
 =item * C<reverse> I<Bool> - set to 1 to have the oldest entry first
 

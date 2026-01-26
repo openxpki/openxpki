@@ -24,11 +24,11 @@ sub init_log ($self, $args) {
         large => 1,
     );
 
-    my $result = $self->send_command_v2( 'get_workflow_log', { id => $id } );
-
-    $result = [] unless($result);
-
-    $self->log->trace( "dumper result: " . Dumper $result) if $self->log->is_trace;
+    my $result = $self->send_command_v2('get_workflow_log' => {
+        id => $id,
+        reverse => 1,
+        limit => 0,
+    }) // [];
 
     $self->main->add_section({
         type => 'grid',
