@@ -400,7 +400,7 @@ sub sd_notify {
     shift if ($_[0] // '') eq __PACKAGE__; # support call via -> and ::
     my $message = shift;
 
-    return undef unless ($ENV{NOTIFY_SOCKET});
+    return unless $ENV{NOTIFY_SOCKET};
 
     # Unix Domain Socket öffnen
     my $sock = IO::Socket::UNIX->new(
@@ -452,12 +452,12 @@ sub sd_notify_status {
 
 =head2 want_sd_notify
 
-Returns true if systemd notification is expected
+Returns C<1> if systemd notification is expected, C<0> otherwise.
 
 =cut
 
-sub want_sd_notify() {
-    return defined $ENV{NOTIFY_SOCKET};
+sub want_sd_notify {
+    return $ENV{NOTIFY_SOCKET} ? 1 : 0;
 }
 
 
