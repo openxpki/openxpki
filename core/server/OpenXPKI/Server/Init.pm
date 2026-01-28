@@ -465,7 +465,7 @@ sub get_database {
         ##! 4: "DBI Environment: $env_name => ".$db_env->{$env_name}
     }
 
-    # TODO #legacydb Remove treatment of DB parameters "debug" and "log" (occurs in example database.yaml)
+    # TODO #v4.0 #legacydb Remove treatment of DB parameters "debug" and "log" (occurs in example database.yaml)
     delete $db_config->{log};
     delete $db_config->{debug};
 
@@ -473,10 +473,7 @@ sub get_database {
         # if this DB object should be used for logging: we prevent recursive
         # calls to log functions in OpenXPKI::Server::Log::Appender::Database
         log => CTX('log')->system(),
-        db_params => {
-            db_type => 'MySQL', # default
-            %{ $db_config },
-        },
+        db_params => $db_config,
         $autocommit ? (autocommit => 1) : (),
     );
 
