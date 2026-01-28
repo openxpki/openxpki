@@ -186,38 +186,6 @@ sub _build_driver {
     return $instance;
 }
 
-# Converts DBI errors into OpenXPKI exceptions
-sub _dbi_error_handler {
-    my ($self, $msg, $dbh, $more_details) = @_;
-
-    my $details = {
-        source => "?",
-        dbi_error => $dbh->errstr,
-        dsn => $self->driver->dbi_dsn,
-        user => $self->driver->user,
-        ref $more_details ? %$more_details : (),
-    };
-
-    my $method = "";
-    my $our_msg;
-
-    # original message is like: [class] [method] failed: [message]
-    if ($msg =~ m/^(?<class>[a-z:_]+)\s+(?<method>[^\(\s]+)/i) {
-        $details->{source} = sprintf("%s::%s", $+{class}, $+{method});
-        $method = $+{method};
-    }
-
-    $our_msg = "connection failed"                          if "connect" eq $method;
-    $our_msg = "preparing SQL query failed"                 if "prepare" eq $method;
-    $our_msg = "binding parameters to SQL statement failed" if "bind_params" eq $method;
-    $our_msg = "execution of SQL query failed"              if "execute" eq $method;
-
-    OpenXPKI::Exception->throw(
-        message => "Database error" . ($our_msg ? ": $our_msg" : ""),
-        params => $details,
-    );
-};
-
 sub _build_dbix_handler ($self) {
 
     my %attrs = $self->_driver_return_val_to_hash('dbi_attrs');
@@ -301,6 +269,38 @@ sub _build_dbix_handler ($self) {
 ################################################################################
 # Methods
 #
+
+# Converts DBI errors into OpenXPKI exceptions
+sub _dbi_error_handler {
+    my ($self, $msg, $dbh, $more_details) = @_;
+
+    my $details = {
+        source => "?",
+        dbi_error => $dbh->errstr,
+        dsn => $self->driver->dbi_dsn,
+        user => $self->driver->user,
+        ref $more_details ? %$more_details : (),
+    };
+
+    my $method = "";
+    my $our_msg;
+
+    # original message is like: [class] [method] failed: [message]
+    if ($msg =~ m/^(?<class>[a-z:_]+)\s+(?<method>[^\(\s]+)/i) {
+        $details->{source} = sprintf("%s::%s", $+{class}, $+{method});
+        $method = $+{method};
+    }
+
+    $our_msg = "connection failed"                          if "connect" eq $method;
+    $our_msg = "preparing SQL query failed"                 if "prepare" eq $method;
+    $our_msg = "binding parameters to SQL statement failed" if "bind_params" eq $method;
+    $our_msg = "execution of SQL query failed"              if "execute" eq $method;
+
+    OpenXPKI::Exception->throw(
+        message => "Database error" . ($our_msg ? ": $our_msg" : ""),
+        params => $details,
+    );
+};
 
 # Tries to call the given method on the driver.
 # Returns:
