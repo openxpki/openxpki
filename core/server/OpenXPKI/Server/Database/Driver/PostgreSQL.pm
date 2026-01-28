@@ -38,7 +38,7 @@ sub dbi_dsn {
 }
 
 # Additional parameters for DBI's connect()
-sub dbi_connect_params {
+sub dbi_attrs {
     pg_enable_utf8 => 1,
 }
 

@@ -177,6 +177,7 @@ sub _build_session ($self) {
 
         my $type = delete $db_conf->{type} or die "Session config: missing parameter 'session.database.type'\n";
         my $db = delete $db_conf->{name}   or die "Session config: missing parameter 'session.database.name'\n";
+        my $dsn_extra;
 
         # Map OpenXPKI type names to DBI names
         my $type_map = {
@@ -188,21 +189,39 @@ sub _build_session ($self) {
             PostgreSQL => 'Pg',
         };
 
+        # Backwards compatibility to server DB config option "driver"
+        if (my $connect_attrs = delete $db_conf->{driver}) {
+            die "Session config: parameter 'session.database.driver' must be a mapping (keys + values)\n"
+                unless ref $connect_attrs eq 'HASH';
+            $db_conf->{dbi}->{attrs} = $connect_attrs;
+        }
+
+        # Additional DSN parameters and attributes
+        #     dbi:
+        #         dsn_extra:
+        #         attrs:
+        if (my $dbi = delete $db_conf->{dbi}) {
+            if ($dsn_extra = $dbi->{dsn_extra}) {
+                die "Session config: parameter 'session.database.dbi.dsn_extra' must be a string\n"
+                    if ref $dsn_extra;
+            }
+            # 4th parameter to DBI->connect($data_source, $user, $pass, $attrs)
+            if (my $connect_attrs = $dbi->{attrs}) {
+                die "Session config: parameter 'session.database.dbi.attrs' must be a mapping (keys + values)\n"
+                    unless ref $connect_attrs eq 'HASH';
+                $conf->{dbi_connect_attrs} = $connect_attrs;
+            }
+        }
+
         # DataSource is passed as first argument to DBI->connect()
         $conf->{DataSource} = "dbi:$type:" . join(';',
             sprintf('database=%s', $db),
             $db_conf->{host} ? sprintf('host=%s', delete $db_conf->{host}) : (),
             $db_conf->{port} ? sprintf('port=%s', delete $db_conf->{port}) : (),
+            $dsn_extra ? $dsn_extra : (),
         );
 
-        # Additional attributes: 4th parameter to DBI->connect($data_source, $user, $pass, $attrs)
-        if (my $driver = delete $db_conf->{driver}) {
-            die "Session config: parameter 'session.database.driver' must be a mapping (keys + values)\n"
-                unless ref $driver eq 'HASH';
-            $conf->{dbi_connect_attrs} = $driver;
-        }
-
-        # Map config parameters to legacy names
+        # Map config parameters to legacy names processed by CGI::Session::Driver::openxpki
         my %map = (
             namespace => 'NameSpace',
             user => 'User',

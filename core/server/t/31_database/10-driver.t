@@ -26,7 +26,7 @@ with 'OpenXPKI::Server::Database::Role::CountEmulation';
 with 'OpenXPKI::Server::Database::Role::Driver';
 sub dbi_driver { 'SQLite' }
 sub dbi_dsn { my $self = shift; sprintf("dbi:%s:dbname=%s", $self->dbi_driver, $self->name) }
-sub dbi_connect_params { }
+sub dbi_attrs { }
 sub perform_checks { }
 sub on_connect { }
 sub sqlam_params { limit_offset => 'LimitOffset' }
@@ -38,15 +38,15 @@ __PACKAGE__->meta->make_immutable;
 
 package OpenXPKI::Server::Database::Driver::OxitestdbList;
 use Moose; extends 'OpenXPKI::Server::Database::Driver::Oxitestdb';
-sub dbi_connect_params { private_Key => 'ToMyHeart' }
+sub dbi_attrs { private_Key => 'ToMyHeart' }
 
 package OpenXPKI::Server::Database::Driver::OxitestdbHashref;
 use Moose; extends 'OpenXPKI::Server::Database::Driver::Oxitestdb';
-sub dbi_connect_params { { private_Key => 'ToMyHeart' } }
+sub dbi_attrs { { private_Key => 'ToMyHeart' } }
 
 package OpenXPKI::Server::Database::Driver::OxitestdbArrayref;
 use Moose; extends 'OpenXPKI::Server::Database::Driver::Oxitestdb';
-sub dbi_connect_params { [] }
+sub dbi_attrs { [] }
 
 package main;
 
@@ -60,21 +60,21 @@ my $dbi;
 lives_ok { $dbi = OpenXPKI::Server::Database->new(
     log => $log, db_params => { type => "Oxitestdb", name => ":memory:" },
 ) } "driver Oxitestdb - dbi instance";
-lives_ok { $dbi->dbh } "driver Oxitestdb - process dbi_connect_params (undef)";
+lives_ok { $dbi->dbh } "driver Oxitestdb - process dbi_attrs (undef)";
 
 lives_ok { $dbi = OpenXPKI::Server::Database->new(
     log => $log, db_params => { type => "OxitestdbHashref", name => ":memory:" },
 ) } "driver OxitestdbHashref - dbi instance";
-lives_and { is $dbi->dbh->{private_Key}, 'ToMyHeart' } "driver OxitestdbHashref - process dbi_connect_params (HashRef)";
+lives_and { is $dbi->dbh->{private_Key}, 'ToMyHeart' } "driver OxitestdbHashref - process dbi_attrs (HashRef)";
 
 lives_ok { $dbi = OpenXPKI::Server::Database->new(
     log => $log, db_params => { type => "OxitestdbList", name => ":memory:" },
 ) } "driver OxitestdbList - dbi instance";
-lives_and { is $dbi->dbh->{private_Key}, 'ToMyHeart' } "driver OxitestdbList - process dbi_connect_params (list)";
+lives_and { is $dbi->dbh->{private_Key}, 'ToMyHeart' } "driver OxitestdbList - process dbi_attrs (list)";
 
 lives_ok { $dbi = OpenXPKI::Server::Database->new(
     log => $log, db_params => { type => "OxitestdbArrayref", name => ":memory:" },
 ) } "driver OxitestdbArrayref - dbi instance";
-throws_ok { $dbi->dbh } qr/dbi_connect_params/, "driver OxitestdbArrayref - complain about wrong dbi_connect_params";
+throws_ok { $dbi->dbh } qr/dbi_attrs/, "driver OxitestdbArrayref - complain about wrong dbi_attrs";
 
 done_testing;

@@ -32,7 +32,7 @@ requires 'dbi_driver';
 requires 'dbi_dsn';
 
 # Returns HashRef: optional parameters to pass to connect()
-requires 'dbi_connect_params';
+requires 'dbi_attrs';
 
 # May execute custom checks after the driver is instantiated
 requires 'perform_checks';
@@ -86,7 +86,7 @@ requires 'do_sql_replacements';
             $self->name,
         );
     }
-    sub dbi_connect_params { {} }      # Additional parameters for DBI's connect()
+    sub dbi_attrs { {} }               # Optional: additional attributes for DBI's connect()
     sub sqlam_params { {               # Parameters for SQL::Abstract::More
         limit_offset => 'FetchFirst',
     } }
@@ -183,8 +183,8 @@ C<*::Driver::>, case sensitive) in your configuration file.
 
 =head1 METHODS
 
-Please note that the following methods are implemented in the driver class that
-consumes this Moose role.
+Please note that the following methods must be implemented in a driver class
+consuming this role:
 
 =head2 dbi_driver
 
@@ -194,18 +194,18 @@ Returns the DBI compliant case sensitive driver name (I<Str>).
 
 Returns the DSN that is passed to L<DBI/connect> (I<Str>).
 
-=head2 dbi_connect_params
+=head2 dbi_attrs
 
-Returns optional parameters that are passed to L<DBI/connect> (I<HashRef>).
+May return additional attributes that are passed to L<DBI/connect> (via fourth argument) (I<HashRef>).
 
 =head2 dbi_on_connect_do
 
-Returns optional commands to be executed after connecting to the database
+May return commands to be executed after connecting to the database
 (I<ArrayRef> or I<Str>).
 
 =head2 sqlam_params
 
-Returns optional parameters that are passed to L<SQL::Abstract::More/new> (I<HashRef>).
+May return additional parameters that are passed to L<SQL::Abstract::More/new> (I<HashRef>).
 
 =head2 sequence_create_query
 

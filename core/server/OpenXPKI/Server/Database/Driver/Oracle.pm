@@ -35,7 +35,7 @@ sub dbi_dsn {
 }
 
 # Additional parameters for DBI's connect()
-sub dbi_connect_params { }
+sub dbi_attrs { }
 
 # Custom checks after driver instantiation
 sub perform_checks { }

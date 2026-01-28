@@ -31,7 +31,7 @@ sub dbi_dsn {
 }
 
 # Additional parameters for DBI's connect()
-sub dbi_connect_params {
+sub dbi_attrs {
     sqlite_unicode => 1,
     sqlite_use_immediate_transaction => 0,
 }

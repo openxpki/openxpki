@@ -44,7 +44,7 @@ sub dbi_dsn {
 }
 
 # Additional parameters for DBI's connect()
-sub dbi_connect_params {
+sub dbi_attrs {
     mysql_enable_utf8 => 1,
     mysql_auto_reconnect => 0, # taken from DBIx::Connector::Driver::mysql::_connect()
     mysql_bind_type_guessing => 0, # FIXME See https://github.com/openxpki/openxpki/issues/44

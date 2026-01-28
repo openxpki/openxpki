@@ -100,13 +100,9 @@ has 'sqlam' => ( # SQL query builder
     lazy => 1,
     default => sub {
         my $self = shift;
-        my @return = $self->driver->sqlam_params; # use array to get list context
         # tolerate different return values: undef, list, HashRef
         return SQL::Abstract::More->new(
-            $self->_driver_return_val_to_hash(
-                \@return,
-                ref($self->driver)."::sqlam_params",
-            )
+            $self->_driver_return_val_to_hash('sqlam_params'),
         );
     },
     # TODO Support Oracle 12c LIMIT syntax: OFFSET 4 ROWS FETCH NEXT 4 ROWS ONLY
@@ -222,23 +218,44 @@ sub _dbi_error_handler {
     );
 };
 
-sub _build_dbix_handler {
-    my $self = shift;
-    ##! 4: "DSN: ".$self->driver->dbi_dsn
-    ##! 4: "User: ".($self->driver->user // '(none)')
-    my %params = $self->_driver_return_val_to_hash(
-        [ $self->driver->dbi_connect_params ], # driver might return a list so we enforce list context
-        ref($self->driver)."::dbi_connect_params",
-    );
-    ##! 4: "Additional connect() attributes: " . join " | ", map { $_." = ".$params{$_} } keys %params
+sub _build_dbix_handler ($self) {
 
-    my %params_from_config;
-    if ($self->db_params->{driver} && ref $self->db_params->{driver} eq 'HASH') {
-        %params_from_config = %{$self->db_params->{driver}};
+    my %attrs = $self->_driver_return_val_to_hash('dbi_attrs');
+    my $dsn_extra;
+    my $attrs_from_config = {};
+
+    # Backwards compatibility to server DB config: option "driver"
+    if (my $driver = $self->db_params->{driver}) {
+        die "Database config: parameter 'database.xxx.driver' must be a mapping (keys + values)\n"
+            unless ref $driver eq 'HASH';
+        $attrs_from_config = $driver;
     }
 
+    # Additional DSN parameters and attributes
+    #     dbi:
+    #         dsn_extra:
+    #         attrs:
+    if (my $dbi = $self->db_params->{dbi}) {
+        if ($dsn_extra = $dbi->{dsn_extra}) {
+            die "Database config: parameter 'database.xxx.dbi.dsn_extra' must be a string\n"
+                if ref $dsn_extra;
+        }
+        # 4th parameter to DBI->connect($data_source, $user, $pass, $attrs)
+        if (my $attrs = $dbi->{attrs}) {
+            die "Database config: parameter 'database.xxx.dbi.attrs' must be a mapping (keys + values)\n"
+                unless ref $attrs eq 'HASH';
+            $attrs_from_config = $attrs;
+        }
+    }
+    my $dsn = join(';', $self->driver->dbi_dsn, $dsn_extra ? $dsn_extra : ());
+
+    ##! 4: "DSN: $dsn"
+    ##! 4: "User: ".($self->driver->user // '(none)')
+    ##! 4: "Additional connect() attributes from driver: " . join " | ", map { $_." = ".$attrs{$_} } keys %attrs
+    ##! 4: "Additional connect() attributes from config: " . join " | ", map { $_." = ".$attrs_from_config->{$_} } keys $attrs_from_config->%*
+
     my $dbix = DBIx::Handler->new(
-        $self->driver->dbi_dsn,
+        $dsn,
         $self->driver->user,
         $self->driver->passwd,
         {
@@ -256,9 +273,10 @@ sub _build_dbix_handler {
                 }
             },
             # AutoInactiveDestroy => 1, -- automatically set by DBIx::Handler
-            %params,
-            %params_from_config,
+            %attrs,
+            $attrs_from_config->%*,
         },
+        # hooks
         {
             on_connect_do => sub {
                 my $dbh = shift;
@@ -275,7 +293,7 @@ sub _build_dbix_handler {
 
     $self->driver->perform_checks($dbix->dbh);
 
-    ##! 32: 'DBIx Handle ' . Dumper $dbix
+    ##! 32: 'DBIx handle = ' . Dumper $dbix
 
     return $dbix;
 }
@@ -284,44 +302,59 @@ sub _build_dbix_handler {
 # Methods
 #
 
-sub _driver_return_val_to_hash {
-    my ($self, $params, $method) = @_;
-    my $normalized;
-    if (scalar @$params == 0) {             # undef
-        $normalized = {};
+# Tries to call the given method on the driver.
+# Returns:
+# - empty list if driver does not implement the given method
+# - otherwise the method is called and may return an empty list, a hash or a
+#   HashRef which are all normalized to a hash
+sub _driver_return_val_to_hash ($self, $method_name) {
+
+    my @values = $self->driver->$method_name; # driver might return a list so we enforce list context
+    my %normalized;
+
+    if (scalar @values == 0) {                                  # undef
+        %normalized = ();
     }
-    elsif (scalar @$params > 1) {           # list
-        $normalized = { @$params };
+    elsif (scalar @values > 1 and scalar @values % 2 == 0) {    # hash
+        %normalized = @values;
     }
-    elsif (ref $params->[0] eq 'HASH') {    # HashRef
-        $normalized = $params->[0];
+    elsif (scalar @values == 1 and ref $values[0] eq 'HASH') {  # HashRef
+        %normalized = $values[0]->%*;
     }
     else {
+        my $fullname = ref($self->driver)."::$method_name";
         OpenXPKI::Exception->throw (
-            message => "Faulty driver implementation: '$method' did not return undef, a HashRef or a plain hash (list)",
+            message => "Faulty driver implementation: '$fullname' did not return undef, a HashRef or a plain hash (list)",
         );
     }
-    return %$normalized;
+    return %normalized;
 }
 
-sub _driver_return_val_to_list {
-    my ($self, $params, $method) = @_;
-    my $normalized;
-    if (scalar @$params == 0) {             # undef
-        $normalized = [];
+# Tries to call the given method on the driver.
+# Returns:
+# - empty list if driver does not implement the given method
+# - otherwise the method is called and may return an empty list, a list or an
+#   ArrayRef which are all normalized to a list
+sub _driver_return_val_to_list ($self, $method_name) {
+
+    my @values = $self->driver->$method_name; # driver might return a list so we enforce list context
+    my @normalized;
+    if (scalar @values == 0) {                              # undef
+        @normalized = ();
     }
-    elsif (ref $params->[0] eq 'ARRAY') {   # ArrayRef
-        $normalized = $params->[0];
+    elsif (ref $values[0] eq 'ARRAY') {                     # ArrayRef
+        @normalized = $values[0]->@*;
     }
-    elsif (scalar(grep { /.+/ } map { ref } @$params) > 0) { # some elements are not scalars
+    elsif (scalar(grep { /.+/ } map { ref } @values) > 0) { # some elements are not scalars
+        my $fullname = ref($self->driver)."::$method_name";
         OpenXPKI::Exception->throw (
-            message => "Faulty driver implementation: '$method' did not return undef, an ArrayRef or a plain list",
+            message => "Faulty driver implementation: '$fullname' did not return undef, an ArrayRef or a plain list",
         );
     }
-    else {                                  # list of scalars (or single scalar)
-        $normalized = [ @$params ];
+    else {                                                  # list of scalars (or single scalar)
+        @normalized = @values;
     }
-    return @$normalized;
+    return @normalized;
 }
 
 # To remain fork safe DO NOT CACHE this (also do not convert into a lazy attribute).
