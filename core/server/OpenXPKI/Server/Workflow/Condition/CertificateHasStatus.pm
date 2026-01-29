@@ -26,7 +26,7 @@ sub _evaluate {
 
     my $expected_status = $self->param('expected_status');
     ##! 16: "Expected status " . $expected_status
-    if ($expected_status !~ /\A(ISSUED|REVOKED|CRL_ISSUANCE_PENDING|EXPIRED|VALID)\z/) {
+    if ($expected_status !~ /\A(ISSUED|REVOKED|CRL_ISSUANCE_PENDING|EXPIRED|VALID|REVOKED_OR_PENDING|UPCOMING)\z/) {
         configuration_error('certificate has status expected status missing or invalid');
     }
 
@@ -59,6 +59,16 @@ sub _evaluate {
         if ($cert->{notbefore} > time()) {
             CTX('log')->application()->debug("Cert status check failed: certificate is not yet valid");
             condition_error 'certificate is not yet valid';
+        }
+    } elsif ( $expected_status eq 'UPCOMING' && $cert->{status} eq 'ISSUED') {
+        if ($cert->{notbefore} <= time()) {
+            CTX('log')->application()->debug("Cert status check failed: certificate is already valid");
+            condition_error 'certificate is already valid';
+        }
+    } elsif ( $expected_status eq 'REVOKED_OR_PENDING') {
+        if ($cert->{status} ne 'REVOKED' && $cert->{status} ne 'CRL_ISSUANCE_PENDING') {
+            CTX('log')->application()->debug("Cert status check failed: ".$cert->{status}. " is not REVOKED or CRL_ISSUANCE_PENDING");
+            condition_error 'certificate is neither revoked nor pending';
         }
     } elsif ($cert->{status} ne $expected_status) {
         CTX('log')->application()->debug("Cert status check failed: ".$cert->{status}. " != ".$expected_status);
@@ -97,7 +107,8 @@ behaves as the status does not match but sends another verbose error.
 =item expected_status
 
 The status to check against, expects a single status word, possible values
-are ISSUED, REVOKED, CRL_ISSUANCE_PENDING, EXPIRED, VALID
+are ISSUED, EXPIRED, VALID, UPCOMING and
+REVOKED, CRL_ISSUANCE_PENDING or REVOKED_OR_PENDING
 
 =item cert_identifier
 

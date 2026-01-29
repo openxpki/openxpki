@@ -268,14 +268,17 @@ enum 'TokenType', [qw( certsign crlsign datasafe scep cmcra)];
 
 =head2 CertStatus
 
-Enumeration of certificate stati: I<ISSUED>, I<REVOKED>, I<CRL_ISSUANCE_PENDING>
-or I<VALID>, I<EXPIRED>.
+Enumeration of certificate status, basic states are
 
-Please note that in queries specifying a validity date the returned status can
-also be I<VALID>.
+I<ISSUED>, I<REVOKED>, I<CRL_ISSUANCE_PENDING>
+
+I<VALID>, I<EXPIRED>, I<UPCOMING> is I<ISSUED> plus validity evaluation.
+
+Search queries support I<REVOKED_OR_PENDING> as shortcut for
+I<REVOKED> or I<CRL_ISSUANCE_PENDING>.
 
 =cut
-enum 'CertStatus', [qw( ISSUED REVOKED CRL_ISSUANCE_PENDING EXPIRED VALID )];
+enum 'CertStatus', [qw( ISSUED REVOKED CRL_ISSUANCE_PENDING REVOKED_OR_PENDING UPCOMING VALID EXPIRED)];
 
 =head2 SerializationFormat
 

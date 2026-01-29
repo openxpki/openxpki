@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2025-05-02 14:44+0200\n"
+"PO-Revision-Date: 2026-01-29 15:11+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -363,7 +363,7 @@ msgid "I18N_OPENXPKI_UI_CERT_STATUS"
 msgstr "Certificate Status"
 
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_CRL_ISSUANCE_PENDING"
-msgstr "revocation pending"
+msgstr "Revocation Pending"
 
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_EXPIRED"
 msgstr "Expired"
@@ -377,8 +377,14 @@ msgstr "Revoked"
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_REVOKED_AT"
 msgstr "Revoked at"
 
+msgid "I18N_OPENXPKI_UI_CERT_STATUS_REVOKED_OR_PENDING"
+msgstr "Revoked or Pending"
+
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_UNKNOWN"
 msgstr "unknown"
+
+msgid "I18N_OPENXPKI_UI_CERT_STATUS_UPCOMING"
+msgstr "Upcoming"
 
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_VALID"
 msgstr "Valid"
@@ -1427,7 +1433,6 @@ msgstr "Enter the fully qualified hostname (domain name) of your system."
 msgid "I18N_OPENXPKI_UI_PROFILE_IMPORTED_LABEL"
 msgstr "Imported Certificate"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_LABEL"
 msgstr "IoT Device"
 
@@ -1921,6 +1926,12 @@ msgstr "Unable to check value against given backend"
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CONNECTOR_EXCEPTION"
 msgstr "An unknown error occured while talking to a backend system"
 
+msgid "I18N_OPENXPKI_UI_VALIDATOR_DATAPOOL_ENTRY_DOES_NOT_EXIST"
+msgstr "Datapool item does not exist"
+
+msgid "I18N_OPENXPKI_UI_VALIDATOR_DATAPOOL_ENTRY_EXIST"
+msgstr "Datapool item already  exist"
+
 msgid "I18N_OPENXPKI_UI_VALIDATOR_EMPTY_BUT_REQUIRED"
 msgstr "Required field is empty"
 
@@ -2039,6 +2050,12 @@ msgstr "Initialize"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_LABEL"
 msgstr "Initialize"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_ENDPOINT_DESC"
+msgstr "Select the enrollment endpoint you want to use this registration with."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_ENDPOINT_LABEL"
+msgstr "Select Enrollment Endpoint"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_RETYPE_SERVER_PASSWORD_DESC"
 msgstr ""

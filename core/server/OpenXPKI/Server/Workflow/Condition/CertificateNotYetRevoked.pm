@@ -31,6 +31,8 @@ sub evaluate {
 
     CTX('log')->application()->debug("Cert status is ".$cert->{status});
 
+    CTX('log')->deprecated()->error("The CertificateNotYetRevoked condition is deprecated, use CertificateHasStatus instead");
+
     ##! 16: 'status: ' . $cert->{'STATUS'}
     condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_NOT_YET_REVOKED_CERT_IN_STATE_CRL_ISSUANCE_PENDING'
         if ('CRL_ISSUANCE_PENDING' eq $cert->{status});

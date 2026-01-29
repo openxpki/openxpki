@@ -475,7 +475,15 @@ msgid "I18N_OPENXPKI_UI_CERT_STATUS_REVOKED_AT"
 msgstr "Отозван"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_STATUS_REVOKED_OR_PENDING"
+msgstr "Отозван"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_UNKNOWN"
+msgstr "Статус сертификата УЦ"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_STATUS_UPCOMING"
 msgstr "Статус сертификата УЦ"
 
 #, fuzzy
@@ -2604,6 +2612,14 @@ msgid "I18N_OPENXPKI_UI_VALIDATOR_CONNECTOR_EXCEPTION"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_DATAPOOL_ENTRY_DOES_NOT_EXIST"
+msgstr "SPKAC строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_DATAPOOL_ENTRY_EXIST"
+msgstr "Имя учетной записи"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_EMPTY_BUT_REQUIRED"
 msgstr "SPKAC-строка пуста."
 
@@ -2754,6 +2770,14 @@ msgstr "Запустить технологический процесс LDAP-п
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_LABEL"
 msgstr "Запустить технологический процесс LDAP-публикации сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_ENDPOINT_DESC"
+msgstr "Отклонить заявку на отзыв сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_ENDPOINT_LABEL"
+msgstr "Отклонить заявку на отзыв сертификата"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_RETYPE_SERVER_PASSWORD_DESC"

@@ -50,12 +50,12 @@ OpenXPKI::Server::Workflow::Condition::CertificateHasProfile
 =head1 DESCRIPTION
 
 The condition checks if the certificate identified by cert_identifier
-has the profile given in the parameter expected_profile. Certificatea are
+has the profile given in the parameter expected_profile. Certificates are
 checked over all realms.
 
 =head1 Configuration
 
-    is_tls_serveR_profile:
+    is_tls_server_profile:
         class: OpenXPKI::Server::Workflow::Condition::CertificateHasProfile
         param:
           expected_profile: tls-server

@@ -29,7 +29,7 @@ our %FORMAT_MAP = (
     deflist => { type => 'array' },
     cert_info => { _hint => 'if prefixed with "OXJSF1:" it is a JSON string.', },
     # FIXME: use enum from OpenXPKI::Types
-    certstatus => { type => 'string', enum => [ qw( ISSUED REVOKED CRL_ISSUANCE_PENDING EXPIRED ) ] },
+    certstatus => { type => 'string', enum => [ qw( ISSUED REVOKED CRL_ISSUANCE_PENDING EXPIRED VALID REVOKED_OR_PENDING UPCOMING ) ] },
 );
 
 our %TYPE_MAP = (

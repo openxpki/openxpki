@@ -112,8 +112,10 @@ sub init_search ($self, $args = {}) {
         { label => 'I18N_OPENXPKI_UI_CERT_STATUS_ISSUED', value => 'ISSUED'},
         { label => 'I18N_OPENXPKI_UI_CERT_STATUS_VALID', value => 'VALID'},
         { label => 'I18N_OPENXPKI_UI_CERT_STATUS_EXPIRED', value => 'EXPIRED'},
+        { label => 'I18N_OPENXPKI_UI_CERT_STATUS_UPCOMING', value => 'UPCOMING'},
         { label => 'I18N_OPENXPKI_UI_CERT_STATUS_REVOKED', value => 'REVOKED'},
         { label => 'I18N_OPENXPKI_UI_CERT_STATUS_CRL_ISSUANCE_PENDING', value => 'CRL_ISSUANCE_PENDING'},
+        { label => 'I18N_OPENXPKI_UI_CERT_STATUS_REVOKED_OR_PENDING', value => 'REVOKED_OR_PENDING'},
     );
 
     my $preset;
@@ -734,8 +736,6 @@ sub init_detail ($self, $args = {}) {
             { label => 'I18N_OPENXPKI_UI_CERTIFICATE_METADATA', value => \@metadata_lines, format => "rawlist" },
         ) if (scalar @metadata_lines);
     }->();
-
-    # for i18n parser I18N_OPENXPKI_CERT_ISSUED CRL_ISSUANCE_PENDING I18N_OPENXPKI_CERT_REVOKED I18N_OPENXPKI_CERT_EXPIRED
 
     # was in info, bullet list for downloads
     my $base =  $self->script_url . "?page=certificate!download!identifier!$cert_identifier!format!";
