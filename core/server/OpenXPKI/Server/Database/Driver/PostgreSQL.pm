@@ -22,18 +22,39 @@ OpenXPKI::Server::Database::Driver::PostgreSQL - Driver for PostgreSQL databases
 sub dbi_driver { 'Pg' }
 
 # DSN string including all parameters.
-sub dbi_dsn {
-    my $self = shift;
-    # map DBI parameter names to our object attributes
+sub dbi_dsn ($self) {
     my %args = (
-        sslmode => 'allow',
         database => $self->name,
         host => $self->host,
         port => $self->port,
     );
+
+    # TLS
+    if ($self->tls_enabled) {
+        $args{sslmode} = $self->tls_verify_hostname ? 'verify-full' : 'verify-ca';
+        # either use specified CA cert file
+        if ($self->tls_ca_file) {
+            $args{sslrootcert} = $self->tls_ca_file;
+        # or (via OpenSSL)
+        } else {
+            # If sslmode=verify-ca then libpq would fail with:
+            # > weak sslmode "verify-ca" may not be used with sslrootcert=system (use "verify-full")
+            # We fail earlier here to provide an OpenXPKI-specific error message.
+            die "PostgreSQL requires 'tls.verify_hostname' except if you specify 'tls.ca_file'\n"
+                if not $self->tls_verify_hostname;
+            # a) use system cert dir
+            $args{sslrootcert} = 'system';
+            # b) use specified cert dir
+            $ENV{SSL_CERT_DIR} = $self->tls_ca_dir if $self->tls_ca_dir; # OpenSSL reads SSL_CERT_DIR
+        }
+    } elsif (not $self->has_tls_enabled) {
+        # backwards compatibility: before v3.34 the default was 'sslmode=allow'
+        $args{sslmode} = 'allow';
+    }
+
     return sprintf("dbi:%s:%s",
         $self->dbi_driver,
-        join(";", map { "$_=$args{$_}" } grep { defined $args{$_} } keys %args), # only add defined attributes
+        join(";", map { "$_=$args{$_}" } grep { defined $args{$_} } sort keys %args), # only add defined attributes
     );
 }
 

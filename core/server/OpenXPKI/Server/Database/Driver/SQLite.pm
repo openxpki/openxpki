@@ -24,6 +24,10 @@ sub dbi_driver { 'SQLite' }
 # DSN string including all parameters.
 sub dbi_dsn {
     my $self = shift;
+
+    die "Database driver 'SQLite': SSL connection not supported. Please set 'tls.enabled: 0'\n"
+        if $self->tls_enabled;
+
     return sprintf("dbi:%s:dbname=%s",
         $self->dbi_driver,
         $self->name,

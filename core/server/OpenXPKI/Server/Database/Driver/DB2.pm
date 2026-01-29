@@ -24,6 +24,10 @@ sub dbi_driver { 'DB2' }
 # DSN string including all parameters.
 sub dbi_dsn {
     my $self = shift;
+
+    die "Database driver 'DB2': SSL connection must be done externally via DB2 client configuration. Please set 'tls.enabled: 0'\n"
+        if $self->tls_enabled;
+
     return sprintf("dbi:%s:dbname=%s",
         $self->dbi_driver,
         $self->name,

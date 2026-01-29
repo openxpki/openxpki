@@ -39,17 +39,23 @@ sub dbi_dsn {
     );
     return sprintf("dbi:%s:%s",
         $self->dbi_driver,
-        join(";", map { "$_=$args{$_}" } grep { defined $args{$_} } keys %args), # only add defined attributes
+        join(";", map { "$_=$args{$_}" } grep { defined $args{$_} } sort keys %args), # only add defined attributes
     );
 }
 
 # Additional parameters for DBI's connect()
-sub dbi_attrs {
-    mysql_enable_utf8 => 1,
-    mysql_auto_reconnect => 0, # taken from DBIx::Connector::Driver::mysql::_connect()
-    mysql_bind_type_guessing => 0, # FIXME See https://github.com/openxpki/openxpki/issues/44
-}
+sub dbi_attrs ($self) {
+    my %attrs = (
+        mysql_enable_utf8 => 1,
+        mysql_auto_reconnect => 0, # taken from DBIx::Connector::Driver::mysql::_connect()
+        mysql_bind_type_guessing => 0, # FIXME See https://github.com/openxpki/openxpki/issues/44
+    );
 
+    die "Database driver 'MariaDB': SSL connection is not (yet) supported\n"
+        if $self->tls_enabled;
+
+    return %attrs;
+}
 
 # Custom checks after driver instantiation
 sub perform_checks {
@@ -141,7 +147,7 @@ __PACKAGE__->meta->make_immutable;
 
 =head1 Description
 
-Driver for MariaDB servers based on DBD::mysql client library.
+Legacy driver for MariaDB servers based on L<DBD::mysql> client library.
 
 Requires MariaDB >= 10.3.
 

@@ -151,6 +151,44 @@ sub _build_driver {
         delete $args{$_} unless defined $args{$_};
     }
 
+    # TLS configuration
+    #     tls:
+    #         enabled: 1 | 0
+    #         verify_hostname: 1 | 0
+    #         ca_file: /path/to/pem
+    #         ca_dir: /path/to/pemdir
+
+    # Backwards compatibility to server DB config: option "driver"
+    if (my $tls = delete $args{tls}) {
+        die "Database config: parameter 'tls' must be a mapping (keys + values)\n"
+            unless ref $tls eq 'HASH';
+        if ($tls->{enabled}) {
+            $args{tls_enabled} = 1;
+
+            my $ca_file = $tls->{ca_file};
+            my $ca_dir = $tls->{ca_dir};
+
+            die "Database config: 'tls.ca_file' and 'tls.ca_dir' are mutually exclusive\n"
+                if ($ca_file and $ca_dir);
+
+            if ($ca_file) {
+                die "Database config: specified 'tls.ca_file' does not exist\n"
+                    unless -e $ca_file;
+                $args{tls_ca_file} = $ca_file;
+            } elsif ($ca_dir) {
+                die "Database config: specified 'tls.ca_dir' does not exist or is no directory\n"
+                    unless -d $ca_dir;
+                $args{tls_ca_dir} = $ca_dir;
+            }
+
+            $args{tls_verify_hostname} = $tls->{verify_hostname} ? 1 : 0 if defined $tls->{verify_hostname};
+        # Explicitely set "tls_enabled" to 0 so drivers can distinct between "off"
+        # and "default" / option not given (PostgreSQL backwards compatibility).
+        } elsif (defined $tls->{enabled}) {
+            $args{tls_enabled} = 0;
+        }
+    }
+
     my $driver = $args{type};
     OpenXPKI::Exception->throw (
         message => "Parameter 'type' missing: it must equal the last part of a package in the OpenXPKI::Server::Database::Driver::* namespace.",

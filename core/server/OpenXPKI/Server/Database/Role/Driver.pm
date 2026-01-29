@@ -13,13 +13,18 @@ has to consume
 #
 
 # Standardize some connection parameters names for all drivers
-has 'name'         => ( is => 'ro', isa => 'Str', required => 1 );
-has 'namespace'    => ( is => 'ro', isa => 'Str' );    # = schema
-has 'host'         => ( is => 'ro', isa => 'Str' );
-has 'port'         => ( is => 'ro', isa => 'Int' );
-has 'user'         => ( is => 'ro', isa => 'Str' );
-has 'passwd'       => ( is => 'ro', isa => 'Str' );
-has 'lock_timeout' => ( is => 'ro', isa => 'Int', default => 5 ); # in seconds
+has 'name'          => ( is => 'ro', isa => 'Str', required => 1 );
+has 'namespace'     => ( is => 'ro', isa => 'Str' );    # = schema
+has 'host'          => ( is => 'ro', isa => 'Str' );
+has 'port'          => ( is => 'ro', isa => 'Int' );
+has 'user'          => ( is => 'ro', isa => 'Str' );
+has 'passwd'        => ( is => 'ro', isa => 'Str' );
+has 'lock_timeout'  => ( is => 'ro', isa => 'Int', default => 5 ); # in seconds
+
+has 'tls_enabled'   => ( is => 'ro', isa => 'Bool', predicate => 'has_tls_enabled' );
+has 'tls_ca_file'   => ( is => 'ro', isa => 'Str' );
+has 'tls_ca_dir'    => ( is => 'ro', isa => 'Str' );
+has 'tls_verify_hostname' => ( is => 'ro', isa => 'Bool', default => 1 );
 
 ################################################################################
 # Required in drivers classes that consume this role

@@ -39,17 +39,29 @@ sub dbi_dsn {
     );
     return sprintf("dbi:%s:%s",
         $self->dbi_driver,
-        join(";", map { "$_=$args{$_}" } grep { defined $args{$_} } keys %args), # only add defined attributes
+        join(";", map { "$_=$args{$_}" } grep { defined $args{$_} } sort keys %args), # only add defined attributes
     );
 }
 
 # Additional parameters for DBI's connect()
-sub dbi_attrs {
-    # mysql_enable_utf8 => 1,  # not necessary with MariaDB
-    mariadb_auto_reconnect => 0, # taken from DBIx::Connector::Driver::mysql::_connect()
-    mariadb_bind_type_guessing => 0, # FIXME See https://github.com/openxpki/openxpki/issues/44
-}
+sub dbi_attrs ($self) {
+    my %attrs = (
+        mariadb_auto_reconnect => 0, # taken from DBIx::Connector::Driver::mysql::_connect()
+        mariadb_bind_type_guessing => 0, # FIXME See https://github.com/openxpki/openxpki/issues/44
+    );
 
+    die "MariaDB2 requires 'tls.verify_hostname: 0' because system cert store is used, i.e. no 'tls.ca_file' or 'tls.ca_dir' was given\n"
+        if ($self->tls_verify_hostname and not ($self->tls_ca_file or $self->tls_ca_dir));
+
+    # TLS
+    $attrs{mariadb_ssl} = 1                             if $self->tls_enabled;
+    $attrs{mariadb_ssl_ca_file} = $self->tls_ca_file    if $self->tls_ca_file;
+    # ssl_ca_path is only supported for if MariaDB client libs use OpenSSL (true for RHEL)
+    $attrs{mariadb_ssl_ca_path} = $self->tls_ca_dir     if $self->tls_ca_dir;
+    $attrs{mariadb_ssl_verify_server_cert} = 1          if $self->tls_verify_hostname;
+
+    return %attrs;
+}
 
 # Custom checks after driver instantiation
 sub perform_checks {
@@ -141,12 +153,12 @@ __PACKAGE__->meta->make_immutable;
 
 =head1 Description
 
-Driver for MariaDB servers based on DBD::MariaDB client library.
+Driver for MariaDB servers based on L<DBD::MariaDB> client library.
 
 Requires MariaDB >= 10.3.
 
-Does B<not> work on debian buster due to a bug in DBD::MariaDB v1.11
-client library, use the MariaDB class with the old mysql lib instead.
+Does B<not> work on Debian Buster due to a bug in L<DBD::MariaDB> v1.11
+client library - please use the C<MariaDB> driver with the old mysql lib instead.
 
 This class is not meant to be instantiated directly.
 Use L<OpenXPKI::Server::Database/new> instead.

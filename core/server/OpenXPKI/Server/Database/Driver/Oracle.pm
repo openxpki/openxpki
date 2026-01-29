@@ -24,6 +24,9 @@ sub dbi_driver { 'Oracle' };
 sub dbi_dsn {
     my $self = shift;
 
+    die "Database driver 'Oracle': SSL connection must be done externally (sqlnet.ora and tnsnames.ora). Please set 'tls.enabled: 0'\n"
+        if $self->tls_enabled;
+
     # Tell Oracle that the client character set is UTF8
     # (assuming that all data that we send is already UTF8 encoded)
     $ENV{"NLS_LANG"} = '.AL32UTF8' unless(defined $ENV{"NLS_LANG"});
