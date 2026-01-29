@@ -61,7 +61,6 @@ Extra columns available with the default schema are:
     revocation_time
     reason_code
     invalidity_time
-    reason_code
     req_key
     data
 
@@ -352,7 +351,15 @@ sub _make_db_query {
         $where->{'certificate.status'} = 'ISSUED';
         $notafter->greater_than(time());
         $notbefore->smaller_than(time());
+    } elsif ($po->has_status and $po->status eq 'UPCOMING') {
+        $po->clear_status;
+        $where->{'certificate.status'} = 'ISSUED';
+        $notbefore->greater_than(time());
+    } elsif ($po->has_status and $po->status eq 'REVOKED_OR_PENDING') {
+        $po->clear_status;
+        $where->{'certificate.status'} = ['REVOKED','CRL_ISSUANCE_PENDING']
     }
+
 
     $where->{'certificate.identifier'}                = $po->identifier                 if $po->has_identifier;
     $where->{'certificate.issuer_identifier'}         = $po->issuer_identifier          if $po->has_issuer_identifier;

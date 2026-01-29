@@ -396,8 +396,16 @@ msgstr "已吊销"
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_REVOKED_AT"
 msgstr "吊销于"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_STATUS_REVOKED_OR_PENDING"
+msgstr "已吊销"
+
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_UNKNOWN"
 msgstr "未知"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_STATUS_UPCOMING"
+msgstr "即将到来"
 
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_VALID"
 msgstr "有效"
@@ -2112,6 +2120,15 @@ msgstr "无法根据给定的后端检查值"
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CONNECTOR_EXCEPTION"
 msgstr "无法根据给定的后端检查值"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_DATAPOOL_ENTRY_DOES_NOT_EXIST"
+msgstr "证书不是实体证书。"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_DATAPOOL_ENTRY_EXIST"
+msgstr "密钥"
+
 msgid "I18N_OPENXPKI_UI_VALIDATOR_EMPTY_BUT_REQUIRED"
 msgstr "必填字段为空"
 
@@ -2231,6 +2248,14 @@ msgstr "初始化"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_LABEL"
 msgstr "初始化"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_ENDPOINT_DESC"
+msgstr "拒绝此吊销请求。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_ENDPOINT_LABEL"
+msgstr "睡眠中"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_RETYPE_SERVER_PASSWORD_DESC"

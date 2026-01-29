@@ -133,6 +133,16 @@ command "get_cert_statistic" => {
     );
     $result->{total_expired} = sprintf "%01d", $tuple->{amount} + 0;
 
+    # Upcoming
+    $tuple = $db->select_one(%base_query,
+        columns  => [ 'COUNT(identifier)|amount' ],
+        where => {
+            %base_conditions,
+            status => 'ISSUED',
+            notbefore => { '>' => $valid_at },
+        }
+    );
+    $result->{total_upcoming} = sprintf "%01d", $tuple->{amount} + 0;
 
     # Valid
     $tuple = $db->select_one(%base_query,

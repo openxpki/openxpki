@@ -465,8 +465,16 @@ msgid "I18N_OPENXPKI_UI_CERT_STATUS_REVOKED_AT"
 msgstr "Revocato"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_STATUS_REVOKED_OR_PENDING"
+msgstr "Revocato"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_UNKNOWN"
 msgstr "sconosciuto"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_STATUS_UPCOMING"
+msgstr "in arrivo"
 
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_VALID"
 msgstr "Valido"
@@ -2400,6 +2408,15 @@ msgid "I18N_OPENXPKI_UI_VALIDATOR_CONNECTOR_EXCEPTION"
 msgstr "Fallita convalida dell’espressione data"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_DATAPOOL_ENTRY_DOES_NOT_EXIST"
+msgstr "Certificato non è di tipo entity."
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_DATAPOOL_ENTRY_EXIST"
+msgstr "Chiave"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_EMPTY_BUT_REQUIRED"
 msgstr "Uno o più campi Soggetto contengono errori."
 
@@ -2549,6 +2566,14 @@ msgstr "Inizializza"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_LABEL"
 msgstr "Inizializza"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_ENDPOINT_DESC"
+msgstr "Respingi questa richiesta di revoca."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_ENDPOINT_LABEL"
+msgstr "Termina Workflow"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_RETYPE_SERVER_PASSWORD_DESC"

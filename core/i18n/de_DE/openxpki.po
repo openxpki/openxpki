@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2025-05-16 12:52+0200\n"
+"PO-Revision-Date: 2026-01-29 15:14+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -375,8 +375,14 @@ msgstr "gesperrt"
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_REVOKED_AT"
 msgstr "gesperrt um"
 
+msgid "I18N_OPENXPKI_UI_CERT_STATUS_REVOKED_OR_PENDING"
+msgstr "gesperrt oder Sperrung ausstehend"
+
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_UNKNOWN"
 msgstr "unbekannt"
+
+msgid "I18N_OPENXPKI_UI_CERT_STATUS_UPCOMING"
+msgstr "zukünftig"
 
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_VALID"
 msgstr "gültig"
@@ -1431,7 +1437,6 @@ msgstr "Geben Sie bitte den FQDN (Hostname) des Systems an."
 msgid "I18N_OPENXPKI_UI_PROFILE_IMPORTED_LABEL"
 msgstr "Importiertes Zertifikat"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_LABEL"
 msgstr "IoT Geräte"
 
@@ -1935,6 +1940,12 @@ msgid "I18N_OPENXPKI_UI_VALIDATOR_CONNECTOR_EXCEPTION"
 msgstr ""
 "Bei der Kommunikation mit einem externen System ist ein Fehler aufgetreten"
 
+msgid "I18N_OPENXPKI_UI_VALIDATOR_DATAPOOL_ENTRY_DOES_NOT_EXIST"
+msgstr "Datapool Eintrag existiert nicht"
+
+msgid "I18N_OPENXPKI_UI_VALIDATOR_DATAPOOL_ENTRY_EXIST"
+msgstr "Datapool Eintrag bereits vorhanden"
+
 msgid "I18N_OPENXPKI_UI_VALIDATOR_EMPTY_BUT_REQUIRED"
 msgstr ""
 "Dieses Feld erfordert die Angabe eines Wertes. Bitte stellen Sie sicher, "
@@ -2056,6 +2067,13 @@ msgstr "Initialize"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_LABEL"
 msgstr "Initialize"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_ENDPOINT_DESC"
+msgstr ""
+"Geben Sie den Endpunkt an, für den diese Registrierung verwendet werden soll."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_ENDPOINT_LABEL"
+msgstr "Endpunkt auswählen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_RETYPE_SERVER_PASSWORD_DESC"
 msgstr ""

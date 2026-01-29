@@ -373,8 +373,16 @@ msgstr "失効済み"
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_REVOKED_AT"
 msgstr "失効済み"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_STATUS_REVOKED_OR_PENDING"
+msgstr "失効済み"
+
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_UNKNOWN"
 msgstr "不明"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_STATUS_UPCOMING"
+msgstr "有効日前"
 
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_VALID"
 msgstr "有効"
@@ -1915,6 +1923,14 @@ msgstr "指定された内容に対して値を確認できません"
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CONNECTOR_EXCEPTION"
 msgstr "バックエンドシステムとの通信中に不明なエラーが発生しました"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_DATAPOOL_ENTRY_DOES_NOT_EXIST"
+msgstr "証明書は実在の証明書ではありません。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_DATAPOOL_ENTRY_EXIST"
+msgstr "暗号化"
+
 msgid "I18N_OPENXPKI_UI_VALIDATOR_EMPTY_BUT_REQUIRED"
 msgstr "必須項目が空です。"
 
@@ -2036,6 +2052,18 @@ msgstr "初期化する"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_LABEL"
 msgstr "初期化する"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_ENDPOINT_DESC"
+msgstr ""
+"Type the certificate identifier or use the autosearch function to find the "
+"certificate you want to renew. If you can not find/identify your certificate "
+"please select certificate search from the main menu. The result list will "
+"contain a link to change the metadata."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_ENDPOINT_LABEL"
+msgstr "証明書更新"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_RETYPE_SERVER_PASSWORD_DESC"
 msgstr ""
