@@ -46,7 +46,7 @@ sub execute
         my %hash = $dn->get_hashed_content();
         $query->{subject} = 'CN='.$hash{CN}[0].',%';
     } else {
-        $query->{subject} = $cert_subject.'%';
+        $query->{subject} = $cert_subject;
     }
 
     if (my $renewal = $self->param('allow_renewal_period')) {
