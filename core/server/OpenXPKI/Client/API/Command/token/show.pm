@@ -15,7 +15,7 @@ OpenXPKI::Client::API::Command::token::show
 
 =head1 DESCRIPTION
 
-Show the alias for a given alias name
+Show details of the token for the given alias.
 
 =cut
 
@@ -23,6 +23,7 @@ command "show" => {
     alias => { isa => 'Str', 'label' => 'Alias', required => 1 },
     key => { isa => 'Bool', 'label' => 'Show key details', default => 0 },
     cert => { isa => 'Bool', 'label' => 'Show certificate details', default => 0 },
+    status => { isa => 'Bool', 'label' => 'Show status of key online test', default => 0 },
 } => sub ($self, $param) {
 
     my $alias = $param->alias;
@@ -35,6 +36,11 @@ command "show" => {
     if ($param->key) {
         my $token = $self->run_command('get_token_info', { alias => $alias } );
         map { $info->{$_} = $token->param($_); } qw( key_name key_store key_engine );
+    }
+
+    if ($param->status) {
+        my $status = $self->run_command('is_token_usable', { alias => $alias } );
+        $info->{'key_status'} = ($status->result ? 'online' : 'unknown');
     }
 
     if ($param->cert) {

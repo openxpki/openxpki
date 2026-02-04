@@ -11,11 +11,17 @@ OpenXPKI::Client::API::Command::cli::show
 
 =head1 DESCRIPTION
 
-Show information related to connection and authentication of this client
+Show information related to connection and authentication of this client.
+
+Tries to connect to the backend. If an authentication key is found, the public
+key and key identifier are printed and the key is used to connect.
+
+If the I<pubkey> flag is given, only prints the public key.
 
 =cut
 
 command "show" => {
+    pubkey => { isa => 'Bool', label => 'Output public key only' },
 } => sub ($self, $param) {
 
     # accessing internals via rawapi
@@ -31,6 +37,21 @@ command "show" => {
         $res->{account_id} = $pk->export_key_jwk_thumbprint('SHA256');
         $res->{account_key} = $pk->export_key_pem('public');
     }
+
+    # keyout only
+    if ($param->pubkey) {
+        # keyout requested but no key found
+        die "export of key request but no key found\n" unless ($res->{account_key});
+        return $res->{account_key};
+    }
+
+    try {
+        my $ping = $self->run_enquiry('ping');
+        $res->{ping} = $ping->result() if (blessed $ping);
+    } catch($err) {
+        $res->{ping} = "failed ($err)";
+    }
+
     return $res;
 
 };
