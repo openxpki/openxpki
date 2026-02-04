@@ -140,7 +140,7 @@ my %opt = ('verbose' => \$verbose);
 # pass_through: anything unknown, ambiguous or invalid will be passed through to @ARGV
 Getopt::Long::Configure('pass_through','bundling');
 
-GetOptions( \%opt, ('verbose|v+','json','json-pretty','auth-key|k=s','auth-config|c=s','pass|p:s','no-auth','socket=s','help','version|V'));
+GetOptions( \%opt, ('verbose|v+','json','json-pretty','auth-key|k=s','auth-config|c=s','pass|p:s','no-auth','socket=s','out|o=s','help','version|V'));
 
 if ($opt{version}) {
     if (!Mojo::Loader::load_class('OpenXPKI::Enterprise::VERSION')) {
@@ -352,18 +352,28 @@ if ($res->state == 200) {
     if (blessed $out) {
         $out = $out->params();
     }
+
+    # redirect output if needed
+    my $outfile = $opt{out} || '/dev/stdout';
+    open(OUT, '>', $outfile) || die "unable to write to outfile at $outfile\n";
+
+    # output plain strings as is and ignore format flags
     if (ref $out eq '')  {
         $out = OpenXPKI::i18n::i18nTokenizer($out);
-    } else {
-        $out = OpenXPKI::i18n::i18n_walk($out);
+        chomp $out;
+        say OUT $out;
+        exit 0;
     }
+
+    # run i18 translater on structure
+    $out = OpenXPKI::i18n::i18n_walk($out);
     if ($opt{'json-pretty'}) {
-        print $json->pretty()->encode($out);
+        print OUT $json->pretty()->encode($out);
     } elsif ($opt{'json'}) {
-        print $json->encode($out);
+        print OUT $json->encode($out);
     } else {
         my $ypp = YAML::PP->new( schema => [qw/ + Perl tags=!perl / ]);
-        print $ypp->dump_string($out);
+        print OUT $ypp->dump_string($out);
     }
     exit 0;
 
@@ -410,6 +420,10 @@ Print output data as compact JSON structure.
 =item --json-pretty
 
 Print output data as formated JSON structure.
+
+=item --out|o
+
+Redirect the output to the given file.
 
 =item --auth-config|-c
 

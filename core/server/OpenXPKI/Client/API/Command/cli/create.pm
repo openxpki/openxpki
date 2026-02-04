@@ -26,23 +26,40 @@ Add the public key to the system configuration at I<system.cli.auth>.
 =cut
 
 command "create" => {
+    nopass => { isa => 'Bool', label => 'Store key unencrypted' },
+    stdin =>  { isa => 'Bool', label => 'Read the password from stdin' },
+    keyout => { isa => 'Bool', label => 'Output private key only' },
 } => sub ($self, $param) {
 
-    my $pass = main::read_password("Please enter password to encrypt the key (empty to skip):");
-    if ($pass) {
+    my $pass;
+
+    if ($param->stdin) {
+        $pass = <STDIN>;
         chomp $pass;
-        my $retype = main::read_password("Please retype password:");
-        chomp $retype;
-        if ($retype ne $pass) {
-            die "Given passwords do not match";
+        die "no password was found on stdin\n" unless($pass);
+    } elsif ($param->nopass) {
+        $self->log->warn('generating key without password');
+    } else {
+        $pass = main::read_password("Please enter password to encrypt the key (empty to skip):");
+        if ($pass) {
+            chomp $pass;
+            my $retype = main::read_password("Please retype password:");
+            chomp $retype;
+            die "Given passwords do not match\n" unless ($retype eq $pass);
         }
     }
 
     #Key generation
     my $pk = Crypt::PK::ECC->new();
     $pk->generate_key('secp256r1');
+
+    # return private key only
+    return $pk->export_key_pem('private', $pass)
+        if ($param->keyout);
+
+    # return structure
     return {
-        private => $pk->export_key_pem('private',$pass),
+        private => $pk->export_key_pem('private', $pass),
         public  => $pk->export_key_pem('public'),
         id => $pk->export_key_jwk_thumbprint('SHA256'),
     };
