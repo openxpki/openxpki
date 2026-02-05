@@ -4,7 +4,7 @@ After=network.target apache2.service openxpki-serverd.service
 Requires=openxpki-serverd.service
 
 [Service]
-type=notify
+Type=notify
 NotifyAccess=main
 TimeoutStartSec=30s
 PIDFile=/run/openxpki-clientd/openxpki-clientd.pid
