@@ -50,15 +50,17 @@ sub dbi_attrs ($self) {
         mariadb_bind_type_guessing => 0, # FIXME See https://github.com/openxpki/openxpki/issues/44
     );
 
-    die "MariaDB2 requires 'tls.verify_hostname: 0' because system cert store is used, i.e. no 'tls.ca_file' or 'tls.ca_dir' was given\n"
-        if ($self->tls_verify_hostname and not ($self->tls_ca_file or $self->tls_ca_dir));
-
     # TLS
-    $attrs{mariadb_ssl} = 1                             if $self->tls_enabled;
-    $attrs{mariadb_ssl_ca_file} = $self->tls_ca_file    if $self->tls_ca_file;
-    # ssl_ca_path is only supported for if MariaDB client libs use OpenSSL (true for RHEL)
-    $attrs{mariadb_ssl_ca_path} = $self->tls_ca_dir     if $self->tls_ca_dir;
-    $attrs{mariadb_ssl_verify_server_cert} = 1          if $self->tls_verify_hostname;
+    if ($self->tls_enabled) {
+        die "MariaDB2 requires 'tls.verify_hostname: 0' because system cert store is used, i.e. no 'tls.ca_file' or 'tls.ca_dir' was given\n"
+            if ($self->tls_verify_hostname and not ($self->tls_ca_file or $self->tls_ca_dir));
+
+        $attrs{mariadb_ssl} = 1;
+        $attrs{mariadb_ssl_ca_file} = $self->tls_ca_file    if $self->tls_ca_file;
+        # ssl_ca_path is only supported for if MariaDB client libs use OpenSSL (true for RHEL)
+        $attrs{mariadb_ssl_ca_path} = $self->tls_ca_dir     if $self->tls_ca_dir;
+        $attrs{mariadb_ssl_verify_server_cert} = 1          if $self->tls_verify_hostname;
+    }
 
     return %attrs;
 }
