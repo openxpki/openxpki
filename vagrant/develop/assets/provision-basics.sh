@@ -23,9 +23,6 @@ while read def; do export $def; done < /etc/environment
 echo "Apt - update package list"
 apt-get update >$LOG 2>&1
 
-kernel=$(uname -r)
-kernel_base=$(printf '%s\n' "${kernel%%-amd64}")
-
 # libzip-dev - for Net::SSLeay
 # libexpat1-dev - for XML::Parser
 # linux-headers-amd64 - required to compile guest addons using "vagrant vbguest" (on the host)
@@ -34,17 +31,24 @@ install_packages mc rsync gettext \
   nginx \
   libssl-dev libzip-dev libexpat1-dev \
   libtest-deep-perl libtest-exception-perl \
-  linux-headers-${kernel} linux-headers-${kernel_base}-common \
+  linux-headers-amd64 \
   build-essential curl
+
+systemctl disable nginx >$LOG 2>&1
+systemctl stop nginx >$LOG 2>&1
+systemctl start apache2 >$LOG 2>&1
 
 echo "Apt - upgrade"
 apt-get upgrade --assume-yes --with-new-pkgs >$LOG 2>&1
 
-systemctl stop unattended-upgrades >$LOG 2>&1
-apt-get purge -y unattended-upgrades >$LOG 2>&1
+if systemctl cat unattended-upgrades >/dev/null 2>&1; then
+    echo "Apt - disable unattended-upgrades"
+    systemctl stop unattended-upgrades >$LOG 2>&1
+    apt-get purge -y unattended-upgrades >$LOG 2>&1
+fi
 
 # yq
 VERSION=v4.50.1
 PLATFORM=linux_amd64
-wget https://github.com/mikefarah/yq/releases/download/${VERSION}/yq_${PLATFORM} -O /usr/local/bin/yq && \
+wget -q https://github.com/mikefarah/yq/releases/download/${VERSION}/yq_${PLATFORM} -O /usr/local/bin/yq && \
     chmod +x /usr/local/bin/yq
