@@ -202,9 +202,7 @@ sub cmd_start ($self) {
 
         my $directory = dirname($socket_file);
         unless (-d $directory) {
-            mkdir($directory, 0755) or do {
-                die "unable to create socket directory: $!\n";
-            };
+            mkdir($directory, 0755) or die "Unable to create socket directory: $!\n";
             ##! 32: 'created socket directory ' . $directory
         }
 
