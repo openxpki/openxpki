@@ -4599,5 +4599,8 @@ msgstr "Wake Up"
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "Yes"
 
+#~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_NOT_TRUSTED"
+#~ msgstr "Signer certificate is not trusted."
+
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_UNKNOWN_TYPE"
 #~ msgstr "Cannot initiate workflow: type unknown"

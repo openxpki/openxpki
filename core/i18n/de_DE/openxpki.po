@@ -4684,5 +4684,8 @@ msgstr "aufwecken"
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "ja"
 
+#~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_NOT_TRUSTED"
+#~ msgstr "Antragssteller-Zertifikat wird nicht vertraut."
+
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_UNKNOWN_TYPE"
 #~ msgstr "Der Workflow konnte nicht gestartet werden: Typ unbekannt"
