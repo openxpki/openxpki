@@ -12,10 +12,10 @@ OpenXPKI::Client::API::Command::config::footprint
 
 =head1 DESCRIPTION
 
-Shows the footprint of the B<running> OpenXPKI configuration.
+Show the footprint of the B<running> OpenXPKI configuration.
 
-The footprint provides information about the inner complexity of your
-installation.
+The footprint provides a summary of the inner complexity of your
+installation (number of realms, profiles, workflows, etc.).
 
 =cut
 

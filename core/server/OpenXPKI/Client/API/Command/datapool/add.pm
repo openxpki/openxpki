@@ -12,16 +12,16 @@ OpenXPKI::Client::API::Command::datapool::add
 
 =head1 DESCRIPTION
 
-Add a new value to the datapool
+Add a new entry to the datapool.
 
 =cut
 
 command "add" => {
-    namespace => { isa => 'Str', label => 'Namespace', hint => 'hint_namespace', required => 1 },
-    key => { isa => 'Str', label => 'Key', required => 1 },
-    value => { isa => 'Str', label => 'Value', required => 1 },
-    expiry => { isa => 'Epoch', label => 'Expiry Date' },
-    encrypt => { isa => 'Bool', label => 'Encrypt' },
+    namespace => { isa => 'Str', label => 'Datapool namespace', hint => 'hint_namespace', required => 1 },
+    key => { isa => 'Str', label => 'Key for the new entry', required => 1 },
+    value => { isa => 'Str', label => 'Value to store', required => 1 },
+    expiry => { isa => 'Epoch', label => 'Expiration date (epoch)' },
+    encrypt => { isa => 'Bool', label => 'Encrypt the value using the datavault token' },
 } => sub ($self, $param) {
 
     my $res = $self->run_command('set_data_pool_entry', {

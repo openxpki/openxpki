@@ -13,22 +13,24 @@ OpenXPKI::Client::API::Command::cli::create
 
 =head1 DESCRIPTION
 
-Generate a new key pair to use it as authentication key for this client.
+Generate a new ECC (secp256r1) key pair for CLI client authentication.
 
-The command will provide the public and private key as PEM encoded blocks.
-Put the B<private> key into a file, ensure proper permissions on it to
-manage access. Reference the key file usig I<--auth-key> when using this
-tool or place the key to a file named I<~/.oxi/client.key> where it gets
-automatically loaded.
+Returns the private key, public key (both PEM-encoded) and the JWK
+thumbprint as key identifier. The private key can optionally be
+encrypted with a password.
 
-Add the public key to the system configuration at I<system.cli.auth>.
+Store the B<private> key in a file with restricted permissions and
+reference it via C<--auth-key>, or place it at F<~/.oxi/client.key>
+for automatic loading.
+
+Add the B<public> key to the server configuration at C<system.cli.auth>.
 
 =cut
 
 command "create" => {
-    nopass => { isa => 'Bool', label => 'Store key unencrypted' },
-    stdin =>  { isa => 'Bool', label => 'Read the password from stdin' },
-    keyout => { isa => 'Bool', label => 'Output private key only' },
+    nopass => { isa => 'Bool', label => 'Generate key without password encryption' },
+    stdin =>  { isa => 'Bool', label => 'Read encryption password from stdin instead of prompting' },
+    keyout => { isa => 'Bool', label => 'Output only the private key PEM block' },
 } => sub ($self, $param) {
 
     my $pass;

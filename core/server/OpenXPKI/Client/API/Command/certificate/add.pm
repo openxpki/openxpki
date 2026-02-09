@@ -14,14 +14,21 @@ OpenXPKI::Client::API::Command::certificate::add
 
 =head1 DESCRIPTION
 
-Add a new (non-token) certificate.
+Import a PEM-encoded certificate into the database.
+
+Reads the certificate from the given file and load it into the database.If the
+certificate already exists in the database, the import is silently skipped.
+
+The chain of the certificate must already exist, skip chain building with
+C<force_nochain>. Set C<force_noverify> to skip chain validation, e.g. to
+import expired certificates.
 
 =cut
 
 command "add" => {
-    cert => { isa => 'FileContents', label => 'Certificate file', required => 1 },
-    force_nochain => { isa => 'Bool', default => 0, 'label' => 'Enforce import even if the chain can not be built', },
-    force_noverify => { isa => 'Bool', default => 0, 'label' => 'Enforce import even if the chain can not be be validated', },
+    cert => { isa => 'FileContents', label => 'PEM-encoded certificate file to import', required => 1 },
+    force_nochain => { isa => 'Bool', default => 0, 'label' => 'Import even if the issuer chain cannot be built' },
+    force_noverify => { isa => 'Bool', default => 0, 'label' => 'Import even if the chain cannot be validated' },
 
 } => sub ($self, $param) {
 

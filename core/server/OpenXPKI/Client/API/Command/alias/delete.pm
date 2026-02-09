@@ -13,13 +13,16 @@ OpenXPKI::Client::API::Command::alias::delete
 
 =head1 DESCRIPTION
 
-Delete an alias
+Delete a non-token alias entry.
+
+Verifies that the alias exists and does not belong to a token group
+before deletion. Token aliases must be managed via C<token delete>.
 
 =cut
 
 command "delete" => {
-    alias => { isa => 'Str', 'label' => 'Alias', required => 1 },
-    remove_key => { isa => 'Bool', 'label' => 'Remove the key' },
+    alias => { isa => 'Str', 'label' => 'Alias name to delete', required => 1 },
+    remove_key => { isa => 'Bool', 'label' => 'Also remove the associated key (not yet implemented)' },
 } => sub ($self, $param) {
 
     # TODO Parameter remove_key is not processed

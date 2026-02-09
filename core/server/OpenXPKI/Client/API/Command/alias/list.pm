@@ -14,7 +14,11 @@ OpenXPKI::Client::API::Command::alias::list
 
 =head1 DESCRIPTION
 
-List (non-token) alias entries
+List non-token alias entries grouped by alias group.
+
+Returns a hash keyed by group name, each containing a C<count> and an
+C<item> array with the alias entries. Token groups are excluded - use
+C<token list> for those.
 
 =cut
 
@@ -31,10 +35,10 @@ sub hint_group ($self, $input_params) {
 }
 
 command "list" => {
-    group => { isa => 'Str', label => 'Token group (e.g. tg_server)', hint => 'hint_group' },
-    expired => { isa => 'Bool' },
-    valid => { isa => 'Bool' },
-    upcoming => { isa => 'Bool' },
+    group => { isa => 'Str', label => 'Restrict to this alias group', hint => 'hint_group' },
+    expired => { isa => 'Bool', label => 'Show only expired aliases' },
+    valid => { isa => 'Bool', label => 'Show only currently valid aliases' },
+    upcoming => { isa => 'Bool', label => 'Show only aliases with future validity' },
 } => sub ($self, $param) {
 
     my $groups;

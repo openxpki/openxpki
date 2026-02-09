@@ -12,19 +12,16 @@ OpenXPKI::Client::API::Command::config::show
 
 =head1 DESCRIPTION
 
-Show information of the B<running> OpenXPKI configuration.
+Show information from the B<running> OpenXPKI configuration.
 
-If called without parameters, prints the information found at
-I<system.version> and the configuration digest.
+Without parameters returns the version information (from
+C<system.version>) together with the configuration digest.
 
-Provide a config path (key seperated by a dot, e.g.
-I<system.database.main>) to dump the configuration found at this
-node.
-
+When a path is given, dumps the configuration tree at that node.
 =cut
 
 command "show" => {
-    path => { isa => 'Str', label => 'Path to dump' },
+    path => { isa => 'Str', label => 'Dot-separated config path to dump (e.g. system.database.main)' },
 } => sub ($self, $param) {
 
 

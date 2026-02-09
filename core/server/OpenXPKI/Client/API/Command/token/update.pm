@@ -15,7 +15,11 @@ OpenXPKI::Client::API::Command::token::update
 
 =head1 DESCRIPTION
 
-Add a new generation of a crytographic token.
+Update an existing token alias.
+
+Can update validity overrides and/or add or replace the private key.
+Use C<key> to import a new key (fails if a key already exists) or
+C<key_update> to overwrite an existing key.
 
 =cut
 
@@ -25,11 +29,11 @@ sub hint_type ($self, $input_params) {
 }
 
 command "update" => {
-    alias => { isa => 'Str', 'label' => 'Alias', hint => 'hint_type', required => 1 },
-    key => { isa => 'FileContents', label => 'Key file (new)' },
-    key_update => { isa => 'FileContents', label => 'Key file (update)' },
-    notbefore => { isa => 'Epoch', label => 'Validity override (notbefore)' },
-    notafter => { isa => 'Epoch', label => 'Validity override (notafter)' },
+    alias => { isa => 'Str', 'label' => 'Token alias to update', hint => 'hint_type', required => 1 },
+    key => { isa => 'FileContents', label => 'PEM-encoded key file to add (fails if key exists)' },
+    key_update => { isa => 'FileContents', label => 'PEM-encoded key file to replace existing key' },
+    notbefore => { isa => 'Epoch', label => 'Override validity start (epoch)' },
+    notafter => { isa => 'Epoch', label => 'Override validity end (epoch)' },
 } => sub ($self, $param) {
 
     my $alias = $param->alias;

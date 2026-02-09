@@ -12,7 +12,9 @@ OpenXPKI::Client::API::Command::workflow::create
 
 =head1 DESCRIPTION
 
-Initiate a new workflow
+Create a new workflow instance of given C<type>.
+
+Parameters for the workflow are appended as C<key=value> pairs.
 
 =cut
 
@@ -25,7 +27,7 @@ sub hint_type ($self, $input_params) {
 }
 
 command "create" => {
-    type => { isa => 'Str', label => 'Workflow Type', hint => 'hint_type', required => 1 },
+    type => { isa => 'Str', label => 'Workflow type to create', hint => 'hint_type', required => 1 },
 } => sub ($self, $param) {
 
     my $wf_parameters = $self->build_hash_from_payload($param);

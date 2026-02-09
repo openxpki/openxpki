@@ -77,6 +77,18 @@ sub show_help ($arg) {
     #
     $pod.= $api->get_pod("${cmd}::$subcmd", 'DESCRIPTION');
 
+    # check for needs_realm and protected flags
+    my $package = $api->namespace_commands($cmd)->{$subcmd};
+    if ($package) {
+        my $meta = $package->meta;
+        my @flags;
+        push @flags, 'requires privileged access (auth-key)' if $meta->can('protected') && $meta->protected;
+        push @flags, 'requires realm (--realm)' if $meta->can('needs_realm') && $meta->needs_realm;
+        if (@flags) {
+            $pod .= ucfirst(join(', ', @flags))
+        }
+    }
+
     my $attrs = $api->get_attribute_details($cmd, $subcmd);
     if (scalar keys $attrs->%*) {
         $pod.= "\n\n=head1 PARAMETERS\n\n=over\n\n";

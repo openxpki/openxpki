@@ -15,7 +15,12 @@ OpenXPKI::Client::API::Command::token::add
 
 =head1 DESCRIPTION
 
-Add a new generation of a crytographic token.
+Add a new generation of a cryptographic token.
+
+Creates a new token alias by importing or referencing a certificate and
+optionally importing a private key. The token type must be a valid token
+group (e.g. C<certsign>, C<datasafe>). The key is imported to the
+key store configured in the backend (filesystem or datapool).
 
 =cut
 
@@ -25,13 +30,13 @@ sub hint_type ($self, $input_params) {
 }
 
 command "add" => {
-    type => { isa => 'Str', 'label' => 'Token type (e.g. certsign)', hint => 'hint_type', required => 1 },
-    cert => { isa => 'FileContents', label => 'Certificate file' },
-    identifier => { isa => 'Str', label => 'Certificate identifier' },
-    key => { isa => 'FileContents', label => 'Key file' },
-    generation => { isa => 'Int', label => 'Generation' },
-    notbefore => { isa => 'Int', label => 'Validity override (notbefore)' },
-    notafter => { isa => 'Int', label => 'Validity override (notafter)' },
+    type => { isa => 'Str', 'label' => 'Token type identifier (e.g. certsign, datasafe)', hint => 'hint_type', required => 1 },
+    cert => { isa => 'FileContents', label => 'PEM-encoded certificate file to import' },
+    identifier => { isa => 'Str', label => 'Certificate identifier (alternative to cert file)' },
+    key => { isa => 'FileContents', label => 'PEM-encoded private key file to import' },
+    generation => { isa => 'Int', label => 'Generation number for the token alias' },
+    notbefore => { isa => 'Int', label => 'Override validity start (epoch)' },
+    notafter => { isa => 'Int', label => 'Override validity end (epoch)' },
 } => sub ($self, $param) {
 
     my $type = $param->type;

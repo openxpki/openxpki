@@ -13,7 +13,9 @@ OpenXPKI::Client::API::Command::alias::update
 
 =head1 DESCRIPTION
 
-Update an existing alias entry
+Update validity overrides of an existing non-token alias.
+
+At least one of the update parameters must be provided.
 
 =cut
 
@@ -23,9 +25,9 @@ sub hint_alias ($self, $input_params) {
 }
 
 command "update" => {
-    alias => { isa => 'Str', 'label' => 'Alias', hint => 'hint_alias', required => 1 },
-    notbefore => { isa => 'Epoch', label => 'Validity override (notbefore)' },
-    notafter => { isa => 'Epoch', label => 'Validity override (notafter)' },
+    alias => { isa => 'Str', 'label' => 'Alias name to update', hint => 'hint_alias', required => 1 },
+    notbefore => { isa => 'Epoch', label => 'Override validity start (epoch)' },
+    notafter => { isa => 'Epoch', label => 'Override validity end (epoch)' },
 } => sub ($self, $param) {
 
     my $alias = $param->alias;

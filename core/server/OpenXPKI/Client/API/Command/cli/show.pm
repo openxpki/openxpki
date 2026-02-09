@@ -11,17 +11,16 @@ OpenXPKI::Client::API::Command::cli::show
 
 =head1 DESCRIPTION
 
-Show information related to connection and authentication of this client.
+Show connection and authentication details of this CLI client.
 
-Tries to connect to the backend. If an authentication key is found, the public
-key and key identifier are printed and the key is used to connect.
-
+Displays the configured socket file, timeout, account key status
+and attempts a ping to verify connectivity.
 If the I<pubkey> flag is given, only prints the public key.
 
 =cut
 
 command "show" => {
-    pubkey => { isa => 'Bool', label => 'Output public key only' },
+    pubkey => { isa => 'Bool', label => 'Output only the public key PEM block' },
 } => sub ($self, $param) {
 
     # accessing internals via rawapi

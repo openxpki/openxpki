@@ -12,14 +12,14 @@ OpenXPKI::Client::API::Command::workflow::wakeup
 
 =head1 DESCRIPTION
 
-Manually wakeup a paused workflow.
+Manually wake up a paused workflow.
 
 =cut
 
 command "wakeup" => {
-    id => { isa => 'Int', label => 'Workflow Id', required => 1 },
-    async => { isa => 'Bool' },
-    wait => { isa => 'Bool' },
+    id => { isa => 'Int', label => 'Workflow ID to wake up', required => 1 },
+    async => { isa => 'Bool', label => 'Execute the wakeup asynchronously' },
+    wait => { isa => 'Bool', label => 'Wait for the workflow to reach the next stop point' },
 } => sub ($self, $param) {
 
     my $res = $self->run_command('wakeup_workflow', {

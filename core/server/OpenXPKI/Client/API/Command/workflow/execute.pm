@@ -12,7 +12,9 @@ OpenXPKI::Client::API::Command::workflow::execute
 
 =head1 DESCRIPTION
 
-Run action on an existing workflow instance
+Execute an activity on an existing workflow instance.
+
+Parameters for the workflow are appended as C<key=value> pairs.
 
 =cut
 
@@ -23,8 +25,8 @@ sub hint_action ($self, $input_params) {
 }
 
 command "execute" => {
-    id => { isa => 'Int', label => 'Workflow Id', required => 1 },
-    action => { isa => 'Str', label => 'Action', hint => 'hint_action', required => 1 },
+    id => { isa => 'Int', label => 'Workflow ID', required => 1 },
+    action => { isa => 'Str', label => 'Activity name to execute', hint => 'hint_action', required => 1 },
 } => sub ($self, $param) {
 
     my $wf_parameters = $self->build_hash_from_payload($param);

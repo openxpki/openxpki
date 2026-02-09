@@ -7,11 +7,11 @@ command_setup
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::cli::show
+OpenXPKI::Client::API::Command::cli::ping
 
 =head1 DESCRIPTION
 
-Show information related to connection and authentication of this client
+Ping the OpenXPKI server and return connection status information.
 
 =cut
 

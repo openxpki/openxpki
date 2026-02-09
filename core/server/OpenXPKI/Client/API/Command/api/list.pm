@@ -11,7 +11,10 @@ OpenXPKI::Client::API::Command::api::list
 
 =head1 DESCRIPTION
 
-Show the list of available commands
+List all available API commands on the server.
+
+Returns an array of command names. Use C<api help E<lt>commandE<gt>>
+to get details about a specific command.
 
 =cut
 

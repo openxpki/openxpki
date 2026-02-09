@@ -12,16 +12,17 @@ OpenXPKI::Client::API::Command::config::smtptest
 
 =head1 DESCRIPTION
 
-Send a test message for the selected realm to validate SMTP is working.
+Send a test notification email to verify SMTP configuration.
 
-This test requires that you have not modified or removed the default
-test message from the configuration!
+Uses the notification framework of the selected realm to send a test
+message. Requires that the default C<testmail> message template has not
+been removed from the configuration unless another message template is selected.
 
 =cut
 
 command "smtptest" => {
-    mailto => { isa => 'Str', label => 'The email address to send the mail to', required => 1 },
-    message => { isa => 'Str', label => 'The message template to send', default => 'testmail' },
+    mailto => { isa => 'Str', label => 'Recipient email address for the test message', required => 1 },
+    message => { isa => 'Str', label => 'Notification template name to use', default => 'testmail' },
 } => sub ($self, $param) {
 
     my $res = $self->run_command('send_notification', {

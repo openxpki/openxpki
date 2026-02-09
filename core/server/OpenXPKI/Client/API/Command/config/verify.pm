@@ -12,10 +12,14 @@ OpenXPKI::Client::API::Command::config::verify
 
 =head1 DESCRIPTION
 
-Verify the content of a directory holding a YAML system configuration.
+Verify a local YAML configuration directory.
 
-Contrary to I<config show> this works on a local copy and does not query
-the running instance!
+Unlike C<config show> this operates on a local copy of the
+configuration and does B<not> query the running OpenXPKI instance.
+
+Parses the YAML tree and checks for a valid C<system> node. Can
+optionally dump a specific path or run a linter module (e.g.
+C<workflow>) for deeper validation.
 
 =cut
 
@@ -26,9 +30,9 @@ use Mojo::Loader;
 use OpenXPKI::Config::Backend;
 
 command "verify" => {
-    config => { isa => 'ReadableDir', label => 'Path to local config tree', default => $OpenXPKI::Defaults::SERVER_CONFIG_DIR },
-    path => { isa => 'Str', label => 'Path to dump' },
-    module => { isa => 'Str', label => 'Optional linter module' },
+    config => { isa => 'ReadableDir', label => 'Path to the local configuration directory', default => $OpenXPKI::Defaults::SERVER_CONFIG_DIR },
+    path => { isa => 'Str', label => 'Dot-separated path to dump from the parsed config' },
+    module => { isa => 'Str', label => 'Linter module to run (e.g. workflow)' },
 } => sub ($self, $param) {
 
     my $res;
