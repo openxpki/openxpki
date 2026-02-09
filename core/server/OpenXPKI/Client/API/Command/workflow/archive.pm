@@ -12,12 +12,12 @@ OpenXPKI::Client::API::Command::workflow::archive
 
 =head1 DESCRIPTION
 
-Trigger archivial of a workflow.
+Trigger archival of a workflow.
 
 =cut
 
 command "archive" => {
-    id => { isa => 'Int', label => 'Workflow Id', required => 1 },
+    id => { isa => 'Int', label => 'Workflow ID to archive', required => 1 },
 } => sub ($self, $param) {
 
     my $res = $self->run_command('archive_workflow', {

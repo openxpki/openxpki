@@ -12,15 +12,19 @@ OpenXPKI::Client::API::Command::datapool::update
 
 =head1 DESCRIPTION
 
-Update the value and/or expiration date of a datapool item
+Update the value and/or expiration date of an existing datapool entry.
+
+When updating the value, the encryption flag and expiration date of the
+existing entry are preserved unless explicitly overridden. At least one
+of C<value> or C<expiry> must be provided.
 
 =cut
 
 command "update" => {
-    namespace => { isa => 'Str', label => 'Namespace', hint => 'hint_namespace', required => 1 },
-    key => { isa => 'Str', label => 'Key', hint => 'hint_key', required => 1 },
-    value => { isa => 'Str', label => 'Value' },
-    expiry => { isa => 'Epoch', label => 'Expiry Date' },
+    namespace => { isa => 'Str', label => 'Datapool namespace', hint => 'hint_namespace', required => 1 },
+    key => { isa => 'Str', label => 'Key of the entry to update', hint => 'hint_key', required => 1 },
+    value => { isa => 'Str', label => 'New value (preserves encryption settings)' },
+    expiry => { isa => 'Epoch', label => 'New expiration date (epoch timestamp)' },
 } => sub ($self, $param) {
 
     my $res;

@@ -12,7 +12,7 @@ OpenXPKI::Client::API::Command::workflow::list
 
 =head1 DESCRIPTION
 
-List workflow ids based on given filter criteria.
+List workflow instances matching the given filter criteria.
 
 =cut
 
@@ -27,10 +27,10 @@ sub hint_proc_state ($self, $input_params) {
 }
 
 command "list" => {
-    state => { isa => 'Str', label => 'Workflow State' },
-    proc_state => { isa => 'Str', label => 'Workflow Proc State', hint => 'hint_proc_state' },
-    type => { isa => 'Str', label => 'Workflow Type', hint => 'hint_type' },
-    limit => { isa => 'Int', label => 'Result Count', default => 25 },
+    state => { isa => 'Str', label => 'Filter by workflow state' },
+    proc_state => { isa => 'Str', label => 'Filter by processing state (e.g. running, manual, exception)', hint => 'hint_proc_state' },
+    type => { isa => 'Str', label => 'Filter by workflow type', hint => 'hint_type' },
+    limit => { isa => 'Int', label => 'Maximum number of results to return', default => 25 },
 } => sub ($self, $param) {
 
     my %query = map {

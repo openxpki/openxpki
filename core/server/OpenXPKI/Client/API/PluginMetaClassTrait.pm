@@ -51,6 +51,7 @@ sub set_command_behaviour ($self, $arg) {
     }
 
     if ($arg->needs_realm) {
+        $self->needs_realm(1);
         $self->add_default_attribute_spec(
             realm => {
                 isa => 'Str', required => 1,
@@ -60,7 +61,31 @@ sub set_command_behaviour ($self, $arg) {
         );
     }
 
-    # TODO Implement command_setup(protected => 1) or replace it with protected_command
+    $self->protected($arg->protected) if $arg->protected;
 }
+
+=head2 needs_realm
+
+Boolean flag indicating that the command requires a PKI realm parameter.
+
+=cut
+
+has needs_realm => (
+    is => 'rw',
+    isa => 'Bool',
+    default => 0,
+);
+
+=head2 protected
+
+Boolean flag indicating that the command requires privileged access.
+
+=cut
+
+has protected => (
+    is => 'rw',
+    isa => 'Bool',
+    default => 0,
+);
 
 1;

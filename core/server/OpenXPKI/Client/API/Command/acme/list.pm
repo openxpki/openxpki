@@ -15,8 +15,9 @@ OpenXPKI::Client::API::Command::acme::list
 
 List all ACME account entries from the datapool.
 
-Shows the datapool ID, the account KID and the key thumbprint.
-To get account data and key information please use I<show>.
+Returns an array of hashes with C<key_id>, C<kid> and C<thumbprint>
+for each registered account. To get full account data and key
+information use C<acme show>.
 
 =cut
 

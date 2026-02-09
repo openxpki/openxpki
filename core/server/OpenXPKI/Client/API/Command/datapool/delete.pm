@@ -12,14 +12,16 @@ OpenXPKI::Client::API::Command::datapool::delete
 
 =head1 DESCRIPTION
 
-Delete a single item or a full namespace from the datapool
+Delete a single entry or an entire namespace from the datapool.
+
+Either C<key> or C<all> must be provided.
 
 =cut
 
 command "delete" => {
-    namespace => { isa => 'Str', label => 'Namespace', hint => 'hint_namespace', required => 1 },
-    key => { isa => 'Str', label => 'Key if the item to be removed', hint => 'hint_key',},
-    all => { isa => 'Bool', label => 'Remove the full namespace' },
+    namespace => { isa => 'Str', label => 'Datapool namespace', hint => 'hint_namespace', required => 1 },
+    key => { isa => 'Str', label => 'Key of the entry to delete', hint => 'hint_key',},
+    all => { isa => 'Bool', label => 'Delete all entries in the namespace' },
 } => sub ($self, $param) {
 
     my $res;

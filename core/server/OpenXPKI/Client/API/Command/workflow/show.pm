@@ -12,14 +12,16 @@ OpenXPKI::Client::API::Command::workflow::show
 
 =head1 DESCRIPTION
 
-Show information on an existing workflow
+Show details of an existing workflow instance.
+
+Returns workflow metadata, state, context and available actions.
 
 =cut
 
 command "show" => {
-    id => { isa => 'Int', label => 'Workflow Id', required => 1 },
-    attributes => { isa => 'Bool', label => 'Show Attributes', default => 0 },
-    deserialize => { isa => 'Bool', label => 'Deserialize Context', description => 'Unpack serialized context items', default => 0 },
+    id => { isa => 'Int', label => 'Workflow ID', required => 1 },
+    attributes => { isa => 'Bool', label => 'Include workflow attributes in the output', default => 0 },
+    deserialize => { isa => 'Bool', label => 'Unpack serialized values in the workflow context', description => 'Unpack serialized context items', default => 0 },
 } => sub ($self, $param) {
 
     my $cmd_param = {

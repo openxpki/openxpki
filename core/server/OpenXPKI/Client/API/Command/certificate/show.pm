@@ -13,17 +13,17 @@ OpenXPKI::Client::API::Command::certificate::show
 
 Show details for a given certificate identifier.
 
-If I<attributes> is given, the I<meta> and I<system> attributes are added to
-the output structure.
-
-Set I<certonly> to get the raw PEM block.
+By default returns a hash with key certificate fields (subject, issuer,
+validity, status, etc.). For revoked certificates the revocation details
+are included automatically. If the certificate is a local entity the
+associated profile name is added as well.
 
 =cut
 
 command "show" => {
-    identifier => { isa => 'Str', label => 'Certificate identifier' },
-    attributes => { isa => 'Bool', label => 'Show attributes', default => 0 },
-    certonly   => { isa => 'Bool', label => 'Show raw PEM block', default => 0 },
+    identifier => { isa => 'Str', label => 'Certificate identifier to look up' },
+    attributes => { isa => 'Bool', label => 'Include meta and system attributes', default => 0 },
+    certonly   => { isa => 'Bool', label => 'Return only the raw PEM block', default => 0 },
 } => sub ($self, $param) {
 
     my $identifier = $param->identifier;

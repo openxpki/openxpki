@@ -15,15 +15,18 @@ OpenXPKI::Client::API::Command::token::show
 
 =head1 DESCRIPTION
 
-Show details of the token for the given alias.
+Show details of a token alias.
+
+Returns the alias information and optionally includes key details,
+certificate details and/or the key online status.
 
 =cut
 
 command "show" => {
-    alias => { isa => 'Str', 'label' => 'Alias', required => 1 },
-    key => { isa => 'Bool', 'label' => 'Show key details', default => 0 },
-    cert => { isa => 'Bool', 'label' => 'Show certificate details', default => 0 },
-    status => { isa => 'Bool', 'label' => 'Show status of key online test', default => 0 },
+    alias => { isa => 'Str', 'label' => 'Token alias to look up', required => 1 },
+    key => { isa => 'Bool', 'label' => 'Include key details (name, store, engine)', default => 0 },
+    cert => { isa => 'Bool', 'label' => 'Include certificate details (subject, issuer, status, validity)', default => 0 },
+    status => { isa => 'Bool', 'label' => 'Check if the key is usable (online test)', default => 0 },
 } => sub ($self, $param) {
 
     my $alias = $param->alias;

@@ -12,13 +12,16 @@ OpenXPKI::Client::API::Command::acme::show
 
 =head1 DESCRIPTION
 
-Show an account entry from the datapool.
+Show details of an ACME account entry from the datapool.
+
+Returns the account data including the KID (key identifier) and
+thumbprint. The private key (JWK) is excluded by default.
 
 =cut
 
 command "show" => {
-    id => { isa => 'Str', label => 'Account Key Id', required => 1 },
-    with_privatekey => { isa => 'Bool', label => 'Show Private Key' },
+    id => { isa => 'Str', label => 'Account key ID (datapool key) to look up', required => 1 },
+    with_privatekey => { isa => 'Bool', label => 'Include the private key (JWK) in the output' },
 } => sub ($self, $param) {
 
     my $res = $self->run_protected_command('get_data_pool_entry', {

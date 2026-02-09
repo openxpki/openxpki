@@ -15,7 +15,11 @@ OpenXPKI::Client::API::Command::alias::add
 
 =head1 DESCRIPTION
 
-Add a new (non-token) alias.
+Create a new non-token alias entry.
+
+Either provide a PEM-encoded certificate file (which will be imported
+automatically) or reference an existing certificate by its identifier.
+The alias group must not be a token group - use C<token add> for that.
 
 =cut
 
@@ -25,12 +29,12 @@ sub hint_type ($self, $input_params) {
 }
 
 command "add" => {
-    group => { isa => 'Str', 'label' => 'Token group (e.g. tg_server)', required => 1 },
-    cert => { isa => 'FileContents', label => 'Certificate file' },
-    identifier => { isa => 'Str', label => 'Certificate identifier' },
-    generation => { isa => 'Int', label => 'Generation' },
-    notbefore => { isa => 'Int', label => 'Validity override (notbefore)' },
-    notafter => { isa => 'Int', label => 'Validity override (notafter)' },
+    group => { isa => 'Str', 'label' => 'Alias group name (e.g. tg_server)', required => 1 },
+    cert => { isa => 'FileContents', label => 'PEM-encoded certificate file to import' },
+    identifier => { isa => 'Str', label => 'Certificate identifier (alternative to cert file)' },
+    generation => { isa => 'Int', label => 'Generation number for the alias' },
+    notbefore => { isa => 'Int', label => 'Override validity start (epoch)' },
+    notafter => { isa => 'Int', label => 'Override validity end (epoch)' },
 } => sub ($self, $param) {
 
     $self->check_group($param->group);

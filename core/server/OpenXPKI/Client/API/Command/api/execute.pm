@@ -12,23 +12,24 @@ OpenXPKI::Client::API::Command::api::execute
 
 =head1 DESCRIPTION
 
-Run a named API command on the server.
+Execute a named API command on the server.
 
-The name of the command to run is taken from the command parameter, it
-is also supported to replace the term I<execute> with the actual name
-of the command, e.g. 'oxi api get_cert ...'.
+The command name is taken from the C<command> parameter. It is also
+possible to replace the term I<execute> with the actual command name,
+e.g. C<oxi api get_cert ...>.
 
-Parameters for the command itself are just appended to the command
-as I<key=value>, flags are given as I<key>.
+Parameters for the API command are appended as C<key=value> pairs;
+boolean flags can be given as bare C<key>. The parameters are validated
+against the command's signature before execution.
 
-Protected commands can be executed if called with a configured
-authentication key. Even if the command itself might run in global
-mode it is currently mandatory to provide a realm.
+Protected commands are executed if called with a configured
+authentication key. Even if the command itself runs in global mode it
+is currently mandatory to provide a realm.
 
 =cut
 
 command "execute" => {
-    command => { isa => 'Str', label => 'Command', hint => 'hint_command', required => 1 },
+    command => { isa => 'Str', label => 'Name of the API command to execute', hint => 'hint_command', required => 1 },
 } => sub ($self, $param) {
 
     my $command = $param->command;

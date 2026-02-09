@@ -12,14 +12,14 @@ OpenXPKI::Client::API::Command::datapool::list
 
 =head1 DESCRIPTION
 
-List datapool keys/items for a given namespace
+List datapool keys in a given namespace.
 
 =cut
 
 command "list" => {
-    namespace => { isa => 'Str', label => 'Namespace', hint => 'hint_namespace', required => 1 },
-    limit => { isa => 'Int', label => 'Result Count', default => 25 },
-    metadata => { isa => 'Bool', label => 'Show Metadata' },
+    namespace => { isa => 'Str', label => 'Datapool namespace to list', hint => 'hint_namespace', required => 1 },
+    limit => { isa => 'Int', label => 'Maximum number of entries to return', default => 25 },
+    metadata => { isa => 'Bool', label => 'Include creation date, expiration and encryption flag' },
 } => sub ($self, $param) {
 
     my $query = {

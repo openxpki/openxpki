@@ -12,13 +12,13 @@ OpenXPKI::Client::API::Command::alias::show
 
 =head1 DESCRIPTION
 
-Show the alias entry for a given alias name
+Show details of a non-token alias entry.
 
 =cut
 
 command "show" => {
-    alias => { isa => 'Str', 'label' => 'Alias', required => 1 },
-    cert => { isa => 'Bool', 'label' => 'Show certificate details'},
+    alias => { isa => 'Str', 'label' => 'Alias name to look up', required => 1 },
+    cert => { isa => 'Bool', 'label' => 'Include certificate details (subject, issuer, status, validity)' },
 } => sub ($self, $param) {
 
     my $alias = $param->alias;

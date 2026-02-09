@@ -13,13 +13,17 @@ OpenXPKI::Client::API::Command::token::delete
 
 =head1 DESCRIPTION
 
-Delete the token for a given alias name
+Delete a token alias.
+
+Verifies the alias exists and belongs to a token group before deletion.
+Optionally removes the associated private key from the datapool (only
+supported for datapool-stored keys).
 
 =cut
 
 command "delete" => {
-    alias => { isa => 'Str', 'label' => 'Alias', required => 1 },
-    remove_key => { isa => 'Bool', 'label' => 'Remove the key', default => 0 },
+    alias => { isa => 'Str', 'label' => 'Token alias to delete', required => 1 },
+    remove_key => { isa => 'Bool', 'label' => 'Also remove the private key from the datapool', default => 0 },
 } => sub ($self, $param) {
 
     my $alias = $param->alias;

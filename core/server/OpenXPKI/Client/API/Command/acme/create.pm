@@ -33,12 +33,12 @@ sub hint_keyspec {
 }
 
 command "create" => {
-    directory => { isa => 'Str', label => 'Directory Url', required => 1 },
-    contact => { isa => 'Str', label => 'Contact (email address)', required => 1 },
-    label => { isa => 'Str', label => 'Account Label', required => 1 },
-    keyspec => { isa => 'Str', label => 'RSA bits (rsaXXXX) or curve name', default => 'secp384r1', hint => 'hint_keyspec' },
-    eab_kid => { isa => 'Str', label => 'Ext. Account ID' },
-    eab_mac => { isa => 'Str', label => 'Ext. Account MAC Key' },
+    directory => { isa => 'Str', label => 'URL of the ACME directory endpoint', required => 1 },
+    contact => { isa => 'Str', label => 'Contact email address for the account', required => 1 },
+    label => { isa => 'Str', label => 'Label used to identify this account', required => 1 },
+    keyspec => { isa => 'Str', label => 'ECC curve name or RSA key size (e.g. secp384r1, rsa2048)', default => 'secp384r1', hint => 'hint_keyspec' },
+    eab_kid => { isa => 'Str', label => 'External account binding key ID' },
+    eab_mac => { isa => 'Str', label => 'External account binding MAC key' },
 
 } => sub ($self, $param) {
 

@@ -12,15 +12,17 @@ OpenXPKI::Client::API::Command::workflow::fail
 
 =head1 DESCRIPTION
 
-Manually set a hanging workflow to failed, see I<fail_workflow> for
-details.
+Manually set a hanging workflow to the failed state.
+
+See the C<fail_workflow> API command for details on the underlying
+operation.
 
 =cut
 
 command "fail" => {
-    id => { isa => 'Int', label => 'Workflow Id', required => 1 },
-    error => { isa => 'Bool', label => 'Error message' },
-    reason => { isa => 'Bool', label => 'Error reason' },
+    id => { isa => 'Int', label => 'Workflow ID to fail', required => 1 },
+    error => { isa => 'Str', label => 'Error message to record' },
+    reason => { isa => 'Str', label => 'Error reason to record' },
 } => sub ($self, $param) {
 
     my $res = $self->run_command('fail_workflow', {

@@ -12,12 +12,15 @@ OpenXPKI::Client::API::Command::workflow::reset
 
 =head1 DESCRIPTION
 
-Manually reset a hanging workflow, see I<reset_workflow> for details.
+Manually reset a hanging workflow.
+
+See the C<reset_workflow> API command for details on the underlying
+operation.
 
 =cut
 
 command "reset" => {
-    id => { isa => 'Int', label => 'Workflow Id', required => 1 },
+    id => { isa => 'Int', label => 'Workflow ID to reset', required => 1 },
 } => sub ($self, $param) {
 
     my $res = $self->run_command('reset_workflow', {
