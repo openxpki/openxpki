@@ -99,10 +99,12 @@ sub execute {
 
     # Check the chain
     # set from either db query or from chain validation
-    my ($signer_issuer, $signer_root, $signer_revoked, @signer_chain);
+    my ($signer_issuer, $signer_root, $signer_revoked);
     my $signer_realm = 'unknown';
     my $signer_profile = 'unknown';
+    my $validate_chain;
 
+    # certificate identifier was found in the internal database
     if ($cert_hash) {
         ##! 16: 'certificate found in database'
         # certificate was found in local database
@@ -120,19 +122,38 @@ sub execute {
             }
         }
 
-        if ($signer_issuer) {
+        # do chain validation via database - this is prone to possible
+        # collision attacks against the sha1 based certificate identifier
+        # unless the signer_cert was properly validated against a trusted chain
+        if ($signer_issuer && $self->param('skip_chain_validation')) {
+            CTX('log')->application()->info("Do chain validation against database");
             my $signer_chain = CTX('api2')->get_chain( start_with => $signer_issuer );
-            @signer_chain = @{$signer_chain->{identifiers}};
             if ($signer_chain->{complete}) {
-                $signer_root = pop @{$signer_chain->{identifiers}};
+                $signer_root = pop $signer_chain->{identifiers}->@*;
             }
+        } else {
+            # marker for chain validation
+            $validate_chain = 1;
         }
+
+    # certificate neither "local" nor otherwise "known"
+    # external signer is allowed so proceed here
     } elsif (!$x509->is_selfsigned() && $self->param('allow_external_signer')) {
+
         ##! 16: 'external certificate - try to validate'
-        # use validate to build the chain
         $signer_realm = 'external';
 
+        # marker for chain validation
+        $validate_chain = 1;
+
+    }
+
+    # perform chain validation
+    if ($validate_chain) {
+        ##! 16: 'perform chain validation'
+
         my $crl_check = $self->param('crl_check') || 'none';
+        CTX('log')->application()->info("Do external chain validation with CRL check $crl_check");
 
         my $chain_validate = CTX('api2')->validate_certificate(
             pem => $signer_cert,
@@ -143,15 +164,15 @@ sub execute {
         ##! 32: 'chain validation status ' . $cert_status
         if ($cert_status =~ m{(VALID|REVOKED|NOROOT)}) {
 
-            @signer_chain = @{$chain_validate->{chain}};
+            my @signer_chain = $chain_validate->{chain}->@*;
             # remove the entity from the chain
             shift @signer_chain;
-            if ($signer_chain[0]) {
+            if (scalar @signer_chain) {
                 $signer_issuer = CTX('api2')->get_cert_identifier( cert => $signer_chain[0] );
             }
 
             if ($cert_status ne 'NOROOT') {
-                my $signer_root_pem = pop @{$chain_validate->{chain}};
+                my $signer_root_pem = pop @signer_chain;
                 $signer_root = CTX('api2')->get_cert_identifier( cert => $signer_root_pem );
                 $context->param('signer_chain_ok' => 1);
             }
@@ -222,8 +243,6 @@ sub execute {
         return 1;
     }
 
-    my $matched = 0;
-
     CTX('log')->application()->debug("Trusted Signer Authorization $signer_profile / $signer_realm / $signer_subject / $signer_identifier");
 
     TRUST_RULE:
@@ -259,6 +278,7 @@ sub execute {
 
     $context->param('signer_authorized' => 0);
     return 1;
+
 }
 
 1;
@@ -275,76 +295,88 @@ OpenXPKI::Server::Workflow::Activity::Tools::EvaluateSignerTrust
 
 =head1 DESCRIPTION
 
-Evaluate if the signer certificate can be trusted. Populates the result
-into several context items, all values are boolean. Checks are by default
-done based on the contents of the certificate database and work only for
-certificates which are found there. If you want to validate certificates
-from an external CA you must import the full issuer chain and either set
-the I<allow_external_signer> flag or import the used signer certificates
-themselves.
+Evaluate if the signer certificate can be trusted and is authorized.
+Populates several context items with the results of the validation.
+
+Checks are by default done based on the contents of the certificate
+database and work only for certificates found there. If you want to
+validate certificates from an external CA you must import the full
+issuer chain and either set the C<allow_external_signer> parameter or
+import the used signer certificates themselves.
+
+=head2 Context Parameters
+
+=head3 Output
 
 =over
 
-=item signer_trusted
+=item signer_trusted (Bool)
 
-true if the complete chain is available and certificate status is not
+True if the complete chain is available and certificate status is not
 revoked. Does B<NOT> check for expiration.
 
-=item signer_authorized
+=item signer_authorized (Bool)
 
-true if the signer matches one of the given rules. This does B<NOT> depend
-on the trust status of the certificate, so you need to check both flags or
-delegate the chain validation to another component (e.g. tls config of
-webserver). Will be I<undef> in case the certificate chain could not be
-validated at all or no trust rules have been found.
+True if the signer matches one of the given rules. This does B<NOT>
+depend on the trust status of the certificate, so you need to check
+both flags or delegate the chain validation to another component
+(e.g. TLS configuration of a webserver). Will be C<undef> if the
+certificate chain could not be validated at all or no trust rules
+were found.
 
-=item signer_validity_ok
+=item signer_validity_ok (Bool)
 
-true if the current date is within the notbefore/notafter window
+True if the current date is within the notbefore/notafter window.
 
-=item signer_revoked
+=item signer_revoked (Bool)
 
-true if the certificate is marked revoked.
+True if the certificate is marked as revoked.
 
-=item signer_chain_ok
+=item signer_chain_ok (Bool)
 
-only available with external signers, true if the certificate chain
-was successfully build, false otherwise.
+Only available with external signers. True if the certificate chain
+was successfully built, false otherwise.
 
-=item signer_cert_identifier
+=item signer_cert_identifier (Str)
 
-the identifier of the signer certificate
+The identifier of the signer certificate. Empty string if the
+certificate is self-signed and not found in the database.
 
-=item signer_subject
+=item signer_subject (Str)
 
-the subject of the signer certificate,
-only exported if export_subject parameter is set
+The subject of the signer certificate. Only exported if the
+C<export_subject> parameter is set.
 
-=item signer_subject_key_identifier, signer_public_key_hash
+=item signer_subject_key_identifier (Str)
 
-the signer_key_identifier / public_key_hash of the signer
-certificate, see export_key_identifier parameter for details.
+The subject key identifier or public key hash of the signer
+certificate. See C<export_key_identifier> parameter for details.
 
-=item signer_in_current_realm
+=item signer_public_key_hash (Str)
 
-Boolean, weather the signer is an entity in the current realm
+The SHA1 hash of the public key (only when C<export_key_identifier>
+is set to C<both>).
+
+=item signer_in_current_realm (Bool)
+
+Whether the signer is an entity in the current realm.
 
 =back
 
-=head1 Configuration
+=head1 CONFIGURATION
 
 The check for authorization uses a list of rules. Those can be either
-given explicitly to the I<rules> parameter or as a pointer to the realm
-config. A common pattern used in OpenXPKI is to build the path for the
-rules from the server properties, e.g. the SCEP workflow uses
-I<scep.[% context.server ].authorized_signer>..
+given explicitly to the C<rules> parameter or as a pointer to the
+realm config. A common pattern used in OpenXPKI is to build the path
+for the rules from the server properties, e.g. the SCEP workflow uses
+C<scep.[% context.server %].authorized_signer>.
 
-If I<rules> is a scalar, it is considered to be a config path, if it is
-a hash it is taken as explicitly defined ruleset.
+If C<rules> is a scalar, it is considered to be a config path. If it
+is a hash it is taken as an explicitly defined ruleset.
 
-The ruleset structure is a hash of hashes, were each entry is a combination
-of one or more matching rules. The name of the rule is just used for logging
-purpose:
+The ruleset structure is a hash of hashes, where each entry is a
+combination of one or more matching rules. The name of the rule is
+used for logging purposes only:
 
   rule1:
     subject: CN=scep-signer.*,dc=OpenXPKI,dc=org
@@ -354,110 +386,131 @@ purpose:
 
 =head2 Rules
 
-The rules in one entry are ANDed together, values are full string match,
-except the subject rule. If you want to provide alternatives, add multiple
-list items.
+The rules within one entry are ANDed together. Values are full string
+matches, except the subject rule which is a regexp. If you want to
+provide alternatives, add multiple list items.
 
 =over
 
 =item subject
 
-Evaluated as a regexp against the signers full subject, therefore any
-characters with a special meaning in perl regexp need to be escaped!
+Evaluated as a regexp against the signer's full subject. Characters
+with special meaning in Perl regexps must be escaped.
 
 =item profile
 
 Matches the name of the internal OpenXPKI profile assigned to this
-certificate. This implies that the certificate was issued by us.
+certificate. This implies that the certificate was issued by this CA.
 
 =item realm
 
-The name of the realm where the certificate originates from, works also
-for certificates imported into a realm. If not set, the default is the
-current realm. Pass the special value I<_any> to ignore the realm during
-rule evaluation.
+The name of the realm where the certificate originates from. Also
+works for certificates imported into a realm. If not set, the default
+is the current realm. Pass the special value C<_any> to ignore the
+realm during rule evaluation.
 
-Special rules apply when matching on "identifier" or "issuer_alias".
+Special rules apply when matching on C<identifier> or C<issuer_alias>.
 
 =item identifier
 
-The identifier of the certificate. This works also with external issued or
-self signed certificates. I<realm> is only matched if set explicit, so
-I<realm: _any> is the default.
+The identifier of the certificate. Also works with externally issued
+or self-signed certificates. C<realm> is only matched if set
+explicitly, so C<realm: _any> is the default.
 
 =item issuer_alias
 
-The name of an alias group as registered in the I<aliases> table. Matches
-if the certificate issuer has an active alias in the given group. The alias
-item is searched in the given realm and the global realm, setting
-I<realm: _any> is ignored (search is done in the global realm only).
+The name of an alias group as registered in the C<aliases> table.
+Matches if the certificate issuer has an active alias in the given
+group. The alias is searched in the given realm and the global realm.
+Setting C<realm: _any> is ignored (search is done in the global
+realm only).
 
-Note: The query is done at once for the given and global realm, this might
-cause unexepcted behaviour when the same alias exists in both with different
-validity dates (there will be a positive match if either the local or the
-global realm lists the item as valid).
+Note: The query is done at once for the given and global realm. This
+might cause unexpected behaviour when the same alias exists in both
+with different validity dates (there will be a positive match if
+either the local or the global realm lists the item as valid).
 
 =item root_alias
 
-Same as issuer_alias but queries for the root certificate
+Same as C<issuer_alias> but queries for the root certificate.
 
 =item meta_*
 
-Load the metadata attributes assigned to the certificate and match against
-the given value.
+Load the metadata attributes assigned to the certificate and match
+against the given value.
 
 =back
 
-=head2 Parameters
+=head2 Activity Parameters
 
 =over
 
 =item rules
 
-Usually a scalar value, taken as config path to read the rules from. Can
-also be a hash that represents an explicit ruleset (see Rules).
+Usually a scalar value, taken as config path to read the rules from.
+Can also be a hash that represents an explicit ruleset (see L</Rules>).
 
 =item export_subject
 
-Boolean, if set the signer_subject is exported to the context.
+Boolean. If set, the signer subject is exported to the context
+parameter C<signer_subject>.
 
 =item export_key_identifier
 
-Export information about the signers subject_key_identifier. As there is
-an ambiguity on this term, you can switch the behaviour.
+Export information about the signer's subject key identifier. The
+behaviour depends on the value:
 
-The default behaviour on any true value is to write the key identifier
-read from the certificate to  I<signer_subject_key_identifier>. If you
-pass I<hash>, you get the value of the SHA1 hash of the public key as
-defined in RFC5280 in this field. If you pass I<both>, the SHA1 has will
-be written as an additional field to I<signer_public_key_hash>.
+=over
+
+=item C<hash>
+
+Write the SHA1 hash of the public key (as defined in RFC 5280) to
+C<signer_subject_key_identifier>.
+
+=item C<both>
+
+Write the subject key identifier to C<signer_subject_key_identifier>
+and the SHA1 hash to C<signer_public_key_hash>.
+
+=item I<(any true value)>
+
+Write the key identifier read from the certificate to
+C<signer_subject_key_identifier>.
+
+=back
 
 B<Note>: If a certificate does not contain an explicit subject key
 identifier, this always falls back to the SHA1 hash.
 
 =item allow_external_signer
 
-Boolean, if set and the signer is not found in the local database the activity
-tries to verify the certificate chain using the validate_certificate API
-method.
+Boolean. If set and the signer is not found in the local database,
+the activity tries to verify the certificate chain using the
+C<validate_certificate> API method.
 
 =item allow_untrusted_signer
 
-Boolean, if true, the rulesets are processed even if the certificate chain
-could not be built or validated. This is only useful with external signers.
+Boolean. If true, the rulesets are processed even if the certificate
+chain could not be built or validated. Only useful with external
+signers.
+
+=item skip_chain_validation
+
+Boolean. If true, the signer certificate chain validation is done against the
+database only and not using a cryptographic operation. This should only be
+activated if you have otherwise validated the certificate.
 
 =item crl_check
 
-Only used when the certificate is an external signer. Valid values are
-I<leaf> or I<all>, tries to use CRLs when validating the certificate for
-either the lead certificate or the full chain. The required CRLs must
-exist in the CRL table.
-
+Only used with external signers. Valid values are C<leaf> or C<all>.
+Tries to use CRLs when validating the certificate for either the
+leaf certificate or the full chain. See C<validate_certificate> API method.
 
 =item allow_surrogate_certificate
 
-Boolean, if set and the signer is not found in the local database B<and> is
-self-signed the database is searched for an entity certificate with the same
-subject key id. This is used e.g. in the PoP renewal via EST/RPC.
+Boolean. If set and the signer is not found in the local database
+B<and> is self-signed, the database is searched for an entity
+certificate with the same subject key ID. This is used e.g. in the
+proof-of-possession renewal via EST/RPC.
 
 =back
