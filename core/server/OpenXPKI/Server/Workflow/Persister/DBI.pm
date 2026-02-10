@@ -10,29 +10,33 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Serialization::Simple;
 use DateTime;
 use DateTime::Format::Strptime;
+use JSON::XS;
 
-
-# my @FIELDS = qw( );
-# __PACKAGE__->mk_accessors(@FIELDS);
-
-# limits
-my $context_value_max_length = 32768;
+my @FIELDS = qw( mode );
+__PACKAGE__->mk_accessors(@FIELDS);
 
 # tools
+my $serializer = OpenXPKI::Serialization::Simple->new;
 my $parser = DateTime::Format::Strptime->new(
     pattern  => '%Y-%m-%d %H:%M:%S',
     on_error => sub { OpenXPKI::Exception->throw(
-        message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_PARSE_DATE_ERROR",
+        message => "error in workflow persister",
     )},
 );
 
 sub init {
     my ($self, $params) = @_;
-    # for (@FIELDS) {
-    #     $self->$_( $params->{$_} ) if $params->{$_};
-    # }
+    for (@FIELDS) {
+        $self->$_( $params->{$_} ) if $params->{$_};
+    }
+    $self->mode('legacy') unless $self->mode;
+
+    OpenXPKI::Exception->throw(
+        message => "Database schema is to old for persister mode inline",
+    ) if ($self->mode eq 'inline' && CTX('dbi')->version() < 5);
+
     $self->SUPER::init($params);
-    return; # no useful return value
+    return;
 }
 
 sub create_workflow {
@@ -81,22 +85,34 @@ sub __update_workflow {
     # save user info so Watchdog is able to resume workflow in correct context
     my $workflow_session = CTX('session')->data->freeze(only => [ "user", "role" ]);
 
+    my %set = (
+        workflow_state       => $workflow->state,
+        workflow_last_update => DateTime->now->strftime('%Y-%m-%d %H:%M:%S'),
+        workflow_proc_state  => $workflow->proc_state,
+        workflow_wakeup_at   => $workflow->wakeup_at || 0,
+        workflow_count_try   => $workflow->count_try,
+        workflow_reap_at     => $workflow->reap_at || 0,
+        workflow_session     => $workflow_session,
+        workflow_archive_at  => $workflow->archive_at,
+        # always reset the watchdog key, if the workflow is updated from within
+        # the API/Factory, as the worlds most famous db system is unable to
+        # handle NULL values we use a literal....
+        watchdog_key => '__CATCHME',
+    );
+
+    # inline mode: store context as JSON in the workflow table
+    if ($self->mode eq 'inline' && $workflow->persist_context) {
+        my ($exec_state_json, $context_json) = $self->__build_context_json($workflow);
+        $set{workflow_exec_state} = $exec_state_json;
+        # full context is only written at persist level 2
+        if ($workflow->persist_context > 1) {
+            $set{workflow_context} = $context_json;
+        }
+    }
+
     CTX('dbi')->merge(
         into => 'workflow',
-        set  => {
-            workflow_state       => $workflow->state,
-            workflow_last_update => DateTime->now->strftime('%Y-%m-%d %H:%M:%S'),
-            workflow_proc_state  => $workflow->proc_state,
-            workflow_wakeup_at   => $workflow->wakeup_at || 0,
-            workflow_count_try   => $workflow->count_try,
-            workflow_reap_at     => $workflow->reap_at || 0,
-            workflow_session     => $workflow_session,
-            workflow_archive_at  => $workflow->archive_at,
-            # always reset the watchdog key, if the workflow is updated from within
-            # the API/Factory, as the worlds most famous db system is unable to
-            # handle NULL values we use a literal....
-            watchdog_key => '__CATCHME',
-        },
+        set  => \%set,
         set_once => {
             pki_realm => CTX('session')->data->pki_realm,
             workflow_type => $workflow->type,
@@ -109,6 +125,9 @@ sub __update_workflow {
 
 sub __update_workflow_context {
     my ($self, $workflow) = @_;
+
+    # inline mode: context is stored in workflow table, skip row-based storage
+    return if ($self->mode eq 'inline');
 
     my $id  = $workflow->id;
     my $context = $workflow->context;
@@ -126,7 +145,7 @@ sub __update_workflow_context {
         ##! 32: "WF #$id: Only update internals " . join(":", @updated )
     }
 
-    # do not persit the virtual workflow_id/creator/tenant field
+    # do not persist the virtual workflow_id/creator/tenant field
     # ignore "volatile" context parameters starting with an underscore
     @updated = grep { $_ !~ /\A(_.+|creator|workflow_id|tenant)\z/ } @updated;
 
@@ -148,7 +167,7 @@ sub __update_workflow_context {
 
         # automatic serialization
         if ( ref $value eq 'ARRAY' or ref $value eq 'HASH' ) {
-            $value = OpenXPKI::Serialization::Simple->new->serialize($value);
+            $value = $serializer->serialize($value);
         }
 
         ##! 16: "  saving context key: $key => $value"
@@ -225,6 +244,87 @@ sub __update_workflow_attributes {
     }
 }
 
+sub __build_context_json {
+    my ($self, $workflow) = @_;
+
+    my $id = $workflow->id//'0';
+    my $context = $workflow->context;
+    my $params = $context->param;
+
+    my (%exec_state, %ctx);
+
+    for my $key (keys %{$params}) {
+        # skip volatile, virtual fields
+        next if $key =~ /\A(_.+|creator|workflow_id|tenant)\z/;
+
+        my $value = $params->{$key};
+        # skip undefined values
+        next unless defined $value;
+        ##! 32: $key
+        ##! 128: $value
+        if ( ref $value eq 'ARRAY' ) {
+
+            # do we need any checks here?
+
+        } elsif ( ref $value eq 'HASH' ) {
+
+            # do we need any checks here?
+
+        } elsif ( ref $value ne '') {
+
+            $self->__throw_serialize_error($id, $key, 'unexpected data type');
+
+        } elsif ($value =~ m{ (?:\p{Unassigned}|\x00) }xms ) {
+
+            $self->__throw_serialize_error($id, $key, 'unexpected character');
+
+        } elsif (OpenXPKI::Serialization::Simple::is_serialized($value)) {
+
+            ##! 32: 'deserializing key ' . $key
+            # legacy- serialization was not built in so some activities still
+            # serialized non-scalar structures, unpack them here
+            CTX('log')->workflow()->debug("pre-serialized item in workflow context $id / $key");
+
+            $value = $serializer->deserialize($value);
+        }
+
+        if ($key =~ /^wf_/) {
+            $exec_state{$key} = $value;
+        } else {
+            $ctx{$key} = $value;
+        }
+    }
+
+    return (encode_json(\%exec_state), encode_json(\%ctx));
+}
+
+
+sub __throw_serialize_error {
+
+    my $self = shift;
+    my $id   = shift;
+    my $key   = shift;
+    my $error = shift;
+
+    my $dbi = CTX("dbi");
+    $dbi->rollback;
+    $dbi->start_txn;
+
+    OpenXPKI::Exception->throw(
+        message => "Illegal data in workflow context persister",
+        params => {
+            workflow_id => $id,
+            context_key => $key,
+            error       => $error,
+        },
+        log => {
+            priority => 'fatal',
+            facility => 'workflow',
+        },
+    );
+
+}
+
 sub fetch_workflow {
     my $self = shift;
     my $id   = shift;
@@ -233,17 +333,19 @@ sub fetch_workflow {
 
     my $dbi = CTX("dbi");
 
+    my @columns = qw(
+        workflow_state
+        workflow_last_update
+        workflow_proc_state
+        workflow_count_try
+        workflow_wakeup_at
+        workflow_reap_at
+        workflow_archive_at
+    );
+
     my $result = $dbi->select_one(
         from => 'workflow',
-        columns => [ qw(
-            workflow_state
-            workflow_last_update
-            workflow_proc_state
-            workflow_count_try
-            workflow_wakeup_at
-            workflow_reap_at
-            workflow_archive_at
-        ) ],
+        columns => \@columns,
         where => {
             workflow_id => $id,
             pki_realm => CTX('session')->data->pki_realm,
@@ -281,21 +383,45 @@ sub fetch_extra_workflow_data {
     my $id  = $workflow->id();
     my $dbi = CTX('dbi');
 
-    # Context
-    my $sth = $dbi->select(
-        from => "workflow_context",
-        columns => [ "workflow_context_key", "workflow_context_value" ],
-        where => { workflow_id => $id },
-    );
     # context was set in fetch_workflow
     my $context = $workflow->context();
-    while (my $row = $sth->fetchrow_arrayref) {
-        ##! 32: "Setting context param: ".$row->[0]." => ".$row->[1]
-        $context->param($row->[0] => $row->[1]);
+
+    if ($self->mode eq 'inline') {
+
+        my $result = $dbi->select_one(
+            from => 'workflow',
+            columns => ['workflow_exec_state', 'workflow_context'],
+            where => {
+                workflow_id => $id,
+                pki_realm => CTX('session')->data->pki_realm,
+            },
+        );
+
+        my $exec_state = $result->{workflow_exec_state} ? decode_json($result->{workflow_exec_state}) : {};
+        my $ctx_data   = $result->{workflow_context}    ? decode_json($result->{workflow_context})    : {};
+        for my $key (keys %{$exec_state}) {
+            ##! 32: "Setting inline exec_state param: $key"
+            $context->param($key => $exec_state->{$key});
+        }
+        for my $key (keys %{$ctx_data}) {
+            ##! 32: "Setting inline context param: $key"
+            $context->param($key => $ctx_data->{$key});
+        }
+
+    } else {
+        my $sth = $dbi->select(
+            from => "workflow_context",
+            columns => [ "workflow_context_key", "workflow_context_value" ],
+            where => { workflow_id => $id },
+        );
+        while (my $row = $sth->fetchrow_arrayref) {
+            ##! 32: "Setting context param: ".$row->[0]." => ".$row->[1]
+            $context->param($row->[0] => $row->[1]);
+        }
     }
 
     # Attributes
-    $sth = $dbi->select(
+    my $sth = $dbi->select(
         from => 'workflow_attributes',
         columns => [ 'attribute_contentkey', 'attribute_value' ],
         where => { workflow_id => $id },
@@ -483,11 +609,39 @@ main DBI module.
 For a description of the exported functions please refer to the Workflow
 module documentation.
 
+=head1 Configuration
+
+    OpenXPKI:
+        class: OpenXPKI::Server::Workflow::Persister::DBI
+        mode: legacy
+
+=head2 mode
+
+Controls how the workflow context is stored. Possible values:
+
+=over
+
+=item legacy (default)
+
+Context values are stored as individual rows in the C<workflow_context>
+table (one row per key-value pair). This is the traditional behavior.
+
+=item inline
+
+Context values are serialized as JSON and stored directly in the
+C<workflow> table using the columns C<workflow_context> and
+C<workflow_exec_state>.
+
+The C<workflow_context> table is not used in inline mode.
+
+=back
+
 =head1 Functions
 
 =head2 init
 
 Initializes the persister (assigns sequence generators).
+Reads C<mode> from the persister configuration.
 
 =head2 create_workflow
 
