@@ -351,6 +351,14 @@ else
     yq -i '.socket_group = "www-data"' /etc/openxpki/config.d/system/server.yaml
 fi
 
+# CLI setup
+echo "- configure CLI key"
+cli_keys=$(mktemp)
+echo | oxi cli create | grep -v 'Please enter' > $cli_keys
+yq eval '.auth.admin.key = (.public) | .auth.admin.role = "RA Operator" | del(.public) | del(.private) | del(.id)' $cli_keys > /etc/openxpki/config.d/system/cli.yaml
+mkdir -p ~/.oxi
+yq '.private' $cli_keys > ~/.oxi/client.key
+
 echo "- inject HSM terminal simulation config"
 cat <<__EOF > /etc/openxpki/config.d/system/terminal.yaml
 ncipher:
