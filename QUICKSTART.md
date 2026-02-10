@@ -130,9 +130,9 @@ session:
     Password: mysecret
 ```
 
-Please note the different spelling, while the backend driver is named `MariaDB2`
+Please note the different spelling: while the backend driver is named `MariaDB2`
 for historic reasons, the driver in the session configuration must be the original
-perl name `MariaDB`.
+Perl name `MariaDB`.
 
 ## System Setup
 

@@ -331,7 +331,7 @@ __HANDLER
 yq -i '.connectors.local.LOCATION = "/var/tmp"' /etc/openxpki/config.d/realm/democa/publishing.yaml
 
 # database setup
-echo "- configure MariaDB as database"
+echo "- configure MariaDB2 database driver"
 cat <<__DB > /etc/openxpki/config.d/system/database.yaml
 main:
     debug: 0

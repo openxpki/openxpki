@@ -1218,7 +1218,7 @@ sub _db_config_from_env {
     my ($self) = @_;
 
     return {
-        type    => "MariaDB",
+        type    => "MariaDB2",
         $ENV{OXI_TEST_DB_MYSQL_DBHOST} ? ( host => $ENV{OXI_TEST_DB_MYSQL_DBHOST} ) : (),
         $ENV{OXI_TEST_DB_MYSQL_DBPORT} ? ( port => $ENV{OXI_TEST_DB_MYSQL_DBPORT} ) : (),
         name    => $ENV{OXI_TEST_DB_MYSQL_NAME},

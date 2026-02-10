@@ -24,7 +24,7 @@ has 'data' => (
     predicate => 'has_data',
 );
 
-enum 'DBMS', [qw( SQLite MySQL MariaDB MariaDB2 Oracle PostgreSQL )];
+enum 'DBMS', [qw( SQLite MySQL MariaDB2 Oracle PostgreSQL )];
 
 # restrict tests to certain dbms
 has 'test_only' => (
@@ -104,7 +104,7 @@ sub get_dbi_params ($self, $db_type) {
         passwd => $ENV{OXI_TEST_DB_MYSQL_PASSWORD},
     );
 
-    if ('MySQL' eq $db_type or 'MariaDB' eq $db_type or 'MariaDB2' eq $db_type) {
+    if ('MySQL' eq $db_type or 'MariaDB2' eq $db_type) {
         return {
             type => $db_type,
             %common,
@@ -180,7 +180,6 @@ sub run ($self, $name, $plan, $tests) {
     $SUBTEST->('SQLite',     'DBD::SQLite',  undef,                       "$name (SQLite)");
     $SUBTEST->('Oracle',     'DBD::Oracle',  'OXI_TEST_DB_ORACLE_NAME',   "$name (Oracle)");
     $SUBTEST->('MySQL',      'DBD::mysql',   'OXI_TEST_DB_MYSQL_NAME',    "$name (MySQL)");
-    $SUBTEST->('MariaDB',    'DBD::mysql',   'OXI_TEST_DB_MYSQL_NAME',    "$name (MariaDB)");
     $SUBTEST->('MariaDB2',   'DBD::MariaDB', 'OXI_TEST_DB_MYSQL_NAME',    "$name (MariaDB2)");
     $SUBTEST->('PostgreSQL', 'DBD::Pg',      'OXI_TEST_DB_POSTGRES_NAME', "$name (PostgreSQL)");
 }

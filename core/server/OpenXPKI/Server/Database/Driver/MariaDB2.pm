@@ -160,7 +160,7 @@ Driver for MariaDB servers based on L<DBD::MariaDB> client library.
 Requires MariaDB >= 10.3.
 
 Does B<not> work on Debian Buster due to a bug in L<DBD::MariaDB> v1.11
-client library - please use the C<MariaDB> driver with the old mysql lib instead.
+client library.
 
 This class is not meant to be instantiated directly.
 Use L<OpenXPKI::Server::Database/new> instead.

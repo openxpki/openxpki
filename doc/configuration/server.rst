@@ -22,20 +22,11 @@ The general configuration block looks like::
         driver:
             LongReadLen: 10000000
 
-OpenXPKI supports MariaDB (MySQL), PostgreSQL and Oracle.
+OpenXPKI supports MariaDB, MySQL, PostgreSQL and Oracle.
 The *namespace* parameter is used only by the Oracle driver.
 Options given to ``driver`` are passed to DBI as extra parameters.
 
 Check perldoc OpenXPKI::Server::Database::Driver::<type> for more info on the parameters.
-
-The recommended driver is ``MariaDB2`` which uses the perl MariaDB driver module while
-``MariaDB`` internally uses the old ``mysql`` driver of perl. Depending on the OS and perl
-version used this might just be an alias but we have also seen very strange issues here.
-*Note:* It looks like the DBD::MariaDB module shipped with bookworm has an issue with reference
-counters leading to very messy log output and **might** also have implications on security or
-system stability - we therefore recommend to stick with the ``MariaDB`` module in combination
-with the old ``libdbd-mysql-perl`` driver.
-
 
 System
 -----------------------

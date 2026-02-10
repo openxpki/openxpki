@@ -42,10 +42,6 @@ my $tests = [
     },
     {
         env_var => 'OXI_TEST_DB_MYSQL_NAME',
-        db_params => DatabaseTest->new->get_dbi_params('MariaDB'),
-    },
-    {
-        env_var => 'OXI_TEST_DB_MYSQL_NAME',
         db_params => DatabaseTest->new->get_dbi_params('MariaDB2'),
     },
     {

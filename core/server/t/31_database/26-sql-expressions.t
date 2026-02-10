@@ -21,7 +21,7 @@ use_ok("OpenXPKI::Server::Database");
 my $mariadb_expr = 'EXTRACT(YEAR FROM FROM_UNIXTIME(notbefore))';
 
 my $expected = {
-    MariaDB    => qr/^extract \( year \s+ from \s+ from_unixtime \( notbefore \) \)/msxi,
+    MariaDB2   => qr/^extract \( year \s+ from \s+ from_unixtime \( notbefore \) \)/msxi,
     MySQL      => qr/^extract \( year \s+ from \s+ from_unixtime \( notbefore \) \)/msxi,
     Oracle     => qr/^extract \( year \s+ from \s+ to_date \( '19700101' , 'YYYYMMDD' \) \+ \( 1\/86400 \) \* notbefore \)/msxi,
     PostgreSQL => qr/^extract \( year \s+ from \s+ to_timestamp \( notbefore \) \)/msxi,
