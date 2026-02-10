@@ -277,7 +277,7 @@ sub freeze ($self, $arg) {
         delete $data_hash->{$_} for @{ $arg->except };
     }
 
-    return "JSON:".($self->_json->encode($data_hash));
+    return $self->_json->encode($data_hash);
 }
 
 =head2 thaw
@@ -301,10 +301,17 @@ sub thaw ($self, $frozen) {
     if ($frozen =~ /^HASH\n/ ) {
         $data_hash = OpenXPKI::Serialization::Simple->new->deserialize($frozen);
     }
-    else {
-        OpenXPKI::Exception->throw(message => "Unknown format of serialized data")
-            unless $frozen =~ /^JSON:/;
+    # up to 3.34 we had a prefix here
+    elsif ($frozen =~ /^JSON:/ ) {
         $data_hash = $self->_json->decode(substr($frozen,5));
+    }
+    # it is hopefully plain json now
+    elsif ($frozen =~ /\A\{.*\}\z/) {
+        $data_hash = $self->_json->decode($frozen);
+
+    # this is unexpected now
+    } else {
+        OpenXPKI::Exception->throw(message => "Unknown format of serialized data");
     }
 
     # set session attributes via accessor methods
