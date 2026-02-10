@@ -156,18 +156,18 @@ sub __persistCertificateInformation {
         }
     }
 
-    CTX('log')->audit('cakey')->info('certificate signed', {
+    CTX('log')->audit('cakey')->info('certificate signed',
         cakey     => $cert_data->{authority_key_identifier},
         certid    => $identifier,
         key       => $cert_data->{subject_key_identifier},
         pki_realm => $pki_realm,
-    });
+    );
 
-    CTX('log')->audit('entity')->info('certificate issued', {
+    CTX('log')->audit('entity')->info('certificate issued',
         certid    => $identifier,
         key       => $cert_data->{subject_key_identifier},
         pki_realm => $pki_realm,
-    });
+    );
 
 
     CTX('dbi')->insert(

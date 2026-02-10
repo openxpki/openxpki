@@ -483,11 +483,11 @@ sub issueCRL {
 
     CTX('log')->application()->info('CRL issued for CA ' . $ca_alias . ' in realm ' . $pki_realm);
 
-    CTX('log')->audit('cakey')->info('crl issued', {
+    CTX('log')->audit('cakey')->info('crl issued',
         cakey     => $ca_identifier,
         token     => $ca_alias,
         pki_realm => $pki_realm,
-    });
+    );
 
     my $data = {
         pki_realm         => $pki_realm,

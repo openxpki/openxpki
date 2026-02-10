@@ -187,10 +187,10 @@ command "import_certificate" => {
         #
         if ($params->force_noverify) {
             CTX('log')->system()->warn("Importing certificate without chain verification! $cert_identifier / " . $x509->get_subject);
-            CTX('log')->audit('system')->warn('certificate import without chain validation', {
+            CTX('log')->audit('system')->warn('certificate import without chain validation',
                 certid    => $cert_identifier,
                 key       => $x509->get_subject_key_id(),
-            });
+            );
             $valid = 1;
         }
         else {
@@ -205,10 +205,10 @@ command "import_certificate" => {
             # force the invalid issuer
             if ($params->force_issuer) {
                 CTX('log')->system->warn("Forced import of certificate with invalid! $cert_identifier / " . $x509->get_subject());
-                CTX('log')->audit('system')->warn('certificate import without chain validation', {
+                CTX('log')->audit('system')->warn('certificate import without chain validation',
                     certid    => $cert_identifier,
                     key       => $x509->get_subject_key_id(),
-                });
+                );
             } else {
                 OpenXPKI::Exception->throw(
                     message => 'Unable to build certificate chain',

@@ -122,9 +122,9 @@ sub execute {
 
             CTX('log')->application()->info("Export of private key to context for $cert_identifier");
 
-            CTX('log')->audit('key')->info("private key export to context", {
+            CTX('log')->audit('key')->info("private key export to context",
                 certid => $cert_identifier
-            });
+            );
 
             # If template is given we add the key to the params list
             # otherwise we directly export the (base64 encoded) private key

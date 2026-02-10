@@ -26,7 +26,7 @@ sub execute {
     delete $params->{'export_password'};
     delete $params->{'enc_alg'};
 
-    CTX('log')->audit('key')->info("generating private key via NICE");
+    CTX('log')->audit('key')->info("fetching private key via NICE");
 
     ##! 32: 'NICE generatekey parameters ' . Dumper $params
     my $nice_backend = OpenXPKI::Server::NICE::Factory->getHandler( $self );

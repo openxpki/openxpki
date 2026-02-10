@@ -32,7 +32,7 @@ command "clear_secret" => {
     secret => { isa => 'AlphaPunct', required => 1, },
 } => sub {
     my ($self, $params) = @_;
-    CTX('log')->audit('system')->info("clearing secret", { group => $params->secret });
+    CTX('log')->audit('system')->info("clearing secret", group => $params->secret );
     CTX('crypto_layer')->clear_secret($params->secret);
     return 1;
 };

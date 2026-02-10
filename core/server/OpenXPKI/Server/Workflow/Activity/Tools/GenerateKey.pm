@@ -55,9 +55,9 @@ sub execute
     my $pkcs8 = CTX('api2')->generate_key(%$params);
 
     delete $params->{password};
-    CTX('log')->audit('key')->info("generating private key", {
+    CTX('log')->audit('key')->info("generating private key",
         %{$params}
-    });
+    );
 
     my $target_key = $self->param('target_key') || 'private_key';
 

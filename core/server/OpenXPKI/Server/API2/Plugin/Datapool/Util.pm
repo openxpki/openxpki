@@ -299,10 +299,10 @@ sub create_realm_encryption_key ($self, $arg) {
     );
 
     CTX('log')->system()->info(sprintf('New datapool encryption token was created (Token: %s, Key: %s)', $safe_id, $key_id));
-    CTX('log')->audit('system')->info('New datapool encryption token was created', {
+    CTX('log')->audit('system')->info('New datapool encryption token was created',
         token  => $safe_id,
         keyid  => $key_id,
-    });
+    );
 
     # add key ID
     $result->{KEY_ID} = $key_id;
@@ -359,11 +359,11 @@ sub rekey_realm_encryption_key ($self, $key_id, $safe_id) {
         force => 1,
     );
 
-    CTX('log')->audit('system')->info('Datapool encryption key was rekeyed', {
+    CTX('log')->audit('system')->info('Datapool encryption key was rekeyed',
         source => $result->{encryption_key},
         target => $safe_id,
         keyid  => $key_id,
-    });
+    );
 
 }
 

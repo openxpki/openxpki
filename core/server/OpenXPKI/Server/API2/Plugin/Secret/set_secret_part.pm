@@ -46,17 +46,17 @@ command "set_secret_part" => {
             VALUE => $params->value,
         });
 
-        CTX('log')->audit('system')->info("set secret part", {
+        CTX('log')->audit('system')->info("set secret part",
             group => $params->secret,
-            $params->has_part ? (part => $params->part) : (),
-        });
+            ($params->has_part ? (part => $params->part) : ()),
+        );
     }
     catch ($err) {
-        CTX('log')->audit('system')->warn("incorrect secret given", {
+        CTX('log')->audit('system')->warn("incorrect secret given",
             group => $params->secret,
-            $params->has_part ? (part => $params->part) : (),
+            ($params->has_part ? (part => $params->part) : ()),
             error => "$err",
-        });
+        );
         die $err;
     };
 

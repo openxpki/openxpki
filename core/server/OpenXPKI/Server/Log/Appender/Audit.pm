@@ -29,9 +29,11 @@ sub log {
     my $loglevel  = $arg_ref->{'log4p_level'};
 
     my $message = $arg_ref->{'message'};
+
     if (ref $message eq 'ARRAY') {
         $message = shift @{$message};
     }
+    chomp $message;
 
     my ($seconds, $micro) = Time::HiRes::gettimeofday();
     $seconds += $micro/1000000;

@@ -67,9 +67,9 @@ sub execute {
     CTX('log')->application()->info("Export of private key to archive for $cert_identifier");
 
 
-    CTX('log')->audit('key')->info("private key export to archive", {
+    CTX('log')->audit('key')->info("private key export to archive",
         certid => $cert_identifier
-    });
+    );
 
     $zip->addString( $privkey, $key_file )
         ->desiredCompressionMethod( COMPRESSION_DEFLATED );

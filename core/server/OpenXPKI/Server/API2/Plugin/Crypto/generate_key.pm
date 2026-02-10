@@ -136,7 +136,7 @@ command "generate_key" => {
         }
     }
 
-    CTX('log')->audit('key')->info("generating private key", { key_alg => $key_alg });
+    CTX('log')->audit('key')->info("generating private key", key_alg => $key_alg);
 
     ##! 16: $command
     return $token->command($command);

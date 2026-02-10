@@ -42,9 +42,13 @@ command "get_private_key_for_cert" => {
     my $nopassword = $params->nopassword;
 
     if ($nopassword) {
-        CTX('log')->audit('key')->warn("private key export without password", { certid => $identifier });
+        CTX('log')->audit('key')->warn("private key export without password",
+            certid => $identifier
+        );
     } else {
-        CTX('log')->audit('key')->info("private key export", { certid => $identifier });
+        CTX('log')->audit('key')->info("private key export",
+            certid => $identifier
+        );
     }
 
     my $private_key = $self->get_private_key_from_db($identifier)
@@ -190,9 +194,9 @@ command "convert_private_key" => {
         );
     }
 
-    if ($nopassword) {
-        CTX('log')->audit('key')->warn("private key export without password");
-    }
+    CTX('log')->audit('key')->warn("private key export without password",
+        certid => $identifier
+    ) if ($nopassword);
 
     ##! 4: 'identifier: ' . $identifier
     ##! 4: 'format: ' . $format
