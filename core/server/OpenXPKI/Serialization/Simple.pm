@@ -70,26 +70,18 @@ sub deserialize
     if ($string && (ref $string eq 'HASH') || (ref $string eq 'ARRAY')) {
         return $string;
 
-    # We try to detect the serialization format autmagically here
-    # The legacy encoder has one of these keywords and a separator
-
-    } elsif ( $string =~ /^(SCALAR|ARRAY|HASH|UNDEF|BASE64)(\w|\n|-)/ ) {
-        ##! 32: 'Autodetect - Legacy'
-        my $separator = $2;
-        # I dont know if there is anything else in the wild but just in case
-        # we try to also detect non LF separators
-        if ($separator ne "\n") {
-            ##! 32: 'Non LF Separator ' . $separator
-        }
-
-        $self->_legacy()->{SEPARATOR} = $separator;
-        return $self->_legacy()->deserialize( $string );
-
     } elsif ( $string =~ /^OXJSF1:/ ) {
         ##! 32: 'Autodetect - JSON'
         return $self->_json()->deserialize( substr($string,7) );
     } elsif ( $string =~ /^OXB64:/ ) {
         return decode_base64( substr($string, 6 ) );
+
+    # The legacy encoder has one of these keywords and a separator
+    # non-linebreak character as separator is no longer detected here
+    # UNCOMMENT LINES BELOW FOR LEGACY SUPPORT
+    #} elsif ( $string =~ /^(SCALAR|ARRAY|HASH|UNDEF|BASE64)\n/ ) {
+    #    return $self->_legacy()->deserialize( $string );
+
     }
 
     OpenXPKI::Exception->throw(
@@ -99,16 +91,23 @@ sub deserialize
         }
     );
 
-
 }
 
 # this is static!
 sub is_serialized {
 
     my $msg  = shift;
-    return (defined $msg &&
-        ref $msg eq '' &&
-        $msg =~ /^(((SCALAR|ARRAY|HASH|UNDEF|BASE64)(\w|\n|-))|OXJSF1|OXB64)/);
+
+    return 0 unless(defined $msg);
+
+    return 0 unless(ref $msg eq '');
+
+    return 1 if ($msg =~ /^(OXJSF1|OXB64)/);
+
+    # UNCOMMENT LINE BELOW FOR LEGACY SUPPORT
+    # return 1 if ($msg =~ /^((SCALAR|ARRAY|HASH|UNDEF|BASE64)\n)/);
+
+    return 0;
 
 }
 
