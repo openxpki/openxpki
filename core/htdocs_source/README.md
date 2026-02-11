@@ -90,7 +90,7 @@ pnpm config set auto-install-peers true
 
 To continue developing later on the Node.js version has to be set:
 
-```bash 
+```bash
 cd core/htdocs_source
 nvm use
 ```
@@ -112,7 +112,7 @@ pnpm install
 **Compilation**
 
 ```bash
-pnpm run build
+make ember
 ```
 
 **Running the frontend**
@@ -120,10 +120,18 @@ pnpm run build
 To run the Ember.js based web UI locally incl. live reload (on code changes) you have to start an OpenXPKI backend via Docker or Vagrant and then run:
 
 ```bash
-pnpm run serve
+make serve
 ```
 
 (this calls `ember serve` and proxies AJAX requests to `$DEV_SERVER_FORWARD_TO`)
+
+The UI is then available under:
+
+http://localhost:4200/webui/index/#/openxpki/login
+
+A test website with most of the UI components can be found under:
+
+http://localhost:4200/webui/democa/#/test
 
 **Source code checks (aka. "linting")**
 
