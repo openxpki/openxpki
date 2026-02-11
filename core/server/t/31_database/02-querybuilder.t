@@ -11,9 +11,9 @@ Log::Log4perl->easy_init($ENV{TEST_VERBOSE} ? $ERROR : $OFF);
 #
 my $log = Log::Log4perl->get_logger;
 
-use_ok("OpenXPKI::Server::Database");
+use_ok("OpenXPKI::Database");
 my $dbi;
-lives_ok { $dbi = OpenXPKI::Server::Database->new(
+lives_ok { $dbi = OpenXPKI::Database->new(
     log => $log,
     db_params => { type => "SQLite", name => ":memory:" },
 ) } "dbi instance";

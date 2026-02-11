@@ -1,9 +1,9 @@
-package OpenXPKI::Server::Database::Query;
+package OpenXPKI::Database::Query;
 use OpenXPKI -class;
 
 =head1 Name
 
-OpenXPKI::Server::Database::Query - Container for SQL query string and bind
+OpenXPKI::Database::Query - Container for SQL query string and bind
 parameters
 
 =cut

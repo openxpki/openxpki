@@ -16,7 +16,7 @@ use Regexp::Common;
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::Database::Legacy;
+use OpenXPKI::Database::Legacy;
 use OpenXPKI::Server::API2::Plugin::Cert::DateCondition;
 
 has 'return_columns_default' => (
@@ -475,7 +475,7 @@ sub _make_db_query {
             }
             # TODO #legacydb search_cert's CERT_ATTRIBUTES allows old DB layer syntax
             $where->{ "$table_alias.attribute_value" } =
-                OpenXPKI::Server::Database::Legacy->convert_dynamic_cond($attrib);
+                OpenXPKI::Database::Legacy->convert_dynamic_cond($attrib);
 
             $ii++;
         }

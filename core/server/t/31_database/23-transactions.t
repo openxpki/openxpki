@@ -7,7 +7,7 @@ use Test::Exception;
 use File::Temp qw/ tempfile /;
 use FindBin qw( $Bin );
 
-#use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Database.*'} = 100;
+#use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Database.*'} = 100;
 
 #
 # setup

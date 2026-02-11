@@ -5,7 +5,7 @@ use Test::Deep ':v1';
 use Test::Exception;
 use FindBin qw( $Bin );
 
-#use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Database.*'} = 100;
+#use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Database.*'} = 100;
 
 #
 # setup
@@ -26,8 +26,6 @@ my $db = DatabaseTest->new(
 #
 # tests
 #
-use_ok "OpenXPKI::Server::Database";
-
 $db->run("SQL INSERT with automatic ID = sequence generation", 2, sub {
     my $t = shift;
     my $dbi = $t->dbi;
@@ -48,5 +46,4 @@ $db->run("SQL INSERT with automatic ID = sequence generation", 2, sub {
     ], "correct data after insert";
 });
 
-done_testing($db->test_no + 1);
-
+done_testing($db->test_no);

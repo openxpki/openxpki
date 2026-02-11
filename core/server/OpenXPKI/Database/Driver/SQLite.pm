@@ -1,21 +1,21 @@
-package OpenXPKI::Server::Database::Driver::SQLite;
+package OpenXPKI::Database::Driver::SQLite;
 use OpenXPKI -class;
 
 with qw(
-    OpenXPKI::Server::Database::Role::SequenceEmulation
-    OpenXPKI::Server::Database::Role::MergeEmulation
-    OpenXPKI::Server::Database::Role::CountEmulation
-    OpenXPKI::Server::Database::Role::Driver
+    OpenXPKI::Database::Role::SequenceEmulation
+    OpenXPKI::Database::Role::MergeEmulation
+    OpenXPKI::Database::Role::CountEmulation
+    OpenXPKI::Database::Role::Driver
 );
 
 =head1 Name
 
-OpenXPKI::Server::Database::Driver::SQLite - Driver for SQLite databases
+OpenXPKI::Database::Driver::SQLite - Driver for SQLite databases
 
 =cut
 
 ################################################################################
-# required by OpenXPKI::Server::Database::Role::Driver
+# required by OpenXPKI::Database::Role::Driver
 #
 
 # DBI compliant driver name
@@ -66,7 +66,7 @@ sub sqlam_params {
 
 sub table_drop_query {
     my ($self, $dbi, $table) = @_;
-    return OpenXPKI::Server::Database::Query->new(
+    return OpenXPKI::Database::Query->new(
         string => "DROP TABLE IF EXISTS $table",
     );
 }
@@ -95,7 +95,7 @@ sub do_sql_replacements {
 }
 
 ################################################################################
-# required by OpenXPKI::Server::Database::Role::SequenceEmulation
+# required by OpenXPKI::Database::Role::SequenceEmulation
 #
 
 sub sql_autoinc_column { return "INTEGER PRIMARY KEY AUTOINCREMENT" }
@@ -111,6 +111,6 @@ __PACKAGE__->meta->make_immutable;
 =head1 Description
 
 This class is not meant to be instantiated directly.
-Use L<OpenXPKI::Server::Database/new> instead.
+Use L<OpenXPKI::Database/new> instead.
 
 =cut

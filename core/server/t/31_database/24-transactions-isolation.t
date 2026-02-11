@@ -10,10 +10,10 @@ use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($ENV{TEST_VERBOSE} ? $ERROR : $OFF);
 
 use FindBin qw( $Bin );
-use OpenXPKI::Server::Database;
+use OpenXPKI::Database;
 require "$Bin/DatabaseTest.pm";
 
-#use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Database.*'} = 100;
+#use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Database.*'} = 100;
 
 #
 # setup
@@ -54,8 +54,8 @@ for my $test (@{$tests}) {
     my $env_var = $test->{env_var};
     my $db_params = $test->{db_params};
 
-    my $db_alice = OpenXPKI::Server::Database->new(log => $log, db_params => $db_params);
-    my $db_bob   = OpenXPKI::Server::Database->new(log => $log, db_params => $db_params);
+    my $db_alice = OpenXPKI::Database->new(log => $log, db_params => $db_params);
+    my $db_bob   = OpenXPKI::Database->new(log => $log, db_params => $db_params);
 
     SKIP: {
         skip "$env_var not set", 1 if ($env_var and not $ENV{$env_var});

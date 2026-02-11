@@ -353,7 +353,7 @@ sub _make_query_params {
             }
             # TODO #legacydb search_workflow_instances' ATTRIBUTE allows old DB layer syntax
             $where->{ "$table_alias.attribute_value" } =
-                OpenXPKI::Server::Database::Legacy->convert_dynamic_cond($cond);
+                OpenXPKI::Database::Legacy->convert_dynamic_cond($cond);
 
             $ii++;
 

@@ -1,23 +1,23 @@
-package OpenXPKI::Server::Database::Driver::MySQL;
+package OpenXPKI::Database::Driver::MySQL;
 use OpenXPKI -class;
 
 with qw(
-    OpenXPKI::Server::Database::Role::SequenceEmulation
-    OpenXPKI::Server::Database::Role::MergeSupport
-    OpenXPKI::Server::Database::Role::CountEmulation
-    OpenXPKI::Server::Database::Role::Driver
+    OpenXPKI::Database::Role::SequenceEmulation
+    OpenXPKI::Database::Role::MergeSupport
+    OpenXPKI::Database::Role::CountEmulation
+    OpenXPKI::Database::Role::Driver
 );
 
 =head1 Name
 
-OpenXPKI::Server::Database::Driver::MySQL
+OpenXPKI::Database::Driver::MySQL
 
 =cut
 
 use DBI qw(:sql_types);
 
 ################################################################################
-# required by OpenXPKI::Server::Database::Role::Driver
+# required by OpenXPKI::Database::Role::Driver
 #
 
 # DBI compliant driver name
@@ -73,12 +73,12 @@ sub sqlam_params {
 sub do_sql_replacements { shift; shift } # return input argument
 
 ################################################################################
-# required by OpenXPKI::Server::Database::Role::SequenceEmulation
+# required by OpenXPKI::Database::Role::SequenceEmulation
 #
 
 sub table_drop_query {
     my ($self, $dbi, $table) = @_;
-    return OpenXPKI::Server::Database::Query->new(
+    return OpenXPKI::Database::Query->new(
         string => "DROP TABLE IF EXISTS $table",
     );
 }
@@ -93,14 +93,14 @@ sub last_auto_id {
 }
 
 ################################################################################
-# required by OpenXPKI::Server::Database::Role::MergeSupport
+# required by OpenXPKI::Database::Role::MergeSupport
 #
 
 sub merge_query {
     my ($self, $dbi, $into, $set, $set_once, $where) = @_;
     my %all_val  = ( %$set, %$set_once, %$where );
 
-    return OpenXPKI::Server::Database::Query->new(
+    return OpenXPKI::Database::Query->new(
         string => sprintf(
             "INSERT INTO %s (%s) VALUES (%s) ON DUPLICATE KEY UPDATE %s",
             $into,
@@ -122,6 +122,6 @@ __PACKAGE__->meta->make_immutable;
 Driver for MySQL databases (tested with 5.6/5.7 only)!
 
 This class is not meant to be instantiated directly.
-Use L<OpenXPKI::Server::Database/new> instead.
+Use L<OpenXPKI::Database/new> instead.
 
 =cut

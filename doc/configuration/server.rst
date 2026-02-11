@@ -26,7 +26,7 @@ OpenXPKI supports MariaDB, MySQL, PostgreSQL and Oracle.
 The *namespace* parameter is used only by the Oracle driver.
 Options given to ``driver`` are passed to DBI as extra parameters.
 
-Check perldoc OpenXPKI::Server::Database::Driver::<type> for more info on the parameters.
+Check perldoc OpenXPKI::Database::Driver::<type> for more info on the parameters.
 
 System
 -----------------------

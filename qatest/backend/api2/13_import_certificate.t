@@ -17,7 +17,7 @@ use Test::Exception;
 
 # Project modules
 use lib $Bin, "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
-# use OpenXPKI::Debug; BEGIN { $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Database.*'} = 0b1111111 }
+# use OpenXPKI::Debug; BEGIN { $OpenXPKI::Debug::LEVEL{'OpenXPKI::Database.*'} = 0b1111111 }
 use OpenXPKI::Test;
 
 plan tests => 13;

@@ -1,21 +1,21 @@
-package OpenXPKI::Server::Database::Driver::PostgreSQL;
+package OpenXPKI::Database::Driver::PostgreSQL;
 use OpenXPKI -class;
 
 with qw(
-    OpenXPKI::Server::Database::Role::SequenceSupport
-    OpenXPKI::Server::Database::Role::MergeEmulation
-    OpenXPKI::Server::Database::Role::CountEmulation
-    OpenXPKI::Server::Database::Role::Driver
+    OpenXPKI::Database::Role::SequenceSupport
+    OpenXPKI::Database::Role::MergeEmulation
+    OpenXPKI::Database::Role::CountEmulation
+    OpenXPKI::Database::Role::Driver
 );
 
 =head1 Name
 
-OpenXPKI::Server::Database::Driver::PostgreSQL - Driver for PostgreSQL databases
+OpenXPKI::Database::Driver::PostgreSQL - Driver for PostgreSQL databases
 
 =cut
 
 ################################################################################
-# required by OpenXPKI::Server::Database::Role::Driver
+# required by OpenXPKI::Database::Role::Driver
 #
 
 # DBI compliant driver name
@@ -85,7 +85,7 @@ sub sqlam_params {
 
 sub sequence_create_query {
     my ($self, $dbi, $seq) = @_;
-    return OpenXPKI::Server::Database::Query->new(
+    return OpenXPKI::Database::Query->new(
         string => "CREATE SEQUENCE $seq START WITH 0 INCREMENT BY 1 MINVALUE 0 NO MAXVALUE",
     );
 }
@@ -93,14 +93,14 @@ sub sequence_create_query {
 # Returns a query that removes an SQL sequence
 sub sequence_drop_query {
     my ($self, $dbi, $seq) = @_;
-    return OpenXPKI::Server::Database::Query->new(
+    return OpenXPKI::Database::Query->new(
         string => "DROP SEQUENCE IF EXISTS $seq",
     );
 }
 
 sub table_drop_query {
     my ($self, $dbi, $table) = @_;
-    return OpenXPKI::Server::Database::Query->new(
+    return OpenXPKI::Database::Query->new(
         string => "DROP TABLE IF EXISTS $table",
     );
 }
@@ -114,7 +114,7 @@ sub do_sql_replacements {
 }
 
 ################################################################################
-# required by OpenXPKI::Server::Database::Role::SequenceSupport
+# required by OpenXPKI::Database::Role::SequenceSupport
 #
 
 sub nextval_query {
@@ -127,6 +127,6 @@ __PACKAGE__->meta->make_immutable;
 =head1 Description
 
 This class is not meant to be instantiated directly.
-Use L<OpenXPKI::Server::Database/new> instead.
+Use L<OpenXPKI::Database/new> instead.
 
 =cut

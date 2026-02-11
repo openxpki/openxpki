@@ -14,7 +14,7 @@ use OpenXPKI::Server::Context qw( CTX );
 
 has dbi => (
     is => 'ro',
-    isa => 'OpenXPKI::Server::Database',
+    isa => 'OpenXPKI::Database',
     lazy => 1,
     default => sub {
         CTX('dbi') or die "Could not instantiate database backend\n";

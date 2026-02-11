@@ -1,20 +1,20 @@
-package OpenXPKI::Server::Database::Driver::Oracle;
+package OpenXPKI::Database::Driver::Oracle;
 use OpenXPKI -class;
 
 with qw(
-    OpenXPKI::Server::Database::Role::SequenceSupport
-    OpenXPKI::Server::Database::Role::MergeEmulation
-    OpenXPKI::Server::Database::Role::Driver
+    OpenXPKI::Database::Role::SequenceSupport
+    OpenXPKI::Database::Role::MergeEmulation
+    OpenXPKI::Database::Role::Driver
 );
 
 =head1 Name
 
-OpenXPKI::Server::Database::Driver::Oracle - Driver for Oracle databases
+OpenXPKI::Database::Driver::Oracle - Driver for Oracle databases
 
 =cut
 
 ################################################################################
-# required by OpenXPKI::Server::Database::Role::Driver
+# required by OpenXPKI::Database::Role::Driver
 #
 
 # DBI compliant driver name
@@ -56,7 +56,7 @@ sub sqlam_params {
 
 sub sequence_create_query {
     my ($self, $dbi, $seq) = @_;
-    return OpenXPKI::Server::Database::Query->new(
+    return OpenXPKI::Database::Query->new(
         string => "CREATE SEQUENCE $seq START WITH 0 INCREMENT BY 1 MINVALUE 0 NOMAXVALUE ORDER",
     );
 }
@@ -65,7 +65,7 @@ sub sequence_create_query {
 sub sequence_drop_query {
     my ($self, $dbi, $seq) = @_;
     # TODO For Oracle check if sequence exists before dropping to avoid errors
-    return OpenXPKI::Server::Database::Query->new(
+    return OpenXPKI::Database::Query->new(
         string => "DROP SEQUENCE $seq",
     );
 }
@@ -73,7 +73,7 @@ sub sequence_drop_query {
 sub table_drop_query {
     my ($self, $dbi, $table) = @_;
     # TODO For Oracle check if table exists before dropping to avoid errors
-    return OpenXPKI::Server::Database::Query->new(
+    return OpenXPKI::Database::Query->new(
         string => "DROP TABLE $table",
     );
 }
@@ -98,7 +98,7 @@ sub do_sql_replacements {
 
 
 ################################################################################
-# required by OpenXPKI::Server::Database::Role::SequenceSupport
+# required by OpenXPKI::Database::Role::SequenceSupport
 #
 
 sub nextval_query {
@@ -133,6 +133,6 @@ __PACKAGE__->meta->make_immutable;
 This driver supports only named connection via TNS names (no host/port setup).
 
 This class is not meant to be instantiated directly.
-Use L<OpenXPKI::Server::Database/new> instead.
+Use L<OpenXPKI::Database/new> instead.
 
 =cut

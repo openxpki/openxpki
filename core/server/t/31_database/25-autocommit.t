@@ -1,6 +1,6 @@
-package OpenXPKI::Server::Database::Driver::MySQLTest;
+package OpenXPKI::Database::Driver::MySQLTest;
 use Moose;
-extends 'OpenXPKI::Server::Database::Driver::MySQL';
+extends 'OpenXPKI::Database::Driver::MySQL';
 
 around 'dbi_dsn' => sub {
     my $orig = shift;
@@ -21,7 +21,7 @@ use Log::Log4perl;
 use FindBin qw( $Bin );
 require "$Bin/DatabaseTest.pm";
 
-#use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Database.*'} = 100;
+#use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Database.*'} = 100;
 
 plan skip_all => "No MySQL database found / OXI_TEST_DB_MYSQL_NAME not set" unless $ENV{OXI_TEST_DB_MYSQL_NAME};
 
@@ -50,10 +50,10 @@ my $db_params = {
     type => 'MySQLTest',
 };
 
-use_ok "OpenXPKI::Server::Database";
+use_ok "OpenXPKI::Database";
 
-my $db_alice = OpenXPKI::Server::Database->new(log => $log, db_params => $db_params, autocommit => 1);
-my $db_bob   = OpenXPKI::Server::Database->new(log => $log, db_params => $db_params);
+my $db_alice = OpenXPKI::Database->new(log => $log, db_params => $db_params, autocommit => 1);
+my $db_bob   = OpenXPKI::Database->new(log => $log, db_params => $db_params);
 
 # Checks if db handle "bob" sees the given data in table "test"
 sub bob_sees {

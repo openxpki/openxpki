@@ -59,7 +59,7 @@ has 'test_no' => (
 
 sub BUILD {
     my $self = shift;
-    use_ok "OpenXPKI::Server::Database"; $self->count_test;
+    use_ok "OpenXPKI::Database"; $self->count_test;
 }
 
 # Return true if the given DB type shall be tested

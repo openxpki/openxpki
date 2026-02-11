@@ -1,9 +1,9 @@
-package OpenXPKI::Server::Database::Role::SequenceSupport;
+package OpenXPKI::Database::Role::SequenceSupport;
 use OpenXPKI -role;
 
 =head1 Name
 
-OpenXPKI::Server::Database::Role::SequenceSupport - Moose role for database
+OpenXPKI::Database::Role::SequenceSupport - Moose role for database
 drivers to indicate that they support sequences
 
 =cut

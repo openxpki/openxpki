@@ -1,16 +1,16 @@
-package OpenXPKI::Server::Database::Driver::MariaDB2;
+package OpenXPKI::Database::Driver::MariaDB2;
 use OpenXPKI -class;
 
 with qw(
-    OpenXPKI::Server::Database::Role::SequenceSupport
-    OpenXPKI::Server::Database::Role::MergeSupport
-    OpenXPKI::Server::Database::Role::CountEmulation
-    OpenXPKI::Server::Database::Role::Driver
+    OpenXPKI::Database::Role::SequenceSupport
+    OpenXPKI::Database::Role::MergeSupport
+    OpenXPKI::Database::Role::CountEmulation
+    OpenXPKI::Database::Role::Driver
 );
 
 =head1 Name
 
-OpenXPKI::Server::Database::Driver::MariaDB2
+OpenXPKI::Database::Driver::MariaDB2
 
 =cut
 
@@ -22,7 +22,7 @@ use DBI qw(:sql_types);
 use DBI::Const::GetInfoType; # provides %GetInfoType hash
 
 ################################################################################
-# required by OpenXPKI::Server::Database::Role::Driver
+# required by OpenXPKI::Database::Role::Driver
 #
 
 # DBI compliant driver name
@@ -97,7 +97,7 @@ sub sqlam_params {
 sub sequence_create_query {
     my ($self, $dbi, $seq) = @_;
 
-    return OpenXPKI::Server::Database::Query->new(
+    return OpenXPKI::Database::Query->new(
         string => "CREATE SEQUENCE $seq START = 0 INCREMENT = 1 MINVALUE = 0 NOMAXVALUE",
     );
 }
@@ -105,14 +105,14 @@ sub sequence_create_query {
 # Returns a query that removes an SQL sequence
 sub sequence_drop_query {
     my ($self, $dbi, $seq) = @_;
-    return OpenXPKI::Server::Database::Query->new(
+    return OpenXPKI::Database::Query->new(
         string => "DROP SEQUENCE IF EXISTS $seq",
     );
 }
 
 sub table_drop_query {
     my ($self, $dbi, $table) = @_;
-    return OpenXPKI::Server::Database::Query->new(
+    return OpenXPKI::Database::Query->new(
         string => "DROP TABLE IF EXISTS $table",
     );
 }
@@ -120,7 +120,7 @@ sub table_drop_query {
 sub do_sql_replacements { shift; shift } # return input argument
 
 ################################################################################
-# required by OpenXPKI::Server::Database::Role::SequenceSupport
+# required by OpenXPKI::Database::Role::SequenceSupport
 #
 
 sub nextval_query {
@@ -129,14 +129,14 @@ sub nextval_query {
 }
 
 ################################################################################
-# required by OpenXPKI::Server::Database::Role::MergeSupport
+# required by OpenXPKI::Database::Role::MergeSupport
 #
 
 sub merge_query {
     my ($self, $dbi, $into, $set, $set_once, $where) = @_;
     my %all_val  = ( %$set, %$set_once, %$where );
 
-    return OpenXPKI::Server::Database::Query->new(
+    return OpenXPKI::Database::Query->new(
         string => sprintf(
             "INSERT INTO %s (%s) VALUES (%s) ON DUPLICATE KEY UPDATE %s",
             $into,
@@ -163,6 +163,6 @@ Does B<not> work on Debian Buster due to a bug in L<DBD::MariaDB> v1.11
 client library.
 
 This class is not meant to be instantiated directly.
-Use L<OpenXPKI::Server::Database/new> instead.
+Use L<OpenXPKI::Database/new> instead.
 
 =cut

@@ -1,9 +1,9 @@
-package OpenXPKI::Server::Database::Role::MergeEmulation;
+package OpenXPKI::Database::Role::MergeEmulation;
 use OpenXPKI -role;
 
 =head1 Name
 
-OpenXPKI::Server::Database::Role::MergeEmulation - Moose role for database
+OpenXPKI::Database::Role::MergeEmulation - Moose role for database
 drivers to indicate that the DBMS does not provide native support for a MERGE
 query
 
@@ -56,7 +56,7 @@ This role emulates an SQL MERGE (you could also call it REPLACE) query through
 SELECT + INSERT/UPDATE.
 
 After a SELECT to check for row existance an INSERT or UPDATE query is built
-and an L<OpenXPKI::Server::Database::Query> object returned.
+and an L<OpenXPKI::Database::Query> object returned.
 
 =head1 Required methods in the consuming driver class
 

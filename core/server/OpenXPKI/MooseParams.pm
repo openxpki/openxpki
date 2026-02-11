@@ -107,7 +107,7 @@ modified behaviour:
 Usage:
 
     my ($self, $query, $return_rownum) = positional_args(\@_,
-        { isa => 'OpenXPKI::Server::Database::Query|Str' },
+        { isa => 'OpenXPKI::Database::Query|Str' },
         { isa => 'Bool', optional => 1, default => 0 },
     );
 

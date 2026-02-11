@@ -44,7 +44,7 @@ available methods.
 # Project modules
 use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::Database;
+use OpenXPKI::Database;
 
 ################################################################################
 # Attributes
@@ -52,12 +52,12 @@ use OpenXPKI::Server::Database;
 
 has dbi => (
     is => 'rw',
-    isa => 'OpenXPKI::Server::Database',
+    isa => 'OpenXPKI::Database',
     lazy => 1,
     default => sub {
         my $self = shift;
         if ($self->dbi_params) {
-            return OpenXPKI::Server::Database->new(
+            return OpenXPKI::Database->new(
                 db_params => $self->dbi_params,
                 autocommit => 1,
                 log => $self->log,

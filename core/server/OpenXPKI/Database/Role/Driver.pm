@@ -1,9 +1,9 @@
-package OpenXPKI::Server::Database::Role::Driver;
+package OpenXPKI::Database::Role::Driver;
 use OpenXPKI -role;
 
 =head1 NAME
 
-OpenXPKI::Server::Database::Role::Driver - Moose role that every database driver
+OpenXPKI::Database::Role::Driver - Moose role that every database driver
 has to consume
 
 =cut
@@ -51,19 +51,19 @@ requires 'sqlam_params';
 # Returns Int: next insert ID ("serial")
 requires 'next_id';
 
-# Returns OpenXPKI::Server::Database::Query: query to create a new sequence
+# Returns OpenXPKI::Database::Query: query to create a new sequence
 requires 'sequence_create_query';
 
-# Returns OpenXPKI::Server::Database::Query: query to drop a sequence
+# Returns OpenXPKI::Database::Query: query to drop a sequence
 requires 'sequence_drop_query';
 
-# Returns OpenXPKI::Server::Database::Query: query to drop a table
+# Returns OpenXPKI::Database::Query: query to drop a table
 requires 'table_drop_query';
 
-# Returns OpenXPKI::Server::Database::Query: MERGE query (="REPLACE" = "UPSERT" = UPDATE or INSERT)
+# Returns OpenXPKI::Database::Query: MERGE query (="REPLACE" = "UPSERT" = UPDATE or INSERT)
 requires 'merge_query';
 
-# Returns OpenXPKI::Server::Database::Query: to count the rows of a given SELECT statement
+# Returns OpenXPKI::Database::Query: to count the rows of a given SELECT statement
 requires 'count_rows';
 
 # Returns a HashRef of qr() expressions and their replacement strings
@@ -73,16 +73,16 @@ requires 'do_sql_replacements';
 
 =head1 SYNOPSIS
 
-    package OpenXPKI::Server::Database::Driver::MyDB2;
+    package OpenXPKI::Database::Driver::MyDB2;
     use OpenXPKI -class;
 
     with qw(
-        OpenXPKI::Server::Database::Role::SequenceSupport
-        OpenXPKI::Server::Database::Role::MergeEmulation
-        OpenXPKI::Server::Database::Role::Driver
+        OpenXPKI::Database::Role::SequenceSupport
+        OpenXPKI::Database::Role::MergeEmulation
+        OpenXPKI::Database::Role::Driver
     );
 
-    # required by OpenXPKI::Server::Database::Role::Driver
+    # required by OpenXPKI::Database::Role::Driver
     sub dbi_driver { 'DB2' }           # DBI compliant driver name
     sub dbi_dsn {                      # DSN string including all parameters.
         my $self = shift;
@@ -96,7 +96,7 @@ requires 'do_sql_replacements';
         limit_offset => 'FetchFirst',
     } }
 
-    # required by OpenXPKI::Server::Database::Role::SequenceSupport
+    # required by OpenXPKI::Database::Role::SequenceSupport
     sub nextval_query {                # SQL query to retrieve next sequence value
         my ($self, $seq) = @_;
         return "VALUES NEXTVAL FOR $seq";
@@ -142,20 +142,20 @@ To connect OpenXPKI to your (not yet supported) DBMS follow these steps:
 
 =over
 
-=item 1. Write a driver class in the C<OpenXPKI::Server::Database::Driver::*>
+=item 1. Write a driver class in the C<OpenXPKI::Database::Driver::*>
 namespace that consumes the following Moose roles:
 
 =over
 
-=item * L<OpenXPKI::Server::Database::Role::SequenceSupport> if your DBMS has native support for sequences,
+=item * L<OpenXPKI::Database::Role::SequenceSupport> if your DBMS has native support for sequences,
 
-=item * L<OpenXPKI::Server::Database::Role::SequenceEmulation> otherwise.
+=item * L<OpenXPKI::Database::Role::SequenceEmulation> otherwise.
 
-=item * L<OpenXPKI::Server::Database::Role::MergeSupport> if your DBMS has native support for some form of an SQL MERGE query (="REPLACE" = "UPSERT" = "INSERT or UPDATE"),
+=item * L<OpenXPKI::Database::Role::MergeSupport> if your DBMS has native support for some form of an SQL MERGE query (="REPLACE" = "UPSERT" = "INSERT or UPDATE"),
 
-=item * L<OpenXPKI::Server::Database::Role::MergeEmulation> otherwise.
+=item * L<OpenXPKI::Database::Role::MergeEmulation> otherwise.
 
-=item * L<OpenXPKI::Server::Database::Role::Driver>
+=item * L<OpenXPKI::Database::Role::Driver>
 
 =back
 
@@ -214,15 +214,15 @@ May return additional parameters that are passed to L<SQL::Abstract::More/new> (
 
 =head2 sequence_create_query
 
-Returns an L<OpenXPKI::Server::Database::Query> object containing the SQL query
+Returns an L<OpenXPKI::Database::Query> object containing the SQL query
 that creates a new sequence (or a table emulating a sequence, if the driver has
-got the role L<OpenXPKI::Server::Database::Role::SequenceEmulation>).
+got the role L<OpenXPKI::Database::Role::SequenceEmulation>).
 
 Parameters:
 
 =over
 
-=item * B<$dbi> - OpenXPKI database handler (C<OpenXPKI::Server::Database>, required)
+=item * B<$dbi> - OpenXPKI database handler (C<OpenXPKI::Database>, required)
 
 =item * B<$seq> - Name of SQL sequence to be created (I<Str>, required)
 
@@ -230,15 +230,15 @@ Parameters:
 
 =head2 sequence_drop_query
 
-Returns an L<OpenXPKI::Server::Database::Query> object containing the SQL query
+Returns an L<OpenXPKI::Database::Query> object containing the SQL query
 that removes a sequence (or a table emulating a sequence, if the driver has
-got the role L<OpenXPKI::Server::Database::Role::SequenceEmulation>).
+got the role L<OpenXPKI::Database::Role::SequenceEmulation>).
 
 Parameters:
 
 =over
 
-=item * B<$dbi> - OpenXPKI database handler (C<OpenXPKI::Server::Database>, required)
+=item * B<$dbi> - OpenXPKI database handler (C<OpenXPKI::Database>, required)
 
 =item * B<$seq> - Name of SQL sequence to be removed (I<Str>, required)
 
@@ -252,7 +252,7 @@ Parameters:
 
 =over
 
-=item * B<$dbi> - OpenXPKI database handler (C<OpenXPKI::Server::Database>, required)
+=item * B<$dbi> - OpenXPKI database handler (C<OpenXPKI::Database>, required)
 
 =item * B<$seq> - Name of SQL sequence whose next value shall be returned (I<Str>, required)
 
@@ -261,14 +261,14 @@ Parameters:
 =head2 merge_query
 
 Builds a MERGE query (or emulates it by either an INSERT or an UPDATE query)
-and returns a L<OpenXPKI::Server::Database::Query> object which contains SQL
+and returns a L<OpenXPKI::Database::Query> object which contains SQL
 string and bind parameters.
 
 Parameters:
 
 =over
 
-=item * B<$dbi> - OpenXPKI database handler (C<OpenXPKI::Server::Database>, required)
+=item * B<$dbi> - OpenXPKI database handler (C<OpenXPKI::Database>, required)
 
 =item * B<$into> - Table name including schema (if applicable) (I<Str>, required)
 
@@ -288,7 +288,7 @@ C<<{ col1 => val1, col2 => val2 }>> (I<HashRef>)
 
 #=head2 table_drop_query
 #
-#Returns an L<OpenXPKI::Server::Database::Query> object containing the SQL query
+#Returns an L<OpenXPKI::Database::Query> object containing the SQL query
 #that removes a table. If possible the query should contain something like
 #C<IF EXISTS> so that the DMBS does not complain about non-existing tables.
 #
@@ -296,7 +296,7 @@ C<<{ col1 => val1, col2 => val2 }>> (I<HashRef>)
 #
 #=over
 #
-#=item * B<$dbi> - OpenXPKI database handler (C<OpenXPKI::Server::Database>, required)
+#=item * B<$dbi> - OpenXPKI database handler (C<OpenXPKI::Database>, required)
 #
 #=item * B<$table> - Name of table to be dropped (I<Str>, required)
 #

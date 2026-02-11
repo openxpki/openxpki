@@ -14,7 +14,7 @@ use OpenXPKI::i18n qw(set_language set_locale_prefix);
 use OpenXPKI::Config;
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::VolatileVault;
-use OpenXPKI::Server::Database;
+use OpenXPKI::Database;
 use OpenXPKI::Server::Log;
 use OpenXPKI::Server::Log::CLI;
 use OpenXPKI::Server::API2;
@@ -469,7 +469,7 @@ sub get_database {
     delete $db_config->{log};
     delete $db_config->{debug};
 
-    my $db = OpenXPKI::Server::Database->new(
+    my $db = OpenXPKI::Database->new(
         # if this DB object should be used for logging: we prevent recursive
         # calls to log functions in OpenXPKI::Server::Log::Appender::Database
         log => CTX('log')->system(),
@@ -591,7 +591,7 @@ configured cryptographic tokens.
 
 =head3 get_database
 
-Returns an instance of the L<OpenXPKI::Server::Database>.
+Returns an instance of the L<OpenXPKI::Database>.
 
 A section name must be given below the config path I<system.database>.
 

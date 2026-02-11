@@ -1,9 +1,9 @@
-package OpenXPKI::Server::Database::Role::MergeSupport;
+package OpenXPKI::Database::Role::MergeSupport;
 use OpenXPKI -role;
 
 =head1 Name
 
-OpenXPKI::Server::Database::Role::MergeSupport - Moose role for database
+OpenXPKI::Database::Role::MergeSupport - Moose role for database
 drivers to indicate native support for MERGE (= REPLACE = INSERT or UPDATE).
 
 =cut
@@ -11,7 +11,7 @@ drivers to indicate native support for MERGE (= REPLACE = INSERT or UPDATE).
 ################################################################################
 # Required in drivers classes that consume this role
 #
-requires 'merge_query';   # OpenXPKI::Server::Database::Query: SQL query to run
+requires 'merge_query';   # OpenXPKI::Database::Query: SQL query to run
 
 ################################################################################
 # Methods
@@ -28,14 +28,14 @@ call it REPLACE) in some form.
 
 =head2 merge_query
 
-Must return the DBMS specific SQL query (L<OpenXPKI::Server::Database::Query>)
+Must return the DBMS specific SQL query (L<OpenXPKI::Database::Query>)
 that does an SQL MERGE.
 
 When called it gets passed the following parameter (additional to C<$self>):
 
 =over
 
-=item * B<$dbi> - the L<OpenXPKI::Server::Database> instance
+=item * B<$dbi> - the L<OpenXPKI::Database> instance
 
 =item * B<$into> - Table name (I<Str>, required)
 

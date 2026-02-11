@@ -136,7 +136,7 @@ B<before> you use C<OpenXPKI::Test>:
     use Test::More;
 
     use OpenXPKI::Debug;
-    BEGIN { $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Database.*'} = 0b1111111 }
+    BEGIN { $OpenXPKI::Debug::LEVEL{'OpenXPKI::Database.*'} = 0b1111111 }
 
     use OpenXPKI::Test;
 
@@ -163,7 +163,7 @@ use OpenXPKI::Log4perl;
 use Log::Log4perl::Appender;
 use Log::Log4perl::Filter::MDC;
 use Log::Log4perl::Layout::NoopLayout;
-use OpenXPKI::Server::Database;
+use OpenXPKI::Database;
 use OpenXPKI::Server::Context;
 use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Log;
@@ -358,14 +358,14 @@ has db_conf => (
     },
 );
 
-=item * I<dbi> (optional) - instance of L<OpenXPKI::Server::Database>.
+=item * I<dbi> (optional) - instance of L<OpenXPKI::Database>.
 
 Per default it is initialized with a new instance using C<$self-E<gt>db_conf>.
 
 =cut
 has dbi => (
     is => 'rw',
-    isa => 'OpenXPKI::Server::Database',
+    isa => 'OpenXPKI::Database',
     lazy => 1,
     builder => '_build_dbi',
 );
@@ -1168,7 +1168,7 @@ sub _build_dbi {
     my ($self) = @_;
 
     #Log::Log4perl->easy_init($OFF);
-    return OpenXPKI::Server::Database->new(
+    return OpenXPKI::Database->new(
         log => OpenXPKI::Server::Log->new(use_current_config => 1)->system,
         db_params => $self->db_conf,
     );

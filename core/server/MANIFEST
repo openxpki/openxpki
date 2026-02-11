@@ -305,21 +305,23 @@ OpenXPKI/Role/SubjectAltNameMaps.pm
 
 ## database interface of the server
 
+OpenXPKI/Database.pm
+OpenXPKI/Database/Legacy.pm
+OpenXPKI/Database/Query.pm
+OpenXPKI/Database/QueryBuilder.pm
+OpenXPKI/Database/Driver/MariaDB2.pm
+OpenXPKI/Database/Driver/MySQL.pm
+OpenXPKI/Database/Driver/Oracle.pm
+OpenXPKI/Database/Driver/PostgreSQL.pm
+OpenXPKI/Database/Driver/SQLite.pm
+OpenXPKI/Database/Role/CountEmulation.pm
+OpenXPKI/Database/Role/Driver.pm
+OpenXPKI/Database/Role/MergeEmulation.pm
+OpenXPKI/Database/Role/MergeSupport.pm
+OpenXPKI/Database/Role/SequenceEmulation.pm
+OpenXPKI/Database/Role/SequenceSupport.pm
+# legacy compatibility:
 OpenXPKI/Server/Database.pm
-OpenXPKI/Server/Database/Legacy.pm
-OpenXPKI/Server/Database/Query.pm
-OpenXPKI/Server/Database/QueryBuilder.pm
-OpenXPKI/Server/Database/Driver/MariaDB2.pm
-OpenXPKI/Server/Database/Driver/MySQL.pm
-OpenXPKI/Server/Database/Driver/Oracle.pm
-OpenXPKI/Server/Database/Driver/PostgreSQL.pm
-OpenXPKI/Server/Database/Driver/SQLite.pm
-OpenXPKI/Server/Database/Role/CountEmulation.pm
-OpenXPKI/Server/Database/Role/Driver.pm
-OpenXPKI/Server/Database/Role/MergeEmulation.pm
-OpenXPKI/Server/Database/Role/MergeSupport.pm
-OpenXPKI/Server/Database/Role/SequenceEmulation.pm
-OpenXPKI/Server/Database/Role/SequenceSupport.pm
 
 ## logging interface
 OpenXPKI/Server/Log.pm

@@ -224,13 +224,14 @@ sub is_regular_workflow {
 Used in database C<INSERT>s to automatically set a primary key to the next
 serial number (i.e. sequence associated with the table).
 
-See L<OpenXPKI::Server::Database/insert> for details.
+See L<OpenXPKI::Database/insert> for details.
 
 
 =cut
 
+# NOTE: please make sure this stays in sync with OpenXPKI::Server::Database->AUTO_ID()
 sub AUTO_ID :prototype() {
-    state $obj = bless {}, "OpenXPKI::Server::Database::AUTOINCREMENT";
+    state $obj = bless {}, "OpenXPKI::Database::AUTOINCREMENT";
     return $obj;
 }
 

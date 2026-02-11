@@ -1,9 +1,9 @@
-package OpenXPKI::Server::Database::Role::CountEmulation;
+package OpenXPKI::Database::Role::CountEmulation;
 use OpenXPKI -role;
 
 =head1 Name
 
-OpenXPKI::Server::Database::Role::CountEmulation - Moose role for database
+OpenXPKI::Database::Role::CountEmulation - Moose role for database
 drivers to emulate row count with a subselect
 
 =cut

@@ -6,7 +6,7 @@ use Test::Deep ':v1';
 use Test::Exception;
 use FindBin qw( $Bin );
 
-#use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Database.*'} = 100;
+#use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Database.*'} = 100;
 
 #
 # Oracle shows a special behaviour where values <= 4000 bytes are casted to

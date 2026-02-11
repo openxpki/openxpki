@@ -16,7 +16,7 @@ Log::Log4perl->easy_init($ENV{TEST_VERBOSE} ? $ERROR : $OFF);
 #
 my $log = Log::Log4perl->get_logger;
 
-use_ok("OpenXPKI::Server::Database");
+use_ok("OpenXPKI::Database");
 
 my $mariadb_expr = 'EXTRACT(YEAR FROM FROM_UNIXTIME(notbefore))';
 
@@ -31,7 +31,7 @@ my $expected = {
 for my $driver (sort keys %$expected) { # MySQL PostgreSQL SQLite Oracle DB2
     subtest "$driver: SELECT with FROM_UNIXTIME ()" => sub {
         my $dbi;
-        lives_ok { $dbi = OpenXPKI::Server::Database->new(
+        lives_ok { $dbi = OpenXPKI::Database->new(
             log => $log,
             db_params => { type => $driver, name => "dummy" },
         ) } "dbi instance";

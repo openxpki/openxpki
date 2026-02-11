@@ -195,9 +195,9 @@ WriteMakefile(
         'DateTime::Format::Strptime'    => 0,           # OpenXPKI::Server::Workflow::Persister::DBI
         'DateTime'                      => '0.22',
         'DBD::Mock'                     => '1.45',
-        'DBD::SQLite'                   => '1.52',      # tests of OpenXPKI::Server::Database
+        'DBD::SQLite'                   => '1.52',      # tests of OpenXPKI::Database
         'DBI'                           => '1',
-        'DBIx::Handler'                 => '0.14',      # OpenXPKI::Server::Database
+        'DBIx::Handler'                 => '0.14',      # OpenXPKI::Database
         'Devel::NYTProf'                => 0,           # CPAN
         'English'                       => '1',         # for broken Perl installations like on Ubuntu Drapper
         'Exception::Class'              => '1.22',
@@ -215,12 +215,12 @@ WriteMakefile(
         'LWP::UserAgent'                => '6.05',      # Constituent of module libwww-perl
         'Math::BigInt'                  => '1.9993',    # makes FreeBSD happy
         'MIME::Entity'                  => 0,
-        'Module::Load'                  => '0.32',      # OpenXPKI::Server::Database
+        'Module::Load'                  => '0.32',      # OpenXPKI::Database
         'Mojolicious'                   => '9.31',      # 9.31 is included in Debian Bookworm
         'Moose'                         => '1',
         'MooseX::InsideOut'             => '0.106',     # OpenXPKI::Crypto::Secret::Split etc.
         'MooseX::NonMoose'              => 0,           # OpenXPKI::Server::Workflow::Validator::PasswordQuality
-        'MooseX::Params::Validate'      => '0.21',      # OpenXPKI::Server::Database
+        'MooseX::Params::Validate'      => '0.21',      # OpenXPKI::Database
         'MooseX::StrictConstructor'     => '0.21',
         'Net::DNS'                      => '0.83',
         'Net::LDAP'                     => '0.32',
@@ -235,7 +235,7 @@ WriteMakefile(
         'Prometheus::Tiny::Shared'      => '0.026',
         'Regexp::Common'                => '2',
         'SOAP::Lite'                    => 0,
-        'SQL::Abstract::More'           => '1.38',      # OpenXPKI::Server::Database
+        'SQL::Abstract::More'           => '1.38',      # OpenXPKI::Database
         'Sys::SigAction'                => '0.06',
         'Template'                      => '2.15',
         'Term::ReadKey'                 => 0,

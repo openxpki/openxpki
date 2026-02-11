@@ -1,11 +1,11 @@
-package OpenXPKI::Server::Database::QueryBuilder;
+package OpenXPKI::Database::QueryBuilder;
 use OpenXPKI -class;
 
 use namespace::autoclean;
 
 =head1 Name
 
-OpenXPKI::Server::Database::QueryBuilder - Programmatic interface to SQL queries
+OpenXPKI::Database::QueryBuilder - Programmatic interface to SQL queries
 
 =cut
 
@@ -13,7 +13,7 @@ OpenXPKI::Server::Database::QueryBuilder - Programmatic interface to SQL queries
 use SQL::Abstract::More; # TODO Use SQL::Maker instead of SQL::Abstract::More? (but the former only supports Oracle type LIMITs)
 
 # Project modules
-use OpenXPKI::Server::Database::Query;
+use OpenXPKI::Database::Query;
 
 ################################################################################
 # Attributes
@@ -23,7 +23,7 @@ use OpenXPKI::Server::Database::Query;
 
 has 'driver' => (
     is => 'ro',
-    does => 'OpenXPKI::Server::Database::Role::Driver',
+    does => 'OpenXPKI::Database::Role::Driver',
     required => 1,
 );
 
@@ -62,8 +62,8 @@ signature_for _make_query => (
     positional => [
         'Str',
         'HashRef',
-        'Optional[OpenXPKI::Server::Database::Query]' => {
-            default => sub { OpenXPKI::Server::Database::Query->new },
+        'Optional[OpenXPKI::Database::Query]' => {
+            default => sub { OpenXPKI::Database::Query->new },
         },
     ]
 );
@@ -148,7 +148,7 @@ sub select ($self, $arg) {
         $arg->{from} = \($join_info->{sql});
 
         if ($join_info) {
-            $query = OpenXPKI::Server::Database::Query->new;
+            $query = OpenXPKI::Database::Query->new;
             $query->add_params( @{$join_info->{bind}} );
         }
     }
@@ -264,10 +264,10 @@ Named parameters: see L<attributes section above|/"Constructor parameters">.
 
 =head2 select
 
-Builds a SELECT query and returns a L<OpenXPKI::Server::Database::Query> object
+Builds a SELECT query and returns a L<OpenXPKI::Database::Query> object
 which contains SQL string and bind parameters.
 
-The method parameters are documented in L<OpenXPKI::Server::Database/select>.
+The method parameters are documented in L<OpenXPKI::Database/select>.
 
 
 
@@ -287,13 +287,13 @@ and turn it into:
 
     \[ "IN ($query)" => @bind ]
 
-The method parameters are documented in L<OpenXPKI::Server::Database/subselect>.
+The method parameters are documented in L<OpenXPKI::Database/subselect>.
 
 
 
 =head2 insert
 
-Builds an INSERT query and returns a L<OpenXPKI::Server::Database::Query> object
+Builds an INSERT query and returns a L<OpenXPKI::Database::Query> object
 which contains SQL string and bind parameters.
 
 Named parameters:
@@ -310,18 +310,18 @@ Named parameters:
 
 =head2 update
 
-Builds an UPDATE query and returns a L<OpenXPKI::Server::Database::Query> object
+Builds an UPDATE query and returns a L<OpenXPKI::Database::Query> object
 which contains SQL string and bind parameters.
 
 A WHERE clause is required to prevent accidential updates of all rows in a table.
 
-The method parameters are documented in L<OpenXPKI::Server::Database/update>.
+The method parameters are documented in L<OpenXPKI::Database/update>.
 
 
 
 =head2 delete
 
-Builds a DELETE query and returns an L<OpenXPKI::Server::Database::Query> object
+Builds a DELETE query and returns an L<OpenXPKI::Database::Query> object
 which contains SQL string and bind parameters.
 
 To prevent accidential deletion of all rows of a table you must specify
@@ -332,6 +332,6 @@ parameter C<all> if you want to do that:
         all => 1,
     );
 
-The method parameters are documented in L<OpenXPKI::Server::Database/delete>.
+The method parameters are documented in L<OpenXPKI::Database/delete>.
 
 =cut

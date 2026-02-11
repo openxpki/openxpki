@@ -18,11 +18,11 @@ has 'dbi_params' => (
 
 has 'dbi' => (
     is => 'rw',
-    isa => 'OpenXPKI::Server::Database',
+    isa => 'OpenXPKI::Database',
     lazy => 1,
     default => sub {
         my $self = shift;
-        return OpenXPKI::Server::Database->new(
+        return OpenXPKI::Database->new(
             log => $self->_log,
             db_params => $self->dbi_params,
         );

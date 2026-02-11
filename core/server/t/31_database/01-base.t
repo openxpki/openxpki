@@ -14,7 +14,7 @@ my $log = Log::Log4perl->get_logger;
 #
 # tests
 #
-use_ok("OpenXPKI::Server::Database");
+use_ok("OpenXPKI::Database");
 my %params = (
     type =>       "SQLite",
     name =>       ":memory:",
@@ -23,7 +23,7 @@ my %params = (
 my $dbi;
 
 # create faulty instance
-lives_ok { $dbi = OpenXPKI::Server::Database->new(
+lives_ok { $dbi = OpenXPKI::Database->new(
     log => $log,
     db_params => {
         %params,
@@ -34,7 +34,7 @@ lives_ok { $dbi = OpenXPKI::Server::Database->new(
 throws_ok { $dbi->driver } qr/\btype\b.*missing/, "Complain about missing 'type' parameter";
 
 # create correct instance
-lives_ok { $dbi = OpenXPKI::Server::Database->new(
+lives_ok { $dbi = OpenXPKI::Database->new(
     log => $log,
     db_params => \%params,
 ) } "create instance";

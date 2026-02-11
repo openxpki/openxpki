@@ -1,14 +1,14 @@
-package OpenXPKI::Server::Database::Role::SequenceEmulation;
+package OpenXPKI::Database::Role::SequenceEmulation;
 use OpenXPKI -role;
 
 =head1 Name
 
-OpenXPKI::Server::Database::Role::SequenceEmulation - Moose role for database
+OpenXPKI::Database::Role::SequenceEmulation - Moose role for database
 drivers to indicate that they have to emulate sequences through a standard table
 
 =cut
 
-use OpenXPKI::Server::Database::Query;
+use OpenXPKI::Database::Query;
 
 ################################################################################
 # Required in drivers classes that consume this role
@@ -26,7 +26,7 @@ sub sequence_create_query {
     my ($self, $dbi, $seq) = @_;
     ## my $info = $dbi->dbh->type_info( [ SQL_SMALLINT, SQL_INTEGER, SQL_DECIMAL ] ); # Does not work for SQlite
     my $autoinc = $self->sql_autoinc_column; # implemented by driver class
-    return OpenXPKI::Server::Database::Query->new(
+    return OpenXPKI::Database::Query->new(
         string => "CREATE TABLE $seq (seq_number $autoinc, dummy SMALLINT DEFAULT NULL)",
     );
 }
@@ -60,7 +60,7 @@ When called it gets passed the following parameter:
 
 =over
 
-=item * B<$dbi> - instance of L<OpenXPKI::Server::Database>
+=item * B<$dbi> - instance of L<OpenXPKI::Database>
 
 =back
 

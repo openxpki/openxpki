@@ -1,9 +1,9 @@
-package OpenXPKI::Server::Database::Legacy;
+package OpenXPKI::Database::Legacy;
 use OpenXPKI;
 
 =head1 Name
 
-OpenXPKI::Server::Database::Legacy - Compatibility functions for the old database layer
+OpenXPKI::Database::Legacy - Compatibility functions for the old database layer
 
 =cut
 

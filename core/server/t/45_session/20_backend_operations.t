@@ -151,7 +151,7 @@ driver_ok {
 my $sqlite_db = "$tempdir/test.sqlite";
 `sqlite3 $sqlite_db "PRAGMA journal_mode = WAL"`; # switch SQLite db to WAL mode
 
-my $dbi = OpenXPKI::Server::Database->new(
+my $dbi = OpenXPKI::Database->new(
     db_params => {
         type => "SQLite",
         name => "$tempdir/test.sqlite",
