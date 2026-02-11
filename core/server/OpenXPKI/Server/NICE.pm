@@ -5,7 +5,6 @@ use Encode;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Crypt::X509;
 use OpenXPKI::Serialization::Simple;
-use OpenXPKI::Server::Database::Legacy;
 
 # Attribute Setup
 

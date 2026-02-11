@@ -3,7 +3,6 @@ use OpenXPKI -base => 'OpenXPKI::Server::Workflow::Activity';
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Serialization::Simple;
-use OpenXPKI::Server::Database::Legacy;
 
 use OpenXPKI::Server::NICE::Factory;
 
