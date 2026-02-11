@@ -519,7 +519,7 @@ sub handle_login ($self, $page, $action, $reply) {
     }
 
     if ( $reply->{SERVICE_MSG} eq 'SERVICE_READY' ) {
-        $self->log->info('Authentication successul - fetch session info');
+        $self->log->info('Authentication successful - fetch session info');
         # Fetch the user info from the server
         $reply = $self->client->send_receive_service_msg( 'COMMAND',
             { COMMAND => 'get_session_info', PARAMS => {}, API => 2 } );
