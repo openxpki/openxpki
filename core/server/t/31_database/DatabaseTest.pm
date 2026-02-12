@@ -3,7 +3,6 @@ use OpenXPKI qw( -class -typeconstraints );
 
 use Test::More;
 use Test::Exception;
-use Log::Log4perl;
 use Module::Load ();
 use File::Basename qw( dirname );
 
@@ -22,7 +21,7 @@ has 'columns' => (
 has 'data' => (
     is => 'rw',
     isa => 'ArrayRef',
-    predicate => 'has_data',
+    default => sub { [] },
 );
 
 enum 'DBMS', [qw( SQLite MySQL MariaDB2 Oracle PostgreSQL )];
@@ -152,7 +151,7 @@ sub run ($self, $name, $plan, $tests) {
                     type => $dbtype,
                     dbi_params => $dbi_params,
                     columns => $self->columns,
-                    $self->has_data ? (data => $self->data) : (),
+                    data => $self->data,
                 );
                 $conn2 = DatabaseTestConnection->new(
                     type => $dbtype,
@@ -161,17 +160,14 @@ sub run ($self, $name, $plan, $tests) {
                 );
             } $dbi_params->{type}.": create Database instances";
 
-            SKIP: {
-                skip "no data provided to insert", 1 unless $self->has_data;
-                lives_ok {
-                    $conn1->_create_table;
-                } $dbi_params->{type}.": insert test data";
-            }
+            lives_ok {
+                $conn1->_create_table;
+            } $dbi_params->{type}.": create table / insert test data";
 
             $tests->($conn1, $conn2);
             $conn1->dbi->commit;
             $conn2->dbi->commit;
-            $conn1->_drop_table if $self->has_data;
+            $conn1->_drop_table if scalar $self->columns->@*;
             # esp. prevent prevent deadlocks due to SQLite file locking if second instance of DatabaseTest is used later on:
             $conn1->dbi->disconnect;
             $conn2->dbi->disconnect;

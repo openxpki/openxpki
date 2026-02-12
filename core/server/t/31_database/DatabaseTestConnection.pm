@@ -59,7 +59,12 @@ has '_col_info' => (
 has 'data' => (
     is => 'rw',
     isa => 'ArrayRef',
-    predicate => 'has_data',
+);
+
+has 'capture_logs' => (
+    is => 'rw',
+    isa => 'Bool',
+    default => 0,
 );
 
 has '_log' => (
@@ -75,7 +80,7 @@ sub BUILD {
         log4perl.appender.Everything          = Log::Log4perl::Appender::String
         log4perl.appender.Everything.layout   = Log::Log4perl::Layout::PatternLayout
         log4perl.appender.Everything.layout.ConversionPattern = %d %c.%p %m%n
-    ");
+    ") if $self->capture_logs;
     $self->_log( Log::Log4perl->get_logger() );
 }
 
@@ -86,7 +91,6 @@ sub get_data {
 
 sub clear_data {
     my $self = shift;
-    die("Cannot re-init data because attribute 'data' was not set") unless $self->has_data;
     note "Clearing test data";
     $self->_drop_table;
     $self->_create_table;
@@ -95,7 +99,7 @@ sub clear_data {
 # Returns all log messages since the last call of this method
 sub get_log {
     my $appender = Log::Log4perl->appender_by_name("Everything")
-        or die("Could not access Log4perl appender");
+        or die 'Could not access our capturing Log4perl appender, maybe "capture_logs => 1" was not specified';
     my $messages = $appender->string;
     $appender->string("");
     return $messages;
@@ -105,19 +109,23 @@ sub _create_table {
     my $self = shift;
     eval { $self->dbi->drop_table("test") }; # FIXME Remove eval{} as soon as Oracle and DB2 driver don't throw exception on non-existing table
     diag $@ if $@;
-    $self->dbi->run("CREATE TABLE test (".join(", ", @{ $self->_col_info->{fulldef} }).")");
-    # Create a hash with the column names and the data
-    my $col_names = $self->_col_info->{names};
-    for my $row (@{ $self->data }) {
-        my %values = map { $col_names->[$_] => $row->[$_] } 0..$#{ $col_names };
-        $self->dbi->insert(into => "test", values => \%values);
+
+    # Create table if there is a column definition
+    if ($self->_col_info->{fulldef}->@*) {
+        $self->dbi->run('CREATE TABLE test ('.join(', ', $self->_col_info->{fulldef}->@*).')');
+        # Create a hash with the column names and the data
+        my $col_names = $self->_col_info->{names};
+        for my $row ($self->data->@*) {
+            my %values = map { $col_names->[$_] => $row->[$_] } 0..$#{ $col_names };
+            $self->dbi->insert(into => 'test', values => \%values);
+        }
     }
 
-    eval { $self->dbi->drop_sequence("test") }; # FIXME Remove eval{} as soon as Oracle and DB2 driver don't throw exception on non-existing table
+    eval { $self->dbi->drop_sequence('test') }; # FIXME Remove eval{} as soon as Oracle and DB2 driver don't throw exception on non-existing table
     diag $@ if $@;
-    $self->dbi->create_sequence("test");
+    $self->dbi->create_sequence('test');
 
-    $self->dbi->run("COMMIT");
+    $self->dbi->run('COMMIT');
 }
 
 sub _drop_table {

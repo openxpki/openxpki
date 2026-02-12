@@ -33,6 +33,7 @@ my $db = DatabaseTest->new(
         [ 2, "Buergersteig" ],
         [ 3, "Rathaus" ],
     ],
+    capture_logs => 1,
 );
 
 #
