@@ -149,7 +149,10 @@ driver_ok {
 # CUSTOM DATABASE backed session
 
 my $sqlite_db = "$tempdir/test.sqlite";
-`sqlite3 $sqlite_db "PRAGMA journal_mode = WAL"`; # switch SQLite db to WAL mode
+
+# Switch SQLite to WAL mode
+system(qq(sqlite3 $sqlite_db "PRAGMA journal_mode = WAL")) == 0
+    or BAIL_OUT("Failed to set SQLite WAL mode (exit code: " . ($? >> 8) . ")");
 
 my $dbi = OpenXPKI::Database->new(
     db_params => {

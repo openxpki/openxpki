@@ -5,21 +5,25 @@ use Test::More;
 use Test::Deep ':v1';
 use Test::Exception;
 use File::Temp qw/ tempfile /;
-use FindBin qw( $Bin );
+use File::Basename qw( dirname );
 
 #use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Database.*'} = 100;
 
 #
 # setup
 #
-require "$Bin/DatabaseTest.pm";
+my $dir = dirname(__FILE__);
+require "$dir/DatabaseTest.pm"; ## no critic (Modules::RequireBarewordIncludes)
 
 my $columns = [ # yes an ArrayRef to have a defined order!
     id => "INTEGER PRIMARY KEY",
     text => "VARCHAR(100)",
 ];
 my (undef, $sqlite_db) = tempfile(UNLINK => 1);
-`sqlite3 $sqlite_db "PRAGMA journal_mode = WAL"`; # switch SQLite db to WAL mode
+
+# Switch SQLite to WAL mode
+system(qq(sqlite3 $sqlite_db "PRAGMA journal_mode = WAL")) == 0
+    or BAIL_OUT("Failed to set SQLite WAL mode (exit code: " . ($? >> 8) . ")");
 
 my $db = DatabaseTest->new(
     sqlite_db => $sqlite_db,

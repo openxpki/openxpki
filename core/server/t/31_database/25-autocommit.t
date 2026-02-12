@@ -18,8 +18,9 @@ use Test::More;
 use Test::Exception;
 use Log::Log4perl;
 
-use FindBin qw( $Bin );
-require "$Bin/DatabaseTest.pm";
+use File::Basename qw( dirname );
+my $dir = dirname(__FILE__);
+require "$dir/DatabaseTest.pm"; ## no critic (Modules::RequireBarewordIncludes)
 
 #use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Database.*'} = 100;
 

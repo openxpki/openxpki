@@ -5,9 +5,10 @@ use Test::More;
 use Test::Exception;
 use Log::Log4perl;
 use Module::Load ();
+use File::Basename qw( dirname );
 
-use FindBin qw( $Bin );
-require "$Bin/DatabaseTestConnection.pm";
+my $dir = dirname(__FILE__);
+require "$dir/DatabaseTestConnection.pm"; ## no critic (Modules::RequireBarewordIncludes)
 
 
 has 'columns' => (

@@ -3,14 +3,15 @@ use OpenXPKI;
 use Test::More;
 use Test::Deep ':v1';
 use Test::Exception;
-use FindBin qw( $Bin );
+use File::Basename qw( dirname );
 
 #use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Database.*'} = 100;
 
 #
 # setup
 #
-require "$Bin/DatabaseTest.pm";
+my $dir = dirname(__FILE__);
+require "$dir/DatabaseTest.pm"; ## no critic (Modules::RequireBarewordIncludes)
 
 my $db = DatabaseTest->new(
     columns => [ # yes an ArrayRef to have a defined order!

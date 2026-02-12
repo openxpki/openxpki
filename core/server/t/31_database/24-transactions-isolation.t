@@ -9,9 +9,10 @@ use File::Temp qw/ tempfile /;
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($ENV{TEST_VERBOSE} ? $ERROR : $OFF);
 
-use FindBin qw( $Bin );
+use File::Basename qw( dirname );
 use OpenXPKI::Database;
-require "$Bin/DatabaseTest.pm";
+my $dir = dirname(__FILE__);
+require "$dir/DatabaseTest.pm"; ## no critic (Modules::RequireBarewordIncludes)
 
 #use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Database.*'} = 100;
 
@@ -31,7 +32,10 @@ sub handle_sees {
 }
 
 my (undef, $sqlite_db) = tempfile(UNLINK => 1);
-`sqlite3 $sqlite_db "PRAGMA journal_mode = WAL"`; # switch SQLite db to WAL mode
+
+# Switch SQLite to WAL mode
+system(qq(sqlite3 $sqlite_db "PRAGMA journal_mode = WAL")) == 0
+    or BAIL_OUT("Failed to set SQLite WAL mode (exit code: " . ($? >> 8) . ")");
 
 my $tests = [
     {
