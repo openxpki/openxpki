@@ -112,7 +112,7 @@ sub init ($self) {
 
     $self->log->trace(
         sprintf('Frontend session driver initialized: datasource = %s, tablename = %s, user = %s',
-        $self->{DataSource}, $self->{TableName}, $self->{User},
+        $self->{DataSource}, $self->{TableName}, $self->{User}//'<none>',
     ));
     return 1;
 }
