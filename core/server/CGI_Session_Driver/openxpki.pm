@@ -226,7 +226,7 @@ sub store ($self, $sid, $datastr, $etime = undef) {
 
     my $sth = $dbh->prepare_cached("SELECT ".$self->{IdColName}." FROM ".$self->{TableName}." WHERE ".$self->{IdColName}." = ?", undef, 3);
     unless ( defined $sth ) {
-        return $self->set_error( 'store() - $dbh->prepare_cached failed: ' . $sth->errstr );
+        return $self->set_error( 'store() - $dbh->prepare_cached failed: ' . $dbh->errstr );
     }
 
     $sth->execute( $sid )
