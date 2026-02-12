@@ -250,6 +250,8 @@ sub _build_session ($self) {
         $conf->{LongReadLen} = $conf->{LongReadLen} // 100000;
     }
 
+    $conf->{TableName} = join('.', delete($conf->{NameSpace})//(), 'frontend_session');
+
     my $session = OpenXPKI::Client::Service::WebUI::Session->new_patched(
         $driver, # may be undef
         $id, # may be undef

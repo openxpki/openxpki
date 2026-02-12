@@ -40,10 +40,17 @@ names and adds some security options.
             host: db.example.com
             #port: 3306
             #namespace: openxpki
+
             user: openxpki_session
             password: mypass
+
             encrypt_key: mysecretkey
             log_ip: 1
+
+            dbi:
+                #dsn_extra: dummyvalue=1
+                attrs:
+                    #LongReadLen: 10000000
 
 =over
 
@@ -99,11 +106,10 @@ L<C<CGI::Session::Driver::DBI-E<gt>new()>|CGI::Session::Driver::DBI/new>.
 
 =cut
 sub init ($self) {
-    Log::Log4perl->initialized or Log::Log4perl->easy_init($ERROR);
+    Log::Log4perl->easy_init($ERROR) unless Log::Log4perl->initialized;
 
     $self->{IdColName} = 'session_id';
     $self->{DataColName} = 'data';
-    $self->{TableName} = join '.', $self->{NameSpace}//(), 'frontend_session';
     $self->{_crypt} = Crypt::CBC->new(
         -key => $self->{EncryptKey},
         -cipher => 'Crypt::OpenSSL::AES',
@@ -229,9 +235,14 @@ sub store ($self, $sid, $datastr, $etime = undef) {
     my $rc = $sth->fetchrow_array;
     $sth->finish;
 
-    my $action_sth;
-    my @args = ($datastr, time(), (($self->{LogIP} && $ENV{REMOTE_ADDR}) ? $ENV{REMOTE_ADDR} : ''), $sid);
+    my @values = (
+        $datastr,
+        time(),
+        (($self->{LogIP} && $ENV{REMOTE_ADDR}) ? $ENV{REMOTE_ADDR} : ''),
+        $sid
+    );
 
+    my $action_sth;
     if ( $rc ) {
         $action_sth = $dbh->prepare_cached(
             sprintf(
@@ -242,7 +253,7 @@ sub store ($self, $sid, $datastr, $etime = undef) {
         );
         $self->log->debug("Frontend session updated: $sid");
     } else {
-        push @args, time();
+        push @values, time();
         $action_sth = $dbh->prepare_cached(
             sprintf(
                 "INSERT INTO %s (%s, modified, ip_address, %s, created) VALUES(?, ?, ?, ?, ?)",
@@ -256,12 +267,12 @@ sub store ($self, $sid, $datastr, $etime = undef) {
         return $self->set_error( 'store() - $dbh->prepare failed: ' . $dbh->errstr );
     }
 
-    $action_sth->execute(@args)
+    $action_sth->execute(@values)
         or return $self->set_error( 'store() - $action_sth->execute failed: ' . $action_sth->errstr );
 
     $action_sth->finish;
 
-    $self->{Handle}->disconnect;
+    $dbh->disconnect;
     $self->{Handle} = undef;
 
     return 1;
