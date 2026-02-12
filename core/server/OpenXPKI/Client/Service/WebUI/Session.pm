@@ -57,7 +57,7 @@ around BUILDARGS => sub ($orig, $class, @args) {
     if (my $dsn = $args[0]) {
         my $dsn_args = $class->parse_dsn($dsn);
         if (my $driver = $dsn_args->{driver}) {
-            Log::Log4perl->initialized or Log::Log4perl->easy_init($ERROR);
+            Log::Log4perl->easy_init($ERROR) unless Log::Log4perl->initialized;
             my $log = Log::Log4perl->get_logger('openxpki.client.service.webui.session');
             $log->debug("Check frontend session driver '$driver' availability");
             try {
@@ -97,6 +97,17 @@ sub clone ($self) {
     # now calling CGI::Session->new() as instance method generates a new object
     # with the same settings but a new SID etc.
     return $self->SUPER::new_patched();
+}
+
+=head2 flush
+
+Wraps the parent's C<flush> method but dies in case of error instead of just
+returning C<undef>.
+
+=cut
+sub flush ($self) {
+    Log::Log4perl->get_logger('openxpki.client.service.webui.session')->trace('Flush frontend session');
+    return $self->SUPER::flush // die $self->errstr;
 }
 
 # query() is used by CGI::Session->load() if the requested session ID is invalid.
