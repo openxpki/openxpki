@@ -112,6 +112,90 @@ has session => (
     predicate => 'has_session',
     builder => '_build_session',
 );
+# Parse new session config syntax (2026-01+): session.database
+# Returns ($db_params, $encrypt_key, $log_ip).
+# Takes only the HashRef from session.database so the logic can be tested without a full WebUI object.
+sub _parse_new_session_config {
+    my ($new_db_conf) = @_;
+
+    my $db_conf = { %$new_db_conf }; # copy so we can delete from it
+
+    # Extract session-specific parameters (not part of db_params)
+    my $encrypt_key = delete $db_conf->{encrypt_key};
+    my $log_ip      = delete $db_conf->{log_ip};
+
+    # 'password' is an alias for 'passwd' (compatibility with server DB config)
+    if (exists $db_conf->{password}) {
+        my $pw = delete $db_conf->{password};
+        $db_conf->{passwd} //= $pw;
+    }
+
+    # 'namespace' stays in db_params: OpenXPKI::Database driver uses it to
+    # prefix table names in all queries (e.g. Oracle schema)
+    return ($db_conf, $encrypt_key, $log_ip);
+}
+
+# Parse old session config syntax (pre 2026-01): session.driver + session.params / session_driver
+# Returns ($db_params, $encrypt_key, $log_ip).
+# Takes the raw config values so the logic can be tested without a full WebUI object.
+#
+# Parameters:
+#   $old_conf   - HashRef from session.params / session_driver
+sub _parse_old_session_config {
+    my ($old_conf) = @_;
+
+    my $conf = $old_conf ? { %$old_conf } : {}; # copy so we can delete from it
+
+    # Extract session-specific parameters
+    my $encrypt_key = delete $conf->{EncryptKey};
+    my $log_ip      = delete $conf->{LogIP};
+
+    # Parse the DataSource DSN (dbi:Driver:key=val;...) into db_params
+    my $datasource = delete $conf->{DataSource}
+        or die "Session config: missing 'DataSource' in session driver config\n";
+
+    my ($dbi_driver, $driver_dsn) = $datasource =~ m{^dbi:([^:]+):(.*)$}i;
+    die "Session config: cannot parse DataSource '$datasource'\n" unless $dbi_driver;
+
+    # Map DBI driver names to OpenXPKI::Database type names
+    my %dbi_to_type = (
+        mysql   => 'MySQL',
+        mariadb => 'MariaDB2',
+        pg      => 'PostgreSQL',
+        oracle  => 'Oracle',
+        sqlite  => 'SQLite',
+    );
+    my $type = $dbi_to_type{ lc($dbi_driver) }
+        or die "Session config: unsupported DBI driver '$dbi_driver' in DataSource\n";
+
+    # Parse the driver-specific DSN part: collect key=value pairs and bare tokens separately
+    my (@dsn_extra, %dsn_params);
+    for (split /;/, $driver_dsn) {
+        if (/=/) { my ($k, $v) = split /=/, $_, 2; $dsn_params{$k} = $v }
+        else      { push @dsn_extra, $_ }
+    }
+
+    my $db_params = {
+        type      => $type,
+        name      => delete($dsn_params{database}) // delete($dsn_params{dbname}) // delete($dsn_params{db}),
+        host      => delete $dsn_params{host},
+        port      => delete $dsn_params{port},
+        user      => delete $conf->{User},
+        passwd    => delete($conf->{Password}) // delete($conf->{passwd}),
+        namespace => delete $conf->{NameSpace},
+        # Pass any unrecognised DSN parameters through as dsn_extra
+        (@dsn_extra || %dsn_params) ? (dbi => { dsn_extra => join(';', @dsn_extra, map { "$_=$dsn_params{$_}" } sort keys %dsn_params) }) : (),
+    };
+
+    # DBI connect attributes (set via session.params / session_driver in old format)
+    if (my $attrs = delete $conf->{dbi_connect_attrs}) {
+        $db_params->{dbi} //= {};
+        $db_params->{dbi}{attrs} = $attrs;
+    }
+
+    return ($db_params, $encrypt_key, $log_ip);
+}
+
 sub _build_session ($self) {
     my $id;
 
@@ -157,105 +241,31 @@ sub _build_session ($self) {
     #
     # Frontend session
     #
-    my $driver;
-    my $conf = {};
+    my ($db_params, $encrypt_key, $log_ip);
 
-    #
-    # Before v4.0 we map the new config syntax to the old syntax and feed
-    # it to our CGI::Session based implementation.
-    #
-
-    # TODO Remove legacy session config parsing once we use our own non-CGI::Session based class
-
-    # Existence of session.database tells us to use DB driver
-    if (my $db_conf = $self->config->get_hash('session.database')) {
-        $driver = 'driver:openxpki';
-        if (my $old_driver = $self->config->get('session.driver')) {
-            die "Session config ambiguous: 'session.database' is set but legacy parameter 'session.driver' is set to '$old_driver'\n"
-                if $old_driver ne $driver;
-        }
-
-        my $type = delete $db_conf->{type} or die "Session config: missing parameter 'session.database.type'\n";
-        my $db = delete $db_conf->{name}   or die "Session config: missing parameter 'session.database.name'\n";
-        my $dsn_extra;
-
-        # Map OpenXPKI type names to DBI names
-        my $type_map = {
-            MySQL => 'mysql',
-            MariaDB2 => 'MariaDB',
-            # We do explicitely NOT map MariaDB => 'mysql' as this could lead to
-            # confusion if someone already enters the DBI name into the config
-            # instead of our internal driver name.
-            PostgreSQL => 'Pg',
-        };
-
-        # Backwards compatibility to server DB config option "driver"
-        if (my $connect_attrs = delete $db_conf->{driver}) {
-            die "Session config: parameter 'session.database.driver' must be a mapping (keys + values)\n"
-                unless ref $connect_attrs eq 'HASH';
-            $db_conf->{dbi}->{attrs} = $connect_attrs;
-        }
-
-        # Additional DSN parameters and attributes
-        #     dbi:
-        #         dsn_extra:
-        #         attrs:
-        if (my $dbi = delete $db_conf->{dbi}) {
-            if ($dsn_extra = $dbi->{dsn_extra}) {
-                die "Session config: parameter 'session.database.dbi.dsn_extra' must be a string\n"
-                    if ref $dsn_extra;
-            }
-            # 4th parameter to DBI->connect($data_source, $user, $pass, $attrs)
-            if (my $connect_attrs = $dbi->{attrs}) {
-                die "Session config: parameter 'session.database.dbi.attrs' must be a mapping (keys + values)\n"
-                    unless ref $connect_attrs eq 'HASH';
-                $conf->{dbi_connect_attrs} = $connect_attrs;
-            }
-        }
-
-        # DataSource is passed as first argument to DBI->connect()
-        $conf->{DataSource} = "dbi:$type:" . join(';',
-            sprintf('database=%s', $db),
-            $db_conf->{host} ? sprintf('host=%s', delete $db_conf->{host}) : (),
-            $db_conf->{port} ? sprintf('port=%s', delete $db_conf->{port}) : (),
-            $dsn_extra ? $dsn_extra : (),
-        );
-
-        # Map config parameters to legacy names processed by CGI::Session::Driver::openxpki
-        my %map = (
-            namespace => 'NameSpace',
-            user => 'User',
-            password => 'Password',
-            passwd   => 'Password', # compatibility with 'password' alias in server DB config
-            log_ip => 'LogIP',
-            encrypt_key => 'EncryptKey',
-        );
-
-        for my $key (keys $db_conf->%*) {
-            next unless $map{$key};
-            $conf->{$map{$key}} = delete $db_conf->{$key};
-        }
-
-        die "Session config contains unknown parameters:\n" . join('', map { "- session.database.$_\n"} keys $db_conf->%*)
-            if scalar $db_conf->%*;
+    # Recent config syntax (since 2026-01)
+    if (my $conf = $self->config->get_hash('session.database')) {
+        ($db_params, $encrypt_key, $log_ip) = _parse_new_session_config($conf);
 
     # Old config syntax (pre 2026-01)
     } else {
-        $driver = $self->config->get('session.driver');
+        my $driver = $self->config->get('session.driver');
+        die "Session config: file-based sessions are no longer supported, please migrate to 'session.database'\n"
+            if ($driver//'') ne 'driver:openxpki';
+
         $conf = $self->config->get_hash('session.params');   # new format (.yaml)
         $conf //= $self->config->get_hash('session_driver'); # old format (.conf)
-        # Default for file driver
-        $conf //= { Directory => '/tmp' } if ($driver//'') ne 'driver:openxpki';
         # Default LongReadLen for Oracle
         $conf->{LongReadLen} = $conf->{LongReadLen} // 100000;
+
+        ($db_params, $encrypt_key, $log_ip) = _parse_old_session_config($conf);
     }
 
-    $conf->{TableName} = join('.', delete($conf->{NameSpace})//(), 'frontend_session');
-
-    my $session = OpenXPKI::Client::Service::WebUI::Session->new_patched(
-        $driver, # may be undef
-        $id, # may be undef
-        $conf
+    my $session = OpenXPKI::Client::Service::WebUI::Session->new(
+        db_params  => $db_params,
+        id         => $id,
+        defined($encrypt_key) ? (encrypt_key => $encrypt_key) : (),
+        defined($log_ip)      ? (log_ip      => $log_ip)      : (),
     );
     $session->expire($self->config->get('session.timeout'))
         if $self->config->exists('session.timeout');
@@ -265,7 +275,6 @@ sub _build_session ($self) {
     if ($self->log->is_debug) {
         my %info = (
             id => $session->id,
-            $driver ? (driver => $driver) : (),
             $session->expire ? (expires => $session->expire) : (),
         );
         $self->log->debug('Frontend session: ' . join(', ', map { "$_ = $info{$_}" } sort keys %info));
