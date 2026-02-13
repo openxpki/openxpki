@@ -32,7 +32,6 @@ OpenXPKI/Log4perl/Appender/Journald.pm
 OpenXPKI/Log4perl/Filter/SkipMojolicious.pm
 OpenXPKI/Log4perl/MojoLogger.pm
 OpenXPKI/Metrics.pm
-OpenXPKI/MooseParams.pm
 OpenXPKI/Password.pm
 OpenXPKI/Random.pm
 OpenXPKI/Template.pm
