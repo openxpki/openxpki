@@ -16,26 +16,30 @@ OpenXPKI - Base module to reduce boilerlate code in our packages.
 
     use OpenXPKI;
 
-    # Inheritance
-    use OpenXPKI -base   => 'Net::Server::MultiType';
-    use OpenXPKI -parent => 'Net::Server::MultiType'; # alias for -base
-    use OpenXPKI qw ( -base Net::Server::MultiType );
-
     # Moose class
     use OpenXPKI -class;
     use OpenXPKI qw( -class -nonmoose );
     use OpenXPKI qw( -class -typeconstraints );
     use OpenXPKI qw( -class -exporter );
     use OpenXPKI qw( -class -insideout );
+    use OpenXPKI qw( -class -nonmoose -insideout );
 
     # Moose role
     use OpenXPKI -role;
+
+    # Simple Perl class with inheritance
+    use OpenXPKI -parent => 'Net::Server::MultiType'; # alias for -base
+    use OpenXPKI -base   => 'Net::Server::MultiType';
+    use OpenXPKI qw ( -base Net::Server::MultiType ); # same
 
     # Class::Std class
     use OpenXPKI -class_std;
 
     # API plugin
     use OpenXPKI -plugin;
+
+    # Client API plugin
+    use OpenXPKI -client_plugin;
 
     # WebUI Data Transfer Object
     use OpenXPKI -dto;
@@ -180,6 +184,10 @@ sub import {
 
 }
 
+1;
+
+__END__
+
 =head1 DESCRIPTION
 
 When using this package various pragmas and modules are imported into the
@@ -187,202 +195,79 @@ calling package via L<Import::Into>.
 
     use OpenXPKI;
 
-This is equivalent to adding the following imports to the calling package:
+This adds the following imports to the calling package:
+
+=head2 Pragmas
 
     use strict;
     use warnings;
     use utf8; # allows for UTF-8 characters within the source code
     use English;
 
-    # Language features
-    use feature "current_sub";
-    use feature "isa";
-    use feature "say";
-    use feature "signatures";
-    use feature "state";
-    no feature "indirect";
-    no feature "multidimensional";
-    no feature "bareword_filehandles"; # only if Perl version >= 5.36.0
+=head2 Language features
 
-    # Core modules
-    use Data::Dumper;
-    use Scalar::Util "blessed";
+=head3 C<use feature "current_sub";>
 
-    # CPAN modules
-    use Type::Params qw( signature_for signature );
-    use Feature::Compat::Try;
+=over
 
-    # Project modules
-    use OpenXPKI::Debug;
-    use OpenXPKI::Exception;
-    use OpenXPKI::Util;
-    use OpenXPKI::Defaults;
+=item
 
-Various options allow to import additional modules:
-
-=head2 Perl class with inheritance
-
-    use OpenXPKI -base   => 'Net::Server::MultiType';
-    use OpenXPKI -parent => 'Net::Server::MultiType'; # alias for -base
-
-additionally adds the imports
-
-    use parent qw( Net::Server::MultiType );
-
-=head2 Moose class
-
-    use OpenXPKI -class;
-
-additionally adds the imports
-
-    use Moose;
-
-=head2 Moose class with type constraints
-
-    use OpenXPKI qw( -class -typeconstraints );
-
-additionally adds the imports
-
-    use Moose;
-    use Moose::Util::TypeConstraints;
-
-=head2 Moose class with strict constructor
-
-    use OpenXPKI qw( -class -strictconstructor );
-
-additionally adds the imports
-
-    use Moose;
-    use MooseX::StrictConstructor;
-
-=head2 Moose exporter class
-
-    use OpenXPKI qw( -class -exporter );
-
-additionally adds the imports
-
-    use Moose;
-    use Moose::Exporter;
-
-=head2 Moose class extending a non-Moose class
-
-    use OpenXPKI qw( -class -nonmoose );
-
-additionally adds the imports
-
-    use Moose;
-    use MooseX::NonMoose;
-
-=head2 Moose inside-out class
-
-    use OpenXPKI qw( -class -insideout );
-
-additionally adds the imports
-
-    use Moose;
-    use MooseX::InsideOut;
-
-while
-
-    use OpenXPKI qw( -class -nonmoose -insideout );
-
-additionally adds the imports
-
-    use Moose;
-    use MooseX::NonMoose::InsideOut;
-
-=head2 Moose role
-
-    use OpenXPKI -role;
-
-additionally adds the imports
-
-    use Moose::Role;
-
-=head2 Moose exporter role
-
-    use OpenXPKI qw( -role -exporter );
-
-additionally adds the imports
-
-    use Moose::Role;
-    use MooseX::Exporter;
-
-=head2 C<Class::Std> class
-
-    use OpenXPKI -class_std;
-
-additionally adds the imports
-
-    use Class::Std;
-
-=head2 API plugin
-
-    use OpenXPKI -plugin;
-
-additionally adds the imports
-
-    use Moose;
-    use OpenXPKI::Base::API::Plugin;
-
-=head2 Client API plugin
-
-    use OpenXPKI -client_plugin;
-
-additionally adds the imports
-
-    use Moose;
-    use OpenXPKI::Base::API::Plugin;
-    use OpenXPKI::Client::API::Plugin;
-
-=head2 WebUI Data Transfer Object
-
-    use OpenXPKI -dto;
-
-additionally adds the imports
-
-    use Moose;
-    use MooseX::StrictConstructor;
-    use OpenXPKI::Client::Service::WebUI::Response::DTO;
-
-=head2 Imports
-
-=head3 use feature "current_sub"
-
-New C<__SUB__> token that returns a reference to the current subroutine
+C<__SUB__> token that returns a reference to the current subroutine
 or undef outside of a subroutine.
 
-=head3 use feature "isa"
+=back
 
-New C<isa> infix operator:
+=head3 C<use feature "isa";>
+
+=over
+
+=item
+
+C<isa> infix operator
+(L<see Perldoc|https://perldoc.perl.org/feature#The-'isa'-feature>):
 
     if ($o isa 'OpenXPKI::Exception') {
         ...
     }
 
-Also see L<https://perldoc.perl.org/feature#The-'isa'-feature>.
+=back
 
-=head3 use feature "say"
+=head3 C<use feature "say";>
 
-New C<say> function which behaves like C<print> with a trailing newline:
+=over
+
+=item
+
+C<say> function which behaves like C<print> with a trailing newline
+(L<see Perldoc|https://perldoc.perl.org/feature#The-'say'-feature>):
 
     say "Yay";
 
-Also see L<https://perldoc.perl.org/feature#The-'say'-feature>.
+=back
 
-=head3 use feature "signatures"
+=head3 C<use feature "signatures";>
 
-Enable subroutine signatures:
+=over
+
+=item
+
+Enable subroutine signatures
+(L<see Perldoc|https://perldoc.perl.org/feature#The-'signatures'-feature>):
 
     sub message ($self, $a, $b) {
         ...
     }
 
-Also see L<https://perldoc.perl.org/feature#The-'signatures'-feature>.
+=back
 
-=head3 use feature "state"
+=head3 C<use feature "state";>
 
-New C<state> keyword:
+=over
+
+=item
+
+C<state> keyword
+(L<see Perldoc|https://perldoc.perl.org/feature#The-'state'-feature>):
 
     sub do_things {
         # will be set on first call to do_things() and preserved
@@ -390,52 +275,83 @@ New C<state> keyword:
         ...
     }
 
-Also see L<https://perldoc.perl.org/feature#The-'state'-feature>.
+=back
 
-=head3 no feature "indirect"
+=head3 C<no feature "indirect";>
 
-Disable indirect object syntax:
+=over
 
-    use OpenXPKI::Server::Session;
+=item
 
-    my $sess = OpenXPKI::Server::Session->new; # ok
-    my $sess = new OpenXPKI::Server::Session;  # dies
+Disable indirect object syntax (L<see Perldoc|https://perldoc.perl.org/feature#The-'indirect'-feature>):
 
-Also see L<https://perldoc.perl.org/feature#The-'indirect'-feature>.
+    use Dummy;
+    my $d;
+    $d = Dummy->new; # ok
+    $d = new Dummy;  # dies
 
-=head3 no feature "multidimensional"
+=back
+
+=head3 C<no feature "multidimensional";>
+
+=over
+
+=item
 
 Disable auto conversion of e.g. C<$foo{$x, $y}> into C<$foo{join($;, $x, $y)}>
-(this was a Perl 4 feature).
+(this was a Perl 4 feature, L<see Perldoc|https://perldoc.perl.org/feature#The-'multidimensional'-feature>).
 
-Also see L<https://perldoc.perl.org/feature#The-'multidimensional'-feature>.
+=back
 
-=head3 no feature "bareword_filehandles"
+=head3 C<no feature "bareword_filehandles";>
 
-Disable bareword filehandles for builtin functions operations:
+=over
+
+=item
+
+Disable bareword filehandles for builtin functions operations
+(L<see Perldoc|https://perldoc.perl.org/feature#The-'bareword_filehandles'-feature>):
 
     open my $fh, '>', $file; # ok
     open FH, '>', $file;     # dies
 
-Also see L<https://perldoc.perl.org/feature#The-'bareword_filehandles'-feature>.
+=back
 
-=head3 use Data::Dumper
+=head2 Modules for syntax enhancement and helpers
 
-New C<Dumper> function:
+=head3 C<use Data::Dumper;>
+
+=over
+
+=item
+
+Provides function C<Dumper()>:
 
     $self->log->trace(Dumper $obj) if $self->log->is_trace;
 
-=head3 use Scalar::Util "blessed"
+=back
 
-New C<blessed> function:
+=head3 C<use Scalar::Util "blessed";>
+
+=over
+
+=item
+
+Provides function C<blessed()>:
 
     if (blessed $result) {
         ...
     }
 
-=head3 use Type::Params "signature_for"
+=back
 
-New C<signature_for> function:
+=head3 C<use Type::Params qw( signature_for signature );>
+
+=over
+
+=item
+
+Provides function C<signature_for()> (see L<Type::Params|https://metacpan.org/pod/Type::Params#signature_for-$function_name-=%3E-(-%25spec-)>):
 
     signature_for merge => (
         method => 1,
@@ -443,18 +359,35 @@ New C<signature_for> function:
             into     => 'Str',
             set      => 'HashRef',
             set_once => 'Optional[ HashRef ]', { default => {} },
-            where    => 'HashRef[Value]',
         ],
     );
     sub merge ($self, $arg) {
         if ($arg->set_once) ...
     }
 
-Also see L<https://metacpan.org/pod/Type::Params#signature_for-$function_name-=%3E-(-%25spec-)>.
+C<signature_for()> does not work with Moose's around modifier (anymore), so we
+have to use C<signature()> in that case.
 
-=head3 use Feature::Compat::Try
+    around compute => sub ($orig, $self, @args) {
+        state $sig = signature(
+            named => [
+                keys      => 'ArrayRef',
+                bitlength => 'Optional[ Num ]',
+            ],
+        );
+        my ($arg) = $sig->(@args);
+        ...
+    };
 
-Try/catch control flow:
+=back
+
+=head3 C<use Feature::Compat::Try;>
+
+=over
+
+=item
+
+Provides C<try>/C<catch> control flow (see L<Feature::Compat::Try|https://metacpan.org/pod/Feature::Compat::Try>):
 
    try {
       attempt_a_thing();
@@ -465,20 +398,130 @@ Try/catch control flow:
       return "failure";
    }
 
-Also see L<https://metacpan.org/pod/Feature::Compat::Try>.
-
-=head3 OpenXPKI modules
-
-=over
-
-=item * L<OpenXPKI::Debug>
-
-=item * L<OpenXPKI::Exception>
-
-=item * L<OpenXPKI::Util>
-
 =back
 
-=cut
+=head2 OpenXPKI modules
 
-1;
+=head3 L<C<use OpenXPKI::Debug;>|OpenXPKI::Debug>
+
+=head3 L<C<use OpenXPKI::Exception;>|OpenXPKI::Exception>
+
+=head3 L<C<use OpenXPKI::Util;>|OpenXPKI::Util>
+
+=head3 L<C<use OpenXPKI::Defaults;>|OpenXPKI::Defaults>
+
+=head1 OPTIONS
+
+=head2 Moose class
+
+    use OpenXPKI -class;
+    extends 'OpenXPKI::XYZ';
+
+    ### adds these imports:
+    # use Moose;
+
+=head3 ...with type constraints
+
+    use OpenXPKI qw( -class -typeconstraints );
+
+    ### adds these imports:
+    # use Moose;
+    # use Moose::Util::TypeConstraints;
+
+=head3 ...with strict constructor
+
+    use OpenXPKI qw( -class -strictconstructor );
+
+    ### adds these imports:
+    # use Moose;
+    # use MooseX::StrictConstructor;
+
+=head3 ...with exporter
+
+    use OpenXPKI qw( -class -exporter );
+
+    ### adds these imports:
+    # use Moose;
+    # use Moose::Exporter;
+
+=head3 ...extending non-Moose class
+
+    use OpenXPKI qw( -class -nonmoose );
+
+    ### adds these imports:
+    # use Moose;
+    # use MooseX::NonMoose;
+
+=head3 ...inside-out
+
+    use OpenXPKI qw( -class -insideout );
+
+    ### adds these imports:
+    # use Moose;
+    # use MooseX::InsideOut;
+
+=head3 ...inside-out, extending non-Moose class
+
+    use OpenXPKI qw( -class -nonmoose -insideout );
+
+    ### adds these imports:
+    # use Moose;
+    # use MooseX::NonMoose::InsideOut;
+
+=head2 Moose role
+
+    use OpenXPKI -role;
+
+    ### adds these imports:
+    # use Moose::Role;
+
+=head3 ...with exporter
+
+    use OpenXPKI qw( -role -exporter );
+
+    ### adds these imports:
+    # use Moose::Role;
+    # use MooseX::Exporter;
+
+=head2 Simple Perl class with inheritance
+
+    use OpenXPKI -base   => 'Net::Server::MultiType';
+    use OpenXPKI -parent => 'Net::Server::MultiType'; # alias for -base
+
+    ### adds these imports:
+    # use parent qw( Net::Server::MultiType );
+
+=head2 C<Class::Std> class
+
+    use OpenXPKI -class_std;
+
+    ### adds these imports:
+    # use Class::Std;
+
+=head2 API plugin
+
+    use OpenXPKI -plugin;
+
+    ### adds these imports:
+    # use Moose;
+    # use OpenXPKI::Base::API::Plugin;
+
+=head2 Client API plugin
+
+    use OpenXPKI -client_plugin;
+
+    ### adds these imports:
+    # use Moose;
+    # use OpenXPKI::Base::API::Plugin;
+    # use OpenXPKI::Client::API::Plugin;
+
+=head2 WebUI Data Transfer Object
+
+    use OpenXPKI -dto;
+
+    ### adds these imports:
+    # use Moose;
+    # use MooseX::StrictConstructor;
+    # use OpenXPKI::Client::Service::WebUI::Response::DTO;
+
+=cut
