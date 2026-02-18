@@ -19,6 +19,7 @@ sub _evaluate
     my $probe;
     if ($key) {
         $probe = $context->param($key);
+         CTX('log')->deprecated()->debug('using contextkey in Condition::DateTime is deprecated');
     } else {
         $probe = $self->param('value');
     }
@@ -29,7 +30,7 @@ sub _evaluate
 
     ##! 32: 'Probe ' . $probe . ' nb: ' . $notbefore  . ' - na: ' . $notafter
 
-    condition_error ("DateTime context value ($key) to test is missing or empty") unless ($probe);
+    condition_error ("DateTime probe value is missing or empty") unless ($probe);
 
     my $dt_probe = OpenXPKI::DateTime::get_validity({
         VALIDITY => $probe,
@@ -47,11 +48,11 @@ sub _evaluate
             : $dt_now;
 
         if ($dt_probe <= $dt_notbefore) {
-            CTX('log')->application()->debug("DateTime condition failed $key $dt_probe < $dt_notbefore");
+            CTX('log')->application()->debug("DateTime condition failed $dt_probe < $dt_notbefore");
 
-            condition_error ("$key $dt_probe is less then notbefore $dt_notbefore");
+            condition_error ("$dt_probe is less then notbefore $dt_notbefore");
         }
-        CTX('log')->application()->debug("DateTime condition passed $key $dt_probe > $dt_notbefore");
+        CTX('log')->application()->debug("DateTime condition passed $dt_probe > $dt_notbefore");
 
     }
 
@@ -65,12 +66,12 @@ sub _evaluate
             : $dt_now;
 
         if ($dt_probe >= $dt_notafter) {
-            CTX('log')->application()->debug("DateTime condition failed - $key $dt_probe > $dt_notafter");
+            CTX('log')->application()->debug("DateTime condition failed - $dt_probe > $dt_notafter");
 
-            condition_error ("$key $dt_probe is larger then notafter $dt_notafter");
+            condition_error ("$dt_probe is larger then notafter $dt_notafter");
         }
 
-        CTX('log')->application()->debug("DateTime condition passed $key $dt_probe < $dt_notafter");
+        CTX('log')->application()->debug("DateTime condition passed $dt_probe < $dt_notafter");
 
     }
 
