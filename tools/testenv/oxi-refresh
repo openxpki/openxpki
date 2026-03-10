@@ -263,7 +263,7 @@ webui_conf=/etc/openxpki/client.d/service/webui/default.yaml
 if [ -e $webui_conf ]; then
     echo "- set WebUI session driver to database"
     yq -i '
-      .session.database.type = "MariaDB" |
+      .session.database.type = "MariaDB2" |
       .session.database.host = "127.0.0.1" |
       .session.database.name = "openxpki" |
       .session.database.user = "openxpki_session" |
