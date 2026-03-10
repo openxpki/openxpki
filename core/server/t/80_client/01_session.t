@@ -4,13 +4,6 @@ use warnings;
 use FindBin qw($Bin);
 use lib "$Bin/../..";
 
-# Pre-load CGI::Session::Driver::openxpki from its non-standard path so that
-# Module::Load inside Session.pm finds the package already registered.
-BEGIN {
-    require "$FindBin::Bin/../../CGI_Session_Driver/openxpki.pm"; ## no critic (Modules::RequireBarewordIncludes)
-    $INC{"CGI/Session/Driver/openxpki.pm"} = "$FindBin::Bin/../../CGI_Session_Driver/openxpki.pm";
-}
-
 use Test::More;
 use Test::Exception;
 use Test::Deep ':v1';
