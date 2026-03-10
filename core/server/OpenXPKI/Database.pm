@@ -776,15 +776,67 @@ For more details see L<OpenXPKI::Database::Role::Driver>.
 =item * B<db_params> - I<HashRef> with parameters for the DBI data source name
 string (required).
 
-Required keys in this hash:
+Keys in this hash:
 
 =over
 
-=item * B<type> - last part of a package in the C<OpenXPKI::Database::Driver::*> namespace. (I<Str>, required)
+=item * B<type> - last part of a package in the C<OpenXPKI::Database::Driver::*>
+namespace, e.g. C<MySQL> or C<PostgreSQL> (I<Str>, required)
 
-=item * Any of the L<OpenXPKI::Database::Role::Driver/Constructor parameters>
+=item * B<name> - database name (I<Str>, required)
 
-=item * Additional parameters required by the specific driver
+=item * B<host> - database host: IP address or hostname (I<Str>, optional)
+
+=item * B<port> - database TCP port (I<Int>, optional)
+
+=item * B<user> - database username (I<Str>, optional)
+
+=item * B<passwd> - database password (I<Str>, optional)
+
+=item * B<namespace> - schema/namespace prepended as table prefix in all queries,
+e.g. to host multiple OpenXPKI installations in one database (I<Str>, optional)
+
+=item * B<lock_timeout> - timeout in seconds to wait for a database lock
+(I<Int>, optional, default: 5)
+
+=item * B<server_id> - node ID embedded in generated serial numbers via bitwise OR
+after a left-shift of C<server_shift> bits. Allows multiple nodes to generate
+non-colliding IDs. (I<Int>, optional, default: C<2**server_shift - 1>)
+
+=item * B<server_shift> - number of bits to left-shift the raw sequence value
+before embedding the C<server_id> (I<Int>, optional, default: 8)
+
+=item * B<tls> - I<HashRef> for TLS/SSL connection settings (optional):
+
+=over
+
+=item * B<enabled> - enable TLS (I<Bool>)
+
+=item * B<ca_file> - path to a PEM CA certificate file; mutually exclusive with
+C<ca_dir> (I<Str>, optional)
+
+=item * B<ca_dir> - path to a directory of PEM CA certificates; mutually exclusive
+with C<ca_file> (I<Str>, optional)
+
+=item * B<verify_hostname> - verify the server hostname against the certificate
+(I<Bool>, optional, default: 1)
+
+=back
+
+=item * B<dbi> - I<HashRef> for low-level DBI overrides (optional):
+
+=over
+
+=item * B<dsn_extra> - additional string appended (semicolon-separated) to the
+driver's DSN (I<Str>, optional)
+
+=item * B<attrs> - I<HashRef> of additional attributes passed as the fourth
+argument to L<DBI/connect> (I<HashRef>, optional)
+
+=back
+
+=item * B<driver> - legacy: I<HashRef> of DBI connect attributes – B<use C<dbi.attrs>
+instead> (I<HashRef>, optional, deprecated)
 
 =back
 
