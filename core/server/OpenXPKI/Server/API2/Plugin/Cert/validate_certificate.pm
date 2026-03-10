@@ -40,7 +40,58 @@ If I<anchor> is set, the resulting chain is tested against the list. If any
 of the given certificates is found in the chain, the result is I<TRUSTED>.
 Otherwise it is I<UNTRUSTED>.
 
-The return value is a I<HashRef>:
+B<CRL Check>
+
+For certificates that are managed by this PKI instance, the revocation
+status is ALWAYS checked based in the information in the database.
+
+If you want to validate externally issued certificates, you can pass the
+I<crl_check> parameter with one of the following values (default is I<none>).
+There is currently no special return value for CRL checks, failure to
+validate will just return the status "BROKEN".
+
+For details on CRL checking see C<handle_external_crl>, I<import> and
+I<autoupdate> will be set to true unless I<volatile> is set.
+
+B<NOTE>: This feature is only available with the enterprise extensions installed.
+
+=over
+
+=item * B<none>: Do not perform a CRL check, this is the default.
+
+=item * B<soft>: Tries to find a valid CRL for the leaf certificate but will
+silently skip the revocation check if no CRL is found.
+
+=item * B<leaf>: Tries to find a valid CRL for the leaf certificate, will throw
+an exception if there is no fresh CRL information.
+
+=item * B<all>: Tries to find a valid CRL for all certifiates in the chain,
+will throw an exception if there is no fresh CRL information for any element.
+
+=back
+
+B<Parameters>
+
+=over
+
+=item * C<pem> I<Str> - PEM encoded certificate (I<Str>)
+
+=item * C<chain> I<ArrayRef> - full certificate chain (list of PEM encoded
+certificates)
+
+=item * C<pkcs7> I<Str> - PEM encoded PKCS7 container
+
+=item * C<anchor> I<ArrayRef> - list of trust anchors (certificate identifiers).
+
+=item * C<novalidity> I<Bool> - treat expired certificates as good
+
+=item * C<crl_check> I<Str> - one of C<none>, C<soft>, C<leaf>, C<all>
+
+=item * C<volatile> I<Bool> - do not persist chain certificates
+
+=back
+
+B<Returns> a I<HashRef>:
 
     {
         status => '...',    # validation result
@@ -68,66 +119,6 @@ local database, if C<anchor> is given: chain does not match trust list
 trust list.
 
 =back
-
-B<Parameters>
-
-=over
-
-=item * C<pem> I<Str> - PEM encoded certificate (I<Str>)
-
-=item * C<chain> I<ArrayRef> - full certificate chain (list of PEM encoded
-certificates)
-
-=item * C<pkcs7> I<Str> - PEM encoded PKCS7 container
-
-=item * C<anchor> I<ArrayRef> - list of trust anchors (certificate identifiers).
-
-=item * C<novalidity> I<Bool> - treat expired certificates as good
-
-=item * C<crl_check> I<Str> - one of none, soft, leaf, all
-
-=back
-
-B<CRL Check>
-
-For certificates that are managed by this PKI instance, the revocation
-status is ALWAYS checked based in the information in the database.
-
-If you want to validate externally issued certificates, you can pass the
-I<crl_check> parameter with one of the following values (default is I<none>).
-There is currently no special return value for CRL checks, failure to
-validate will just return the status "BROKEN".
-
-For details on CRL checking see C<handle_external_crl>, I<import> and
-I<autoupdate> will be set to true unless I<volatile> is set.
-
-B<NOTE>: Feature is only available with the enterprise extensions installed.
-
-=over
-
-=item none
-
-Do not perform a CRL check, this is the default.
-
-=item soft
-
-Tries to find a valid CRL for the leaf certificate but will silently skip
-the revocation check if no CRL is found.
-
-=item leaf
-
-Tries to find a valid CRL for the leaf certificate, will throw an exception
-if there is no fresh CRL information.
-
-=item all
-
-Tries to find a valid CRL for all certifiates in the chain, will throw an
-exception if there is no fresh CRL information for any element.
-
-=back
-
-=item * C<volatile> I<Bool> - do not persist chain certificates
-
 
 B<Changes compared to API v1:>
 

@@ -835,7 +835,7 @@ argument to L<DBI/connect> (I<HashRef>, optional)
 
 =back
 
-=item * B<driver> - legacy: I<HashRef> of DBI connect attributes – B<use C<dbi.attrs>
+=item * B<driver> - legacy: I<HashRef> of DBI connect attributes - B<use C<dbi.attrs>
 instead> (I<HashRef>, optional, deprecated)
 
 =back
