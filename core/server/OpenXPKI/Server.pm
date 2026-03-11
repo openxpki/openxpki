@@ -4,6 +4,7 @@ use OpenXPKI -base => 'Net::Server::MultiType';
 # Core modules
 use Socket;
 use Module::Load ();
+use List::Util qw( none );
 
 # CPAN modules
 use File::Basename;
@@ -334,7 +335,7 @@ sub pre_loop_hook {
 sub child_init_hook {
 
     my $self = shift;
-    OpenXPKI::Server::__set_process_name("worker: init");
+    OpenXPKI::Server::__set_process_name(worker => 'init');
 
 }
 
@@ -364,12 +365,12 @@ sub sig_term {
 
 sub sig_hup {
     ##! 1: 'start'
-    my $pids = OpenXPKI::Control::Server->get_pids();
+    my $pids = OpenXPKI::Control::Server->get_pids;
 
-    CTX('log')->system()->info(sprintf "SIGHUP received - cleanup childs (%01d found)", scalar @{$pids->{worker}});
+    CTX('log')->system->info(sprintf "SIGHUP received - cleanup childs (%01d found)", scalar @{$pids->{worker}});
 
-    if (@{$pids->{worker}}) {
-        kill 15, @{$pids->{worker}};
+    if (my @w_pids = $pids->{$OpenXPKI::Defaults::PROC_NAME_WORKER}->@*) {
+        kill 15, @w_pids;
     }
 
     # FIXME - should also reinit some of the services
@@ -428,7 +429,7 @@ sub do_process_request {
     umask $self->{umask};
 
     # masquerade process...
-    OpenXPKI::Server::__set_process_name("worker: connecting");
+    OpenXPKI::Server::__set_process_name(worker => 'connecting');
 
     ##! 2: "transport protocol detector"
     my $transport = undef;
@@ -556,7 +557,7 @@ sub do_process_request {
         $log->logdie(blessed($service)."->run() failed: $err");
     }
 
-    OpenXPKI::Server::__set_process_name("worker: wfc");
+    OpenXPKI::Server::__set_process_name(worker => 'wfc');
 
 }
 
@@ -755,18 +756,23 @@ sub __get_server_config {
     return \%params;
 }
 
-sub __set_process_name {
+sub __set_process_name ($identity, $details = '') {
+    our @valid_procnames = (
+        $OpenXPKI::Defaults::PROC_NAME_SERVER,
+        $OpenXPKI::Defaults::PROC_NAME_WATCHDOG,
+        $OpenXPKI::Defaults::PROC_NAME_WORKER,
+        $OpenXPKI::Defaults::PROC_NAME_WORKFLOW,
+        $OpenXPKI::Defaults::PROC_NAME_METRICS
+    );
 
-    my $identity = shift;
-    my @args = @_;
-    if (@args) {
-        $identity = sprintf $identity, @args;
-    }
+    die "__set_process_name(): invalid process identity '$identity'. Expected one of: " . join(', ', @valid_procnames)
+        if none { $identity eq $_ } @valid_procnames;
 
     my $alias = CTX('config')->get(['system','server','name']) || 'main';
-    $0 = "openxpkid ($alias) $identity";
-    return;
+    $0 = "$OpenXPKI::Defaults::PROC_BASENAME ($alias) $identity"
+        .($details ? ": $details" : '');
 
+    return;
 }
 
 ################################################

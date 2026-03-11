@@ -378,21 +378,21 @@ sub start_or_reload {
     my %args = @_;
 
     ##! 1: 'start'
-    my $pids = OpenXPKI::Control::Server->get_pids();
+    my $pids = OpenXPKI::Control::Server->get_pids;
 
     # Start watchdog if not running
-    if (not scalar @{$pids->{watchdog}}) {
+    if (not scalar $pids->{$OpenXPKI::Defaults::PROC_NAME_WATCHDOG}->@*) {
         my $config = CTX('config');
 
         return 0 if $config->get('system.watchdog.disabled');
 
-        my $watchdog = OpenXPKI::Server::Watchdog->new();
+        my $watchdog = OpenXPKI::Server::Watchdog->new;
         $watchdog->keep_parent_sigchld($args{keep_parent_sigchld} ? 1 : 0);
         $watchdog->run;
     }
     # Signal reload
     else {
-        kill 'HUP', @{$pids->{watchdog}};
+        kill 'HUP', $pids->{$OpenXPKI::Defaults::PROC_NAME_WATCHDOG}->@*;
     }
 
     return 1;
@@ -407,14 +407,14 @@ This will NOT kill the watchdog but tell it to gracefully stop.
 =cut
 sub terminate {
     ##! 1: 'terminate'
-    my $pids = OpenXPKI::Control::Server->get_pids();
+    my $pids = OpenXPKI::Control::Server->get_pids;
 
-    if (scalar $pids->{watchdog}) {
-        kill 'TERM', @{$pids->{watchdog}};
-        CTX('log')->system()->info('Told watchdog to terminate');
+    if (my @w_pids = $pids->{$OpenXPKI::Defaults::PROC_NAME_WATCHDOG}->@*) {
+        kill 'TERM', @w_pids;
+        CTX('log')->system->info('Told watchdog to terminate');
     }
     else {
-        CTX('log')->system()->error('No watchdog instances to terminate');
+        CTX('log')->system->error('No watchdog instances to terminate');
     }
 
     return 1;
@@ -438,9 +438,9 @@ sub run {
     CTX('log')->system->info('Watchdog: starting' . (scalar @userinfo ? ' with '.join(',', @userinfo) : ''));
 
     # Check if we already have a watchdog running
-    my $result = OpenXPKI::Control::Server->get_pids();
-    my $instance_count = scalar @{$result->{watchdog}};
-    if ($instance_count >= $self->max_instance_count()) {
+    my $pids = OpenXPKI::Control::Server->get_pids;
+    my $instance_count = scalar $pids->{$OpenXPKI::Defaults::PROC_NAME_WATCHDOG}->@*;
+    if ($instance_count >= $self->max_instance_count) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_WATCHDOG_RUN_TOO_MANY_INSTANCES',
             params => {
@@ -479,7 +479,7 @@ sub run {
         $self->{original_pid}             = $PID;
 
         # set process name
-        OpenXPKI::Server::__set_process_name("Watchdog: init");
+        OpenXPKI::Server::__set_process_name(watchdog => 'init');
 
         CTX('log')->system()->info(sprintf( 'Watchdog initialized, delays are: initial: %01d, idle: %01d, run: %01d',
                 $self->interval_wait_initial(), $self->interval_loop_idle(), $self->interval_loop_run() ));
@@ -580,17 +580,17 @@ sub __main_loop {
             if (!$slots_avail_count) {
                 ##! 16: 'watchdog paused - too much load'
                 $sec = $self->interval_sleep_overload;
-                OpenXPKI::Server::__set_process_name("watchdog (OVERLOAD)");
+                OpenXPKI::Server::__set_process_name(watchdog => 'OVERLOAD');
                 CTX('log')->system->warn(sprintf "Watchdog: process limit (%01d) reached, will sleep for %01d seconds", $self->max_worker_count(), $sec );
             } elsif (my $wf_id = $self->__scan_for_paused_workflows()) {
                 ##! 32: 'watchdog busy - forked child for wf ' . $wf_id
                 $sec = $self->interval_loop_run;
                 $slots_avail_count--;
-                OpenXPKI::Server::__set_process_name("watchdog (busy)");
+                OpenXPKI::Server::__set_process_name(watchdog => 'busy');
                 CTX('metrics')->set('watchdog_slots_avail', $slots_avail_count);
             } else {
                 ##! 32: 'watchdog idle'
-                OpenXPKI::Server::__set_process_name("watchdog (idle)");
+                OpenXPKI::Server::__set_process_name(watchdog => 'idle');
             }
             ##! 64: sprintf('watchdog sleeps %d secs', $sec)
 
@@ -598,10 +598,15 @@ sub __main_loop {
             if ($self->interval_status_update &&
                 ((time - $beacon->{last_update}) > $self->interval_status_update )) {
 
-                my $pids = OpenXPKI::Control::Server->get_pids();
+                my $pids = OpenXPKI::Control::Server->get_pids;
+                my @proc_names = (
+                    $OpenXPKI::Defaults::PROC_NAME_WATCHDOG,
+                    $OpenXPKI::Defaults::PROC_NAME_WORKER,
+                    $OpenXPKI::Defaults::PROC_NAME_WORKFLOW,
+                );
                 my $now = time()*1000;
-                foreach my $key ('watchdog','worker','workflow') {
-                    my $value = scalar @{$pids->{$key}};
+                foreach my $key (@proc_names) {
+                    my $value = scalar $pids->{$key}->@*;
                     CTX('metrics')->set('process_count', $value, { scope => $key }, $now);
                     $beacon->{'process_count_'.$key} = $value;
                 }

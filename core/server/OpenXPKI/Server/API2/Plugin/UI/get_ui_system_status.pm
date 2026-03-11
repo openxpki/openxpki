@@ -62,15 +62,15 @@ command "get_ui_system_status" => {
     }
 
     # Process count
-    my $pids = OpenXPKI::Control::Server->get_pids();
+    my $pids = OpenXPKI::Control::Server->get_pids;
 
     my $config =  CTX('config')->get_hash("system.version");
 
     my $result = {
         secret_offline  => $offline_secrets,
-        watchdog        => scalar @{$pids->{watchdog}},
-        worker          => scalar @{$pids->{worker}},
-        workflow        => scalar @{$pids->{workflow}},
+        watchdog        => scalar @{$pids->{$OpenXPKI::Defaults::PROC_NAME_WATCHDOG}},
+        worker          => scalar @{$pids->{$OpenXPKI::Defaults::PROC_NAME_WORKER}},
+        workflow        => scalar @{$pids->{$OpenXPKI::Defaults::PROC_NAME_WORKFLOW}},
         version         => $OpenXPKI::VERSION::VERSION,
         hostname        => hostname,
         node_id         => CTX('config')->node_id,

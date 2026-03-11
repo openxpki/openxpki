@@ -14,6 +14,14 @@ our $SERVER_LEGACY_SOCKET = '/var/openxpki/openxpki.socket';
 our $SERVER_PID     = '/run/openxpkid/openxpkid.pid';
 our $SERVER_CONFIG_DIR = '/etc/openxpki/config.d/';
 
+# Process string used to identify OpenXPKI processes
+our $PROC_BASENAME = 'openxpki-serverd';
+our $PROC_NAME_SERVER     = 'server';
+our $PROC_NAME_WATCHDOG   = 'watchdog';
+our $PROC_NAME_WORKER     = 'worker';
+our $PROC_NAME_WORKFLOW   = 'workflow';
+our $PROC_NAME_METRICS    = 'metrics';
+
 our $CLIENT_SOCKET  = '/run/openxpki-clientd/openxpki-clientd.sock';
 our $CLIENT_PID     = '/run/openxpki-clientd/openxpki-clientd.pid';
 our $CLIENT_CONFIG_DIR = '/etc/openxpki/client.d/';

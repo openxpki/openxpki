@@ -783,12 +783,12 @@ sub __change_state : PRIVATE {
         CTX('session')->data->status($new_state);
     }
 
-    # Set the daemon name after enterin MAIN_LOOP
+    # Set the daemon name after entering MAIN_LOOP
 
     if ($new_state eq "MAIN_LOOP") {
-        OpenXPKI::Server::__set_process_name("worker: %s (%s)", CTX('session')->data->user, CTX('session')->data->role);
+        OpenXPKI::Server::__set_process_name(worker => sprintf('%s (%s)', CTX('session')->data->user, CTX('session')->data->role));
     } elsif ($new_state eq "NEW") {
-        OpenXPKI::Server::__set_process_name("worker: connected");
+        OpenXPKI::Server::__set_process_name(worker => 'connected');
     }
 
     return 1;

@@ -19,7 +19,7 @@ Returns information about all child processes of the server process:
 
     [
         {
-            pid => 123, time => 1718098183, info => 'openxpkid (main) server',
+            pid => 123, time => 1718098183, info => 'openxpki-serverd (main) server',
             ...
         }
     ]

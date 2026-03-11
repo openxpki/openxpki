@@ -63,8 +63,12 @@ command "control_watchdog" => {
     if ("status" eq $action) {
         my $result = OpenXPKI::Control::Server->get_pids;
         return {
-            pid => $result->{watchdog},
-            children => ref $result->{workflow} ? scalar @{$result->{workflow}} : 0
+            pid => $result->{$OpenXPKI::Defaults::PROC_NAME_WATCHDOG},
+            children => (
+                ref $result->{$OpenXPKI::Defaults::PROC_NAME_WORKFLOW}
+                    ? scalar @{$result->{$OpenXPKI::Defaults::PROC_NAME_WORKFLOW}}
+                    : 0
+            )
         }
     }
 };

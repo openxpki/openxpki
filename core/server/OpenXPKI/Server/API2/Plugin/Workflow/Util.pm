@@ -162,7 +162,7 @@ sub _execute_activity_sync {
 
     my $log = CTX('log')->workflow;
 
-    OpenXPKI::Server::__set_process_name("workflow: id %s", $workflow->id);
+    OpenXPKI::Server::__set_process_name(workflow => sprintf('running (id %s)', $workflow->id));
     # run activity
     eval { $self->_run_activity($workflow, $activity) };
 
@@ -170,7 +170,7 @@ sub _execute_activity_sync {
        $log->error(sprintf ('Error executing workflow activity "%s" on workflow id #%s (type "%s"): %s',
             $activity, $workflow->id, $workflow->type, $eval_err));
 
-        OpenXPKI::Server::__set_process_name("workflow: id %s (exception)", $workflow->id);
+        OpenXPKI::Server::__set_process_name(workflow => sprintf('exception (id %s)', $workflow->id));
 
         my $logcfg = { priority => 'error', facility => 'workflow' };
 
@@ -216,7 +216,7 @@ sub _execute_activity_sync {
         );
     };
 
-    OpenXPKI::Server::__set_process_name("workflow: id %s (cleanup)", $workflow->id());
+    OpenXPKI::Server::__set_process_name(workflow => sprintf('cleanup (id %s)', $workflow->id));
     return 0;
 }
 
@@ -267,7 +267,7 @@ sub _execute_activity_async {
 
         ##! 16: 'I am the child process running the activity'
         # append fork info to process name
-        OpenXPKI::Server::__set_process_name("workflow: id %s (detached)", $workflow->id());
+        OpenXPKI::Server::__set_process_name(workflow => sprintf('detached (id %s)', $workflow->id));
 
         # create memory-only session for workflow if it's not already one
         if (CTX('session')->type ne 'Memory') {
@@ -296,7 +296,7 @@ sub _execute_activity_async {
         # DB rollback is not needed as this process will terminate now anyway
     }
 
-    OpenXPKI::Server::__set_process_name("workflow: id %s (detached - cleanup)", $workflow->id());
+    OpenXPKI::Server::__set_process_name(workflow => sprintf('detached - cleanup (id %s)', $workflow->id));
 
     try {
         OpenXPKI::Server->cleanup();

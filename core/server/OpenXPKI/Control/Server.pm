@@ -488,28 +488,40 @@ PID of the Prometheus agent.
 
 sub get_pids {
     my $proc = Proc::ProcessTable->new;
-    my $result = { 'server' => 0, 'watchdog' => [], 'worker' => [], 'workflow' => [], 'prometheus' => 0 };
+
+    my $pn_base = $OpenXPKI::Defaults::PROC_BASENAME;
+    my $pn_server   = $OpenXPKI::Defaults::PROC_NAME_SERVER;
+    my $pn_watchdog = $OpenXPKI::Defaults::PROC_NAME_WATCHDOG;
+    my $pn_worker   = $OpenXPKI::Defaults::PROC_NAME_WORKER;
+    my $pn_wf       = $OpenXPKI::Defaults::PROC_NAME_WORKFLOW;
+    my $pn_metrics  = $OpenXPKI::Defaults::PROC_NAME_METRICS;
+
+    my $result = {
+        $pn_server   => 0,
+        $pn_watchdog => [],
+        $pn_worker   => [],
+        $pn_wf       => [],
+        $pn_metrics  => 0,
+    };
+
     my $pgrp = getpgrp($$); # Process Group of myself
+
     for my $p ($proc->table->@*) {
-        next unless $pgrp == $p->pgrp;
+        next unless $pgrp == $p->pgrp; # only interested in our process group
 
         my $cmd = $p->cmndline;
-        if ($cmd =~ / ^ openxpkid .* server /xi) {
-            $result->{server} = $p->pid; next;
-        }
-        if ($cmd =~ / ^ openxpkid .* watchdog /xi) {
-            push @{$result->{watchdog}}, $p->pid; next;
-        }
-        if ($cmd =~ / ^ openxpkid .* worker /xi) {
-            push @{$result->{worker}}, $p->pid; next;
-        }
-        if ($cmd =~ / ^ openxpkid .* workflow /xi) {
-            push @{$result->{workflow}}, $p->pid; next;
-        }
-        if ($cmd =~ / ^ openxpkid .* Prometheus /xi) {
-            $result->{prometheus} = $p->pid; next;
+        for my $procname (keys $result->%*) {
+            # look for "PROC_BASENAME .* PROC_NAME_XXX" pattern
+            next unless $cmd =~ / ^ \Q $pn_base \E .* \Q $procname \E /xi;
+            # handle array and scalar result types
+            if (ref $result->{$procname} eq 'ARRAY') {
+                push $result->{$procname}->@*, $p->pid;
+            } else {
+                $result->{$procname} = $p->pid;
+            }
         }
     }
+
     return $result;
 }
 
@@ -520,7 +532,7 @@ processes of the server process:
 
     [
         {
-            pid => 123, time => 1718098183, info => 'openxpkid (main) server',
+            pid => 123, time => 1718098183, info => 'openxpki-serverd (main) server',
             ...
         }
     ]
@@ -532,12 +544,15 @@ sub list_process {
     my @result;
     my $pgrp = getpgrp($$); # Process Group of myself
 
+    my $pn_worker = $OpenXPKI::Defaults::PROC_NAME_WORKER;
+    my $pn_wf     = $OpenXPKI::Defaults::PROC_NAME_WORKFLOW;
+
     foreach my $p ( @{$proc->table} ) {
         next unless $pgrp == $p->pgrp;
 
         if (!$p->cmndline) {
             push @result, { 'pid' => $p->pid, 'time' => $p->start, 'info' => '' };
-        } elsif ($p->cmndline =~ m{ ((worker|workflow): .*) \z }x) {
+        } elsif ($p->cmndline =~ m{ (( \Q $pn_worker \E | \Q $pn_wf \E ): .*) \z }x) {
             push @result, { 'pid' => $p->pid, 'time' => $p->start, 'info' => $1 };
         } else {
             push @result, { 'pid' => $p->pid, 'time' => $p->start, 'info' => $p->cmndline };
