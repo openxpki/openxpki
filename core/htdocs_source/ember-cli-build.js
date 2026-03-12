@@ -2,9 +2,15 @@
 
 const EmberApp = require('ember-cli/lib/broccoli/ember-app');
 const Funnel = require('broccoli-funnel');
-const { Webpack } = require('@embroider/webpack');
+const {
+  compatBuild
+} = require("@embroider/compat");
 
-module.exports = function(defaults) {
+module.exports = async function(defaults) {
+  const {
+    buildOnce
+  } = await import("@embroider/vite");
+
   // special behaviour in production mode
   let on_production = {};
   if (process.env.EMBER_ENV === "production") {
@@ -116,7 +122,7 @@ module.exports = function(defaults) {
   /********************************
    * Compilation
    ********************************/
-  return require('@embroider/compat').compatBuild(app, Webpack, {
+  return compatBuild(app, buildOnce, {
     staticAddonTestSupportTrees: true,
     staticAddonTrees: true,
     staticInvokables: true,
@@ -124,6 +130,7 @@ module.exports = function(defaults) {
        of Embroider and can't be turned off. To prepare for this you should set
        'staticEmberSource: true' in your Embroider config. */
     staticEmberSource: true,
+    useAddonConfigModule: false,
     // splitAtRoutes: ['route.name'], // can also be a RegExp
 
     // packagerOptions: {

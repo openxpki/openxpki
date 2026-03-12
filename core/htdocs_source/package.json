@@ -1,6 +1,8 @@
 {
   "//": [
-    "@ember/string - required by ember-bootstrap"
+    "@ember/string - required by ember-bootstrap",
+    "'ember test' uses testem (configured in testem.js) and Vite handles the",
+    "build step internally via Embroider."
   ],
   "name": "openxpki",
   "version": "0.0.0",
@@ -17,15 +19,15 @@
     "outputpath": "dist"
   },
   "scripts": {
-    "build": "ember build --environment=production --output-path=$OPENXPKI_BUILD_OUTPUT_PATH",
+    "build": "vite build",
     "lint:css": "stylelint \"**/*.css\"",
     "lint:css:fix": "concurrently \"npm:lint:css -- --fix\"",
     "lint:hbs": "ember-template-lint .",
     "lint:hbs:fix": "ember-template-lint . --fix",
     "lint:js": "eslint . --cache",
     "lint:js:fix": "eslint . --fix",
-    "serve": "ember serve --host=0.0.0.0 --proxy=$DEV_SERVER_FORWARD_TO --secure-proxy false --output-path=dist-dev",
-    "test:ember": "ember test",
+    "serve": "vite --host=0.0.0.0",
+    "test:ember": "vite build --mode development && ember test --path $OPENXPKI_BUILD_OUTPUT_PATH",
     "docs": "jsdoc -c .jsdoc.js --verbose app"
   },
   "devDependencies": {
@@ -33,17 +35,22 @@
     "@babel/eslint-parser": "^7.28.6",
     "@babel/plugin-proposal-decorators": "^7.29.0",
     "@babel/plugin-syntax-decorators": "^7.28.6",
+    "@babel/plugin-transform-runtime": "^7.29.0",
     "@ember/optional-features": "^3.0.0",
     "@ember/string": "^4.0.1",
     "@ember/test-helpers": "^5.4.1",
-    "@embroider/compat": "^3.8.1",
-    "@embroider/core": "^3.5.0",
+    "@embroider/compat": "^4.1.13",
+    "@embroider/config-meta-loader": "^1.0.0",
+    "@embroider/core": "^4.4.3",
+    "@embroider/legacy-inspector-support": "^0.1.3",
     "@embroider/macros": "^1.16.10",
-    "@embroider/router": "^2.1.8",
-    "@embroider/webpack": "^4.0.9",
+    "@embroider/router": "^3.0.1",
+    "@embroider/vite": "^1.5.2",
     "@eslint/js": "^10.0.1",
     "@glimmer/component": "^2.0.0",
     "@glimmer/tracking": "^1.1.2",
+    "@rollup/plugin-babel": "^6.1.0",
+    "babel-plugin-ember-template-compilation": "^2.3.0",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
     "broccoli-funnel": "^3.0.8",
@@ -51,19 +58,15 @@
     "choices.js": "^11.2.1",
     "concurrently": "^9.2.1",
     "copy-text-to-clipboard": "^3.2.2",
+    "decorator-transforms": "^2.3.1",
     "detect-browser": "^5.3.0",
     "ember-auto-import": "^2.12.1",
     "ember-bootstrap": "^6.7.0",
     "ember-cli": "^6.11.0",
     "ember-cli-babel": "^8.3.1",
-    "ember-cli-clean-css": "^3.0.0",
-    "ember-cli-dependency-checker": "^3.3.3",
     "ember-cli-head": "^2.0.0",
     "ember-cli-htmlbars": "^7.0.0",
-    "ember-cli-inject-live-reload": "^2.1.0",
     "ember-cli-sass": "^11.0.1",
-    "ember-cli-sri": "^2.1.1",
-    "ember-cli-terser": "^4.0.2",
     "ember-cli-update": "^3.0.1",
     "ember-flatpickr": "^9.0.2",
     "ember-intl": "^8.2.0",
@@ -73,7 +76,6 @@
     "ember-qunit": "^9.0.4",
     "ember-resolver": "^13.2.0",
     "ember-source": "~6.11.0",
-    "ember-template-imports": "^4.4.0",
     "ember-template-lint": "^7.9.3",
     "ember-tippy": "^3.0.0-beta.0",
     "eslint": "^10.0.3",
@@ -84,7 +86,6 @@
     "globals": "^17.4.0",
     "js-yaml": "^4.1.1",
     "jsdoc": "^4.0.5",
-    "loader.js": "^4.7.0",
     "luxon": "^3.7.2",
     "pretender": "^3.4.7",
     "prettier": "^3.8.1",
@@ -100,12 +101,26 @@
     "tippy.js": "^6.3.7",
     "tracked-built-ins": "^4.1.0",
     "uplot": "^1.6.32",
-    "webpack": "^5.105.4"
+    "vite": "^7.3.1"
   },
   "engines": {
     "node": ">= 18"
   },
   "ember": {
     "edition": "octane"
+  },
+  "exports": {
+    "./tests/*": "./tests/*",
+    "./*": "./app/*"
+  },
+  "pnpm": {
+    "overrides": {
+      "babel-plugin-ember-template-compilation": "2.3.0"
+    },
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "core-js",
+      "esbuild"
+    ]
   }
 }
