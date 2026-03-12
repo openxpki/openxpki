@@ -57,4 +57,5 @@ Vagrant.configure("2") do |config|
   end
 
   config.ssh.forward_agent = true
+  config.ssh.extra_args = ["-t", "sudo -i"]
 end

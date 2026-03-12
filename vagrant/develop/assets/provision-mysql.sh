@@ -23,8 +23,11 @@ while read def; do export $def; done < /etc/environment
 # Run Docker container
 #
 docker rm -f mariadb >/dev/null 2>&1
-docker run -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root \
-           --name mariadb mariadb:10.5 >$LOG 2>&1 || _exit $?
+docker run \
+    --restart always \
+    -d -p 3306:3306 \
+    -e MYSQL_ROOT_PASSWORD=root \
+    --name mariadb mariadb:10.5 >$LOG 2>&1 || _exit $?
 
 #
 # Install MySQL client
