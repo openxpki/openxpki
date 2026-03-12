@@ -38,6 +38,8 @@ Vagrant.configure("2") do |config|
 
       dev.vm.provision "Create /run-env", :type => "shell", :inline => "mkdir -p /run-env && chmod 0777 /run-env"
 
+      dev.vm.provision "Load /etc/environment for root", :type => "shell", :inline => "echo 'set -a; source /etc/environment; set +a' >> /root/.bashrc"
+
       dev.vm.provision "Provisioning", :type => "shell", :path => "provision.sh", :args => [ virtualbox_version() ]
 
       # TCP ports - OpenXPKI

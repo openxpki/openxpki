@@ -38,17 +38,22 @@ if [ ! -z $OXI_TEST_DB_ORACLE_NAME ]; then
     echo "|     Oracle:   sqlplus64 $OXI_TEST_DB_ORACLE_USER/$OXI_TEST_DB_ORACLE_PASSWORD@$OXI_TEST_DB_ORACLE_NAME"
 fi
 
-cat <<'__RESTART'
+cat <<'__'
 |
 | After restarting this VM:
-__RESTART
-test ! -z $OXI_TEST_DB_MYSQL_NAME  && echo "|     docker start mariadb"
+|     systemctl start openxpki-clientd openxpki-serverd
+__
+test ! -z $OXI_TEST_DB_MYSQL_NAME  && echo "|     docker start mariadb (should be done automatically by Docker)"
 test ! -z $OXI_TEST_DB_ORACLE_NAME && echo "|     docker start oracle"
 
-cat <<'__FOOTER'
-|     systemctl start openxpkid
+cat <<'__'
 |
-| Most actions need root rights, so you better do "sudo su" first.
-^--
+__
 
-__FOOTER
+test $(whoami) != "root" && cat <<'__'
+| Most actions need root rights, so you better do "sudo su" first.
+__
+
+cat <<'__'
+^--
+__
