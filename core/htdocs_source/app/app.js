@@ -1,3 +1,4 @@
+import '@warp-drive/ember/install';
 import Application from '@ember/application';
 import Resolver from 'ember-resolver';
 import loadInitializers from 'ember-load-initializers';
@@ -10,10 +11,10 @@ import setupInspector from "@embroider/legacy-inspector-support/ember-source-4.1
 import compatModules from "@embroider/virtual/compat-modules";
 
 export default class App extends Application {
-    modulePrefix = config.modulePrefix;
-    podModulePrefix = config.podModulePrefix;
-    Resolver = Resolver.withModules(compatModules);
-    inspector = setupInspector(this);
+  modulePrefix = config.modulePrefix;
+  podModulePrefix = config.podModulePrefix;
+  Resolver = Resolver.withModules(compatModules);
+  inspector = setupInspector(this);
 }
 
 loadInitializers(App, config.modulePrefix, compatModules);

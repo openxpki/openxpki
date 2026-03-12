@@ -1,3 +1,4 @@
+import '@warp-drive/ember/install';
 import Application from 'openxpki/app';
 import config from 'openxpki/config/environment';
 import * as QUnit from 'qunit';

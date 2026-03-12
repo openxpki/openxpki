@@ -1,97 +1,161 @@
+// eslint.config.mjs
 /**
  * Debugging:
  *   https://eslint.org/docs/latest/use/configure/debug
- *  ----------------------------------------------------
  *
- *   Print a file's calculated configuration
- *
+ *   Print a file's calculated configuration:
  *     npx eslint --print-config path/to/file.js
  *
- *   Inspecting the config
- *
+ *   Inspecting the config:
  *     npx eslint --inspect-config
- *
  */
+
 import globals from 'globals';
 import js from '@eslint/js';
+import { defineConfig, globalIgnores } from 'eslint/config';
 
-import ember from 'eslint-plugin-ember/recommended';
-import prettier from 'eslint-plugin-prettier/recommended';
+import emberPlugin from 'eslint-plugin-ember';
+import emberParser from 'ember-eslint-parser';
 import qunit from 'eslint-plugin-qunit';
 import n from 'eslint-plugin-n';
+import warpDrive from 'eslint-plugin-warp-drive';
+import prettierRecommended from 'eslint-plugin-prettier/recommended';
 
-import babelParser from '@babel/eslint-parser';
+// Useful presets from plugins
+const emberRecommended = emberPlugin.configs.recommended;
+const emberRecommendedGjs = emberPlugin.configs['recommended-gjs'];
+const emberRecommendedGts = emberPlugin.configs['recommended-gts'];
 
-const esmParserOptions = {
-  ecmaFeatures: { modules: true },
-  ecmaVersion: 'latest',
-  requireConfigFile: false,
-  babelOptions: {
-    plugins: [
-      ['@babel/plugin-proposal-decorators', { decoratorsBeforeExport: true }],
-    ],
-  },
-};
+export default defineConfig([
+  // Global ignores
+  globalIgnores(['dist/', 'coverage/', 'tmp/', 'node_modules/', '!**/.*']),
 
-export default [
+  // Base JS rules (applies to everything JS-ish, will be refined by overrides below)
   js.configs.recommended,
-  prettier,
-  ember.configs.base,
-  ember.configs.gjs,
-  /**
-   * Ignores must be in their own object
-   * https://eslint.org/docs/latest/use/configure/ignore
-   */
+
+  // General Ember JS/TS rules for classic files (.js, maybe .ts)
   {
-    ignores: ['dist/', 'node_modules/', 'coverage/', '!**/.*'],
-  },
-  /**
-   * https://eslint.org/docs/latest/use/configure/configuration-files#configuring-linter-options
-   */
-  {
-    linterOptions: {
-      reportUnusedDisableDirectives: 'error',
-    },
-  },
-  {
-    files: ['**/*.js'],
+    files: ['**/*.{js,ts}'],
     languageOptions: {
-      parser: babelParser,
-    },
-  },
-  {
-    files: ['**/*.{js,gjs}'],
-    languageOptions: {
-      parserOptions: esmParserOptions,
+      ecmaVersion: 'latest',
+      sourceType: 'module',
       globals: {
         ...globals.browser,
       },
     },
-  },
-  {
-    files: ['tests/**/*-test.{js,gjs}'],
     plugins: {
-      qunit,
+      ember: emberPlugin,
+    },
+    rules: {
+      // Start from the plugin's recommended rules
+      ...emberRecommended.rules,
+
+      // Example tweaks:
+      'no-console': 'warn',
+      'ember/no-jquery': 'error',
     },
   },
-  /**
-   * CJS node files
-   */
+
+  // GJS files – first-class template components in JS
   {
-    files: [
-      '**/*.cjs',
-      'config/**/*.js',
-      'testem.js',
-      'testem*.js',
-      '.prettierrc.js',
-      '.stylelintrc.js',
-      '.template-lintrc.js',
-      'ember-cli-build.js',
-    ],
+    files: ['**/*.gjs'],
+    languageOptions: {
+      parser: emberParser,
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: {
+        ...globals.browser,
+      },
+    },
+    plugins: {
+      ember: emberPlugin,
+    },
+    rules: {
+      // Recommended Ember + GJS rules
+      ...emberRecommended.rules,
+      ...emberRecommendedGjs.rules,
+    },
+  },
+
+  // GTS files – first-class template components in TS
+  {
+    files: ['**/*.gts'],
+    languageOptions: {
+      parser: emberParser,
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: {
+        ...globals.browser,
+      },
+    },
+    plugins: {
+      ember: emberPlugin,
+    },
+    rules: {
+      ...emberRecommended.rules,
+      ...emberRecommendedGts.rules,
+    },
+  },
+
+  // HBS templates – parsed by ember-eslint-parser as Handlebars
+  {
+    files: ['**/*.hbs'],
+    languageOptions: {
+      parser: emberParser,
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: {
+        ...globals.browser,
+      },
+    },
+    plugins: {
+      ember: emberPlugin,
+    },
+    rules: {
+      // Ember’s template-related rules live here too
+      ...emberRecommended.rules,
+    },
+  },
+
+  // WarpDrive (package-unification / modern data layer)
+  {
+    files: ['**/*.{js,gjs,gts}'],
+    plugins: {
+      'warp-drive': warpDrive,
+    },
+    rules: {
+      // Enable the plugin's recommended rule set
+      ...warpDrive.configs.recommended.rules,
+    },
+  },
+
+  // Test files (QUnit)
+  {
+    files: ['tests/**/*-test.{js,gjs,gts,ts}'],
+    plugins: {
+      qunit,
+      ember: emberPlugin,
+    },
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: {
+        ...globals.browser,
+      },
+    },
+    rules: {
+      ...qunit.configs.recommended.rules,
+      ...emberRecommended.rules,
+      // You can relax some Ember rules here if tests need it
+    },
+  },
+
+  // Node CJS files
+  {
+    files: ['**/*.cjs', 'config/**/*.js', 'ember-cli-build.js'],
     plugins: {
       n,
     },
-
     languageOptions: {
       sourceType: 'script',
       ecmaVersion: 'latest',
@@ -99,23 +163,36 @@ export default [
         ...globals.node,
       },
     },
+    rules: {
+      ...n.configs.recommended.rules,
+    },
   },
-  /**
-   * ESM node files
-   */
+
+  // Node ESM files
   {
     files: ['**/*.mjs'],
     plugins: {
       n,
     },
-
     languageOptions: {
       sourceType: 'module',
       ecmaVersion: 'latest',
-      parserOptions: esmParserOptions,
       globals: {
         ...globals.node,
       },
     },
+    rules: {
+      ...n.configs.recommended.rules,
+    },
   },
-];
+
+  // Linter options
+  {
+    linterOptions: {
+      reportUnusedDisableDirectives: 'error',
+    },
+  },
+
+  // Prettier MUST be last so it disables conflicting stylistic rules
+  prettierRecommended,
+]);

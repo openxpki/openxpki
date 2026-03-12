@@ -2,14 +2,12 @@
 
 const EmberApp = require('ember-cli/lib/broccoli/ember-app');
 const Funnel = require('broccoli-funnel');
-const {
-  compatBuild
-} = require("@embroider/compat");
+const { compatBuild } = require("@embroider/compat");
 
-module.exports = async function(defaults) {
-  const {
-    buildOnce
-  } = await import("@embroider/vite");
+module.exports = async function (defaults) {
+  const { setConfig } = await import('@warp-drive/core/build-config');
+  const { buildOnce } = await import('@embroider/vite');
+
 
   // special behaviour in production mode
   let on_production = {};
@@ -36,8 +34,8 @@ module.exports = async function(defaults) {
     console.log("****************************************\n");
   }
 
-  // app configuration
-  const app = new EmberApp(defaults, {
+
+  let app = new EmberApp(defaults, {
     // Add options here
     ...on_production,
 
@@ -93,6 +91,16 @@ module.exports = async function(defaults) {
     },
   });
 
+  setConfig(app, __dirname, {
+    // this should be the most recent <major>.<minor> version for
+    // which all deprecations have been fully resolved
+    // and should be updated when that changes
+    compatWith: '5.8',
+    deprecations: {
+      // ... list individual deprecations that have been resolved here
+    },
+  });
+
   /********************************
    * Additional libraries whose direct import in a component fails
    ********************************/
@@ -139,6 +147,4 @@ module.exports = async function(defaults) {
     //   publicAssetURL: 'assets/', // use relative URL (without `{rootURL}/`) so that the old /openxpki/ backend path works
     // },
   });
-
-  // return app.toTree();
 };
