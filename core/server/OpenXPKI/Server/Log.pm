@@ -125,22 +125,6 @@ sub audit {
     return Log::Log4perl->get_logger("openxpki.audit.$subcat");
 }
 
-# install wrapper / helper subs - DEPRECATED, use new format
-# TODO Remove deprecated CTX('log')->debug() method etc.
-no strict 'refs';
-for my $prio (qw/ debug info warn error fatal trace /) {
-    *{$prio} = sub {
-        my ( $self, $message, $facility ) = @_;
-
-        if (not $facility or
-            $facility !~ m{ \A (?:application|auth|audit|system|workflow) \z }xms
-        ) {
-            $facility = 'system';
-        }
-        $self->$facility()->$prio($message);
-    };
-}
-
 __PACKAGE__->meta->make_immutable;
 
 __END__
