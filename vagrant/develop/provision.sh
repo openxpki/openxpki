@@ -41,5 +41,8 @@ announce "Install OpenXPKI"
 announce "Install SQLite"
 /vagrant/assets/provision-sqlite.sh
 
+announce "Install sscep"
+/vagrant/assets/provision-sscep.sh
+
 announce "Cleanup"
 /vagrant/assets/provision-cleanup.sh
