@@ -203,8 +203,8 @@ sub __handle_NEW_SESSION : PRIVATE {
         ##! 8: "no language specified"
     }
 
-    OpenXPKI::Server::Context::setcontext({'session' => $session, force => 1});
-    Log::Log4perl::MDC->put('sid', substr($session->data->id,0,4));
+    OpenXPKI::Server::Context::setcontext({ session => $session, force => 1 });
+    Log::Log4perl::MDC->put('sid', $session->short_id);
     CTX('log')->system->info('New session created');
 
     $self->__change_state({ STATE => 'SESSION_ID_SENT', });
@@ -236,8 +236,8 @@ sub __handle_CONTINUE_SESSION {
 
     # There might be an exisiting session if the child did some work before
     # we therefore use force to overwrite exisiting entries
-    OpenXPKI::Server::Context::setcontext({'session' => $session, force => 1});
-    Log::Log4perl::MDC->put('sid', substr($sess_id,0,4));
+    OpenXPKI::Server::Context::setcontext({ session => $session, force => 1 });
+    Log::Log4perl::MDC->put('sid', $session->short_id);
     CTX('log')->system->debug('Session resumed');
 
     # do not use __change_state here, as we want to have access
@@ -256,8 +256,8 @@ sub __handle_RESET_SESSIONID: PRIVATE {
     my $msg     = shift;
 
     my $sess_id = CTX('session')->new_id;
-    CTX('log')->system->debug("Changing session ID to ".substr($sess_id,0,4));
-    Log::Log4perl::MDC->put('sid', substr($sess_id,0,4));
+    CTX('log')->system->debug("Changing session ID to ".CTX('session')->short_id);
+    Log::Log4perl::MDC->put('sid', CTX('session')->short_id);
 
     ##! 4: 'new session id ' . $sess_id
 
