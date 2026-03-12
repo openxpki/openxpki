@@ -238,6 +238,8 @@ sub __handle_CONTINUE_SESSION {
     # we therefore use force to overwrite exisiting entries
     OpenXPKI::Server::Context::setcontext({ session => $session, force => 1 });
     Log::Log4perl::MDC->put('sid', $session->short_id);
+    Log::Log4perl::MDC->put('user', $session->data->user) if $session->data->user;
+    Log::Log4perl::MDC->put('role', $session->data->role) if $session->data->role;
     CTX('log')->system->debug('Session resumed');
 
     # do not use __change_state here, as we want to have access
