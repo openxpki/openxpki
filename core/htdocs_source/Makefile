@@ -135,6 +135,7 @@ docs: docker-build ## create Javascript API documentation in /docs-api
 shell: docker-build ## run interactive shell
 	$(MANAGER) run $(MANAGER_OPTS_RUN) -ti --rm \
 	  -v $(abspath ./):/source:ro \
+	  -v $(abspath ./):/output \
 	  --entrypoint /bin/bash \
 	  $(IMAGE)
 
