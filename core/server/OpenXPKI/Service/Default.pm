@@ -324,8 +324,6 @@ sub __handle_SESSION_ID_ACCEPTED : PRIVATE {
     my $message = shift;
 
     if ($state_of{$ident} eq 'SESSION_ID_SENT_FROM_RESET') {
-        ##! 4: 'existing session detected'
-        my $session = CTX('session');
         ##! 8: 'Session ' . Dumper $session
         $self->__change_state({
             STATE => 'MAIN_LOOP',
@@ -333,8 +331,6 @@ sub __handle_SESSION_ID_ACCEPTED : PRIVATE {
     }
 
     if ($state_of{$ident} eq 'SESSION_ID_SENT_FROM_CONTINUE') {
-        ##! 4: 'existing session detected'
-        my $session = CTX('session');
         ##! 8: 'Session ' . Dumper $session
         $self->__change_state({
             STATE => CTX('session')->data->status,
