@@ -4,9 +4,7 @@ OpenXPKI is an easy-to-deploy and easy-to-use RA/CA software that makes
 handling of certificates easy but nevertheless you should **really**
 have some basic knowledge on what a PKI is.
 
-> [!TIP]
->
-> If you just want to see *OpenXPKI in action* for a first impression of the tool, use the public demo at <https://demo.openxpki.org>.
+If you just want to see *OpenXPKI in action* for a first impression of the tool, use the public demo at <https://demo.openxpki.org>.
 
 ## Support
 
@@ -38,23 +36,18 @@ and
 [QUICKSTART.md](https://github.com/openxpki/openxpki-config/blob/community/QUICKSTART.md)
 which have some more detailed instructions how to setup the system.
 
-> [!NOTE]
->
 > The configuration is (usually) backward compatible but most
 > releases introduce new components and new configuration that can not be
 > used with old releases. Make sure your code version is recent enough to
 > run the config!
 
-> [!IMPORTANT]
->
 > Starting with v3.22, there is mandatory cross check of config, database
 > schema and code via the `system.version.depend` node. We
 > recommend to keep and maintain this in your config!
 
 ## Debian Builds
 
-> [!CAUTION]
->
+
 > **Packages are for Debian 12 (Bookworm) / 64bit (arch amd64). The
 > en_US.utf8 locale must be installed as the translation system will crash
 > otherwise! The packages do NOT work on Ubuntu or 32bit systems. Packages
@@ -221,6 +214,7 @@ and
 [QUICKSTART.md](https://github.com/openxpki/openxpki-config/blob/community/QUICKSTART.md) document to setup your
 production realms.
 
+(testdrive)=
 ### Testdrive
 
 Navigate your browser to <https://yourhost/webui/index/>. If your
@@ -237,7 +231,7 @@ during install and can find it in clear text in
 
 The usernames are `alice` and `bob` (users) and `rob`, `rose` and `raop` (operators).
 To setup your local user database have a look at the files in the `auth` directory and the
-[authentication section in the realm configuration](reference/configuration/realm.html#authentication)
+[authentication section in the realm configuration](../backend/realm.md#authentication)
 
 1.  Login as User (Username: bob, Password: \<see above\>)
 2.  Go to \"Request\", select \"Request new certificate\"
@@ -263,102 +257,5 @@ browsers developer console (F12 or CTRL+F12 on most browsers).
 If you get an internal server error, make sure you have the *en_US.utf8*
 locale installed (`locale -a | grep en_US`)!
 
-If you encounter "Received ProtectedCommand without proper authentication"
-errors when using the `oxi` command line tool, see the [CLI authentication
-setup documentation](operation/cli.html#authentication-setup) for instructions
-on configuring the necessary authentication keys.
-
-For further investigation, check
-`/var/log/openxpki-client/webui.log` and
+If you can not find anything in the logs, also check
 `/var/log/apache/error.log`
-
-## Enabling the SCEP service
-
-### SCEP RA Certificate
-
-Create a certificate to be used as SCEP RA, this is usually a TLS Server
-certificate from the CA itself or signed by an external CA. Import the
-certificate and register it as SCEP RA token:
-
-```bash
-oxi token add --realm democa --type scep --cert scep.crt --key scep.key
-```
-
-> [!NOTE]
->
-> Each realm needs its own SCEP token so you need to run this
-> command for any realm that provides an SCEP service. It is possible to
-> use the same SCEP token in multiple realms.
-
-You can also use the legacy command to add the scep token:
-
-```bash
-openxpkiadm alias --realm democa --token scep --file scep.crt --key scep.key
-```
-
-### Setup SCEP Endpoint
-
-The SCEP setup is already included in the core distribution and example
-configuration.
-
-OpenXPKI requires an *endpoint* to be defined in your configuration, the
-address of each endpoint is `http://yourhost/scep/<endpoint>`.
-
-The path equals to the file name in the
-`client.d/service/scep/` directory, the default configuration
-deploys `generic.yaml` so you have to point your SCEP client
-to `http://yourhost/scep/generic`. Please note that any
-endpoint also requires an internal definition inside the realm
-configuration, a verbose example can be found in the file `config.d/realm/democa/scep/generic.yaml`.
-
-SCEP supports enrollment via challenge password as well as signing on
-behalf. Advanced configuration is described in the SCEP workflow
-section.
-
-**Important**: The default SCEP configuration uses `SecretChallenge` as the
-challenge password and requires the certificate Common Name (CN) to end with
-`openxpki.test` to receive automated approval. If your certificate CN does not
-end with `openxpki.test`, the request will require manual approval by an operator.
-
-The best way for testing the service is the sscep command line tool (available at e.g. <https://github.com/certnanny/sscep>).
-
-Check if the service is working properly at all:
-
-```bash
-mkdir tmp
-./sscep getca -c tmp/cacert -u http://yourhost/scep/generic
-```
-
-Should show and download a list of the root certificates to the tmp
-folder.
-
-To test an enrollment:
-
-```bash
-openssl req -new -keyout tmp/scep-test.key -out tmp/scep-test.csr -newkey rsa:2048 -nodes \
-    -subj "/CN=scep-test.openxpki.test"
-./sscep enroll -u http://yourhost/scep/generic \
-    -k tmp/scep-test.key -r tmp/scep-test.csr \
-    -c tmp/cacert-0 \
-    -l tmp/scep-test.crt \
-    -t 10 -n 1
-```
-
-Make sure you set the challenge password when prompted (default:
-'SecretChallenge'). Note that the example above uses `scep-test.openxpki.test`
-as the CN, which ends with `openxpki.test` and will receive automated approval.
-On current desktop hardware the issue workflow will take approx. 10 seconds to
-finish and you should end up with a certificate matching your request in the tmp folder.
-
-## Support for Java Keystore
-
-OpenXPKI can assemble server generated keys into java keystores for
-immediate use with java-based applications like tomcat. This requires a
-recent version of java `keytool` installed. On debian, this is provided
-by the package `openjdk-7-jre`. Note: You can set the location of the
-keytool binary in `system.crypto.token.javajks`, the default is
-/usr/bin/keytool.
-
-Hint: Most modern java applications work without any issues with
-standard PKCS12 containers so you might want to try this as an
-alternative.

@@ -31,7 +31,10 @@ extensions = ["myst_parser"]
 templates_path = ['_templates']
 
 # The suffix of source filenames.
-source_suffix = '.rst'
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.md': 'markdown',
+}
 
 # The encoding of source files.
 #source_encoding = 'utf-8-sig'
@@ -41,7 +44,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'OpenXPKI'
-copyright = u'2025, The OpenXPKI Project'
+copyright = u'2026, The OpenXPKI Project'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -92,7 +95,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-# html_theme = 'default'
+#html_theme = 'default'
 
 html_theme = 'sphinx_rtd_theme'
 html_logo = 'openxpki.svg'
@@ -128,7 +131,7 @@ html_theme_options = {
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = []
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.

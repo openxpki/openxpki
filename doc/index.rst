@@ -1,5 +1,4 @@
-.. OpenXPKI documentation master file, created by
-   sphinx-quickstart.
+.. OpenXPKI documentation master file
 
 ============
   OpenXPKI
@@ -7,61 +6,42 @@
 
 *An open, enterprise-grade PKI/Trustcenter*
 
-Table of Contents:
-------------------
+.. toctree::
+   :maxdepth: 2
+   :caption: Getting Started
+
+   getting-started/quickstart
 
 .. toctree::
    :maxdepth: 2
-   :caption: Basics
+   :caption: Backend Configuration
 
-   introduction
-   quickstart
-   upgrading
-
-Setup and Configuration
+   backend/backend
+   backend/realm
+   backend/profiles
 
 .. toctree::
    :maxdepth: 2
-   :caption: Setup and Configuration
+   :caption: Frontend Configuration
 
-   configuration/introduction
-   configuration/server
-   configuration/realm
-   configuration/workflow
-   configuration/workflow-ui
-   configuration/output
-   configuration/uicontrol
-   configuration/profile
-   configuration/workflows/certrequest
-   configuration/workflows/certrevocation
-   configuration/workflows/crlissuance
-   configuration/workflows/enroll
-   configuration/workflows/smartcard
+   frontend/webservice
+   frontend/webui
+   frontend/endpoints
 
-Automation / External APIs
 
 .. toctree::
-   :maxdepth: 3
-   :caption: Automation / External APIs
-
-   subsystems/index
-   subsystems/rpc
-   subsystems/rpc-openapi
-   subsystems/est
-   subsystems/scep
-
-Operation
-
-.. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
    :caption: Operation
 
-   operation/index
-   operation/logging
-   operation/tokenconfig
+   operation/operations
 
 .. toctree::
-   glossary
+   :maxdepth: 2
+   :caption: Certifcate Lifecycle
+
+   lifecycle/request
+   lifecycle/revocation
+   lifecycle/enrollment
 
 
 Indices and tables
@@ -69,4 +49,3 @@ Indices and tables
 
 * :ref:`genindex`
 * :ref:`search`
-
