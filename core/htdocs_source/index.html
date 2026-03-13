@@ -4,19 +4,10 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        {{content-for "head"}}
-
-        <link integrity="" rel="stylesheet" href="/@embroider/virtual/vendor.css">
-        <link integrity="" rel="stylesheet" href="/@embroider/virtual/app.css">
+        <link rel="stylesheet" href="/@embroider/virtual/vendor.css">
         <link rel="shortcut icon" href="favicon.png">
-
-        {{content-for "head-footer"}}
     </head>
     <body>
-        <div id="ember-bootstrap-wormhole"></div>
-
-        {{content-for "body"}}
-
         <div class="oxi-loading-banner">
             <h4 class="alert alert-info" role="alert">
                 <span class="glyphicon glyphicon-refresh spin"></span>
@@ -24,14 +15,12 @@
             </h4>
         </div>
 
-        <script src="/@embroider/virtual/vendor.js"></script>
+        <script type="module" src="/@embroider/virtual/vendor.js"></script>
         <script type="module">
             import Application from './app/app';
             import environment from './app/config/environment';
 
             Application.create(environment.APP);
         </script>
-
-        {{content-for "body-footer"}}
     </body>
 </html>

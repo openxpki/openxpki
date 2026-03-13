@@ -75,11 +75,11 @@ export default class OxiChartComponent extends Component {
     }
 
     @action
-    plot(element) {
+    async plot(element) {
         const type = this.args.options.type;
 
         if (type == 'line' || type == 'bar') {
-            new ChartLineBar(element, this.opt, this.args.data);
+            await ChartLineBar(element, this.opt, this.args.data);
         }
         else if (type == 'pie') {
             new ChartPie(element, this.opt, this.args.data);

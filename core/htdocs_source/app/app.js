@@ -1,4 +1,5 @@
-import '@warp-drive/ember/install';
+import 'bootstrap'; // Bootstrap JS — initialises data-API event delegation (Dropdown, Modal, etc.)
+import './styles/app.scss';
 import Application from '@ember/application';
 import Resolver from 'ember-resolver';
 import loadInitializers from 'ember-load-initializers';

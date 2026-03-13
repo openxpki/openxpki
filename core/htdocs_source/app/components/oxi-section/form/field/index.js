@@ -4,8 +4,8 @@ import { service } from '@ember/service'
 import { debug } from '@ember/debug'
 
 const fieldModules = Object.fromEntries(
-    Object.entries(import.meta.glob('./*/index.*', { eager: true }))
-        .map(([path, mod]) => [path.replace(/^\.\/(.+)\/index\..+$/, '$1'), mod])
+    Object.entries(import.meta.glob('./*/index.js', { eager: true }))
+        .map(([path, mod]) => [path.replace(/^\.\/(.+)\/index\.js$/, '$1'), mod])
 )
 
 export default class OxiFieldMainComponent extends Component {

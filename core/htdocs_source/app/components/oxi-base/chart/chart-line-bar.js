@@ -1,7 +1,8 @@
 'use strict'
 
-import uPlot from 'uplot';
-import seriesBarsPlugin from './uplot/seriesbars-plugin';
+// uPlot and seriesbars-plugin are lazy-imported inside ChartLineBar() to
+// avoid uPlot's top-level Intl.NumberFormat(navigator.language) call crashing
+// the module graph at app boot time when navigator.language is invalid.
 import axisTimestampConfig from './uplot/axis-timestamp-config';
 
 function reducedAlphaColor(cssColor) {
@@ -35,7 +36,11 @@ function reducedAlphaColor(cssColor) {
 /*
   Line and Bar chart class
 */
-export default function ChartLineBar(element, opts, data) {
+export default async function ChartLineBar(element, opts, data) {
+    const [{ default: uPlot }, { default: seriesBarsPlugin }] = await Promise.all([
+        import('uplot'),
+        import('./uplot/seriesbars-plugin'),
+    ]);
     // FIXME: Temporary workaround for seriesBarsPlugin() not working with single series
     const barChartSingleSeriesFix = (opts.type == 'bar' && data.length < 2);
 

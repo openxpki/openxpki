@@ -18,7 +18,6 @@ import emberPlugin from 'eslint-plugin-ember';
 import emberParser from 'ember-eslint-parser';
 import qunit from 'eslint-plugin-qunit';
 import n from 'eslint-plugin-n';
-import warpDrive from 'eslint-plugin-warp-drive';
 import prettierRecommended from 'eslint-plugin-prettier/recommended';
 
 // Useful presets from plugins
@@ -120,9 +119,7 @@ export default defineConfig([
   // WarpDrive (package-unification / modern data layer)
   {
     files: ['**/*.{js,gjs,gts}'],
-    plugins: {
-      'warp-drive': warpDrive,
-    },
+    plugins: {},
     rules: {
       // Enable the plugin's recommended rule set
       ...warpDrive.configs.recommended.rules,

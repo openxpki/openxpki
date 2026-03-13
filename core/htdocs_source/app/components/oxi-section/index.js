@@ -3,7 +3,7 @@ import { action } from '@ember/object'
 import { debug } from '@ember/debug'
 
 const sectionModules = Object.fromEntries(
-    Object.entries(import.meta.glob('./*/index.*', { eager: true }))
+    Object.entries(import.meta.glob('./*/index.js', { eager: true }))
         .map(([path, mod]) => [path.replace(/^\.\/(.+)\/index\..+$/, '$1'), mod])
 )
 

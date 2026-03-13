@@ -1,0 +1,24 @@
+<div
+    class="modal {{if @fade "fade"}}"
+    tabindex="-1"
+    aria-hidden="true"
+    {{bs-modal-init
+        @open
+        onHidden=@onHidden
+        onShown=@onShown
+        backdropClose=@backdropClose
+        backdrop=@backdrop
+        onReady=this.registerClose
+    }}
+>
+    <div class={{this.dialogClass}}>
+        <div class="modal-content">
+            {{yield (hash
+                header=(component "bs-modal/header" closeButton=@closeButton)
+                body=(component "bs-modal/body")
+                footer=(component "bs-modal/footer")
+                close=this.close
+            )}}
+        </div>
+    </div>
+</div>

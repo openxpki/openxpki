@@ -1,23 +1,20 @@
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import {
-  babelCompatSupport,
-  templateCompatSupport,
-} from '@embroider/compat/babel';
+import { templateCompatSupport, templateColocation } from '@embroider/compat/babel';
+import { buildMacros } from '@embroider/macros/babel';
+
+const { babelMacros } = buildMacros();
 
 export default {
   plugins: [
+    ...babelMacros,
     [
       'babel-plugin-ember-template-compilation',
       {
-        enableLegacyModules: [
-          'ember-cli-htmlbars',
-          'ember-cli-htmlbars-inline-precompile',
-          'htmlbars-inline-precompile',
-        ],
         transforms: [...templateCompatSupport()],
       },
     ],
+    templateColocation(),
     [
       'module:decorator-transforms',
       {
@@ -36,7 +33,6 @@ export default {
         regenerator: false,
       },
     ],
-    ...babelCompatSupport(),
   ],
 
   generatorOpts: {

@@ -1,27 +1,32 @@
-import loadConfigFromMeta from '@embroider/config-meta-loader';
-import { assert } from '@ember/debug';
+// Pure-Vite build: read environment directly from Vite's import.meta.env
+// (replaces @embroider/config-meta-loader which requires classicEmberSupport)
+const environment = import.meta.env.MODE || 'development';
+const isProduction = environment === 'production';
+const isTest = environment === 'test';
+const isDevelopment = environment === 'development';
 
-const config = loadConfigFromMeta('openxpki');
-
-assert(
-  'config is not an object',
-  typeof config === 'object' && config !== null
-);
-assert(
-  'modulePrefix was not detected on your config',
-  'modulePrefix' in config && typeof config.modulePrefix === 'string'
-);
-assert(
-  'locationType was not detected on your config',
-  'locationType' in config && typeof config.locationType === 'string'
-);
-assert(
-  'rootURL was not detected on your config',
-  'rootURL' in config && typeof config.rootURL === 'string'
-);
-assert(
-  'APP was not detected on your config',
-  'APP' in config && typeof config.APP === 'object'
-);
-
-export default config;
+export default {
+    modulePrefix: 'openxpki',
+    podModulePrefix: 'openxpki/route-pods',
+    environment,
+    locationType: isTest ? 'none' : 'hash',
+    EmberENV: {
+        EXTEND_PROTOTYPES: false,
+        FEATURES: {},
+    },
+    APP: {
+        ...(isDevelopment ? {
+            LOG_TRANSITIONS: true,
+            LOG_TRANSITIONS_INTERNAL: true,
+            LOG_VIEW_LOOKUPS: true,
+        } : {}),
+        ...(isTest ? {
+            LOG_ACTIVE_GENERATION: false,
+            LOG_VIEW_LOOKUPS: false,
+            rootElement: '#ember-testing',
+            autoboot: false,
+        } : {}),
+    },
+    rootURL: isProduction ? '' : isTest ? '/' : '/webui/democa/',
+    buildYear: new Date().getFullYear(),
+};

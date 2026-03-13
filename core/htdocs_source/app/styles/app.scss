@@ -1,13 +1,15 @@
+@use "tippy.js/dist/tippy.css";
 @use "uplot/dist/uPlot.min.css";
 @use "choices.js/public/assets/styles/choices.css";
 @use "bootstrap/dist/css/bootstrap.css";
 @use "flatpickr/dist/flatpickr.css";
-@use "bootstrap-icons/font/bootstrap-icons.scss" with (
-  $bootstrap-icons-font-dir: "fonts/"
-);
+// @use "bootstrap-icons/font/bootstrap-icons.scss" with (
+//   $bootstrap-icons-font-dir: ""
+// );
 @use "bootstrap-v5-tweaks.css";
 @use "choices-js-tweaks.css";
 @use "glyphicons.css";
+@import "bootstrap-icons/font/bootstrap-icons.css";
 
 /******************************************************************************
  * Common helpers
