@@ -1,14 +1,16 @@
 import Component from '@glimmer/component'
 import { action } from '@ember/object'
-import { importSync } from '@embroider/macros'
-import { ensureSafeComponent } from '@embroider/util'
 import { debug } from '@ember/debug'
+
+const sectionModules = Object.fromEntries(
+    Object.entries(import.meta.glob('./*/index.*', { eager: true }))
+        .map(([path, mod]) => [path.replace(/^\.\/(.+)\/index\..+$/, '$1'), mod])
+)
 
 export default class OxiSectionComponent extends Component {
     get sectionComponent() {
         debug(`oxi-section: importing ./${this.args.content.type}`)
-        let module = importSync(`./${this.args.content.type}`)
-        return ensureSafeComponent(module.default, this)
+        return sectionModules[this.args.content.type]?.default
     }
 
     get sectionData() {

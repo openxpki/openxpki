@@ -1,8 +1,9 @@
-/*
-PLEASE NOTE: CSS imports for Node.js modules are done in /ember-cli-build.js .
-*/
+@use "uplot/dist/uPlot.min.css";
+@use "choices.js/public/assets/styles/choices.css";
+@use "bootstrap/dist/css/bootstrap.css";
+@use "flatpickr/dist/flatpickr.css";
 @use "bootstrap-icons/font/bootstrap-icons.scss" with (
-  $bootstrap-icons-font-dir: "fonts/" // will result in "asset/fonts" as specified in ember-cli-build.js
+  $bootstrap-icons-font-dir: "fonts/"
 );
 @use "bootstrap-v5-tweaks.css";
 @use "choices-js-tweaks.css";

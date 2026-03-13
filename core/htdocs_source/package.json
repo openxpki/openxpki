@@ -40,6 +40,7 @@
     "@babel/plugin-proposal-decorators": "^7.29.0",
     "@babel/plugin-syntax-decorators": "^7.28.6",
     "@babel/plugin-transform-runtime": "^7.29.0",
+    "@babel/runtime": "^7.28.6",
     "@ember/optional-features": "^3.0.0",
     "@ember/string": "^4.0.1",
     "@ember/test-helpers": "^5.4.1",
@@ -54,24 +55,25 @@
     "@glimmer/component": "^2.0.0",
     "@glimmer/tracking": "^1.1.2",
     "@rollup/plugin-babel": "^6.1.0",
+    "@warp-drive/build-config": "~5.8.1",
     "@warp-drive/core": "~5.8.1",
+    "@warp-drive/ember": "~5.8.1",
     "@warp-drive/json-api": "~5.8.1",
     "@warp-drive/legacy": "~5.8.1",
     "@warp-drive/utilities": "~5.8.1",
     "babel-plugin-ember-template-compilation": "^3.1.0",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
-    "broccoli-funnel": "^3.0.8",
     "caniuse-lite": "^1.0.30001778",
     "choices.js": "^11.2.1",
     "concurrently": "^9.2.1",
     "copy-text-to-clipboard": "^3.2.2",
     "decorator-transforms": "^2.3.1",
     "detect-browser": "^5.3.0",
+    "ember-auto-import": "^2.0.0",
     "ember-bootstrap": "^6.7.0",
     "ember-cli": "^6.11.0",
     "ember-cli-babel": "^8.3.1",
-    "ember-cli-head": "^2.0.0",
     "ember-cli-htmlbars": "^7.0.0",
     "ember-cli-sass": "^11.0.1",
     "ember-cli-update": "^3.0.1",
@@ -118,6 +120,12 @@
   },
   "ember": {
     "edition": "octane"
+  },
+  "ember-bootstrap": {
+    "bootstrapVersion": 5,
+    "importBootstrapCSS": false,
+    "insertEmberWormholeElementToDom": false,
+    "include": ["bs-button", "bs-modal", "bs-dropdown", "bs-navbar", "bs-collapse"]
   },
   "pnpm": {
     "overrides": {

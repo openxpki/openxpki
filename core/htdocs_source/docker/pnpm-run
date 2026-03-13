@@ -38,12 +38,12 @@ fi
 
 # ...instead use /node_modules/ from the container
 # (if we do manual work inside the container, the target might already exist)
-if [[ ! -L /build/node_modules ]]; then ln -s /node_modules /build/node_modules; fi
+if [[ ! -d /build/node_modules ]]; then mv /node_modules /build/node_modules; fi
 
 # pnpm resolves the virtual-store-dir relative to the working directory, but
 # the Docker image installed node_modules at "/" (not "/build"), so we must
 # tell pnpm where the virtual store actually lives.
-echo "virtual-store-dir=/node_modules/.pnpm" > /build/.npmrc
+echo "virtual-store-dir=/build/node_modules/.pnpm" > /build/.npmrc
 
 cd /build
 
