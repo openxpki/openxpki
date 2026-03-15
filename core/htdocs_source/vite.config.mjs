@@ -14,6 +14,11 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',
+    watch: {
+      // The container dev server syncs source via rsync (1s intervals), so
+      // inotify is not needed and often exhausted by host processes (VSCode etc.)
+      usePolling: true,
+    },
     proxy: {
       '^.*/cgi-bin/webui.fcgi': {
         target: process.env.DEV_SERVER_FORWARD_TO,
