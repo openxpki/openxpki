@@ -280,7 +280,7 @@ export default class OxiContentService extends Service {
         // Client side error
         catch (error) {
             this.#setLoadingBanner(null)
-            console.error('There was an error while processing the data', error)
+            console.error('There was an error while processing the data:', error)
             this.error = this.intl.t('error_popup.message.client', { reason: error })
             return null
         }
