@@ -5,6 +5,29 @@ import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
 
+// @embroider/vite@1.6.1's embroider-resolver plugin calls emitFile() in its
+// buildEnd hook, which Vite 6+ throws on during the dev-server dep-scan build.
+// Guard it so buildEnd only runs for actual `vite build` invocations.
+function fixEmbroiderResolverForVite6(plugins) {
+  return plugins.map((p) => {
+    if (p?.name !== 'embroider-resolver' || !p.buildEnd) return p;
+    let serveMode = false;
+    const origConfigResolved = p.configResolved;
+    const origBuildEnd = p.buildEnd;
+    return {
+      ...p,
+      configResolved(config) {
+        serveMode = config.command === 'serve';
+        origConfigResolved?.call(this, config);
+      },
+      async buildEnd(...args) {
+        if (serveMode) return;
+        return origBuildEnd.apply(this, args);
+      },
+    };
+  });
+}
+
 const unminified = process.env.OPENXPKI_UI_BUILD_UNMINIFIED == 1;
 
 export default defineConfig({
@@ -54,7 +77,7 @@ export default defineConfig({
   },
   plugins: [
     hbs(),
-    ember(),
+    ...fixEmbroiderResolverForVite6(ember()),
     babel({
       babelHelpers: 'runtime',
       extensions,
