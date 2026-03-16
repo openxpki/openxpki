@@ -20,6 +20,8 @@ export default class TestController extends Controller {
     @tracked
     selectedFormIndex = 0
 
+    @tracked nightMode = false
+
     buttons = []
 
     charts = section_chart
@@ -261,6 +263,13 @@ header:
     @action
     setLang(lang) {
         this.oxiLocale.locale = lang;
+    }
+
+    @action
+    toggleNightMode() {
+        this.nightMode = !this.nightMode
+        let theme = this.nightMode ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-bs-theme', theme)
     }
 
     async setCurrentForm(index) {

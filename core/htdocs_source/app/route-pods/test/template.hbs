@@ -24,8 +24,15 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="card border-secondary">
-                <div class="card-body">
+                <div class="card-body d-flex align-items-center gap-2">
                     <OxiBase::ButtonContainer @buttons={{this.buttons}} />
+                    <button
+                        type="button"
+                        class="btn btn-sm {{if this.nightMode "btn-outline-info" "btn-outline-secondary bg-warning-subtle"}}"
+                        {{on "click" this.toggleNightMode}}
+                    >
+                        <i class="bi {{if this.nightMode "bi-moon-fill" "bi-sun-fill"}}"></i>
+                    </button>
                 </div>
             </div>
         </div>
