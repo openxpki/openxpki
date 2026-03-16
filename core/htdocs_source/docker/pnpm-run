@@ -91,6 +91,12 @@ elif [ "add" == "$1" ]; then
   cp package.json pnpm-lock.yaml /output
   echo -e "\nDone.\npackage.json and pnpm-lock.yaml were updated on your host."
 
+elif [ "test:ember" == "$1" ]; then
+  echo -e "\n[pnpm run test:ember]"
+  # Tests build and serve from /build/dist (not /compiled).
+  # CI=1 enables --no-sandbox for Chromium running inside the container.
+  CI=1 pnpm run test:ember
+
 else # including "serve"
   echo -e "\n[pnpm run $1]"
   # The output path for compiled assets can be changed via
