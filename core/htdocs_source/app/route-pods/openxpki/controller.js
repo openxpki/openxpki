@@ -24,12 +24,12 @@ export default class OpenXpkiController extends Controller {
         'startat',
         'limit',
         'force',
-        // 'trigger' -- not neccessary as we only evaluate it in route.js/model()
+        'trigger', // must be declared for ember-source >= 6.11 even though we only read it from transition.to.queryParams in route.js
     ]
     @tracked startat = null
     @tracked limit = null
     @tracked force = null
-    // @tracked trigger = null
+    @tracked trigger = null
 
     @tracked loading = false
 
