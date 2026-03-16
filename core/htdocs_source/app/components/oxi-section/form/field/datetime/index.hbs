@@ -12,6 +12,7 @@
                 @date={{this.date}}
                 @onReady={{this.onReady}}
                 @onChange={{this.datePicked}}
+                @onDestroyed={{this.onFlatpickrDestroyed}}
                 @enableTime={{true}}
                 @dateFormat={{t 'component.oxifield_datetime.date_format'}}
                 @locale={{this.oxiLocale.shortLocale}}
@@ -21,7 +22,7 @@
             />
             {{#if this.allowClearing}}
                 <BsButton
-                    @onClick={{this.flatpickr.clear}}
+                    @onClick={{this.clearFlatpickr}}
                     @icon="glyphicon glyphicon-trash"
                     @type="light"
                     class="oxi-btn-cancel btn-sm"
@@ -29,7 +30,7 @@
                 </BsButton>
             {{/if}}
             <BsButton
-                @onClick={{this.flatpickr.open}}
+                @onClick={{this.openFlatpickr}}
                 @icon="glyphicon glyphicon-calendar"
             >
             </BsButton>

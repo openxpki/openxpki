@@ -30,7 +30,7 @@ export default class EmberFlatpickr extends Component {
     // ember-modifier tracks every this.args.* access, so the modifier re-runs
     // automatically when any passed argument changes — replacing all {{did-update}} calls.
     setup = modifier((element) => {
-        const { date, onChange, wrap, disabled, onReady, onOpen, onClose, locale, ...rest } =
+        const { date, onChange, wrap, disabled, onReady, onOpen, onClose, locale, onDestroyed, ...rest } =
             this.args;
 
         assert(
@@ -50,8 +50,8 @@ export default class EmberFlatpickr extends Component {
         let destroyed = false;
 
         const init = async () => {
-            if (typeof locale === 'string' && locale !== 'en') {
-                await waitForPromise(import(/* @vite-ignore */ `flatpickr/dist/l10n/${locale}.js`));
+            if (locale === 'de') {
+                await waitForPromise(import('flatpickr/dist/l10n/de.js'));
             }
             if (destroyed) return;
 
@@ -72,6 +72,7 @@ export default class EmberFlatpickr extends Component {
 
         return () => {
             destroyed = true;
+            onDestroyed?.();
             this.flatpickrRef?.destroy();
             this.flatpickrRef = undefined;
         };
@@ -79,6 +80,7 @@ export default class EmberFlatpickr extends Component {
 
     willDestroy() {
         super.willDestroy();
+        this.args.onDestroyed?.();
         this.flatpickrRef?.destroy();
         this.flatpickrRef = undefined;
     }
