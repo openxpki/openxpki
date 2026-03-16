@@ -116,16 +116,6 @@ export default defineConfig([
     },
   },
 
-  // WarpDrive (package-unification / modern data layer)
-  {
-    files: ['**/*.{js,gjs,gts}'],
-    plugins: {},
-    rules: {
-      // Enable the plugin's recommended rule set
-      ...warpDrive.configs.recommended.rules,
-    },
-  },
-
   // Test files (QUnit)
   {
     files: ['tests/**/*-test.{js,gjs,gts,ts}'],

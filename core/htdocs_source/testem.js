@@ -2,6 +2,7 @@
 if (typeof module !== "undefined") {
   module.exports = {
     test_page: 'tests/index.html?hidepassed',
+    cwd: process.env.OPENXPKI_BUILD_OUTPUT_PATH || 'dist',
     disable_watching: true,
     launch_in_ci: ['chromium'],
     launch_in_dev: ['chromium'],

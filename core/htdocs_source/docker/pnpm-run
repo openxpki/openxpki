@@ -48,10 +48,6 @@ echo "virtual-store-dir=/build/node_modules/.pnpm" > /build/.npmrc
 cd /build
 
 if [ "update-ember" == "$1" ]; then
-  echo -e "\n[Update ember-cli and ember-cli-update]"
-  pnpm remove ember-cli ember-cli-update
-  pnpm add --save-dev ember-cli ember-cli-update
-
   echo -e "\n[Update Ember app]"
   # ember-cli-update expects a Git checkout
   git config --global user.email "dummy@example.com"
@@ -59,7 +55,7 @@ if [ "update-ember" == "$1" ]; then
   git init
   git add -A
   git commit -m "Initial" -q
-  ./node_modules/.bin/ember-cli-update
+  npx ember-cli-update
 
   echo -e "\n[Copy changes back to host]"
   # we assume that we run in a clean Git checkout on the host (Makefile ensures that)
