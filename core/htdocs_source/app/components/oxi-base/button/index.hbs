@@ -24,7 +24,7 @@
         >
             {{#if @button.tooltip}} <Tippy>{{@button.tooltip}}</Tippy> {{/if}}
             {{#if (has-block)}} {{yield}} {{else}} {{@button.label}} {{/if}}
-            {{#if isLoading}} <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> {{/if}}
+            {{#if isLoading}} &nbsp;<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> {{/if}}
         </BsButton>
     {{/if}}
 
