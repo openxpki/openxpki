@@ -20,11 +20,12 @@ export default class ApplicationController extends Controller {
     @service('intl') intl
 
     @tracked restricted_width = true
-    @tracked nightMode = false
+    @tracked nightMode = localStorage.getItem('oxi-night-mode') === 'true'
 
     constructor() {
         super(...arguments)
         this.intl.setLocale(['en-us']);
+        document.documentElement.setAttribute('data-bs-theme', this.nightMode ? 'dark' : 'light')
     }
 
     @action toggleWidth() {
@@ -45,5 +46,6 @@ export default class ApplicationController extends Controller {
         this.nightMode = !this.nightMode
         let theme = this.nightMode ? 'dark' : 'light'
         document.documentElement.setAttribute('data-bs-theme', theme)
+        localStorage.setItem('oxi-night-mode', this.nightMode)
     }
 }

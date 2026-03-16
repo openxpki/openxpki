@@ -20,7 +20,7 @@ export default class TestController extends Controller {
     @tracked
     selectedFormIndex = 0
 
-    @tracked nightMode = false
+    @tracked nightMode = localStorage.getItem('oxi-night-mode') === 'true'
 
     buttons = []
 
@@ -270,6 +270,7 @@ header:
         this.nightMode = !this.nightMode
         let theme = this.nightMode ? 'dark' : 'light'
         document.documentElement.setAttribute('data-bs-theme', theme)
+        localStorage.setItem('oxi-night-mode', this.nightMode)
     }
 
     async setCurrentForm(index) {
