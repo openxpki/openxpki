@@ -28,7 +28,7 @@
     "lint:js": "eslint . --cache",
     "lint:js:fix": "eslint . --fix",
     "serve": "vite --host=0.0.0.0",
-    "test:ember": "vite build --mode development && testem ci",
+    "test:ember": "vite build --mode test && testem ci",
     "docs": "jsdoc -c .jsdoc.js --verbose app"
   },
   "devDependencies": {

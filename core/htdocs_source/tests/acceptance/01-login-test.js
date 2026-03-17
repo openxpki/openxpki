@@ -13,7 +13,7 @@ function debugPageContents() {
     console.debug(getRootElement().ownerDocument.evaluate(`.//div[contains(@class,"tab-pane")]`, getRootElement()).iterateNext().innerHTML)
 }
 function pageContains(regexp) {
-  return document.querySelector('div.tab-content').innerHTML.match(regexp)
+  return getRootElement().innerHTML.match(regexp)
 }
 
 module('Acceptance | 01 login', function (hooks) {
