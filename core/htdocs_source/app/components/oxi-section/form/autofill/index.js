@@ -116,7 +116,7 @@ export default class Autofill extends Component {
             // If OK: unpack JSON data
             if (response?.ok) {
                 let label = this.intl.t('autofill.result', { target: this.label });
-                this.convert(response).then(data => {
+                return this.convert(response).then(data => {
                     debug("Autofill: data = " + data);
                     return this.valueSetter(data, label);
                 });
