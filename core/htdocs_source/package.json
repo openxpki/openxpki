@@ -83,6 +83,7 @@
     "sass": "^1.98.0",
     "testem": "^3.18.0",
     "tippy.js": "^6.3.7",
+    "tracked-built-ins": "^4.1.0",
     "uplot": "^1.6.32",
     "vite": "^7.3.1"
   },
