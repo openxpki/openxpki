@@ -25,13 +25,14 @@
                     @onClick={{this.clearFlatpickr}}
                     @icon="glyphicon glyphicon-trash"
                     @type="light"
-                    class="oxi-btn-reset btn-sm"
+                    class="oxi-btn-subtle-remove btn-sm"
                 >
                 </BsButton>
             {{/if}}
             <BsButton
                 @onClick={{this.openFlatpickr}}
                 @icon="glyphicon glyphicon-calendar"
+                class="btn-secondary"
             >
             </BsButton>
             {{#if @error}}<div class="invalid-feedback">{{@error}}</div>{{/if}}

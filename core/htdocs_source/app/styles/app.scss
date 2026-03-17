@@ -701,7 +701,7 @@ div.oxifield-upload {
 .oxi-btn-terminate   { background-color: var(--oxi-btn-bg-terminate); }
 
 /* Clone add/remove buttons — subtle variants of exceptional (blue) / cancel (red) */
-.oxi-clone-add {
+.oxi-btn-subtle-add {
   background-color: color-mix(in srgb, var(--oxi-btn-bg-exceptional) 50%, white);
   color: #1a5276 !important;
   border-color: var(--oxi-btn-bg-exceptional) !important;
@@ -711,7 +711,7 @@ div.oxifield-upload {
   }
 }
 
-.oxi-clone-del {
+.oxi-btn-subtle-remove {
   background-color: color-mix(in srgb, var(--oxi-btn-bg-cancel) 50%, white);
   color: #7a2020 !important;
   border-color: var(--oxi-btn-bg-cancel) !important;
@@ -730,12 +730,10 @@ div.oxifield-upload {
 .oxi-btn-reset,       .oxi-btn-alternative,
 .oxi-btn-exceptional, .oxi-btn-loading,
 .oxi-btn-terminate,
-.oxi-clone-add,       .oxi-clone-del {
-
+.oxi-btn-subtle-add,  .oxi-btn-subtle-remove {
   &:hover, &:active, &.active, &:focus-visible {
     background-image: linear-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0.3));
   }
-
   &:focus-visible {
     outline: none;
     box-shadow: 0 0 0 0px #fff, 0 0 0 4px rgba(61, 133, 184, 0.7);
