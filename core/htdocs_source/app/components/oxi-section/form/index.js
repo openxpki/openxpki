@@ -458,7 +458,7 @@ export default class OxiSectionFormComponent extends Component {
 
         // check validity and gather form data
         for (const field of this.fields) {
-            if (!field.is_optional && !field.value) {
+            if (!field.is_optional && (field.value === undefined || field.value === null)) {
                 this.setFieldError(field, this.intl.t('component.oxisection_form.missing_value'))
                 return
             } else {
