@@ -8,7 +8,7 @@ import { toZonedTime, fromZonedTime } from 'date-fns-tz';
 export default class OxiFieldDatetimeComponent extends Component {
     @service('oxi-locale') oxiLocale;
 
-    date;
+    @tracked date;
     flatpickr; // reference to the JS object
     timezoneLabel = this.args.content.timezone || "UTC";
     @tracked allowClearing = false
@@ -68,6 +68,7 @@ export default class OxiFieldDatetimeComponent extends Component {
 
     @action
     clearFlatpickr() {
+        this.date = null;
         this.flatpickr?.clear();
     }
 
