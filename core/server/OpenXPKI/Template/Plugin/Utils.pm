@@ -162,6 +162,26 @@ sub digest {
 
 }
 
+=head3 to_pem ( binary, head )
+
+Encode the given I<binary> data to PEM format and add BEGIN/END headers
+based on the value passed to I<head>.
+
+=cut
+
+sub to_pem {
+
+    my $self = shift;
+    my $string = shift;
+    my $head = shift;
+    my $inner = MIME::Base64::encode_base64($string,'');
+    $inner =~ s{ (.{64}) }{$1\n}xmsg;
+    chomp $inner;
+    return "-----BEGIN $head-----\n$inner\n-----END $head-----";
+
+}
+
+
 =head3 pem_tidy ( text block with pem data )
 
 Cleanup a string holding one or many PEM blocks by stripping any
