@@ -65,7 +65,12 @@ export default class OxiFieldTextareaComponent extends Component {
         evt.stopPropagation()
         evt.preventDefault()
         if (!this.args.allow_upload) return
-        await this.setFile(evt.dataTransfer.files[0])
+        try {
+            await this.setFile(evt.dataTransfer.files[0])
+        } catch(e) {
+            /* eslint-disable-next-line no-console */
+            console.error('oxifield-textarea: error reading dropped file', e)
+        }
     }
 
     @action
