@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import { extensions, hbs, ember } from '@embroider/vite';
 import { babel } from '@rollup/plugin-babel';
 import { createRequire } from 'module';
+import browserReleaseDates from './lib/vite-plugin-browser-release-dates.mjs';
 
 const require = createRequire(import.meta.url);
 
@@ -76,6 +77,7 @@ export default defineConfig({
     },
   },
   plugins: [
+    browserReleaseDates(),
     hbs(),
     ...fixEmbroiderResolverForVite6(ember()),
     babel({
