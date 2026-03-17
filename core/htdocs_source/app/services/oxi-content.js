@@ -721,7 +721,7 @@ export default class OxiContentService extends Service {
         if (suppressBreadcrumb) debug('#setBreadcrumbs(): server sent empty hash - suppressing new breadcrumb')
 
         if (! suppressBreadcrumb) {
-            if (bc.is_root) this.breadcrumbs = []
+            if (bc.is_root) this.breadcrumbs = new TrackedArray()
 
             // Set defaults from server
             breadcrumb = {
