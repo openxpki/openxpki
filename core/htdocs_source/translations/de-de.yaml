@@ -10,7 +10,7 @@ site:
   close_popup: "Schließen"
   back: "Zurück"
   workflow_info: "Workflow"
-  old_browser: "Sie benutzen eine veraltete Browser-Version: {browser}. Das kann zu Problemen bei der Benutzung von OpenXPKI führen."
+  old_browser: "Ihr Browser ist veraltet: {browser}. Das kann zu Problemen bei der Benutzung von OpenXPKI führen."
   session_renewed: "Sie haben sich in einem anderen Browser-Fenster neu angemeldet.\nDie Anmelde-Sitzung wurde erneuert, bitte wiederholen Sie die eben ausgeführte Aktion."
 
 userinfo:
@@ -84,3 +84,8 @@ component:
 autofill:
   button: "{target} abfragen"
   result: "Abfrageergebnis von: {target}"
+
+theme:
+  light: "Farbschema: hell"
+  dark: "Farbschema: dunkel"
+  auto: "Farbschema: auto (wie Browser/System)"

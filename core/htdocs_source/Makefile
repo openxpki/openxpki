@@ -50,7 +50,7 @@ else
 #	MANAGER_OPTS = --add-host host.containers.internal:host-gateway
 endif
 
-.PHONY: help ember nocache debug serve \
+.PHONY: help ember nocache debug serve test \
 		update-ember update-deps update-lockfile \
 		docs docker-build prune npm-cache
 
@@ -74,6 +74,15 @@ nocache: ember ## compile Ember code in Docker without cache (force re-installat
 
 debug: BUILD_UNMINIFIED = 1 ## compile Ember but with unminified JavaScript + incl. sourcemaps
 debug: ember
+
+#
+# Run Ember.js test suite
+#
+test: docker-build ## run Ember.js test suite inside the container
+	$(MANAGER) run $(MANAGER_OPTS_RUN) -ti --rm \
+	  -v $(abspath ./):/source:ro \
+	  $(IMAGE) \
+	  test:ember
 
 #
 # Run local Ember.js development server
@@ -135,6 +144,7 @@ docs: docker-build ## create Javascript API documentation in /docs-api
 shell: docker-build ## run interactive shell
 	$(MANAGER) run $(MANAGER_OPTS_RUN) -ti --rm \
 	  -v $(abspath ./):/source:ro \
+	  -v $(abspath ./):/output \
 	  --entrypoint /bin/bash \
 	  $(IMAGE)
 

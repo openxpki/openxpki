@@ -37,15 +37,17 @@ else
 fi
 
 # ...instead use /node_modules/ from the container
-mv /node_modules /build/node_modules
+# (if we do manual work inside the container, the target might already exist)
+if [[ ! -d /build/node_modules ]]; then mv /node_modules /build/node_modules; fi
+
+# pnpm resolves the virtual-store-dir relative to the working directory, but
+# the Docker image installed node_modules at "/" (not "/build"), so we must
+# tell pnpm where the virtual store actually lives.
+echo "virtual-store-dir=/build/node_modules/.pnpm" > /build/.npmrc
 
 cd /build
 
 if [ "update-ember" == "$1" ]; then
-  echo -e "\n[Update ember-cli and ember-cli-update]"
-  pnpm remove ember-cli ember-cli-update
-  pnpm add --save-dev ember-cli ember-cli-update
-
   echo -e "\n[Update Ember app]"
   # ember-cli-update expects a Git checkout
   git config --global user.email "dummy@example.com"
@@ -53,7 +55,7 @@ if [ "update-ember" == "$1" ]; then
   git init
   git add -A
   git commit -m "Initial" -q
-  ./node_modules/.bin/ember-cli-update
+  npx ember-cli-update
 
   echo -e "\n[Copy changes back to host]"
   # we assume that we run in a clean Git checkout on the host (Makefile ensures that)
@@ -88,6 +90,12 @@ elif [ "add" == "$1" ]; then
 
   cp package.json pnpm-lock.yaml /output
   echo -e "\nDone.\npackage.json and pnpm-lock.yaml were updated on your host."
+
+elif [ "test:ember" == "$1" ]; then
+  echo -e "\n[pnpm run test:ember]"
+  # Tests build and serve from /build/dist (not /compiled).
+  # CI=1 enables --no-sandbox for Chromium running inside the container.
+  CI=1 pnpm run test:ember
 
 else # including "serve"
   echo -e "\n[pnpm run $1]"

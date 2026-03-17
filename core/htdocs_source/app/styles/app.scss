@@ -1,12 +1,27 @@
-/*
-PLEASE NOTE: CSS imports for Node.js modules are done in /ember-cli-build.js .
-*/
-@use "bootstrap-icons/font/bootstrap-icons.scss" with (
-  $bootstrap-icons-font-dir: "fonts/" // will result in "asset/fonts" as specified in ember-cli-build.js
-);
-@use "bootstrap-v5-tweaks.css";
-@use "choices-js-tweaks.css";
+@use "tippy.js/dist/tippy.css";
+@use "uplot/dist/uPlot.min.css";
+@use "choices.js/public/assets/styles/choices.css";
+@use "bootstrap/dist/css/bootstrap.css";
+@use "flatpickr/dist/flatpickr.css";
+@use "oxi-variables.scss";
+@use "flatpickr-dark-tweaks.scss";
+@use "bootstrap-v5-tweaks.scss";
+@use "choices-js-tweaks.scss";
 @use "glyphicons.css";
+@import "bootstrap-icons/font/bootstrap-icons.css";
+
+/******************************************************************************
+ * Color scheme - tells browser to render native UI (scrollbars, inputs, etc.) accordingly
+ */
+
+:root,
+[data-bs-theme=light] {
+    color-scheme: light;
+}
+
+[data-bs-theme=dark] {
+    color-scheme: dark;
+}
 
 /******************************************************************************
  * Common helpers
@@ -26,11 +41,21 @@ PLEASE NOTE: CSS imports for Node.js modules are done in /ember-cli-build.js .
 html,
 body {
   height: 100%;
+  color: var(--oxi-body-color);
 }
 
 /* Header */
 .oxi-header {
   margin-bottom: 0;
+}
+
+/* Navbar separator - light mode uses Bootstrap's secondary-bg-subtle, dark mode is darker */
+.oxi-navbar-separator {
+  border-color: var(--bs-secondary-border-subtle) !important;
+
+  [data-bs-theme=dark] & {
+    border-color: #2c3036 !important;
+  }
 }
 
 .oxi-header-bar {
@@ -111,6 +136,14 @@ img.toplogo {
 
 [data-bs-theme=dark] .oxi-footer {
   background-color: #333;
+}
+
+.oxi-dark-mode-switch .btn.btn-outline-secondary {
+  --bs-btn-hover-color: var(--bs-dark);
+}
+
+[data-bs-theme=dark] .oxi-dark-mode-switch .btn.btn-outline-info {
+  --bs-btn-hover-color: var(--bs-light);
 }
 
 .userinfo {
@@ -205,13 +238,9 @@ div.required .choices.oxi-inline-select {
   bottom:0;
   left:0;
   right:0;
-  background-color: #fff;
+  background-color: #fff;   [data-bs-theme=dark] & { background-color: #000; }
   opacity:0.7;
   z-index:1001;
-}
-
-[data-bs-theme=dark] .dimmer {
-  background-color: #000;
 }
 
 .oxi-loading-banner {
@@ -243,11 +272,17 @@ div.required .choices.oxi-inline-select {
  */
 
 .oxi-breadcrumb + .oxi-breadcrumb::before {
-  color: #fff;
+  color: #fff; [data-bs-theme=dark] & { color: #000; }
 }
 
-[data-bs-theme=dark] .oxi-breadcrumb + .oxi-breadcrumb::before {
-  color: #000;
+[data-bs-theme=dark] .oxi-breadcrumb {
+  background-color: rgba(108, 117, 125, 0.45);
+  color: #9a9da0;
+}
+
+.oxi-breadcrumb {
+  background-color: var(--bs-secondary);
+  color: #fff;
 }
 
 .oxi-breadcrumb::before {
@@ -278,6 +313,13 @@ div.required .choices.oxi-inline-select {
 /******************************************************************************
  * Grid
  */
+
+/* Bootstrap sets --bs-table-color on .table which forces text color via
+   .table > :not(caption) > * > * { color: var(--bs-table-color-state...) }.
+   In dark mode we reset it to inherit so cells use their natural color. */
+[data-bs-theme=dark] .table {
+  --bs-table-color: inherit;
+}
 
 .oxi-grid-container {
   padding-bottom: 40px;
@@ -430,11 +472,7 @@ tr.gridrow-danger:hover   > td { background-color: #e6c1c7 !important; }
     ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "
     ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "
     ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
-  color: #9cA5Ad;
-}
-
-[data-bs-theme=dark] .oxi-keyvalue-dots::after {
-  color: #525a60;
+  color: #9cA5Ad;       [data-bs-theme=dark] & { color: #525a60; }
 }
 
 .oxi-truncate {
@@ -448,28 +486,28 @@ tr.gridrow-danger:hover   > td { background-color: #e6c1c7 !important; }
 .styled-valid,
 .dns-valid,
 .certstatus-issued {
-  color: green;
+  color: green;         [data-bs-theme=dark] & { color: #5cb85c; }
 }
 
 .styled-failed,
 .dns-failed,
 .certstatus-revoked {
-  color: red;
+  color: red;           [data-bs-theme=dark] & { color: #e06060; }
 }
 
 .dns-skipped,
 .styled-attention,
 .certstatus-crl_issuance_pending {
-  color: orange;
+  color: #c98200;       [data-bs-theme=dark] & { color: #da912b; }
 }
 
 .certstatus-expired {
-  color: #444;
+  color: #444;          [data-bs-theme=dark] & { color: #888; }
 }
 
 .dns-timeout,
 .certstatus-unknown {
-  color: #79d1f3;
+  color: #d457c6;       [data-bs-theme=dark] & { color: #cd70c3; }
 }
 
 .styled-attention,
@@ -478,7 +516,7 @@ tr.gridrow-danger:hover   > td { background-color: #e6c1c7 !important; }
 }
 
 .styled-encrypted {
-  color: #721c24;
+  color: #721c24;       [data-bs-theme=dark] & { color: #c06070; }
 }
 .styled-encrypted:before {
   content: '\1F510 ';
@@ -547,66 +585,35 @@ form div.required label.col-form-label {
 }
 
 /* Input fields */
-div.required {
-  input:not(:checked):not(.choices__input),
-  select,
-  .choices:not(.oxi-inline-select), /* Choices.js */
-  textarea {
-    background-color: #fff3c2 !important;
-    border:1px solid #444;
-  }
-}
 
-[data-bs-theme=dark] {
-  div.required {
-    input:not(:checked):not(.choices__input),
-    select,
-    .choices:not(.oxi-inline-select), /* Choices.js */
-    textarea {
-      background-color: #3a2f03 !important;
-      border-color: #777777;
+.form-control {
+  color: var(--oxi-form-input-color);
+  border-width: 1px;
+  border-style: solid;
+  div:not(.optional) &:not([disabled]) {
+    form:not(.was-validated) & {
+        border-color: #444;     [data-bs-theme=dark] & { border-color: #4d4d4d; }
     }
+    background-color: var(--oxi-form-input-required-bg-color);
+    /* Override browser autofill background (Firefox / Chrome — must be separate rules, not comma-combined) */
+    &:autofill { background-color: var(--oxi-form-input-required-bg-color) !important; }
+    &:-webkit-autofill { -webkit-box-shadow: 0 0 0 1000px var(--oxi-form-input-required-bg-color) inset !important; }
   }
-}
-
-div.required {
-  input.form-control[disabled] ,
-  select.form-control[disabled],
-  .choices:has(select.form-control[disabled]):not(.oxi-inline-select), /* Choices.js */
-  textarea.form-control[disabled] {
-    border:1px solid #ccc;
-  }
-}
-
-[data-bs-theme=dark] {
-  div.required {
-    input.form-control[disabled] ,
-    select.form-control[disabled],
-    .choices:has(select.form-control[disabled]):not(.oxi-inline-select), /* Choices.js */
-    textarea.form-control[disabled] {
-      border-color: #333;
+  div.optional &:not([disabled]) {
+    form:not(.was-validated) & {
+        border-color: #888;     [data-bs-theme=dark] & { border-color: #757575; }
     }
+    background-color: var(--oxi-form-input-optional-bg-color);
+    /* Override browser autofill background (Firefox / Chrome — must be separate rules, not comma-combined) */
+    &:autofill { background-color: var(--oxi-form-input-optional-bg-color) !important; }
+    &:-webkit-autofill { -webkit-box-shadow: 0 0 0 1000px var(--oxi-form-input-optional-bg-color) inset !important; }
   }
 }
 
-div.optional {
-  input,
-  select,
-  .choices:not(.oxi-inline-select), /* Choices.js */
-  textarea {
-    border:1px #888 dotted;
-  }
-}
-
-[data-bs-theme=dark] {
-  div.optional {
-    input,
-    select,
-    .choices:not(.oxi-inline-select), /* Choices.js */
-    textarea {
-      border-color: #787878;
-    }
-  }
+.choices:has(select.form-control[disabled]):not(.oxi-inline-select), /* Choices.js */
+.form-control[disabled] {
+  background-color: transparent;
+  border-color: #ddd;           [data-bs-theme=dark] & { border-color: #333; }
 }
 
 .oxi-checkbox {
@@ -643,128 +650,116 @@ div.oxifield-upload {
   white-space: nowrap;
 }
 
-/* Datetime */
-div.optional input.flatpickr-input {
-  background-color: transparent;
-}
-div.required input.flatpickr-input {
-  background-color: #fff3c2;
-}
-[data-bs-theme=dark] div.required input.flatpickr-input {
-  background-color: #3a2f03;
-}
-
 /******************************************************************************
  * Buttons
  */
-.oxi-btn-loading {
-  color: #fff;
-  background-color: #428bca;
-  border-color: #357ebd;
-}
 
-[data-bs-theme=dark] .oxi-btn-loading {
-  color: #000;
-  background-color: #3b7cb5;
-  border-color: #4a8bc4;
-}
+/* --- Named button background colors (light / dark) --- */
 
-.oxi-btn-loading {
-  &:hover, &:focus, &:active, &.active {
-    color: #fff;
-    background-color: #3276b1;
-    border-color: #285e8e;
-  }
+:root {
+  --oxi-btn-bg-primary:     #3d85b8;
+  --oxi-btn-bg-submit:      #c5dfa8;
+  --oxi-btn-bg-info:        #e0e0d6;
+  --oxi-btn-bg-cancel:      #e6a8a8;
+  --oxi-btn-bg-alternative: #f4e9cf;
+  --oxi-btn-bg-exceptional: #8dc8e8;
+  --oxi-btn-bg-terminate:   #ba8eb6;
 }
 
 [data-bs-theme=dark] {
-  .oxi-btn-loading {
-    &:hover, &:focus, &:active, &.active {
-      color: #000;
-      background-color: #5390c6;
-      border-color: #75a6d1;
+  --oxi-btn-bg-primary:     #4a8fca;
+  --oxi-btn-bg-submit:      #3e5b23;
+  --oxi-btn-bg-info:        #3d3d3d;
+  --oxi-btn-bg-cancel:      #613434;
+  --oxi-btn-bg-alternative: #524628;
+  --oxi-btn-bg-exceptional: #165570;
+  --oxi-btn-bg-terminate:   #674569;
+}
+
+/* --- Map button classes to named background colors --- */
+
+/* Solid (dark bg, white text) */
+.oxi-btn-primary,
+.btn-primary         { background-color: var(--oxi-btn-bg-primary); }
+
+/* Pastel (light bg, dark text) */
+.oxi-btn-expected,
+.oxi-btn-submit      { background-color: var(--oxi-btn-bg-submit); }
+
+.oxi-btn-optional,
+.oxi-btn-info        { background-color: var(--oxi-btn-bg-info); }
+
+.oxi-btn-failure,
+.oxi-btn-cancel      { background-color: var(--oxi-btn-bg-cancel); }
+
+.oxi-btn-reset,
+.oxi-btn-alternative { background-color: var(--oxi-btn-bg-alternative); }
+
+.oxi-btn-exceptional,
+.oxi-btn-loading     { background-color: var(--oxi-btn-bg-exceptional); }
+
+.oxi-btn-terminate   { background-color: var(--oxi-btn-bg-terminate); }
+
+/* Clone add/remove buttons — subtle variants of exceptional (blue) / cancel (red) */
+.oxi-btn-subtle-add {
+  background-color: color-mix(in srgb, var(--oxi-btn-bg-exceptional) 50%, white);
+  color: #1a5276 !important;
+  border-color: var(--oxi-btn-bg-exceptional) !important;
+  [data-bs-theme=dark] & {
+    background-color: color-mix(in srgb, var(--oxi-btn-bg-exceptional) 50%, black);
+    color: #8dc8e8 !important;
+  }
+}
+
+.oxi-btn-subtle-remove {
+  background-color: color-mix(in srgb, var(--oxi-btn-bg-cancel) 50%, white);
+  color: #7a2020 !important;
+  border-color: var(--oxi-btn-bg-cancel) !important;
+  [data-bs-theme=dark] & {
+    background-color: color-mix(in srgb, var(--oxi-btn-bg-cancel) 50%, black);
+    color: #e6a8a8 !important;
+  }
+}
+
+/* --- Shared: hover brightens via overlay --- */
+
+.oxi-btn-primary,     .btn-primary,
+.oxi-btn-expected,    .oxi-btn-submit,
+.oxi-btn-optional,    .oxi-btn-info,
+.oxi-btn-failure,     .oxi-btn-cancel,
+.oxi-btn-reset,       .oxi-btn-alternative,
+.oxi-btn-exceptional, .oxi-btn-loading,
+.oxi-btn-terminate,
+.oxi-btn-subtle-add,  .oxi-btn-subtle-remove {
+  &:hover, &:active, &.active, &:focus-visible {
+    background-image: linear-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0.3));
+  }
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 0px #fff, 0 0 0 4px rgba(61, 133, 184, 0.7);
+    [data-bs-theme=dark] & {
+      box-shadow: 0 0 0 0px #222, 0 0 0 4px rgba(42, 84, 122, 0.8);
     }
   }
 }
 
-.oxi-button-container a.btn::before {
-  font-family: "Glyphicons Halflings";
-  content: "\e144";
-  font-size: 80%;
-  padding-right: 0.5rem;
-}
+/* --- Solid button text/border --- */
 
-/* Button format from workflow defs */
-
-.oxi-btn-expected,
-.oxi-btn-expected:focus,
-.oxi-btn-submit,
-.oxi-btn-submit:focus {
-  background-color: #c9e2b3;
-}
-.oxi-btn-optional,
-.oxi-btn-optional:focus,
-.oxi-btn-info,
-.oxi-btn-info:focus {
-    background-color: #e4e4da;
-}
-.oxi-btn-failure,
-.oxi-btn-failure:focus,
-.oxi-btn-cancel,
-.oxi-btn-cancel:focus {
-  background-color: #e39f9f;
-}
-.oxi-btn-reset,
-.oxi-btn-reset:focus,
-.oxi-btn-alternative,
-.oxi-btn-alternative:focus {
-  background-color: #ffd78c;
-}
-.oxi-btn-exceptional,
-.oxi-btn-exceptional:focus {
-  background-color: #79d1f3;
-}
-.oxi-btn-terminate,
-.oxi-btn-terminate:focus {
-  background-color: #ad7fa8;
+.oxi-btn-primary, .oxi-btn-primary:focus, .oxi-btn-primary:hover, .oxi-btn-primary:active,
+.btn-primary,     .btn-primary:focus,     .btn-primary:hover,     .btn-primary:active {
+  color: #fff;
+  border-color: rgba(0,0,0,0.2);
 }
 
 [data-bs-theme=dark] {
-  .oxi-btn-expected,
-  .oxi-btn-expected:focus,
-  .oxi-btn-submit,
-  .oxi-btn-submit:focus {
-    background-color: #344b20;
-  }
-  .oxi-btn-optional,
-  .oxi-btn-optional:focus,
-  .oxi-btn-info,
-  .oxi-btn-info:focus {
-    background-color: #26261d;
-  }
-  .oxi-btn-failure,
-  .oxi-btn-failure:focus,
-  .oxi-btn-cancel,
-  .oxi-btn-cancel:focus {
-    background-color: #5b1f1f;
-  }
-  .oxi-btn-reset,
-  .oxi-btn-reset:focus,
-  .oxi-btn-alternative,
-  .oxi-btn-alternative:focus {
-    background-color: #6f4a06;
-  }
-  .oxi-btn-exceptional,
-  .oxi-btn-exceptional:focus {
-    background-color: #126281;
-  }
-  .oxi-btn-terminate,
-  .oxi-btn-terminate:focus {
-    background-color: #7d5479;
+  .oxi-btn-primary, .oxi-btn-primary:focus,
+  .btn-primary,     .btn-primary:focus {
+    color: #000;
   }
 }
 
-/* Background for all buttons above */
+/* --- Pastel button text/border --- */
+
 .oxi-btn-expected,    .oxi-btn-expected:focus,
 .oxi-btn-submit,      .oxi-btn-submit:focus,
 .oxi-btn-optional,    .oxi-btn-optional:focus,
@@ -773,25 +768,32 @@ div.required input.flatpickr-input {
 .oxi-btn-reset,       .oxi-btn-reset:focus,
 .oxi-btn-alternative, .oxi-btn-alternative:focus,
 .oxi-btn-exceptional, .oxi-btn-exceptional:focus,
+.oxi-btn-loading,     .oxi-btn-loading:focus,
 .oxi-btn-terminate,   .oxi-btn-terminate:focus,
 .oxi-btn-info,        .oxi-btn-info:focus {
   color: #333; border-color: #ccc;
+  [data-bs-theme=dark] & { color: #ccc; border-color: #000; }
 }
 
-[data-bs-theme=dark] {
-  .oxi-btn-expected,    .oxi-btn-expected:focus,
-  .oxi-btn-submit,      .oxi-btn-submit:focus,
-  .oxi-btn-optional,    .oxi-btn-optional:focus,
-  .oxi-btn-optional,    .oxi-btn-optional:focus,
-  .oxi-btn-failure,     .oxi-btn-failure:focus,
-  .oxi-btn-cancel,      .oxi-btn-cancel:focus,
-  .oxi-btn-reset,       .oxi-btn-reset:focus,
-  .oxi-btn-alternative, .oxi-btn-alternative:focus,
-  .oxi-btn-exceptional, .oxi-btn-exceptional:focus,
-  .oxi-btn-terminate,   .oxi-btn-terminate:focus,
-  .oxi-btn-info,        .oxi-btn-info:focus {
-    color: #ccc; border-color: #333;
+/* --- Disabled button border --- */
+
+.btn:disabled, .btn.disabled {
+  border-color: #d8d8d8;
+  [data-bs-theme=dark] & {
+    color: #555;
+    border-color: #555;
+    background-color: #2a2a2a;
+    background-image: none;
   }
+}
+
+/* --- Link/icon prefix for external link buttons --- */
+
+.oxi-button-container a.btn::before {
+  font-family: "Glyphicons Halflings";
+  content: "\e144";
+  font-size: 80%;
+  padding-right: 0.5rem;
 }
 
 .oxi-btn-tile {
@@ -804,13 +806,13 @@ div.required input.flatpickr-input {
     easier to overwrite with another style declaration. */
   background-color: rgba(var(--bs-light-rgb));
 
+  [data-bs-theme=dark] & {
+    background-color: rgba(var(--bs-dark-rgb));
+  }
+
   &:hover {
     border-color: unset;
   }
-}
-
-[data-bs-theme=dark] .oxi-btn-card {
-  background-color: rgba(var(--bs-dark-rgb));
 }
 
 .oxi-btn-info::before {
@@ -872,7 +874,7 @@ div.required input.flatpickr-input {
     /* Show the dropdown menu on hover */
     .menu { display: block }
     /* Change the background color of the dropdown button when the dropdown content is shown */
-    .content { border-color: #bfe0a8 }
+    .content { border-color: #bfe0a8; [data-bs-theme=dark] & { border-color: #2a412a; } }
   }
 
   .content {
@@ -883,6 +885,7 @@ div.required input.flatpickr-input {
   .menu {
     display: none;
     background-color: #dff0d8;
+    [data-bs-theme=dark] & { background-color: #1e3a1e; }
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 10;
     width: 100%;

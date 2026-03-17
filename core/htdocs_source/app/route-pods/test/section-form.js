@@ -25,6 +25,14 @@ export default [
                 },
                 {
                     type: "text",
+                    name: "text",
+                    label: "Text (small, disabled)",
+                    value: "",
+                    width: "small",
+                    readonly: 1,
+                },
+                {
+                    type: "text",
                     name: "text_maybe",
                     label: "Text (large)",
                     value: "",

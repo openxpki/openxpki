@@ -115,32 +115,64 @@ export default {
                 "0x3ff536fff8da93943aa",
                 [ "CN=e.d.c:pkiclient", "DC=Test Deployment", "DC=OpenXPKI", "DC=org" ],
                 {
-                    value: "ISSUED",
-                    label: "Issued"
+                    value: "REVOKED",
+                    label: "Revoked"
                 },
                 "1585959633",
                 "1617495633",
                 "0qLkfCTwwj-8SoSOTtlRQLqS20o",
                 "0qLkfCTwwj-8SoSOTtlRQLqS20o",
                 {
-                    label: "Issued",
-                    value: "ISSUED"
+                    label: "Revoked",
+                    value: "REVOKED"
                 }
             ],
             [
                 "0x2ff8fa8ee5590e2553a",
                 [ "CN=e.d.c:pkiclient", "DC=Test Deployment", "DC=OpenXPKI", "DC=org" ],
                 {
-                    label: "Issued",
-                    value: "ISSUED"
+                    label: "Expired",
+                    value: "EXPIRED"
                 },
                 "1585434533",
                 "<a href=\"test\" onclick=\"alert('huh')\">test</a>",
                 "fPF_JVAco7Eg0d3kANRFLYRPu5o",
                 "fPF_JVAco7Eg0d3kANRFLYRPu5o",
                 {
-                    label: "Issued",
-                    value: "ISSUED"
+                    label: "Expired",
+                    value: "EXPIRED"
+                }
+            ],
+            [
+                "0x2348fa8ee5590e2553a",
+                [ "CN=e.d.c:pkiclient", "DC=Test Deployment", "DC=OpenXPKI", "DC=org" ],
+                {
+                    label: "crl_issuance_pending",
+                    value: "crl_issuance_pending"
+                },
+                "1585434533",
+                "<a href=\"test\" onclick=\"alert('huh')\">test</a>",
+                "fPF_JVAco7Eg0d3kANRFLYRPu5o",
+                "fPF_JVAco7Eg0d3kANRFLYRPu5o",
+                {
+                    label: "crl_issuance_pending",
+                    value: "crl_issuance_pending"
+                }
+            ],
+            [
+                "0x8758fa8ee5590e2553a",
+                [ "CN=e.d.c:pkiclient", "DC=Test Deployment", "DC=OpenXPKI", "DC=org" ],
+                {
+                    label: "unknown",
+                    value: "unknown"
+                },
+                "1585434533",
+                "<a href=\"test\" onclick=\"alert('huh')\">test</a>",
+                "fPF_JVAco7Eg0d3kANRFLYRPu5o",
+                "fPF_JVAco7Eg0d3kANRFLYRPu5o",
+                {
+                    label: "unknown",
+                    value: "unknown"
                 }
             ],
 

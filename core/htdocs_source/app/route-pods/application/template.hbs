@@ -1,4 +1,4 @@
-{{!-- <HeadLayout/> is required by ember-cli-head --}}
+{{!-- <HeadLayout/> injects title + custom CSS into document.head via {{#in-element}} --}}
 <HeadLayout/>
 
 <div class="container-fluid oxi-page">
@@ -23,10 +23,11 @@
                 <div class="col col-auto oxi-dark-mode-switch">
                     <button
                         type="button"
-                        class="btn btn-sm {{if this.nightMode "btn-outline-info" "btn-outline-secondary bg-warning-subtle"}}"
-                        {{on "click" this.toggleNightMode}}
+                        class="btn btn-sm {{this.themeButtonClass}}"
+                        {{on "click" this.cycleThemeMode}}
                     >
-                        <i class="bi {{if this.nightMode "bi-moon-fill" "bi-sun-fill"}}"></i>
+                        <Tippy>{{t (concat 'theme.' this.themeMode)}}</Tippy>
+                        <i class="bi {{this.themeIcon}}"></i>
                     </button>
                 </div>
             </OxiFooter>

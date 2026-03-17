@@ -33,7 +33,7 @@
               Breadcrumbs
             }}
             {{#each this.breadcrumbs as |bc|}}
-                {{#let (concat "badge text-bg-secondary rounded-pill oxi-breadcrumb mb-3 " bc.class) as |css|}}
+                {{#let (concat "badge rounded-pill oxi-breadcrumb mb-3 " bc.class) as |css|}}
                 {{#if bc.page}}
                     <a
                         class="btn {{css}}"
@@ -43,7 +43,7 @@
                         {{bc.label}}
                     </a>
                 {{else}}
-                    <span class="{{css}} bg-secondary">
+                    <span class="{{css}}">
                         {{bc.label}}
                     </span>
                 {{/if}}
@@ -146,8 +146,8 @@
         <OxiBase::Formatted::Arbitrary @value={{this.model.error}} @raw={{true}} />
     </Modal.body>
     <Modal.footer>
-        <BsButton {{on "click" this.reload}} @type="primary">{{t 'error_popup.reload'}}</BsButton>
-        <BsButton {{on "click" Modal.close}}>{{t 'site.close_popup'}}</BsButton>
+        <BsButton {{on "click" this.reload}} @type="" class="oxi-btn-primary">{{t 'error_popup.reload'}}</BsButton>
+        <BsButton {{on "click" Modal.close}} @type="" class="oxi-btn-optional">{{t 'site.close_popup'}}</BsButton>
     </Modal.footer>
 </BsModal>
 

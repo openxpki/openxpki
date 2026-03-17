@@ -17,7 +17,7 @@ export default class OpenXpkiRoute extends Route {
         startat:  { refreshModel: true },
         limit:    { refreshModel: true },
         force:    { refreshModel: true }, // not evaluated, only used to trigger model refresh
-        // trigger -- not neccessary as we only evaluate it in model() below
+        trigger:  { refreshModel: false }, // must be declared for ember-source >= 6.11 even though we only read it from transition.to.queryParams
     }
     previousParams = []
 

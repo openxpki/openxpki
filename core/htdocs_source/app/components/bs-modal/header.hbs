@@ -1,0 +1,6 @@
+<div class="modal-header" ...attributes>
+    {{yield}}
+    {{#unless (eq @closeButton false)}}
+        <button type="button" class="btn-close" tabindex="-1" data-bs-dismiss="modal" aria-label="Close"></button>
+    {{/unless}}
+</div>

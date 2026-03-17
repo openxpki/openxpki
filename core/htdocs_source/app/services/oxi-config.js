@@ -107,6 +107,11 @@ export default class OxiConfigService extends Service {
         return null
     }
 
+    get logoUrl() {
+        let path = this.header?.logo || 'img/logo.png'
+        return this.#rel2absUrl(path)
+    }
+
     get oldHeader() {
         // if YAML parameter 'header' is a string (or undefined)
         if (!this.header && this.localConfig.header) {

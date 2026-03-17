@@ -4,7 +4,7 @@ import { action } from '@ember/object'
 import { service } from '@ember/service'
 import { A } from '@ember/array'
 import { detect } from 'detect-browser'
-import lite from 'caniuse-lite'
+import agents from 'virtual:browser-release-dates'
 import copy from 'copy-text-to-clipboard'
 import Link from 'openxpki/data/link'
 
@@ -24,12 +24,12 @@ export default class OpenXpkiController extends Controller {
         'startat',
         'limit',
         'force',
-        // 'trigger' -- not neccessary as we only evaluate it in route.js/model()
+        'trigger', // must be declared for ember-source >= 6.11 even though we only read it from transition.to.queryParams in route.js
     ]
     @tracked startat = null
     @tracked limit = null
     @tracked force = null
-    // @tracked trigger = null
+    @tracked trigger = null
 
     @tracked loading = false
 
@@ -83,7 +83,7 @@ export default class OpenXpkiController extends Controller {
         if (name == 'firefox' && browser.os.match(/android/i)) name = 'and_ff'
 
         // look if 'caniuse' knows this browser
-        let agent = lite.agents[name]
+        let agent = agents[name]
         if (!agent) return null
 
         // look if 'caniuse' knows this version

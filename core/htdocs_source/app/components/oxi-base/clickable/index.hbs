@@ -21,10 +21,10 @@
                 {{defuse c.description}}
             </Modal.body>
             <Modal.footer>
-                <BsButton {{on "click" this.executeAction}} @type="primary">
+                <BsButton {{on "click" this.executeAction}} @type="" class="oxi-btn-primary">
                     {{if c.confirm_label c.confirm_label (t 'button.confirm_dialog.ok')}}
                 </BsButton>
-                <BsButton {{on "click" Modal.close}}>
+                <BsButton {{on "click" this.resetConfirmState}} @type="" class="oxi-btn-optional">
                     {{if c.cancel_label c.cancel_label (t 'button.confirm_dialog.cancel')}}
                 </BsButton>
             </Modal.footer>

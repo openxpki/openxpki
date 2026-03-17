@@ -8,6 +8,7 @@ RUN apt-get update && \
     apt-get -y install \
         rsync \
         git \
+        chromium \
         && \
     apt-get clean
 

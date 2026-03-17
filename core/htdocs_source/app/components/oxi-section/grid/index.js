@@ -2,6 +2,7 @@ import Component from '@glimmer/component'
 import { service } from '@ember/service'
 import { action, set as emSet } from '@ember/object'
 import { tracked } from '@glimmer/tracking'
+import { TrackedArray } from 'tracked-built-ins'
 import { debug } from '@ember/debug'
 import ContainerButton from 'openxpki/data/container-button'
 import GridButton from 'openxpki/data/grid-button'
@@ -34,7 +35,7 @@ export default class OxiSectionGridComponent extends Component {
         super(...arguments)
 
         this.rawColumns = this.args.def.columns || []
-        this.rawData = this.args.def.data || []
+        this.rawData = new TrackedArray(this.args.def.data || [])
         this.actions = (this.args.def.actions || []).map(a => GridAction.fromHash(a))
 
         this.colByName = new Map()
@@ -63,7 +64,7 @@ export default class OxiSectionGridComponent extends Component {
 
     get visibleColumns() {
         return this.rawColumns
-        .map( (col, index) => { col.index = index; return col })
+        .map( (col, index) => ({ ...col, index }))
         .filter(col => col.sTitle[0] !== "_" && col.bVisible != 0);
     }
 
@@ -271,16 +272,18 @@ export default class OxiSectionGridComponent extends Component {
         }
         request[button.selection] = this.sortedData.filter(i => i.checked).map(i => i.originalData[index])
         emSet(button, "loading", true)
-
-        await this.content.requestPage(request)
-        emSet(button, "loading", false)
+        try {
+            await this.content.requestPage(request)
+        } finally {
+            emSet(button, "loading", false)
+        }
     }
 
     // (de-)select single row
     @action
     select(row) {
-        emSet(this.rawData[row.originalIndex], "checked", !this.rawData[row.originalIndex].checked)
-        this.rawData = this.rawData // eslint-disable-line no-self-assign -- trigger Ember update
+        let idx = row.originalIndex
+        this.rawData[idx] = { ...this.rawData[idx], checked: !this.rawData[idx].checked }
         this.updateButtonState()
     }
 
@@ -288,8 +291,9 @@ export default class OxiSectionGridComponent extends Component {
     @action
     selectAll() {
         const wasAllChecked = this.allChecked;
-        this.rawData.forEach(i => emSet(i, "checked", !wasAllChecked)) // FIXME turn rawData into object that extends Base and use @tracked properties instead of emSet()
-        this.rawData = this.rawData // eslint-disable-line no-self-assign -- trigger Ember update
+        for (let i = 0; i < this.rawData.length; i++) {
+            this.rawData[i] = { ...this.rawData[i], checked: !wasAllChecked }
+        }
         this.updateButtonState()
     }
 
@@ -311,7 +315,7 @@ export default class OxiSectionGridComponent extends Component {
             reverse: page.reverse ? 1 : 0,
         }, { verbose: true })
         .then((res) => {
-            this.rawData = res.data || [];
+            this.rawData = new TrackedArray(res.data || []);
             this.pager.setFromHash(page);
         });
     }

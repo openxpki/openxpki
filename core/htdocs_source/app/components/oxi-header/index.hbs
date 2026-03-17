@@ -10,7 +10,7 @@
             {{else}}
                 <div class="col">
                     {{!-- template-lint-disable no-bare-strings --}}
-                    <a href="./#/"><img src={{try this.config.header.logo (concat this.rootURL "img/logo.png")}} alt="OpenXPKI"></a>
+                    <a href="./#/"><img src={{this.config.logoUrl}} alt="OpenXPKI"></a>
                 </div>
                 <div class="col d-none d-md-flex justify-content-center">
                     <h4 class="oxi-header">

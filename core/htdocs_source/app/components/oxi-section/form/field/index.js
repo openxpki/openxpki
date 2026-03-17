@@ -1,9 +1,12 @@
 import Component from '@glimmer/component'
 import { action } from '@ember/object'
 import { service } from '@ember/service'
-import { importSync } from '@embroider/macros'
-import { ensureSafeComponent } from '@embroider/util'
 import { debug } from '@ember/debug'
+
+const fieldModules = Object.fromEntries(
+    Object.entries(import.meta.glob('./*/index.js', { eager: true }))
+        .map(([path, mod]) => [path.replace(/^\.\/(.+)\/index\.js$/, '$1'), mod])
+)
 
 export default class OxiFieldMainComponent extends Component {
     @service('oxi-backend') backend;
@@ -21,8 +24,7 @@ export default class OxiFieldMainComponent extends Component {
 
     get fieldComponent() {
         debug(`oxi-section/form/field: importing ./${this.args.field.type}`)
-        let module = importSync(`./${this.args.field.type}`)
-        return ensureSafeComponent(module.default, this)
+        return fieldModules[this.args.field.type]?.default
     }
 
     get isSmall() {
@@ -74,13 +76,13 @@ export default class OxiFieldMainComponent extends Component {
     @action
     onKeydown(event) {
         // ENTER --> submit form
-        if (event.keyCode === 13 && this.field.type !== "textarea") {
+        if (event.key === 'Enter' && this.field.type !== "textarea") {
             event.stopPropagation();
             event.preventDefault();
             this.args.onSubmit();
         }
         // TAB --> clonable fields: add another clone
-        if (event.keyCode === 9 && this.field._lastCloneInGroup && this.field.value !== null && this.field.value !== "") {
+        if (event.key === 'Tab' && this.field._lastCloneInGroup && this.field.value !== null && this.field.value !== "") {
             event.stopPropagation();
             event.preventDefault();
             this.addClone();

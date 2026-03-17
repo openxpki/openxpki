@@ -68,20 +68,20 @@ import Clickable from 'openxpki/data/clickable'
 */
 let format2css = {
     none:           "", // to allow formatting via <OxiBase::Button class="..."> without adding fallback defaults
-    primary:        "btn-primary bg-primary",
-    submit:         "btn-secondary oxi-btn-submit",
-    loading:        "btn-secondary oxi-btn-loading",
-    cancel:         "btn-secondary oxi-btn-cancel",
-    reset:          "btn-secondary oxi-btn-reset",
-    expected:       "btn-secondary oxi-btn-expected",
-    failure:        "btn-secondary oxi-btn-failure",
-    optional:       "btn-secondary oxi-btn-optional",
-    alternative:    "btn-secondary oxi-btn-alternative",
-    exceptional:    "btn-secondary oxi-btn-exceptional",
-    terminate:      "btn-secondary oxi-btn-terminate",
-    tile:           "btn-secondary oxi-btn-tile",
-    card:           "btn-secondary oxi-btn-card",
-    info:           "btn-secondary oxi-btn-info",
+    primary:        "oxi-btn-primary",
+    submit:         "oxi-btn-submit",
+    loading:        "oxi-btn-loading",
+    cancel:         "oxi-btn-cancel",
+    reset:          "oxi-btn-reset",
+    expected:       "oxi-btn-expected",
+    failure:        "oxi-btn-failure",
+    optional:       "oxi-btn-optional",
+    alternative:    "oxi-btn-alternative",
+    exceptional:    "oxi-btn-exceptional",
+    terminate:      "oxi-btn-terminate",
+    tile:           "oxi-btn-tile",
+    card:           "oxi-btn-card",
+    info:           "oxi-btn-info",
 }
 
 export default class OxiClickableComponent extends Component {

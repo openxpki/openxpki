@@ -1,9 +1,10 @@
 import Service from '@ember/service'
 import { service } from '@ember/service'
 import { tracked } from '@glimmer/tracking'
+import { TrackedArray, TrackedMap } from 'tracked-built-ins'
 import { later, next, cancel } from '@ember/runloop'
 import { isArray } from '@ember/array'
-import { action, set as emSet } from '@ember/object'
+import { action } from '@ember/object'
 import { debug, warn } from '@ember/debug'
 import { guidFor } from '@ember/object/internals'
 import Page from 'openxpki/data/page'
@@ -22,7 +23,7 @@ export default class OxiContentService extends Service {
     @service('oxi-backend') backend
 
     @tracked user = null
-    @tracked navEntries = []
+    @tracked navEntries = new TrackedArray()
     @tracked pingTimer = null
     @tracked refreshTimer = null
     @tracked structure = null
@@ -34,14 +35,14 @@ export default class OxiContentService extends Service {
 
     @tracked top = null
     @tracked popup = null
-    @tracked breadcrumbs = []
+    @tracked breadcrumbs = new TrackedArray()
 
     @tracked error = null
     @tracked loadingBanner = null
     last_session_id = null // to track server-side logouts with session id changes
     #loginTimestamp = null // to track logouts in another browser window via Cookie comparison
 
-    @tracked refreshTimers = new Map()
+    refreshTimers = new TrackedMap()
 
     /*
     Custom handlers for exceptions returned by the server (HTTP status codes):
@@ -175,7 +176,7 @@ export default class OxiContentService extends Service {
         let i = this.breadcrumbs.findIndex(el => el === bc)
         debug(`Navigating to breadcrumb #${i}: ${bc.page}`)
         // cut breadcrumbs list back to the one we're navigating to
-        this.breadcrumbs = this.breadcrumbs.slice(0, i+1)
+        this.breadcrumbs.splice(i+1)
         // open breadcrumb's page
         this.openPage({ name: bc.page, target: this.TARGET.TOP, force: true, params: { trigger: 'breadcrumb' } })
     }
@@ -280,7 +281,7 @@ export default class OxiContentService extends Service {
         // Client side error
         catch (error) {
             this.#setLoadingBanner(null)
-            console.error('There was an error while processing the data', error)
+            console.error('There was an error while processing the data:', error)
             this.error = this.intl.t('error_popup.message.client', { reason: error })
             return null
         }
@@ -364,7 +365,7 @@ export default class OxiContentService extends Service {
 
         // menu
         if (doc.structure) {
-            this.navEntries = doc.structure
+            this.navEntries = new TrackedArray(doc.structure)
             this.#refreshNavEntries()
         }
 
@@ -561,7 +562,6 @@ export default class OxiContentService extends Service {
         this.cancelTimer(id)
         debug(`Register timer "${id}"`)
         this.refreshTimers.set(id, later(ctx, cb, timeoutSec * 1000))
-        this.refreshTimers = this.refreshTimers // trigger Ember refresh
     }
 
     /**
@@ -578,7 +578,6 @@ export default class OxiContentService extends Service {
         debug(`Cancel timer "${id}"`)
         cancel(oldTimer)
         this.refreshTimers.delete(id)
-        this.refreshTimers = this.refreshTimers // trigger Ember refresh
     }
 
     /**
@@ -588,7 +587,6 @@ export default class OxiContentService extends Service {
         debug('Cancel all timers')
         for (const timer of this.refreshTimers.values()) cancel(timer)
         this.refreshTimers.clear()
-        this.refreshTimers = this.refreshTimers // trigger Ember refresh
     }
 
     // Sets the loading state, i.e. dims the page and shows a banner with the
@@ -707,13 +705,13 @@ export default class OxiContentService extends Service {
         // Reset breadcrumbs for nav menu clicks
         if (navAction) {
             debug(`#setBreadcrumbs(): navigation item detected, resetting breadcrumbs`)
-            this.breadcrumbs = []
+            this.breadcrumbs.splice(0)
         }
 
         // login or logout pages
         if (this.LOGIN_PAGES.findIndex(p => pageName.startsWith(p)) != -1) {
             debug(`#setBreadcrumbs(): login/logout page detected, suppressing breadcrumbs`)
-            this.breadcrumbs = []
+            this.breadcrumbs.splice(0)
             return
         }
 
@@ -723,7 +721,7 @@ export default class OxiContentService extends Service {
         if (suppressBreadcrumb) debug('#setBreadcrumbs(): server sent empty hash - suppressing new breadcrumb')
 
         if (! suppressBreadcrumb) {
-            if (bc.is_root) this.breadcrumbs = []
+            if (bc.is_root) this.breadcrumbs = new TrackedArray()
 
             // Set defaults from server
             breadcrumb = {
@@ -752,7 +750,7 @@ export default class OxiContentService extends Service {
             )
             if (alreadySeenAt != -1) {
                 debug('#setBreadcrumbs(): breadcrumb already in list - replacing it (to get new label)')
-                this.breadcrumbs = this.breadcrumbs.slice(0, alreadySeenAt)
+                this.breadcrumbs.splice(alreadySeenAt)
             }
         }
 
@@ -761,22 +759,22 @@ export default class OxiContentService extends Service {
 
         // add new breadcrumb
         this.breadcrumbs.push(breadcrumb)
-        this.breadcrumbs = this.breadcrumbs // trigger Ember refresh
     }
 
     #refreshNavEntries() {
-        for (const entry of this.navEntries) {
-            emSet(entry, "active", (entry.key === this?.top?.name))
-            if (entry.entries) {
-                entry.entries.forEach(i => emSet(i, "active", false))
-                let subEntry = entry.entries.find(i => i.key == this?.top?.name)
-                if (subEntry) {
-                    emSet(subEntry, "active", true)
-                    emSet(entry, "active", true)
-                }
+        for (let i = 0; i < this.navEntries.length; i++) {
+            let entry = this.navEntries[i]
+            let updatedSubEntries = entry.entries?.map(sub => ({
+                ...sub,
+                active: sub.key == this?.top?.name,
+            }))
+            let hasActiveSubEntry = updatedSubEntries?.some(s => s.active) ?? false
+            this.navEntries[i] = {
+                ...entry,
+                active: (entry.key === this?.top?.name) || hasActiveSubEntry,
+                ...(updatedSubEntries && { entries: updatedSubEntries }),
             }
         }
-        this.navEntries = this.navEntries // eslint-disable-line no-self-assign -- trigger Ember update
     }
 
     #getLoginTimestampCookie() {

@@ -52,7 +52,7 @@ export default class OxiFieldTextComponent extends Component {
 
                 let fieldName = content.name
                 let otherFields = Array.from(this.acFieldRefParams.keys()).filter(f => f !== fieldName)
-                this.acOtherFieldsReferenced = otherFields.size > 0;
+                this.acOtherFieldsReferenced = otherFields.length > 0;
             }
         }
     }
@@ -156,9 +156,12 @@ export default class OxiFieldTextComponent extends Component {
 
                 this.searchResults = doc;
                 if (doc[0] != null) {
-                    doc[0].active = true;
+                    emSet(doc[0], "active", true);
                 }
                 this.isDropdownOpen = true;
+            }).catch((err) => {
+                /* eslint-disable-next-line no-console */
+                console.error('oxi-section/form/field/text: autocomplete query failed', err);
             });
         }, 0.3);
     }
@@ -168,7 +171,7 @@ export default class OxiFieldTextComponent extends Component {
         if (this.isDropdownOpen == false) return;
 
         // Enter - select active value
-        if (evt.keyCode === 13) {
+        if (evt.key === 'Enter') {
             let results = this.searchResults;
             let a = results.find(i => i.active == true)
             if (a) {
@@ -177,17 +180,17 @@ export default class OxiFieldTextComponent extends Component {
             evt.stopPropagation(); evt.preventDefault();
         }
         // Escape
-        else if (evt.keyCode === 27) {
+        else if (evt.key === 'Escape') {
             this.isDropdownOpen = false;
             evt.stopPropagation(); evt.preventDefault();
         }
         // Arrow up
-        else if (evt.keyCode === 38) {
+        else if (evt.key === 'ArrowUp') {
             this.selectNeighbor(-1);
             evt.stopPropagation(); evt.preventDefault();
         }
         // Arrow down
-        else if (evt.keyCode === 40) {
+        else if (evt.key === 'ArrowDown') {
             this.selectNeighbor(1);
             evt.stopPropagation(); evt.preventDefault();
         }

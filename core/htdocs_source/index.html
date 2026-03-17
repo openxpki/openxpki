@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="stylesheet" href="/@embroider/virtual/vendor.css">
+        <link rel="shortcut icon" href="favicon.png">
+    </head>
+    <body>
+        <div class="oxi-loading-banner">
+            <h4 class="alert alert-info" role="alert">
+                <span class="glyphicon glyphicon-refresh spin"></span>
+                &nbsp;OpenXPKI is loading...
+            </h4>
+        </div>
+
+        <script type="module" src="/@embroider/virtual/vendor.js"></script>
+        <script type="module">
+            import Application from './app/app';
+            import environment from './app/config/environment';
+
+            Application.create(environment.APP);
+        </script>
+    </body>
+</html>

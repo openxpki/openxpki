@@ -8,7 +8,7 @@ This directory contains the UI source code, it cannot be used directly on your w
 
 #### Compilation
 
-The OpenXPKI UI as an Ember.js application has to be compiled into plain JavaScript files ("bundles") after source code updates. This is done via  `ember-cli` but the easiest way is to use the supplied `Makefile` which in turn uses Docker/Podman.
+The OpenXPKI UI as an Ember.js application has to be compiled into plain JavaScript files ("bundles") after source code updates. The easiest way is to use the supplied `Makefile` which in turn uses Docker/Podman.
 
 ```bash
 make ember
@@ -98,7 +98,7 @@ nvm use
 **Ember CLI and other global Tools**
 
 ```bash
-pnpm install -g ember-cli ember-cli-update npm-check-updates
+pnpm install -g npm-check-updates
 ```
 
 **Required Node.js modules**
@@ -149,21 +149,19 @@ pnpm run lint:css:fix
 
 ### Updates
 
-**ember-cli**
-
-Also see [the Ember CLI update guide](https://cli.emberjs.com/release/basic-use/upgrading/).
+**testem**
 
 ```bash
-pnpm remove ember-cli ember-cli-update
-pnpm install --save-dev ember-cli ember-cli-update
-./node_modules/.bin/ember --version
+pnpm remove testem
+pnpm install --save-dev testem
+./node_modules/.bin/testem --version
 ```
 
 **Ember app (config, dependencies etc.)**
 
 ```bash
 nvm use
-./node_modules/.bin/ember-cli-update
+npx ember-cli-update
 pnpm audit fix
 # to install the modules on your host and update package-lock.json:
 pnpm install

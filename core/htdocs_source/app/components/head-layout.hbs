@@ -1,0 +1,10 @@
+{{#in-element this.headElement insertBefore=null}}
+  <title>{{this.config.pageTitle}}</title>
+  <meta property="og:title" content={{this.config.pageTitle}} />
+  {{#if this.config.customCSSUrl}}
+    <link integrity="" rel="stylesheet" href="{{this.config.customCSSUrl}}">
+  {{/if}}
+  {{#if this.config.customCSS}}
+    <style type="text/css">{{defuse this.config.customCSS}}</style>
+  {{/if}}
+{{/in-element}}

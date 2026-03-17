@@ -1,6 +1,7 @@
 import Component from '@glimmer/component'
 import { action } from "@ember/object"
 import { tracked } from '@glimmer/tracking'
+import { TrackedArray } from 'tracked-built-ins'
 import { isArray } from '@ember/array'
 import { service } from '@ember/service'
 import { debug, warn } from '@ember/debug'
@@ -27,11 +28,12 @@ export default class OxiSectionFormComponent extends Component {
     @service router
 
     @tracked loading = false
-    @tracked fields = []
+    @tracked fields = new TrackedArray()
 
     clonableRefNames = new Set()
     domElementsByFieldId = {}
     dependants = {} // dependent fields by parent field name
+    #actionOnChangeSeq = new Map() // field.name -> latest request sequence number
 
     get buttons() {
         let buttons = []
@@ -62,7 +64,7 @@ export default class OxiSectionFormComponent extends Component {
 
     constructor() {
         super(...arguments)
-        this.fields = this.#prepareFields(this.args.def.fields)
+        this.fields = new TrackedArray(this.#prepareFields(this.args.def.fields))
         this.#updateCloneFields()
     }
 
@@ -221,7 +223,6 @@ export default class OxiSectionFormComponent extends Component {
         if (fields.length == 0) return
         let anchorPos = this.fields.indexOf(anchor)
         this.fields.splice(anchorPos + 1, 0, ...fields)
-        this.fields = this.fields // trigger Ember refresh
     }
 
     // remove given field(s) from field list
@@ -231,8 +232,8 @@ export default class OxiSectionFormComponent extends Component {
             let pos = this.fields.indexOf(field)
             if (pos == -1) continue
             this.fields.splice(pos, 1)
+            delete this.domElementsByFieldId[field._id]
         }
-        this.fields = this.fields // trigger Ember refresh
     }
 
     // Turns all (non-empty) fields into request parameters (returns an Object)
@@ -327,10 +328,16 @@ export default class OxiSectionFormComponent extends Component {
             ...this.#encodeAllFields({ includeEmpty: true }),
         }
 
+        // deduplicate: if a newer request for the same field arrives before this
+        // one resolves, discard this response
+        let seq = (this.#actionOnChangeSeq.get(field.name) || 0) + 1
+        this.#actionOnChangeSeq.set(field.name, seq)
+
         let fields = this.fields
 
         return this.content.requestUpdate(request)
         .then((doc) => {
+            if (this.#actionOnChangeSeq.get(field.name) !== seq) return null
             // replace fields in case the response contains an updated version
             for (const newField of this.#prepareFields(doc.fields)) {
                 for (const oldField of fields) {
@@ -340,7 +347,6 @@ export default class OxiSectionFormComponent extends Component {
                     }
                 }
             }
-            this.fields = fields // trigger refresh
             return null
         })
     }
@@ -457,7 +463,7 @@ export default class OxiSectionFormComponent extends Component {
 
         // check validity and gather form data
         for (const field of this.fields) {
-            if (!field.is_optional && !field.value) {
+            if (!field.is_optional && (field.value === undefined || field.value === null)) {
                 this.setFieldError(field, this.intl.t('component.oxisection_form.missing_value'))
                 return
             } else {

@@ -4,6 +4,7 @@
 /dist/
 /dist-dev/
 /declarations/
+/tmp/
 
 # dependencies
 /node_modules/
