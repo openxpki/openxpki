@@ -129,6 +129,14 @@ img.toplogo {
   background-color: #333;
 }
 
+.oxi-dark-mode-switch .btn.btn-outline-secondary {
+  --bs-btn-hover-color: var(--bs-dark);
+}
+
+[data-bs-theme=dark] .oxi-dark-mode-switch .btn.btn-outline-info {
+  --bs-btn-hover-color: var(--bs-light);
+}
+
 .userinfo {
   font-size: 80%;
 }

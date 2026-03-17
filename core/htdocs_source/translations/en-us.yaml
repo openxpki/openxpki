@@ -84,3 +84,8 @@ component:
 autofill:
   button: "Query {target}"
   result: "Query result from: {target}"
+
+theme:
+  light: "Color scheme: light"
+  dark: "Color scheme: dark"
+  auto: "Color scheme: auto (follows browser/system)"

@@ -20,7 +20,28 @@ export default class TestController extends Controller {
     @tracked
     selectedFormIndex = 0
 
-    @tracked nightMode = localStorage.getItem('oxi-night-mode') === 'true'
+    @tracked themeMode = localStorage.getItem('oxi-theme-mode') || 'auto'
+
+    get effectiveTheme() {
+        if (this.themeMode === 'auto') return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        return this.themeMode
+    }
+    get themeIcon() {
+        switch (this.themeMode) {
+            case 'dark': return 'bi-moon-fill'
+            case 'light': return 'bi-sun-fill'
+            case 'auto': return 'bi-circle-half'
+            default: return 'bi-sun-fill'
+        }
+    }
+    get themeButtonClass() {
+        switch (this.themeMode) {
+            case 'dark': return 'btn-outline-info'
+            case 'light': return 'btn-outline-secondary bg-warning-subtle'
+            case 'auto': return this.effectiveTheme === 'dark' ? 'btn-outline-info' : 'btn-outline-secondary bg-warning-subtle'
+            default: return 'btn-outline-secondary'
+        }
+    }
 
     buttons = []
 
@@ -266,11 +287,15 @@ header:
     }
 
     @action
-    toggleNightMode() {
-        this.nightMode = !this.nightMode
-        let theme = this.nightMode ? 'dark' : 'light'
-        document.documentElement.setAttribute('data-bs-theme', theme)
-        localStorage.setItem('oxi-night-mode', this.nightMode)
+    cycleThemeMode() {
+        switch (this.themeMode) {
+            case 'light': this.themeMode = 'dark'; break
+            case 'dark': this.themeMode = 'auto'; break
+            case 'auto': this.themeMode = 'light'; break
+            default: this.themeMode = 'auto'
+        }
+        document.documentElement.setAttribute('data-bs-theme', this.effectiveTheme)
+        localStorage.setItem('oxi-theme-mode', this.themeMode)
     }
 
     async setCurrentForm(index) {

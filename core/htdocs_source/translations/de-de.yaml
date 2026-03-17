@@ -84,3 +84,8 @@ component:
 autofill:
   button: "{target} abfragen"
   result: "Abfrageergebnis von: {target}"
+
+theme:
+  light: "Farbschema: hell"
+  dark: "Farbschema: dunkel"
+  auto: "Farbschema: auto (wie Browser/System)"
