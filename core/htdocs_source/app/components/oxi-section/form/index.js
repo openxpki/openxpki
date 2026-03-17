@@ -231,6 +231,7 @@ export default class OxiSectionFormComponent extends Component {
             let pos = this.fields.indexOf(field)
             if (pos == -1) continue
             this.fields.splice(pos, 1)
+            delete this.domElementsByFieldId[field._id]
         }
         this.fields = this.fields // trigger Ember refresh
     }
