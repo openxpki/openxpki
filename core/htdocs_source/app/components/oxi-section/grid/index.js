@@ -63,7 +63,7 @@ export default class OxiSectionGridComponent extends Component {
 
     get visibleColumns() {
         return this.rawColumns
-        .map( (col, index) => { col.index = index; return col })
+        .map( (col, index) => ({ ...col, index }))
         .filter(col => col.sTitle[0] !== "_" && col.bVisible != 0);
     }
 
@@ -271,9 +271,11 @@ export default class OxiSectionGridComponent extends Component {
         }
         request[button.selection] = this.sortedData.filter(i => i.checked).map(i => i.originalData[index])
         emSet(button, "loading", true)
-
-        await this.content.requestPage(request)
-        emSet(button, "loading", false)
+        try {
+            await this.content.requestPage(request)
+        } finally {
+            emSet(button, "loading", false)
+        }
     }
 
     // (de-)select single row
