@@ -821,8 +821,12 @@ sub prepare ($self, $c) {
 
 # optionally called by OpenXPKI::Client::Service::Role::Base
 sub cleanup ($self) {
-    # write session changes to storage + close DB connection (if DBI handler)
-    $self->session->flush if $self->has_session;
+    if ($self->has_session) {
+        # write session changes to storage
+        $self->session->flush;
+        # close session DB connection to avoid leaking handles
+        $self->session->db->disconnect if $self->session->has_db;
+    }
     # detach backend
     $self->client->detach if $self->has_client;
 }

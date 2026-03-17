@@ -92,6 +92,7 @@ has db => (
     lazy => 1,
     init_arg => undef,
     builder => '_build_db',
+    predicate => 'has_db',
 );
 
 sub _build_db ($self) {
@@ -392,6 +393,11 @@ sub clone ($self) {
     $self->log->debug('Clone frontend session');
     $self->delete;
     $self->flush;
+
+    # Disconnect old DB handle to avoid leaking connections.
+    # The new Session object will lazily create its own connection.
+    $self->db->disconnect if $self->has_db;
+
     return ref($self)->new(
         db_params  => $self->db_params,
         table_name => $self->table_name,
@@ -634,6 +640,11 @@ sub _db_remove ($self) {
         where => { session_id => $hashed_sid },
     );
     $self->log->debug("Frontend session removed: $hashed_sid");
+}
+
+sub DEMOLISH ($self, $is_global_destruction) {
+    return if $is_global_destruction;
+    $self->db->disconnect if $self->has_db;
 }
 
 __PACKAGE__->meta->make_immutable;
