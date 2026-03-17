@@ -1,5 +1,6 @@
 import Component from '@glimmer/component';
-import { DateTime } from 'luxon';
+import { fromUnixTime } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
 import { action } from '@ember/object';
 
 /**
@@ -67,7 +68,7 @@ export default class OxiFormattedComponent extends Component {
 
     get timestamp() {
         return (this.args.value > 0
-            ? DateTime.fromSeconds(parseInt(this.args.value)).setZone('utc').toFormat('yyyy-MM-dd HH:mm:ss') + ' UTC'
+            ? formatInTimeZone(fromUnixTime(parseInt(this.args.value)), 'UTC', 'yyyy-MM-dd HH:mm:ss') + ' UTC'
             : '---');
     }
 

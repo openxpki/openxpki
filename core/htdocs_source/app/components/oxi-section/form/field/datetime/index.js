@@ -2,7 +2,8 @@ import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { service } from '@ember/service';
-import { DateTime, SystemZone } from 'luxon';
+import { fromUnixTime, getUnixTime } from 'date-fns';
+import { toZonedTime, fromZonedTime } from 'date-fns-tz';
 
 export default class OxiFieldDatetimeComponent extends Component {
     @service('oxi-locale') oxiLocale;
@@ -14,7 +15,7 @@ export default class OxiFieldDatetimeComponent extends Component {
 
     get timezone() {
         let tz = this.args.content.timezone || "utc";
-        if (tz === "local") tz = new SystemZone().name; // Browser's timezone
+        if (tz === "local") tz = Intl.DateTimeFormat().resolvedOptions().timeZone; // Browser's timezone
         return tz;
     }
 
@@ -28,11 +29,10 @@ export default class OxiFieldDatetimeComponent extends Component {
             this.date = null;
         }
         else {
-            let dt = ("now" === epoch) ? DateTime.now() : DateTime.fromSeconds(parseInt(epoch));
-            dt = dt.setZone(this.timezone);
+            let date = ("now" === epoch) ? new Date() : fromUnixTime(parseInt(epoch));
 
-            // create a Date() object with the same numbers but in local timezone
-            this.date = dt.setZone(new SystemZone(), { keepLocalTime: true }).toJSDate();
+            // create a Date() object with the same wall-clock numbers as in this.timezone
+            this.date = toZonedTime(date, this.timezone);
             this.allowClearing = true;
         }
     }
@@ -75,9 +75,7 @@ export default class OxiFieldDatetimeComponent extends Component {
     datePicked(dates, dateStr, flatpickr) {
         let epoch = null
         if (dates[0]) {
-            let dt = DateTime.fromJSDate(dates[0])
-            dt = dt.setZone(this.timezone, { keepLocalTime: true })
-            epoch = dt.toSeconds()
+            epoch = getUnixTime(fromZonedTime(dates[0], this.timezone))
             // Guard to avoid spurious tracked re-renders when the value is unchanged
             if (!this.allowClearing) this.allowClearing = true
         }
