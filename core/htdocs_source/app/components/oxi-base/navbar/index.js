@@ -28,7 +28,7 @@ export default class OxiNavbarComponent extends Component {
     getRootItemClasses(index) {
         let classes = "py-1 ps-2 px-lg-3"
         if (index != 0) {
-            classes += " border-start border-1 border-secondary-subtle"
+            classes += " border-start border-1 oxi-navbar-separator"
         }
         return classes
     }

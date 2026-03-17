@@ -11,7 +11,7 @@
 @import "bootstrap-icons/font/bootstrap-icons.css";
 
 /******************************************************************************
- * Color scheme — tells browser to render native UI (scrollbars, inputs, etc.) accordingly
+ * Color scheme - tells browser to render native UI (scrollbars, inputs, etc.) accordingly
  */
 
 :root,
@@ -47,6 +47,15 @@ body {
 /* Header */
 .oxi-header {
   margin-bottom: 0;
+}
+
+/* Navbar separator - light mode uses Bootstrap's secondary-bg-subtle, dark mode is darker */
+.oxi-navbar-separator {
+  border-color: var(--bs-secondary-border-subtle) !important;
+
+  [data-bs-theme=dark] & {
+    border-color: #2c3036 !important;
+  }
 }
 
 .oxi-header-bar {
