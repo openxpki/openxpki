@@ -31,8 +31,11 @@ function fixEmbroiderResolverForVite6(plugins) {
 
 const unminified = process.env.OPENXPKI_UI_BUILD_UNMINIFIED == 1;
 
-export default defineConfig({
-  base: '', // emit relative asset paths (no leading slash) so htdocs can be served from any subpath
+export default defineConfig(({ mode }) => ({
+  // Production: ''                 -> relative asset paths, htdocs can be served from any subpath.
+  // Development: '/webui/democa/'  -> Vite serves public/ files at that prefix, matching
+  // rootURL in environment.js so static assets (e.g. img/logo.png) resolve correctly.
+  base: mode === 'production' ? '' : '/webui/democa/',
   build: {
     outDir: process.env.OPENXPKI_BUILD_OUTPUT_PATH ?? 'dist',
     emptyOutDir: true, // clean output ("dist") dir before storing new assets there
@@ -85,4 +88,4 @@ export default defineConfig({
       extensions,
     }),
   ],
-});
+}));
