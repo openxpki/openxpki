@@ -104,6 +104,23 @@ sub binary {
 
 }
 
+=head2 key
+
+Print the public key of the container (raw binary)
+
+=cut
+
+sub key {
+
+    my $self = shift;
+    my $pkcs10 = shift;
+
+    my $csr = $self->_load($pkcs10);
+    if (!$csr) { return; }
+
+    return $csr->get_pub_key();
+
+}
 
 =head2 subject_key_identifier
 
