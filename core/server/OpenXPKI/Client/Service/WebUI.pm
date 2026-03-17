@@ -241,7 +241,7 @@ sub _build_session ($self) {
     #
     # Frontend session
     #
-    my ($db_params, $encrypt_key, $log_ip);
+    my ($legacy_file_session, $db_params, $encrypt_key, $log_ip);
 
     # Recent config syntax (since 2026-01)
     if (my $conf = $self->config->get_hash('session.database')) {
@@ -250,18 +250,30 @@ sub _build_session ($self) {
     # Old config syntax (pre 2026-01)
     } else {
         my $driver = $self->config->get('session.driver');
-        die "Session config: file-based sessions are no longer supported, please migrate to 'session.database'\n"
-            if ($driver//'') ne 'driver:openxpki';
+        # die "Session config: file-based sessions are no longer supported, please migrate to 'session.database'\n"
+        #     if ($driver//'') ne 'driver:openxpki';
 
         $conf = $self->config->get_hash('session.params');   # new format (.yaml)
         $conf //= $self->config->get_hash('session_driver'); # old format (.conf)
-        # Default LongReadLen for Oracle
-        $conf->{LongReadLen} = $conf->{LongReadLen} // 100000;
 
-        ($db_params, $encrypt_key, $log_ip) = _parse_old_session_config($conf);
+        # Legacy File driver
+        if (($driver//'') ne 'driver:openxpki') {
+            $conf //= { Directory => '/tmp' };
+
+            $legacy_file_session = OpenXPKI::Client::Service::WebUI::LegacyCGISession->new_patched(
+                $driver, # may be undef
+                $id,     # may be undef
+                $conf
+            );
+        } else {
+            # Default LongReadLen for Oracle
+            $conf->{LongReadLen} = $conf->{LongReadLen} // 100000;
+
+            ($db_params, $encrypt_key, $log_ip) = _parse_old_session_config($conf);
+        }
     }
 
-    my $session = OpenXPKI::Client::Service::WebUI::Session->new(
+    my $session = $legacy_file_session // OpenXPKI::Client::Service::WebUI::Session->new(
         db_params  => $db_params,
         id         => $id,
         defined($encrypt_key) ? (encrypt_key => $encrypt_key) : (),
