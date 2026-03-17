@@ -17,6 +17,7 @@ export default class OxiFieldSelectComponent extends Component {
 
     // returns true if the given value is NOT part of the SELECT's option list
     isCustomValue(val) {
+        if (val === null || val === undefined || val === '') return false;
         return (this.args.content.options.map(o => o.value).indexOf(val) < 0);
     }
 
