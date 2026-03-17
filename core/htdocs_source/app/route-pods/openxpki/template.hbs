@@ -33,7 +33,7 @@
               Breadcrumbs
             }}
             {{#each this.breadcrumbs as |bc|}}
-                {{#let (concat "badge text-bg-secondary rounded-pill oxi-breadcrumb mb-3 " bc.class) as |css|}}
+                {{#let (concat "badge rounded-pill oxi-breadcrumb mb-3 " bc.class) as |css|}}
                 {{#if bc.page}}
                     <a
                         class="btn {{css}}"
@@ -43,7 +43,7 @@
                         {{bc.label}}
                     </a>
                 {{else}}
-                    <span class="{{css}} bg-secondary">
+                    <span class="{{css}}">
                         {{bc.label}}
                     </span>
                 {{/if}}

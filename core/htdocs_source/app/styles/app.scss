@@ -258,6 +258,16 @@ div.required .choices.oxi-inline-select {
   color: #fff; [data-bs-theme=dark] & { color: #000; }
 }
 
+[data-bs-theme=dark] .oxi-breadcrumb {
+  background-color: rgba(108, 117, 125, 0.45);
+  color: #9a9da0;
+}
+
+.oxi-breadcrumb {
+  background-color: var(--bs-secondary);
+  color: #fff;
+}
+
 .oxi-breadcrumb::before {
   font-family: "Glyphicons Halflings";
   padding-right: 0.5rem;
