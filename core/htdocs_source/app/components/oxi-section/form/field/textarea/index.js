@@ -27,7 +27,7 @@ export default class OxiFieldTextareaComponent extends Component {
     @action
     onKeydown(event) {
         // prevent form submit when hitting ENTER
-        if (event.keyCode === 13) {
+        if (event.key === 'Enter') {
             event.stopPropagation();
         }
     }
@@ -50,11 +50,14 @@ export default class OxiFieldTextareaComponent extends Component {
     @action
     async fileSelected(evt) {
         if (evt.target.type !== "file") { return }
-        await this.setFile(evt.target.files[0])
-        // Reset file input value as otherwise <input type="file"> will not fire
-        // a "change" event on Chrome browsers if the same file is selected again
-        // (after hitting our "Reset" button which does not affect the input).
-        evt.target.value = null
+        try {
+            await this.setFile(evt.target.files[0])
+        } finally {
+            // Reset file input value as otherwise <input type="file"> will not fire
+            // a "change" event on Chrome browsers if the same file is selected again
+            // (after hitting our "Reset" button which does not affect the input).
+            evt.target.value = null
+        }
     }
 
     @action
@@ -85,13 +88,14 @@ export default class OxiFieldTextareaComponent extends Component {
     setFile(file) {
         debug(`oxifield-textarea: setFile() - loading contents of ${file.name}`)
 
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             // convert file to ArrayBuffer
             let reader = new FileReader()
             reader.onload = (e) => {
                 this.setFileData(e.target.result, file.name)
                 resolve()
             }
+            reader.onerror = (e) => reject(e.target.error)
             reader.readAsArrayBuffer(file)
         })
     }
