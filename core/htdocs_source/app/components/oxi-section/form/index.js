@@ -32,6 +32,7 @@ export default class OxiSectionFormComponent extends Component {
     clonableRefNames = new Set()
     domElementsByFieldId = {}
     dependants = {} // dependent fields by parent field name
+    #actionOnChangeSeq = new Map() // field.name -> latest request sequence number
 
     get buttons() {
         let buttons = []
@@ -328,10 +329,16 @@ export default class OxiSectionFormComponent extends Component {
             ...this.#encodeAllFields({ includeEmpty: true }),
         }
 
+        // deduplicate: if a newer request for the same field arrives before this
+        // one resolves, discard this response
+        let seq = (this.#actionOnChangeSeq.get(field.name) || 0) + 1
+        this.#actionOnChangeSeq.set(field.name, seq)
+
         let fields = this.fields
 
         return this.content.requestUpdate(request)
         .then((doc) => {
+            if (this.#actionOnChangeSeq.get(field.name) !== seq) return null
             // replace fields in case the response contains an updated version
             for (const newField of this.#prepareFields(doc.fields)) {
                 for (const oldField of fields) {
