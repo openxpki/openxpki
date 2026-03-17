@@ -664,9 +664,17 @@ div.oxifield-upload {
 .oxi-btn-terminate {
   background-color: var(--oxi-btn-bg);
 
-  &:hover, &:active, &.active {
+  &:hover, &:active, &.active, &:focus-visible {
     background-color: var(--oxi-btn-bg);
     background-image: linear-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0.3));
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 0px #fff, 0 0 0 4px rgba(61, 133, 184, 0.7);
+    [data-bs-theme=dark] & {
+      box-shadow: 0 0 0 0px #222, 0 0 0 4px rgba(42, 84, 122, 0.8);
+    }
   }
 }
 
