@@ -581,7 +581,7 @@ form div.required label.col-form-label {
   color: var(--oxi-form-input-color);
   border-width: 1px;
   border-style: solid;
-  div:not(.optional) & {
+  div:not(.optional) &:not([disabled]) {
     form:not(.was-validated) & {
         border-color: #444;     [data-bs-theme=dark] & { border-color: #4d4d4d; }
     }
@@ -590,23 +590,21 @@ form div.required label.col-form-label {
     &:autofill { background-color: var(--oxi-form-input-required-bg-color) !important; }
     &:-webkit-autofill { -webkit-box-shadow: 0 0 0 1000px var(--oxi-form-input-required-bg-color) inset !important; }
   }
-  div.optional & {
+  div.optional &:not([disabled]) {
     form:not(.was-validated) & {
         border-color: #888;     [data-bs-theme=dark] & { border-color: #757575; }
     }
-    border-style: dotted;
     background-color: var(--oxi-form-input-optional-bg-color);
     /* Override browser autofill background (Firefox / Chrome — must be separate rules, not comma-combined) */
     &:autofill { background-color: var(--oxi-form-input-optional-bg-color) !important; }
     &:-webkit-autofill { -webkit-box-shadow: 0 0 0 1000px var(--oxi-form-input-optional-bg-color) inset !important; }
   }
+}
 
-  input.form-control[disabled],
-  select.form-control[disabled],
-  .choices:has(select.form-control[disabled]):not(.oxi-inline-select), /* Choices.js */
-  textarea.form-control[disabled] {
-    border-color: #ccc;         [data-bs-theme=dark] & { border-color: #333; }
-  }
+.choices:has(select.form-control[disabled]):not(.oxi-inline-select), /* Choices.js */
+.form-control[disabled] {
+  background-color: transparent;
+  border-color: #ddd;           [data-bs-theme=dark] & { border-color: #333; }
 }
 
 .oxi-checkbox {
