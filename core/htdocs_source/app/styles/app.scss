@@ -654,31 +654,74 @@ div.oxifield-upload {
  * Buttons
  */
 
-/* --- Per-button base colors as CSS custom properties --- */
+/* --- Named button background colors (light / dark) --- */
+
+:root {
+  --oxi-btn-bg-primary:     #3d85b8;
+  --oxi-btn-bg-submit:      #c5dfa8;
+  --oxi-btn-bg-info:        #e0e0d6;
+  --oxi-btn-bg-cancel:      #e6a8a8;
+  --oxi-btn-bg-alternative: #f4e9cf;
+  --oxi-btn-bg-exceptional: #8dc8e8;
+  --oxi-btn-bg-terminate:   #ba8eb6;
+}
+
+[data-bs-theme=dark] {
+  --oxi-btn-bg-primary:     #4a8fca;
+  --oxi-btn-bg-submit:      #3e5b23;
+  --oxi-btn-bg-info:        #3d3d3d;
+  --oxi-btn-bg-cancel:      #613434;
+  --oxi-btn-bg-alternative: #524628;
+  --oxi-btn-bg-exceptional: #165570;
+  --oxi-btn-bg-terminate:   #674569;
+}
+
+/* --- Map button classes to named background colors --- */
 
 /* Solid (dark bg, white text) */
 .oxi-btn-primary,
-.btn-primary         { --oxi-btn-bg: #3d85b8; [data-bs-theme=dark] & { --oxi-btn-bg: #4a8fca; } }
+.btn-primary         { background-color: var(--oxi-btn-bg-primary); }
 
 /* Pastel (light bg, dark text) */
 .oxi-btn-expected,
-.oxi-btn-submit      { --oxi-btn-bg: #c5dfa8; [data-bs-theme=dark] & { --oxi-btn-bg: #3e5b23; } }
+.oxi-btn-submit      { background-color: var(--oxi-btn-bg-submit); }
 
 .oxi-btn-optional,
-.oxi-btn-info        { --oxi-btn-bg: #e0e0d6; [data-bs-theme=dark] & { --oxi-btn-bg: #3d3d3d; } }
+.oxi-btn-info        { background-color: var(--oxi-btn-bg-info); }
 
 .oxi-btn-failure,
-.oxi-btn-cancel      { --oxi-btn-bg: #e6a8a8; [data-bs-theme=dark] & { --oxi-btn-bg: #613434; } }
+.oxi-btn-cancel      { background-color: var(--oxi-btn-bg-cancel); }
 
 .oxi-btn-reset,
-.oxi-btn-alternative { --oxi-btn-bg: #f4e9cf; [data-bs-theme=dark] & { --oxi-btn-bg: #524628; } }
+.oxi-btn-alternative { background-color: var(--oxi-btn-bg-alternative); }
 
 .oxi-btn-exceptional,
-.oxi-btn-loading     { --oxi-btn-bg: #8dc8e8; [data-bs-theme=dark] & { --oxi-btn-bg: #165570; } }
+.oxi-btn-loading     { background-color: var(--oxi-btn-bg-exceptional); }
 
-.oxi-btn-terminate   { --oxi-btn-bg: #ba8eb6; [data-bs-theme=dark] & { --oxi-btn-bg: #674569; } }
+.oxi-btn-terminate   { background-color: var(--oxi-btn-bg-terminate); }
 
-/* --- Shared: apply background and lit-up hover via brightness filter --- */
+/* Clone add/remove buttons — subtle variants of exceptional (blue) / cancel (red) */
+.oxi-clone-add {
+  background-color: color-mix(in srgb, var(--oxi-btn-bg-exceptional) 50%, white);
+  color: #1a5276 !important;
+  border-color: var(--oxi-btn-bg-exceptional) !important;
+  [data-bs-theme=dark] & {
+    background-color: color-mix(in srgb, var(--oxi-btn-bg-exceptional) 50%, black);
+    color: #8dc8e8 !important;
+  }
+}
+
+.oxi-clone-del {
+  background-color: color-mix(in srgb, var(--oxi-btn-bg-cancel) 50%, white);
+  color: #7a2020 !important;
+  border-color: var(--oxi-btn-bg-cancel) !important;
+  [data-bs-theme=dark] & {
+    background-color: color-mix(in srgb, var(--oxi-btn-bg-cancel) 50%, black);
+    color: #e6a8a8 !important;
+  }
+}
+
+/* --- Shared: hover brightens via overlay --- */
 
 .oxi-btn-primary,     .btn-primary,
 .oxi-btn-expected,    .oxi-btn-submit,
@@ -686,11 +729,10 @@ div.oxifield-upload {
 .oxi-btn-failure,     .oxi-btn-cancel,
 .oxi-btn-reset,       .oxi-btn-alternative,
 .oxi-btn-exceptional, .oxi-btn-loading,
-.oxi-btn-terminate {
-  background-color: var(--oxi-btn-bg);
+.oxi-btn-terminate,
+.oxi-clone-add,       .oxi-clone-del {
 
   &:hover, &:active, &.active, &:focus-visible {
-    background-color: var(--oxi-btn-bg);
     background-image: linear-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0.3));
   }
 
