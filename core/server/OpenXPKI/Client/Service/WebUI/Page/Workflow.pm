@@ -574,6 +574,7 @@ sub render_from_workflow {
             breadcrumb => $self->__get_breadcrumb($wf_info),
             description => $self->__get_templated_description($wf_info, $wf_info->{state}),
             css_class => 'workflow workflow-page ' . ($wf_info->{state}->{uiclass} || ''),
+            workflow_state => $wf_info->{workflow}->{state},
             OpenXPKI::Util->is_regular_workflow($wf_id) ? (
                 canonical_uri => "workflow!load!wf_id!${wf_id}",
                 workflow_id => $wf_id,

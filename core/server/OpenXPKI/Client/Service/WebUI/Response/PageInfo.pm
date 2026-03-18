@@ -41,6 +41,11 @@ has 'workflow_id' => (
     isa => 'Str',
 );
 
+has 'workflow_state' => (
+    is => 'rw',
+    isa => 'Str',
+);
+
 # only for popups
 has 'large' => (
     is => 'rw',
