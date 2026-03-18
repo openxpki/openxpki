@@ -31,6 +31,12 @@ msgstr "アカウントキー"
 msgid "I18N_OPENXPKI_UI_ACCOUNT_STATUS_LABEL"
 msgstr "アカウント状態"
 
+msgid "I18N_OPENXPKI_UI_ACME_ACCOUNT_EAB_INFO_LABEL"
+msgstr "EAB情報"
+
+msgid "I18N_OPENXPKI_UI_ACME_ACCOUNT_EAB_KID_LABEL"
+msgstr "EABキーID"
+
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "リクエストされたアクションが見つかりません"
 
@@ -905,6 +911,9 @@ msgstr "同じ最終/最新更新情報である発行者のCRLが存在しま�
 msgid "I18N_OPENXPKI_UI_IMPORT_CRL_ISSUER_NOT_FOUND"
 msgstr "CRLの発行者証明書を見つけることができません"
 
+msgid "I18N_OPENXPKI_UI_INVALIDITY_TIME_OUTSIDE_VALIDITY_WINDOW"
+msgstr "無効時刻が証明書の有効期間外です"
+
 msgid "I18N_OPENXPKI_UI_INVALID_PROFILE"
 msgstr "無効なプロファイル"
 
@@ -1428,10 +1437,6 @@ msgstr "システムに最も適したホスト名（ドメイン名）を入力
 
 msgid "I18N_OPENXPKI_UI_PROFILE_IMPORTED_LABEL"
 msgstr "インポート済み証明書"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_LABEL"
-msgstr "IoTデバイス"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_STYLE_DESC"
 msgstr ""
@@ -2864,6 +2869,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_TOOLTIP"
 msgstr "所定の日時に失効が予定されている"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ELIGIBILITY_RESULT_LABEL"
+msgstr "資格確認結果"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EMAIL_DESC"
 msgstr "Eメール"
 
@@ -2976,6 +2984,9 @@ msgstr ""
 "the subject and will show them in a drop down list below. Select the needed "
 "certificate from the list by clicking on it. Note that the search function "
 "requires a minimum of three letters."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_ELIGIBLE_LABEL"
+msgstr "資格あり"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_REPLACE_LABEL"
 msgstr "更新"
@@ -3265,6 +3276,25 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REQUEST_MODE_LABEL"
 msgstr "リクエストモード"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_QUEUE_LABEL"
+msgstr "失効キュー"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT_REPLACE"
+msgstr "証明書を失効する理由を指定します。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
+msgstr "証明書を失効する理由を指定します。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_COMPROMISE"
+msgstr "証明書鍵が漏洩しました"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_LOST"
+msgstr "証明書を失効する理由を指定します。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_TIME_DESC"
 msgstr "失効日を未来の日付にする場合に設定します。"
@@ -3727,6 +3757,9 @@ msgstr "参照日"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_COUNT"
 msgstr "有効な証明書"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_DISTINCT"
+msgstr "有効な個別の件名"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_DISTINTCT"
 msgstr "有効な個別の件名"
@@ -4576,3 +4609,7 @@ msgstr "実行"
 
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "はい"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_LABEL"
+#~ msgstr "IoTデバイス"

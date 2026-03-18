@@ -10,8 +10,8 @@ msgstr ""
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
 "PO-Revision-Date: 2016-03-25 14:42+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
-"Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
-"net>\n"
+"Language-Team: OpenXPKI developers list <openxpki-"
+"devel@lists.sourceforge.net>\n"
 "Language: it_IT\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -43,6 +43,12 @@ msgstr "Retries"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_ACCOUNT_STATUS_LABEL"
 msgstr "Stato"
+
+msgid "I18N_OPENXPKI_UI_ACME_ACCOUNT_EAB_INFO_LABEL"
+msgstr "Informazioni EAB"
+
+msgid "I18N_OPENXPKI_UI_ACME_ACCOUNT_EAB_KID_LABEL"
+msgstr "EAB Key ID"
 
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "Azione richiesta non trovata"
@@ -1176,6 +1182,11 @@ msgstr "mostra le liste di revoca precedenti"
 msgid "I18N_OPENXPKI_UI_IMPORT_CRL_ISSUER_NOT_FOUND"
 msgstr "Pagina richiesta non trovata"
 
+msgid "I18N_OPENXPKI_UI_INVALIDITY_TIME_OUTSIDE_VALIDITY_WINDOW"
+msgstr ""
+"Il tempo di invalidità è al di fuori della finestra di validità del "
+"certificato"
+
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_INVALID_PROFILE"
 msgstr "Numero di serie del certificato"
@@ -1825,10 +1836,6 @@ msgid "I18N_OPENXPKI_UI_PROFILE_IMPORTED_LABEL"
 msgstr "Token Datasafe"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_LABEL"
-msgstr "Extended naming (expert use only)"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_STYLE_DESC"
 msgstr "Stile denominazione avanzato"
 
@@ -2268,8 +2275,9 @@ msgstr ""
 "Thank you for using OpenXPKI - for support and announcements please "
 "subscribe to our <a href=\"https://lists.sourceforge.net/lists/listinfo/"
 "openxpki-users\">mailinglist</a>.<br> If you need help with your setup or "
-"commercial support, please contact <a href=\"mailto:"
-"openxpki@whiterabbitsecurity.com\">openxpki@whiterabbitsecurity.com.</a>"
+"commercial support, please contact <a "
+"href=\"mailto:openxpki@whiterabbitsecurity.com\">openxpki@whiterabbitsecurity.com."
+"</a>"
 
 # Remove?
 #, fuzzy
@@ -3493,6 +3501,9 @@ msgstr "Creator"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_TOOLTIP"
 msgstr "Creator"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ELIGIBILITY_RESULT_LABEL"
+msgstr "Risultato Idoneità"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EMAIL_DESC"
 msgstr "Email"
 
@@ -3616,6 +3627,9 @@ msgstr ""
 "termini inseriti e li mostrerà in una lista a scorrimento verticale. "
 "Seleziona il certificato cliccando sull’elemento della lista."
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_ELIGIBLE_LABEL"
+msgstr "È Idoneo"
+
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_REPLACE_LABEL"
 msgstr "Informazioni Richiedente"
@@ -3725,10 +3739,10 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_DESC"
 msgstr ""
-"Usa il calendario o inserisci la data Non_Prima_Del in formato <tt>MM.GG."
-"AAAA HH:MM</tt>. Se non inserisci un orario, verrà inserita la mezzanotte "
-"(inizio del giorno inserito). Per ripristinare il campo al valore auto, "
-"azzera il campo oppure inserisci 0 (zero)."
+"Usa il calendario o inserisci la data Non_Prima_Del in formato "
+"<tt>MM.GG.AAAA HH:MM</tt>. Se non inserisci un orario, verrà inserita la "
+"mezzanotte (inizio del giorno inserito). Per ripristinare il campo al valore "
+"auto, azzera il campo oppure inserisci 0 (zero)."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_LABEL"
 msgstr "Non Valido Prima Del"
@@ -3948,6 +3962,29 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REQUEST_MODE_LABEL"
 msgstr "Codice Motivazione"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_QUEUE_LABEL"
+msgstr "Coda di Revoca"
+
+# This is just a prefix
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT_REPLACE"
+msgstr ""
+"Ulteriori informazioni utili a spiegare il motivo della richiesta di revoca."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
+msgstr "non specificato / altra ragione"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_COMPROMISE"
+msgstr "la chiave del certificato è stata compromessa"
+
+# This is just a prefix
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_LOST"
+msgstr ""
+"Ulteriori informazioni utili a spiegare il motivo della richiesta di revoca."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_TIME_DESC"
@@ -4480,6 +4517,9 @@ msgstr "Data Riferimento"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_COUNT"
 msgstr "Certificati Validi"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_DISTINCT"
+msgstr "Soggetti Distinti Validi"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_DISTINTCT"
 msgstr "Soggetti Distinti Validi"
@@ -5505,6 +5545,10 @@ msgstr "Sì"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
 #~ msgstr "Seleziona prima un profilo nel campo soprastante"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_LABEL"
+#~ msgstr "Extended naming (expert use only)"
 
 # Remove?
 #, fuzzy

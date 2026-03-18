@@ -41,6 +41,12 @@ msgstr "Дочерние технологические процессы"
 msgid "I18N_OPENXPKI_UI_ACCOUNT_STATUS_LABEL"
 msgstr "Дочерние технологические процессы"
 
+msgid "I18N_OPENXPKI_UI_ACME_ACCOUNT_EAB_INFO_LABEL"
+msgstr "EAB информация"
+
+msgid "I18N_OPENXPKI_UI_ACME_ACCOUNT_EAB_KID_LABEL"
+msgstr "EAB идентификатор ключа"
+
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "Тестировщик"
@@ -1161,6 +1167,9 @@ msgstr "Действителен"
 msgid "I18N_OPENXPKI_UI_IMPORT_CRL_ISSUER_NOT_FOUND"
 msgstr "Тестировщик"
 
+msgid "I18N_OPENXPKI_UI_INVALIDITY_TIME_OUTSIDE_VALIDITY_WINDOW"
+msgstr "Время недействительности выходит за пределы срока действия сертификата"
+
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_INVALID_PROFILE"
 msgstr "Изменить профиль сертификата "
@@ -1910,10 +1919,6 @@ msgid "I18N_OPENXPKI_UI_PROFILE_IMPORTED_LABEL"
 msgstr "Профиль TLS сервера "
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_LABEL"
-msgstr "Расширенный профиль"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_STYLE_DESC"
 msgstr "Расширенный профиль"
 
@@ -2051,14 +2056,14 @@ msgstr "Профиль пользователя"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_DNS_DESCRIPTION"
 msgstr ""
-"DNS-имя - это мнемоническая запись адреса компьютера в сети. Например: www."
-"openxpki.org"
+"DNS-имя - это мнемоническая запись адреса компьютера в сети. Например: "
+"www.openxpki.org"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_DNS_WILDCARD_DESCRIPTION"
 msgstr ""
-"DNS-имя - это мнемоническая запись адреса компьютера в сети. Например: www."
-"openxpki.org"
+"DNS-имя - это мнемоническая запись адреса компьютера в сети. Например: "
+"www.openxpki.org"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_IP"
@@ -2445,8 +2450,9 @@ msgstr ""
 "Thank you for using OpenXPKI - for support and announcements please "
 "subscribe to our <a href=\"https://lists.sourceforge.net/lists/listinfo/"
 "openxpki-users\">mailinglist</a>.<br> If you need help with your setup or "
-"commercial support, please contact <a href=\"mailto:"
-"openxpki@whiterabbitsecurity.com\">openxpki@whiterabbitsecurity.com.</a>"
+"commercial support, please contact <a "
+"href=\"mailto:openxpki@whiterabbitsecurity.com\">openxpki@whiterabbitsecurity.com."
+"</a>"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_SYSTEM_VERSION_STATUS_LABEL"
@@ -3731,6 +3737,9 @@ msgstr "Пауза"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_TOOLTIP"
 msgstr "Пауза"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ELIGIBILITY_RESULT_LABEL"
+msgstr "Результат проверки права"
+
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EMAIL_DESC"
 msgstr "Дочерние технологические процессы"
@@ -3859,6 +3868,9 @@ msgstr "Отклонить заявку на сертификат"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ISSUER_IDENTIFIER_TOOLTIP"
 msgstr "Идентификатор сертификата"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_ELIGIBLE_LABEL"
+msgstr "Имеет право"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_REPLACE_LABEL"
@@ -4254,6 +4266,25 @@ msgstr "SPKAC строка пуста."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REQUEST_MODE_LABEL"
+msgstr "SPKAC-строка пуста."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_QUEUE_LABEL"
+msgstr "Очередь отзыва"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT_REPLACE"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_COMPROMISE"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_LOST"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
@@ -4868,6 +4899,9 @@ msgstr "Экспорт"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_COUNT"
 msgstr "Экспорт"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_DISTINCT"
+msgstr "Действительные уникальные субъекты"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_DISTINTCT"
@@ -5914,6 +5948,10 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
 #~ msgstr "Профиль пользователя"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_LABEL"
+#~ msgstr "Расширенный профиль"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_USER_ADD_USER"
