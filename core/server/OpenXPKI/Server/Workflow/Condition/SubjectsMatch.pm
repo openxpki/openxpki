@@ -34,6 +34,9 @@ sub _evaluate {
 
         $subject1 = $dn1{CN}[0];
         $subject2 = $dn2{CN}[0];
+
+        condition_error('subject match subject1 has no CN') unless($subject1);
+        condition_error('subject match subject2 has no CN') unless($subject2);
     }
 
     if (!$subject1 || $subject1 ne $subject2) {
