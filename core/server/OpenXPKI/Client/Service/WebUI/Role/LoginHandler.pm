@@ -352,8 +352,7 @@ sub handle_login ($self, $page, $action, $reply) {
             } else {
                 $self->log->error('No ENV data to perform SSO Login');
                 $self->logout_session;
-                $uilogin->init_login_missing_data;
-                return $uilogin;
+                return $uilogin->init_login_missing_data;
             }
 
         } elsif ( $login_type eq 'X509' ) {
@@ -380,8 +379,7 @@ sub handle_login ($self, $page, $action, $reply) {
             } else {
                 $self->log->error('Certificate missing for X509 Login');
                 $self->logout_session;
-                $uilogin->init_login_missing_data;
-                return $uilogin;
+                return $uilogin->init_login_missing_data;
             }
 
         } elsif( $login_type  eq 'OIDC' ) {

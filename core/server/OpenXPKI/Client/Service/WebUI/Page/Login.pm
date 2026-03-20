@@ -78,6 +78,8 @@ sub init_auth_stack ($self, $stacks) {
                 data => \@stackdesc
         }});
     }
+
+    return $self;
 }
 
 sub init_login_passwd ($self, $args) {
@@ -99,6 +101,8 @@ sub init_login_passwd ($self, $args) {
         buttons => [{ label => 'I18N_OPENXPKI_UI_LOGIN_ABORT_BUTTON', page => 'logout', format => 'failure' }],
     );
     $form->add_field(%{ $_ }) for @{ $args->{field} };
+
+    return $self;
 }
 
 sub init_login_missing_data ($self) {
@@ -111,6 +115,8 @@ sub init_login_missing_data ($self) {
             description => 'I18N_OPENXPKI_UI_LOGIN_NO_DATA_PAGE'
         }
     });
+
+    return $self;
 }
 
 sub init_logout ($self, $args = {}) {
@@ -123,10 +129,14 @@ sub init_logout ($self, $args = {}) {
             description => 'I18N_OPENXPKI_UI_HOME_LOGOUT_PAGE'
         }
     });
+
+    return $self;
 }
 
 sub init_index ($self, $args = {}) {
     $self->redirect->to('redirect!welcome');
+
+    return $self;
 }
 
 __PACKAGE__->meta->make_immutable;
