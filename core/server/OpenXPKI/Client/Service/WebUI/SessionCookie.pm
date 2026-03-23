@@ -139,6 +139,7 @@ sub as_mojo_cookies ($self, $session) {
     if (not $self->request->cookie('oxi-extid')) {
         push @result, Mojo::Cookie::Response->new(
             name => 'oxi-extid',
+            path => '/',
             value => Data::UUID->new->create_b64,
             samesite => 'Lax',
             secure => (($self->request->is_secure and not $self->insecure) ? 1 : 0),

@@ -28,6 +28,7 @@ use MIME::Base64 qw( encode_base64 );
 
 # CPAN modules
 use Crypt::JWT qw( encode_jwt decode_jwt );
+use URI::Escape;
 
 # Project modules
 use OpenXPKI::Client::Service::WebUI::Page::Login;
@@ -461,12 +462,13 @@ sub handle_login ($self, $page, $action, $reply) {
                     # TODO - this is only set if we had a roundtrip before
                     # move this into the session
                     my $hash_key = $self->request->cookie('oxi-extid');
+                    die "No external key to prepare OIDC" unless($hash_key);
                     my $auth_token = {
                         response_type => 'code',
                         client_id => $oidc_client{client_id},
                         scope => ($auth->{scope} || 'openid profile email'),
                         redirect_uri => $redirect_uri.'/oidc_redirect',
-                        state => encode_jwt( alg => 'HS256', key => $hash_key, payload => {
+                        state => encode_jwt( alg => 'HS256', key => $hash_key->value, payload => {
                             session_id => $sess_id,
                             baseurl => $redirect_uri,
                         }),
