@@ -1643,7 +1643,7 @@ if ($cmd eq 'initdb') {
     }
 
     my $raw = freeze($config->_config());
-    open FILE, ">", $target || die "Unable to open/write to $target\n";
+    open(my $fh, ">", $target) or die "Unable to open/write to $target\n";
     # Signed config
     if ($params{key} && $params{cert}) {
         my $FileUtils = OpenXPKI::FileUtils->new;
@@ -1677,11 +1677,11 @@ if ($cmd eq 'initdb') {
         my $pkcs7  = $FileUtils->read_file($outfile);
         # replace headers
         $pkcs7 =~ s{-----(BEGIN|END)[^-]+-----}{-----$1 OPENXPKI SIGNED CONFIG V1-----}g;
-        print FILE $pkcs7;
+        print $fh $pkcs7;
     } else {
-        print FILE "-----BEGIN OPENXPKI CONFIG V1 -----\n".encode_base64($raw)."-----END OPENXPKI CONFIG V1-----";
+        print $fh "-----BEGIN OPENXPKI CONFIG V1 -----\n".encode_base64($raw)."-----END OPENXPKI CONFIG V1-----";
     }
-    close (FILE);
+    close($fh);
 
     print "File written to $target\nConfig hash is " . Digest::SHA::sha256_hex($raw) . "\n";
 

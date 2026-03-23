@@ -367,25 +367,25 @@ if ($res->state == 200) {
 
     # redirect output if needed
     my $outfile = $opt{out} || '/dev/stdout';
-    open(OUT, '>', $outfile) || die "unable to write to outfile at $outfile\n";
+    open(my $OUT, '>', $outfile) || die "unable to write to outfile at $outfile\n";
 
     # output plain strings as is and ignore format flags
     if (ref $out eq '')  {
         $out = OpenXPKI::i18n::i18nTokenizer($out);
         chomp $out;
-        say OUT $out;
+        say $OUT $out;
         exit 0;
     }
 
     # run i18 translater on structure
     $out = OpenXPKI::i18n::i18n_walk($out);
     if ($opt{'json-pretty'}) {
-        print OUT $json->pretty()->encode($out);
+        print $OUT $json->pretty()->encode($out);
     } elsif ($opt{'json'}) {
-        print OUT $json->encode($out);
+        print $OUT $json->encode($out);
     } else {
         my $ypp = YAML::PP->new( schema => [qw/ + Perl tags=!perl / ]);
-        print OUT $ypp->dump_string($out);
+        print $OUT $ypp->dump_string($out);
     }
     exit 0;
 

@@ -89,9 +89,9 @@ sub output {
         next unless defined ($msg->{result}->{$key});
         -e $value && die "fileout output file exists ($value)\n";
 
-        if (open (OUT, ">", $value)) {
-            print OUT $msg->{result}->{$key};
-            close OUT;
+        if (open(my $fh, ">", $value)) {
+            print $fh $msg->{result}->{$key};
+            close $fh;
         } else {
             warn "Unable to open fileout file $value for $key!";
         }
@@ -100,9 +100,9 @@ sub output {
     return unless($output);
 
     if ($params{out}) {
-        if (open (OUT, ">", $params{out})) {
-            print OUT $output;
-            close OUT;
+        if (open(my $fh, ">", $params{out})) {
+            print $fh $output;
+            close $fh;
             print "Wrote result to " .$params{out}."\n";
         } else {
             warn "Unable to open output file!";
