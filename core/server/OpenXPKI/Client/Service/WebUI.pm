@@ -774,9 +774,8 @@ sub op_handlers {
             return $self->response;
         },
         'oidc_redirect' => sub ($self) {
-            my $headers = $self->response->headers;
-            $headers->add('X-Content-Type-Options' => 'nosniff');
-            $headers->strict_transport_security('max-age=31536000');
+            $self->response->set_header('strict-transport-security' => 'max-age=31536000');
+            $self->response->set_header('x-content-type-options' => 'nosniff');
 
             my $page = $self->handle_oidc;
             $self->response->result($page);
