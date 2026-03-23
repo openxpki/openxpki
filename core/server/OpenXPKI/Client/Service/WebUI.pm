@@ -48,9 +48,17 @@ Config values: C<session.cookey> aka. C<session.cookie_secret>
 has cipher => (
     init_arg => undef, # set in BUILD
     is => 'rw',
-    isa => 'Crypt::CBC',
-    predicate => 'has_cipher',
+    lazy => 1,
+    isa => 'Crypt::CBC|Undef',
+    builder => '_get_cipher',
 );
+
+# Autobuilder is required for OIDC session restore but attribute
+# can be undef in case encryption is not configured
+sub has_cipher {
+    my $cipher = shift->cipher();
+    return (defined $cipher);
+}
 
 =head2 auth
 
@@ -126,10 +134,12 @@ sub _build_session ($self) {
             # wrapped into a HMAC JWT using the extid cookie
             $self->log->debug('Restore session from OIDC redirect');
             my $hash_key = $self->request->cookie('oxi-extid') || die 'Unable to find CSRF cookie';
-            my $state = decode_jwt( key => $hash_key, token => $oidc_state );
+            my $state = decode_jwt( key => $hash_key->value, token => $oidc_state );
             $self->log->trace('Decoded state = ' . Dumper $state) if $self->log->is_trace;
             $id = $state->{session_id};
             $id = $self->cipher->decrypt(decode_base64($id)) if $self->has_cipher;
+
+            $self->log->trace('Decoded Frontend Session ID: ' . $id);
             # TODO - need to handle errors here!
         }
         catch ($err) {
@@ -527,10 +537,8 @@ sub BUILD ($self, $args) {
 
     $self->log->trace('Request cookies: ' . ($self->request->headers->cookie // '(none)')) if $self->log->is_trace;
 
-    # Cookie cipher
-    if (my $cipher = $self->_get_cipher) {
-        $self->cipher($cipher);
-    }
+    # Init Cookie cipher
+    $self->cipher();
 
     # TODO Rework auth.sign.key handling
     # The key is used to sign non-password auth requests.
@@ -628,6 +636,12 @@ sub _get_cipher ($self) {
 # required by OpenXPKI::Client::Service::Role::Info
 sub declare_routes ($r) {
     # WebUI URLs as of 3.26
+    $r->any(['GET'] => '/webui/<realm>/oidc_redirect')->to(
+        service_class => __PACKAGE__,
+        endpoint => 'default',
+        operation => 'oidc_redirect',
+    );
+
     $r->any('/webui/<realm>')->to(
         service_class => __PACKAGE__,
         endpoint => 'default',
@@ -636,7 +650,7 @@ sub declare_routes ($r) {
 
 # required by OpenXPKI::Client::Service::Role::Base
 sub prepare ($self, $c) {
-    $self->operation('default');
+    $self->operation($c->stash('operation') // 'default');
 
     # set the method to generate URL paths
     # https://metacpan.org/pod/Mojolicious::Controller#url_for
@@ -759,6 +773,15 @@ sub op_handlers {
             $self->response->result($page);
             return $self->response;
         },
+        'oidc_redirect' => sub ($self) {
+            my $headers = $self->response->headers;
+            $headers->add('X-Content-Type-Options' => 'nosniff');
+            $headers->strict_transport_security('max-age=31536000');
+
+            my $page = $self->handle_oidc;
+            $self->response->result($page);
+            return $self->response;
+        },
     ];
 }
 
@@ -798,7 +821,7 @@ EOF
     }
 
     my $page = $response->result; # OpenXPKI::Client::Service::WebUI::Page
-    my $ui_resp = $page->ui_response; # OpenXPKI::Client::Service::WebUI::Response
+    my $ui_resp = $self->ui_response; # OpenXPKI::Client::Service::WebUI::Response
 
     $c->res->cookies($self->session_cookie->as_mojo_cookies($self->session)->@*);
 
@@ -946,6 +969,58 @@ sub handle_ui_request ($self) {
 
     # Handle login (from OpenXPKI::Client::Service::WebUI::Role::LoginHandler)
     return $self->handle_login($page || '', $action, $reply);
+}
+
+=head2 handle_oidc
+
+Handles the OIDC authorization code callback from the Identity Provider.
+
+Called when the IdP redirects the browser to C</webui/E<lt>realmE<gt>/oidc_redirect>.
+The frontend session (incl. C<backend_session_id>, C<oidc-nonce>) has already been
+restored from the JWT-encoded C<state> parameter by L</_build_session>.
+
+Establishes the backend connection and calls L</handle_login> directly with
+C<page='login'> to ensure the OIDC auth code (C<code> request parameter) is
+processed — bypassing the redirect-to-login early return that would happen with
+an empty page parameter.
+
+This approach is robust to expired backend sessions: if the backend session timed
+out during the IdP roundtrip, C<handle_login> re-runs realm/stack selection using
+values from the restored frontend session and eventually reaches C<GET_OIDC_LOGIN>
+again where the code exchange takes place.
+
+Returns an instance of L<OpenXPKI::Client::Service::WebUI::Page>.
+
+=cut
+sub handle_oidc ($self) {
+    $self->log->debug('Incoming OIDC redirect - processing auth code response');
+
+    my $new_page = sub ($cb) {
+        my $page = OpenXPKI::Client::Service::WebUI::Page->new(webui => $self);
+        $cb->($page);
+        return $page;
+    };
+
+    my $reply = $self->ping_client;
+
+    if ($reply->{SERVICE_MSG} eq 'START_SESSION') {
+        $reply = $self->client->init_session;
+        $self->log->debug('Init new backend session for OIDC callback');
+    }
+
+    if ($reply->{SERVICE_MSG} eq 'ERROR') {
+        return $new_page->(sub ($p) { $p->status->error($p->message_from_error_reply($reply)) });
+    }
+
+    # Propagate realm/stack from URL path detection into session so handle_login
+    # can set them on a freshly created backend session if needed
+    $self->session->param('pki_realm', $self->current_realm) if $self->has_current_realm;
+    $self->session->param('auth_stack', $self->current_auth_stack) if $self->has_current_auth_stack;
+
+    # Call handle_login with page='login' to reach the OIDC code-redemption branch.
+    # Without this, an empty page parameter would trigger an early return (redirect
+    # to login page) before the 'code' request parameter is ever examined.
+    return $self->handle_login('login', '', $reply);
 }
 
 =head2 ping_client
