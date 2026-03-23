@@ -501,6 +501,7 @@ tr.gridrow-danger:hover   > td { background-color: #e6c1c7 !important; }
   color: #c98200;       [data-bs-theme=dark] & { color: #da912b; }
 }
 
+.styled-skipped,
 .certstatus-expired {
   color: #444;          [data-bs-theme=dark] & { color: #888; }
 }
