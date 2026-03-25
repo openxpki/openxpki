@@ -156,121 +156,120 @@ sub handle_login ($self, $page, $action, $reply) {
 
     $self->log->debug(sprintf("Status: '%s'", $reply->{SERVICE_MSG}));
 
-    # Only one realm? Redirect in "path" mode
-    # (server skipped realm selection so we assume there is only one realm)
-    if (
-        'path' eq $self->realm_mode
-        and $self->is_realm_selection_page
-        and $reply->{SERVICE_MSG} eq 'GET_AUTHENTICATION_STACK'
-    ) {
-        # fetch realm name
-        $reply = $self->client->send_receive_service_msg('GET_REALM_LIST');
-        my $realm_list = $reply->{PARAMS};
+    if ( $reply->{SERVICE_MSG} eq 'GET_PKI_REALM') {
+        # store realm in backend session if given
+        if ($pki_realm) {
+            $self->log->debug("Set chosen pki_realm '$pki_realm' in backend session");
+            $reply = $self->client->send_receive_service_msg( 'GET_PKI_REALM', { PKI_REALM => $pki_realm } );
 
-        my $error;
-        if (scalar $realm_list->@* == 1) {
-            my $realm = $realm_list->[0]->{name};
-            if (my $paths = $self->realm_path_map->{$realm}) {
-                if (scalar $paths->@* == 1) {
-                    my $url = $paths->[0]->{url};
-                    $self->log->debug("Only one realm - redirect to: $url");
-                    $uilogin->redirect->external($url);
-                    return $uilogin;
-                } else {
-                    $error = "Non-decidable redirect: config service.webui.realm.map contains more than one URL path for realm '$realm'";
+        # show realm selection otherwise
+        } else {
+            $self->log->debug("No realm chosen, showing realm selection page");
+
+            my $realms = $reply->{PARAMS}->{PKI_REALMS};
+
+            my $safe_realm_str = sub {
+                my $r = lc(shift);
+                $r =~ s/[_\s]/-/g;
+                $r =~ s/[^a-z0-9-]//g;
+                $r =~ s/-+/-/g;
+                "oxi-realm-card-$r"
+            };
+
+            my @cards;
+            # "path" mode: realm cards are links to defined sub paths
+            if ('path' eq $self->realm_mode) {
+                # use webui config but only take realms known to the server:
+                my @realm_list =
+                    sort { lc($realms->{$a}->{LABEL}) cmp lc($realms->{$b}->{LABEL}) }
+                    grep { $realms->{$_} }
+                    keys $self->realm_path_map->%*;
+
+                # create a link for each <realm URL path> = <realm> + <auth stack>
+                for my $realm (@realm_list) {
+                    my $auth_stacks = $realms->{$realm}->{AUTH_STACKS};
+
+                    my @defs = $self->realm_path_map->{$realm}->@*;
+                    for my $def (@defs) {
+                        my $stack = $def->{stack};
+                        my $footer = $stack
+                            ? ($auth_stacks->{$stack} ? $auth_stacks->{$stack}->{label} : $stack)
+                            : '';
+                        push @cards, {
+                            label => $realms->{$realm}->{LABEL},
+                            description => $realms->{$realm}->{DESCRIPTION},
+                            footer => $footer,
+                            image => $realms->{$realm}->{IMAGE},
+                            color => $realms->{$realm}->{COLOR},
+                            css_class => $safe_realm_str->($realm),
+                            href => $def->{url},
+                        };
+                    }
                 }
+
+            # other modes: realm cards are actions that set the "pki_realm" parameter
             } else {
-                $error = "Missing redirect target: config service.webui.realm.map does not contain realm '$realm'";
-            }
-        } else {
-            $error = "Non-decidable redirect: server skipped realm selection but there is more than one realm";
-        }
-
-        $self->log->error($error);
-        $uilogin->status->error($error);
-        return $uilogin;
-    }
-
-    # store realm in backend session if it's set
-    if ( $reply->{SERVICE_MSG} eq 'GET_PKI_REALM' and $pki_realm) {
-        $self->log->debug("Set chosen pki_realm '$pki_realm' in backend session");
-        $reply = $self->client->send_receive_service_msg( 'GET_PKI_REALM', { PKI_REALM => $pki_realm } );
-    }
-
-    # if no realm set
-    if ( $reply->{SERVICE_MSG} eq 'GET_PKI_REALM' and not $pki_realm) {
-        $self->log->debug("No realm chosen, showing realm selection page");
-
-        my $realms = $reply->{PARAMS}->{PKI_REALMS};
-
-        my $safe_realm_str = sub {
-            my $r = lc(shift);
-            $r =~ s/[_\s]/-/g;
-            $r =~ s/[^a-z0-9-]//g;
-            $r =~ s/-+/-/g;
-            "oxi-realm-card-$r"
-        };
-
-        my @cards;
-        # "path" mode: realm cards are links to defined sub paths
-        if ('path' eq $self->realm_mode) {
-            # use webui config but only take realms known to the server:
-            my @realm_list =
-                sort { lc($realms->{$a}->{LABEL}) cmp lc($realms->{$b}->{LABEL}) }
-                grep { $realms->{$_} }
-                keys $self->realm_path_map->%*;
-
-            # create a link for each <realm URL path> = <realm> + <auth stack>
-            for my $realm (@realm_list) {
-                my $auth_stacks = $realms->{$realm}->{AUTH_STACKS};
-
-                my @defs = $self->realm_path_map->{$realm}->@*;
-                for my $def (@defs) {
-                    my $stack = $def->{stack};
-                    my $footer = $stack
-                        ? ($auth_stacks->{$stack} ? $auth_stacks->{$stack}->{label} : $stack)
-                        : '';
-                    push @cards, {
-                        label => $realms->{$realm}->{LABEL},
-                        description => $realms->{$realm}->{DESCRIPTION},
-                        footer => $footer,
-                        image => $realms->{$realm}->{IMAGE},
-                        color => $realms->{$realm}->{COLOR},
-                        css_class => $safe_realm_str->($realm),
-                        href => $def->{url},
-                    };
-                }
+                @cards =
+                    map { {
+                        label => $realms->{$_}->{LABEL},
+                        description => $realms->{$_}->{DESCRIPTION},
+                        image => $realms->{$_}->{IMAGE},
+                        color => $realms->{$_}->{COLOR},
+                        css_class => $safe_realm_str->($_),
+                        action => 'login!realm',
+                        action_params => {
+                            pki_realm => $realms->{$_}->{NAME},
+                        },
+                    } }
+                    sort { lc($realms->{$a}->{LABEL}) cmp lc($realms->{$b}->{LABEL}) }
+                    keys %{$realms};
             }
 
-        # other modes: realm cards are actions that set the "pki_realm" parameter
-        } else {
-            @cards =
-                map { {
-                    label => $realms->{$_}->{LABEL},
-                    description => $realms->{$_}->{DESCRIPTION},
-                    image => $realms->{$_}->{IMAGE},
-                    color => $realms->{$_}->{COLOR},
-                    css_class => $safe_realm_str->($_),
-                    action => 'login!realm',
-                    action_params => {
-                        pki_realm => $realms->{$_}->{NAME},
-                    },
-                } }
-                sort { lc($realms->{$a}->{LABEL}) cmp lc($realms->{$b}->{LABEL}) }
-                keys %{$realms};
+            $uilogin->init_realm_cards(\@cards, $self->realm_layout eq 'list' ? 1 : 0);
+            return $uilogin;
         }
-
-        $uilogin->init_realm_cards(\@cards, $self->realm_layout eq 'list' ? 1 : 0);
-        return $uilogin;
     }
 
     if ( $reply->{SERVICE_MSG} eq 'GET_AUTHENTICATION_STACK' ) {
-        # Never auth with an internal stack!
-        if ( $auth_stack && $auth_stack !~ /^_/) {
+        # Only one realmin "path" mode? Redirect to realm URL
+        # (server skipped GET_PKI_REALM so we assume there is only one realm)
+        if ('path' eq $self->realm_mode and $self->is_realm_selection_page) {
+            # fetch realm name
+            $reply = $self->client->send_receive_service_msg('GET_REALM_LIST');
+            my $realm_list = $reply->{PARAMS};
+
+            my $error;
+            if (scalar $realm_list->@* == 1) {
+                my $realm = $realm_list->[0]->{name};
+                if (my $paths = $self->realm_path_map->{$realm}) {
+                    if (scalar $paths->@* == 1) {
+                        my $url = $paths->[0]->{url};
+                        $self->log->debug("Only one realm - redirect to: $url");
+                        $uilogin->redirect->external($url);
+                        return $uilogin;
+                    } else {
+                        $error = "Non-decidable redirect: config service.webui.realm.map contains more than one URL path for realm '$realm'";
+                    }
+                } else {
+                    $error = "Missing redirect target: config service.webui.realm.map does not contain realm '$realm'";
+                }
+            } else {
+                $error = "Non-decidable redirect: server skipped realm selection but there is more than one realm";
+            }
+
+            $self->log->error($error);
+            $uilogin->status->error($error);
+            return $uilogin;
+        }
+
+        # store auth stack in backend session if given
+        if ( $auth_stack && $auth_stack !~ /^_/) { # "!~ /^_/" --> Never auth with an internal stack!
             $self->log->debug("Authentication stack: $auth_stack");
             $reply = $self->client->send_receive_service_msg( 'GET_AUTHENTICATION_STACK', {
                AUTHENTICATION_STACK => $auth_stack
             });
+
+        # show auth stack selection otherwise
         } else {
             my $stacks = $reply->{'PARAMS'}->{'AUTHENTICATION_STACKS'};
 
@@ -487,21 +486,21 @@ sub handle_login ($self, $page, $action, $reply) {
             # form send / credentials are passed (works with an empty form too...)
 
             if ($action eq 'login!password') {
-                $self->log->debug('Seems to be an auth try - validating');
+                $self->log->debug('PASSWD auth try - validating username/password');
                 ##FIXME - Input validation
 
                 my $data;
-                my @fields = $auth->{field} ?
-                    (map { $_->{name} } @{$auth->{field}}) :
-                    ('username','password');
+                my @fields = $auth->{field}
+                    ? (map { $_->{name} } $auth->{field}->@*)
+                    : ('username', 'password');
 
                 foreach my $field (@fields) {
                     my $val = $self->param($field);
-                    next unless ($val);
+                    next unless $val;
                     $data->{$field} = $val;
                 }
 
-                $data = $self->_jwt_signature($data, $jws) if ($jws);
+                $data = $self->_jwt_signature($data, $jws) if $jws;
 
                 $reply = $self->client->send_receive_service_msg( 'GET_PASSWD_LOGIN', $data );
                 $self->log->trace('Auth result ' . Dumper $reply) if $self->log->is_trace;
@@ -514,7 +513,7 @@ sub handle_login ($self, $page, $action, $reply) {
 
         } else {
 
-            $self->log->warn('Unknown login type ' . $login_type );
+            $self->log->warn("Unknown login type '$login_type'");
         }
     }
 
