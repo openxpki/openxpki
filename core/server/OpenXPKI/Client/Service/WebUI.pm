@@ -22,7 +22,6 @@ use List::Util qw ( max );
 # CPAN modules
 use Crypt::JWT qw( encode_jwt decode_jwt );
 use Crypt::CBC;
-use Crypt::PRNG;
 use List::MoreUtils qw( firstidx );
 use Log::Log4perl::MDC;
 use LWP::UserAgent;
@@ -1274,58 +1273,6 @@ sub _fetch_status {
 
     $self->log->debug("Set persisted status: " . $status->{message});
     return $status;
-}
-
-=head2 encrypt_jwt
-
-Encrypt the given data into a JWT using the encryption key stored in session
-parameter C<jwt_encryption_key> (key will be set to random value if it does not
-exist yet).
-
-=cut
-
-# required by OpenXPKI::Client::Service::WebUI::Page
-sub encrypt_jwt ($self, $value) {
-    my $key = $self->session->param('jwt_encryption_key');
-    if (not $key) {
-        $key = Crypt::PRNG::random_bytes(32);
-        $self->session->param('jwt_encryption_key', $key);
-    }
-
-    my $token = encode_jwt(
-        payload => $value,
-        enc => 'A256CBC-HS512',
-        alg => 'PBES2-HS512+A256KW', # uses "HMAC-SHA512" as the PRF and "AES256-WRAP" for the encryption scheme
-        key => $key, # can be any length for PBES2-HS512+A256KW
-        extra_headers => {
-            p2c => 8000, # PBES2 iteration count
-            p2s => 32,   # PBES2 salt length
-        },
-    );
-
-    return $token;
-}
-
-=head2 decrypt_jwt
-
-Decrypt the given JWT using the encryption key stored in session parameter
-C<jwt_encryption_key>.
-
-=cut
-
-# required by OpenXPKI::Client::Service::WebUI::Role::Request
-sub decrypt_jwt ($self, $token) {
-    return unless $token;
-
-    my $jwt_key = $self->session->param('jwt_encryption_key');
-    unless ($jwt_key) {
-        $self->log->debug("JWT encrypted parameter received but client session contains no decryption key");
-        return;
-    }
-
-    my $decrypted = decode_jwt(token => $token, key => $jwt_key);
-
-    return $decrypted;
 }
 
 __PACKAGE__->meta->make_immutable;

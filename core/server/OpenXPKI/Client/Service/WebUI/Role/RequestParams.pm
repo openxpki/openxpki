@@ -4,7 +4,7 @@ use namespace::autoclean;
 
 requires 'request';
 requires 'log';
-requires 'decrypt_jwt';
+requires 'session';
 requires 'json';
 
 =head1 NAME
@@ -30,6 +30,8 @@ use Carp qw( confess );
 use OpenXPKI::Dumper;
 use List::Util qw( first );
 
+# Project modules
+use OpenXPKI::Client::Service::WebUI::JWT;
 
 use constant PREFIX_BASE64 => '_encoded_base64_';
 use constant PREFIX_JWT => '_encrypted_jwt_';
@@ -270,7 +272,7 @@ sub _secure_params ($self, $key) {
     # cache miss - query parameter
     unless (defined $self->_secure_param_cache->{$key}) {
         # Decrypt JWT
-        my @values = map { $self->decrypt_jwt($_) } $self->_get_param_cache(PREFIX_JWT.$key);
+        my @values = map { OpenXPKI::Client::Service::WebUI::JWT->decrypt($self->session, $_) } $self->_get_param_cache(PREFIX_JWT.$key);
         $self->add_secure_params($key => \@values) if scalar @values;
         $self->log->trace($msg . 'not in cache. Query result: (' . join(', ', @values) . ')') if $self->log->is_trace;
     }

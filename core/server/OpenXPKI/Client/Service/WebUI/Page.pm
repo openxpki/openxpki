@@ -21,6 +21,7 @@ use Data::UUID;
 
 # Project modules
 use OpenXPKI::Serialization::Simple;
+use OpenXPKI::Client::Service::WebUI::JWT;
 use OpenXPKI::Client::Service::WebUI::Response;
 use OpenXPKI::Log4perl;
 
@@ -125,7 +126,6 @@ has webui => (
         param
         multi_param
         secure_param
-        encrypt_jwt
         script_url
         base_url
     ) ],
@@ -522,7 +522,7 @@ signature_for call_encrypted => (
     ],
 );
 sub call_encrypted ($self, $arg) {
-    my $token = $self->encrypt_jwt({
+    my $token = OpenXPKI::Client::Service::WebUI::JWT->encrypt($self->session, {
         page => $arg->page,
         secure_param => $arg->secure_param // {},
     });
@@ -1016,11 +1016,3 @@ sub transate_sql_wildcards  {
 }
 
 __PACKAGE__->meta->make_immutable;
-
-=pod
-
-=head2 encrypt_jwt
-
-Encrypt the given data into a JWT using the encryption key stored in session
-parameter C<jwt_encryption_key> (key will be set to random value if it does not
-exist yet).

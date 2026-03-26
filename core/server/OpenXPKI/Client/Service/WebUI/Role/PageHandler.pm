@@ -3,7 +3,7 @@ use OpenXPKI -role;
 use namespace::autoclean;
 
 requires 'log';
-requires 'decrypt_jwt';
+requires 'session';
 requires 'add_params';
 requires 'add_secure_params';
 
@@ -16,6 +16,7 @@ use Log::Log4perl::MDC;
 use URI::Escape;
 
 # Project modules
+use OpenXPKI::Client::Service::WebUI::JWT;
 use OpenXPKI::Client::Service::WebUI::Page::Bootstrap;
 
 signature_for handle_action => (
@@ -142,7 +143,8 @@ sub _load_page_class ($self, $arg) {
     if ($class eq 'encrypted') {
         # as the token has non-word characters the above regex does not contain the full payload
         # we therefore read the payload directly from call stripping the class name
-        my $decrypted = $self->decrypt_jwt($remainder) or return;
+        my $decrypted = OpenXPKI::Client::Service::WebUI::JWT->decrypt($self->session, $remainder)
+            or do { $self->log->debug("JWT encrypted parameter received but client session contains no decryption key"); return; };
         if ($decrypted->{page}) {
             $self->log->debug("Encrypted request with page " . $decrypted->{page});
             ($class, $method) = ($decrypted->{page} =~ /\A (\w+)\!? (\w+)? \z/xms);

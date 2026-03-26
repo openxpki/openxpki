@@ -128,6 +128,7 @@ OpenXPKI/Client/Web/Controller.pm
 
 # WebUI
 OpenXPKI/Client/Service/WebUI.pm
+OpenXPKI/Client/Service/WebUI/JWT.pm
 OpenXPKI/Client/Service/WebUI/LegacyCGISession.pm
 OpenXPKI/Client/Service/WebUI/Page.pm
 OpenXPKI/Client/Service/WebUI/Page/Bootstrap.pm
