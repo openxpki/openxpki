@@ -5,8 +5,6 @@ with qw(
     OpenXPKI::Client::Service::Role::Info
     OpenXPKI::Client::Service::Role::Base
     OpenXPKI::Client::Service::WebUI::Role::RequestParams
-    OpenXPKI::Client::Service::WebUI::Role::PageHandler
-    OpenXPKI::Client::Service::WebUI::Role::LoginHandler
 );
 
 =head1 NAME
@@ -24,7 +22,6 @@ use Crypt::JWT qw( encode_jwt decode_jwt );
 use Crypt::CBC;
 use List::MoreUtils qw( firstidx );
 use Log::Log4perl::MDC;
-use LWP::UserAgent;
 
 # Project modules
 use OpenXPKI::Client;
@@ -32,6 +29,8 @@ use OpenXPKI::Client::Service::WebUI::Response;
 use OpenXPKI::Client::Service::WebUI::Page;
 use OpenXPKI::Client::Service::WebUI::Session;
 use OpenXPKI::Client::Service::WebUI::SessionCookie;
+use OpenXPKI::Client::Service::WebUI::Auth;
+use OpenXPKI::Client::Service::WebUI::Dispatcher;
 use OpenXPKI::i18n qw( i18n_walk );
 
 =head1 ATTRIBUTES
@@ -62,10 +61,10 @@ sub has_cipher {
 =head2 auth
 
 Key I<Str> for JWT token used to sign socket communication during auth requests
-(see L<OpenXPKI::Client::Service::WebUI::Role::LoginHandler/handle_login>)
+(see L<OpenXPKI::Client::Service::WebUI::Auth/handle_login>)
 
 =cut
-sub auth; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+sub auth; # pre-declaration required before "has" so predicate sub has_auth is defined first
 sub has_auth;
 has auth => (
     init_arg => undef, # set in BUILD
@@ -110,7 +109,7 @@ Auto-created.
 Config values: C<session.driver>, C<session.params>, C<session.timeout>
 
 =cut
-sub session; # "stub" subroutine to satisfy OpenXPKI::Client::Service::WebUI::Role::Base; will be overwritten by attribute accessor later on
+sub session; # pre-declaration required so Role::Base requirement is met before attribute accessor is defined
 has session => (
     init_arg => undef,
     is => 'rw', # "rw" as it may be refreshed
@@ -368,7 +367,7 @@ Shortcut for config value C<realm.mode> to determine the current realm:
 C<"select">, C<"path"> or C<"hostname">. Default: C<"select">
 
 =cut
-sub realm_mode; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+sub realm_mode;
 has realm_mode => (
     init_arg => undef,
     is => 'ro',
@@ -436,7 +435,7 @@ C</cgi-bin/xxx> stripped off.
 E.g. C<"/webui/democa">
 
 =cut
-sub url_path; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+sub url_path;
 has url_path => (
     init_arg => undef,
     is => 'rw',
@@ -469,7 +468,7 @@ The base URL allows us to e.g. issue internal UI redirects (without specifying
 the full URL every time).
 
 =cut
-sub base_url; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+sub base_url;
 has base_url => (
     init_arg => undef,
     is => 'ro',
@@ -497,13 +496,43 @@ has base_url => (
     }
 );
 
+=head2 login_handler
+
+Instance of L<OpenXPKI::Client::Service::WebUI::Auth>. Auto-created.
+
+=cut
+has login_handler => (
+    init_arg => undef,
+    is => 'ro',
+    isa => 'OpenXPKI::Client::Service::WebUI::Auth',
+    lazy => 1,
+    default => sub ($self) {
+        OpenXPKI::Client::Service::WebUI::Auth->new(webui => $self)
+    },
+);
+
+=head2 dispatcher
+
+Instance of L<OpenXPKI::Client::Service::WebUI::Dispatcher>. Auto-created.
+
+=cut
+has dispatcher => (
+    init_arg => undef,
+    is => 'ro',
+    isa => 'OpenXPKI::Client::Service::WebUI::Dispatcher',
+    lazy => 1,
+    default => sub ($self) {
+        OpenXPKI::Client::Service::WebUI::Dispatcher->new(webui => $self)
+    },
+);
+
 =head2 response
 
 Generic HTTP response encapsulation (L<OpenXPKI::Client::Service::Response>).
 Auto-created.
 
 =cut
-sub response; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+sub response;
 has response => (
     init_arg => undef,
     is => 'ro',
@@ -521,7 +550,7 @@ specific JSON response. Auto-created, L</session_cookie> gets passed.
 
 =cut
 # Response structure (JSON or some raw bytes) and HTTP headers
-sub ui_response; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+sub ui_response;
 has ui_response => (
     init_arg => undef,
     is => 'ro',
@@ -543,7 +572,7 @@ L</ui_response> status to an error message.
 If the parameter is empty or not set an empty string is returned.
 
 =cut
-sub action; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+sub action;
 has action => (
     init_arg => undef,
     is => 'ro',
@@ -582,7 +611,7 @@ Contains the current realm if it could be detected from path or hostname or
 read from the client session.
 
 =cut
-sub current_realm; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+sub current_realm;
 has current_realm => (
     init_arg => undef,
     is => 'rw',
@@ -596,7 +625,7 @@ Contains the current stack name if it could be detected from path or hostname or
 read from the client session.
 
 =cut
-sub current_auth_stack; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+sub current_auth_stack;
 has current_auth_stack => (
     init_arg => undef,
     is => 'rw',
@@ -610,7 +639,7 @@ Set to C<1> if the current page is the realm selection page (I<realm_mode>
 C<"path"> only).
 
 =cut
-sub is_realm_selection_page; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+sub is_realm_selection_page;
 has is_realm_selection_page => (
     init_arg => undef,
     is => 'rw',
@@ -627,7 +656,7 @@ Mojolicious request's route (= the one defined in L</declare_routes>).
 
 =cut
 
-sub url_path_for; # "stub" subroutine to satisfy "requires" method checks of other consumed roles
+sub url_path_for;
 has '_url_path_for' => (
     init_arg => undef,
     is => 'rw',
@@ -1032,7 +1061,7 @@ sub handle_ui_request ($self) {
     # Handle logout / session restart
     # Do this before connecting the server to have the client in the
     # new session and to recover from backend session failure
-    if (my $logout_page = $self->handle_logout($page)) { # from OpenXPKI::Client::Service::WebUI::Role::LoginHandler
+    if (my $logout_page = $self->login_handler->handle_logout($page)) {
         return $logout_page;
     }
 
@@ -1074,9 +1103,9 @@ sub handle_ui_request ($self) {
     if ( $reply->{SERVICE_MSG} eq 'SERVICE_READY' or $page =~ /^bootstrap!(.+)/) {
         if ($action) {
             # Action is only valid within a post request
-            return $self->handle_action($action); # from OpenXPKI::Client::Service::WebUI::Role::PageHandler
+            return $self->dispatcher->action($action);
         } else {
-            return $self->handle_view($page || 'home'); # from OpenXPKI::Client::Service::WebUI::Role::PageHandler
+            return $self->dispatcher->view($page || 'home');
         }
     }
 
@@ -1084,8 +1113,7 @@ sub handle_ui_request ($self) {
     # we get the problem that ui is logged in but backend is not
     $self->logout_session if $self->session->param('is_logged_in');
 
-    # Handle login (from OpenXPKI::Client::Service::WebUI::Role::LoginHandler)
-    return $self->handle_login($page || '', $action, $reply);
+    return $self->login_handler->handle_login($page || '', $action, $reply);
 }
 
 =head2 handle_oidc
@@ -1137,7 +1165,7 @@ sub handle_oidc ($self) {
     # Call handle_login with page='login' to reach the OIDC code-redemption branch.
     # Without this, an empty page parameter would trigger an early return (redirect
     # to login page) before the 'code' request parameter is ever examined.
-    return $self->handle_login('login', '', $reply);
+    return $self->login_handler->handle_login('login', '', $reply);
 }
 
 =head2 ping_client

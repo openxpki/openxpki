@@ -500,7 +500,7 @@ Encrypt the given page and parameters using a JWT.
 
 Returns the page call URI consisting of the pseudo page named C<encrypted> and
 the JWT as single parameter that will be decoded in
-L<OpenXPKI::Client::Service::WebUI::Role::PageHandler/_load_page_class>.
+L<OpenXPKI::Client::Service::WebUI::Dispatcher/_load_page_class>.
 
 B<Named parameters>
 

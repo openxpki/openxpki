@@ -1,27 +1,6 @@
-package OpenXPKI::Client::Service::WebUI::Role::LoginHandler;
-use OpenXPKI -role;
+package OpenXPKI::Client::Service::WebUI::Auth;
+use OpenXPKI -class;
 use namespace::autoclean;
-
-requires qw(
-    log
-    config
-    session
-    request
-    client
-    realm_mode
-    auth
-    has_auth
-    current_realm
-    is_realm_selection_page
-    base_url
-
-    url_path_for
-    param
-    handle_view
-    logout_session
-    new_frontend_session
-    ping_client
-);
 
 # Core modules
 use Encode;
@@ -36,13 +15,37 @@ use OpenXPKI::Client::Service::WebUI::Page::Login;
 use OpenXPKI::Template;
 use OpenXPKI::Dumper;
 
+=head1 ATTRIBUTES
+
+=cut
+has webui => (
+    is => 'ro',
+    isa => 'OpenXPKI::Client::Service::WebUI',
+    required => 1,
+    weak_ref => 1,
+);
+
+=head2 log
+
+A logger object, per default set to C<OpenXPKI::Log4perl-E<gt>get_logger>.
+
+=cut
+has log => (
+    is => 'rw',
+    isa => duck_type( [qw(
+           trace    debug    info    warn    error    fatal
+        is_trace is_debug is_info is_warn is_error is_fatal
+    )] ),
+    lazy => 1,
+    default => sub { OpenXPKI::Log4perl->get_logger },
+);
 
 has login_page => (
     init_arg => undef,
     is => 'ro',
     isa => 'Str',
     lazy => 1,
-    default => sub ($self) { $self->config->get('login.page') || $self->config->get('global.loginpage') // '' },
+    default => sub ($self) { $self->webui->config->get('login.page') || $self->webui->config->get('global.loginpage') // '' },
 );
 
 has login_url => (
@@ -50,7 +53,7 @@ has login_url => (
     is => 'ro',
     isa => 'Str',
     lazy => 1,
-    default => sub ($self) { $self->config->get('login.url') || $self->config->get('global.loginurl') // '' },
+    default => sub ($self) { $self->webui->config->get('login.url') || $self->webui->config->get('global.loginurl') // '' },
 );
 
 # Only if realm_mode=path: a map of realms to URL paths
@@ -71,14 +74,14 @@ has realm_path_map => (
 sub _build_realm_path_map ($self) {
     my $map = {};
 
-    my $realm_map = $self->config->get_hash('realm.map');
+    my $realm_map = $self->webui->config->get_hash('realm.map');
     # legacy config
-    $realm_map //= $self->config->get_hash('realm');
+    $realm_map //= $self->webui->config->get_hash('realm');
     for my $url_alias (keys $realm_map->%*) {
         my ($realm, $stack) = split (/\s*;\s*/, $realm_map->{$url_alias});
         $map->{$realm} //= [];
         push $map->{$realm}->@*, {
-            url => $self->url_path_for($url_alias) . '/',
+            url => $self->webui->url_path_for($url_alias) . '/',
             stack => $stack,
         }
     };
@@ -86,7 +89,7 @@ sub _build_realm_path_map ($self) {
     return $map;
 }
 
-# Last server reply from C<$self-E<gt>client-E<gt>send_receive_service_msg()>
+# Last server reply from C<$self->webui->client->send_receive_service_msg()>
 has last_reply => (
     init_arg => undef,
     is => 'rw',
@@ -101,7 +104,7 @@ has page_obj => (
     isa => 'OpenXPKI::Client::Service::WebUI::Page::Login',
     lazy => 1,
     default => sub ($self) {
-        return OpenXPKI::Client::Service::WebUI::Page::Login->new(webui => $self);
+        return OpenXPKI::Client::Service::WebUI::Page::Login->new(webui => $self->webui);
     },
     clearer => 'clear_page_obj',
 );
@@ -122,18 +125,18 @@ sub handle_login ($self, $page, $action, $reply) {
     $self->clear_page_obj; # paranoia: guard against multiple calls to handle_login() within one request
 
     # Read login parameters "pki_realm" and "auth_stack"
-    if ($action eq 'login!realm' and my $realm = scalar $self->param('pki_realm')) {
+    if ($action eq 'login!realm' and my $realm = scalar $self->webui->param('pki_realm')) {
         $self->log->debug("Overwrite realm with '$realm' set via action '$action'");
-        $self->session->param('pki_realm', $realm);
-        $self->session->param('auth_stack', undef);
+        $self->webui->session->param('pki_realm', $realm);
+        $self->webui->session->param('auth_stack', undef);
     }
-    if ($action eq 'login!stack' and my $stack = scalar $self->param('auth_stack')) {
+    if ($action eq 'login!stack' and my $stack = scalar $self->webui->param('auth_stack')) {
         $self->log->debug("Overwrite auth stack with '$stack' set via action '$action'");
-        $self->session->param('auth_stack', $stack);
+        $self->webui->session->param('auth_stack', $stack);
     }
 
-    my $realm = $self->session->param('pki_realm') || '';
-    my $auth_stack =  $self->session->param('auth_stack') || '';
+    my $realm = $self->webui->session->param('pki_realm') || '';
+    my $auth_stack =  $self->webui->session->param('auth_stack') || '';
 
     # If this is an initial request, force redirect to the login page.
     # Does an external redirect if "loginurl" is set in config.
@@ -184,28 +187,28 @@ sub _handle_redirect ($self, $page) {
     # Requests to pages can be redirected after login, store page in session
     if ($page and $page ne 'logout' and $page ne 'welcome') {
         $self->log->debug("Store page request in session for later redirect: $page");
-        $self->session->param('redirect', $page);
+        $self->webui->session->param('redirect', $page);
     }
 
     # Link to an internal method using the class!method
     # FIXME Custom internal login page not working
     if (my $loginpage = $self->login_page) {
         $self->log->debug("Redirect to internal login page: $loginpage");
-        return $self->handle_view($loginpage);
+        return $self->webui->dispatcher->view($loginpage);
     }
 
     if (my $loginurl = $self->login_url) {
         $self->log->debug("Redirect to external login page: $loginurl");
         $self->page_obj->redirect->external($loginurl);
 
-    } elsif ( $self->request->headers->header('X-OPENXPKI-Client') ) {
+    } elsif ( $self->webui->request->headers->header('X-OPENXPKI-Client') ) {
         # Session is gone but we are still in the Ember application
         $self->log->debug("Ember UI request with invalid backend session - redirect to login page");
         $self->page_obj->redirect->to('login');
 
     } else {
         # This is not an Ember request so we need to redirect back to the Ember page
-        my $url = $self->base_url . '/#/openxpki/login';
+        my $url = $self->webui->base_url . '/#/openxpki/login';
         $self->log->debug('Redirect to login page: ' . $url);
         $self->page_obj->redirect->to($url);
     }
@@ -237,7 +240,7 @@ sub _handle_GET_PKI_REALM ($self, $realm) {
 
     my @cards;
     # "path" mode: realm cards are links to defined sub paths
-    if ('path' eq $self->realm_mode) {
+    if ('path' eq $self->webui->realm_mode) {
         # use webui config but only take realms known to the server:
         my @realm_list =
             sort { lc($realms->{$a}->{LABEL}) cmp lc($realms->{$b}->{LABEL}) }
@@ -284,13 +287,13 @@ sub _handle_GET_PKI_REALM ($self, $realm) {
             keys %{$realms};
     }
 
-    return $self->page_obj->init_realm_cards(\@cards, $self->realm_layout eq 'list' ? 1 : 0);
+    return $self->page_obj->init_realm_cards(\@cards, $self->webui->realm_layout eq 'list' ? 1 : 0);
 }
 
 sub _handle_GET_AUTHENTICATION_STACK ($self, $auth_stack) {
-    # Only one realmin "path" mode? Redirect to realm URL
+    # Only one realm in "path" mode? Redirect to realm URL
     # (server skipped GET_PKI_REALM so we assume there is only one realm)
-    if ('path' eq $self->realm_mode and $self->is_realm_selection_page) {
+    if ('path' eq $self->webui->realm_mode and $self->webui->is_realm_selection_page) {
 
         # fetch realm name
         $self->_send_to_backend('GET_REALM_LIST');
@@ -344,7 +347,7 @@ sub _handle_GET_AUTHENTICATION_STACK ($self, $auth_stack) {
         # Directly load stack if there is only one
         if (scalar @stack_list == 1)  {
             $auth_stack = $stack_list[0]->{value};
-            $self->session->param('auth_stack', $auth_stack);
+            $self->webui->session->param('auth_stack', $auth_stack);
             $self->log->debug("Only one stack avail ($auth_stack) - autoselect");
             $self->_send_to_backend( 'GET_AUTHENTICATION_STACK', {
                 AUTHENTICATION_STACK => $auth_stack
@@ -360,19 +363,19 @@ sub _handle_GET_AUTHENTICATION_STACK ($self, $auth_stack) {
 sub _handle_GET_CLIENT_LOGIN ($self, $auth, $jws) {
 
     # SSO Login uses data from the ENV, so no need to render anything
-    $self->log->trace('Available webserver ENV: ' . join(', ', sort keys $self->request->env->%*)) if $self->log->is_trace;
+    $self->log->trace('Available webserver ENV: ' . join(', ', sort keys $self->webui->request->env->%*)) if $self->log->is_trace;
     my $data;
     if ($auth->{envkeys}) {
         foreach my $key (keys %{$auth->{envkeys}}) {
             my $envkey = $auth->{envkeys}->{$key};
             $self->log->debug("Try to load '$key' from webserver ENV '$envkey'");
-            next unless defined $self->request->env->{$envkey};
-            $data->{$key} = Encode::decode('UTF-8', $self->request->env->{$envkey}, Encode::LEAVE_SRC | Encode::FB_CROAK);
+            next unless defined $self->webui->request->env->{$envkey};
+            $data->{$key} = Encode::decode('UTF-8', $self->webui->request->env->{$envkey}, Encode::LEAVE_SRC | Encode::FB_CROAK);
         }
     # legacy support
-    } elsif (my $user = $self->request->env->{OPENXPKI_USER} || $self->request->env->{REMOTE_USER}) {
+    } elsif (my $user = $self->webui->request->env->{OPENXPKI_USER} || $self->webui->request->env->{REMOTE_USER}) {
         $data->{username} = $user;
-        $data->{role} = $self->request->env->{OPENXPKI_GROUP} if $self->request->env->{OPENXPKI_GROUP};
+        $data->{role} = $self->webui->request->env->{OPENXPKI_GROUP} if $self->webui->request->env->{OPENXPKI_GROUP};
     }
 
     # Send login data.
@@ -391,7 +394,7 @@ sub _handle_GET_CLIENT_LOGIN ($self, $auth, $jws) {
 
         # the login url might contain a backlink to the running instance
         $loginurl = OpenXPKI::Template->new->render( $loginurl,
-            { baseurl => $self->base_url } );
+            { baseurl => $self->webui->base_url } );
 
         $self->log->debug("No auth data in environment - redirect found $loginurl");
         $self->page_obj->redirect->external($loginurl);
@@ -400,15 +403,15 @@ sub _handle_GET_CLIENT_LOGIN ($self, $auth, $jws) {
     # bad luck - something seems to be really wrong
     } else {
         $self->log->error('No ENV data to perform SSO Login');
-        $self->logout_session;
+        $self->webui->logout_session;
         return $self->page_obj->init_login_missing_data;
     }
 }
 
 sub _handle_GET_X509_LOGIN ($self, $jws) {
 
-    my $user = $self->request->env->{SSL_CLIENT_S_DN_CN} || $self->request->env->{SSL_CLIENT_S_DN};
-    my $cert = $self->request->env->{SSL_CLIENT_CERT} || '';
+    my $user = $self->webui->request->env->{SSL_CLIENT_S_DN_CN} || $self->webui->request->env->{SSL_CLIENT_S_DN};
+    my $cert = $self->webui->request->env->{SSL_CLIENT_CERT} || '';
 
     $self->log->trace('ENV is ' . Dumper \%ENV) if $self->log->is_trace;
 
@@ -418,7 +421,7 @@ sub _handle_GET_X509_LOGIN ($self, $jws) {
         my @chain;
         # larger chains are very unlikely and we dont support stupid clients
         for (my $cc=0;$cc<=3;$cc++)   {
-            my $chaincert = $self->request->env->{'SSL_CLIENT_CERT_CHAIN_'.$cc};
+            my $chaincert = $self->webui->request->env->{'SSL_CLIENT_CERT_CHAIN_'.$cc};
             last unless ($chaincert);
             push @chain, $chaincert;
         }
@@ -433,7 +436,7 @@ sub _handle_GET_X509_LOGIN ($self, $jws) {
 
     # Error: no cert
     $self->log->error('Certificate missing for X509 Login');
-    $self->logout_session;
+    $self->webui->logout_session;
     return $self->page_obj->init_login_missing_data;
 }
 
@@ -451,10 +454,10 @@ sub _handle_GET_OIDC_LOGIN ($self, $page, $auth, $realm, $auth_stack) {
         my $token = $1;
         $self->log->debug('OIDC Login (3/3) - present token to backend');
         $self->log->trace("Token = $token");
-        my $nonce = $self->session->param('oidc-nonce')
+        my $nonce = $self->webui->session->param('oidc-nonce')
             or return $self->page_obj->init_login_missing_data;
 
-        $self->session->param('oidc-nonce' => undef);
+        $self->webui->session->param('oidc-nonce' => undef);
         $self->_send_to_backend( 'GET_OIDC_LOGIN', {
             token => $token,
             client_id => $oidc_client{client_id},
@@ -467,13 +470,13 @@ sub _handle_GET_OIDC_LOGIN ($self, $page, $auth, $realm, $auth_stack) {
     my $tt = OpenXPKI::Template->new;
     my $uri_pattern = $auth->{redirect_uri} || 'https://[% host _ baseurl %]';
     my $redirect_uri = $tt->render( $uri_pattern, {
-        host => $self->normalized_request_url->host,
-        baseurl => $self->base_url,
+        host => $self->webui->normalized_request_url->host,
+        baseurl => $self->webui->base_url,
         realm => $realm,
         stack => $auth_stack,
     });
 
-    if (my $code = $self->param('code')) {
+    if (my $code = $self->webui->param('code')) {
 
         # Step 2 - user was redirected from IdP
         $self->log->debug("OIDC Login (2/3) - redeem auth code $code");
@@ -496,30 +499,35 @@ sub _handle_GET_OIDC_LOGIN ($self, $page, $auth, $realm, $auth_stack) {
             return $self->page_obj;
         }
 
-        my $auth_info = $self->json->decode($response->decoded_content);
+        my $auth_info = $self->webui->json->decode($response->decoded_content);
+
+        # store token in session and redirect
+        $self->log->debug('OIDC Login (2/3) - store token and redirect');
+        $self->log->trace('Token: ' . Dumper $auth_info) if $self->log->is_trace;
+
         $self->page_obj->redirect->to('login!oidc!token!'.$auth_info->{id_token});
         return $self->page_obj;
 
-    } elsif ($self->session->param('oidc-nonce')) {
+    } elsif ($self->webui->session->param('oidc-nonce')) {
 
         # to avoid an endless loop in case the user is not willing
         # or able to complete the OIDC login, we use the nonce
         # in the session to detect a "returning user" and render an
         # info page instead of doing a redirect
-        $self->logout_session;
+        $self->webui->logout_session;
         return $self->page_obj->init_login_missing_data;
 
     } else {
 
         # Initial step - assemble auth token request and send redirect
         my $nonce = Data::UUID->new->create_b64;
-        my $sess_id = $self->has_cipher ?
-            encode_base64($self->cipher->encrypt($self->session->id),'') :
-            $self->session->id;
+        my $sess_id = $self->webui->has_cipher ?
+            encode_base64($self->webui->cipher->encrypt($self->webui->session->id),'') :
+            $self->webui->session->id;
 
         # TODO - this is only set if we had a roundtrip before
         # move this into the session
-        my $hash_key = $self->request->cookie('oxi-extid');
+        my $hash_key = $self->webui->request->cookie('oxi-extid');
         die "No external key to prepare OIDC" unless($hash_key);
         my $auth_token = {
             response_type => 'code',
@@ -533,7 +541,7 @@ sub _handle_GET_OIDC_LOGIN ($self, $page, $auth, $realm, $auth_stack) {
             nonce => $nonce,
         };
         $self->log->debug('OIDC Login (1/3) - redirect to ' . $oidc_client{auth_uri});
-        $self->session->param('oidc-nonce',$nonce);
+        $self->webui->session->param('oidc-nonce',$nonce);
 
         my $loginurl = $oidc_client{auth_uri}.'?'.join('&', (map { $_ .'='. uri_escape($auth_token->{$_})  } keys %{$auth_token}));
         $self->page_obj->redirect->external($loginurl);
@@ -555,7 +563,7 @@ sub _handle_GET_PASSWD_LOGIN ($self, $action, $auth, $jws) {
             : ('username', 'password');
 
         foreach my $field (@fields) {
-            my $val = $self->param($field);
+            my $val = $self->webui->param($field);
             next unless $val;
             $data->{$field} = $val;
         }
@@ -591,14 +599,14 @@ sub _check_response ($self) {
                 my $tt = OpenXPKI::Template->new;
                 for my $key (keys $ai->%*) {
                     $auth_info->{$key} = $tt->render(
-                        $ai->{$key}, { baseurl => $self->base_url }
+                        $ai->{$key}, { baseurl => $self->webui->base_url }
                     );
                 }
             }
             delete $session_info->{authinfo};
 
-            #$self->client->rekey_session;
-            #my $new_backend_session_id = $self->client->get_session_id;
+            #$self->webui->client->rekey_session;
+            #my $new_backend_session_id = $self->webui->client->get_session_id;
 
             # Generate a new frontend session to prevent session fixation
             # The backend session remains the same but can not be used by an
@@ -640,25 +648,25 @@ sub handle_logout ($self, $page) {
     if ($page eq 'logout') {
         # For SSO Logins the session might hold an external link
         # to logout from the SSO provider
-        my $authinfo = $self->session->param('authinfo') || {};
+        my $authinfo = $self->webui->session->param('authinfo') || {};
         my $goto = $authinfo->{logout};
 
         # create new frontend and backend sessions
-        $self->logout_session; # this will preserve "pki_realm" and "auth_stack" (if fixed)
+        $self->webui->logout_session; # this will preserve "pki_realm" and "auth_stack" (if fixed)
 
         # make sure backend session knows realm and frontend session knows
         # backend session so e.g. "get_menu" returns the proper logout menu from
         # the realm config (if any).
-        $self->_init_client($self->client); # initialize backend session and store its ID in frontend session
+        $self->webui->_init_client($self->webui->client); # initialize backend session and store its ID in frontend session
 
-        if (my $realm = $self->session->param('pki_realm')) {
-            my $auth_stack = $self->session->param('is_fixed_auth_stack') # auth_stack shouldn't be there after session renewal if it's not fixed, but we check anyways
-                ? $self->session->param('auth_stack')
+        if (my $realm = $self->webui->session->param('pki_realm')) {
+            my $auth_stack = $self->webui->session->param('is_fixed_auth_stack') # auth_stack shouldn't be there after session renewal if it's not fixed, but we check anyways
+                ? $self->webui->session->param('auth_stack')
                 : undef;
             # store realm in backend session
-            my $reply = $self->ping_client;
+            my $reply = $self->webui->ping_client;
             if ($reply->{SERVICE_MSG} eq 'GET_PKI_REALM') {
-                $self->client->send_receive_service_msg('GET_PKI_REALM', {
+                $self->webui->client->send_receive_service_msg('GET_PKI_REALM', {
                     PKI_REALM => $realm,
                     $auth_stack ? (AUTHENTICATION_STACK => $auth_stack) : (),
                 });
@@ -685,21 +693,21 @@ sub handle_logout ($self, $page) {
 }
 
 sub _send_to_backend ($self, @args) {
-    my $reply = $self->client->send_receive_service_msg(@args);
+    my $reply = $self->webui->client->send_receive_service_msg(@args);
     $self->last_reply($reply);
     return $reply;
 }
 
 sub _jwt_signature ($self, $data, $jws) {
-    return unless $self->has_auth;
+    return unless $self->webui->has_auth;
 
     $self->log->debug('Sign data using key id ' . $jws->{keyid} );
-    my $pkey = $self->auth;
+    my $pkey = $self->webui->auth;
 
     return encode_jwt(
         payload => {
             param => $data,
-            sid => $self->client->get_session_id,
+            sid => $self->webui->client->get_session_id,
         },
         key => \$pkey,
         auto_iat => 1,
@@ -717,37 +725,37 @@ sub _recreate_frontend_session {
 
     # fetch redirect from old session before deleting it!
     my %keep = map {
-        my $val = $self->session->param($_);
+        my $val = $self->webui->session->param($_);
         (defined $val) ? ($_ => $val) : ();
     } ('redirect','baseurl');
 
     $self->log->trace("Carry over session items: " . Dumper \%keep) if ($self->log->is_trace);
 
     # create a new session
-    $self->new_frontend_session;
+    $self->webui->new_frontend_session;
 
-    map { $self->session->param($_, $keep{$_}) } keys %keep;
+    map { $self->webui->session->param($_, $keep{$_}) } keys %keep;
 
     # set some data
-    $self->session->param('backend_session_id', $self->client->get_session_id );
+    $self->webui->session->param('backend_session_id', $self->webui->client->get_session_id );
 
     # move userinfo to own node
-    $self->session->param('userinfo', $session_info->{userinfo} || {});
+    $self->webui->session->param('userinfo', $session_info->{userinfo} || {});
     delete $session_info->{userinfo};
 
-    $self->session->param('authinfo', $auth_info);
+    $self->webui->session->param('authinfo', $auth_info);
 
-    $self->session->param('user', $session_info);
-    $self->session->param('pki_realm', $session_info->{pki_realm});
-    $self->session->param('is_logged_in', 1);
-    $self->session->param('initialized', 1);
-    $self->session->param('login_timestamp', time);
+    $self->webui->session->param('user', $session_info);
+    $self->webui->session->param('pki_realm', $session_info->{pki_realm});
+    $self->webui->session->param('is_logged_in', 1);
+    $self->webui->session->param('initialized', 1);
+    $self->webui->session->param('login_timestamp', time);
 
     # Check for MOTD, e.g. { level => 'warn', message => 'Beware!' }
-    my $motd = $self->client->send_receive_command_msg( 'get_motd' );
+    my $motd = $self->webui->client->send_receive_command_msg( 'get_motd' );
     if (ref $motd->{PARAMS} eq 'HASH') {
         $self->log->trace('Got MOTD: '. Dumper $motd->{PARAMS} ) if $self->log->is_trace;
-        $self->session->param('motd', $motd->{PARAMS} );
+        $self->webui->session->param('motd', $motd->{PARAMS} );
     }
 
     # Set menu
@@ -755,15 +763,15 @@ sub _recreate_frontend_session {
 }
 
 sub _set_menu ($self) {
-    my $reply = $self->client->send_receive_command_msg('get_menu');
+    my $reply = $self->webui->client->send_receive_command_msg('get_menu');
     my $menu = $reply->{PARAMS} or return;
 
     $self->log->trace('UI config = ' . Dumper $menu) if $self->log->is_trace;
 
-    $self->session->param('menu_items', $menu->{main} || []);
+    $self->webui->session->param('menu_items', $menu->{main} || []);
 
     # persist the optional parts of the menu hash (landmark, tasklist, search attribs)
-    $self->session->param('landmark', $menu->{landmark} || {});
+    $self->webui->session->param('landmark', $menu->{landmark} || {});
     $self->log->trace('Got landmarks: ' . Dumper $menu->{landmark}) if $self->log->is_trace;
 
     # Keepalive pings to endpoint
@@ -775,7 +783,7 @@ sub _set_menu ($self) {
         } else {
             $ping = { href => $menu->{ping}, timeout => 120000 };
         }
-        $self->session->param('ping', $ping);
+        $self->webui->session->param('ping', $ping);
     }
 
     # tasklist, wfsearch, certsearch and bulk can have multiple branches
@@ -787,11 +795,11 @@ sub _set_menu ($self) {
     foreach my $key (qw(tasklist bulk)) {
 
         if (ref $menu->{$key} eq 'ARRAY') {
-            $self->session->param($key, { 'default' => $menu->{$key} });
+            $self->webui->session->param($key, { 'default' => $menu->{$key} });
         } elsif (ref $menu->{$key} eq 'HASH') {
-            $self->session->param($key, $menu->{$key} );
+            $self->webui->session->param($key, $menu->{$key} );
         } else {
-            $self->session->param($key, { 'default' => [] });
+            $self->webui->session->param($key, { 'default' => [] });
         }
         $self->log->trace("Got $key: " . Dumper $menu->{$key}) if $self->log->is_trace;
     }
@@ -803,21 +811,21 @@ sub _set_menu ($self) {
 
         # plain attributes
         if (ref $menu->{$key} eq 'ARRAY') {
-            $self->session->param($key, { 'default' => { attributes => $menu->{$key} } } );
+            $self->webui->session->param($key, { 'default' => { attributes => $menu->{$key} } } );
         } elsif (ref $menu->{$key} eq 'HASH') {
-            $self->session->param($key, $menu->{$key} );
+            $self->webui->session->param($key, $menu->{$key} );
         } else {
             # empty hash is used to disable the search page
-            $self->session->param($key, {} );
+            $self->webui->session->param($key, {} );
         }
         $self->log->trace("Got $key: " . Dumper $menu->{$key}) if $self->log->is_trace;
     }
 
     foreach my $key (qw(datapool)) {
         if (ref $menu->{$key} eq 'HASH' and $menu->{$key}->{default}) {
-            $self->session->param($key, $menu->{$key} );
+            $self->webui->session->param($key, $menu->{$key} );
         } else {
-            $self->session->param($key, { default => {} });
+            $self->webui->session->param($key, { default => {} });
         }
         $self->log->trace("Got $key: " . Dumper $menu->{$key}) if $self->log->is_trace;
     }
@@ -852,7 +860,7 @@ sub _set_menu ($self) {
         }
         return $result;
     }->();
-    $self->session->param('certdetails', $certdetails);
+    $self->webui->session->param('certdetails', $certdetails);
 
     # Check syntax of "wfdetails".
     # (the sub{} below allows using "return" instead of nested "if"-structures)
@@ -872,7 +880,7 @@ sub _set_menu ($self) {
         }
         return $result;
     }->();
-    $self->session->param('wfdetails', $wfdetails);
+    $self->webui->session->param('wfdetails', $wfdetails);
 }
 
-1;
+__PACKAGE__->meta->make_immutable;

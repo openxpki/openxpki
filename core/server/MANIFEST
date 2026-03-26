@@ -128,6 +128,8 @@ OpenXPKI/Client/Web/Controller.pm
 
 # WebUI
 OpenXPKI/Client/Service/WebUI.pm
+OpenXPKI/Client/Service/WebUI/Auth.pm
+OpenXPKI/Client/Service/WebUI/Dispatcher.pm
 OpenXPKI/Client/Service/WebUI/JWT.pm
 OpenXPKI/Client/Service/WebUI/LegacyCGISession.pm
 OpenXPKI/Client/Service/WebUI/Page.pm
@@ -180,8 +182,6 @@ OpenXPKI/Client/Service/WebUI/Response/SectionRole.pm
 OpenXPKI/Client/Service/WebUI/Response/Sections.pm
 OpenXPKI/Client/Service/WebUI/Response/Status.pm
 OpenXPKI/Client/Service/WebUI/Response/User.pm
-OpenXPKI/Client/Service/WebUI/Role/LoginHandler.pm
-OpenXPKI/Client/Service/WebUI/Role/PageHandler.pm
 OpenXPKI/Client/Service/WebUI/Role/RequestParams.pm
 OpenXPKI/Client/Service/WebUI/Session.pm
 OpenXPKI/Client/Service/WebUI/SessionCookie.pm
