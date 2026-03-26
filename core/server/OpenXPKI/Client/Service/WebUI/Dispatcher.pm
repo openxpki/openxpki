@@ -1,6 +1,5 @@
 package OpenXPKI::Client::Service::WebUI::Dispatcher;
-use OpenXPKI -class;
-use namespace::autoclean;
+use OpenXPKI qw( -class -typeconstraints );
 
 # Core modules
 use Module::Load ();

@@ -1,6 +1,5 @@
 package OpenXPKI::Client::Service::WebUI::Auth;
-use OpenXPKI -class;
-use namespace::autoclean;
+use OpenXPKI qw( -class -typeconstraints );
 
 # Core modules
 use Encode;
