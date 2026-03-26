@@ -3,7 +3,6 @@ use OpenXPKI -role;
 use namespace::autoclean;
 
 requires 'request';
-requires 'session';
 requires 'log';
 requires 'decrypt_jwt';
 requires 'json';
