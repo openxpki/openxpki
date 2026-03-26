@@ -13,6 +13,7 @@ requires qw(
     has_auth
     current_realm
     is_realm_selection_page
+    base_url
 
     url_path_for
     param
@@ -85,6 +86,26 @@ sub _build_realm_path_map ($self) {
     return $map;
 }
 
+# Last server reply from C<$self-E<gt>client-E<gt>send_receive_service_msg()>
+has last_reply => (
+    init_arg => undef,
+    is => 'rw',
+    isa => 'HashRef|Undef',
+    default => undef,
+);
+
+# Helper to quickly create response Page objects
+has page_obj => (
+    init_arg => undef,
+    is => 'rw',
+    isa => 'OpenXPKI::Client::Service::WebUI::Page::Login',
+    lazy => 1,
+    default => sub ($self) {
+        return OpenXPKI::Client::Service::WebUI::Page::Login->new(webui => $self);
+    },
+    clearer => 'clear_page_obj',
+);
+
 #
 # METHODS
 #
@@ -96,9 +117,9 @@ signature_for handle_login => (
     ],
 );
 sub handle_login ($self, $page, $action, $reply) {
-    my $uilogin = OpenXPKI::Client::Service::WebUI::Page::Login->new(webui => $self);
-
+    $self->last_reply($reply);
     $self->log->info("Not logged in - authenticating; page = '$page', action = '$action'");
+    $self->clear_page_obj; # paranoia: guard against multiple calls to handle_login() within one request
 
     # Read login parameters "pki_realm" and "auth_stack"
     if ($action eq 'login!realm' and my $realm = scalar $self->param('pki_realm')) {
@@ -111,421 +132,457 @@ sub handle_login ($self, $page, $action, $reply) {
         $self->session->param('auth_stack', $stack);
     }
 
-    my $pki_realm = $self->session->param('pki_realm') || '';
+    my $realm = $self->session->param('pki_realm') || '';
     my $auth_stack =  $self->session->param('auth_stack') || '';
 
-    # if this is an initial request, force redirect to the login page
-    # will do an external redirect in case loginurl is set in config
+    # If this is an initial request, force redirect to the login page.
+    # Does an external redirect if "loginurl" is set in config.
     if ($action !~ /^login/ and $page !~ /^login/) {
-        # Requests to pages can be redirected after login, store page in session
-        if ($page and $page ne 'logout' and $page ne 'welcome') {
-            $self->log->debug("Store page request in session for later redirect: $page");
-            $self->session->param('redirect', $page);
-        }
-
-        # Link to an internal method using the class!method
-        if (my $loginpage = $self->login_page) {
-
-            # FIXME  this is not working
-            $self->log->debug("Redirect to internal login page: $loginpage");
-            return $self->handle_view($loginpage);
-
-        } elsif (my $loginurl = $self->login_url) {
-
-            $self->log->debug("Redirect to external login page: $loginurl");
-            $uilogin->redirect->external($loginurl);
-
-        } elsif ( $self->request->headers->header('X-OPENXPKI-Client') ) {
-
-            # Session is gone but we are still in the Ember application
-            $self->log->debug("Ember UI request with invalid backend session - redirect to login page");
-            $uilogin->redirect->to('login');
-
-        } else {
-
-            # This is not an Ember request so we need to redirect back to the Ember page
-            my $url = $self->base_url . '/#/openxpki/login';
-            $self->log->debug('Redirect to login page: ' . $url);
-            $uilogin->redirect->to($url);
-        }
-        return $uilogin;
+        return $self->_handle_redirect($page);
     }
+
+    $self->log->debug(sprintf("Status: '%s'", $self->last_reply->{SERVICE_MSG}));
 
     # Login usually works in three steps realm -> auth stack -> credentials.
     # If there is only one realm, the server skips the realm selection phase.
 
-    $self->log->debug(sprintf("Status: '%s'", $reply->{SERVICE_MSG}));
-
-    if ( $reply->{SERVICE_MSG} eq 'GET_PKI_REALM') {
-        # store realm in backend session if given
-        if ($pki_realm) {
-            $self->log->debug("Set chosen pki_realm '$pki_realm' in backend session");
-            $reply = $self->client->send_receive_service_msg( 'GET_PKI_REALM', { PKI_REALM => $pki_realm } );
-
-        # show realm selection otherwise
-        } else {
-            $self->log->debug("No realm chosen, showing realm selection page");
-
-            my $realms = $reply->{PARAMS}->{PKI_REALMS};
-
-            my $safe_realm_str = sub {
-                my $r = lc(shift);
-                $r =~ s/[_\s]/-/g;
-                $r =~ s/[^a-z0-9-]//g;
-                $r =~ s/-+/-/g;
-                "oxi-realm-card-$r"
-            };
-
-            my @cards;
-            # "path" mode: realm cards are links to defined sub paths
-            if ('path' eq $self->realm_mode) {
-                # use webui config but only take realms known to the server:
-                my @realm_list =
-                    sort { lc($realms->{$a}->{LABEL}) cmp lc($realms->{$b}->{LABEL}) }
-                    grep { $realms->{$_} }
-                    keys $self->realm_path_map->%*;
-
-                # create a link for each <realm URL path> = <realm> + <auth stack>
-                for my $realm (@realm_list) {
-                    my $auth_stacks = $realms->{$realm}->{AUTH_STACKS};
-
-                    my @defs = $self->realm_path_map->{$realm}->@*;
-                    for my $def (@defs) {
-                        my $stack = $def->{stack};
-                        my $footer = $stack
-                            ? ($auth_stacks->{$stack} ? $auth_stacks->{$stack}->{label} : $stack)
-                            : '';
-                        push @cards, {
-                            label => $realms->{$realm}->{LABEL},
-                            description => $realms->{$realm}->{DESCRIPTION},
-                            footer => $footer,
-                            image => $realms->{$realm}->{IMAGE},
-                            color => $realms->{$realm}->{COLOR},
-                            css_class => $safe_realm_str->($realm),
-                            href => $def->{url},
-                        };
-                    }
-                }
-
-            # other modes: realm cards are actions that set the "pki_realm" parameter
-            } else {
-                @cards =
-                    map { {
-                        label => $realms->{$_}->{LABEL},
-                        description => $realms->{$_}->{DESCRIPTION},
-                        image => $realms->{$_}->{IMAGE},
-                        color => $realms->{$_}->{COLOR},
-                        css_class => $safe_realm_str->($_),
-                        action => 'login!realm',
-                        action_params => {
-                            pki_realm => $realms->{$_}->{NAME},
-                        },
-                    } }
-                    sort { lc($realms->{$a}->{LABEL}) cmp lc($realms->{$b}->{LABEL}) }
-                    keys %{$realms};
-            }
-
-            $uilogin->init_realm_cards(\@cards, $self->realm_layout eq 'list' ? 1 : 0);
-            return $uilogin;
-        }
+    if ($self->last_reply->{SERVICE_MSG} eq 'GET_PKI_REALM') {
+        my $result = $self->_handle_GET_PKI_REALM($realm);
+        return $result if $result;
     }
 
-    if ( $reply->{SERVICE_MSG} eq 'GET_AUTHENTICATION_STACK' ) {
-        # Only one realmin "path" mode? Redirect to realm URL
-        # (server skipped GET_PKI_REALM so we assume there is only one realm)
-        if ('path' eq $self->realm_mode and $self->is_realm_selection_page) {
-            # fetch realm name
-            $reply = $self->client->send_receive_service_msg('GET_REALM_LIST');
-            my $realm_list = $reply->{PARAMS};
-
-            my $error;
-            if (scalar $realm_list->@* == 1) {
-                my $realm = $realm_list->[0]->{name};
-                if (my $paths = $self->realm_path_map->{$realm}) {
-                    if (scalar $paths->@* == 1) {
-                        my $url = $paths->[0]->{url};
-                        $self->log->debug("Only one realm - redirect to: $url");
-                        $uilogin->redirect->external($url);
-                        return $uilogin;
-                    } else {
-                        $error = "Non-decidable redirect: config service.webui.realm.map contains more than one URL path for realm '$realm'";
-                    }
-                } else {
-                    $error = "Missing redirect target: config service.webui.realm.map does not contain realm '$realm'";
-                }
-            } else {
-                $error = "Non-decidable redirect: server skipped realm selection but there is more than one realm";
-            }
-
-            $self->log->error($error);
-            $uilogin->status->error($error);
-            return $uilogin;
-        }
-
-        # store auth stack in backend session if given
-        if ( $auth_stack && $auth_stack !~ /^_/) { # "!~ /^_/" --> Never auth with an internal stack!
-            $self->log->debug("Authentication stack: $auth_stack");
-            $reply = $self->client->send_receive_service_msg( 'GET_AUTHENTICATION_STACK', {
-               AUTHENTICATION_STACK => $auth_stack
-            });
-
-        # show auth stack selection otherwise
-        } else {
-            my $stacks = $reply->{'PARAMS'}->{'AUTHENTICATION_STACKS'};
-
-            # List stacks and hide those starting with an underscore
-            my @stack_list =
-                map { {
-                    'value' => $stacks->{$_}->{name},
-                    'label' => $stacks->{$_}->{label},
-                    'description' => $stacks->{$_}->{description}
-                } }
-                grep { $stacks->{$_}->{name} !~ /^_/ }
-                keys $stacks->%*;
-
-            # Directly load stack if there is only one
-            if (scalar @stack_list == 1)  {
-                $auth_stack = $stack_list[0]->{value};
-                $self->session->param('auth_stack', $auth_stack);
-                $self->log->debug("Only one stack avail ($auth_stack) - autoselect");
-                $reply = $self->client->send_receive_service_msg( 'GET_AUTHENTICATION_STACK', {
-                    AUTHENTICATION_STACK => $auth_stack
-                } );
-            } else {
-                $self->log->trace("Offering stacks: " . Dumper \@stack_list ) if $self->log->is_trace;
-                $uilogin->init_auth_stack(\@stack_list);
-                return $uilogin;
-            }
-        }
+    if ($self->last_reply->{SERVICE_MSG} eq 'GET_AUTHENTICATION_STACK') {
+        my $result = $self->_handle_GET_AUTHENTICATION_STACK($auth_stack);
+        return $result if $result;
     }
 
-    $self->log->debug(sprintf("Selected realm: '%s', new status: '%s'", $pki_realm, $reply->{SERVICE_MSG}));
-    $self->log->trace('Reply = ' . Dumper $reply) if $self->log->is_trace;
+    $self->log->debug(sprintf("Selected realm: '%s', new status: '%s'", $realm, $self->last_reply->{SERVICE_MSG}));
+    $self->log->trace('Reply = ' . Dumper $self->last_reply) if $self->log->is_trace;
 
     # we have more than one login handler and leave it to the login
     # class to render it right.
-    if ( $reply->{SERVICE_MSG} =~ /GET_(.*)_LOGIN/ ) {
-        my $login_type = $1;
+    if ( $self->last_reply->{SERVICE_MSG} =~ /GET_(.*)_LOGIN/ ) {
+        my $type = $1;
 
         ## FIXME - need a good way to configure login handlers
-        $self->log->info('Requested login type ' . $login_type );
-        my $auth = $reply->{PARAMS};
-        my $jws = $reply->{SIGN};
+        $self->log->info('Requested login type ' . $type );
+        my $auth = $self->last_reply->{PARAMS};
+        my $jws = $self->last_reply->{SIGN};
 
-        # SSO Login uses data from the ENV, so no need to render anything
-        if ( $login_type eq 'CLIENT' ) {
-            $self->log->trace('Available webserver ENV: ' . join(', ', sort keys $self->request->env->%*)) if $self->log->is_trace;
-            my $data;
-            if ($auth->{envkeys}) {
-                foreach my $key (keys %{$auth->{envkeys}}) {
-                    my $envkey = $auth->{envkeys}->{$key};
-                    $self->log->debug("Try to load '$key' from webserver ENV '$envkey'");
-                    next unless defined $self->request->env->{$envkey};
-                    $data->{$key} = Encode::decode('UTF-8', $self->request->env->{$envkey}, Encode::LEAVE_SRC | Encode::FB_CROAK);
-                }
-            # legacy support
-            } elsif (my $user = $self->request->env->{OPENXPKI_USER} || $self->request->env->{REMOTE_USER}) {
-                $data->{username} = $user;
-                $data->{role} = $self->request->env->{OPENXPKI_GROUP} if $self->request->env->{OPENXPKI_GROUP};
-            }
+        return $self->_handle_GET_CLIENT_LOGIN($auth, $jws)                     if 'CLIENT' eq $type;
+        return $self->_handle_GET_X509_LOGIN($jws)                              if 'X509' eq $type;
+        return $self->_handle_GET_OIDC_LOGIN($page, $auth, $realm, $auth_stack) if 'OIDC' eq $type;
+        return $self->_handle_GET_PASSWD_LOGIN($action, $auth, $jws)            if 'PASSWD' eq $type;
 
-            # at least some items were found so we send them to the backend
-            if ($data) {
-                $self->log->trace('Sending auth data ' . Dumper $data) if $self->log->is_trace;
-
-                $data = $self->_jwt_signature($data, $jws) if ($jws);
-
-                $reply = $self->client->send_receive_service_msg( 'GET_CLIENT_LOGIN', $data );
-
-            # as nothing was found we do not even try to login in and look for a redirect
-            } elsif (my $loginurl = $auth->{login}) {
-
-                # the login url might contain a backlink to the running instance
-                $loginurl = OpenXPKI::Template->new->render( $loginurl,
-                    { baseurl => $self->base_url } );
-
-                $self->log->debug("No auth data in environment - redirect found $loginurl");
-                $uilogin->redirect->external($loginurl);
-                return $uilogin;
-
-            # bad luck - something seems to be really wrong
-            } else {
-                $self->log->error('No ENV data to perform SSO Login');
-                $self->logout_session;
-                return $uilogin->init_login_missing_data;
-            }
-
-        } elsif ( $login_type eq 'X509' ) {
-            my $user = $self->request->env->{SSL_CLIENT_S_DN_CN} || $self->request->env->{SSL_CLIENT_S_DN};
-            my $cert = $self->request->env->{SSL_CLIENT_CERT} || '';
-
-            $self->log->trace('ENV is ' . Dumper \%ENV) if $self->log->is_trace;
-
-            if ($cert) {
-                $self->log->info('Sending X509 Login ( '.$user.' )');
-                my @chain;
-                # larger chains are very unlikely and we dont support stupid clients
-                for (my $cc=0;$cc<=3;$cc++)   {
-                    my $chaincert = $self->request->env->{'SSL_CLIENT_CERT_CHAIN_'.$cc};
-                    last unless ($chaincert);
-                    push @chain, $chaincert;
-                }
-
-                my $data = { certificate => $cert, chain => \@chain };
-                $data = $self->_jwt_signature($data, $jws) if ($jws);
-
-                $reply =  $self->client->send_receive_service_msg( 'GET_X509_LOGIN', $data);
-                $self->log->trace('Auth result ' . Dumper $reply) if $self->log->is_trace;
-            } else {
-                $self->log->error('Certificate missing for X509 Login');
-                $self->logout_session;
-                return $uilogin->init_login_missing_data;
-            }
-
-        } elsif( $login_type  eq 'OIDC' ) {
-
-            my %oidc_client = map {
-                ($_ => ($auth->{$_} || die "OIDC setup incomplete, $_ is not set"));
-            } qw(client_id auth_uri token_uri client_secret);
-
-            $self->log->trace(SDumper \%oidc_client) if ($self->log->is_trace);
-
-            # we use "page" to transport the token
-            if ($page =~ m{login!oidc!token!([\w\-\.]+)\z}) {
-                # Step 3 - use token to perform authentication
-                my $token = $1;
-                $self->log->debug('OIDC Login (3/3) - present token to backend');
-                $self->log->trace($token);
-                my $nonce = $self->session->param('oidc-nonce');
-                return $uilogin->init_login_missing_data unless ($nonce);
-
-                $self->session->param('oidc-nonce' => undef);
-                $reply = $self->client->send_receive_service_msg( 'GET_OIDC_LOGIN', {
-                    token => $token,
-                    client_id => $oidc_client{client_id},
-                    nonce => $nonce,
-                });
-
-            } else {
-
-                my $tt = OpenXPKI::Template->new;
-                my $uri_pattern = $auth->{redirect_uri} || 'https://[% host _ baseurl %]';
-                my $redirect_uri = $tt->render( $uri_pattern, {
-                    host => $self->normalized_request_url->host,
-                    baseurl => $self->base_url,
-                    realm => $pki_realm,
-                    stack => $auth_stack,
-                });
-
-                if (my $code = $self->param('code')) {
-
-                    # Step 2 - user was redirected from IdP
-                    $self->log->debug("OIDC Login (2/3) - redeem auth code $code");
-                    my $ua = LWP::UserAgent->new;
-                    # For whatever reason this must be www-form encoded and not JSON
-                    my $response = $ua->post( $oidc_client{token_uri}, [
-                        code => $code,
-                        client_id => $oidc_client{client_id},
-                        client_secret => $oidc_client{client_secret},
-                        redirect_uri => $redirect_uri.'/oidc_redirect',
-                        grant_type => 'authorization_code',
-                    ]);
-                    $self->log->trace("OIDC Token Response: " .$response->decoded_content);
-                    if (!$response->is_success) {
-                        $self->log->warn("Unable to redeem token, error was: " . $response->decoded_content);
-                        $uilogin->status->error('Unable to redeem token');
-                        $uilogin->redirect->to('login!missing_data');
-                        return $uilogin;
-                    }
-                    my $auth_info = $self->json->decode($response->decoded_content);
-                    $uilogin->redirect->to('login!oidc!token!'.$auth_info->{id_token});
-                    return $uilogin;
-
-                } elsif ($self->session->param('oidc-nonce')) {
-
-                    # to avoid an endless loop in case the user is not willing
-                    # or able to complete the OIDC login, we use the nonce
-                    # in the session to detect a "returning user" and render an
-                    # info page instead of doing a redirect
-                    $self->logout_session;
-                    return $uilogin->init_login_missing_data;
-
-                } else {
-
-                    # Initial step - assemble auth token request and send redirect
-                    my $nonce = Data::UUID->new->create_b64;
-                    my $sess_id = $self->has_cipher ?
-                        encode_base64($self->cipher->encrypt($self->session->id),'') :
-                        $self->session->id;
-
-                    # TODO - this is only set if we had a roundtrip before
-                    # move this into the session
-                    my $hash_key = $self->request->cookie('oxi-extid');
-                    die "No external key to prepare OIDC" unless($hash_key);
-                    my $auth_token = {
-                        response_type => 'code',
-                        client_id => $oidc_client{client_id},
-                        scope => ($auth->{scope} || 'openid profile email'),
-                        redirect_uri => $redirect_uri.'/oidc_redirect',
-                        state => encode_jwt( alg => 'HS256', key => $hash_key->value, payload => {
-                            session_id => $sess_id,
-                            baseurl => $redirect_uri,
-                        }),
-                        nonce => $nonce,
-                    };
-                    $self->log->debug('OIDC Login (1/3) - redirect to ' . $oidc_client{auth_uri});
-                    $self->session->param('oidc-nonce',$nonce);
-                    my $loginurl = $oidc_client{auth_uri}.'?'.join('&', (map { $_ .'='. uri_escape($auth_token->{$_})  } keys %{$auth_token}));
-                    $uilogin->redirect->external($loginurl);
-                    return $uilogin;
-                }
-            }
-
-        } elsif( $login_type eq 'PASSWD' ) {
-
-            # form send / credentials are passed (works with an empty form too...)
-
-            if ($action eq 'login!password') {
-                $self->log->debug('PASSWD auth try - validating username/password');
-                ##FIXME - Input validation
-
-                my $data;
-                my @fields = $auth->{field}
-                    ? (map { $_->{name} } $auth->{field}->@*)
-                    : ('username', 'password');
-
-                foreach my $field (@fields) {
-                    my $val = $self->param($field);
-                    next unless $val;
-                    $data->{$field} = $val;
-                }
-
-                $data = $self->_jwt_signature($data, $jws) if $jws;
-
-                $reply = $self->client->send_receive_service_msg( 'GET_PASSWD_LOGIN', $data );
-                $self->log->trace('Auth result ' . Dumper $reply) if $self->log->is_trace;
-
-            } else {
-                $self->log->debug('No credentials, render form');
-                $uilogin->init_login_passwd($auth);
-                return $uilogin;
-            }
-
-        } else {
-
-            $self->log->warn("Unknown login type '$login_type'");
-        }
+        $self->log->warn("Unknown login type '$type'");
     }
 
-    if ( $reply->{SERVICE_MSG} eq 'SERVICE_READY' ) {
+    return $self->_check_response;
+}
+
+sub _handle_redirect ($self, $page) {
+    # Requests to pages can be redirected after login, store page in session
+    if ($page and $page ne 'logout' and $page ne 'welcome') {
+        $self->log->debug("Store page request in session for later redirect: $page");
+        $self->session->param('redirect', $page);
+    }
+
+    # Link to an internal method using the class!method
+    # FIXME Custom internal login page not working
+    if (my $loginpage = $self->login_page) {
+        $self->log->debug("Redirect to internal login page: $loginpage");
+        return $self->handle_view($loginpage);
+    }
+
+    if (my $loginurl = $self->login_url) {
+        $self->log->debug("Redirect to external login page: $loginurl");
+        $self->page_obj->redirect->external($loginurl);
+
+    } elsif ( $self->request->headers->header('X-OPENXPKI-Client') ) {
+        # Session is gone but we are still in the Ember application
+        $self->log->debug("Ember UI request with invalid backend session - redirect to login page");
+        $self->page_obj->redirect->to('login');
+
+    } else {
+        # This is not an Ember request so we need to redirect back to the Ember page
+        my $url = $self->base_url . '/#/openxpki/login';
+        $self->log->debug('Redirect to login page: ' . $url);
+        $self->page_obj->redirect->to($url);
+    }
+
+    return $self->page_obj;
+}
+
+sub _handle_GET_PKI_REALM ($self, $realm) {
+    # store realm in backend session if given
+    if ($realm) {
+        $self->log->debug("Set chosen pki_realm '$realm' in backend session");
+        $self->_send_to_backend( 'GET_PKI_REALM', { PKI_REALM => $realm } );
+        return;
+    }
+
+    # show realm selection otherwise
+
+    $self->log->debug("No realm chosen, showing realm selection page");
+
+    my $realms = $self->last_reply->{PARAMS}->{PKI_REALMS};
+
+    my $safe_realm_str = sub {
+        my $r = lc(shift);
+        $r =~ s/[_\s]/-/g;
+        $r =~ s/[^a-z0-9-]//g;
+        $r =~ s/-+/-/g;
+        "oxi-realm-card-$r"
+    };
+
+    my @cards;
+    # "path" mode: realm cards are links to defined sub paths
+    if ('path' eq $self->realm_mode) {
+        # use webui config but only take realms known to the server:
+        my @realm_list =
+            sort { lc($realms->{$a}->{LABEL}) cmp lc($realms->{$b}->{LABEL}) }
+            grep { $realms->{$_} }
+            keys $self->realm_path_map->%*;
+
+        # create a link for each <realm URL path> = <realm> + <auth stack>
+        for my $realm (@realm_list) {
+            my $auth_stacks = $realms->{$realm}->{AUTH_STACKS};
+
+            my @defs = $self->realm_path_map->{$realm}->@*;
+            for my $def (@defs) {
+                my $stack = $def->{stack};
+                my $footer = $stack
+                    ? ($auth_stacks->{$stack} ? $auth_stacks->{$stack}->{label} : $stack)
+                    : '';
+                push @cards, {
+                    label => $realms->{$realm}->{LABEL},
+                    description => $realms->{$realm}->{DESCRIPTION},
+                    footer => $footer,
+                    image => $realms->{$realm}->{IMAGE},
+                    color => $realms->{$realm}->{COLOR},
+                    css_class => $safe_realm_str->($realm),
+                    href => $def->{url},
+                };
+            }
+        }
+
+    # other modes: realm cards are actions that set the "pki_realm" parameter
+    } else {
+        @cards =
+            map { {
+                label => $realms->{$_}->{LABEL},
+                description => $realms->{$_}->{DESCRIPTION},
+                image => $realms->{$_}->{IMAGE},
+                color => $realms->{$_}->{COLOR},
+                css_class => $safe_realm_str->($_),
+                action => 'login!realm',
+                action_params => {
+                    pki_realm => $realms->{$_}->{NAME},
+                },
+            } }
+            sort { lc($realms->{$a}->{LABEL}) cmp lc($realms->{$b}->{LABEL}) }
+            keys %{$realms};
+    }
+
+    return $self->page_obj->init_realm_cards(\@cards, $self->realm_layout eq 'list' ? 1 : 0);
+}
+
+sub _handle_GET_AUTHENTICATION_STACK ($self, $auth_stack) {
+    # Only one realmin "path" mode? Redirect to realm URL
+    # (server skipped GET_PKI_REALM so we assume there is only one realm)
+    if ('path' eq $self->realm_mode and $self->is_realm_selection_page) {
+
+        # fetch realm name
+        $self->_send_to_backend('GET_REALM_LIST');
+        my $realm_list = $self->last_reply->{PARAMS};
+
+        my $error;
+        if (scalar $realm_list->@* == 1) {
+            my $realm = $realm_list->[0]->{name};
+            if (my $paths = $self->realm_path_map->{$realm}) {
+                if (scalar $paths->@* == 1) {
+                    my $url = $paths->[0]->{url};
+                    $self->log->debug("Only one realm - redirect to: $url");
+                    $self->page_obj->redirect->external($url);
+                    return $self->page_obj;
+                } else {
+                    $error = "Non-decidable redirect: config service.webui.realm.map contains more than one URL path for realm '$realm'";
+                }
+            } else {
+                $error = "Missing redirect target: config service.webui.realm.map does not contain realm '$realm'";
+            }
+        } else {
+            $error = "Non-decidable redirect: server skipped realm selection but there is more than one realm";
+        }
+
+        $self->log->error($error);
+        $self->page_obj->status->error($error);
+        return $self->page_obj;
+    }
+
+    # store auth stack in backend session if given
+    if ( $auth_stack && $auth_stack !~ /^_/) { # "!~ /^_/" --> Never auth with an internal stack!
+        $self->log->debug("Authentication stack: $auth_stack");
+        $self->_send_to_backend( 'GET_AUTHENTICATION_STACK', {
+            AUTHENTICATION_STACK => $auth_stack
+        });
+
+    # show auth stack selection otherwise
+    } else {
+        my $stacks = $self->last_reply->{'PARAMS'}->{'AUTHENTICATION_STACKS'};
+
+        # List stacks and hide those starting with an underscore
+        my @stack_list =
+            map { {
+                'value' => $stacks->{$_}->{name},
+                'label' => $stacks->{$_}->{label},
+                'description' => $stacks->{$_}->{description}
+            } }
+            grep { $stacks->{$_}->{name} !~ /^_/ }
+            keys $stacks->%*;
+
+        # Directly load stack if there is only one
+        if (scalar @stack_list == 1)  {
+            $auth_stack = $stack_list[0]->{value};
+            $self->session->param('auth_stack', $auth_stack);
+            $self->log->debug("Only one stack avail ($auth_stack) - autoselect");
+            $self->_send_to_backend( 'GET_AUTHENTICATION_STACK', {
+                AUTHENTICATION_STACK => $auth_stack
+            } );
+        } else {
+            $self->log->trace("Offering stacks: " . Dumper \@stack_list ) if $self->log->is_trace;
+            return $self->page_obj->init_auth_stack(\@stack_list);
+        }
+    }
+    return;
+}
+
+sub _handle_GET_CLIENT_LOGIN ($self, $auth, $jws) {
+
+    # SSO Login uses data from the ENV, so no need to render anything
+    $self->log->trace('Available webserver ENV: ' . join(', ', sort keys $self->request->env->%*)) if $self->log->is_trace;
+    my $data;
+    if ($auth->{envkeys}) {
+        foreach my $key (keys %{$auth->{envkeys}}) {
+            my $envkey = $auth->{envkeys}->{$key};
+            $self->log->debug("Try to load '$key' from webserver ENV '$envkey'");
+            next unless defined $self->request->env->{$envkey};
+            $data->{$key} = Encode::decode('UTF-8', $self->request->env->{$envkey}, Encode::LEAVE_SRC | Encode::FB_CROAK);
+        }
+    # legacy support
+    } elsif (my $user = $self->request->env->{OPENXPKI_USER} || $self->request->env->{REMOTE_USER}) {
+        $data->{username} = $user;
+        $data->{role} = $self->request->env->{OPENXPKI_GROUP} if $self->request->env->{OPENXPKI_GROUP};
+    }
+
+    # Send login data.
+    # At least some items were found, so we send them to the backend.
+    if ($data) {
+        $self->log->trace('Sending auth data ' . Dumper $data) if $self->log->is_trace;
+
+        $data = $self->_jwt_signature($data, $jws) if ($jws);
+
+        $self->_send_to_backend( 'GET_CLIENT_LOGIN', $data );
+        return $self->_check_response;
+    }
+
+    # as nothing was found we do not even try to login in and look for a redirect
+    if (my $loginurl = $auth->{login}) {
+
+        # the login url might contain a backlink to the running instance
+        $loginurl = OpenXPKI::Template->new->render( $loginurl,
+            { baseurl => $self->base_url } );
+
+        $self->log->debug("No auth data in environment - redirect found $loginurl");
+        $self->page_obj->redirect->external($loginurl);
+        return $self->page_obj;
+
+    # bad luck - something seems to be really wrong
+    } else {
+        $self->log->error('No ENV data to perform SSO Login');
+        $self->logout_session;
+        return $self->page_obj->init_login_missing_data;
+    }
+}
+
+sub _handle_GET_X509_LOGIN ($self, $jws) {
+
+    my $user = $self->request->env->{SSL_CLIENT_S_DN_CN} || $self->request->env->{SSL_CLIENT_S_DN};
+    my $cert = $self->request->env->{SSL_CLIENT_CERT} || '';
+
+    $self->log->trace('ENV is ' . Dumper \%ENV) if $self->log->is_trace;
+
+    # Send login data
+    if ($cert) {
+        $self->log->info('Sending X509 Login ( '.$user.' )');
+        my @chain;
+        # larger chains are very unlikely and we dont support stupid clients
+        for (my $cc=0;$cc<=3;$cc++)   {
+            my $chaincert = $self->request->env->{'SSL_CLIENT_CERT_CHAIN_'.$cc};
+            last unless ($chaincert);
+            push @chain, $chaincert;
+        }
+
+        my $data = { certificate => $cert, chain => \@chain };
+        $data = $self->_jwt_signature($data, $jws) if ($jws);
+
+        $self->_send_to_backend( 'GET_X509_LOGIN', $data);
+        $self->log->trace('Auth result ' . Dumper $self->last_reply) if $self->log->is_trace;
+        return $self->_check_response;
+    }
+
+    # Error: no cert
+    $self->log->error('Certificate missing for X509 Login');
+    $self->logout_session;
+    return $self->page_obj->init_login_missing_data;
+}
+
+sub _handle_GET_OIDC_LOGIN ($self, $page, $auth, $realm, $auth_stack) {
+    my %oidc_client = map {
+        ($_ => ($auth->{$_} || die "OIDC setup incomplete, '$_' is not set"));
+    } qw(client_id auth_uri token_uri client_secret);
+
+    $self->log->trace(SDumper \%oidc_client) if ($self->log->is_trace);
+
+    # Send login data.
+    # We use "page" to transport the token.
+    if ($page =~ m{login!oidc!token!([\w\-\.]+)\z}) {
+        # Step 3 - use token to perform authentication
+        my $token = $1;
+        $self->log->debug('OIDC Login (3/3) - present token to backend');
+        $self->log->trace("Token = $token");
+        my $nonce = $self->session->param('oidc-nonce')
+            or return $self->page_obj->init_login_missing_data;
+
+        $self->session->param('oidc-nonce' => undef);
+        $self->_send_to_backend( 'GET_OIDC_LOGIN', {
+            token => $token,
+            client_id => $oidc_client{client_id},
+            nonce => $nonce,
+        });
+        return $self->_check_response;
+
+    }
+
+    my $tt = OpenXPKI::Template->new;
+    my $uri_pattern = $auth->{redirect_uri} || 'https://[% host _ baseurl %]';
+    my $redirect_uri = $tt->render( $uri_pattern, {
+        host => $self->normalized_request_url->host,
+        baseurl => $self->base_url,
+        realm => $realm,
+        stack => $auth_stack,
+    });
+
+    if (my $code = $self->param('code')) {
+
+        # Step 2 - user was redirected from IdP
+        $self->log->debug("OIDC Login (2/3) - redeem auth code $code");
+        my $ua = LWP::UserAgent->new;
+        # For whatever reason this must be www-form encoded and not JSON
+        my $response = $ua->post( $oidc_client{token_uri}, [
+            code => $code,
+            client_id => $oidc_client{client_id},
+            client_secret => $oidc_client{client_secret},
+            redirect_uri => $redirect_uri.'/oidc_redirect',
+            grant_type => 'authorization_code',
+        ]);
+        $self->log->trace("OIDC Token Response: " .$response->decoded_content);
+
+        # Error
+        if (not $response->is_success) {
+            $self->log->warn("Unable to redeem token, error was: " . $response->decoded_content);
+            $self->page_obj->status->error('Unable to redeem token');
+            $self->page_obj->redirect->to('login!missing_data');
+            return $self->page_obj;
+        }
+
+        my $auth_info = $self->json->decode($response->decoded_content);
+        $self->page_obj->redirect->to('login!oidc!token!'.$auth_info->{id_token});
+        return $self->page_obj;
+
+    } elsif ($self->session->param('oidc-nonce')) {
+
+        # to avoid an endless loop in case the user is not willing
+        # or able to complete the OIDC login, we use the nonce
+        # in the session to detect a "returning user" and render an
+        # info page instead of doing a redirect
+        $self->logout_session;
+        return $self->page_obj->init_login_missing_data;
+
+    } else {
+
+        # Initial step - assemble auth token request and send redirect
+        my $nonce = Data::UUID->new->create_b64;
+        my $sess_id = $self->has_cipher ?
+            encode_base64($self->cipher->encrypt($self->session->id),'') :
+            $self->session->id;
+
+        # TODO - this is only set if we had a roundtrip before
+        # move this into the session
+        my $hash_key = $self->request->cookie('oxi-extid');
+        die "No external key to prepare OIDC" unless($hash_key);
+        my $auth_token = {
+            response_type => 'code',
+            client_id => $oidc_client{client_id},
+            scope => ($auth->{scope} || 'openid profile email'),
+            redirect_uri => $redirect_uri.'/oidc_redirect',
+            state => encode_jwt( alg => 'HS256', key => $hash_key->value, payload => {
+                session_id => $sess_id,
+                baseurl => $redirect_uri,
+            }),
+            nonce => $nonce,
+        };
+        $self->log->debug('OIDC Login (1/3) - redirect to ' . $oidc_client{auth_uri});
+        $self->session->param('oidc-nonce',$nonce);
+
+        my $loginurl = $oidc_client{auth_uri}.'?'.join('&', (map { $_ .'='. uri_escape($auth_token->{$_})  } keys %{$auth_token}));
+        $self->page_obj->redirect->external($loginurl);
+        return $self->page_obj;
+    }
+}
+
+sub _handle_GET_PASSWD_LOGIN ($self, $action, $auth, $jws) {
+    # form send / credentials are passed (works with an empty form too...)
+
+    # Send login data
+    if ($action eq 'login!password') {
+        $self->log->debug('PASSWD auth try - validating username/password');
+        ##FIXME - Input validation
+
+        my $data;
+        my @fields = $auth->{field}
+            ? (map { $_->{name} } $auth->{field}->@*)
+            : ('username', 'password');
+
+        foreach my $field (@fields) {
+            my $val = $self->param($field);
+            next unless $val;
+            $data->{$field} = $val;
+        }
+
+        $data = $self->_jwt_signature($data, $jws) if $jws;
+
+        $self->_send_to_backend( 'GET_PASSWD_LOGIN', $data );
+        $self->log->trace('Auth result = ' . Dumper $self->last_reply) if $self->log->is_trace;
+        return $self->_check_response;
+    }
+
+    # Render form
+    $self->log->debug('No credentials, render form');
+    return $self->page_obj->init_login_passwd($auth);
+}
+
+sub _check_response ($self) {
+    if ('SERVICE_READY' eq $self->last_reply->{SERVICE_MSG}) {
+
         $self->log->info('Authentication successful - fetch session info');
         # Fetch the user info from the server
-        $reply = $self->client->send_receive_service_msg( 'COMMAND',
+        $self->_send_to_backend( 'COMMAND',
             { COMMAND => 'get_session_info', PARAMS => {}, API => 2 } );
 
-        if ( $reply->{SERVICE_MSG} eq 'COMMAND' ) {
+        if ( $self->last_reply->{SERVICE_MSG} eq 'COMMAND' ) {
 
-            my $session_info = $reply->{PARAMS};
+            my $session_info = $self->last_reply->{PARAMS};
 
             # merge base URL to authinfo links
             # (we need to get the baseurl before recreating the session below)
@@ -549,37 +606,36 @@ sub handle_login ($self, $page, $action, $reply) {
             # session so access to the old session is not possible
             $self->_recreate_frontend_session($session_info, $auth_info);
 
-            if ($auth_info->{login}) {
-                $uilogin->redirect->to($auth_info->{login});
+            if (my $login_page = $auth_info->{login}) {
+                $self->page_obj->redirect->to($login_page);
             } else {
-                $uilogin->init_index;
+                $self->page_obj->init_index;
             }
-            return $uilogin;
+            return $self->page_obj;
         }
     }
 
-    if ( $reply->{SERVICE_MSG} eq 'ERROR') {
-        $self->log->trace('Server error: '. Dumper $reply) if $self->log->is_trace;
+    if ('ERROR' eq $self->last_reply->{SERVICE_MSG}) {
+        $self->log->trace('Server error: '. Dumper $self->last_reply) if $self->log->is_trace;
 
         # Failure here is likely a wrong password
-        my $msg = $reply->{'ERROR'} && $reply->{'ERROR'}->{CLASS} eq 'OpenXPKI::Exception::Authentication'
-            ? $reply->{'ERROR'}->{LABEL}
-            : $uilogin->message_from_error_reply($reply);
+        my $msg = $self->last_reply->{'ERROR'} && $self->last_reply->{'ERROR'}->{CLASS} eq 'OpenXPKI::Exception::Authentication'
+            ? $self->last_reply->{'ERROR'}->{LABEL}
+            : $self->page_obj->message_from_error_reply($self->last_reply);
 
-        $uilogin->status->error($msg);
-        return $uilogin;
+        $self->page_obj->status->error($msg);
+        return $self->page_obj;
     }
 
     $self->log->error("Unhandled error during auth");
-    $uilogin->status->error("Unhandled error during authentication");
-    return $uilogin;
-
+    $self->page_obj->status->error("Unhandled error during authentication");
+    return $self->page_obj;
 }
 
 sub handle_logout ($self, $page) {
     return unless ($page eq 'logout' or $page eq 'login!logout');
 
-    my $uilogin = OpenXPKI::Client::Service::WebUI::Page::Login->new(webui => $self);
+    $self->clear_page_obj; # paranoia: guard against multiple calls to handle_logout() within one request
 
     if ($page eq 'logout') {
         # For SSO Logins the session might hold an external link
@@ -595,7 +651,7 @@ sub handle_logout ($self, $page) {
         # the realm config (if any).
         $self->_init_client($self->client); # initialize backend session and store its ID in frontend session
 
-        if (my $pki_realm = $self->session->param('pki_realm')) {
+        if (my $realm = $self->session->param('pki_realm')) {
             my $auth_stack = $self->session->param('is_fixed_auth_stack') # auth_stack shouldn't be there after session renewal if it's not fixed, but we check anyways
                 ? $self->session->param('auth_stack')
                 : undef;
@@ -603,7 +659,7 @@ sub handle_logout ($self, $page) {
             my $reply = $self->ping_client;
             if ($reply->{SERVICE_MSG} eq 'GET_PKI_REALM') {
                 $self->client->send_receive_service_msg('GET_PKI_REALM', {
-                    PKI_REALM => $pki_realm,
+                    PKI_REALM => $realm,
                     $auth_stack ? (AUTHENTICATION_STACK => $auth_stack) : (),
                 });
             }
@@ -612,21 +668,26 @@ sub handle_logout ($self, $page) {
         # perform the redirect if set
         if ($goto) {
             $self->log->debug("External redirect on logout to: $goto");
-            $uilogin->redirect->external($goto);
+            $self->page_obj->redirect->external($goto);
         } else {
-            $uilogin->redirect->to('login!logout');
+            $self->page_obj->redirect->to('login!logout');
         }
 
-        return $uilogin;
+        return $self->page_obj;
     }
 
     # show the "you have been logged out" page
     if ($page eq 'login!logout') {
-        $uilogin->init_logout;
-        return $uilogin;
+        return $self->page_obj->init_logout;
     }
 
     return;
+}
+
+sub _send_to_backend ($self, @args) {
+    my $reply = $self->client->send_receive_service_msg(@args);
+    $self->last_reply($reply);
+    return $reply;
 }
 
 sub _jwt_signature ($self, $data, $jws) {
