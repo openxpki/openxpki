@@ -512,7 +512,7 @@ sub get_pids {
         my $cmd = $p->cmndline;
         for my $procname (keys $result->%*) {
             # look for "PROC_BASENAME .* PROC_NAME_XXX" pattern
-            next unless $cmd =~ / ^ \Q $pn_base \E .* \Q $procname \E /xi;
+            next unless $cmd =~ / ^ \Q$pn_base\E .* \Q$procname\E /xi;
             # handle array and scalar result types
             if (ref $result->{$procname} eq 'ARRAY') {
                 push $result->{$procname}->@*, $p->pid;
