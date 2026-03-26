@@ -4,7 +4,7 @@ use namespace::autoclean;
 
 # Core modules
 use Encode;
-use MIME::Base64 qw( encode_base64 );
+use MIME::Base64 qw( encode_base64 decode_base64 );
 
 # CPAN modules
 use Crypt::JWT qw( encode_jwt decode_jwt );
@@ -16,6 +16,11 @@ use OpenXPKI::Template;
 use OpenXPKI::Dumper;
 
 =head1 ATTRIBUTES
+
+=head2 webui
+
+The parent L<OpenXPKI::Client::Service::WebUI> instance. Required; stored as a
+weak reference to avoid circular ownership.
 
 =cut
 has webui => (
@@ -40,6 +45,13 @@ has log => (
     default => sub { OpenXPKI::Log4perl->get_logger },
 );
 
+=head2 login_page
+
+Internal login page name, read from C<login.page> (or the legacy key
+C<global.loginpage>) in the WebUI service config. Empty string when not set.
+Auto-initialized.
+
+=cut
 has login_page => (
     init_arg => undef,
     is => 'ro',
@@ -48,6 +60,13 @@ has login_page => (
     default => sub ($self) { $self->webui->config->get('login.page') || $self->webui->config->get('global.loginpage') // '' },
 );
 
+=head2 login_url
+
+External login redirect URL, read from C<login.url> (or the legacy key
+C<global.loginurl>) in the WebUI service config. Empty string when not set.
+Auto-initialized.
+
+=cut
 has login_url => (
     init_arg => undef,
     is => 'ro',
@@ -56,14 +75,36 @@ has login_url => (
     default => sub ($self) { $self->webui->config->get('login.url') || $self->webui->config->get('global.loginurl') // '' },
 );
 
-# Only if realm_mode=path: a map of realms to URL paths
-# {
-#     realma => [
-#         { url => 'realm-a', stack => 'LocalPassword' },
-#         { url => 'realm-a-cert', stack => 'Certificate' },
-#     ],
-#     realmb => ...
-# }
+=head2 jwt_key
+
+DER-encoded EC public key (I<Str>) used to sign non-password auth requests via
+JWT. Read from config key C<auth.sign.key> (base64-encoded). C<undef> when not
+configured. Auto-initialized.
+
+=cut
+has jwt_key => (
+    init_arg => undef,
+    is => 'ro',
+    isa => 'Str|Undef',
+    lazy => 1,
+    default => sub ($self) {
+        # TODO Rework auth.sign.key handling
+        # The key is used to sign non-password auth requests.
+        # Create the key using "openssl ecparam -name secp256r1 -genkey -noout"
+        # Put the public key into auth/stack.yaml where required.
+        my $key = $self->webui->config->get(['auth', 'sign.key']) or return undef;
+        return decode_base64($key);
+    },
+);
+
+=head2 realm_path_map
+
+Only used when C<realm_mode=path>. A HashRef mapping each realm name to an
+ArrayRef of C<{ url =E<gt> ..., stack =E<gt> ... }> entries, one per URL alias
+defined in C<realm.map> (or the legacy C<realm> key) in the service config.
+Built lazily from the config on first access. Auto-initialized.
+
+=cut
 has realm_path_map => (
     init_arg => undef,
     is => 'rw',
@@ -89,7 +130,13 @@ sub _build_realm_path_map ($self) {
     return $map;
 }
 
-# Last server reply from C<$self->webui->client->send_receive_service_msg()>
+=head2 last_reply
+
+The most recent raw reply HashRef received from
+C<$self-E<gt>webui-E<gt>client-E<gt>send_receive_service_msg()>. C<undef> until
+the first message exchange. Auto-initialized.
+
+=cut
 has last_reply => (
     init_arg => undef,
     is => 'rw',
@@ -97,7 +144,14 @@ has last_reply => (
     default => undef,
 );
 
-# Helper to quickly create response Page objects
+=head2 page_obj
+
+A lazily constructed L<OpenXPKI::Client::Service::WebUI::Page::Login> helper
+used to build login response page objects. Cleared at the start of each call to
+C<login> as a guard against multiple calls within one request.
+Auto-initialized.
+
+=cut
 has page_obj => (
     init_arg => undef,
     is => 'rw',
@@ -113,16 +167,16 @@ has page_obj => (
 # METHODS
 #
 
-signature_for handle_login => (
+signature_for login => (
     method => 1,
     positional => [
         'Str', 'Str', 'HashRef',
     ],
 );
-sub handle_login ($self, $page, $action, $reply) {
+sub login ($self, $page, $action, $reply) {
     $self->last_reply($reply);
     $self->log->info("Not logged in - authenticating; page = '$page', action = '$action'");
-    $self->clear_page_obj; # paranoia: guard against multiple calls to handle_login() within one request
+    $self->clear_page_obj; # paranoia: guard against multiple calls to login() within one request
 
     # Read login parameters "pki_realm" and "auth_stack"
     if ($action eq 'login!realm' and my $realm = scalar $self->webui->param('pki_realm')) {
@@ -640,10 +694,10 @@ sub _check_response ($self) {
     return $self->page_obj;
 }
 
-sub handle_logout ($self, $page) {
+sub logout ($self, $page) {
     return unless ($page eq 'logout' or $page eq 'login!logout');
 
-    $self->clear_page_obj; # paranoia: guard against multiple calls to handle_logout() within one request
+    $self->clear_page_obj; # paranoia: guard against multiple calls to logout() within one request
 
     if ($page eq 'logout') {
         # For SSO Logins the session might hold an external link
@@ -699,10 +753,10 @@ sub _send_to_backend ($self, @args) {
 }
 
 sub _jwt_signature ($self, $data, $jws) {
-    return unless $self->webui->has_auth;
+    return unless defined $self->jwt_key;
 
     $self->log->debug('Sign data using key id ' . $jws->{keyid} );
-    my $pkey = $self->webui->auth;
+    my $pkey = $self->jwt_key;
 
     return encode_jwt(
         payload => {

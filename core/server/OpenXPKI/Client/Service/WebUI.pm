@@ -58,21 +58,6 @@ sub has_cipher {
     return (defined $cipher);
 }
 
-=head2 auth
-
-Key I<Str> for JWT token used to sign socket communication during auth requests
-(see L<OpenXPKI::Client::Service::WebUI::Auth/handle_login>)
-
-=cut
-sub auth; # pre-declaration required before "has" so predicate sub has_auth is defined first
-sub has_auth;
-has auth => (
-    init_arg => undef, # set in BUILD
-    is => 'rw',
-    isa => 'Str',
-    predicate => 'has_auth',
-);
-
 =head2 session_cookie
 
 HTTP session cookie encapsulation (L<OpenXPKI::Client::Service::WebUI::SessionCookie>).
@@ -496,12 +481,12 @@ has base_url => (
     }
 );
 
-=head2 login_handler
+=head2 auth
 
 Instance of L<OpenXPKI::Client::Service::WebUI::Auth>. Auto-created.
 
 =cut
-has login_handler => (
+has auth => (
     init_arg => undef,
     is => 'ro',
     isa => 'OpenXPKI::Client::Service::WebUI::Auth',
@@ -678,15 +663,6 @@ sub BUILD ($self, $args) {
 
     # Init Cookie cipher
     $self->cipher();
-
-    # TODO Rework auth.sign.key handling
-    # The key is used to sign non-password auth requests.
-    # Create the key using "openssl ecparam -name secp256r1 -genkey -noout"
-    # Put the public key into auth/stack.yaml where required.
-    if (my $key = $self->config->get(['auth','sign.key'])) {
-        my $pk = decode_base64($key);
-        $self->auth($pk);
-    }
 
     if ($self->config->get('session.ip_match')) {
         $CGI::Session::IP_MATCH = 1;
@@ -1061,7 +1037,7 @@ sub handle_ui_request ($self) {
     # Handle logout / session restart
     # Do this before connecting the server to have the client in the
     # new session and to recover from backend session failure
-    if (my $logout_page = $self->login_handler->handle_logout($page)) {
+    if (my $logout_page = $self->auth->logout($page)) {
         return $logout_page;
     }
 
@@ -1113,7 +1089,7 @@ sub handle_ui_request ($self) {
     # we get the problem that ui is logged in but backend is not
     $self->logout_session if $self->session->param('is_logged_in');
 
-    return $self->login_handler->handle_login($page || '', $action, $reply);
+    return $self->auth->login($page || '', $action, $reply);
 }
 
 =head2 handle_oidc
@@ -1124,15 +1100,15 @@ Called when the IdP redirects the browser to C</webui/E<lt>realmE<gt>/oidc_redir
 The frontend session (incl. C<backend_session_id>, C<oidc-nonce>) has already been
 restored from the JWT-encoded C<state> parameter by L</_build_session>.
 
-Establishes the backend connection and calls L</handle_login> directly with
-C<page='login'> to ensure the OIDC auth code (C<code> request parameter) is
-processed — bypassing the redirect-to-login early return that would happen with
-an empty page parameter.
+Establishes the backend connection and calls L<OpenXPKI::Client::Service::WebUI::Auth/login>
+directly with C<page='login'> to ensure the OIDC auth code (C<code> request
+parameter) is processed — bypassing the redirect-to-login early return that would
+happen with an empty page parameter.
 
 This approach is robust to expired backend sessions: if the backend session timed
-out during the IdP roundtrip, C<handle_login> re-runs realm/stack selection using
-values from the restored frontend session and eventually reaches C<GET_OIDC_LOGIN>
-again where the code exchange takes place.
+out during the IdP roundtrip, L<OpenXPKI::Client::Service::WebUI::Auth/login>
+re-runs realm/stack selection using values from the restored frontend session and
+eventually reaches C<GET_OIDC_LOGIN> again where the code exchange takes place.
 
 Returns an instance of L<OpenXPKI::Client::Service::WebUI::Page>.
 
@@ -1157,15 +1133,15 @@ sub handle_oidc ($self) {
         return $new_page->(sub ($p) { $p->status->error($p->message_from_error_reply($reply)) });
     }
 
-    # Propagate realm/stack from URL path detection into session so handle_login
+    # Propagate realm/stack from URL path detection into session so $self->auth->login()
     # can set them on a freshly created backend session if needed
     $self->session->param('pki_realm', $self->current_realm) if $self->has_current_realm;
     $self->session->param('auth_stack', $self->current_auth_stack) if $self->has_current_auth_stack;
 
-    # Call handle_login with page='login' to reach the OIDC code-redemption branch.
+    # Call login() with page='login' to reach the OIDC code-redemption branch.
     # Without this, an empty page parameter would trigger an early return (redirect
     # to login page) before the 'code' request parameter is ever examined.
-    return $self->login_handler->handle_login('login', '', $reply);
+    return $self->auth->login('login', '', $reply);
 }
 
 =head2 ping_client
