@@ -77,8 +77,16 @@ The https connection is protected by a Let\'s Encrypt certificate but if
 you want to validate the key on your own, the fingerprint is:
 
 ```bash
-$ gpg --print-md sha256 Release.key (Updated 2025-05-16)
-3FEB1721 48F53252 A6644B65 AD06304F 4751E129 510081E0 042E4E80 1175E3F8
+$ gpg --print-md sha256 Release.key
+Release.key: 1A944DEE E2E97122 3670A2BE 660BDC5D BD776498 5DC99B68 869E4187
+             C27BA772
+```
+
+```bash
+$ gpg --keyid-format 0xlong --import-options show-only --import Release.key
+pub   rsa4096/0x68ACB0D02C23C909 2025-05-16 [SC] [expires: 2027-05-16]
+      0A857FC5DFA8C6BE2A85A8D668ACB0D02C23C909
+uid                              White Rabbit Security GmbH (Package Signing Key for OpenXPKI) <openxpki@whiterabbitsecurity.com>
 ```
 
 You can also find the key on the [github repository](https://github.com/openxpki/openxpki) in
