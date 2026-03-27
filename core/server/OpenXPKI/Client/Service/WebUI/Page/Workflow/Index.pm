@@ -154,7 +154,7 @@ sub action_index ($self) {
         }
         $self->log->trace("wf info on create: " . Dumper $wf_info ) if $self->log->is_trace;
 
-        $self->log->info(sprintf "Create new workflow %s, got id #%s",  $wf_args->{wf_type}, $wf_info->{workflow}->{id} );
+        $self->log->info(sprintf "Create new workflow '%s', got id #%s",  $wf_args->{wf_type}, $wf_info->{workflow}->{id} );
 
         # purge the workflow token
         $self->purge_wf_token;
