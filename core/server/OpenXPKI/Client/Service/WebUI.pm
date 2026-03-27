@@ -1057,7 +1057,7 @@ sub handle_ui_request ($self) {
         return $new_page->(sub { shift->redirect->to($goto) });
     }
 
-    # Handle logout / session restart
+    # Handle LOGOUT / session restart
     # Do this before connecting the server to have the client in the
     # new session and to recover from backend session failure
     return $self->auth->logout($page) if $self->auth->is_logout($page);
@@ -1096,7 +1096,7 @@ sub handle_ui_request ($self) {
     $self->session->param('pki_realm', $self->current_realm) if $self->has_current_realm;
     $self->session->param('auth_stack', $self->current_auth_stack) if $self->has_current_auth_stack;
 
-    # Handle page if logged in (open channel) unless it's the bootstrap page
+    # Handle page if logged in (open channel) or it's the bootstrap page
     if ( $reply->{SERVICE_MSG} eq 'SERVICE_READY' or $page =~ /^bootstrap!(.+)/) {
         if ($action) {
             # Action is only valid within a post request
@@ -1110,6 +1110,7 @@ sub handle_ui_request ($self) {
     # we get the problem that ui is logged in but backend is not
     $self->logout_session if $self->session->param('is_logged_in');
 
+    # Handle LOGIN
     return $self->auth->login($page || '', $action, $reply);
 }
 

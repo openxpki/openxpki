@@ -1,6 +1,40 @@
 package OpenXPKI::Client::Service::WebUI::Dispatcher;
 use OpenXPKI qw( -class -typeconstraints );
 
+=head1 NAME
+
+OpenXPKI::Client::Service::WebUI::Dispatcher - Route WebUI requests to page handler classes
+
+=head1 SYNOPSIS
+
+    my $dispatcher = OpenXPKI::Client::Service::WebUI::Dispatcher->new(
+        webui => $webui,
+    );
+    my $page = $dispatcher->view('workflow!index');    # Dispatch a view
+    my $page = $dispatcher->action('workflow!handle'); # Dispatch an action
+
+=head1 DESCRIPTION
+
+Resolves incoming WebUI request strings of the form C<class!method> (or the
+encrypted C<encrypted!<jwt>> variant) to the appropriate
+C<OpenXPKI::Client::Service::WebUI::Page::*> handler class and method, then
+invokes the handler and follows any internal redirects until a response page is
+produced.
+
+Entry points:
+
+=over
+
+=item * L</action> - for action requests (calls C<action_*> methods)
+
+=item * L</view> - for page-view requests (calls C<init_*> methods)
+
+=back
+
+Both return the page object that should be serialised as the HTTP response.
+
+=cut
+
 # Core modules
 use Module::Load ();
 use Encode;
@@ -14,6 +48,11 @@ use OpenXPKI::Client::Service::WebUI::JWT;
 use OpenXPKI::Client::Service::WebUI::Page::Bootstrap;
 
 =head1 ATTRIBUTES
+
+=head2 webui
+
+The parent L<OpenXPKI::Client::Service::WebUI> instance. Required.
+Held as a weak reference to avoid circular references.
 
 =cut
 has webui => (
@@ -159,32 +198,27 @@ sub view ($self, $view_str, $args, $forced_status = undef) {
     return $page;
 }
 
-=head2 _load_page_class
-
-Parses a call string of the form C<Class!method!key1!val1!key2!val2> (or the
-special C<encrypted!<jwt>> form), resolves the target Perl package, and
-instantiates it.
-
-For actions (C<is_action => 1>) the lookup order is:
-
-  Page::<Class>::Action::<Method>
-  Page::<Class>::<action_method>   (method name with prefix)
-  Page::<Class>::<Method>
-  Page::<Class>::Action
-  Page::<Class>
-
-For views the same cascade is used with C<Init> instead of C<Action>.
-
-Any extra C<!key!val> pairs appended to the call string are decoded (UTF-8,
-URI-unescaped) and added to the request parameters via
-C<< webui->add_params >>. Secure parameters embedded in an encrypted JWT are
-added via C<< webui->add_secure_params >> instead.
-
-Returns a two-element list C<($page_object, $method_name)> on success, or an
-empty list (C<undef> in scalar context) when no matching class/method can be
-found.
-
-=cut
+# Parses a call string of the form "class!method!key1!val1!key2!val2" (or the
+# special "encrypted!<jwt>" form), resolves the target Perl package, and
+# instantiates it.
+#
+# For actions (is_action => 1) the lookup order is:
+#
+#   Page::<Class>::Action::<Method>
+#   Page::<Class>::<action_method>   (method name with prefix)
+#   Page::<Class>::<Method>
+#   Page::<Class>::Action
+#   Page::<Class>
+#
+# For views the same cascade is used with Init instead of Action.
+#
+# Any extra !key!val pairs appended to the call string are decoded (UTF-8,
+# URI-unescaped) and added to the request parameters. Secure parameters embedded
+# in an encrypted JWT are also added via $webui->add_secure_params().
+#
+# Returns a two-element list ($page_object, $method_name) on success, or an
+# empty list (undef in scalar context) when no matching class/method can be
+# found.
 
 signature_for _load_page_class => (
     method => 1,

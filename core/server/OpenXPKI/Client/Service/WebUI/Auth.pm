@@ -1,4 +1,33 @@
 package OpenXPKI::Client::Service::WebUI::Auth;
+
+=head1 NAME
+
+OpenXPKI::Client::Service::WebUI::Auth - Authentication and session management for the WebUI service
+
+=head1 SYNOPSIS
+
+    my $auth = OpenXPKI::Client::Service::WebUI::Auth->new(
+        webui => $webui,
+    );
+
+    # One login step; returns a page object or undef when done
+    my $page = $auth->login($page, $action, $last_server_reply);
+
+    # Handle logout
+    my $page = $auth->logout($page);
+
+=head1 DESCRIPTION
+
+Handles the complete authentication lifecycle for the WebUI: initial login
+redirects, realm and auth-stack selection, credential submission for all
+supported login types (password, X.509 certificate, SSO/client, OIDC), logout,
+and post-login session setup (menu, MOTD, search config).
+
+It is constructed by L<OpenXPKI::Client::Service::WebUI> and called from the
+dispatcher on every request that arrives before or during the login sequence.
+
+=cut
+
 use OpenXPKI qw( -class -typeconstraints );
 
 # Core modules
@@ -31,7 +60,7 @@ has webui => (
 
 =head2 log
 
-A logger object, per default set to C<OpenXPKI::Log4perl-E<gt>get_logger>.
+Logger object. Defaults to C<OpenXPKI::Log4perl-E<gt>get_logger>.
 
 =cut
 has log => (
@@ -145,10 +174,9 @@ has last_reply => (
 
 =head2 page_obj
 
-A lazily constructed L<OpenXPKI::Client::Service::WebUI::Page::Login> helper
-used to build login response page objects. Cleared at the start of each call to
-C<login> as a guard against multiple calls within one request.
-Auto-initialized.
+Helper that returns a L<OpenXPKI::Client::Service::WebUI::Page::Login> object.
+Cleared at the start of each call to C</login> as a guard against multiple calls
+within one request. Auto-initialized.
 
 =cut
 has page_obj => (
@@ -162,9 +190,31 @@ has page_obj => (
     clearer => 'clear_page_obj',
 );
 
-#
-# METHODS
-#
+=head1 METHODS
+
+=head2 login
+
+Drive one step of the login sequence for the current request. Reads realm and
+auth-stack from the session, delegates to the appropriate handler method based
+on the server's C<SERVICE_MSG>, and returns a page object.
+
+B<Parameters>
+
+=over
+
+=item * C<$page> I<Str> - required: page string from the request.
+
+=item * C<$action> I<Str> - required: action string from the request.
+
+=item * C<$reply> I<HashRef> - required: the most recent reply from the backend
+service (i.e. the result of L<OpenXPKI::Client/send_receive_service_msg>).
+
+=back
+
+Returns a L<OpenXPKI::Client::Service::WebUI::Page> page object, or
+C<undef> in special cases if the caller should continue without rendering.
+
+=cut
 
 signature_for login => (
     method => 1,
