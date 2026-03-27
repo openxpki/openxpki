@@ -693,9 +693,36 @@ sub _check_response ($self) {
     return $self->page_obj;
 }
 
-sub logout ($self, $page) {
-    return unless ($page eq 'logout' or $page eq 'login!logout');
+=head2 is_logout
 
+Checks if the given page string is logout related.
+
+=cut
+sub is_logout ($self, $page) {
+    return ($page eq 'logout' or $page eq 'login!logout') ? 1 : 0;
+}
+
+=head2 logout
+
+Handle a logout or post-logout display request. Destroys the current frontend
+and backend sessions, honours any SSO logout redirect configured in the session,
+and renders the "you have been logged out" confirmation page.
+
+Returns C<undef> when C<$page> is not a logout string so the caller can skip
+further processing.
+
+B<Parameters>
+
+=over
+
+=item * C<$page> I<Str> - required: the current page string. Only C<"logout"> and
+C<"login!logout"> are acted upon; all other values cause an immediate C<undef>
+return.
+
+=back
+
+=cut
+sub logout ($self, $page) {
     $self->clear_page_obj; # paranoia: guard against multiple calls to logout() within one request
 
     if ($page eq 'logout') {

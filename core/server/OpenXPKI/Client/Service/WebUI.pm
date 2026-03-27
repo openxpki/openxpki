@@ -1060,9 +1060,7 @@ sub handle_ui_request ($self) {
     # Handle logout / session restart
     # Do this before connecting the server to have the client in the
     # new session and to recover from backend session failure
-    if (my $logout_page = $self->auth->logout($page)) {
-        return $logout_page;
-    }
+    return $self->auth->logout($page) if $self->auth->is_logout($page);
 
     # Prepare realm selection: enforce new server session to get rid of selected realm etc.
     if ($self->is_realm_selection_page) {
