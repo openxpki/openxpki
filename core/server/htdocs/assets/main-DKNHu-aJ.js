@@ -42950,7 +42950,7 @@ function setupGlobal(app, importCallback) {
  * @param {Application} app your `@ember/application` Application sub-class
  */
 function setupInspector (app) {
-  setupGlobal(app, () => __vitePreload(() => import('./modules-4-12-Gz9TLaxf.js'),true              ?[]:void 0,import.meta.url));
+  setupGlobal(app, () => __vitePreload(() => import('./modules-4-12-D7ktjktJ.js'),true              ?[]:void 0,import.meta.url));
 }
 
 const defineModule0 = Object.assign({}, {});
