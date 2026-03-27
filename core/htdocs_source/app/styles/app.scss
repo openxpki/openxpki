@@ -681,43 +681,43 @@ div.oxifield-upload {
 
 /* Solid (dark bg, white text) */
 .oxi-btn-primary,
-.btn-primary         { background-color: var(--oxi-btn-bg-primary); }
+.btn-primary         { --bs-btn-bg: var(--oxi-btn-bg-primary); }
 
 /* Pastel (light bg, dark text) */
 .oxi-btn-expected,
-.oxi-btn-submit      { background-color: var(--oxi-btn-bg-submit); }
+.oxi-btn-submit      { --bs-btn-bg: var(--oxi-btn-bg-submit); }
 
 .oxi-btn-optional,
-.oxi-btn-info        { background-color: var(--oxi-btn-bg-info); }
+.oxi-btn-info        { --bs-btn-bg: var(--oxi-btn-bg-info); }
 
 .oxi-btn-failure,
-.oxi-btn-cancel      { background-color: var(--oxi-btn-bg-cancel); }
+.oxi-btn-cancel      { --bs-btn-bg: var(--oxi-btn-bg-cancel); }
 
 .oxi-btn-reset,
-.oxi-btn-alternative { background-color: var(--oxi-btn-bg-alternative); }
+.oxi-btn-alternative { --bs-btn-bg: var(--oxi-btn-bg-alternative); }
 
 .oxi-btn-exceptional,
-.oxi-btn-loading     { background-color: var(--oxi-btn-bg-exceptional); }
+.oxi-btn-loading     { --bs-btn-bg: var(--oxi-btn-bg-exceptional); }
 
-.oxi-btn-terminate   { background-color: var(--oxi-btn-bg-terminate); }
+.oxi-btn-terminate   { --bs-btn-bg: var(--oxi-btn-bg-terminate); }
 
 /* Clone add/remove buttons — subtle variants of exceptional (blue) / cancel (red) */
 .oxi-btn-subtle-add {
-  background-color: color-mix(in srgb, var(--oxi-btn-bg-exceptional) 50%, white);
+  --bs-btn-bg: color-mix(in srgb, var(--oxi-btn-bg-exceptional) 50%, white);
   color: #1a5276 !important;
   border-color: var(--oxi-btn-bg-exceptional) !important;
   [data-bs-theme=dark] & {
-    background-color: color-mix(in srgb, var(--oxi-btn-bg-exceptional) 50%, black);
+    --bs-btn-bg: color-mix(in srgb, var(--oxi-btn-bg-exceptional) 50%, black);
     color: #8dc8e8 !important;
   }
 }
 
 .oxi-btn-subtle-remove {
-  background-color: color-mix(in srgb, var(--oxi-btn-bg-cancel) 50%, white);
+  --bs-btn-bg: color-mix(in srgb, var(--oxi-btn-bg-cancel) 50%, white);
   color: #7a2020 !important;
   border-color: var(--oxi-btn-bg-cancel) !important;
   [data-bs-theme=dark] & {
-    background-color: color-mix(in srgb, var(--oxi-btn-bg-cancel) 50%, black);
+    --bs-btn-bg: color-mix(in srgb, var(--oxi-btn-bg-cancel) 50%, black);
     color: #e6a8a8 !important;
   }
 }
@@ -732,6 +732,8 @@ div.oxifield-upload {
 .oxi-btn-exceptional, .oxi-btn-loading,
 .oxi-btn-terminate,
 .oxi-btn-subtle-add,  .oxi-btn-subtle-remove {
+  --bs-btn-hover-bg: var(--bs-btn-bg);
+  --bs-btn-active-bg: var(--bs-btn-bg);
   &:hover, &:active, &.active, &:focus-visible {
     background-image: linear-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0.3));
   }
