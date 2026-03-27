@@ -220,7 +220,7 @@ sub _load_page_class ($self, $arg) {
         my $secure_params = $decrypted->{secure_param} // {};
         $self->log->debug("Encrypted request to $class / $method");
         $self->log->trace("Secure params: " . Dumper $secure_params) if ($self->log->is_trace and keys $secure_params->%*);
-        $self->webui->add_secure_params($secure_params->%*);
+        $self->webui->request_params->add_secure_params($secure_params->%*);
     }
     else {
         ($method, $param_raw) = ($remainder =~ /\A (\w+)? \!?(.*) \z/xms);
@@ -232,7 +232,7 @@ sub _load_page_class ($self, $arg) {
                 $params->{$key} = Encode::decode("UTF-8", uri_unescape($val));
             }
             $self->log->trace("Extra params appended to page call: " . Dumper $params) if $self->log->is_trace;
-            $self->webui->add_params($params->%*);
+            $self->webui->request_params->add_params($params->%*);
         }
     }
 

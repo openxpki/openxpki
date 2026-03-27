@@ -4,7 +4,6 @@ use OpenXPKI qw( -class -typeconstraints );
 with qw(
     OpenXPKI::Client::Service::Role::Info
     OpenXPKI::Client::Service::Role::Base
-    OpenXPKI::Client::Service::WebUI::Role::RequestParams
 );
 
 =head1 NAME
@@ -25,6 +24,7 @@ use Log::Log4perl::MDC;
 
 # Project modules
 use OpenXPKI::Client;
+use OpenXPKI::Client::Service::WebUI::RequestParams;
 use OpenXPKI::Client::Service::WebUI::Response;
 use OpenXPKI::Client::Service::WebUI::Page;
 use OpenXPKI::Client::Service::WebUI::Session;
@@ -630,6 +630,29 @@ has is_realm_selection_page => (
     is => 'rw',
     isa => 'Bool',
     default => 0,
+);
+
+=head2 request_params
+
+L<OpenXPKI::Client::Service::WebUI::RequestParams> instance that parses and
+caches request parameters for the current HTTP request. Auto-initialized.
+
+=cut
+
+has request_params => (
+    init_arg => undef,
+    is       => 'ro',
+    isa      => 'OpenXPKI::Client::Service::WebUI::RequestParams',
+    lazy     => 1,
+    default  => sub ($self) {
+        OpenXPKI::Client::Service::WebUI::RequestParams->new(
+            request => $self->request,
+            session => $self->session,
+            log     => $self->log,
+            json    => $self->json,
+        )
+    },
+    handles  => [qw( param multi_param secure_param add_params add_secure_params )],
 );
 
 =head1 METHODS

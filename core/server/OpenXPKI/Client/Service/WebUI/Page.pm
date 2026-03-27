@@ -123,11 +123,29 @@ has webui => (
     is => 'ro',
     isa => 'OpenXPKI::Client::Service::WebUI',
     handles => [ qw(
+        script_url
+        base_url
+    ) ],
+);
+
+=head3 request_params
+
+L<OpenXPKI::Client::Service::WebUI::RequestParams> instance — provides
+L</param>, L</multi_param>, and L</secure_param>. Auto-initialized from
+L</webui>.
+
+=cut
+
+has request_params => (
+    is       => 'ro',
+    isa      => 'OpenXPKI::Client::Service::WebUI::RequestParams',
+    init_arg => undef,
+    lazy     => 1,
+    default  => sub ($self) { $self->webui->request_params },
+    handles  => [ qw(
         param
         multi_param
         secure_param
-        script_url
-        base_url
     ) ],
 );
 
