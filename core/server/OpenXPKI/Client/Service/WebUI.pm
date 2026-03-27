@@ -582,16 +582,16 @@ has action => (
         # check XSRF token
         if (my $action = $self->param('action')) {
             if ($rtoken_request && ($rtoken_request eq $rtoken_session)) {
-                $self->log->debug("Action '$action': valid request");
+                $self->log->debug("Action '$action': XSRF token valid");
                 return ($action // '');
 
             # required to make the login page work when the session expires, #552
             } elsif( !$rtoken_session and ($action =~ /^login\!/ )) {
-                $self->log->debug("Action '$action': login with expired session, ignoring rtoken");
+                $self->log->debug("Action '$action': login with expired session, ignoring XSRF token");
                 return ($action // '');
 
             } else {
-                $self->log->debug("Action '$action': request with invalid rtoken ($rtoken_request != $rtoken_session)");
+                $self->log->debug("Action '$action': request with invalid XSRF token ($rtoken_request != $rtoken_session)");
                 $self->ui_response->status->error('I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID');
                 return '';
             }
