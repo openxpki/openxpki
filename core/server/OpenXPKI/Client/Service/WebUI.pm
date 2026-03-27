@@ -10,6 +10,18 @@ with qw(
 
 OpenXPKI::Client::Service::WebUI - service to deliver web page contents via JSON
 
+=head1 DESCRIPTION
+
+Client service class that implements the OpenXPKI web UI JSON API. It
+consumes L<OpenXPKI::Client::Service::Role::Info> (route declaration) and
+L<OpenXPKI::Client::Service::Role::Base> (request lifecycle).
+
+Each incoming HTTP request is handled by a single instance of this class.
+The instance manages the frontend session (cookie-backed, DB-stored via
+L<OpenXPKI::Client::Service::WebUI::Session>), the backend connection
+(L<OpenXPKI::Client>), realm and auth-stack detection, XSRF token
+validation, and JSON response serialization.
+
 =cut
 
 # Core modules
@@ -349,7 +361,7 @@ sub _init_client ($self, $client) {
 =head2 realm_mode
 
 Shortcut for config value C<realm.mode> to determine the current realm:
-C<"select">, C<"path"> or C<"hostname">. Default: C<"select">
+C<"select">, C<"path"> or C<"hostname">. Default: C<"select">. Auto-initialized.
 
 =cut
 sub realm_mode;
@@ -370,7 +382,7 @@ has realm_mode => (
 =head2 realm_layout
 
 Shortcut for config value C<realm.layout> that defines how to show the realm selection:
-C<"card"> or C<"list">. Default: C<"card">
+C<"card"> or C<"list">. Default: C<"card">. Auto-initialized.
 
 =cut
 has realm_layout => (
@@ -387,7 +399,7 @@ has realm_layout => (
 =head2 script_url
 
 In Mojolicious this is fixed: C<"/cgi-bin/webui.fcgi">. The only usage is to
-distinct the request from static assets access in the webserver.
+distinct the request from static assets access in the webserver. Auto-initialized.
 
 =cut
 has script_url => (
@@ -400,8 +412,8 @@ has script_url => (
 
 =head2 static_dir
 
-Shortcut for config value C<realm.layout> that defines how to show the realm selection:
-C<"card"> or C<"list">. Default: C<"card">
+Shortcut for config value C<global.staticdir>: filesystem path to the directory
+containing static web assets. Default: C<"/var/www">. Auto-initialized.
 
 =cut
 has static_dir => (
@@ -417,7 +429,7 @@ has static_dir => (
 Normalized request URL path (leading, but no trailing slash) with
 C</cgi-bin/xxx> stripped off.
 
-E.g. C<"/webui/democa">
+E.g. C<"/webui/democa">. Auto-initialized.
 
 =cut
 sub url_path;
@@ -450,7 +462,7 @@ This attribute is set from the frontend session parameter C<baseurl> or the
 request parameter C<baseurl> in L</prepare>.
 
 The base URL allows us to e.g. issue internal UI redirects (without specifying
-the full URL every time).
+the full URL every time). Auto-initialized.
 
 =cut
 sub base_url;
@@ -554,7 +566,7 @@ Returns the value of the request parameter L<action> if set and the XSRFtoken is
 valid. If the token is invalid, returns an empty string and sets the
 L</ui_response> status to an error message.
 
-If the parameter is empty or not set an empty string is returned.
+If the parameter is empty or not set an empty string is returned. Auto-initialized.
 
 =cut
 sub action;
@@ -618,7 +630,7 @@ has current_auth_stack => (
     predicate => 'has_current_auth_stack',
 );
 
-=head2
+=head2 is_realm_selection_page
 
 Set to C<1> if the current page is the realm selection page (I<realm_mode>
 C<"path"> only).
