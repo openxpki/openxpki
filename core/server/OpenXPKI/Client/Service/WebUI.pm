@@ -660,7 +660,6 @@ has request_params => (
         OpenXPKI::Client::Service::WebUI::RequestParams->new(
             request => $self->request,
             session => $self->session,
-            log     => $self->log,
             json    => $self->json,
         )
     },
