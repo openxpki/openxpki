@@ -10,8 +10,13 @@ OpenXPKI::Client::Service::WebUI::Dispatcher - Route WebUI requests to page hand
     my $dispatcher = OpenXPKI::Client::Service::WebUI::Dispatcher->new(
         webui => $webui,
     );
-    my $page = $dispatcher->view('workflow!index');    # Dispatch a view
-    my $page = $dispatcher->action('workflow!handle'); # Dispatch an action
+    # Dispatch a view
+    my $page_obj = $dispatcher->dispatch('workflow!index', undef);
+    # equivalent:  $dispatcher->view('workflow!index');
+
+    # Dispatch an action
+    my $page_obj = $dispatcher->dispatch(undef, 'workflow!handle');
+    # equivalent:  $dispatcher->action('workflow!handle');
 
 =head1 DESCRIPTION
 
@@ -78,6 +83,44 @@ has log => (
 );
 
 =head1 METHODS
+
+=head2 dispatch
+
+Top-level entry point: routes to L</action> or L</view> depending on whether
+an action string is present.
+
+If C<$action_str> is non-empty the request is treated as a POST action and
+delegated to L</action>. Otherwise a view is rendered via L</view>.
+
+B<Parameters>
+
+=over
+
+=item * C<$page_str> I<Str|Undef> - required: page identifier (e.g.
+C<"workflow!index">). Used only when C<$action_str> is empty.
+
+=item * C<$action_str> I<Str|Undef> - required: action identifier (e.g.
+C<"workflow!handle">), or an empty string when the request is a view.
+
+=back
+
+Returns the page object that should be serialised as the HTTP response.
+
+=cut
+signature_for dispatch => (
+    method => 1,
+    positional => [
+        'Str|Undef', 'Str|Undef',
+    ],
+);
+sub dispatch ($self, $page_str, $action_str) {
+    if ($action_str) {
+        # Action is only valid within a post request
+        return $self->action($action_str);
+    } else {
+        return $self->view($page_str // '');
+    }
+}
 
 =head2 action
 

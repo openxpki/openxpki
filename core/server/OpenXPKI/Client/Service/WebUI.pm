@@ -1039,14 +1039,7 @@ sub handle_ui_request ($self) {
 
     $self->log->info('Incoming request: ' . join(', ', $page ? "page '$page'" : (), $action ? "action '$action'" : ()));
 
-    # Shortcut to create new pure Page object for redirecting or error status
-    my $new_page = sub ($cb) {
-        my $page = OpenXPKI::Client::Service::WebUI::Page->new(webui => $self);
-        $cb->($page);
-        return $page;
-    };
-
-    # Check for goto redirection first
+    # Handle REDIRECT
     if ($action =~ /^redirect!(.+)/  || $page =~ /^redirect!(.+)/) {
         my $goto = $1;
         if ($goto =~ m{[^\w\-\!]}) {
@@ -1054,7 +1047,9 @@ sub handle_ui_request ($self) {
             $self->log->warn("Invalid redirect target found - aborting");
         }
         $self->log->debug("Redirect to: $goto");
-        return $new_page->(sub { shift->redirect->to($goto) });
+        my $page_obj = OpenXPKI::Client::Service::WebUI::Page->new(webui => $self);
+        $page_obj->redirect->to($goto);
+        return $page_obj;
     }
 
     # Handle LOGOUT / session restart
@@ -1079,16 +1074,9 @@ sub handle_ui_request ($self) {
 
     if ( $reply->{SERVICE_MSG} eq 'ERROR' ) {
         $self->log->debug('Got error from server');
-        return $new_page->(sub ($p) { $p->status->error($p->message_from_error_reply($reply)) });
-    }
-
-    # Set logout menu for bootstrap page if we're not logged in (= not SERVICE_READY)
-    if ($reply->{SERVICE_MSG} ne 'SERVICE_READY' and not defined $self->session->param('menu_items')) {
-        my $reply = $self->client->send_receive_service_msg('GET_LOGOUT_MENU');
-        if ($reply->{PARAMS} and my $menu = $reply->{PARAMS}->{main}) {
-            $self->log->trace('Received logout menu = ' . Dumper $menu) if $self->log->is_trace;
-            $self->session->param('menu_items', $menu);
-        }
+        my $page_obj = OpenXPKI::Client::Service::WebUI::Page->new(webui => $self);
+        $page_obj->status->error($page_obj->message_from_error_reply($reply));
+        return $page_obj;
     }
 
     # Set pki_realm and auth_stack from auto-detection (URL path or hostname or
@@ -1096,22 +1084,31 @@ sub handle_ui_request ($self) {
     $self->session->param('pki_realm', $self->current_realm) if $self->has_current_realm;
     $self->session->param('auth_stack', $self->current_auth_stack) if $self->has_current_auth_stack;
 
-    # Handle page if logged in (open channel) or it's the bootstrap page
-    if ( $reply->{SERVICE_MSG} eq 'SERVICE_READY' or $page =~ /^bootstrap!(.+)/) {
-        if ($action) {
-            # Action is only valid within a post request
-            return $self->dispatcher->action($action);
-        } else {
-            return $self->dispatcher->view($page || 'home');
+    # Handle BOOTSTRAP
+    if ($page =~ /^bootstrap!(.+)/) {
+        # Set logout menu for bootstrap page if we're not logged in (= not SERVICE_READY)
+        if ($reply->{SERVICE_MSG} ne 'SERVICE_READY' and not defined $self->session->param('menu_items')) {
+            my $reply = $self->client->send_receive_service_msg('GET_LOGOUT_MENU');
+            if ($reply->{PARAMS} and my $menu = $reply->{PARAMS}->{main}) {
+                $self->log->trace('Received logout menu = ' . Dumper $menu) if $self->log->is_trace;
+                $self->session->param('menu_items', $menu);
+            }
         }
+        return $self->dispatcher->view($page);
     }
 
-    # If the backend session logged out but did not terminate
-    # we get the problem that ui is logged in but backend is not
-    $self->logout_session if $self->session->param('is_logged_in');
+    # Handle PAGE or ACTION (if logged in = open channel)
+    if ('SERVICE_READY' eq $reply->{SERVICE_MSG}) {
+        return $self->dispatcher->dispatch($page || 'home', $action);
 
     # Handle LOGIN
-    return $self->auth->login($page || '', $action, $reply);
+    } else {
+        # Prevent problems if the backend session logged out but did not terminate:
+        # then the UI is logged in but backend is not.
+        $self->logout_session if $self->session->param('is_logged_in');
+
+        return $self->auth->login($page, $action, $reply);
+    }
 }
 
 =head2 handle_oidc
@@ -1138,12 +1135,6 @@ Returns an instance of L<OpenXPKI::Client::Service::WebUI::Page>.
 sub handle_oidc ($self) {
     $self->log->debug('Incoming OIDC redirect - processing auth code response');
 
-    my $new_page = sub ($cb) {
-        my $page = OpenXPKI::Client::Service::WebUI::Page->new(webui => $self);
-        $cb->($page);
-        return $page;
-    };
-
     my $reply = $self->ping_client;
 
     if ($reply->{SERVICE_MSG} eq 'START_SESSION') {
@@ -1152,7 +1143,9 @@ sub handle_oidc ($self) {
     }
 
     if ($reply->{SERVICE_MSG} eq 'ERROR') {
-        return $new_page->(sub ($p) { $p->status->error($p->message_from_error_reply($reply)) });
+        my $page_obj = OpenXPKI::Client::Service::WebUI::Page->new(webui => $self);
+        $page_obj->status->error($page_obj->message_from_error_reply($reply));
+        return $page_obj;
     }
 
     # Propagate realm/stack from URL path detection into session so $self->auth->login()
@@ -1163,7 +1156,7 @@ sub handle_oidc ($self) {
     # Call login() with page='login' to reach the OIDC code-redemption branch.
     # Without this, an empty page parameter would trigger an early return (redirect
     # to login page) before the 'code' request parameter is ever examined.
-    return $self->auth->login('login', '', $reply);
+    return $self->auth->login('login', undef, $reply);
 }
 
 =head2 ping_client

@@ -202,9 +202,9 @@ B<Parameters>
 
 =over
 
-=item * C<$page> I<Str> - required: page string from the request.
+=item * C<$page> I<Str|Undef> - required: page string from the request.
 
-=item * C<$action> I<Str> - required: action string from the request.
+=item * C<$action> I<Str|Undef> - required: action string from the request.
 
 =item * C<$reply> I<HashRef> - required: the most recent reply from the backend
 service (i.e. the result of L<OpenXPKI::Client/send_receive_service_msg>).
@@ -219,11 +219,14 @@ C<undef> in special cases if the caller should continue without rendering.
 signature_for login => (
     method => 1,
     positional => [
-        'Str', 'Str', 'HashRef',
+        'Str|Undef', 'Str|Undef', 'HashRef',
     ],
 );
 sub login ($self, $page, $action, $reply) {
+    $page //= '';
+    $action //= '';
     $self->last_reply($reply);
+
     $self->log->info("Not logged in - authenticating; page = '$page', action = '$action'");
     $self->clear_page_obj; # paranoia: guard against multiple calls to login() within one request
 
