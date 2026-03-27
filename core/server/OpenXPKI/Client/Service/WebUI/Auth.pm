@@ -454,7 +454,7 @@ sub _handle_GET_AUTHENTICATION_STACK ($self, $auth_stack) {
         if (scalar @stack_list == 1)  {
             $auth_stack = $stack_list[0]->{value};
             $self->webui->session->param('auth_stack', $auth_stack);
-            $self->log->debug("Only one stack avail ($auth_stack) - autoselect");
+            $self->log->debug("Only one stack available ($auth_stack) - autoselect");
             $self->_send_to_backend( 'GET_AUTHENTICATION_STACK', {
                 AUTHENTICATION_STACK => $auth_stack
             } );
@@ -733,7 +733,7 @@ sub _check_response ($self) {
         $self->log->trace('Server error: '. Dumper $self->last_reply) if $self->log->is_trace;
 
         # Failure here is likely a wrong password
-        my $msg = $self->last_reply->{'ERROR'} && $self->last_reply->{'ERROR'}->{CLASS} eq 'OpenXPKI::Exception::Authentication'
+        my $msg = $self->last_reply->{'ERROR'} && ($self->last_reply->{'ERROR'}->{CLASS}//'') eq 'OpenXPKI::Exception::Authentication'
             ? $self->last_reply->{'ERROR'}->{LABEL}
             : $self->page_obj->message_from_error_reply($self->last_reply);
 
@@ -761,9 +761,6 @@ Handle a logout or post-logout display request. Destroys the current frontend
 and backend sessions, honours any SSO logout redirect configured in the session,
 and renders the "you have been logged out" confirmation page.
 
-Returns C<undef> when C<$page> is not a logout string so the caller can skip
-further processing.
-
 B<Parameters>
 
 =over
@@ -776,6 +773,8 @@ return.
 
 =cut
 sub logout ($self, $page) {
+    die "logout() called with invalid page string '$page'" unless $self->is_logout($page);
+
     $self->clear_page_obj; # paranoia: guard against multiple calls to logout() within one request
 
     if ($page eq 'logout') {
@@ -821,8 +820,6 @@ sub logout ($self, $page) {
     if ($page eq 'login!logout') {
         return $self->page_obj->init_logout;
     }
-
-    return;
 }
 
 sub _send_to_backend ($self, @args) {
