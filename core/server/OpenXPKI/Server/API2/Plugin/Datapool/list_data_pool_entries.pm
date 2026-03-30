@@ -52,7 +52,13 @@ Supports asterisk C<*> as wildcard to do a substring search, e.g. C<*cert> for a
 
 =item * C<metadata> I<Bool> - add mtime and expiration date to the result (epoch)
 
-=item * Cvalues> I<Bool> - add values to the result (attention - these may be objects)
+=item * C<values> I<Bool> - add values to the result (attention - these may be serialized objects)
+
+=item * C<deserialize> I<Bool> - deserialize value into perl strcuture (requires values)
+
+=item * C<order> I<Str|ArrayRef[Str]> - column(s) to sort by. Optional, default: C<['datapool_key', 'namespace']>.
+
+=item * C<reverse> I<Bool> - reverse sort order. Optional, default: false.
 
 =item * C<mtime_after> I<Str> - only return entries last modified B<after>
 given dateC<**>. Optional.
@@ -92,6 +98,9 @@ command "list_data_pool_entries" => {
     start     => { isa => 'Int', required => 0 },
     metadata  => { isa => 'Bool', default => 0 },
     values    => { isa => 'Bool', default => 0 },
+    deserialize => { isa => 'Bool' },
+    order   => { isa => 'ArrayRefOrStr', coerce => 1, required => 0 },
+    reverse => { isa => 'Bool', default => 0 },
 } => sub {
     my ($self, $params) = @_;
 
@@ -101,6 +110,11 @@ command "list_data_pool_entries" => {
     $self->assert_current_pki_realm_within_workflow($params->pki_realm);
 
     my $sql_params = $self->_make_db_query($params, $params->metadata, $params->values);
+
+    my $order_by = $params->has_order ? $params->order : [ 'datapool_key', 'namespace' ];
+    $sql_params->{order_by} = $params->reverse
+        ? [ map { "-$_" } ref($order_by) ? @{$order_by} : $order_by ]
+        : (ref($order_by) ? $order_by : [ $order_by ]);
 
     if ($params->has_limit) {
         $sql_params->{limit} = $params->limit;
@@ -121,7 +135,13 @@ command "list_data_pool_entries" => {
     my @result = map {
         my $tuple = $_;
         +{
-            map { ($translate{$_} // $_) => $tuple->{$_} } keys $tuple->%*
+            map {
+                my $key = $translate{$_} // $_;
+                my $val = $tuple->{$_};
+                $val = OpenXPKI::Serialization::Simple->new->deserialize($val)
+                    if $key eq 'value' and $params->deserialize;
+                $key => $val
+            } keys $tuple->%*
         }
     } $data->@*;
 
@@ -232,7 +252,6 @@ sub _make_db_query {
             defined($key_name) ? (datapool_key => { -like => $key_name }) : (),
             %additional_where,
         },
-        order_by => [ 'datapool_key', 'namespace' ],
     };
 }
 
