@@ -56,13 +56,13 @@ command "create" => {
     $pk->generate_key('secp256r1');
 
     # return private key only
-    return $pk->export_key_pem('private', $pass)
+    return $pk->export_key_pem('private_short', $pass)
         if ($param->keyout);
 
     # return structure
     return {
-        private => $pk->export_key_pem('private', $pass),
-        public  => $pk->export_key_pem('public'),
+        private => $pk->export_key_pem('private_short', $pass),
+        public  => $pk->export_key_pem('public_short'),
         id => $pk->export_key_jwk_thumbprint('SHA256'),
     };
 

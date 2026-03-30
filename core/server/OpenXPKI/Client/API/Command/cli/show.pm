@@ -34,7 +34,7 @@ command "show" => {
 
     if (my $pk = $client->authenticator->account_key) {
         $res->{account_id} = $pk->export_key_jwk_thumbprint('SHA256');
-        $res->{account_key} = $pk->export_key_pem('public');
+        $res->{account_key} = $pk->export_key_pem('public_short');
     }
 
     # keyout only
