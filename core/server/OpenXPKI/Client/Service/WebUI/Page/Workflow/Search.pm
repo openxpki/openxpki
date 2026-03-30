@@ -199,6 +199,8 @@ sub action_search ($self) {
         $query->{proc_state} = $proc_state;
         $input->{wf_proc_state} = $proc_state;
         $verbose->{wf_proc_state} = $self->get_proc_state_label($proc_state);
+    } else {
+        $query->{proc_state} = { '!=' => 'archived' };
     }
 
     if (my $last_update_before = $self->param('last_update_before')) {
