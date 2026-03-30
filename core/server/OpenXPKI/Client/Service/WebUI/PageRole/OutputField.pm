@@ -376,13 +376,37 @@ sub __render_deflist {
 sub __render_grid {
     my ($self, $field, $item) = @_;
     my @head;
-    # item value can be data or grid specification
-    if (ref $item->{value} eq 'HASH') {
+
+
+    # "grid from hash" using a columns map
+    # uses syntax similar to report engine
+    if ($field->{cols}) {
+        $item->{header} = [ map { { 'sTitle' => $_->{head}//'' } } $field->{cols}->@* ];
+        my @formatted;
+        foreach my $line ($item->{value}->@*) {
+            my @row;
+            foreach my $col ($field->{cols}->@*) {
+                if ($col->{key}) {
+                    push @row, $line->{$col->{key}}//'';
+                } else {
+                    push @row, '';
+                }
+            }
+            push @formatted, \@row;
+        }
+        $item->{value} = \@formatted;
+
+    # item value can grid specification
+    } elsif (ref $item->{value} eq 'HASH') {
         my $hv = $item->{value};
         $item->{header} = [ map { { 'sTitle' => $_ } } @{$hv->{header}} ];
         $item->{value} = $hv->{value};
+
+    # add headers
     } elsif ($field->{header}) {
         $item->{header} = [ @head = map { { 'sTitle' => $_ } } @{$field->{header}} ];
+
+    # add empty first line
     } else {
         $item->{header} = [ @head = map { { 'sTitle' => '' } } @{$item->{value}->[0]} ];
     }
