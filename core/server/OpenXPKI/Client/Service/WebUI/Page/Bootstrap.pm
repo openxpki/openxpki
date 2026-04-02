@@ -58,7 +58,7 @@ sub init_structure ($self, $args) {
     }
 
     # Configured menu items
-    if (my $menu = $self->session_param('menu_items')) { # session parameter is set in OpenXPKI::Client::Service::WebUI::Role::LoginHandler->_set_menu()
+    if (my $menu = $self->session_param('menu_items')) { # session parameter is set in OpenXPKI::Client::Service::WebUI::Auth->_set_menu()
         $self->menu->items($menu);
 
     # Default (Logout) menu

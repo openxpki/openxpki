@@ -21,6 +21,7 @@ use Data::UUID;
 
 # Project modules
 use OpenXPKI::Serialization::Simple;
+use OpenXPKI::Client::Service::WebUI::JWT;
 use OpenXPKI::Client::Service::WebUI::Response;
 use OpenXPKI::Log4perl;
 
@@ -122,12 +123,29 @@ has webui => (
     is => 'ro',
     isa => 'OpenXPKI::Client::Service::WebUI',
     handles => [ qw(
+        script_url
+        base_url
+    ) ],
+);
+
+=head3 request_params
+
+L<OpenXPKI::Client::Service::WebUI::RequestParams> instance — provides
+L</param>, L</multi_param>, and L</secure_param>. Auto-initialized from
+L</webui>.
+
+=cut
+
+has request_params => (
+    is       => 'ro',
+    isa      => 'OpenXPKI::Client::Service::WebUI::RequestParams',
+    init_arg => undef,
+    lazy     => 1,
+    default  => sub ($self) { $self->webui->request_params },
+    handles  => [ qw(
         param
         multi_param
         secure_param
-        encrypt_jwt
-        script_url
-        base_url
     ) ],
 );
 
@@ -500,7 +518,7 @@ Encrypt the given page and parameters using a JWT.
 
 Returns the page call URI consisting of the pseudo page named C<encrypted> and
 the JWT as single parameter that will be decoded in
-L<OpenXPKI::Client::Service::WebUI::Role::PageHandler/_load_page_class>.
+L<OpenXPKI::Client::Service::WebUI::Dispatcher/_load_page_class>.
 
 B<Named parameters>
 
@@ -522,7 +540,7 @@ signature_for call_encrypted => (
     ],
 );
 sub call_encrypted ($self, $arg) {
-    my $token = $self->encrypt_jwt({
+    my $token = OpenXPKI::Client::Service::WebUI::JWT->encrypt($self->session, {
         page => $arg->page,
         secure_param => $arg->secure_param // {},
     });
@@ -1016,11 +1034,3 @@ sub transate_sql_wildcards  {
 }
 
 __PACKAGE__->meta->make_immutable;
-
-=pod
-
-=head2 encrypt_jwt
-
-Encrypt the given data into a JWT using the encryption key stored in session
-parameter C<jwt_encryption_key> (key will be set to random value if it does not
-exist yet).

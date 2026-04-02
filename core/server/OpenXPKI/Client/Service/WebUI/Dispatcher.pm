@@ -1,11 +1,44 @@
-package OpenXPKI::Client::Service::WebUI::Role::PageHandler;
-use OpenXPKI -role;
-use namespace::autoclean;
+package OpenXPKI::Client::Service::WebUI::Dispatcher;
+use OpenXPKI qw( -class -typeconstraints );
 
-requires 'log';
-requires 'decrypt_jwt';
-requires 'add_params';
-requires 'add_secure_params';
+=head1 NAME
+
+OpenXPKI::Client::Service::WebUI::Dispatcher - Route WebUI requests to page handler classes
+
+=head1 SYNOPSIS
+
+    my $dispatcher = OpenXPKI::Client::Service::WebUI::Dispatcher->new(
+        webui => $webui,
+    );
+    # Dispatch a view
+    my $page_obj = $dispatcher->dispatch('workflow!index', undef);
+    # equivalent:  $dispatcher->view('workflow!index');
+
+    # Dispatch an action
+    my $page_obj = $dispatcher->dispatch(undef, 'workflow!handle');
+    # equivalent:  $dispatcher->action('workflow!handle');
+
+=head1 DESCRIPTION
+
+Resolves incoming WebUI request strings of the form C<class!method> (or the
+encrypted C<encrypted!<jwt>> variant) to the appropriate
+C<OpenXPKI::Client::Service::WebUI::Page::*> handler class and method, then
+invokes the handler and follows any internal redirects until a response page is
+produced.
+
+Entry points:
+
+=over
+
+=item * L</action> - for action requests (calls C<action_*> methods)
+
+=item * L</view> - for page-view requests (calls C<init_*> methods)
+
+=back
+
+Both return the page object that should be serialised as the HTTP response.
+
+=cut
 
 # Core modules
 use Module::Load ();
@@ -16,15 +49,100 @@ use Log::Log4perl::MDC;
 use URI::Escape;
 
 # Project modules
+use OpenXPKI::Client::Service::WebUI::JWT;
 use OpenXPKI::Client::Service::WebUI::Page::Bootstrap;
 
-signature_for handle_action => (
+=head1 ATTRIBUTES
+
+=head2 webui
+
+The parent L<OpenXPKI::Client::Service::WebUI> instance. Required.
+Held as a weak reference to avoid circular references.
+
+=cut
+has webui => (
+    is => 'ro',
+    isa => 'OpenXPKI::Client::Service::WebUI',
+    required => 1,
+    weak_ref => 1,
+);
+
+=head2 log
+
+A logger object, per default set to C<OpenXPKI::Log4perl-E<gt>get_logger>.
+
+=cut
+has log => (
+    is => 'rw',
+    isa => duck_type( [qw(
+           trace    debug    info    warn    error    fatal
+        is_trace is_debug is_info is_warn is_error is_fatal
+    )] ),
+    lazy => 1,
+    default => sub { OpenXPKI::Log4perl->get_logger },
+);
+
+=head1 METHODS
+
+=head2 dispatch
+
+Top-level entry point: routes to L</action> or L</view> depending on whether
+an action string is present.
+
+If C<$action_str> is non-empty the request is treated as a POST action and
+delegated to L</action>. Otherwise a view is rendered via L</view>.
+
+B<Parameters>
+
+=over
+
+=item * C<$page_str> I<Str|Undef> - required: page identifier (e.g.
+C<"workflow!index">). Used only when C<$action_str> is empty.
+
+=item * C<$action_str> I<Str|Undef> - required: action identifier (e.g.
+C<"workflow!handle">), or an empty string when the request is a view.
+
+=back
+
+Returns the page object that should be serialised as the HTTP response.
+
+=cut
+signature_for dispatch => (
+    method => 1,
+    positional => [
+        'Str|Undef', 'Str|Undef',
+    ],
+);
+sub dispatch ($self, $page_str, $action_str) {
+    if ($action_str) {
+        # Action is only valid within a post request
+        return $self->action($action_str);
+    } else {
+        return $self->view($page_str // '');
+    }
+}
+
+=head2 action
+
+Dispatches an action request identified by the given action string (e.g.
+C<"workflow!handle">).
+
+Parses the string, loads the appropriate page class, and calls the
+C<action_*> method on it. If the handler issues an internal redirect, the
+corresponding C<init_*> view is rendered instead. Falls back to
+C<home!welcome> when no action string is supplied or no handler is found.
+
+Returns the page object that should be serialised as the HTTP response.
+
+=cut
+
+signature_for action => (
     method => 1,
     positional => [
         'Str',
     ],
 );
-sub handle_action ($self, $action_str) {
+sub action ($self, $action_str) {
     my $page;
     my $error;
 
@@ -40,7 +158,7 @@ sub handle_action ($self, $action_str) {
             if (my $target = $page->internal_redirect_target) {
                 my ($view_str, $method_args) = $target->@*;
                 $self->log->trace("Internal redirect to: $view_str") if $self->log->is_trace;
-                $page = $self->handle_view($view_str, $method_args, $page->status);
+                $page = $self->view($view_str, $method_args, $page->status);
             }
         } else {
             $error = 'I18N_OPENXPKI_UI_ACTION_NOT_FOUND';
@@ -48,7 +166,7 @@ sub handle_action ($self, $action_str) {
     }
 
     # Render a page only if there is no action or object instantiation failed
-    $page //= $self->handle_view('home!welcome');
+    $page //= $self->view('home!welcome');
     $page->status->error($error) if $error;
 
     Log::Log4perl::MDC->put('wfid', undef);
@@ -56,7 +174,22 @@ sub handle_action ($self, $action_str) {
     return $page;
 }
 
-signature_for handle_view => (
+=head2 view
+
+Dispatches a page-view request identified by the given view string (e.g.
+C<"workflow!index">).
+
+Repeatedly resolves internal redirects (up to 10 hops) until a terminal
+page is reached or the class lookup fails (in which case the 404 bootstrap
+page is returned). An optional C<$forced_status> object is propagated to
+the first rendered page and then cleared; subsequent redirect hops inherit
+the status of the previous page.
+
+Returns the page object that should be serialised as the HTTP response.
+
+=cut
+
+signature_for view => (
     method => 1,
     positional => [
         'Str',
@@ -64,7 +197,7 @@ signature_for handle_view => (
         'OpenXPKI::Client::Service::WebUI::Response::Status' => { optional => 1 },
     ],
 );
-sub handle_view ($self, $view_str, $args, $forced_status = undef) {
+sub view ($self, $view_str, $args, $forced_status = undef) {
     # Special page requests
     $view_str = 'home!welcome' if $view_str eq 'welcome';
 
@@ -100,7 +233,7 @@ sub handle_view ($self, $view_str, $args, $forced_status = undef) {
             }
 
         } else {
-            $page = OpenXPKI::Client::Service::WebUI::Page::Bootstrap->new(webui => $self)->page_not_found;
+            $page = OpenXPKI::Client::Service::WebUI::Page::Bootstrap->new(webui => $self->webui)->page_not_found;
             last;
         }
     }
@@ -108,17 +241,27 @@ sub handle_view ($self, $view_str, $args, $forced_status = undef) {
     return $page;
 }
 
-=head2 _load_page_class
-
-Extracts the class and method name and extra parameters encoded in the given
-call string and tries to instantiate the class.
-
-On success, the corresponding class instance and the extracted method name is
-returned (two element list).
-
-On error C<undef> is returned.
-
-=cut
+# Parses a call string of the form "class!method!key1!val1!key2!val2" (or the
+# special "encrypted!<jwt>" form), resolves the target Perl package, and
+# instantiates it.
+#
+# For actions (is_action => 1) the lookup order is:
+#
+#   Page::<Class>::Action::<Method>
+#   Page::<Class>::<action_method>   (method name with prefix)
+#   Page::<Class>::<Method>
+#   Page::<Class>::Action
+#   Page::<Class>
+#
+# For views the same cascade is used with Init instead of Action.
+#
+# Any extra !key!val pairs appended to the call string are decoded (UTF-8,
+# URI-unescaped) and added to the request parameters. Secure parameters embedded
+# in an encrypted JWT are also added via $webui->add_secure_params().
+#
+# Returns a two-element list ($page_object, $method_name) on success, or an
+# empty list (undef in scalar context) when no matching class/method can be
+# found.
 
 signature_for _load_page_class => (
     method => 1,
@@ -142,7 +285,8 @@ sub _load_page_class ($self, $arg) {
     if ($class eq 'encrypted') {
         # as the token has non-word characters the above regex does not contain the full payload
         # we therefore read the payload directly from call stripping the class name
-        my $decrypted = $self->decrypt_jwt($remainder) or return;
+        my $decrypted = OpenXPKI::Client::Service::WebUI::JWT->decrypt($self->webui->session, $remainder)
+            or do { $self->log->debug("JWT encrypted parameter received but client session contains no decryption key"); return; };
         if ($decrypted->{page}) {
             $self->log->debug("Encrypted request with page " . $decrypted->{page});
             ($class, $method) = ($decrypted->{page} =~ /\A (\w+)\!? (\w+)? \z/xms);
@@ -153,7 +297,7 @@ sub _load_page_class ($self, $arg) {
         my $secure_params = $decrypted->{secure_param} // {};
         $self->log->debug("Encrypted request to $class / $method");
         $self->log->trace("Secure params: " . Dumper $secure_params) if ($self->log->is_trace and keys $secure_params->%*);
-        $self->add_secure_params($secure_params->%*);
+        $self->webui->request_params->add_secure_params($secure_params->%*);
     }
     else {
         ($method, $param_raw) = ($remainder =~ /\A (\w+)? \!?(.*) \z/xms);
@@ -165,7 +309,7 @@ sub _load_page_class ($self, $arg) {
                 $params->{$key} = Encode::decode("UTF-8", uri_unescape($val));
             }
             $self->log->trace("Extra params appended to page call: " . Dumper $params) if $self->log->is_trace;
-            $self->add_params($params->%*);
+            $self->webui->request_params->add_params($params->%*);
         }
     }
 
@@ -209,7 +353,7 @@ sub _load_page_class ($self, $arg) {
 
         # check class if method exists (faster than checking the instantiated object)
         if ($pkg->can($fullmethod)) {
-            my $obj = $pkg->new(webui => $self);
+            my $obj = $pkg->new(webui => $self->webui);
             return ($obj, $fullmethod);
         }
     }
@@ -222,4 +366,4 @@ sub _load_page_class ($self, $arg) {
     return;
 }
 
-1;
+__PACKAGE__->meta->make_immutable;

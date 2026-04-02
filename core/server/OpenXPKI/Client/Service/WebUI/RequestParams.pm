@@ -1,26 +1,32 @@
-package OpenXPKI::Client::Service::WebUI::Role::RequestParams;
-use OpenXPKI -role;
-use namespace::autoclean;
-
-requires 'request';
-requires 'log';
-requires 'decrypt_jwt';
-requires 'json';
+package OpenXPKI::Client::Service::WebUI::RequestParams;
+use OpenXPKI -class;
 
 =head1 NAME
 
-OpenXPKI::Client::Service::WebUI::Role::Request
+OpenXPKI::Client::Service::WebUI::RequestParams - request parameter accessor
 
 =head1 DESCRIPTION
 
-Extends the L<OpenXPKI::Client::Service::Role::Request> role with methods to query
-request parameters (browser request data) regardless of the transport format
-that was used.
+Parses and caches request parameters (browser request data) regardless of the
+transport format used.
 
-If the data was POSTed as JSON blob, the parameters are already expanded
-with the values in the I<cache> hash. If data was sent via HTTP GET or POST
-(form-encoded), the I<cache> hash holds the keys and the value I<undef> and the
-parameter expansion is done on the first request to L</param>.
+If the data was POSTed as JSON blob the parameters are already expanded with
+the values in the I<cache> hash.  If data was sent via HTTP GET or POST
+(form-encoded), the I<cache> hash holds the keys with value I<undef> and the
+parameter expansion is done on the first access to L</param>.
+
+=head1 SYNOPSIS
+
+    my $rp = OpenXPKI::Client::Service::WebUI::RequestParams->new(
+        request => $mojolicious_request,
+        session => $session,
+        log     => $logger,
+        json    => $json_codec,
+    );
+
+    my $val  = $rp->param('foo');
+    my @vals = $rp->multi_param('bar');
+    my $sec  = $rp->secure_param('token');
 
 =cut
 
@@ -28,51 +34,87 @@ parameter expansion is done on the first request to L</param>.
 use MIME::Base64;
 use Carp qw( confess );
 use OpenXPKI::Dumper;
-use List::Util qw( first );
 
+# Project modules
+use OpenXPKI::Client::Service::WebUI::JWT;
 
 use constant PREFIX_BASE64 => '_encoded_base64_';
-use constant PREFIX_JWT => '_encrypted_jwt_';
+use constant PREFIX_JWT    => '_encrypted_jwt_';
+
+=head1 ATTRIBUTES
+
+=head2 request
+
+The L<Mojo::Message::Request> object for the current HTTP request. Required.
+
+=cut
+
+has request => (
+    is       => 'ro',
+    required => 1,
+);
+
+=head2 session
+
+The L<OpenXPKI::Client::Service::WebUI::Session> object for the current
+frontend session. Required.
+
+=cut
+
+has session => (
+    is       => 'ro',
+    required => 1,
+);
+
+=head2 log
+
+Logger object. Required.
+
+=cut
+
+has log => (
+    is       => 'ro',
+    required => 1,
+);
+
+=head2 json
+
+JSON codec (must have a C<decode> method). Required.
+
+=cut
+
+has json => (
+    is       => 'ro',
+    required => 1,
+);
 
 # _param_cache (and _secure_param_cache) work as follows:
 # All GET/POST parameter keys are inserted as $key => undef. The undefined value
 # indicates that the parameter exists but was not yet queried / decoded.
 # Data passed via JSON is directly inserted as $key => $value.
 has _param_cache => (
-    is => 'rw',
-    isa => 'HashRef',
-    traits => ['Hash'],
+    is      => 'rw',
+    isa     => 'HashRef',
+    traits  => ['Hash'],
     default => sub { {} },
 );
 
 # parameters from a secure JWT
 has _secure_param_cache => (
-    is => 'rw',
-    isa => 'HashRef',
-    traits => ['Hash'],
+    is      => 'rw',
+    isa     => 'HashRef',
+    traits  => ['Hash'],
     default => sub { {} },
 );
 
-=head1 METHODS
-
-=cut
-
-# Around modifier with fallback BUILD method:
-# "around 'BUILD'" complains if there is no BUILD method in the inheritance
-# chain of the consuming class. So we define an empty fallback method.
-# If the consuming class defines an own BUILD method it will overwrite ours.
-# The "around" modifier will work in any case.
-# Please note that "around 'build'" is only allowed in roles.
-# https://metacpan.org/dist/Moose/view/lib/Moose/Manual/Construction.pod#BUILD-and-parent-classes
-sub BUILD {}
-after 'BUILD' => sub ($self, $args) {
+sub BUILD ($self, $args) {
     #
     # Preset all keys in the cache (for JSON data, also set the values)
     #
 
     # store keys from GET/POST params
     for my $key ($self->request->params->names->@*) {
-        $self->_param_cache->{$key} = undef; # we do not yet query/cache the value but make the key known
+        $self->_param_cache->{$key} = undef; # not yet queried/cached but key is known
         $self->_flag_encoded_value($key);
         $self->log->trace(sprintf('Request parameter: %s = %s', $key, join(',', $self->request->every_param($key)->@*))) if $self->log->is_trace;
     }
@@ -97,7 +139,7 @@ after 'BUILD' => sub ($self, $args) {
 
         $self->add_params($data->%*);
     }
-};
+}
 
 # Check if parameter key hints an encoded value (Base64 or JWT): insert the
 # sanitized key name into the cache so the "exists" check in _params() or
@@ -116,6 +158,22 @@ sub _flag_encoded_value ($self, $key) {
     }
 }
 
+=head1 METHODS
+
+=head2 add_params
+
+Add or overwrite plain parameters in the cache.
+
+B<Parameters>
+
+=over
+
+=item * I<%params> - key/value pairs; values may be plain scalars or ArrayRefs.
+
+=back
+
+=cut
+
 sub add_params {
     my $self = shift;
     my %params = @_;
@@ -127,6 +185,20 @@ sub add_params {
         $self->_flag_encoded_value($key);
     }
 }
+
+=head2 add_secure_params
+
+Add or overwrite secure (JWT-decrypted) parameters in the cache.
+
+B<Parameters>
+
+=over
+
+=item * I<%params> - key/value pairs; values may be plain scalars or ArrayRefs.
+
+=back
+
+=cut
 
 sub add_secure_params {
     my $self = shift;
@@ -146,11 +218,19 @@ Returns the value of an input parameter.
 
 To get all values of a multi-valued parameter use L</multi_param>.
 
+B<Parameters>
+
+=over
+
+=item * I<Str> C<$key> - parameter name to retrieve.
+
+=back
+
 =cut
 
 sub param ($self, $key) {
-    confess 'param() must be called in scalar context' if wantarray; # die
-    confess 'param() expects a single key (string) as argument' if (not $key or ref $key); # die
+    confess 'param() must be called in scalar context' if wantarray;
+    confess 'param() expects a single key (string) as argument' if (not $key or ref $key);
 
     my @values = $self->_params($key); # list context
     if (defined $values[0]) {
@@ -167,11 +247,19 @@ Returns all values of a multi-value input parameter.
 
 Can only be used in list context.
 
+B<Parameters>
+
+=over
+
+=item * I<Str> C<$key> - parameter name to retrieve.
+
+=back
+
 =cut
 
 sub multi_param ($self, $key) {
-    confess 'multi_param() must be called in list context' unless wantarray; # die
-    confess 'multi_param() expects a single key (string) as argument' if (not $key or ref $key); # die
+    confess 'multi_param() must be called in list context' unless wantarray;
+    confess 'multi_param() expects a single key (string) as argument' if (not $key or ref $key);
 
     my @values = $self->_params($key); # list context
     return @values;
@@ -198,8 +286,8 @@ B<Parameters>
 =cut
 
 sub secure_param ($self, $key) {
-    confess 'secure_param() must be called in scalar context' if wantarray; # die
-    confess 'secure_param() expects a single key (string) as argument' if (not $key or ref $key); # die
+    confess 'secure_param() must be called in scalar context' if wantarray;
+    confess 'secure_param() expects a single key (string) as argument' if (not $key or ref $key);
 
     my @values = $self->_secure_params($key); # list context
 
@@ -270,7 +358,7 @@ sub _secure_params ($self, $key) {
     # cache miss - query parameter
     unless (defined $self->_secure_param_cache->{$key}) {
         # Decrypt JWT
-        my @values = map { $self->decrypt_jwt($_) } $self->_get_param_cache(PREFIX_JWT.$key);
+        my @values = map { OpenXPKI::Client::Service::WebUI::JWT->decrypt($self->session, $_) } $self->_get_param_cache(PREFIX_JWT.$key);
         $self->add_secure_params($key => \@values) if scalar @values;
         $self->log->trace($msg . 'not in cache. Query result: (' . join(', ', @values) . ')') if $self->log->is_trace;
     }
@@ -291,5 +379,4 @@ sub _get_secure_param_cache ($self, $key) {
     return @{ $self->_secure_param_cache->{$key} // [] }
 }
 
-1;
-
+__PACKAGE__->meta->make_immutable;
