@@ -1,6 +1,8 @@
 package OpenXPKI::Client::Service::WebUI::RequestParams;
 use OpenXPKI -class;
 
+with 'OpenXPKI::Role::Logger';
+
 =head1 NAME
 
 OpenXPKI::Client::Service::WebUI::RequestParams - request parameter accessor
@@ -62,17 +64,6 @@ frontend session. Required.
 =cut
 
 has session => (
-    is       => 'ro',
-    required => 1,
-);
-
-=head2 log
-
-Logger object. Required.
-
-=cut
-
-has log => (
     is       => 'ro',
     required => 1,
 );

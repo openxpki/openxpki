@@ -10,21 +10,22 @@ use Log::Log4perl;
 use List::Util 'none';
 
 # Project modules
-use OpenXPKI::i18n qw(set_language set_locale_prefix);
 use OpenXPKI::Config;
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::VolatileVault;
 use OpenXPKI::Database;
+use OpenXPKI::i18n qw(set_language set_locale_prefix);
+use OpenXPKI::Log4perl;
+use OpenXPKI::Metrics;
+use OpenXPKI::Server::API2;
+use OpenXPKI::Server::Bedroom;
+use OpenXPKI::Server::Authentication;
+use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Log;
 use OpenXPKI::Server::Log::CLI;
-use OpenXPKI::Server::API2;
-use OpenXPKI::Server::Authentication;
 use OpenXPKI::Server::Notification::Handler;
-use OpenXPKI::Workflow::Handler;
-use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Session;
-use OpenXPKI::Server::Bedroom;
-use OpenXPKI::Metrics;
+use OpenXPKI::Workflow::Handler;
 
 # define an array of hash refs mapping the task id to the corresponding
 # init code. the order of the array elements is also the default execution
@@ -210,6 +211,11 @@ sub __do_init_log {
     OpenXPKI::Server::Context::setcontext({
         'log' => $log
     });
+
+    # Register default logger with OpenXPKI::Log4perl so this will work:
+    #   OpenXPKI::Log4perl->get_logger->info('...');
+    OpenXPKI::Log4perl->set_default_facility($log->application->category);
+
     ##! 64: 'log during init: ' . ref $log
 }
 

@@ -23,7 +23,9 @@ provide some custom enhancements
     use OpenXPKI::Log4perl;
 
     OpenXPKI::Log4perl->init_or_fallback($cfg_file);
-    my $log = OpenXPKI::Log4perl->get_logger(...);
+    OpenXPKI::Log4perl->set_default_facility('openxpki.server.application');
+    my $log = OpenXPKI::Log4perl->get_logger;
+    $log->info('...');
 
 =head1 DESCRIPTION
 
@@ -86,9 +88,6 @@ sub init_or_fallback ($class, @args) {
             push @warnings, "Unsupported format for Log4perl configuration (expected: filename, ScalarRef or HashRef)";
             $config = undef;
         }
-    } else {
-        # if not initialized: complain and init screen logger
-        push @warnings, "Initializing Log4perl in fallback mode (output to STDERR)";
     }
 
     # use config if given
@@ -97,6 +96,7 @@ sub init_or_fallback ($class, @args) {
         Log::Log4perl->init($config);
     # or fall back on screen logger unless there is a running config
     } elsif (not Log::Log4perl->initialized) {
+        push @warnings, "Initializing Log4perl in fallback mode (output to STDERR)";
         $class->init_screen_logger;
     }
 
@@ -111,9 +111,7 @@ B<Parameters:>
 
 =over
 
-=item * C<$prio>
-
-log priority (level) to use for output to STDERR (optional, default: WARN)
+=item * I<Str> C<$prio> - log priority (level) to use for output to STDERR (optional, default: C<"WARN">)
 
 =back
 
@@ -189,6 +187,28 @@ sub _add_patternlayout_spec {
     $spec_added = 1;
 }
 
+=head2 get_logger
+
+Returns a logger instance for the given category.
+
+In a Mojolicious environment (C<$ENV{OPENXPKI_MOJO}> set) returns an
+L<OpenXPKI::Log4perl::MojoLogger> instance (compatible to C<Log::Log4perl::Logger>);
+otherwise returns a standard L<Log::Log4perl:Logger>.
+
+If no category is given, falls back to the default facility set via
+L</set_default_facility> (or C<openxpki.system> in server context).
+
+B<Parameters>
+
+=over
+
+=item * C<category> I<Str> - optional: Log4perl category name. Defaults to the
+value set via L</set_default_facility>.
+
+=back
+
+=cut
+
 sub get_logger {
     my ($class, @args) = @_;
     # if someone calls us with :: instead of ->, $class contains first argument instead of class name
@@ -208,6 +228,22 @@ sub get_logger {
         );
     }
 }
+
+=head2 set_default_facility
+
+Sets the default logger facility used by L</get_logger> when no category is given.
+
+    OpenXPKI::Log4perl->set_default_facility($name);
+
+B<Parameters>
+
+=over
+
+=item * C<facility> I<Str> - required: Log4perl category name (e.g. C<openxpki.client.service.webui>).
+
+=back
+
+=cut
 
 sub set_default_facility {
     my ($class, @args) = @_;

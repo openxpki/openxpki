@@ -1,6 +1,8 @@
 package OpenXPKI::Client::Service::WebUI::Dispatcher;
 use OpenXPKI qw( -class -typeconstraints );
 
+with 'OpenXPKI::Role::Logger';
+
 =head1 NAME
 
 OpenXPKI::Client::Service::WebUI::Dispatcher - Route WebUI requests to page handler classes
@@ -65,21 +67,6 @@ has webui => (
     isa => 'OpenXPKI::Client::Service::WebUI',
     required => 1,
     weak_ref => 1,
-);
-
-=head2 log
-
-A logger object, per default set to C<OpenXPKI::Log4perl-E<gt>get_logger>.
-
-=cut
-has log => (
-    is => 'rw',
-    isa => duck_type( [qw(
-           trace    debug    info    warn    error    fatal
-        is_trace is_debug is_info is_warn is_error is_fatal
-    )] ),
-    lazy => 1,
-    default => sub { OpenXPKI::Log4perl->get_logger },
 );
 
 =head1 METHODS
