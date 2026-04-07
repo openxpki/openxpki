@@ -3,7 +3,7 @@ use OpenXPKI -class;
 
 use Digest::SHA qw(sha1_hex);
 use Log::Log4perl;
-use Sys::Hostname;
+use Sys::Hostname();
 use Module::Load ();
 use List::Util qw(any);
 
@@ -43,6 +43,20 @@ has backend => (
     },
 );
 
+# Hostname can be set explicit from config at system.server.hostname
+# Defaults to the system name as returned by Sys::Hostname::hostname()
+has hostname => (
+    is => 'ro',
+    isa => 'Str',
+    lazy => 1,
+    default => sub {
+        shift->get(['system','server','hostname']) || Sys::Hostname::hostname();
+    }
+);
+
+# Node Id can be set explicit from config at system.server.node_id
+# Default to the hostname or the first 16 chars of the hex encoded
+# sha1 hash of the hostname in case its length exceeds 16 chars.
 has node_id => (
     is => 'ro',
     isa => 'Str',
@@ -50,12 +64,11 @@ has node_id => (
     builder => '__init_node_id',
 );
 
-# Node Id is the hostname or the first 16 chars of the hex encoded
-# sha1 hash of the hostname in case its length exceeds 16 chars.
 sub __init_node_id {
-    my $name = shift->get(['system','server','node_id']);
+    my $self = shift;
+    my $name = $self->get(['system','server','node_id']);
     return $name if ($name);
-    $name = hostname;
+    $name = $self->hostname;
     if (length($name) > 16) {
         $name = substr(sha1_hex($name),0,16);
     }

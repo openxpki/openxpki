@@ -129,7 +129,8 @@ sub param {
                     role => CTX('session')->data->role,
                     userinfo => CTX('session')->data->userinfo,
                     pki_realm => CTX('session')->data->pki_realm
-                }
+                },
+                hostname => CTX('config')->hostname,
             });
 
             ##! 32: 'tt result ' . $out

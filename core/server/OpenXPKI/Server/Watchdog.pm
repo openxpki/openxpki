@@ -20,7 +20,6 @@ The namespace is I<system.watchdog>. The properties are:
 
 # CPAN modules
 use Log::Log4perl::MDC;
-use Sys::Hostname;
 
 # Project modules
 use OpenXPKI::Control::Server;
@@ -294,24 +293,28 @@ has _exception_count => (
 has _next_session_cleanup => (
     is => 'rw',
     isa => 'Int',
+    default => 0,
     init_arg => undef,
 );
 
 has _next_auto_archiving => (
     is => 'rw',
     isa => 'Int',
+    default => 0,
     init_arg => undef,
 );
 
 has _next_crl_purge => (
     is => 'rw',
     isa => 'Int',
+    default => 0,
     init_arg => undef,
 );
 
 has _next_scheduler_run => (
     is => 'rw',
     isa => 'Int',
+    default => 0,
     init_arg => undef,
 );
 
@@ -492,7 +495,6 @@ sub run {
 
         # setup helper object for purging expired sessions
         if ($self->interval_session_purge) {
-            $self->_next_session_cleanup( time );
             $self->_session_purge_handler( OpenXPKI::Server::Session->new(load_config => 1) );
             CTX('log')->system->info("Watchdog: initialize session purge with interval " . $self->interval_session_purge);
         }
@@ -503,17 +505,14 @@ sub run {
                 message => 'Unable to load scheduler class'
             ) if (Mojo::Loader::load_class('OpenXPKI::Server::Scheduler'));
             $self->_scheduler_handler( OpenXPKI::Server::Scheduler->new() );
-            $self->_next_scheduler_run( time );
             CTX('log')->system->info("Watchdog: initialize scheduler with interval " . $self->interval_scheduler_run);
         }
 
         if ($self->interval_auto_archiving) {
-            $self->_next_auto_archiving( time );
             CTX('log')->system->info("Watchdog: initialize auto-archiving with interval " . $self->interval_auto_archiving);
         }
 
         if ($self->interval_crl_purge) {
-            $self->_next_crl_purge( time );
             CTX('log')->system->info("Watchdog: initialize CRL purge with interval " . $self->interval_crl_purge);
         }
 
@@ -548,7 +547,7 @@ sub __main_loop {
         version => $OpenXPKI::VERSION::VERSION,
         config => CTX('config')->checksum,
         uptime => $BASETIME,
-        node => hostname,
+        node => CTX('config')->hostname,
         last_update => 0,
     };
     while (not $TERMINATE) {
@@ -615,7 +614,7 @@ sub __main_loop {
                 ##! 64: $beacon
                 CTX('api2')->set_data_pool_entry(
                     namespace => 'sys.cluster.nodes',
-                    key => hostname,
+                    key => CTX('config')->hostname,
                     pki_realm => '_global',
                     value => $beacon,
                     serialize => 'simple',
@@ -689,8 +688,6 @@ sub __run_scheduler {
 }
 
 =head2 __purge_crl
-
-Purge expired CRLs
 
 Removes records from the CRL table if next_update is in the past
 
