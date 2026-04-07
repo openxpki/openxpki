@@ -541,6 +541,8 @@ OpenXPKI/Server/Workflow/Activity/User/HashUserPassword.pm
 OpenXPKI/Server/Workflow/Activity/User/InsertUserData.pm
 OpenXPKI/Server/Workflow/Activity/User/LoadUserData.pm
 OpenXPKI/Server/Workflow/Activity/User/PersistUserData.pm
+OpenXPKI/Server/Workflow/Activity/Status/GetSystemStatus.pm
+OpenXPKI/Server/Workflow/Activity/Status/GetTokenStatus.pm
 OpenXPKI/Server/Workflow/Activity/Tools/AddCertExtension.pm
 OpenXPKI/Server/Workflow/Activity/Tools/AppendCertificateMetadata.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Approve.pm
