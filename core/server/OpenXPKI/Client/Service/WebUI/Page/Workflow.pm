@@ -681,8 +681,9 @@ sub render_from_workflow {
                     $self->log->trace('Adding grid ' . Dumper $field) if $self->log->is_trace;
                     $self->main->add_section({
                         type => 'grid',
-                        className => 'workflow',
+                        className => $field->{className} || 'workflow',
                         content => {
+                            label => $field->{label} || '',
                             actions => ($field->{action} ? [{
                                 page => $field->{action},
                                 label => '',
@@ -700,6 +701,7 @@ sub render_from_workflow {
                     $self->log->trace('Adding chart ' . Dumper $field) if $self->log->is_trace;
                     $self->main->add_section({
                         type => 'chart',
+                        className => $field->{className}//'',
                         content => {
                             label => $field->{label} || '',
                             options => $field->{options},

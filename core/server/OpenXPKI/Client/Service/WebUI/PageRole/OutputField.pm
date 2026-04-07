@@ -377,20 +377,46 @@ sub __render_grid {
     my ($self, $field, $item) = @_;
     my @head;
 
+    $self->log->trace('Rendering grid from data '.  Dumper $item);
 
     # "grid from hash" using a columns map
     # uses syntax similar to report engine
     if ($field->{cols}) {
-        $item->{header} = [ map { { 'sTitle' => $_->{head}//'' } } $field->{cols}->@* ];
+        $item->{header} = [ map { {
+            'sTitle' => $_->{head}//'',
+            ($_->{format} ? ('format' => $_->{format}) : ())
+        } } $field->{cols}->@* ];
         my @formatted;
-        foreach my $line ($item->{value}->@*) {
+        # support for "one line tables"
+        my @rows;
+        if (ref $item->{value} eq 'ARRAY') {
+            @rows = $item->{value}->@*;
+        } elsif (ref $item->{value} eq 'HASH') {
+            @rows = ( $item->{value} );
+        } else {
+            $self->log->warn('Input data has invalid format: ' . ref $item->{value});
+        }
+        foreach my $line (@rows) {
             my @row;
             foreach my $col ($field->{cols}->@*) {
-                if ($col->{key}) {
-                    push @row, $line->{$col->{key}}//'';
-                } else {
+                if (!$col->{key}) {
                     push @row, '';
+                    next;
                 }
+                if (ref $line ne 'HASH') {
+                    $self->log->warn('Line in data has invalid format: ' . ref $line);
+                    push @row, '';
+                    next;
+                }
+                my $val = $line->{$col->{key}}//'';
+                $val = $self->send_command_v2('render_template', {
+                    template => $col->{template},
+                    params => { value => $val },
+                }) if ($col->{template});
+
+                $val = sprintf($col->{printf}, $val)
+                    if ($col->{printf});
+                push @row, $val;
             }
             push @formatted, \@row;
         }

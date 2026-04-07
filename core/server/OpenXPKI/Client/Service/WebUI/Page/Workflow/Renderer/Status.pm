@@ -240,7 +240,8 @@ sub render_system_status ($self, $args, $wf_action, $param = undef) {
     my $nodes = $self->send_command_v2( 'list_data_pool_entries', {
         pki_realm => '_global',
         namespace => 'sys.cluster.nodes',
-        values => 1
+        values => 1,
+        deserialize => 1,
     });
 
     $self->log->trace("result: " . Dumper $nodes ) if $self->log->is_trace;
@@ -249,7 +250,7 @@ sub render_system_status ($self, $args, $wf_action, $param = undef) {
 #    my $ser = OpenXPKI::Serialization::Simple->new();
     foreach my $line (@{$nodes}) {
         my $className = '';
-        my $node = $self->serializer->deserialize($line->{value});
+        my $node = $line->{value};
         push @nodes, [
             $node->{node},
             substr($node->{config},0,8),
