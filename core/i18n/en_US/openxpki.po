@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2026-03-18 15:14+0100\n"
+"PO-Revision-Date: 2026-04-07 18:21+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-"
 "devel@lists.sourceforge.net>\n"
@@ -40,6 +40,18 @@ msgstr "EAB Key ID"
 
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "Requested action not found"
+
+msgid "I18N_OPENXPKI_UI_ALIAS_GROUP"
+msgstr "Group"
+
+msgid "I18N_OPENXPKI_UI_ALIAS_GROUP_EXPIRY"
+msgstr "Expiry"
+
+msgid "I18N_OPENXPKI_UI_ALIAS_GROUP_ITEMS_TOTAL"
+msgstr "Items"
+
+msgid "I18N_OPENXPKI_UI_ALIAS_GROUP_ITEMS_VALID"
+msgstr "Valid"
 
 msgid "I18N_OPENXPKI_UI_API_TOKEN"
 msgstr "API-Token/Secret"
@@ -508,9 +520,8 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT"
 msgstr "This is just a prefix"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
-msgstr "unspecified / other reason"
+msgstr "discontinued"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
@@ -890,6 +901,9 @@ msgstr "Domain List"
 
 msgid "I18N_OPENXPKI_UI_FIELD_ERROR_CODE"
 msgstr "Error Code"
+
+msgid "I18N_OPENXPKI_UI_HEALTH_STATUS"
+msgstr "Health"
 
 # Remove?
 msgid "I18N_OPENXPKI_UI_HOME_LOGOUT_HEAD"
@@ -1628,6 +1642,69 @@ msgstr "Report Configuration"
 msgid "I18N_OPENXPKI_UI_REPORT_DOWNLOAD_LABEL"
 msgstr "Download"
 
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_ARCHIVED"
+msgstr "Archived"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_EXCEEDED"
+msgstr "Exceeded"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_EXCEPTION"
+msgstr "Exception"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_FAILED"
+msgstr "Failed"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_FINISHED"
+msgstr "Finished"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_INIT"
+msgstr "Initial"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_MANUAL"
+msgstr "Pending"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_MATURE"
+msgstr "Mature"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_NEAR_EXPIRY"
+msgstr "Near Expiry"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_PAUSE"
+msgstr "Pause"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_RECENT_EXPIRY"
+msgstr "Recently Expired"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_RUNNING"
+msgstr "Running"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_STRAY"
+msgstr "Stray"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_TOTAL_COUNT"
+msgstr "Total"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_TOTAL_DISTINCT"
+msgstr "Distinct"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_TOTAL_EXPIRED"
+msgstr "Expired"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_TOTAL_RENEWED"
+msgstr "Renewed"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_TOTAL_REVOKED"
+msgstr "Revoked"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_VALID_COUNT"
+msgstr "Valid"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_VALID_DISTINTCT"
+msgstr "Valid Distinct"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_ZOMBIE"
+msgstr "Zombie"
+
 msgid "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_CREATED"
 msgstr "Last Update"
 
@@ -1795,6 +1872,27 @@ msgstr "seconds"
 
 msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_STARTED"
 msgstr "started"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_ALIAS_GROUPS_LABEL"
+msgstr "Alias Group Status"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_ALIAS_LIST_LABEL"
+msgstr "Alias Details"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_CERTIFICATE_STATS_LABEL"
+msgstr "Certificate Statistics"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_CLUSTER_STATUS_LABEL"
+msgstr "Cluster Status"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_CRL_STATUS_LABEL"
+msgstr "Certificate Revocation List Status"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_TOKEN_LIST_LABEL"
+msgstr "Token Status"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_WORKFLOW_STATS_LABEL"
+msgstr "Workflow Statistics"
 
 msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_CRITICAL"
 msgstr "Your system status is critical!"
@@ -2624,6 +2722,9 @@ msgstr "Failed Approval Rules"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVAL_REPORTS_LABEL"
 msgstr "Executed Approval Rules"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_AUTHENTICATION_REPORT_LABEL"
+msgstr "Authentication Report"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_BULKDATA_DESC"
 msgstr "Input data as defined by the field specification. "
@@ -4302,6 +4403,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_RESULT_LABEL"
 msgstr "Certificate Metadata"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_STATUS_SUMMARY_SUCCESS_LABEL"
+msgstr "OpenXPKI System Status Summary"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC"
 msgstr "This workflow has finished with success and can not be restarted"
 
@@ -4502,6 +4606,12 @@ msgstr "Issue certificate revocation lists."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_LABEL"
 msgstr "CRL Issuance"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_API_DESC"
+msgstr "Workflow handling revocation via automated APIs."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_API_LABEL"
+msgstr "Certificate Revocation via API"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BULK_DESC"
 msgstr ""
 "This workflow allows the revocation of multiple certificates at once. You "
@@ -4636,5 +4746,20 @@ msgstr "Yes"
 #~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_NOT_TRUSTED"
 #~ msgstr "Signer certificate is not trusted."
 
+#~ msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_FIELD_REPORT_DATA_LABEL"
+#~ msgstr "Certificate Detail Report "
+
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_UNKNOWN_TYPE"
 #~ msgstr "Cannot initiate workflow: type unknown"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_SUMMARY_FIELD_REPORT_DATA_LABEL"
+#~ msgstr "Certificate Detail Report "
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_STATUS_SUMMARY_DESC"
+#~ msgstr "Report showing certificate count in several states."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_STATUS_SUMMARY_LABEL"
+#~ msgstr "Certificates Status Report"

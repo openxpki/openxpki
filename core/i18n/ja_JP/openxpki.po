@@ -40,6 +40,22 @@ msgstr "EABキーID"
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "リクエストされたアクションが見つかりません"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ALIAS_GROUP"
+msgstr "トークン別名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ALIAS_GROUP_EXPIRY"
+msgstr "CRLが期限切れです"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ALIAS_GROUP_ITEMS_TOTAL"
+msgstr "最終更新時刻"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ALIAS_GROUP_ITEMS_VALID"
+msgstr "最終更新時刻"
+
 msgid "I18N_OPENXPKI_UI_API_TOKEN"
 msgstr "APIトークン"
 
@@ -892,6 +908,10 @@ msgstr "ドメインリスト"
 msgid "I18N_OPENXPKI_UI_FIELD_ERROR_CODE"
 msgstr "エラーコード"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_HEALTH_STATUS"
+msgstr "証明書ステータス"
+
 msgid "I18N_OPENXPKI_UI_HOME_LOGOUT_HEAD"
 msgstr "ログアウト"
 
@@ -1438,6 +1458,10 @@ msgstr "システムに最も適したホスト名（ドメイン名）を入力
 msgid "I18N_OPENXPKI_UI_PROFILE_IMPORTED_LABEL"
 msgstr "インポート済み証明書"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_LABEL"
+msgstr "IoTデバイス"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_STYLE_DESC"
 msgstr ""
 "This style uses serialNumber instead of commonName to be used for e.g. IoT "
@@ -1621,6 +1645,90 @@ msgstr "レポート構成"
 msgid "I18N_OPENXPKI_UI_REPORT_DOWNLOAD_LABEL"
 msgstr "ダウンロード"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_ARCHIVED"
+msgstr "証明書ライフサイクルサポート"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_EXCEEDED"
+msgstr "最近更新された証明書"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_EXCEPTION"
+msgstr "レポートの詳細"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_FAILED"
+msgstr "秘密鍵は復号化/読み込みできませんでした。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_FINISHED"
+msgstr "証明書ライフサイクルサポート"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_INIT"
+msgstr "関連するワークフローを表示"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_MANUAL"
+msgstr "証明書ライフサイクルサポート"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_MATURE"
+msgstr "証明書ライフサイクルサポート"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_NEAR_EXPIRY"
+msgstr "有効期限間近の証明書"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_PAUSE"
+msgstr "証明書ライフサイクルサポート"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_RECENT_EXPIRY"
+msgstr "最近の有効期限切れの証明書"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_RUNNING"
+msgstr "証明書ライフサイクルサポート"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_STRAY"
+msgstr "証明書ライフサイクルサポート"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_TOTAL_COUNT"
+msgstr "証明書の全体数"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_TOTAL_DISTINCT"
+msgstr "全体の個別の件名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_TOTAL_EXPIRED"
+msgstr "全体の有効期限切れの証明書"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_TOTAL_RENEWED"
+msgstr "全体の更新された証明書"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_TOTAL_REVOKED"
+msgstr "全体の失効した証明書"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_VALID_COUNT"
+msgstr "有効な証明書"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_VALID_DISTINTCT"
+msgstr "有効な個別の件名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_ZOMBIE"
+msgstr "証明書ライフサイクルサポート"
+
 msgid "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_CREATED"
 msgstr "最終更新"
 
@@ -1788,6 +1896,32 @@ msgstr "起動時間(秒)"
 
 msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_STARTED"
 msgstr "開始時刻"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_ALIAS_GROUPS_LABEL"
+msgstr ""
+
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_ALIAS_LIST_LABEL"
+msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_CERTIFICATE_STATS_LABEL"
+msgstr "証明書の詳細レポート"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_CLUSTER_STATUS_LABEL"
+msgstr "証明書の詳細レポート"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_CRL_STATUS_LABEL"
+msgstr "証明書の詳細レポート"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_TOKEN_LIST_LABEL"
+msgstr "証明書の詳細レポート"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_WORKFLOW_STATS_LABEL"
+msgstr "証明書の詳細レポート"
 
 msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_CRITICAL"
 msgstr "システム状態が危険です！"
@@ -2620,6 +2754,10 @@ msgstr "失敗した承認ルール"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVAL_REPORTS_LABEL"
 msgstr "実行された承認ルール"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_AUTHENTICATION_REPORT_LABEL"
+msgstr "通知"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_BULKDATA_DESC"
 msgstr "フィールド仕様で定義された入力データ。"
@@ -4289,6 +4427,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_RESULT_LABEL"
 msgstr "証明書のメタデータ"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_STATUS_SUMMARY_SUCCESS_LABEL"
+msgstr "レポート結果"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC"
 msgstr "このワークフローは成功して終了し、再実行はできません"
 
@@ -4479,6 +4621,16 @@ msgstr "CRLを発行します。"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_LABEL"
 msgstr "CRL発行"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_API_DESC"
+msgstr ""
+"このワークフローでは、複数の証明書を一度に失効させることができます。有効な証"
+"明書識別子のリストを提供する必要があります。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_API_LABEL"
+msgstr "一括失効リクエスト"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BULK_DESC"
 msgstr ""
 "このワークフローでは、複数の証明書を一度に失効させることができます。有効な証"
@@ -4611,5 +4763,20 @@ msgid "I18N_OPENXPKI_UI_YES"
 msgstr "はい"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_LABEL"
-#~ msgstr "IoTデバイス"
+#~ msgid "I18N_OPENXPKI_UI_REPORT_FIELD_VALID_REVOKED"
+#~ msgstr "有効性はあるが失効した証明書"
+
+#~ msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_FIELD_REPORT_DATA_LABEL"
+#~ msgstr "証明書の詳細レポート"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_SUMMARY_FIELD_REPORT_DATA_LABEL"
+#~ msgstr "証明書の詳細レポート"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_STATUS_SUMMARY_DESC"
+#~ msgstr "いくつかの状態における証明書の数を示すレポート。"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_STATUS_SUMMARY_LABEL"
+#~ msgstr "証明書ステータスレポート"

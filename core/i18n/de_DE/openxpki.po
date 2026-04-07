@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2026-03-18 15:14+0100\n"
+"PO-Revision-Date: 2026-04-07 18:21+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-"
 "devel@lists.sourceforge.net>\n"
@@ -40,6 +40,18 @@ msgstr "EAB Schlüssel-ID"
 
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "Die ausgewählte Aktion ist nicht verfügbar"
+
+msgid "I18N_OPENXPKI_UI_ALIAS_GROUP"
+msgstr "Gruppe"
+
+msgid "I18N_OPENXPKI_UI_ALIAS_GROUP_EXPIRY"
+msgstr "Ablauf"
+
+msgid "I18N_OPENXPKI_UI_ALIAS_GROUP_ITEMS_TOTAL"
+msgstr "Anzahl"
+
+msgid "I18N_OPENXPKI_UI_ALIAS_GROUP_ITEMS_VALID"
+msgstr "Gültig"
 
 msgid "I18N_OPENXPKI_UI_API_TOKEN"
 msgstr "API-Token/Passwort"
@@ -886,6 +898,9 @@ msgstr "Domainliste"
 msgid "I18N_OPENXPKI_UI_FIELD_ERROR_CODE"
 msgstr "Fehlercode"
 
+msgid "I18N_OPENXPKI_UI_HEALTH_STATUS"
+msgstr "Gesundheit"
+
 # Remove?
 msgid "I18N_OPENXPKI_UI_HOME_LOGOUT_HEAD"
 msgstr "Erfolgreich abgemeldet"
@@ -910,8 +925,7 @@ msgid "I18N_OPENXPKI_UI_IMPORT_CRL_ISSUER_NOT_FOUND"
 msgstr "Aussteller dieser CRL unbekannt!"
 
 msgid "I18N_OPENXPKI_UI_INVALIDITY_TIME_OUTSIDE_VALIDITY_WINDOW"
-msgstr ""
-"Sperrdatum liegt außerhalb des Gültigkeitszeitraums des Zertifikats"
+msgstr "Sperrdatum liegt außerhalb des Gültigkeitszeitraums des Zertifikats"
 
 msgid "I18N_OPENXPKI_UI_INVALID_PROFILE"
 msgstr "Ungültiges Profil"
@@ -1633,6 +1647,69 @@ msgstr "Inhalt"
 msgid "I18N_OPENXPKI_UI_REPORT_DOWNLOAD_LABEL"
 msgstr "Download"
 
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_ARCHIVED"
+msgstr "Archiviert"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_EXCEEDED"
+msgstr "Überschritten"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_EXCEPTION"
+msgstr "Ausnahme"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_FAILED"
+msgstr "Fehlgeschlagen"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_FINISHED"
+msgstr "Abgeschlossen"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_INIT"
+msgstr "Initial"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_MANUAL"
+msgstr "Ausstehend"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_MATURE"
+msgstr "Reif"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_NEAR_EXPIRY"
+msgstr "Demnächst Ablaufend"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_PAUSE"
+msgstr "Pausiert"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_RECENT_EXPIRY"
+msgstr "Kürzlich Abgelaufen"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_RUNNING"
+msgstr "Laufend"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_STRAY"
+msgstr "Verwaist"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_TOTAL_COUNT"
+msgstr "Gesamt"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_TOTAL_DISTINCT"
+msgstr "Eindeutig"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_TOTAL_EXPIRED"
+msgstr "Abgelaufen"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_TOTAL_RENEWED"
+msgstr "Erneuert"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_TOTAL_REVOKED"
+msgstr "Gesperrt"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_VALID_COUNT"
+msgstr "Gültig"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_VALID_DISTINTCT"
+msgstr "Gültig/Eindeutig"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_ZOMBIE"
+msgstr "Zombie"
+
 msgid "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_CREATED"
 msgstr "Letzte Aktualisierung"
 
@@ -1801,6 +1878,27 @@ msgstr "Sekunden"
 
 msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_STARTED"
 msgstr "Start"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_ALIAS_GROUPS_LABEL"
+msgstr "Status der Aliasgruppen"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_ALIAS_LIST_LABEL"
+msgstr "Aliases"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_CERTIFICATE_STATS_LABEL"
+msgstr "Zertifikatsstatistik"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_CLUSTER_STATUS_LABEL"
+msgstr "Cluster Status"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_CRL_STATUS_LABEL"
+msgstr "Status der Revozierungslisten"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_TOKEN_LIST_LABEL"
+msgstr "Status aller Token"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_WORKFLOW_STATS_LABEL"
+msgstr "Workflowstatistik"
 
 msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_CRITICAL"
 msgstr "Der Systemstatus ist kritisch!"
@@ -2662,6 +2760,9 @@ msgstr "Fehlgeschlagene Freigaberegeln"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVAL_REPORTS_LABEL"
 msgstr "Ausgeführte Freigaberegeln"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_AUTHENTICATION_REPORT_LABEL"
+msgstr "Authentisierungen"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_BULKDATA_DESC"
 msgstr "Daten zum Import in der vorgegebenen Spezfikation. "
 
@@ -3341,7 +3442,6 @@ msgstr "Zertifikat ausgetauscht"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
 msgstr "Service eingestellt"
-
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_COMPROMISE"
 msgstr "Schlüssel kompromittiert"
@@ -4386,6 +4486,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_RESULT_LABEL"
 msgstr "Zertifikat Meta-Daten"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_STATUS_SUMMARY_SUCCESS_LABEL"
+msgstr "OpenXPKI Übersicht Systemstatus "
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC"
 msgstr ""
 "Dieser Workflow wurde erfolgreich abgeschlossen und kann nicht erneut "
@@ -4588,6 +4691,14 @@ msgstr "Erlaubt das Ausstellen von Sperrlisten."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_LABEL"
 msgstr "Sperrliste ausstellen"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_API_DESC"
+msgstr ""
+"Dieser Workflow wickelt Sperranfragen über die "
+"Automatisierungsschnittstellen ab."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_API_LABEL"
+msgstr "Sperrung über API"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BULK_DESC"
 msgstr ""
 "Dieser Workflow erlaubt das Sperren mehrerer Zertifikate. Es muss eine Liste "
@@ -4723,5 +4834,24 @@ msgstr "ja"
 #~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_NOT_TRUSTED"
 #~ msgstr "Antragssteller-Zertifikat wird nicht vertraut."
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_REPORT_FIELD_VALID_REVOKED"
+#~ msgstr "Nicht abgelaufene, jedoch gesperrte Zertifikate"
+
+#~ msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_FIELD_REPORT_DATA_LABEL"
+#~ msgstr "Detaillierter Zertifikatsbericht"
+
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_UNKNOWN_TYPE"
 #~ msgstr "Der Workflow konnte nicht gestartet werden: Typ unbekannt"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_SUMMARY_FIELD_REPORT_DATA_LABEL"
+#~ msgstr "Detaillierter Zertifikatsbericht"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_STATUS_SUMMARY_DESC"
+#~ msgstr "Aufstellung der Menge an Zertifikaten nach Status."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_STATUS_SUMMARY_LABEL"
+#~ msgstr "Zertifikatsstatusbericht"

@@ -335,6 +335,14 @@ div.oxi-grid th.sortable {
   white-space: nowrap;
 }
 
+table.fixed-grid {
+  table-layout: fixed
+}
+
+table.text-end td {
+  text-align: right;
+}
+
 /* plain grid-row without status */
 tr.gridrow:hover > td { background-color: #E7E7E7 !important; }
 
@@ -406,20 +414,32 @@ tr.gridrow-archived:hover       > td { background-color: #c0ddc0 !important; }
 }
 
 /* general classes...*/
-tr.gridrow-ok             > td { background-color: #dff0d8 !important; }
-tr.gridrow-ok:hover       > td { background-color: #c9e2b3 !important; }
-tr.gridrow-warning        > td { background-color: #fbeed5 !important; }
-tr.gridrow-warning:hover  > td { background-color: #faf2cc !important; }
-tr.gridrow-danger         > td { background-color: #ebcccc !important; }
-tr.gridrow-danger:hover   > td { background-color: #e6c1c7 !important; }
+tr.gridrow-ok,
+tr.gridrow-good,
+tr.gridrow-valid            { > td { background-color: #dff0d8 !important; } }
+tr.gridrow-ok:hover,
+tr.gridrow-good:hover,
+tr.gridrow-valid:hover      { > td { background-color: #c9e2b3 !important; } }
+tr.gridrow-warning          { > td { background-color: #fbeed5 !important; } }
+tr.gridrow-warning:hover    { > td { background-color: #faf2cc !important; } }
+tr.gridrow-danger,
+tr.gridrow-critical         { > td { background-color: #ebcccc !important; } }
+tr.gridrow-danger:hover,
+tr.gridrow-critical:hover   { > td { background-color: #e6c1c7 !important; } }
 
 [data-bs-theme=dark] {
-  tr.gridrow-ok             > td { background-color: #204412 !important; }
-  tr.gridrow-ok:hover       > td { background-color: #333 !important; }
-  tr.gridrow-warning        > td { background-color: #493209 !important; }
-  tr.gridrow-warning:hover  > td { background-color: #333 !important; }
-  tr.gridrow-danger         > td { background-color: #421010 !important; }
-  tr.gridrow-danger:hover   > td { background-color: #333 !important; }
+  tr.gridrow-ok,
+  tr.gridrow-good,
+  tr.gridrow-valid            { > td { background-color: #204412 !important; } }
+  tr.gridrow-ok:hover,
+  tr.gridrow-good:hover,
+  tr.gridrow-valid:hover      { > td { background-color: #333 !important; } }
+  tr.gridrow-warning          { > td { background-color: #493209 !important; } }
+  tr.gridrow-warning:hover    { > td { background-color: #333 !important; } }
+  tr.gridrow-danger,
+  tr.gridrow-critical         { > td { background-color: #421010 !important; } }
+  tr.gridrow-danger:hover,
+  tr.gridrow-critical:hover   { > td { background-color: #333 !important; } }
 }
 
 /******************************************************************************

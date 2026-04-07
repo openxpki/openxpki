@@ -54,6 +54,22 @@ msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "Azione richiesta non trovata"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_ALIAS_GROUP"
+msgstr "Stato del Token"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ALIAS_GROUP_EXPIRY"
+msgstr "Scaduto"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ALIAS_GROUP_ITEMS_TOTAL"
+msgstr "Ultimo Aggiornamento"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ALIAS_GROUP_ITEMS_VALID"
+msgstr "Ultimo Aggiornamento"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_API_TOKEN"
 msgstr "Nome utente"
 
@@ -1158,6 +1174,11 @@ msgstr "Paese"
 
 # Remove?
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_HEALTH_STATUS"
+msgstr "Stato del Certificato"
+
+# Remove?
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_HOME_LOGOUT_HEAD"
 msgstr "Home"
 
@@ -1836,6 +1857,10 @@ msgid "I18N_OPENXPKI_UI_PROFILE_IMPORTED_LABEL"
 msgstr "Token Datasafe"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_LABEL"
+msgstr "Extended naming (expert use only)"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_STYLE_DESC"
 msgstr "Stile denominazione avanzato"
 
@@ -2034,6 +2059,98 @@ msgstr "Report Completo"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_REPORT_DOWNLOAD_LABEL"
 msgstr "Scarica"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_ARCHIVED"
+msgstr "Report Completo"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_EXCEEDED"
+msgstr "Certificato scaduto di recente"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_EXCEPTION"
+msgstr "Usa la history del workflow per auditing o per la ricerca di errori"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_FAILED"
+msgstr "Catena di certificazione"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_FINISHED"
+msgstr "Report Completo"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_INIT"
+msgstr "Mostra i workflow correlati"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_MANUAL"
+msgstr "Report Completo"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_MATURE"
+msgstr "Report Completo"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_NEAR_EXPIRY"
+msgstr "Certificato in Scadenza"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_PAUSE"
+msgstr "Report Completo"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_RECENT_EXPIRY"
+msgstr "Certificato scaduto di recente"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_RUNNING"
+msgstr "Report Completo"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_STRAY"
+msgstr "Report Completo"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_TOTAL_COUNT"
+msgstr "Conteggio Totale Certificati"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_TOTAL_DISTINCT"
+msgstr "Numero Totale Soggetti"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_TOTAL_EXPIRED"
+msgstr "Certificati Scaduti"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_TOTAL_RENEWED"
+msgstr "Certificati Revocati"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_TOTAL_REVOKED"
+msgstr "Certificati Revocati"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_VALID_COUNT"
+msgstr "Certificati Validi"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_VALID_DISTINTCT"
+msgstr "Soggetti Distinti Validi"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_ZOMBIE"
+msgstr "Report Completo"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_CREATED"
@@ -2252,6 +2369,32 @@ msgstr "Questa Richiesta di Revoca è in attesa di approvazione."
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_STARTED"
 msgstr "Emesso"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_ALIAS_GROUPS_LABEL"
+msgstr ""
+
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_ALIAS_LIST_LABEL"
+msgstr ""
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_CERTIFICATE_STATS_LABEL"
+msgstr "Report Completo Certificati"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_CLUSTER_STATUS_LABEL"
+msgstr "Report Completo Certificati"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_CRL_STATUS_LABEL"
+msgstr "Report Completo Certificati"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_TOKEN_LIST_LABEL"
+msgstr "Report Completo Certificati"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_WORKFLOW_STATS_LABEL"
+msgstr "Report Completo Certificati"
 
 # Remove?
 #, fuzzy
@@ -3201,6 +3344,10 @@ msgstr "Approvazioni"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVAL_REPORTS_LABEL"
 msgstr "Approvazioni"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_AUTHENTICATION_REPORT_LABEL"
+msgstr "Certificato"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_BULKDATA_DESC"
@@ -5093,6 +5240,10 @@ msgstr "Le modifiche sono state salvate in via definitiva nel database."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_RESULT_LABEL"
 msgstr "I Metadati sono stati aggiornati"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_STATUS_SUMMARY_SUCCESS_LABEL"
+msgstr "Risultati Report"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC"
 msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 
@@ -5329,6 +5480,17 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_LABEL"
 msgstr "Emissione CRL"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_API_DESC"
+msgstr ""
+"Pubblica le Informazioni sulla Autorità di certificazione (CA, Certification "
+"Authority), ovvero Certificati della CA e Liste Revoche (CRL) in archivi "
+"predefiniti."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_API_LABEL"
+msgstr "Pubblica Informazioni CA"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BULK_DESC"
 msgstr ""
 "Pubblica le Informazioni sulla Autorità di certificazione (CA, Certification "
@@ -5547,8 +5709,11 @@ msgstr "Sì"
 #~ msgstr "Seleziona prima un profilo nel campo soprastante"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_IOT_DEVICE_LABEL"
-#~ msgstr "Extended naming (expert use only)"
+#~ msgid "I18N_OPENXPKI_UI_REPORT_FIELD_VALID_REVOKED"
+#~ msgstr "Certificati Revocati"
+
+#~ msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_FIELD_REPORT_DATA_LABEL"
+#~ msgstr "Report Completo Certificati"
 
 # Remove?
 #, fuzzy
@@ -6028,6 +6193,10 @@ msgstr "Sì"
 #~ msgstr "Certificato Revocato"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_SUMMARY_FIELD_REPORT_DATA_LABEL"
+#~ msgstr "Report Completo Certificati"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ADDUSER_DESC"
 #~ msgstr ""
 #~ "Questo Workflow è definitivamente fallito e non può essere riavviato"
@@ -6060,3 +6229,13 @@ msgstr "Sì"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RESETPASS_LABEL"
 #~ msgstr "Ricerca nei Workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_STATUS_SUMMARY_DESC"
+#~ msgstr ""
+#~ "Report che mostra il numero di certificati presenti nei loro vari stati "
+#~ "(Emesso, Scaduto, ecc.)."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_STATUS_SUMMARY_LABEL"
+#~ msgstr "Report Riassuntivo Certificati"
