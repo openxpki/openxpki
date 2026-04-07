@@ -123,7 +123,11 @@ sub handle_dispatch_error ($self, $err) {
                 $err->isa('Moose::Exception::ValidationFailed')
                 or $err->isa('Moose::Exception::ValidationFailedForTypeConstraint')
             ) {
-                die OpenXPKI::DTO::ValidationException->new( field => $err->attribute->init_arg, reason => 'type' );
+                die OpenXPKI::DTO::ValidationException->new(
+                    field   => $err->attribute->init_arg,
+                    reason  => 'type',
+                    message => $err->type->get_message($err->value),
+                );
             }
         }
         $err->rethrow if $err->can('rethrow');

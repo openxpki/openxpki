@@ -319,7 +319,8 @@ triggered) if the source and the target have the same type.
 
 =cut
 subtype 'FileContents',
-    as 'ScalarRef';
+    as 'ScalarRef',
+    message { sprintf "'%s' is not a readable file", (ref $_ ? '<ref>' : $_) };
 
 coerce 'FileContents',
     from 'ReadableFile',
