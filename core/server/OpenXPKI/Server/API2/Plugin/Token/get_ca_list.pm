@@ -25,12 +25,13 @@ Each entry of the list is a I<HashRef>:
         notbefore => '...',  # certificate validity (UNIX epoch timestamp)
         notafter => '...',   # certificate validity (UNIX epoch timestamp)
         subject => '...',    # certificate subject
-        status => '...',     # verbose status of the token: EXPIRED, UPCOMING, ONLINE, OFFLINE OR UNKNOWN
+        status => '...',     # verbose status of the token: EXPIRED, UPCOMING, REVOKED, ONLINE, OFFLINE OR UNKNOWN
     }
 
 The online/offline status check is only possible from within the current
 realm, for requests outside the current realm the status of a valid token is
-always C<UNKNOWN>.
+always C<UNKNOWN>. If the certificate is outside its validity window or revoked,
+no check is executed.
 
 The list is sorted by C<notbefore> date, starting with the newest date.
 Dates are taken from the alias table and might differ from the certificates
@@ -77,6 +78,7 @@ command "get_ca_list" => {
         columns => [
             'certificate.data',
             'certificate.subject',
+            'certificate.status',
             'aliases.notbefore',
             'aliases.notafter',
             'aliases.alias',
@@ -107,11 +109,16 @@ command "get_ca_list" => {
 
         # Check if the token is still valid - dates are already unix timestamps
         my $now = time;
-        if ($row->{notbefore} > $now) {
+
+        if ($row->{status} ne 'ISSUED') {
+            $item->{status} = 'REVOKED';
+
+        } elsif ($row->{notbefore} > $now) {
             $item->{status} = 'UPCOMING';
         }
         elsif ($row->{notafter} < $now) {
             $item->{status} = 'EXPIRED';
+
         }
         # Check if the key is usable (only if requested)
         elsif ($params->check_online) {

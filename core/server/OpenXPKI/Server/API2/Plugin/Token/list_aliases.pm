@@ -50,6 +50,8 @@ B<Parameters>
 
 =item * C<upcoming> I<Bool> - weather to show only upcoming items (default is no)
 
+=item * C<revoked> I<Bool> - weather to include revoked certificates (default is no)
+
 =back
 
 =cut
@@ -59,6 +61,7 @@ command "list_aliases" => {
     valid   => { isa => 'Bool', default => 0 },
     expired   => { isa => 'Bool', default => 0 },
     upcoming   => { isa => 'Bool', default => 0 },
+    revoked   => { isa => 'Bool', default => 0 },
 } => sub {
     my ($self, $params) = @_;
 
@@ -66,40 +69,44 @@ command "list_aliases" => {
 
     my %query;
     %query = (
-        'notbefore' => { '<' => time() },
-        'notafter'  => { '>' => time() },
+        'aliases.notbefore' => { '<' => time() },
+        'aliases.notafter'  => { '>' => time() },
     ) if ($params->valid);
 
     if ($params->expired) {
         if ($params->valid) {
-            delete $query{notafter}
+            delete $query{'aliases.notafter'}
         } else {
-            $query{notafter} = { '<', time };
+            $query{'aliases.notafter'} = { '<', time };
         }
     }
 
     if ($params->upcoming) {
         if ($params->valid) {
-            delete $query{notbefore};
+            delete $query{'aliases.notbefore'};
         } else {
-            $query{notbefore} = { '>', time };
+            $query{'aliases.notbefore'} = { '>', time };
         }
     }
 
+    $query{'certificate.status'} = 'ISSUED'
+        unless($params->revoked);
+
     my $aliases = CTX('dbi')->select_hashes(
-        from => 'aliases',
+        from_join => 'aliases identifier=identifier certificate',
         columns => [
-            'notbefore',
-            'notafter',
-            'alias',
-            'identifier',
+            'aliases.notbefore',
+            'aliases.notafter',
+            'aliases.alias',
+            'aliases.identifier',
+            'certificate.status',
         ],
         where => {
-            'pki_realm' => $pki_realm,
+            'aliases.pki_realm' => $pki_realm,
             'group_id' => $params->group,
             %query
         },
-        order_by => [ '-notbefore' ],
+        order_by => [ '-aliases.notbefore' ],
     );
 
     return $aliases || {};

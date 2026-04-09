@@ -84,6 +84,18 @@ command "get_token_alias_by_group" => {
 };
 
 
+=head2 get_token_group_by_type
+
+Return the name of the alias group for a named token type.
+
+=cut
+command "get_token_group_by_type" => {
+    type     => { isa => 'TokenType', required => 1, },
+} => sub {
+    my ($self, $params) = @_;
+    return CTX('config')->get(['crypto','type',$params->type]);
+};
+
 =head2 list_token_groups
 
 Return the map to assign group names to the token types.
@@ -120,15 +132,16 @@ sub _token_alias_by_group {
     my $validity_epoch = OpenXPKI::Server::API2::Plugin::Token::Util->validity_to_epoch($validity);
 
     my $alias = CTX('dbi')->select_one(
-        from => 'aliases',
+        from_join => 'aliases identifier=identifier certificate',
         columns => [ 'alias' ],
         where => {
-            pki_realm => $pki_realm,
-            group_id  => $group,
-            notbefore => { '<' => $validity_epoch->{notbefore} },
-            notafter  => { '>' => $validity_epoch->{notafter} },
+            'aliases.pki_realm' => $pki_realm,
+            'aliases.group_id'  => $group,
+            'aliases.notbefore' => { '<' => $validity_epoch->{notbefore} },
+            'aliases.notafter'  => { '>' => $validity_epoch->{notafter} },
+            'certificate.status' => 'ISSUED',
         },
-        order_by => [ '-notbefore' ],
+        order_by => [ '-aliases.notbefore' ],
     )
     or OpenXPKI::Exception->throw (
         message => 'Could not find token alias by group',
