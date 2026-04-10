@@ -86,7 +86,7 @@ export default class ApplicationController extends Controller {
 
     @action
     cycleThemeMode() {
-        // Cycle: light → dark → auto → light
+        // Cycle: light -> dark -> auto -> light
         switch (this.themeMode) {
             case 'light': this.themeMode = 'dark'; break
             case 'dark': this.themeMode = 'auto'; break
