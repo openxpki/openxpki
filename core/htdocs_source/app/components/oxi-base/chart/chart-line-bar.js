@@ -37,6 +37,11 @@ function reducedAlphaColor(cssColor) {
   Line and Bar chart class
 */
 export default async function ChartLineBar(element, opts, data) {
+    // uPlot calls new Intl.NumberFormat(navigator.language) when it first loads.
+    // Guard against invalid language tags (e.g. Playwright sets it to "undefined").
+    if (!navigator.language || navigator.language === 'undefined') {
+        try { Object.defineProperty(Navigator.prototype, 'language', { get: () => 'en-US', configurable: true }) } catch(e) {}
+    }
     const [{ default: uPlot }, { default: seriesBarsPlugin }] = await Promise.all([
         import('uplot'),
         import('./uplot/seriesbars-plugin'),
@@ -181,6 +186,9 @@ export default async function ChartLineBar(element, opts, data) {
         }
         uplotOptions.series.push(seriesOpts);
 
+        // Bar charts draw values on top of each bar via the plugin, so no y-axis needed.
+        if (opts.type == 'bar') continue;
+
         // add up to 2 axis (left and right)
         if (uplotOptions.axes.length < 3) {
             let axis = {
@@ -188,7 +196,7 @@ export default async function ChartLineBar(element, opts, data) {
                 space: Math.max((opts.bar_vertical ? opts.width : opts.height) / 20, 15),
                 //labelSize: 150,
                 size: 60,
-                stroke: opts.type == 'bar' ? 'black' : color,
+                stroke: color,
             };
             // special treatment for percent
             if (scale == '%') uPlot.assign(axis, {
@@ -208,8 +216,93 @@ export default async function ChartLineBar(element, opts, data) {
         }
     }
 
-    new uPlot(uplotOptions, uplotData, (uplot, init) => {
-        element.appendChild(uplot.root);
-        init();
-    })
+    function createChart(width, height) {
+        uplotOptions.width = width;
+        uplotOptions.height = height;
+        return new uPlot(uplotOptions, uplotData, (uplot, init) => {
+            element.appendChild(uplot.root);
+            init();
+        });
+    }
+
+    const autoWidth = opts.width === 'auto';
+    const autoHeight = opts.height === 'auto';
+
+    // FIXED size
+    if (!autoWidth && !autoHeight) {
+        createChart(opts.width, opts.height);
+        return;
+    }
+
+    // AUTO size
+    const AUTO_HEIGHT_DEFAULT = 200;
+
+    let chart = null;
+    let lastCanvasWidth = null;
+    // legendReserved: the fixed amount to subtract from availWidth for the side legend
+    // (legendWidth + columnGap). Measured once on first render; label text never changes.
+    let legendReserved = 0;
+
+    // Snapshot the container height before first render. If zero the container
+    // is sized by its content, so use the fallback.
+    const initialHeight = Math.floor(element.getBoundingClientRect().height);
+    let fixedHeight = autoHeight ? (initialHeight || AUTO_HEIGHT_DEFAULT) : opts.height;
+
+    const legendSide = opts.legend_position === 'right' || opts.legend_position === 'left';
+
+    // Initial render: create chart, measure title and legend, recreate once if needed.
+    function initialRender() {
+        const availWidth = autoWidth ? Math.max(1, Math.floor(element.getBoundingClientRect().width)) : opts.width;
+        chart = createChart(availWidth, fixedHeight);
+
+        // Measure and subtract title height once so it does not overflow the container.
+        const titleEl = element.querySelector('.u-title');
+        if (titleEl && titleEl.offsetHeight > 0) {
+            fixedHeight = Math.max(1, fixedHeight - titleEl.offsetHeight);
+            chart.destroy();
+            element.innerHTML = '';
+            chart = createChart(availWidth, fixedHeight);
+        }
+
+        // When legend is on the side, measure legend width + column-gap and subtract
+        // from canvas width so canvas + gap + legend fits the container.
+        if (autoWidth && legendSide) {
+            const legendEl = element.querySelector('.u-legend');
+            const uplotRoot = element.querySelector('.uplot');
+            if (legendEl && uplotRoot) {
+                const columnGap = Math.ceil(parseFloat(getComputedStyle(uplotRoot).columnGap) || 0);
+                const legendWidth = Math.ceil(legendEl.getBoundingClientRect().width);
+                if (legendWidth > 0 && legendWidth < availWidth) {
+                    legendReserved = columnGap + legendWidth;
+                    const canvasWidth = availWidth - legendReserved;
+                    chart.destroy();
+                    element.innerHTML = '';
+                    chart = createChart(canvasWidth, fixedHeight);
+                    lastCanvasWidth = canvasWidth;
+                    return;
+                }
+            }
+        }
+        lastCanvasWidth = availWidth;
+    }
+
+    initialRender();
+
+    const observer = new ResizeObserver((entries) => {
+        const entry = entries[0];
+        if (!entry) return;
+        if (autoWidth && entry.contentRect.width < 1) return;
+        const availWidth = autoWidth ? Math.max(1, Math.floor(element.getBoundingClientRect().width)) : opts.width;
+        const canvasWidth = availWidth - legendReserved;
+        if (canvasWidth === lastCanvasWidth) return;
+        lastCanvasWidth = canvasWidth;
+        chart.setSize({ width: canvasWidth, height: fixedHeight });
+    });
+
+    // Observe element's parent: element itself grows/shrinks with uPlot content,
+    // so we watch the containing block which is sized by CSS layout.
+    observer.observe(element.parentElement || element);
+
+    // Store cleanup function so the Ember component can disconnect the observer
+    element._uplotCleanup = () => { observer.disconnect(); if (chart) chart.destroy(); };
 }

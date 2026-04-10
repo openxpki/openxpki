@@ -676,13 +676,18 @@ div.oxifield-upload {
 
   .oxi-tiles-cell {
     container-type: inline-size;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     > * { flex: 1; }
   }
 
+  // Vertically center card contents without shrinking the card-body width.
+  // align-self would shrink to content and break chart width calculations.
   .card-body {
-    align-self: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 }
 
@@ -1003,12 +1008,23 @@ div.oxifield-upload {
  * Charts (oxi-base/chart)
  */
 
+/* Prevent the chart from growing its flex/grid container (feedback loop guard) */
+.oxi-chart {
+  min-width: 0;
+}
+
+.uplot .pie-chart-svg {
+  width: 100%;
+  max-height: 100%;
+}
+
 /* Place the uPlot legend to the right or left of the chart canvas */
 .uplot.u-legend-right,
 .uplot.u-legend-left {
   display: grid;
   grid-template-rows: auto auto;
   column-gap: 1em;
+  align-items: stretch;
 
   .u-title {
     grid-column: 1 / -1;
@@ -1016,7 +1032,24 @@ div.oxifield-upload {
 
   .u-legend {
     margin-top: 0;
-    align-self: center;
+    align-self: stretch;
+    height: 100%;
+    text-align: left;
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .u-series th {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    text-align: left;
+  }
+
+  .u-wrap {
+    display: flex;
+    align-items: center;
   }
 }
 
@@ -1062,4 +1095,3 @@ div.oxifield-upload {
     padding: 6pt;
   }
 }
-

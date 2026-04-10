@@ -1,6 +1,7 @@
 import Component from '@glimmer/component';
 import { action } from "@ember/object";
 import { guidFor } from '@ember/object/internals';
+import { registerDestructor } from '@ember/destroyable';
 
 import ChartPie from './chart-pie';
 import ChartLineBar from './chart-line-bar';
@@ -22,8 +23,8 @@ import ChartLineBar from './chart-line-bar';
  *
  *   **Layout**
  *   - `type` { string } - Chart type: `'line'` (default), `'bar'`, or `'pie'`
- *   - `width` { number } - Chart width in px. Default: `400`
- *   - `height` { number } - Chart height in px. Default: `200`
+ *   - `width` { number|string } - Chart width in px, or `'auto'` to fill the container width. Default: `'auto'`
+ *   - `height` { number|string } - Chart height in px, or `'auto'` to fill the container height. Default: `'auto'`
  *   - `title` { string } - Chart title shown above the plot. Default: `""`
  *   - `cssClass` { string } - Extra CSS class added to the uPlot root element. Default: `null`
  *
@@ -73,8 +74,8 @@ export default class OxiChartComponent extends Component {
           Option defaults
         */
         const defaults = {
-            width: 400,
-            height: 200,
+            width: 'auto',
+            height: 'auto',
             title: "",
             cssClass: null,
             type: 'line',
@@ -127,6 +128,13 @@ export default class OxiChartComponent extends Component {
         }
         else {
             throw new Error(`Unknown chart type '${type}'`);
+        }
+
+        if (element._uplotCleanup) {
+            registerDestructor(this, () => element._uplotCleanup());
+        }
+        if (element._pieCleanup) {
+            registerDestructor(this, () => element._pieCleanup());
         }
     }
 }

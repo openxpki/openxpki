@@ -2,7 +2,6 @@ let line = {
     type: 'chart',
     className: 'test-chart',
     content: {
-        label: "Chart",
         options: {
             type: 'line',
             title: 'Line',
@@ -103,12 +102,11 @@ pie_right.content.options.legend_position = 'right';
 pie_left.content.options.legend_position = 'left';
 
 export default [
-    line, line_right, line_left,
-    bar, bar_right, bar_left,
     {
         type: 'chart',
         className: 'test-chart',
         content: {
+            label: "Chart",
             options: {
                 type: 'bar',
                 title: 'Bar: one group',
@@ -129,5 +127,7 @@ export default [
             data: [['2019','23.8','53.6','37.4']],
         }
     },
-    pie, pie_right, pie_left,
+    line,       bar,        pie,
+    line_right, bar_right,  pie_right,
+    line_left,  bar_left,   pie_left,
 ]

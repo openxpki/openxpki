@@ -69,12 +69,15 @@ export default function ChartPie(element, opts, data) {
     const wrap = placeDiv(WRAP, root);
     wrap.appendChild(svg);
 
-    wrap.style.width = opts.width + 'px';
-    wrap.style.height = opts.height + 'px';
-    svg.setAttribute('width', '100%');
-    svg.setAttribute('height', '100%');
+    const AUTO_SIZE_DEFAULT = 200;
+    const autoWidth = opts.width === 'auto';
+    const autoHeight = opts.height === 'auto';
+    // Initial size — will be corrected by ResizeObserver if auto
+    wrap.style.width = (autoWidth ? AUTO_SIZE_DEFAULT : opts.width) + 'px';
+    wrap.style.height = (autoHeight ? AUTO_SIZE_DEFAULT : opts.height) + 'px';
+    svg.setAttribute('class', 'pie-chart-svg');
     svg.setAttribute('viewBox','0 0 100 100');
-    svg.setAttribute('preserveAspectRatio','xMidYMax');
+    svg.setAttribute('preserveAspectRatio','xMidYMin');
 
     let filled = 0;
     for (let row of data) {
@@ -116,4 +119,49 @@ export default function ChartPie(element, opts, data) {
     }
 
     element.appendChild(root);
+
+    if (!autoWidth && !autoHeight) return;
+
+    const legendSide = opts.legend_position === 'right' || opts.legend_position === 'left';
+    const legendEl = root.querySelector('.u-legend');
+    const titleEl = root.querySelector('.u-title');
+
+    // Snapshot the height once. If zero the container is sized by its content,
+    // so fall back to a square (width-based) size.
+    const initialHeight = Math.floor(element.getBoundingClientRect().height);
+    const fixedHeight = autoHeight ? (initialHeight || null) : opts.height;
+
+    let lastCanvasWidth = null;
+
+    function resize() {
+        // Read the element's own rendered width - the CSS layout has already
+        // constrained it to the available space in its container.
+        const availWidth = autoWidth ? Math.max(1, Math.floor(element.getBoundingClientRect().width)) : opts.width;
+        const columnGap = (autoWidth && legendSide) ? Math.ceil(parseFloat(getComputedStyle(root).columnGap) || 0) : 0;
+        const legendWidth = (autoWidth && legendSide && legendEl) ? legendEl.offsetWidth : 0;
+        const titleHeight = (autoHeight && titleEl) ? titleEl.offsetHeight : 0;
+        const w = autoWidth ? Math.max(1, availWidth - columnGap - legendWidth) : opts.width;
+        if (w === lastCanvasWidth) return;
+        lastCanvasWidth = w;
+        root.style.maxWidth = availWidth + 'px';
+        const availH = fixedHeight ? Math.max(1, fixedHeight - titleHeight) : 0;
+        const h = autoHeight ? (availH || w) : opts.height; // square fallback when height unknown
+        wrap.style.width = w + 'px';
+        wrap.style.height = h + 'px';
+    }
+
+    // Initial size
+    resize();
+
+    const observer = new ResizeObserver((entries) => {
+        const entry = entries[0];
+        if (!entry) return;
+        if (autoWidth && entry.contentRect.width < 1) return;
+        resize();
+    });
+
+    // Observe element's parent: element itself grows/shrinks with content,
+    // so we watch the containing block which is sized by CSS layout.
+    observer.observe(element.parentElement || element);
+    element._pieCleanup = () => observer.disconnect();
 }
