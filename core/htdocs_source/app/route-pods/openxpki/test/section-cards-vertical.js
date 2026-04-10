@@ -1,8 +1,9 @@
-export default {
+export default [{
     type: "cards",
     content: {
-        label: "oxi-section/cards",
+        label: "Cards (vertical)",
         description: "Please select a realm for your certificate request:",
+        vertical: true,
         cards: [
             {
                 label: 'Terra',
@@ -34,4 +35,4 @@ export default {
             },
         ],
     },
-}
+}]

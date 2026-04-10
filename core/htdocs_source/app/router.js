@@ -13,6 +13,9 @@ Router.map(function() {
      */
     this.route("openxpki", { path: "/openxpki/:page" }, function() {
          this.route("popup", { path: "/popup/:popup_page" })
+         if (config.environment === 'development') {
+             this.route('test', { path: '/test' })
+         }
     })
     if (config.environment === 'development') this.route("test")
 })

@@ -1,12 +1,13 @@
 import Route from '@ember/routing/route'
 import { service } from '@ember/service'
 import { debug } from '@ember/debug'
+import config from 'openxpki/config/environment'
 
 /**
  * @module route/openxpki
  */
 export default class OpenXpkiRoute extends Route {
-    @service('oxi-config') config
+    @service('oxi-config') oxiConfig
     @service('oxi-content') content
 
     // Reserved Ember property "queryParams"
@@ -21,10 +22,20 @@ export default class OpenXpkiRoute extends Route {
     }
     previousParams = []
 
-    // // Reserved Ember function
-    // async beforeModel(transition) {
-    //     let page = transition.to.parent.params.page // to = openxpki.index
-    // }
+    // Reserved Ember function
+    async beforeModel(transition) {
+        // Install Pretender mock server before model() does first HTTP request.
+        // This cannot be done in the "test" child route's beforeModel() because
+        // the parent model() hook runs first.
+        if (config.environment === 'development') {
+            const page = transition.to.params?.page ?? transition.to.parent?.params?.page
+            if (page === 'test') {
+                // dynamic import to keep test code out of production bundles
+                const { setupPretender } = await import('./test/pretender-setup')
+                setupPretender()
+            }
+        }
+    }
 
     // Reserved Ember function
     async model(params, transition) {
@@ -38,7 +49,7 @@ export default class OpenXpkiRoute extends Route {
 
         debug(`openxpki/route - model(): page = ${page}, trigger = ${trigger}, force = ${force}`)
 
-        await this.config.ready // localconfig.js might change rootURL, so first thing is to query it
+        await this.oxiConfig.ready // localconfig.js might change rootURL, so first thing is to query it
 
         const equalArrays = (a1, a2) => a1.size === a2.size && a1.every((key, i) => a1.at(i) === a2.at(i))
 

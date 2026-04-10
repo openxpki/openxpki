@@ -1,5 +1,3 @@
-import ContainerButton from 'openxpki/data/container-button'
-
 const _testButton = {
     label: "Button",
     format: "primary",
@@ -7,16 +5,17 @@ const _testButton = {
     disabled: false,
 }
 
-let buttons = [
-    ContainerButton.fromHash({
-        label: "External link",
+const buttons = [
+    {
+        label: "Link",
         format: "failure",
         tooltip: "Just fyi",
         href: "https://www.openxpki.org",
         target: "_blank",
-    }),
-    ContainerButton.fromHash({
-        label: "External link (with confirmation)",
+        break_before: 1,
+    },
+    {
+        label: "Link (confirm)",
         format: "exceptional",
         tooltip: "Just fyi",
         href: "https://www.openxpki.org",
@@ -25,46 +24,51 @@ let buttons = [
             label: "Really sure?",
             description: "This opens an external page.",
         },
-    }),
-    ContainerButton.fromHash(_testButton),
-    ContainerButton.fromHash({
+    },
+    { ..._testButton },
+    {
         ..._testButton,
         label: "With confirmation",
         confirm: {
             label: "Really sure?",
             description: "Think about it one more time.",
         },
-        break_before: 1,
-    }),
-    ContainerButton.fromHash({
+    },
+    {
         ..._testButton,
         label: "Disabled",
         disabled: true,
         break_after: 1,
-    }),
+    },
 ]
 
 for (const format of [
     'primary',
     'submit',
-    'loading',
-    'cancel',
-    'reset',
     'expected',
-    'failure',
-    'optional',
-    'alternative',
+    'loading',
     'exceptional',
     'terminate',
+    'cancel',
+    'failure',
+    'reset',
+    'alternative',
+    'optional',
+    'info',
     'tile',
     'card',
-    'info',
 ]) {
-    buttons.push(ContainerButton.fromHash({
-        ..._testButton,
-        format,
-        label: format,
-    }))
+    buttons.push({ ..._testButton, format, label: format })
 }
 
-export default buttons
+export default [{
+    type: "form",
+    action: "login!text",
+    reset: "login!text",
+    content: {
+        label: "Buttons",
+        title: "Buttons",
+        fields: [],
+        buttons,
+    },
+}]

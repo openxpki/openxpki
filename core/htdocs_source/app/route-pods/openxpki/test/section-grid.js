@@ -22,11 +22,11 @@ function additionalGridRows() {
     return result;
 }
 
-export default {
+export default [{
     type: "grid",
     className: "certificate",
     content: {
-        label: "oxi-section/grid",
+        label: "Grid",
         empty: "No data available",
         buttons: [
             {
@@ -179,4 +179,4 @@ export default {
             ...additionalGridRows(),
         ]
     },
-}
+}]

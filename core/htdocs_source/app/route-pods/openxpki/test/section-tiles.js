@@ -1,7 +1,7 @@
-export default {
+export default [{
     type: "tiles",
     content: {
-        label: "oxi-section/tiles",
+        label: "Tiles",
         description: "",
         maxcol: 4,
         align: 'left',
@@ -58,4 +58,4 @@ export default {
             },
         ],
     },
-}
+}]

@@ -124,11 +124,11 @@
             {{/each}}
         </div>
     </div>
-</div>
 
-{{!-- Contents of sub-routes (i.e. /openxpki/popup) if any.
-      "Each template will be rendered into the {{outlet}} of its parent route's template." --}}
-{{outlet}}
+    {{!-- Contents of sub-routes (i.e. /openxpki/popup, /openxpki/test) if any.
+          "Each template will be rendered into the {{outlet}} of its parent route's template." --}}
+    {{outlet}}
+</div>
 
 <BsModal
     @open={{if this.model.error true false}}
