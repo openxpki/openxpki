@@ -29,7 +29,7 @@ export default class OpenXpkiRoute extends Route {
         // the parent model() hook runs first.
         if (config.environment === 'development') {
             const page = transition.to.params?.page ?? transition.to.parent?.params?.page
-            if (page === 'test') {
+            if (page === 'test' || page?.startsWith('openxpki.test.')) {
                 // dynamic import to keep test code out of production bundles
                 const { setupPretender } = await import('./test/pretender-setup')
                 setupPretender()
