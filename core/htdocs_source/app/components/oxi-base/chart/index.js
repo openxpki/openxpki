@@ -6,14 +6,54 @@ import ChartPie from './chart-pie';
 import ChartLineBar from './chart-line-bar';
 
 /**
- * Draws a line or bar chart.
+ * Draws a line, bar, or pie chart powered by uPlot.
  *
  * ```html
  * <OxiBase::Chart @data={{this.data}} @options={{this.options}} />
  * ```
  *
- * @param { array } data - list of data rows: `[ [x1, a1, b1, c1, ...], [x2, b2, c2, ...], ... ]`
- * @param { hash } options - display options for the chart
+ * @param { array } data
+ *   List of data rows, each row being an array where the first element is the
+ *   X value (timestamp or category label) and the remaining elements are Y
+ *   values for each series:
+ *   `[ [x1, a1, b1, ...], [x2, a2, b2, ...], ... ]`
+ *
+ * @param { object } options - Display options for the chart:
+ *
+ *   **Layout**
+ *   - `type` { string } - Chart type: `'line'` (default), `'bar'`, or `'pie'`
+ *   - `width` { number } - Chart width in px. Default: `400`
+ *   - `height` { number } - Chart height in px. Default: `200`
+ *   - `title` { string } - Chart title shown above the plot. Default: `""`
+ *   - `cssClass` { string } - Extra CSS class added to the uPlot root element. Default: `null`
+ *
+ *   **X axis** (line/bar only)
+ *   - `x_is_timestamp` { boolean } - Treat X values as Unix timestamps (seconds).
+ *     Default: `true`
+ *   - `bar_vertical` { boolean } - Render bar chart with vertical bars (i.e. horizontal layout).
+ *     Default: `false`
+ *
+ *   **Legend**
+ *   - `legend_label` { boolean } - Show series labels in the legend.
+ *     Default: `true` when `options.series` is provided, `false` otherwise
+ *   - `legend_value` { boolean } - Show live data values at the cursor position in the legend
+ *     (line/bar only). Default: `false`
+ *   - `legend_position` { string } - Legend placement: `'bottom'` (default), `'right'`, or `'left'`
+ *   - `legend_date_format` { string } - Date format string for the X value shown in the legend
+ *     (line chart with `x_is_timestamp` only).
+ *     Tokens: `{YYYY}` `{MM}` `{DD}` `{HH}` `{mm}` `{ss}`.
+ *     Default: `'{YYYY}-{MM}-{DD}, {HH}:{mm}:{ss}'`
+ *
+ *   **Series** (array of per-series objects, one entry per data column after X)
+ *   - `series` { array } - Series configuration. Each entry may contain:
+ *     - `label` { string } - Series label shown in the legend. Default: `''`
+ *     - `color` { string } - CSS color string for the stroke/fill. Default: auto-generated palette
+ *     - `fill` { string } - Fill color (line chart only). Default: `color` at 10 % opacity
+ *     - `line_width` { number } - Stroke width in CSS px (line chart only). Default: `1`
+ *     - `scale` { string|Array } - Y scale to bind this series to.
+ *       Use `'auto'` (default) for a shared auto-ranging scale, `'%'` for a 0–100 % scale,
+ *       or a two-element array `[min, max]` to create a fixed-range scale.
+ *
  * @class OxiBase::Chart
  */
 
@@ -43,6 +83,7 @@ export default class OxiChartComponent extends Component {
             // Only 'line' and 'bar' chart:
             legend_value: false,
             legend_date_format: '{YYYY}-{MM}-{DD}, {HH}:{mm}:{ss}',
+            legend_position: 'bottom',
             x_is_timestamp: true,
             bar_vertical: false,
         };

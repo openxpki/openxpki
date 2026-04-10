@@ -72,6 +72,12 @@ export default async function ChartLineBar(element, opts, data) {
         legend: {
             show: opts.legend_label,
             live: opts.legend_value,
+            ...((opts.legend_label && (opts.legend_position === 'right' || opts.legend_position === 'left')) && {
+                mount: (self, legendEl) => {
+                    self.root.classList.add(`u-legend-${opts.legend_position}`);
+                    self.root.appendChild(legendEl);
+                },
+            }),
         },
         scales: {
             x: {

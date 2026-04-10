@@ -868,6 +868,41 @@ div.oxifield-upload {
 }
 
 /******************************************************************************
+ * Charts (oxi-base/chart)
+ */
+
+/* Place the uPlot legend to the right or left of the chart canvas */
+.uplot.u-legend-right,
+.uplot.u-legend-left {
+  display: grid;
+  grid-template-rows: auto auto;
+  column-gap: 1em;
+
+  .u-title {
+    grid-column: 1 / -1;
+  }
+
+  .u-legend {
+    margin-top: 0;
+    align-self: center;
+  }
+}
+
+.uplot.u-legend-right {
+  grid-template-columns: auto 1fr;
+
+  .u-wrap  { grid-column: 1; grid-row: 2; }
+  .u-legend { grid-column: 2; grid-row: 2; }
+}
+
+.uplot.u-legend-left {
+  grid-template-columns: 1fr auto;
+
+  .u-legend { grid-column: 1; grid-row: 2; }
+  .u-wrap   { grid-column: 2; grid-row: 2; }
+}
+
+/******************************************************************************
  * Others
  */
 .hover-element {

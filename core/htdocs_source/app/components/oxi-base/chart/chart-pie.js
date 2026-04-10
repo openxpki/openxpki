@@ -62,6 +62,10 @@ export default function ChartPie(element, opts, data) {
 
     let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
 
+    if (opts.legend_position === 'right' || opts.legend_position === 'left') {
+        addClass(root, `u-legend-${opts.legend_position}`);
+    }
+
     const wrap = placeDiv(WRAP, root);
     wrap.appendChild(svg);
 
