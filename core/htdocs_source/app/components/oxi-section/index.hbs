@@ -3,10 +3,10 @@
 
     <div class="card bg-body-tertiary mb-3 ms-md-3">
 
-        {{#if (or @content.content.label @content.content.description)}}
+        {{#if (or this.label @content.content.description)}}
             <div class="card-header px-2 {{unless @content.compact "py-2"}}">
-                {{#if @content.content.label}}
-                    <h4>{{@content.content.label}}</h4>
+                {{#if this.label}}
+                    <h4>{{this.label}}</h4>
                 {{/if}}
                 {{#if @content.content.description}}
                     {{defuse @content.content.description}}
@@ -14,7 +14,7 @@
             </div>
         {{/if}}
 
-        <div class="card-body px-0 {{unless @content.compact "py-2"}}" {{on-init this.initialized}}>
+        <div class="card-body px-2 {{unless @content.compact "py-2"}}" {{on-init this.initialized}}>
             <this.sectionComponent
                 @def={{this.sectionData}}
                 @isCompact={{@content.compact}}
@@ -26,8 +26,8 @@
 {{else}}
 
     <div class="mt-1 {{if @content.compact "oxi-compact" "mb-3"}}">
-        {{#if @content.content.label}}
-            <h4>{{@content.content.label}}</h4>
+        {{#if this.label}}
+            <h4>{{this.label}}</h4>
         {{/if}}
         {{#if @content.content.description}}
             <div class={{unless @content.compact "mb-3"}}>{{defuse @content.content.description}}</div>

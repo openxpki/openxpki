@@ -652,6 +652,132 @@ div.oxifield-upload {
 }
 
 /******************************************************************************
+ * Tiles
+ */
+
+.oxi-tiles {
+  .oxi-tiles-row {
+    display: grid;
+    align-items: stretch;
+    grid-template-columns: 1fr; // single column below md
+    > * { min-width: 0; }
+    @media (min-width: 768px) {
+      @for $i from 1 through 12 {
+        &.oxi-tiles-cols-#{$i} { grid-template-columns: repeat(#{$i}, 1fr); }
+      }
+    }
+  }
+
+  .oxi-tiles-cell {
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+    > * { flex: 1; }
+  }
+
+  .card-body {
+    align-self: center;
+  }
+}
+
+// Bootstrap responsive classes re-implemented as container queries so that
+// components inside tile cells respond to cell width, not viewport width.
+//
+// Strategy: inside .oxi-tiles-cell (a container), first reset all breakpoint
+// classes to their "below breakpoint" defaults (overriding viewport @media rules),
+// then re-enable them via @container queries at the same thresholds Bootstrap uses.
+
+@mixin bootstrap-responsive-reset($bp) {
+  // Reset display utilities: undo whatever the viewport @media rule set.
+  // d-{bp}-none hides; all others show in various ways. Reset to visible/initial.
+  .d-#{$bp}-inline       { display: none !important; }
+  .d-#{$bp}-inline-block { display: none !important; }
+  .d-#{$bp}-block        { display: none !important; }
+  .d-#{$bp}-grid         { display: none !important; }
+  .d-#{$bp}-inline-grid  { display: none !important; }
+  .d-#{$bp}-table        { display: none !important; }
+  .d-#{$bp}-table-row    { display: none !important; }
+  .d-#{$bp}-table-cell   { display: none !important; }
+  .d-#{$bp}-flex         { display: none !important; }
+  .d-#{$bp}-inline-flex  { display: none !important; }
+  .d-#{$bp}-none         { display: block !important; }
+  // Reset col utilities to full width (below-breakpoint Bootstrap behavior)
+  .col-#{$bp}            { flex: 0 0 auto; width: 100%; }
+  .col-#{$bp}-auto       { flex: 0 0 auto; width: 100%; }
+  @for $i from 1 through 12 {
+    .col-#{$bp}-#{$i}    { flex: 0 0 auto; width: 100%; }
+  }
+}
+
+@mixin bootstrap-responsive-utilities($bp) {
+  // display utilities
+  .d-#{$bp}-inline       { display: inline !important; }
+  .d-#{$bp}-inline-block { display: inline-block !important; }
+  .d-#{$bp}-block        { display: block !important; }
+  .d-#{$bp}-grid         { display: grid !important; }
+  .d-#{$bp}-inline-grid  { display: inline-grid !important; }
+  .d-#{$bp}-table        { display: table !important; }
+  .d-#{$bp}-table-row    { display: table-row !important; }
+  .d-#{$bp}-table-cell   { display: table-cell !important; }
+  .d-#{$bp}-flex         { display: flex !important; }
+  .d-#{$bp}-inline-flex  { display: inline-flex !important; }
+  .d-#{$bp}-none         { display: none !important; }
+  // col utilities
+  .col-#{$bp}            { flex: 1 1 0%; max-width: 100%; }
+  .col-#{$bp}-auto       { flex: 0 0 auto; width: auto; }
+  @for $i from 1 through 12 {
+    .col-#{$bp}-#{$i}    { flex: 0 0 auto; width: calc($i / 12 * 100%); }
+  }
+  // spacing utilities (p and m, all sides)
+  @each $prop, $abbrev in (margin: m, padding: p) {
+    @each $size, $val in (0: 0, 1: 0.25rem, 2: 0.5rem, 3: 1rem, 4: 1.5rem, 5: 3rem) {
+      .#{$abbrev}-#{$bp}-#{$size}  { #{$prop}: $val !important; }
+      .#{$abbrev}x-#{$bp}-#{$size} { #{$prop}-right: $val !important; #{$prop}-left: $val !important; }
+      .#{$abbrev}y-#{$bp}-#{$size} { #{$prop}-top: $val !important; #{$prop}-bottom: $val !important; }
+      .#{$abbrev}t-#{$bp}-#{$size} { #{$prop}-top: $val !important; }
+      .#{$abbrev}e-#{$bp}-#{$size} { #{$prop}-right: $val !important; }
+      .#{$abbrev}b-#{$bp}-#{$size} { #{$prop}-bottom: $val !important; }
+      .#{$abbrev}s-#{$bp}-#{$size} { #{$prop}-left: $val !important; }
+    }
+    .#{$abbrev}-#{$bp}-auto  { #{$prop}: auto !important; }
+    .#{$abbrev}x-#{$bp}-auto { #{$prop}-right: auto !important; #{$prop}-left: auto !important; }
+    .#{$abbrev}y-#{$bp}-auto { #{$prop}-top: auto !important; #{$prop}-bottom: auto !important; }
+    .#{$abbrev}t-#{$bp}-auto { #{$prop}-top: auto !important; }
+    .#{$abbrev}e-#{$bp}-auto { #{$prop}-right: auto !important; }
+    .#{$abbrev}b-#{$bp}-auto { #{$prop}-bottom: auto !important; }
+    .#{$abbrev}s-#{$bp}-auto { #{$prop}-left: auto !important; }
+  }
+}
+
+// Step 1: inside a tile cell, reset all breakpoint classes to their narrow defaults.
+.oxi-tiles-cell {
+  @include bootstrap-responsive-reset(sm);
+  @include bootstrap-responsive-reset(md);
+  @include bootstrap-responsive-reset(lg);
+  @include bootstrap-responsive-reset(xl);
+  @include bootstrap-responsive-reset(xxl);
+  .oxi-keyvalue-label         { flex: 0 0 100%; width: 100%; max-width: 100%; }
+  .oxi-keyvalue-label-infobox { flex: 0 0 100%; width: 100%; max-width: 100%; }
+}
+
+// Step 2: re-enable at container breakpoints.
+@container (min-width: 576px)  { @include bootstrap-responsive-utilities(sm); }
+@container (min-width: 768px)  {
+  @include bootstrap-responsive-utilities(md);
+  .oxi-keyvalue-label         { flex: 0 0 auto; width: auto; max-width: 35%; }
+  .oxi-keyvalue-label-infobox { flex: 0 0 auto; width: auto; max-width: 42%; }
+}
+@container (min-width: 992px)  {
+  @include bootstrap-responsive-utilities(lg);
+  .oxi-keyvalue-label { max-width: 27%; }
+}
+@container (min-width: 1200px) {
+  @include bootstrap-responsive-utilities(xl);
+  .oxi-keyvalue-label { max-width: 19%; }
+}
+@container (min-width: 1400px) { @include bootstrap-responsive-utilities(xxl); }
+
+/******************************************************************************
  * Buttons
  */
 

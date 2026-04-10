@@ -66,8 +66,7 @@ export default [{
     action: "login!text",
     reset: "login!text",
     content: {
-        label: "Buttons",
-        title: "Buttons",
+        label: "Button formats",
         fields: [],
         buttons,
     },

@@ -1,67 +1,58 @@
 import Component from '@glimmer/component';
 
+const EMPTY_TILE = { type: 'empty' };
+
 /**
- * Draws tiles.
+ * Draws a grid of tiles, each rendered via `OxiSection`.
  *
- * @param { hash } def - section definition
- * ```javascript
- * {
- *      label: 'Actions',
- *      description: 'Please choose an action',
- *      maxcol: 4, // maximum tiles per row (optional, default: maximum according to browser window)
- *      align: 'left', // or 'center' or 'right' (optional, default: 'left')
- *      tiles: [
- *          {
- *              type: 'button', content: { ... },
- *          },
- *          {
- *              type: 'newline',
- *          },
- *          {
- *              type: 'button', content: { ... },
- *          },
- *      ],
- * }
+ * ```html
+ * <OxiSection::Tiles @def={{this.def}} />
  * ```
+ *
+ * @param { object } def - Section definition:
+ *   - `label` { string } - Section heading. Default: `""`
+ *   - `description` { string } - Subheading shown below the label. Default: `""`
+ *   - `maxcol` { number } - Maximum tiles per row. Default: `4`
+ *   - `borders` { boolean } - Render each tile as a card with a border. Default: `false`
+ *   - `tiles` { array } - List of tile descriptors. Each entry is either:
+ *     - A standard `OxiSection` definition with `type` set to any section
+ *       type (`'button'`, `'keyvalue'`, `'form'`, `'grid'`, `'text'`, `'chart'`,
+ *       `'cards'`, ...) and a matching `content` object, or
+ *     - `'newline'` to force a row break at that position
+ *
  * @class OxiSection::Tiles
  * @extends Component
  */
 export default class OxiSectionTilesComponent extends Component {
-    get tiles() {
+    // Returns an array of rows, each row padded to maxcol with empty tiles.
+    // Splits on type:"newline" and enforces maxcol (default 4).
+    get rows() {
         let tiles = this.args.def.tiles || [];
-        let maxcol = this.args.def.maxcol;
+        let maxcol = this.maxcol;
 
-        if (! maxcol) return tiles;
+        let rows = [];
+        let currentRow = [];
 
-        // insert a newline after maxcol columns
-        let result = [];
-        let newline = { type: 'newline' };
+        const flush = () => {
+            while (currentRow.length < maxcol) currentRow.push(EMPTY_TILE);
+            rows.push(currentRow);
+            currentRow = [];
+        };
 
-        let col = 0;
         for (const t of tiles) {
-            if (++col > maxcol) {
-                result.push(newline);
-                col = 0;
+            if (t === 'newline' || t.type === 'newline') {
+                if (currentRow.length) flush();
+                continue;
             }
-
-            let newTile = {
-                ...t,
-                content: { ...t.content }, // explicitely copy content so Ember does not complain if we set format below
-            };
-
-            if (t.type == 'newline') {
-                col = 0;
-            } else {
-                newTile.content.format = 'tile'; // button format
-            }
-            result.push(newTile);
+            if (currentRow.length >= maxcol) flush();
+            currentRow.push(t);
         }
-        return result;
+        if (currentRow.length) flush();
+
+        return rows;
     }
 
-    get align() {
-        let defaultAlign = 'left';
-        let align = this.args.def.align || defaultAlign;
-        return align.match(/^(left|right|center)$/) ? align : defaultAlign;
+    get maxcol() {
+        return this.args.def.maxcol ?? 4;
     }
 }

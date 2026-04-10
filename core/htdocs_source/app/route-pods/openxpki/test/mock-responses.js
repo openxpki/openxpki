@@ -1,3 +1,4 @@
+import section_button         from './section-button'
 import section_chart          from './section-chart'
 import section_form_text      from './section-form-text'
 import section_form_select    from './section-form-select'
@@ -7,7 +8,7 @@ import section_form_datetime  from './section-form-datetime'
 import section_form_cloneable from './section-form-cloneable'
 import section_form_various   from './section-form-various'
 import section_form_tooltips  from './section-form-tooltips'
-import section_buttons        from './section-buttons'
+import section_button_format  from './section-button-format'
 import section_grid           from './section-grid'
 import section_keyvalue       from './section-keyvalue'
 import section_tiles          from './section-tiles'
@@ -35,12 +36,13 @@ const FORM_SECTIONS = [
 ]
 
 const SECTIONS = [
-    nav('openxpki.test.charts',         section_chart),
     nav('openxpki.test.keyvalue',       section_keyvalue),
+    nav('openxpki.test.grid',           section_grid),
+    nav('openxpki.test.button',         section_button),
+    nav('openxpki.test.button-format',  section_button_format),
     nav('openxpki.test.cards',          section_cards),
     nav('openxpki.test.cards-vertical', section_cards_vertical),
-    nav('openxpki.test.buttons', section_buttons),
-    nav('openxpki.test.grid',           section_grid),
+    nav('openxpki.test.charts',         section_chart),
     nav('openxpki.test.tiles',          section_tiles),
 ]
 
@@ -53,8 +55,8 @@ export const bootstrapResponse = {
     rtoken:     RTOKEN,
     language:   'en',
     structure: [
+        { label: 'Form', entries: FORM_SECTIONS.map(({ label, key, page }) => ({ label, key, page })) },
         ...SECTIONS,
-        { label: 'Forms', entries: FORM_SECTIONS.map(({ label, key, page }) => ({ label, key, page })) },
     ],
     user:      { name: 'test', role: 'admin', realname: 'Test User', role_label: 'Admin' },
     pki_realm: 'test',

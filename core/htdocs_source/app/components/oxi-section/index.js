@@ -23,6 +23,12 @@ export default class OxiSectionComponent extends Component {
         }
     }
 
+    get label() {
+        return this.args.content.type === 'button'
+            ? null
+            : this.args.content?.content?.label
+    }
+
     @action
     initialized() {
         if (this.args.onInit) this.args.onInit();

@@ -4,8 +4,103 @@ export default [{
         label: "Tiles",
         description: "",
         maxcol: 4,
-        align: 'left',
+        borders: 1,
         tiles: [
+            {
+                type: "text", content: {
+                    description: "Take a deep dive into masterly distilled information and mind-blowingly sustainable diagrams—the insights are absolutely game-changing.<br><i>#DataDriven #Innovation #ContinuousLearning</i>",
+                }
+            },
+            {
+                type: 'chart',
+                className: 'test-chart',
+                content: {
+                    options: {
+                        type: 'bar',
+                        title: 'Bar',
+                        legend_position: 'right',
+                        series: [
+                            {
+                                label: 'Requested',
+                                color: 'rgba(0, 100, 200, 0.9)',
+                                scale: '%',
+                            },
+                            {
+                                label: 'Renewed',
+                                color: 'rgba(200, 200, 200, 1)',
+                                scale: '%',
+                            },
+                            {
+                                label: 'Revoked',
+                                color: 'rgba(200, 30, 100, 0.9)',
+                                scale: '%',
+                            },
+                        ],
+                    },
+                    data: [['2018','23.8','53.6','37.4'],['2019','19.6','43.3','63.4'],['2020','4.2','51.8','47.4']],
+                }
+            },
+            {
+                type: 'chart',
+                className: 'test-chart',
+                content: {
+                    options: {
+                        type: 'pie',
+                        title: 'Pie',
+                        legend_position: 'right',
+                        series: [
+                            {
+                                label: 'Requested',
+                            },
+                            {
+                                label: 'Renewed',
+                            },
+                            {
+                                label: 'Revoked',
+                            },
+                            {
+                                label: 'Unchanged',
+                            },
+                        ],
+                    },
+                    data: [['2019','14','44','30','12']],
+                }
+            },
+            {
+                type: "keyvalue", content: {
+                    data: [
+                        {
+                            format: "timestamp",
+                            label: "timestamp",
+                            value: 1617495633,
+                        },
+                        {
+                            format: "styled",
+                            label: "styled",
+                            value: "attention:hear my words",
+                        },
+                        {
+                            format: "certstatus",
+                            label: "certstatus",
+                            value: {
+                                value: "issued",
+                                label: "<i>Issued</i>",
+                                tooltip: "It's issued",
+                            },
+                        },
+                        {
+                            format: "link",
+                            label: "link",
+                            value: {
+                                page: "workflow!load!wf_id!13567",
+                                label: 13567,
+                                target: "top",
+                            },
+                        },
+                    ],
+                },
+            },
+            'newline',
             {
                 type: 'button', content: {
                     label: 'Request certificate',
@@ -20,7 +115,7 @@ export default [{
                     page: 'workflow!index!wf_type!certificate_revocation_request_v2',
                 },
             },
-            { type: 'newline' },
+            'newline',
             {
                 type: 'button', content: {
                     label: 'SCEP Workflow Search',
