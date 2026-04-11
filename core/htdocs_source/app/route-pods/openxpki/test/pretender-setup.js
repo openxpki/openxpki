@@ -1,4 +1,4 @@
-import Pretender from 'pretender'
+import { macroCondition, isDevelopingApp } from '@embroider/macros'
 import ENV from 'openxpki/config/environment'
 import { pages, bootstrapResponse } from './mock-responses'
 
@@ -6,9 +6,11 @@ let server = null
 let currentLanguage = bootstrapResponse.language
 let session_index = 0
 
-export function setupPretender() {
+export async function setupPretender() {
+    if (!macroCondition(isDevelopingApp())) return
     if (server) return  // idempotent
 
+    const { default: Pretender } = await import('pretender')
     server = new Pretender()
 
     server.get(`${ENV.rootURL}localconfig.yaml`, () => [

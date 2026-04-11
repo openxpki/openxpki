@@ -32,7 +32,7 @@ export default class OpenXpkiRoute extends Route {
             if (page === 'test' || page?.startsWith('openxpki.test.')) {
                 // dynamic import to keep test code out of production bundles
                 const { setupPretender } = await import('./test/pretender-setup')
-                setupPretender()
+                await setupPretender()
             }
         }
     }

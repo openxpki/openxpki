@@ -1,12 +1,13 @@
 import Route from '@ember/routing/route'
-import { setupPretender, shutdownPretender } from './pretender-setup'
 
 export default class TestRoute extends Route {
-    beforeModel() {
-        setupPretender()  // no-op if already set up by the initializer
+    async beforeModel() {
+        const { setupPretender } = await import('./pretender-setup')
+        await setupPretender()  // no-op if already set up by the parent route's beforeModel
     }
 
-    deactivate() {
+    async deactivate() {
+        const { shutdownPretender } = await import('./pretender-setup')
         shutdownPretender()
     }
 }
