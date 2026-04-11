@@ -28,10 +28,10 @@ import { guidFor } from '@ember/object/internals'
  *   - `buttons` { array } - Optional list of button definitions rendered below the items
  *     via {@link OxiBase::ButtonContainer}.
  *
- * @param { boolean } isCompact - When true, renders all items inline (suitable for use
- *   inside a compact container such as an infobox tile) instead of the default grid layout.
- * @param { object } meta - Rendering metadata passed down from the parent section:
+ * @param { object } meta - Rendering metadata:
  *   - `isInfoBox` { boolean } - Adjusts column widths and label CSS for infobox context.
+ *   - `isCompact` { boolean } - When true, renders all items inline (suitable for use
+*       inside a compact container such as an infobox tile) instead of the default grid layout.
  *
  * @class OxiSection::KeyValue
  * @extends Component

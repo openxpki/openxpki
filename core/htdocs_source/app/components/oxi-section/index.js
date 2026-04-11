@@ -42,13 +42,20 @@ export default class OxiSectionComponent extends Component {
         return sectionModules[this.args.content.type]?.default
     }
 
-    get sectionData() {
+    get data() {
         return {
             ...this.args.content?.content,
             // map some inconsistently placed properties into the section data
             action:     this.args.content?.action,       // used by oxi-section/form
             reset:      this.args.content?.reset,        // used by oxi-section/form
             className:  this.args.content?.className,    // used by oxi-section/grid
+        }
+    }
+
+    get meta() {
+        return {
+            ...(this.args.meta ?? {}),
+            isCompact: this.args.content?.compact ? true : false,
         }
     }
 
