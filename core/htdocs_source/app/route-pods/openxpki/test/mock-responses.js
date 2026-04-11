@@ -1,19 +1,20 @@
-import section_button         from './section-button'
-import section_chart          from './section-chart'
-import section_form_text      from './section-form-text'
-import section_form_select    from './section-form-select'
-import section_form_dependants from './section-form-dependants'
-import section_form_password  from './section-form-password'
-import section_form_datetime  from './section-form-datetime'
-import section_form_cloneable from './section-form-cloneable'
-import section_form_various   from './section-form-various'
-import section_form_tooltips  from './section-form-tooltips'
-import section_button_format  from './section-button-format'
-import section_grid           from './section-grid'
-import section_keyvalue       from './section-keyvalue'
-import section_tiles          from './section-tiles'
-import section_cards          from './section-cards'
-import section_cards_vertical from './section-cards-vertical'
+import section_button           from './section-button'
+import section_chart            from './section-chart'
+import section_form_text        from './section-form-text'
+import section_form_select      from './section-form-select'
+import section_form_dependants  from './section-form-dependants'
+import section_form_password    from './section-form-password'
+import section_form_datetime    from './section-form-datetime'
+import section_form_cloneable   from './section-form-cloneable'
+import section_form_various     from './section-form-various'
+import section_form_tooltips    from './section-form-tooltips'
+import section_button_format    from './section-button-format'
+import section_grid             from './section-grid'
+import section_keyvalue         from './section-keyvalue'
+import section_tiles            from './section-tiles'
+import section_cards            from './section-cards'
+import section_cards_vertical   from './section-cards-vertical'
+import section_text             from './section-text'
 
 const SESSION_ID = 'mock-session-test-1'
 const RTOKEN     = 'mock-rtoken-test-1'
@@ -44,6 +45,7 @@ const SECTIONS = [
     nav('openxpki.test.cards-vertical', section_cards_vertical),
     nav('openxpki.test.charts',         section_chart),
     nav('openxpki.test.tiles',          section_tiles),
+    nav('openxpki.test.text',           section_text),
 ]
 
 // Bootstrap response: sets up session, CSRF token, locale, and the test menu.
