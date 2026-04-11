@@ -42950,7 +42950,7 @@ function setupGlobal(app, importCallback) {
  * @param {Application} app your `@ember/application` Application sub-class
  */
 function setupInspector (app) {
-  setupGlobal(app, () => __vitePreload(() => import('./modules-4-12-BkpRPaUJ.js'),true              ?[]:void 0,import.meta.url));
+  setupGlobal(app, () => __vitePreload(() => import('./modules-4-12-B92CZWiX.js'),true              ?[]:void 0,import.meta.url));
 }
 
 const defineModule0 = Object.assign({}, {});
@@ -65646,7 +65646,7 @@ const TEMPLATE$d = templateFactory(
                         <div class="oxi-tiles-cell oxi-tiles-cell--empty oxi-tiles-cell--colspan-{{tile.colspan}}"></div>
                     {{else}}
                         <div class="oxi-tiles-cell oxi-tiles-cell--colspan-{{tile.colspan}}">
-                            <OxiSection @content={{tile}} @meta={{hash renderAsCard=@def.borders}}/>
+                            <OxiSection @content={{tile}} @meta={{hash renderAsCard=@def.border}}/>
                         </div>
                     {{/if}}
                 {{/each}}
@@ -65657,8 +65657,8 @@ const TEMPLATE$d = templateFactory(
 
 */
 {
-  "id": "9k5k05Is",
-  "block": "[[[3,\" components/oxi-section/tiles \"],[1,\"\\n\"],[41,[30,1,[\"tiles\",\"length\"]],[[[1,\"    \"],[10,0],[14,0,\"oxi-tiles\"],[12],[1,\"\\n\"],[42,[28,[37,3],[[28,[37,3],[[30,0,[\"rows\"]]],null]],null],null,[[[1,\"            \"],[10,0],[15,0,[29,[\"oxi-tiles-row oxi-tiles-cols-\",[30,0,[\"maxcol\"]]]]],[12],[1,\"\\n\"],[42,[28,[37,3],[[28,[37,3],[[30,2]],null]],null],null,[[[41,[28,[32,0],[[30,3,[\"type\"]],\"empty\"],null],[[[1,\"                        \"],[10,0],[15,0,[29,[\"oxi-tiles-cell oxi-tiles-cell--empty oxi-tiles-cell--colspan-\",[30,3,[\"colspan\"]]]]],[12],[13],[1,\"\\n\"]],[]],[[[1,\"                        \"],[10,0],[15,0,[29,[\"oxi-tiles-cell oxi-tiles-cell--colspan-\",[30,3,[\"colspan\"]]]]],[12],[1,\"\\n                            \"],[8,[32,1],null,[[\"@content\",\"@meta\"],[[30,3],[28,[32,2],null,[[\"renderAsCard\"],[[30,1,[\"borders\"]]]]]]],null],[1,\"\\n                        \"],[13],[1,\"\\n\"]],[]]]],[3]],null],[1,\"            \"],[13],[1,\"\\n\"]],[2]],null],[1,\"    \"],[13],[1,\"\\n\"]],[]],null]],[\"@def\",\"row\",\"tile\"],[\"if\",\"div\",\"each\",\"-track-array\"]]",
+  "id": "Ty54Ifb0",
+  "block": "[[[3,\" components/oxi-section/tiles \"],[1,\"\\n\"],[41,[30,1,[\"tiles\",\"length\"]],[[[1,\"    \"],[10,0],[14,0,\"oxi-tiles\"],[12],[1,\"\\n\"],[42,[28,[37,3],[[28,[37,3],[[30,0,[\"rows\"]]],null]],null],null,[[[1,\"            \"],[10,0],[15,0,[29,[\"oxi-tiles-row oxi-tiles-cols-\",[30,0,[\"maxcol\"]]]]],[12],[1,\"\\n\"],[42,[28,[37,3],[[28,[37,3],[[30,2]],null]],null],null,[[[41,[28,[32,0],[[30,3,[\"type\"]],\"empty\"],null],[[[1,\"                        \"],[10,0],[15,0,[29,[\"oxi-tiles-cell oxi-tiles-cell--empty oxi-tiles-cell--colspan-\",[30,3,[\"colspan\"]]]]],[12],[13],[1,\"\\n\"]],[]],[[[1,\"                        \"],[10,0],[15,0,[29,[\"oxi-tiles-cell oxi-tiles-cell--colspan-\",[30,3,[\"colspan\"]]]]],[12],[1,\"\\n                            \"],[8,[32,1],null,[[\"@content\",\"@meta\"],[[30,3],[28,[32,2],null,[[\"renderAsCard\"],[[30,1,[\"border\"]]]]]]],null],[1,\"\\n                        \"],[13],[1,\"\\n\"]],[]]]],[3]],null],[1,\"            \"],[13],[1,\"\\n\"]],[2]],null],[1,\"    \"],[13],[1,\"\\n\"]],[]],null]],[\"@def\",\"row\",\"tile\"],[\"if\",\"div\",\"each\",\"-track-array\"]]",
   "moduleName": "/build/app/components/oxi-section/tiles/index.hbs",
   "scope": () => [Eq, OxiSectionComponent, hash],
   "isStrictMode": false
@@ -65680,7 +65680,7 @@ const EMPTY_TILE = {
  *   - `label` { string } - Section heading. Default: `""`
  *   - `description` { string } - Subheading shown below the label. Default: `""`
  *   - `maxcol` { number } - Maximum tiles per row. Default: `4`
- *   - `borders` { boolean } - Render each tile as a card with a border. Default: `false`
+ *   - `border` { boolean } - Render each tile as a card with a border. Default: `false`
  *   - `tiles` { array } - List of tile descriptors. Each entry is either:
  *     - A standard {@link OxiSection} definition with `type` set to any section
  *       type (`'button'`, `'keyvalue'`, `'form'`, `'grid'`, `'text'`, `'chart'`,
@@ -69079,7 +69079,7 @@ const section_tiles = [{
     label: "Tiles",
     description: "",
     maxcol: 4,
-    borders: 1,
+    border: 1,
     tiles: [{
       type: "text",
       colspan: 2,
