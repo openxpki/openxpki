@@ -668,6 +668,12 @@ div.oxifield-upload {
     }
   }
 
+  @media (min-width: 768px) {
+    @for $i from 2 through 12 {
+      .oxi-tiles-cell--colspan-#{$i} { grid-column: span #{$i}; }
+    }
+  }
+
   .oxi-tiles-cell {
     container-type: inline-size;
     display: flex;

@@ -5,9 +5,9 @@
             <div class="oxi-tiles-row oxi-tiles-cols-{{this.maxcol}}">
                 {{#each row as |tile|}}
                     {{#if (eq tile.type "empty")}}
-                        <div class="oxi-tiles-cell oxi-tiles-cell--empty"></div>
+                        <div class="oxi-tiles-cell oxi-tiles-cell--empty oxi-tiles-cell--colspan-{{tile.colspan}}"></div>
                     {{else}}
-                        <div class="oxi-tiles-cell">
+                        <div class="oxi-tiles-cell oxi-tiles-cell--colspan-{{tile.colspan}}">
                             <OxiSection @content={{tile}} @meta={{hash renderAsCard=@def.borders}}/>
                         </div>
                     {{/if}}

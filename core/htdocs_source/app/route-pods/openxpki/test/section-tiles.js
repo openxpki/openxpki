@@ -1,3 +1,4 @@
+// prettier-ignore
 export default [{
     type: "tiles",
     content: {
@@ -7,7 +8,7 @@ export default [{
         borders: 1,
         tiles: [
             {
-                type: "text", content: {
+                type: "text", colspan: 2, content: {
                     description: "Take a deep dive into masterly distilled information and mind-blowingly sustainable diagrams—the insights are absolutely game-changing.<br><i>#DataDriven #Innovation #ContinuousLearning</i>",
                 }
             },
