@@ -29,8 +29,8 @@
                 @showClearButton={{@content.is_optional}}
                 @noInputGroup={{@content.editable}}
                 @inline={{@content.inline}}
+                @setFocusInfo={{@setFocusInfo}}
                 required={{not @content.is_optional}}
-                {{on-init @setFocusInfo true}}
             />
         {{/if}}
         {{#if @content.editable}}

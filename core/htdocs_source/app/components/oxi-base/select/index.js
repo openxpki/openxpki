@@ -96,6 +96,7 @@ export default class OxiSelectComponent extends Component {
             },
         })
         if (this.args.onInsert) this.args.onInsert(element)
+        if (this.args.setFocusInfo) this.args.setFocusInfo(this.#choicesObj.containerOuter.element, true)
         this.notifyOnChange()
     }
 

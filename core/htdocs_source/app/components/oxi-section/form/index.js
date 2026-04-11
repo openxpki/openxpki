@@ -447,12 +447,12 @@ export default class OxiSectionFormComponent extends Component {
 
     /**
      * Register a DOM element for a field so focus and custom validity can be managed.
-     * Called by sub-components of {@link OxiSection::Form::Field} via the `{{on-init}}` modifier:
+     * Called by sub-components of {@link OxiSection::Form::Field} via the `{{on-init}}` modifier using the passed `@setFocusInfo wrapper`:
      * ```html
-     * {{on-init @registerField field element true}}
-     * {{on-init @registerField field element false}}
+     * {{on-init @setFocusInfo true}}
+     * {{on-init @setFocusInfo false}}
      * ```
-     * Pass `true` if the element is an editable input that may sensibly receive focus.
+     * "on-init" automatically passed the element as first argument. `true` should be passed as second argument if the element is an editable input that may sensibly receive focus.
      *
      * @param { Field } field - Field object (injected in the template via `(fn ...)`).
      * @param { HTMLElement } element - The rendered DOM input element.
