@@ -5,7 +5,10 @@
 
         <span class="oxi-keyvalue">
             {{#each this.items as |item|}}
-                <span class="{{item.className}} oxi-keyvalue-items">
+                {{#if item.isHead}}
+                    <b>{{item.value}}</b><br>
+                {{else}}
+                    <span class="{{item.className}} oxi-keyvalue-item">
                         {{#if item.preamble}}<i>{{item.preamble}}</i><br/>{{/if}}
                         {{#if item.label}}
                             <span class="text-secondary fw-bold {{if @meta.isInfoBox "oxi-keyvalue-label-infobox" "oxi-keyvalue-label"}}">
@@ -22,7 +25,8 @@
                                 <span class="glyphicon glyphicon-refresh"></span>
                             </span>
                         {{/if}}
-                </span>
+                    </span>
+                {{/if}}
             {{/each}}
         </span>
 
