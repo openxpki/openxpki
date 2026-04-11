@@ -70,12 +70,15 @@ let pie = {
             series: [
                 {
                     label: 'Requested',
+                    color: 'rgba(0, 100, 200, 0.9)',
                 },
                 {
                     label: 'Renewed',
+                    color: 'rgba(200, 200, 200, 1)',
                 },
                 {
                     label: 'Revoked',
+                    color: 'rgba(200, 30, 100, 0.9)',
                 },
                 {
                     label: 'Unchanged',
@@ -115,12 +118,15 @@ export default [
                 series: [
                     {
                         label: 'Requested',
+                        color: 'rgba(0, 100, 200, 0.9)',
                     },
                     {
                         label: 'Renewed',
+                        color: 'rgba(200, 200, 200, 1)',
                     },
                     {
                         label: 'Revoked',
+                        color: 'rgba(200, 30, 100, 0.9)',
                     },
                 ],
             },
