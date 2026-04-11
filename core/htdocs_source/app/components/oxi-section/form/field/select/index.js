@@ -60,10 +60,9 @@ export default class OxiFieldSelectComponent extends Component {
 
     @action
     optionSelected(value) {
-        debug("oxifield-select (" + this.args.content.name + "): optionSelected(" + value + ")");
+        debug(`oxifield-select (${this.args.content.name}): optionSelected(${value})`);
         this.args.onChange(value);
     }
-
 
     @action
     toggleCustomMode() {
