@@ -5,6 +5,27 @@ import { scheduleOnce } from '@ember/runloop';
 import { service } from '@ember/service';
 import { guidFor } from '@ember/object/internals'
 
+/**
+ * Single-line text input field implementation, with optional autocomplete drop-down.
+ * Pasted text is cleaned up (leading/trailing quotes and whitespace stripped).
+ *
+ * @param { object } content - Plain field hash (from {@link Field}):
+ *   - `value` { string } - Initial value.
+ *   - `placeholder` { string } - Placeholder text.
+ *   - `is_optional` { boolean } - When falsy the input is marked required.
+ *   - `autocomplete_query` { object } - Optional. Enables autocomplete:
+ *     - `action` { string } - Required. Backend action to query for suggestions.
+ *     - `params` { object } - Optional. Maps backend parameter names to other field names
+ *       whose current values are included in the query.
+ * @param { function } onChange - Callback invoked with `(value, skipValidityChecks)`.
+ *   `skipValidityChecks` is `true` while an autocomplete selection is in progress.
+ * @param { function } setFocusInfo - Callback to register the input element for focus management.
+ * @param { function } encodeFields - Callback to encode referenced sibling field values for autocomplete queries.
+ * @param { string } [error] - Validation error message to display below the input.
+ *
+ * @class OxiSection::Form::Field::Text
+ * @extends Component
+ */
 export default class OxiFieldTextComponent extends Component {
     @service('intl') intl;
     @service('oxi-content') content;

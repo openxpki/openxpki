@@ -1,11 +1,36 @@
 /**
  * Local re-implementation of ember-flatpickr (https://github.com/RobbieTheWagner/ember-flatpickr).
  * Shipping the source directly avoids the addon's pre-compiled dist referencing
- * @embroider/virtual/modifiers/* paths that the pure-Vite ember() plugin cannot resolve.
+ * `@embroider/virtual/modifiers/*` paths that the pure-Vite `ember()` plugin cannot resolve.
  *
  * Lifecycle:
- *   - `setup` modifier runs on insert and re-runs (destroy + reinit) whenever any @arg changes
+ *   - `setup` modifier runs on insert and re-runs (destroy + reinit) whenever any `@arg` changes
  *   - `willDestroy()` tears down the flatpickr instance when the component leaves the DOM
+ *
+ * ```html
+ * <EmberFlatpickr
+ *     @date={{this.date}}
+ *     @onChange={{this.datePicked}}
+ *     @onReady={{this.onReady}}
+ *     @enableTime={{true}}
+ * />
+ * ```
+ *
+ * @param { Date|null } date - Initial date value passed to flatpickr as `defaultDate`.
+ * @param { function } onChange - Required. flatpickr `onChange` callback: `(dates, dateStr, instance)`.
+ * @param { boolean } [enableTime] - Show time picker in addition to date.
+ * @param { string } [dateFormat] - flatpickr date format string.
+ * @param { string } [locale] - Locale code (currently `'de'` loads the German flatpickr locale).
+ * @param { boolean } [allowInput] - Allow direct text input in addition to the picker.
+ * @param { string } [placeholder] - Placeholder text for the input element.
+ * @param { boolean } [disabled] - Disables the input.
+ * @param { function } [onReady] - flatpickr `onReady` callback: `(dates, dateStr, instance)`.
+ * @param { function } [onOpen] - flatpickr `onOpen` callback.
+ * @param { function } [onClose] - flatpickr `onClose` callback.
+ * @param { function } [onDestroyed] - Called just before the flatpickr instance is destroyed.
+ *
+ * @class EmberFlatpickr
+ * @extends Component
  */
 import Component from '@glimmer/component';
 import { assert } from '@ember/debug';

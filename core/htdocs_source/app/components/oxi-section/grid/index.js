@@ -10,14 +10,44 @@ import GridAction from 'openxpki/data/grid-action'
 import Pager from 'openxpki/data/pager'
 
 /**
- * Draws a grid.
+ * Render a sortable, pageable data grid with optional row selection and actions.
  *
- * @param { hash } def - section definition
- * ```javascript
- * {
- *     ... // TODO
- * }
+ * ```html
+ * <OxiSection::Grid @def={{this.def}} />
  * ```
+ *
+ * @param { object } def - Section definition:
+ *   - `label` { string } - Section heading. Default: `""`
+ *   - `description` { string } - Subheading shown below the label. Default: `""`
+ *   - `columns` { array } - Column descriptors. Each entry has:
+ *     - `sTitle` { string } - Column title (columns whose title starts with `_`
+ *       are hidden; `_status` / `_className` provide a per-row CSS class)
+ *     - `format` { string } - Cell format hint (e.g. `'certstatus'`, `'timestamp'`, ...)
+ *     - `bVisible` { number } - Set to `0` to hide the column. Default: `1`
+ *     - `sortkey` { string } - Key used for server-side (or client-side) sorting.
+ *       Omit to make the column non-sortable.
+ *   - `data` { array } - Row data as a 2-D array; each inner array contains one
+ *     value per column (positional, matching `columns`).
+ *   - `actions` { array } - Row-level action descriptors (rendered as icon buttons
+ *     per row). Column values may be interpolated with `{columnTitle}` placeholders.
+ *     Each entry is a {@link GridAction} hash with:
+ *     - `label` { string } - Tooltip / label (ignored when there is only one action)
+ *     - `icon` { string } - Optional icon name
+ *     - `href` / `page` / `action` { string } - Navigation or workflow target
+ *   - `buttons` { array } - Toolbar button descriptors. Buttons with a `select`
+ *     property become bulk-selection buttons ({@link GridButton}); all others are
+ *     standard {@link ContainerButton} entries.
+ *   - `pager` { object } - Pagination/sorting state with:
+ *     - `pagerurl` { string } - URL used to fetch a new page; absence disables
+ *       server-side paging/sorting (client-side fallback is used instead)
+ *     - `count` { number } - Total number of items
+ *     - `startat` { number } - Zero-based index of the first displayed item
+ *     - `limit` { number } - Items per page
+ *     - `order` { string } - Currently active sort key
+ *     - `reverse` { boolean } - Sort direction
+ *     - `pagesizes` { number[] } - Selectable page-size options
+ *     - `pagersize` { number } - Max page buttons shown before ellipsis
+ *
  * @class OxiSection::Grid
  * @extends Component
  */

@@ -11,14 +11,23 @@ import ContainerButton from 'openxpki/data/container-button'
 import { next } from '@ember/runloop'
 
 /**
- * Draws a form.
+ * Render a form with fields, validation, and submit handling.
  *
- * @param { hash } def - section definition
- * ```javascript
- * {
- *     ... // TODO
- * }
+ * ```html
+ * <OxiSection::Form @def={{this.def}} @meta={{this.meta}} />
  * ```
+ *
+ * @param { object } def - Section definition:
+ *   - `action` { string } - Backend action name to call on submit.
+ *   - `fields` { array } - List of field definition hashes (see {@link Field}).
+ *   - `submit_label` { string } - Label for the submit button. Default: i18n key `component.oxisection_form.submit`.
+ *   - `reset` { string } - If set, a reset button is shown; value is the page to navigate to.
+ *   - `reset_label` { string } - Label for the reset button. Default: i18n key `component.oxisection_form.reset`.
+ *   - `buttons` { array } - Additional {@link ContainerButton} definitions appended after submit/reset.
+ * @param { object } [meta] - Optional metadata passed down from the page:
+ *   - `isPopup` { boolean } - Whether the form is rendered inside a popup.
+ *   - `sectionNo` { number } - Section index used to prioritize focus assignment.
+ *
  * @class OxiSection::Form
  * @extends Component
  */
@@ -290,9 +299,11 @@ export default class OxiSectionFormComponent extends Component {
     }
 
     /**
-     * @param field { hash } - field definition (gets passed in via this components' template, i.e. is a reference to this components' "model")
-     * @param value { string } - the field's new value
-     * @param skipValidityChecks { bool } - set to `true` to skip validity checks
+     * Set a field's value, run validation, handle dependants and `actionOnChange`.
+     *
+     * @param { Field } field - Field object to update (gets passed in via this components' template, i.e. is a reference to this components' "model").
+     * @param { string } value - New value to assign.
+     * @param { boolean } [skipValidityChecks=false] - Skip regex and required-field validation.
      * @memberOf OxiSection::Form
      */
     @action
@@ -374,7 +385,10 @@ export default class OxiSectionFormComponent extends Component {
     }
 
     /**
-     * @param field { hash } - field definition (gets passed in via this components' template, i.e. is a reference to this components' "model")
+     * Change the submitted name of a dynamic input field (key/value pair type).
+     *
+     * @param { Field } field - Field object whose name should change (gets passed in via this components' template, i.e. is a reference to this components' "model").
+     * @param { string } name - New field name (key).
      * @memberOf OxiSection::Form
      */
     @action
@@ -384,7 +398,12 @@ export default class OxiSectionFormComponent extends Component {
     }
 
     /**
-     * @param field { hash } - field definition (gets passed in via this components' template, i.e. is a reference to this components' "model")
+     * Set or clear the validation error message for a field.
+     * Also updates the DOM element's `setCustomValidity` state.
+     *
+     * @param { Field } field - Field object to update (gets passed in via this components' template, i.e. is a reference to this components' "model").
+     * @param { string|null } message - Error message, or `null`/`""` to clear.
+     * @param { boolean } [isServerError=false] - If `true`, stored as a server-side error (not reset on user input).
      * @memberOf OxiSection::Form
      */
     @action
@@ -408,8 +427,11 @@ export default class OxiSectionFormComponent extends Component {
     }
 
     /**
-     * @param fieldNames { array } - the list of field names to encode
-     * @param renameMap { Map } - optional mappings: source field name => target field name
+     * Encode a subset of fields into a plain object suitable for a backend request.
+     * Called by sub-components (e.g. file-upload fields) that need to bundle sibling field values.
+     *
+     * @param { string[] } fieldNames - Names of the fields to encode.
+     * @param { Map } [renameMap] - Optional source-name to target-name mappings applied before encoding.
      * @memberOf OxiSection::Form
      */
     @action
@@ -424,14 +446,17 @@ export default class OxiSectionFormComponent extends Component {
     }
 
     /**
-     * Sub components of {@link OxiSection::Form::Field} should call this by using
-     * the `{{on-init}}` modifier:
+     * Register a DOM element for a field so focus and custom validity can be managed.
+     * Called by sub-components of {@link OxiSection::Form::Field} via the `{{on-init}}` modifier:
      * ```html
-     * {{on-init @setFocusInfo true}}
-     * {{on-init @setFocusInfo false}}
+     * {{on-init @registerField field element true}}
+     * {{on-init @registerField field element false}}
      * ```
-     * depending on if it is an editable input field that may sensibly receive
-     * the focus.
+     * Pass `true` if the element is an editable input that may sensibly receive focus.
+     *
+     * @param { Field } field - Field object (injected in the template via `(fn ...)`).
+     * @param { HTMLElement } element - The rendered DOM input element.
+     * @param { boolean } takesInput - Whether the element accepts user input (and should participate in focus management).
      * @memberOf OxiSection::Form
      */
     @action

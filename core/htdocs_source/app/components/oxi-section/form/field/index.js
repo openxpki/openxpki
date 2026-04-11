@@ -8,6 +8,38 @@ const fieldModules = Object.fromEntries(
         .map(([path, mod]) => [path.replace(/^\.\/(.+)\/index\.js$/, '$1'), mod])
 )
 
+/**
+ * Dispatcher for form field sub-components.
+ * Reads the field type from `@field.type` and dynamically loads the matching
+ * sub-component from `oxi-section/form/field/<type>/`.
+ *
+ * ```html
+ * <OxiSection::Form::Field
+ *     @field={{field}}
+ *     @setValue={{this.setValue}}
+ *     @setName={{fn this.setName field}}
+ *     @setError={{fn this.setError field}}
+ *     @setFocusInfo={{fn this.setFocusInfo field}}
+ *     @encodeFields={{this.encodeFields}}
+ *     @onSubmit={{this.submit}}
+ *     @addClone={{this.addClone}}
+ *     @delClone={{this.delClone}}
+ * />
+ * ```
+ *
+ * @param { Field } field - The {@link Field} data object for this row.
+ * @param { function } setValue - Callback to update the field value: `(field, value)`.
+ * @param { function } setName - Callback to rename a dynamic input field: `(value)`.
+ * @param { function } setError - Callback to set a validation error message: `(message)`.
+ * @param { function } setFocusInfo - Callback to register a DOM element for focus management: `(field, element, takesInput)`.
+ * @param { function } encodeFields - Callback to encode sibling field values for autocomplete requests.
+ * @param { function } onSubmit - Callback invoked when Enter is pressed inside the field.
+ * @param { function } [addClone] - Callback to add a clone of a clonable field.
+ * @param { function } [delClone] - Callback to remove a clone of a clonable field.
+ *
+ * @class OxiSection::Form::Field
+ * @extends Component
+ */
 export default class OxiFieldMainComponent extends Component {
     @service('oxi-backend') backend;
     @service('intl') intl;

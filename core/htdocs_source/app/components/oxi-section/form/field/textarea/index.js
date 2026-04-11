@@ -4,6 +4,25 @@ import { tracked } from '@glimmer/tracking';
 import { service } from '@ember/service';
 import { debug } from '@ember/debug';
 
+/**
+ * Multi-line textarea field implementation, with optional file upload and drag-and-drop.
+ * Binary file content is base64-encoded before being passed to `onChange`.
+ *
+ * @param { object } content - Plain field hash (from {@link Field}):
+ *   - `value` { string } - Initial text content.
+ *   - `placeholder` { string } - Placeholder text.
+ *   - `rows` { number } - Number of visible rows. Default: `10`.
+ *   - `is_optional` { boolean } - When falsy the textarea is marked required.
+ *   - `allow_upload` { boolean } - Show a file-upload button and accept drag-and-drop.
+ *   - `autofill` { object } - Autofill config forwarded to `OxiSection::Form::AutoFill`.
+ * @param { function } onChange - Callback invoked with the new value (string or ArrayBuffer for binary files).
+ * @param { function } setFocusInfo - Callback to register the textarea element for focus management.
+ * @param { function } encodeFields - Callback to encode sibling field values (forwarded to autofill).
+ * @param { string } [error] - Validation error message to display below the textarea.
+ *
+ * @class OxiSection::Form::Field::Textarea
+ * @extends Component
+ */
 export default class OxiFieldTextareaComponent extends Component {
     @service('intl') intl;
 

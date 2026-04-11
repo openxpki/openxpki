@@ -5,6 +5,21 @@ import { service } from '@ember/service';
 import { fromUnixTime, getUnixTime } from 'date-fns';
 import { toZonedTime, fromZonedTime } from 'date-fns-tz';
 
+/**
+ * Date/time picker field implementation, backed by {@link EmberFlatpickr}.
+ *
+ * @param { object } content - Plain field hash (from {@link Field}):
+ *   - `value` { string|number } - Initial epoch timestamp, or `"now"` for the current time.
+ *   - `timezone` { string } - IANA timezone name, `"utc"` (default), or `"local"` for the browser timezone.
+ *   - `placeholder` { string } - Placeholder text for the input.
+ *   - `is_optional` { boolean } - When falsy the input is marked required.
+ * @param { function } onChange - Callback invoked with the selected epoch (number) or `null` when cleared.
+ * @param { function } setFocusInfo - Callback to register the flatpickr input element for focus management.
+ * @param { string } [error] - Validation error message to display below the input.
+ *
+ * @class OxiSection::Form::Field::Datetime
+ * @extends Component
+ */
 export default class OxiFieldDatetimeComponent extends Component {
     @service('oxi-locale') oxiLocale;
 

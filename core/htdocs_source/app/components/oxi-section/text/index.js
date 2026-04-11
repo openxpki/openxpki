@@ -1,14 +1,20 @@
 import Component from '@glimmer/component'
 
 /**
- * Outputs the given text.
+ * Render a block of HTML text, optionally followed by buttons.
  *
- * @param { hash } def - section definition
- * ```javascript
- * {
- *     ... // TODO
- * }
+ * ```html
+ * <OxiSection::Text @def={{this.def}} />
  * ```
+ *
+ * @param { object } def - Section definition:
+ *   - `buttons` { array } - Optional list of button descriptors passed to
+ *     {@link OxiBase::ButtonContainer}.
+ *   - `label` { string } - Section heading (rendered by the parent
+ *     {@link OxiSection} wrapper, not by this component directly).
+ *   - `description` { string } - Subheading shown below the label (also
+ *     rendered by the parent {@link OxiSection} wrapper).
+ *
  * @class OxiSection::Text
  * @extends Component
  */

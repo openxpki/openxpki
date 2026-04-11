@@ -2,12 +2,15 @@ import { tracked } from '@glimmer/tracking'
 import { warn } from '@ember/debug'
 import Base from './base'
 
-/*
- * Form field data:
+/**
+ * Form field data.
  * Underscore prefixed properties are meta data that is only used in
  * oxi-section/form and oxi-section/form/field components.
  * They will be excluded from the plain hash that is passed down to the field
  * implementations oxi-section/form/field/* via @content.
+ *
+ * @class Field
+ * @extends Base
  */
 export default class Field extends Base {
     static _type = 'app/data/field'

@@ -3,6 +3,16 @@ import { service } from '@ember/service';
 import { inject as controller } from '@ember/controller';
 import { action } from '@ember/object';
 
+/**
+ * User info panel in the application header. Displays the logged-in user's name, role,
+ * realm and last-login time. When the user has multiple tenants a drop-down is shown
+ * to switch the active tenant.
+ *
+ * Takes no arguments; all data is read from the {@link service/oxi-content} service.
+ *
+ * @class OxiHeader::UserInfo
+ * @extends Component
+ */
 export default class ApplicationHeaderUserinfo extends Component {
     @service('oxi-content') content;
     @controller('openxpki') openxpki;

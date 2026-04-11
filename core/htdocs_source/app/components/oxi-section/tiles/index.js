@@ -3,7 +3,7 @@ import Component from '@glimmer/component';
 const EMPTY_TILE = { type: 'empty', colspan: 1 };
 
 /**
- * Draws a grid of tiles, each rendered via `OxiSection`.
+ * Draw a grid of tiles, each rendered via {@link OxiSection}.
  *
  * ```html
  * <OxiSection::Tiles @def={{this.def}} />
@@ -15,7 +15,7 @@ const EMPTY_TILE = { type: 'empty', colspan: 1 };
  *   - `maxcol` { number } - Maximum tiles per row. Default: `4`
  *   - `borders` { boolean } - Render each tile as a card with a border. Default: `false`
  *   - `tiles` { array } - List of tile descriptors. Each entry is either:
- *     - A standard `OxiSection` definition with `type` set to any section
+ *     - A standard {@link OxiSection} definition with `type` set to any section
  *       type (`'button'`, `'keyvalue'`, `'form'`, `'grid'`, `'text'`, `'chart'`,
  *       `'cards'`, ...) and a matching `content` object. An optional `colspan`
  *       { number } property makes the tile span that many columns (default: `1`).

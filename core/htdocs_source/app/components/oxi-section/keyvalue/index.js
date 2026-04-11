@@ -4,14 +4,35 @@ import { set as emSet } from '@ember/object'
 import { guidFor } from '@ember/object/internals'
 
 /**
- * Draws a list of key/value pairs.
+ * Render a list of key/value pairs.
  *
- * @param { hash } def - section definition
- * ```javascript
- * {
- *     ... // TODO
- * }
+ * ```html
+ * <OxiSection::KeyValue @def={{this.def}} />
  * ```
+ *
+ * @param { object } def - Section definition:
+ *   - `label` { string } - Section heading. Default: `""`
+ *   - `description` { string } - Subheading shown below the label. Default: `""`
+ *   - `data` { array } - List of items to display. Each entry is an object with:
+ *     - `label` { string } - Row label shown in the left column. Omit to hide the label column entirely.
+ *     - `value` { string } - The value to display, passed to {@link OxiBase::Formatted}.
+ *     - `format` { string } - Format identifier for {@link OxiBase::Formatted} (e.g. `'raw'`, `'link'`, `'datetime'`).
+ *       Items with `format: 'raw'` and an empty value are hidden.
+ *     - `preamble` { string } - Optional italicised text rendered above the value.
+ *     - `className` { string } - Optional extra CSS class added to the row element.
+ *     - `refresh` { object } - Optional auto-refresh config:
+ *       - `uri` { string } - Required. Action URI called to fetch an updated value.
+ *       - `timeout` { number } - Required. Milliseconds between refresh calls.
+ *     - `format: 'head'` - Special marker: renders the `value` as a full-width section divider
+ *       instead of a normal key/value row.
+ *   - `buttons` { array } - Optional list of button definitions rendered below the items
+ *     via {@link OxiBase::ButtonContainer}.
+ *
+ * @param { boolean } isCompact - When true, renders all items inline (suitable for use
+ *   inside a compact container such as an infobox tile) instead of the default grid layout.
+ * @param { object } meta - Rendering metadata passed down from the parent section:
+ *   - `isInfoBox` { boolean } - Adjusts column widths and label CSS for infobox context.
+ *
  * @class OxiSection::KeyValue
  * @extends Component
  */

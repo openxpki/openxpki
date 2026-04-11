@@ -2,7 +2,12 @@ import Component from '@glimmer/component'
 import Clickable from 'openxpki/data/clickable'
 
 /**
- * Draws cards.
+ * Render big clickable bordered buttons with optional image and description
+ * horizontally or vertically.
+ *
+ * ```html
+ * <OxiSection::Cards @def={{this.def}} />
+ * ```
  *
  * @param { hash } def - card section definition
  * ```javascript
