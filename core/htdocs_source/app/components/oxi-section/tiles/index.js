@@ -13,7 +13,7 @@ const EMPTY_TILE = { type: 'empty', colspan: 1 };
  *   - `label` { string } - Section heading. Default: `""`
  *   - `description` { string } - Subheading shown below the label. Default: `""`
  *   - `maxcol` { number } - Maximum tiles per row. Default: `4`
- *   - `borders` { boolean } - Render each tile as a card with a border. Default: `false`
+ *   - `border` { boolean } - Render each tile as a card with a border. Default: `false`
  *   - `tiles` { array } - List of tile descriptors. Each entry is either:
  *     - A standard {@link OxiSection} definition with `type` set to any section
  *       type (`'button'`, `'keyvalue'`, `'form'`, `'grid'`, `'text'`, `'chart'`,

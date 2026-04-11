@@ -5,7 +5,7 @@ export default [{
         label: "Tiles",
         description: "",
         maxcol: 4,
-        borders: 1,
+        border: 1,
         tiles: [
             {
                 type: "text", colspan: 2, content: {

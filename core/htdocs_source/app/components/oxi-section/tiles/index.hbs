@@ -8,7 +8,7 @@
                         <div class="oxi-tiles-cell oxi-tiles-cell--empty oxi-tiles-cell--colspan-{{tile.colspan}}"></div>
                     {{else}}
                         <div class="oxi-tiles-cell oxi-tiles-cell--colspan-{{tile.colspan}}">
-                            <OxiSection @content={{tile}} @meta={{hash renderAsCard=@def.borders}}/>
+                            <OxiSection @content={{tile}} @meta={{hash renderAsCard=@def.border}}/>
                         </div>
                     {{/if}}
                 {{/each}}
