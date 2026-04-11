@@ -72,7 +72,7 @@ export default [
                 {
                     type: "select",
                     name: "select_dependants2",
-                    label: "Level 1",
+                    label: "Only one option - Level 1",
                     options: [
                         {
                             value: 1,
@@ -81,7 +81,7 @@ export default [
                                 {
                                     type: "select",
                                     name: "select_dep_dependants",
-                                    label: "Level 2 - Sub-select",
+                                    label: "Only one option - Level 2",
                                     options: [
                                         {
                                             value: 3,

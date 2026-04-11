@@ -423,7 +423,7 @@ export default class OxiSectionFormComponent extends Component {
         if (!domElement) return
 
         if (!message) message = '' // setCustomValidity() requires empty string to reset error
-        if (domElement) domElement.setCustomValidity(message)
+        if (domElement && typeof domElement.setCustomValidity === 'function') domElement.setCustomValidity(message)
     }
 
     /**
