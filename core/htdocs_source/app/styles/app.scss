@@ -559,8 +559,28 @@ code { white-space: pre; }
   margin-bottom: 0;
 }
 
-.oxi-compact .oxi-keyvalue .oxi-keyvalue-items:not(:first-child):before {
-  content: " \2027 ";
+ul.oxi-formatted-email {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.oxi-compact {
+  .oxi-keyvalue .oxi-keyvalue-item:not(:first-child):before {
+    content: " \2027 ";
+  }
+  ul.oxi-formatted-email {
+    display: inline;
+    li {
+      display: inline;
+    }
+    li:not(:last-child)::after {
+      content: ", ";
+    }
+  }
+  br {
+    display: none;
+  }
 }
 
 .oxi-formatted-asciidata .content {
