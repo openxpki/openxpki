@@ -24,6 +24,7 @@ export default class OxiSectionComponent extends Component {
     }
 
     get label() {
+        // Button labels are on the button, not above
         return this.args.content.type === 'button'
             ? null
             : this.args.content?.content?.label
