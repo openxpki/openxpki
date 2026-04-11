@@ -37,9 +37,9 @@ true              &&(function polyfill() {
 var top = 'top';
 var bottom = 'bottom';
 var right = 'right';
-var left$1 = 'left';
+var left = 'left';
 var auto = 'auto';
-var basePlacements = [top, bottom, right, left$1];
+var basePlacements = [top, bottom, right, left];
 var start = 'start';
 var end$1 = 'end';
 var clippingParents = 'clippingParents';
@@ -403,14 +403,14 @@ function arrow(_ref) {
   var popperOffsets = state.modifiersData.popperOffsets;
   var basePlacement = getBasePlacement$1(state.placement);
   var axis = getMainAxisFromPlacement(basePlacement);
-  var isVertical = [left$1, right].indexOf(basePlacement) >= 0;
+  var isVertical = [left, right].indexOf(basePlacement) >= 0;
   var len = isVertical ? 'height' : 'width';
   if (!arrowElement || !popperOffsets) {
     return;
   }
   var paddingObject = toPaddingObject(options.padding, state);
   var arrowRect = getLayoutRect(arrowElement);
-  var minProp = axis === 'y' ? top : left$1;
+  var minProp = axis === 'y' ? top : left;
   var maxProp = axis === 'y' ? bottom : right;
   var endDiff = state.rects.reference[len] + state.rects.reference[axis] - popperOffsets[axis] - state.rects.popper[len];
   var startDiff = popperOffsets[axis] - state.rects.reference[axis];
@@ -507,7 +507,7 @@ function mapToStyles(_ref2) {
   y = _ref3.y;
   var hasX = offsets.hasOwnProperty('x');
   var hasY = offsets.hasOwnProperty('y');
-  var sideX = left$1;
+  var sideX = left;
   var sideY = top;
   var win = window;
   if (adaptive) {
@@ -523,7 +523,7 @@ function mapToStyles(_ref2) {
     } // $FlowFixMe[incompatible-cast]: force type refinement, we compare offsetParent with window above, but Flow doesn't detect it
 
     offsetParent = offsetParent;
-    if (placement === top || (placement === left$1 || placement === right) && variation === end$1) {
+    if (placement === top || (placement === left || placement === right) && variation === end$1) {
       sideY = bottom;
       var offsetY = isFixed && offsetParent === win && win.visualViewport ? win.visualViewport.height :
       // $FlowFixMe[prop-missing]
@@ -531,7 +531,7 @@ function mapToStyles(_ref2) {
       y -= offsetY - popperRect.height;
       y *= gpuAcceleration ? 1 : -1;
     }
-    if (placement === left$1 || (placement === top || placement === bottom) && variation === end$1) {
+    if (placement === left || (placement === top || placement === bottom) && variation === end$1) {
       sideX = right;
       var offsetX = isFixed && offsetParent === win && win.visualViewport ? win.visualViewport.width :
       // $FlowFixMe[prop-missing]
@@ -866,7 +866,7 @@ function computeOffsets(_ref) {
         y: commonY
       };
       break;
-    case left$1:
+    case left:
       offsets = {
         x: reference.x - element.width,
         y: commonY
@@ -1041,7 +1041,7 @@ function flip(_ref) {
       altBoundary: altBoundary,
       padding: padding
     });
-    var mainVariationSide = isVertical ? isStartVariation ? right : left$1 : isStartVariation ? bottom : top;
+    var mainVariationSide = isVertical ? isStartVariation ? right : left : isStartVariation ? bottom : top;
     if (referenceRect[len] > popperRect[len]) {
       mainVariationSide = getOppositePlacement(mainVariationSide);
     }
@@ -1117,7 +1117,7 @@ function getSideOffsets(overflow, rect, preventedOffsets) {
   };
 }
 function isAnySideFullyClipped(overflow) {
-  return [top, right, bottom, left$1].some(function (side) {
+  return [top, right, bottom, left].some(function (side) {
     return overflow[side] >= 0;
   });
 }
@@ -1159,7 +1159,7 @@ const hide$1 = {
 
 function distanceAndSkiddingToXY(placement, rects, offset) {
   var basePlacement = getBasePlacement$1(placement);
-  var invertDistance = [left$1, top].indexOf(basePlacement) >= 0 ? -1 : 1;
+  var invertDistance = [left, top].indexOf(basePlacement) >= 0 ? -1 : 1;
   var _ref = typeof offset === 'function' ? offset(Object.assign({}, rects, {
       placement: placement
     })) : offset,
@@ -1167,7 +1167,7 @@ function distanceAndSkiddingToXY(placement, rects, offset) {
     distance = _ref[1];
   skidding = skidding || 0;
   distance = (distance || 0) * invertDistance;
-  return [left$1, right].indexOf(basePlacement) >= 0 ? {
+  return [left, right].indexOf(basePlacement) >= 0 ? {
     x: distance,
     y: skidding
   } : {
@@ -1279,7 +1279,7 @@ function preventOverflow(_ref) {
   }
   if (checkMainAxis) {
     var _offsetModifierState$;
-    var mainSide = mainAxis === 'y' ? top : left$1;
+    var mainSide = mainAxis === 'y' ? top : left;
     var altSide = mainAxis === 'y' ? bottom : right;
     var len = mainAxis === 'y' ? 'height' : 'width';
     var offset = popperOffsets[mainAxis];
@@ -1317,13 +1317,13 @@ function preventOverflow(_ref) {
   }
   if (checkAltAxis) {
     var _offsetModifierState$2;
-    var _mainSide = mainAxis === 'x' ? top : left$1;
+    var _mainSide = mainAxis === 'x' ? top : left;
     var _altSide = mainAxis === 'x' ? bottom : right;
     var _offset = popperOffsets[altAxis];
     var _len = altAxis === 'y' ? 'height' : 'width';
     var _min = _offset + overflow[_mainSide];
     var _max = _offset - overflow[_altSide];
-    var isOriginSide = [top, left$1].indexOf(basePlacement) !== -1;
+    var isOriginSide = [top, left].indexOf(basePlacement) !== -1;
     var _offsetModifierValue = (_offsetModifierState$2 = offsetModifierState == null ? void 0 : offsetModifierState[altAxis]) != null ? _offsetModifierState$2 : 0;
     var _tetherMin = isOriginSide ? _min : _offset - referenceRect[_len] - popperRect[_len] - _offsetModifierValue + normalizedTetherOffsetValue.altAxis;
     var _tetherMax = isOriginSide ? _offset + referenceRect[_len] + popperRect[_len] - _offsetModifierValue - normalizedTetherOffsetValue.altAxis : _max;
@@ -1670,7 +1670,7 @@ const Popper = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	eventListeners,
 	flip: flip$1,
 	hide: hide$1,
-	left: left$1,
+	left,
 	main,
 	modifierPhases,
 	offset: offset$1,
@@ -2056,7 +2056,7 @@ function bootstrapDelegationHandler(element, selector, fn) {
     }
   };
 }
-function findHandler$2(events, callable, delegationSelector = null) {
+function findHandler$1(events, callable, delegationSelector = null) {
   return Object.values(events).find(event => event.callable === callable && event.delegationSelector === delegationSelector);
 }
 function normalizeParameters(originalTypeEvent, handler, delegationFunction) {
@@ -2089,7 +2089,7 @@ function addHandler(element, originalTypeEvent, handler, delegationFunction, one
   }
   const events = getElementEvents(element);
   const handlers = events[typeEvent] || (events[typeEvent] = {});
-  const previousFunction = findHandler$2(handlers, callable, isDelegated ? handler : null);
+  const previousFunction = findHandler$1(handlers, callable, isDelegated ? handler : null);
   if (previousFunction) {
     previousFunction.oneOff = previousFunction.oneOff && oneOff;
     return;
@@ -2104,7 +2104,7 @@ function addHandler(element, originalTypeEvent, handler, delegationFunction, one
   element.addEventListener(typeEvent, fn, isDelegated);
 }
 function removeHandler(element, events, typeEvent, handler, delegationSelector) {
-  const fn = findHandler$2(events[typeEvent], handler, delegationSelector);
+  const fn = findHandler$1(events[typeEvent], handler, delegationSelector);
   if (!fn) {
     return;
   }
@@ -6474,7 +6474,7 @@ function checkElementIdShadowing(value) {
   return value && value.nodeType === undefined ? value : undefined;
 }
 // export real global
-const global$1$1 = checkGlobal(checkElementIdShadowing(typeof global === 'object' && global)) || checkGlobal(typeof self === 'object' && self) || checkGlobal(typeof window === 'object' && window) || typeof mainContext !== 'undefined' && mainContext ||
+const global$1 = checkGlobal(checkElementIdShadowing(typeof global === 'object' && global)) || checkGlobal(typeof self === 'object' && self) || checkGlobal(typeof window === 'object' && window) || typeof mainContext !== 'undefined' && mainContext ||
 // set before strict mode in Ember loader/wrapper
 new Function('return this')(); // eval outside of strict mode
 
@@ -6492,7 +6492,7 @@ const context$1 = function (global, Ember) {
     // search for Namespaces
     lookup: Ember.lookup || global
   };
-}(global$1$1, global$1$1.Ember);
+}(global$1, global$1.Ember);
 function getLookup() {
   return context$1.lookup;
 }
@@ -6646,7 +6646,7 @@ const ENV = {
       ENV.FEATURES[feature] = FEATURES[feature] === true;
     }
   }
-})(global$1$1.EmberENV);
+})(global$1.EmberENV);
 function getENV() {
   return ENV;
 }
@@ -6716,13 +6716,13 @@ const {
   toString: functionToString
 } = Function.prototype;
 const {
-  isArray: isArray$7
+  isArray: isArray$5
 } = Array;
 const {
   keys: objectKeys
 } = Object;
 const {
-  stringify: stringify$1
+  stringify
 } = JSON;
 const LIST_LIMIT = 100;
 const DEPTH_LIMIT = 4;
@@ -6759,7 +6759,7 @@ function inspectValue(value, depth, seen) {
       return 'undefined';
     case 'object':
       if (value === null) return 'null';
-      if (isArray$7(value)) {
+      if (isArray$5(value)) {
         valueIsArray = true;
         break;
       }
@@ -6772,7 +6772,7 @@ function inspectValue(value, depth, seen) {
     case 'function':
       return value.toString === functionToString ? value.name ? `[Function:${value.name}]` : `[Function]` : value.toString();
     case 'string':
-      return stringify$1(value);
+      return stringify(value);
     case 'symbol':
     case 'boolean':
     case 'number':
@@ -6788,7 +6788,7 @@ function inspectValue(value, depth, seen) {
   return valueIsArray ? inspectArray(value, depth + 1, seen) : inspectObject(value, depth + 1, seen);
 }
 function inspectKey(key) {
-  return SAFE_KEY.test(key) ? key : stringify$1(key);
+  return SAFE_KEY.test(key) ? key : stringify(key);
 }
 function inspectObject(obj, depth, seen) {
   if (depth > DEPTH_LIMIT) {
@@ -6873,7 +6873,7 @@ function deprecate(...args) {
 }
 let _warnIfUsingStrippedFeatureFlags;
 
-const index$e = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const index$f = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	_warnIfUsingStrippedFeatureFlags,
 	assert: assert$1,
@@ -7229,7 +7229,7 @@ function isNone(obj) {
  A `toString` util function that supports objects without a `toString`
  method, e.g. an object created with `Object.create(null)`.
 */
-function toString$3(obj) {
+function toString$2(obj) {
   if (typeof obj === 'string') {
     return obj;
   }
@@ -7244,7 +7244,7 @@ function toString$3(obj) {
         r += ',';
       }
       if (!isNone(obj[k])) {
-        r += toString$3(obj[k]);
+        r += toString$2(obj[k]);
       }
     }
     return r;
@@ -7305,12 +7305,12 @@ function associateDestroyableChild(parent, child) {
     childMeta = getDestroyableMeta(child);
   return parentMeta.children = push(parentMeta.children, child), childMeta.parents = push(childMeta.parents, parent), child;
 }
-function registerDestructor(destroyable, destructor, eager = false) {
+function registerDestructor$1(destroyable, destructor, eager = false) {
   let meta = getDestroyableMeta(destroyable),
     destructorsKey = eager ? "eagerDestructors" : "destructors";
   return meta[destructorsKey] = push(meta[destructorsKey], destructor), destructor;
 }
-function unregisterDestructor(destroyable, destructor, eager = false) {
+function unregisterDestructor$1(destroyable, destructor, eager = false) {
   let meta = getDestroyableMeta(destroyable),
     destructorsKey = eager ? "eagerDestructors" : "destructors";
   meta[destructorsKey] = remove(meta[destructorsKey], destructor);
@@ -8548,7 +8548,7 @@ const GLIMMER_VALIDATOR_REGISTRATION = Symbol("GLIMMER_VALIDATOR_REGISTRATION");
 if (Reflect.has(globalThis, GLIMMER_VALIDATOR_REGISTRATION)) throw new Error("The `@glimmer/validator` library has been included twice in this application. It could be different versions of the package, or the same version included twice by mistake. `@glimmer/validator` depends on having a single copy of the package in use at any time in an application, even if they are the same version. You must dedupe your build to remove the duplicate packages in order to prevent this error.");
 Reflect.set(globalThis, GLIMMER_VALIDATOR_REGISTRATION, true);
 
-const index$d = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const index$e = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	ALLOW_CYCLES,
 	COMPUTE,
@@ -8782,7 +8782,7 @@ function assertNever(value, desc = "unexpected unreachable branch") {
   throw LOGGER.log("unreachable", value), LOGGER.log(`${desc} :: ${JSON.stringify(value)} (${value})`), new Error("code reached unreachable");
 }
 
-const index$c = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const index$d = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	EMPTY_ARRAY: EMPTY_ARRAY$4,
 	EMPTY_NUMBER_ARRAY,
@@ -9034,7 +9034,7 @@ let ArrayIterator$1 = class ArrayIterator {
   }
 };
 
-const index$b = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const index$c = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	FALSE_REFERENCE,
 	NULL_REFERENCE,
@@ -9494,7 +9494,7 @@ class CustomComponentManager {
       const {
         component: component
       } = bucket;
-      return registerDestructor(bucket, () => delegate.destroyComponent(component)), bucket;
+      return registerDestructor$1(bucket, () => delegate.destroyComponent(component)), bucket;
     }
     return null;
   }
@@ -9573,7 +9573,7 @@ class CustomModifierManager {
       delegate: delegate,
       args: args,
       modifier: instance
-    }, registerDestructor(state, () => delegate.destroyModifier(instance, args)), state;
+    }, registerDestructor$1(state, () => delegate.destroyModifier(instance, args)), state;
   }
   getDebugName(definition) {
     return "function" == typeof definition ? definition.name || definition.toString() : "<unknown>";
@@ -9636,7 +9636,7 @@ function getComponentTemplate(obj) {
   }
 }
 
-const index$a = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const index$b = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	CustomComponentManager,
 	CustomHelperManager,
@@ -10262,7 +10262,7 @@ function getOrCreateActiveObserversFor(target, sync) {
   let observerMap = sync === true ? SYNC_OBSERVERS : ASYNC_OBSERVERS;
   if (!observerMap.has(target)) {
     observerMap.set(target, new Map());
-    registerDestructor(target, () => destroyObservers(target), true);
+    registerDestructor$1(target, () => destroyObservers(target), true);
   }
   return observerMap.get(target);
 }
@@ -13155,7 +13155,7 @@ function throttle(...args) {
   return _backburner.throttle(...args);
 }
 
-const index$9 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const index$a = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	_backburner,
 	_cancelTimers,
@@ -13566,7 +13566,7 @@ const VALID_FULL_NAME_REGEXP = /^[^:]+:[^:]+$/;
  @class Registry
  @since 1.11.0
 */
-let Registry$1 = class Registry {
+class Registry {
   _failSet;
   resolver;
   fallback;
@@ -13799,7 +13799,7 @@ let Registry$1 = class Registry {
     if (!this.isValidFullName(fullName)) {
       return false;
     }
-    return has$2(this, this.normalize(fullName));
+    return has$1(this, this.normalize(fullName));
   }
 
   /**
@@ -13893,7 +13893,7 @@ let Registry$1 = class Registry {
   isValidFullName(fullName) {
     return VALID_FULL_NAME_REGEXP.test(fullName);
   }
-};
+}
 function resolve$4(registry, _normalizedName) {
   let normalizedName = _normalizedName;
   let cached = registry._resolveCache[normalizedName];
@@ -13917,7 +13917,7 @@ function resolve$4(registry, _normalizedName) {
   }
   return resolved;
 }
-function has$2(registry, fullName) {
+function has$1(registry, fullName) {
   return registry.resolve(fullName) !== undefined;
 }
 const privateNames = makeDictionary(null);
@@ -13939,7 +13939,7 @@ function getName(obj) {
   return NAMES.get(obj);
 }
 
-const hasOwnProperty$3 = Object.prototype.hasOwnProperty;
+const hasOwnProperty$2 = Object.prototype.hasOwnProperty;
 let searchDisabled = false;
 const flags = {
   _set: 0,
@@ -14024,7 +14024,7 @@ function _processNamespace(paths, root, seen) {
 
   // Loop over all of the keys in the namespace, looking for classes
   for (let key in root) {
-    if (!hasOwnProperty$3.call(root, key)) {
+    if (!hasOwnProperty$2.call(root, key)) {
       continue;
     }
     let obj = root[key];
@@ -14897,7 +14897,7 @@ const ActionHandler = Mixin.create({
   @return {Object} the passed value.
   @public
 */
-function set$2(obj, keyName, value, tolerant) {
+function set$1(obj, keyName, value, tolerant) {
   if (obj.isDestroyed) {
     return value;
   }
@@ -14931,7 +14931,7 @@ function _setPath(root, path, value, tolerant) {
   let keyName = parts.pop();
   let newRoot = _getPath(root, parts, true);
   if (newRoot !== null && newRoot !== undefined) {
-    return set$2(newRoot, keyName, value);
+    return set$1(newRoot, keyName, value);
   } else if (!tolerant) {
     throw new Error(`Property set failed: object in path "${parts.join('.')}" could not be found.`);
   }
@@ -14960,7 +14960,7 @@ function _setPath(root, path, value, tolerant) {
   @public
 */
 function trySet(root, path, value) {
-  return set$2(root, path, value, true);
+  return set$1(root, path, value, true);
 }
 
 /**
@@ -15034,7 +15034,7 @@ const ProxyMixin = Mixin.create({
       return value;
     }
     let content = contentFor(this);
-    return set$2(content, key, value);
+    return set$1(content, key, value);
   }
 });
 
@@ -15445,7 +15445,7 @@ function resolve$2(object, label) {
     return object;
   }
   let promise = new Constructor(noop, label);
-  resolve$1$1(promise, object);
+  resolve$1(promise, object);
   return promise;
 }
 function withOwnPromise() {
@@ -15477,7 +15477,7 @@ function handleForeignThenable(promise, thenable, then) {
       if (thenable === value) {
         fulfill(promise, value);
       } else {
-        resolve$1$1(promise, value);
+        resolve$1(promise, value);
       }
     }, reason => {
       if (sealed) {
@@ -15503,7 +15503,7 @@ function handleOwnThenable(promise, thenable) {
       if (thenable === value) {
         fulfill(promise, value);
       } else {
-        resolve$1$1(promise, value);
+        resolve$1(promise, value);
       }
     }, reason => reject$2(promise, reason));
   }
@@ -15518,7 +15518,7 @@ function handleMaybeThenable(promise, maybeThenable, then$1) {
     fulfill(promise, maybeThenable);
   }
 }
-function resolve$1$1(promise, value) {
+function resolve$1(promise, value) {
   if (promise === value) {
     fulfill(promise, value);
   } else if (objectOrFunction(value)) {
@@ -15616,7 +15616,7 @@ function invokeCallback(state, promise, callback, result) {
   } else if (succeeded === false) {
     reject$2(promise, error);
   } else if (hasCallback) {
-    resolve$1$1(promise, value);
+    resolve$1(promise, value);
   } else if (state === FULFILLED) {
     fulfill(promise, value);
   } else if (state === REJECTED) {
@@ -15631,7 +15631,7 @@ function initializePromise(promise, resolver) {
         return;
       }
       resolved = true;
-      resolve$1$1(promise, value);
+      resolve$1(promise, value);
     }, reason => {
       if (resolved) {
         return;
@@ -15906,7 +15906,7 @@ function race$1(entries, label) {
     return promise;
   }
   for (let i = 0; promise._state === PENDING && i < entries.length; i++) {
-    subscribe$1(Constructor.resolve(entries[i]), undefined, value => resolve$1$1(promise, value), reason => reject$2(promise, reason));
+    subscribe$1(Constructor.resolve(entries[i]), undefined, value => resolve$1(promise, value), reason => reject$2(promise, reason));
   }
   return promise;
 }
@@ -16570,13 +16570,13 @@ function denodeify(nodeFunc, options) {
       if (err) {
         reject$2(promise, err);
       } else if (options === undefined) {
-        resolve$1$1(promise, val);
+        resolve$1(promise, val);
       } else if (options === true) {
-        resolve$1$1(promise, arrayResult(arguments));
+        resolve$1(promise, arrayResult(arguments));
       } else if (Array.isArray(options)) {
-        resolve$1$1(promise, makeObject(arguments, options));
+        resolve$1(promise, makeObject(arguments, options));
       } else {
-        resolve$1$1(promise, val);
+        resolve$1(promise, val);
       }
     };
     if (promiseInput) {
@@ -17142,7 +17142,7 @@ class MapEnumerator extends Enumerator {
   `mapFn` on each fulfilled promise or value when they become fulfilled.
    The promise will be rejected if any of the given `promises` become rejected.
 */
-function map$3(promises, mapFn, label) {
+function map$2(promises, mapFn, label) {
   if (typeof mapFn !== 'function') {
     return Promise$1.reject(new TypeError("map expects a function as a second argument"), label);
   }
@@ -17458,7 +17458,7 @@ const RSVP = {
   off,
   resolve: resolve$3,
   reject,
-  map: map$3,
+  map: map$2,
   async,
   filter
 };
@@ -17478,7 +17478,7 @@ const RSVP$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   filter,
   hash: hash$2,
   hashSettled,
-  map: map$3,
+  map: map$2,
   off,
   on: on$2,
   race,
@@ -17621,14 +17621,14 @@ function setProperties(obj, properties) {
       // SAFETY: casting `properties` this way is safe because any object in JS
       // can be indexed this way, and the result will be `unknown`, making it
       // safe for callers.
-      set$2(obj, propertyName, properties[propertyName]);
+      set$1(obj, propertyName, properties[propertyName]);
     }
   });
   return properties;
 }
 
 const {
-  isArray: isArray$6
+  isArray: isArray$4
 } = Array;
 /**
  @module @ember/array
@@ -17665,7 +17665,7 @@ function makeArray(obj) {
   if (obj === null || obj === undefined) {
     return [];
   }
-  return isArray$6(obj) ? obj : [obj];
+  return isArray$4(obj) ? obj : [obj];
 }
 
 /**
@@ -17812,8 +17812,8 @@ class CoreObject {
       self = this;
     }
     const destroyable = self;
-    registerDestructor(self, ensureDestroyCalled, true);
-    registerDestructor(self, () => destroyable.willDestroy());
+    registerDestructor$1(self, ensureDestroyCalled, true);
+    registerDestructor$1(self, () => destroyable.willDestroy());
 
     // disable chains
     let m = meta$1(self);
@@ -18439,7 +18439,7 @@ const Observable = Mixin.create({
     return getProperties(this, ...args);
   },
   set(keyName, value) {
-    return set$2(this, keyName, value);
+    return set$1(this, keyName, value);
   },
   setProperties(hash) {
     return setProperties(this, hash);
@@ -18503,13 +18503,13 @@ const Observable = Mixin.create({
     return hasListeners(this, `${key}:change`);
   },
   incrementProperty(keyName, increment = 1) {
-    return set$2(this, keyName, (parseFloat(get$2(this, keyName)) || 0) + increment);
+    return set$1(this, keyName, (parseFloat(get$2(this, keyName)) || 0) + increment);
   },
   decrementProperty(keyName, decrement = 1) {
-    return set$2(this, keyName, (get$2(this, keyName) || 0) - decrement);
+    return set$1(this, keyName, (get$2(this, keyName) || 0) - decrement);
   },
   toggleProperty(keyName) {
-    return set$2(this, keyName, !get$2(this, keyName));
+    return set$1(this, keyName, !get$2(this, keyName));
   },
   cacheFor(keyName) {
     let meta = peekMeta(this);
@@ -18711,7 +18711,7 @@ function observer(...args) {
   return func;
 }
 
-const index$8 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const index$9 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	action,
 	computed,
@@ -18721,7 +18721,7 @@ const index$8 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	getProperties,
 	notifyPropertyChange,
 	observer,
-	set: set$2,
+	set: set$1,
 	setProperties,
 	trySet
 }, Symbol.toStringTag, { value: 'Module' }));
@@ -19011,7 +19011,7 @@ class EventDispatcher extends EmberObject {
     }, {});
     let lazyEvents = this.lazyEvents;
     if (_rootElement !== undefined && _rootElement !== null) {
-      set$2(this, 'rootElement', _rootElement);
+      set$1(this, 'rootElement', _rootElement);
     }
     let specifiedRootElement = get$2(this, 'rootElement');
     let rootElement = typeof specifiedRootElement !== 'string' ? specifiedRootElement : document.querySelector(specifiedRootElement);
@@ -19429,7 +19429,7 @@ function reset() {
   cache = {};
 }
 
-const index$7 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const index$8 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	_instrumentStart,
 	flaggedInstrument,
@@ -19847,7 +19847,7 @@ const TYPE_MAP = {
   '[object FileList]': 'filelist'
 };
 const {
-  toString: toString$2
+  toString: toString$1
 } = Object.prototype;
 
 /**
@@ -19921,7 +19921,7 @@ function typeOf(item) {
   if (item === undefined) {
     return 'undefined';
   }
-  let ret = TYPE_MAP[toString$2.call(item)] || 'object';
+  let ret = TYPE_MAP[toString$1.call(item)] || 'object';
   if (ret === 'function') {
     if (CoreObject.detect(item)) {
       ret = 'class';
@@ -20181,7 +20181,7 @@ function insertAt(array, index, item) {
   @return {Boolean} true if the passed object is an array or Array-like
   @public
 */
-function isArray$5(obj) {
+function isArray$3(obj) {
 
   // SAFETY: Property read checks are safe if it's an object
   if (!obj || obj.setInterval) {
@@ -20323,7 +20323,7 @@ const EmberArray = Mixin.create(Enumerable, {
   },
   getEach: mapBy,
   setEach(key, value) {
-    return this.forEach(item => set$2(item, key, value));
+    return this.forEach(item => set$1(item, key, value));
   },
   map(callback, target = null) {
     let ret = A();
@@ -20627,14 +20627,14 @@ let NativeArray = Mixin.create(MutableArray, Observable, {
 });
 
 // Remove any methods implemented natively so we don't override them
-const ignore$1 = ['length'];
+const ignore = ['length'];
 NativeArray.keys().forEach(methodName => {
   // SAFETY: It's safe to read unknown properties from an object
   if (Array.prototype[methodName]) {
-    ignore$1.push(methodName);
+    ignore.push(methodName);
   }
 });
-NativeArray = NativeArray.without(...ignore$1);
+NativeArray = NativeArray.without(...ignore);
 let A;
 A = function (arr) {
   if (isEmberArray(arr)) {
@@ -20646,13 +20646,13 @@ A = function (arr) {
   }
 };
 
-const index$6 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const index$7 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	get A () { return A; },
 	MutableArray,
 	get NativeArray () { return NativeArray; },
 	default: EmberArray,
-	isArray: isArray$5,
+	isArray: isArray$3,
 	makeArray,
 	removeAt,
 	uniqBy
@@ -20788,7 +20788,7 @@ function inject$1(...args) {
   return inject$2('controller', ...args);
 }
 
-const index$5 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const index$6 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	ControllerMixin,
 	default: Controller,
@@ -20860,7 +20860,7 @@ class EngineInstance extends EmberObject.extend(RegistryProxyMixin, ContainerPro
 
     // Create a per-instance registry that will use the application's registry
     // as a fallback for resolving registrations.
-    let registry = this.__registry__ = new Registry$1({
+    let registry = this.__registry__ = new Registry({
       fallback: this.base.__registry__
     });
 
@@ -21105,19 +21105,19 @@ function dependentKeyCompat(...args) {
 }
 setClassicDecorator(dependentKeyCompat);
 
-var createObject$1 = Object.create;
-function createMap$1() {
-  var map = createObject$1(null);
+var createObject = Object.create;
+function createMap() {
+  var map = createObject(null);
   map["__"] = undefined;
   delete map["__"];
   return map;
 }
-var Target$1 = function Target(path, matcher, delegate) {
+var Target = function Target(path, matcher, delegate) {
   this.path = path;
   this.matcher = matcher;
   this.delegate = delegate;
 };
-Target$1.prototype.to = function to(target, callback) {
+Target.prototype.to = function to(target, callback) {
   var delegate = this.delegate;
   if (delegate && delegate.willAddRoute) {
     target = delegate.willAddRoute(this.matcher.target, target);
@@ -21130,35 +21130,35 @@ Target$1.prototype.to = function to(target, callback) {
     this.matcher.addChild(this.path, target, callback, this.delegate);
   }
 };
-var Matcher$1 = function Matcher(target) {
-  this.routes = createMap$1();
-  this.children = createMap$1();
+var Matcher = function Matcher(target) {
+  this.routes = createMap();
+  this.children = createMap();
   this.target = target;
 };
-Matcher$1.prototype.add = function add(path, target) {
+Matcher.prototype.add = function add(path, target) {
   this.routes[path] = target;
 };
-Matcher$1.prototype.addChild = function addChild(path, target, callback, delegate) {
-  var matcher = new Matcher$1(target);
+Matcher.prototype.addChild = function addChild(path, target, callback, delegate) {
+  var matcher = new Matcher(target);
   this.children[path] = matcher;
-  var match = generateMatch$1(path, matcher, delegate);
+  var match = generateMatch(path, matcher, delegate);
   if (delegate && delegate.contextEntered) {
     delegate.contextEntered(target, match);
   }
   callback(match);
 };
-function generateMatch$1(startingPath, matcher, delegate) {
+function generateMatch(startingPath, matcher, delegate) {
   function match(path, callback) {
     var fullPath = startingPath + path;
     if (callback) {
-      callback(generateMatch$1(fullPath, matcher, delegate));
+      callback(generateMatch(fullPath, matcher, delegate));
     } else {
-      return new Target$1(fullPath, matcher, delegate);
+      return new Target(fullPath, matcher, delegate);
     }
   }
   return match;
 }
-function addRoute$1(routeArray, path, handler) {
+function addRoute(routeArray, path, handler) {
   var len = 0;
   for (var i = 0; i < routeArray.length; i++) {
     len += routeArray[i].path.length;
@@ -21170,25 +21170,25 @@ function addRoute$1(routeArray, path, handler) {
   };
   routeArray.push(route);
 }
-function eachRoute$1(baseRoute, matcher, callback, binding) {
+function eachRoute(baseRoute, matcher, callback, binding) {
   var routes = matcher.routes;
   var paths = Object.keys(routes);
   for (var i = 0; i < paths.length; i++) {
     var path = paths[i];
     var routeArray = baseRoute.slice();
-    addRoute$1(routeArray, path, routes[path]);
+    addRoute(routeArray, path, routes[path]);
     var nested = matcher.children[path];
     if (nested) {
-      eachRoute$1(routeArray, nested, callback, binding);
+      eachRoute(routeArray, nested, callback, binding);
     } else {
       callback.call(binding, routeArray);
     }
   }
 }
-var map$2 = function (callback, addRouteCallback) {
-  var matcher = new Matcher$1();
-  callback(generateMatch$1("", matcher, this.delegate));
-  eachRoute$1([], matcher, function (routes) {
+var map$1 = function (callback, addRouteCallback) {
+  var matcher = new Matcher();
+  callback(generateMatch("", matcher, this.delegate));
+  eachRoute([], matcher, function (routes) {
     if (addRouteCallback) {
       addRouteCallback(this, routes);
     } else {
@@ -21202,18 +21202,18 @@ var map$2 = function (callback, addRouteCallback) {
 // chars are "/" and "%".
 // Safe to call multiple times on the same path.
 // Normalizes percent-encoded values in `path` to upper-case and decodes percent-encoded
-function normalizePath$1(path) {
-  return path.split("/").map(normalizeSegment$1).join("/");
+function normalizePath(path) {
+  return path.split("/").map(normalizeSegment).join("/");
 }
 // We want to ensure the characters "%" and "/" remain in percent-encoded
 // form when normalizing paths, so replace them with their encoded form after
 // decoding the rest of the path
-var SEGMENT_RESERVED_CHARS$1 = /%|\//g;
-function normalizeSegment$1(segment) {
+var SEGMENT_RESERVED_CHARS = /%|\//g;
+function normalizeSegment(segment) {
   if (segment.length < 3 || segment.indexOf("%") === -1) {
     return segment;
   }
-  return decodeURIComponent(segment).replace(SEGMENT_RESERVED_CHARS$1, encodeURIComponent);
+  return decodeURIComponent(segment).replace(SEGMENT_RESERVED_CHARS, encodeURIComponent);
 }
 // We do not want to encode these characters when generating dynamic path segments
 // See https://tools.ietf.org/html/rfc3986#section-3.3
@@ -21225,18 +21225,18 @@ function normalizeSegment$1(segment) {
 // The chars "!", "'", "(", ")", "*" do not get changed by `encodeURIComponent`,
 // so the possible encoded chars are:
 // ['%24', '%26', '%2B', '%2C', '%3B', '%3D', '%3A', '%40'].
-var PATH_SEGMENT_ENCODINGS$1 = /%(?:2(?:4|6|B|C)|3(?:B|D|A)|40)/g;
-function encodePathSegment$1(str) {
-  return encodeURIComponent(str).replace(PATH_SEGMENT_ENCODINGS$1, decodeURIComponent);
+var PATH_SEGMENT_ENCODINGS = /%(?:2(?:4|6|B|C)|3(?:B|D|A)|40)/g;
+function encodePathSegment(str) {
+  return encodeURIComponent(str).replace(PATH_SEGMENT_ENCODINGS, decodeURIComponent);
 }
-var escapeRegex$1 = /(\/|\.|\*|\+|\?|\||\(|\)|\[|\]|\{|\}|\\)/g;
-var isArray$4 = Array.isArray;
-var hasOwnProperty$2 = Object.prototype.hasOwnProperty;
-function getParam$1(params, key) {
+var escapeRegex = /(\/|\.|\*|\+|\?|\||\(|\)|\[|\]|\{|\}|\\)/g;
+var isArray$2 = Array.isArray;
+var hasOwnProperty$1 = Object.prototype.hasOwnProperty;
+function getParam(params, key) {
   if (typeof params !== "object" || params === null) {
     throw new Error("You must pass an object as the second argument to `generate`.");
   }
-  if (!hasOwnProperty$2.call(params, key)) {
+  if (!hasOwnProperty$1.call(params, key)) {
     throw new Error("You must provide param `" + key + "` to `generate`.");
   }
   var value = params[key];
@@ -21246,8 +21246,8 @@ function getParam$1(params, key) {
   }
   return str;
 }
-var eachChar$1 = [];
-eachChar$1[0 /* Static */] = function (segment, currentState) {
+var eachChar = [];
+eachChar[0 /* Static */] = function (segment, currentState) {
   var state = currentState;
   var value = segment.value;
   for (var i = 0; i < value.length; i++) {
@@ -21256,52 +21256,52 @@ eachChar$1[0 /* Static */] = function (segment, currentState) {
   }
   return state;
 };
-eachChar$1[1 /* Dynamic */] = function (_, currentState) {
+eachChar[1 /* Dynamic */] = function (_, currentState) {
   return currentState.put(47 /* SLASH */, true, true);
 };
-eachChar$1[2 /* Star */] = function (_, currentState) {
+eachChar[2 /* Star */] = function (_, currentState) {
   return currentState.put(-1 /* ANY */, false, true);
 };
-eachChar$1[4 /* Epsilon */] = function (_, currentState) {
+eachChar[4 /* Epsilon */] = function (_, currentState) {
   return currentState;
 };
-var regex$1 = [];
-regex$1[0 /* Static */] = function (segment) {
-  return segment.value.replace(escapeRegex$1, "\\$1");
+var regex = [];
+regex[0 /* Static */] = function (segment) {
+  return segment.value.replace(escapeRegex, "\\$1");
 };
-regex$1[1 /* Dynamic */] = function () {
+regex[1 /* Dynamic */] = function () {
   return "([^/]+)";
 };
-regex$1[2 /* Star */] = function () {
+regex[2 /* Star */] = function () {
   return "(.+)";
 };
-regex$1[4 /* Epsilon */] = function () {
+regex[4 /* Epsilon */] = function () {
   return "";
 };
-var generate$1 = [];
-generate$1[0 /* Static */] = function (segment) {
+var generate = [];
+generate[0 /* Static */] = function (segment) {
   return segment.value;
 };
-generate$1[1 /* Dynamic */] = function (segment, params) {
-  var value = getParam$1(params, segment.value);
-  if (RouteRecognizer$1.ENCODE_AND_DECODE_PATH_SEGMENTS) {
-    return encodePathSegment$1(value);
+generate[1 /* Dynamic */] = function (segment, params) {
+  var value = getParam(params, segment.value);
+  if (RouteRecognizer.ENCODE_AND_DECODE_PATH_SEGMENTS) {
+    return encodePathSegment(value);
   } else {
     return value;
   }
 };
-generate$1[2 /* Star */] = function (segment, params) {
-  return getParam$1(params, segment.value);
+generate[2 /* Star */] = function (segment, params) {
+  return getParam(params, segment.value);
 };
-generate$1[4 /* Epsilon */] = function () {
+generate[4 /* Epsilon */] = function () {
   return "";
 };
-var EmptyObject$1 = Object.freeze({});
-var EmptyArray$1 = Object.freeze([]);
+var EmptyObject = Object.freeze({});
+var EmptyArray = Object.freeze([]);
 // The `names` will be populated with the paramter name for each dynamic/star
 // segment. `shouldDecodes` will be populated with a boolean for each dyanamic/star
 // segment, indicating whether it should be decoded during recognition.
-function parse$4(segments, route, types) {
+function parse$2(segments, route, types) {
   // normalize route as not starting with a "/". Recognition will
   // also normalize.
   if (route.length > 0 && route.charCodeAt(0) === 47 /* SLASH */) {
@@ -21336,15 +21336,15 @@ function parse$4(segments, route, types) {
     }
     segments.push({
       type: type,
-      value: normalizeSegment$1(part)
+      value: normalizeSegment(part)
     });
   }
   return {
-    names: names || EmptyArray$1,
-    shouldDecodes: shouldDecodes || EmptyArray$1
+    names: names || EmptyArray,
+    shouldDecodes: shouldDecodes || EmptyArray
   };
 }
-function isEqualCharSpec$1(spec, char, negate) {
+function isEqualCharSpec(spec, char, negate) {
   return spec.char === char && spec.negate === negate;
 }
 // A State has a character specification and (`charSpec`) and a list of possible
@@ -21363,7 +21363,7 @@ function isEqualCharSpec$1(spec, char, negate) {
 // Currently, State is implemented naively by looping over `nextStates` and
 // comparing a character specification against a character. A more efficient
 // implementation would use a hash of keys pointing at one or more next states.
-var State$3 = function State(states, id, char, negate, repeat) {
+var State$2 = function State(states, id, char, negate, repeat) {
   this.states = states;
   this.id = id;
   this.char = char;
@@ -21374,33 +21374,33 @@ var State$3 = function State(states, id, char, negate, repeat) {
   this.handlers = undefined;
   this.types = undefined;
 };
-State$3.prototype.regex = function regex$1() {
+State$2.prototype.regex = function regex$1() {
   if (!this._regex) {
     this._regex = new RegExp(this.pattern);
   }
   return this._regex;
 };
-State$3.prototype.get = function get(char, negate) {
+State$2.prototype.get = function get(char, negate) {
   var this$1$1 = this;
   var nextStates = this.nextStates;
   if (nextStates === null) {
     return;
   }
-  if (isArray$4(nextStates)) {
+  if (isArray$2(nextStates)) {
     for (var i = 0; i < nextStates.length; i++) {
       var child = this$1$1.states[nextStates[i]];
-      if (isEqualCharSpec$1(child, char, negate)) {
+      if (isEqualCharSpec(child, char, negate)) {
         return child;
       }
     }
   } else {
     var child$1 = this.states[nextStates];
-    if (isEqualCharSpec$1(child$1, char, negate)) {
+    if (isEqualCharSpec(child$1, char, negate)) {
       return child$1;
     }
   }
 };
-State$3.prototype.put = function put(char, negate, repeat) {
+State$2.prototype.put = function put(char, negate, repeat) {
   var state;
   // If the character specification already exists in a child of the current
   // state, just return that state.
@@ -21409,12 +21409,12 @@ State$3.prototype.put = function put(char, negate, repeat) {
   }
   // Make a new state for the character spec
   var states = this.states;
-  state = new State$3(states, states.length, char, negate, repeat);
+  state = new State$2(states, states.length, char, negate, repeat);
   states[states.length] = state;
   // Insert the new state as a child of the current state
   if (this.nextStates == null) {
     this.nextStates = state.id;
-  } else if (isArray$4(this.nextStates)) {
+  } else if (isArray$2(this.nextStates)) {
     this.nextStates.push(state.id);
   } else {
     this.nextStates = [this.nextStates, state.id];
@@ -21423,29 +21423,29 @@ State$3.prototype.put = function put(char, negate, repeat) {
   return state;
 };
 // Find a list of child states matching the next character
-State$3.prototype.match = function match(ch) {
+State$2.prototype.match = function match(ch) {
   var this$1$1 = this;
   var nextStates = this.nextStates;
   if (!nextStates) {
     return [];
   }
   var returned = [];
-  if (isArray$4(nextStates)) {
+  if (isArray$2(nextStates)) {
     for (var i = 0; i < nextStates.length; i++) {
       var child = this$1$1.states[nextStates[i]];
-      if (isMatch$1(child, ch)) {
+      if (isMatch(child, ch)) {
         returned.push(child);
       }
     }
   } else {
     var child$1 = this.states[nextStates];
-    if (isMatch$1(child$1, ch)) {
+    if (isMatch(child$1, ch)) {
       returned.push(child$1);
     }
   }
   return returned;
 };
-function isMatch$1(spec, char) {
+function isMatch(spec, char) {
   return spec.negate ? spec.char !== char && spec.char !== -1 /* ANY */ : spec.char === char || spec.char === -1 /* ANY */;
 }
 // This is a somewhat naive strategy, but should work in a lot of cases
@@ -21458,7 +21458,7 @@ function isMatch$1(spec, char) {
 //  * prefers using stars for less of the match to more, then
 //  * prefers fewer dynamic segments to more, then
 //  * prefers more static segments to more
-function sortSolutions$1(states) {
+function sortSolutions(states) {
   return states.sort(function (a, b) {
     var ref = a.types || [0, 0, 0];
     var astatics = ref[0];
@@ -21488,7 +21488,7 @@ function sortSolutions$1(states) {
     return 0;
   });
 }
-function recognizeChar$1(states, ch) {
+function recognizeChar(states, ch) {
   var nextStates = [];
   for (var i = 0, l = states.length; i < l; i++) {
     var state = states[i];
@@ -21496,14 +21496,14 @@ function recognizeChar$1(states, ch) {
   }
   return nextStates;
 }
-var RecognizeResults$1 = function RecognizeResults(queryParams) {
+var RecognizeResults = function RecognizeResults(queryParams) {
   this.length = 0;
   this.queryParams = queryParams || {};
 };
-RecognizeResults$1.prototype.splice = Array.prototype.splice;
-RecognizeResults$1.prototype.slice = Array.prototype.slice;
-RecognizeResults$1.prototype.push = Array.prototype.push;
-function findHandler$1(state, originalPath, queryParams) {
+RecognizeResults.prototype.splice = Array.prototype.splice;
+RecognizeResults.prototype.slice = Array.prototype.slice;
+RecognizeResults.prototype.push = Array.prototype.push;
+function findHandler(state, originalPath, queryParams) {
   var handlers = state.handlers;
   var regex = state.regex();
   if (!regex || !handlers) {
@@ -21511,23 +21511,23 @@ function findHandler$1(state, originalPath, queryParams) {
   }
   var captures = originalPath.match(regex);
   var currentCapture = 1;
-  var result = new RecognizeResults$1(queryParams);
+  var result = new RecognizeResults(queryParams);
   result.length = handlers.length;
   for (var i = 0; i < handlers.length; i++) {
     var handler = handlers[i];
     var names = handler.names;
     var shouldDecodes = handler.shouldDecodes;
-    var params = EmptyObject$1;
+    var params = EmptyObject;
     var isDynamic = false;
-    if (names !== EmptyArray$1 && shouldDecodes !== EmptyArray$1) {
+    if (names !== EmptyArray && shouldDecodes !== EmptyArray) {
       for (var j = 0; j < names.length; j++) {
         isDynamic = true;
         var name = names[j];
         var capture = captures && captures[currentCapture++];
-        if (params === EmptyObject$1) {
+        if (params === EmptyObject) {
           params = {};
         }
-        if (RouteRecognizer$1.ENCODE_AND_DECODE_PATH_SEGMENTS && shouldDecodes[j]) {
+        if (RouteRecognizer.ENCODE_AND_DECODE_PATH_SEGMENTS && shouldDecodes[j]) {
           params[name] = capture && decodeURIComponent(capture);
         } else {
           params[name] = capture;
@@ -21542,7 +21542,7 @@ function findHandler$1(state, originalPath, queryParams) {
   }
   return result;
 }
-function decodeQueryParamPart$1(part) {
+function decodeQueryParamPart(part) {
   // http://www.w3.org/TR/html401/interact/forms.html#h-17.13.4.1
   part = part.replace(/\+/gm, "%20");
   var result;
@@ -21553,15 +21553,15 @@ function decodeQueryParamPart$1(part) {
   }
   return result;
 }
-var RouteRecognizer$1 = function RouteRecognizer() {
-  this.names = createMap$1();
+var RouteRecognizer = function RouteRecognizer() {
+  this.names = createMap();
   var states = [];
-  var state = new State$3(states, 0, -1 /* ANY */, true, false);
+  var state = new State$2(states, 0, -1 /* ANY */, true, false);
   states[0] = state;
   this.states = states;
   this.rootState = state;
 };
-RouteRecognizer$1.prototype.add = function add(routes, options) {
+RouteRecognizer.prototype.add = function add(routes, options) {
   var currentState = this.rootState;
   var pattern = "^";
   var types = [0, 0, 0];
@@ -21571,7 +21571,7 @@ RouteRecognizer$1.prototype.add = function add(routes, options) {
   var j = 0;
   for (var i = 0; i < routes.length; i++) {
     var route = routes[i];
-    var ref = parse$4(allSegments, route.path, types);
+    var ref = parse$2(allSegments, route.path, types);
     var names = ref.names;
     var shouldDecodes = ref.shouldDecodes;
     // preserve j so it points to the start of newly added segments
@@ -21585,8 +21585,8 @@ RouteRecognizer$1.prototype.add = function add(routes, options) {
       currentState = currentState.put(47 /* SLASH */, false, false);
       pattern += "/";
       // Add a representation of the segment to the NFA and regex
-      currentState = eachChar$1[segment.type](segment, currentState);
-      pattern += regex$1[segment.type](segment);
+      currentState = eachChar[segment.type](segment, currentState);
+      pattern += regex[segment.type](segment);
     }
     handlers[i] = {
       handler: route.handler,
@@ -21615,7 +21615,7 @@ RouteRecognizer$1.prototype.add = function add(routes, options) {
     };
   }
 };
-RouteRecognizer$1.prototype.handlersFor = function handlersFor(name) {
+RouteRecognizer.prototype.handlersFor = function handlersFor(name) {
   var route = this.names[name];
   if (!route) {
     throw new Error("There is no route named " + name);
@@ -21627,10 +21627,10 @@ RouteRecognizer$1.prototype.handlersFor = function handlersFor(name) {
   }
   return result;
 };
-RouteRecognizer$1.prototype.hasRoute = function hasRoute(name) {
+RouteRecognizer.prototype.hasRoute = function hasRoute(name) {
   return !!this.names[name];
 };
-RouteRecognizer$1.prototype.generate = function generate$1$1(name, params) {
+RouteRecognizer.prototype.generate = function generate$1(name, params) {
   var route = this.names[name];
   var output = "";
   if (!route) {
@@ -21643,7 +21643,7 @@ RouteRecognizer$1.prototype.generate = function generate$1$1(name, params) {
       continue;
     }
     output += "/";
-    output += generate$1[segment.type](segment, params);
+    output += generate[segment.type](segment, params);
   }
   if (output.charAt(0) !== "/") {
     output = "/" + output;
@@ -21653,7 +21653,7 @@ RouteRecognizer$1.prototype.generate = function generate$1$1(name, params) {
   }
   return output;
 };
-RouteRecognizer$1.prototype.generateQueryString = function generateQueryString(params) {
+RouteRecognizer.prototype.generateQueryString = function generateQueryString(params) {
   var pairs = [];
   var keys = Object.keys(params);
   keys.sort();
@@ -21664,7 +21664,7 @@ RouteRecognizer$1.prototype.generateQueryString = function generateQueryString(p
       continue;
     }
     var pair = encodeURIComponent(key);
-    if (isArray$4(value)) {
+    if (isArray$2(value)) {
       for (var j = 0; j < value.length; j++) {
         var arrayPair = key + "[]" + "=" + encodeURIComponent(value[j]);
         pairs.push(arrayPair);
@@ -21679,12 +21679,12 @@ RouteRecognizer$1.prototype.generateQueryString = function generateQueryString(p
   }
   return "?" + pairs.join("&");
 };
-RouteRecognizer$1.prototype.parseQueryString = function parseQueryString(queryString) {
+RouteRecognizer.prototype.parseQueryString = function parseQueryString(queryString) {
   var pairs = queryString.split("&");
   var queryParams = {};
   for (var i = 0; i < pairs.length; i++) {
     var pair = pairs[i].split("="),
-      key = decodeQueryParamPart$1(pair[0]),
+      key = decodeQueryParamPart(pair[0]),
       keyLength = key.length,
       isArray = false,
       value = void 0;
@@ -21699,7 +21699,7 @@ RouteRecognizer$1.prototype.parseQueryString = function parseQueryString(querySt
           queryParams[key] = [];
         }
       }
-      value = pair[1] ? decodeQueryParamPart$1(pair[1]) : "";
+      value = pair[1] ? decodeQueryParamPart(pair[1]) : "";
     }
     if (isArray) {
       queryParams[key].push(value);
@@ -21709,7 +21709,7 @@ RouteRecognizer$1.prototype.parseQueryString = function parseQueryString(querySt
   }
   return queryParams;
 };
-RouteRecognizer$1.prototype.recognize = function recognize(path) {
+RouteRecognizer.prototype.recognize = function recognize(path) {
   var results;
   var states = [this.rootState];
   var queryParams = {};
@@ -21728,8 +21728,8 @@ RouteRecognizer$1.prototype.recognize = function recognize(path) {
     path = "/" + path;
   }
   var originalPath = path;
-  if (RouteRecognizer$1.ENCODE_AND_DECODE_PATH_SEGMENTS) {
-    path = normalizePath$1(path);
+  if (RouteRecognizer.ENCODE_AND_DECODE_PATH_SEGMENTS) {
+    path = normalizePath(path);
   } else {
     path = decodeURI(path);
     originalPath = decodeURI(originalPath);
@@ -21741,7 +21741,7 @@ RouteRecognizer$1.prototype.recognize = function recognize(path) {
     isSlashDropped = true;
   }
   for (var i = 0; i < path.length; i++) {
-    states = recognizeChar$1(states, path.charCodeAt(i));
+    states = recognizeChar(states, path.charCodeAt(i));
     if (!states.length) {
       break;
     }
@@ -21752,7 +21752,7 @@ RouteRecognizer$1.prototype.recognize = function recognize(path) {
       solutions.push(states[i$1]);
     }
   }
-  states = sortSolutions$1(solutions);
+  states = sortSolutions(solutions);
   var state = solutions[0];
   if (state && state.handlers) {
     // if a trailing slash was dropped and a star segment is the last segment
@@ -21760,20 +21760,20 @@ RouteRecognizer$1.prototype.recognize = function recognize(path) {
     if (isSlashDropped && state.pattern && state.pattern.slice(-5) === "(.+)$") {
       originalPath = originalPath + "/";
     }
-    results = findHandler$1(state, originalPath, queryParams);
+    results = findHandler(state, originalPath, queryParams);
   }
   return results;
 };
-RouteRecognizer$1.VERSION = "0.3.4";
+RouteRecognizer.VERSION = "0.3.4";
 // Set to false to opt-out of encoding and decoding path segments.
 // See https://github.com/tildeio/route-recognizer/pull/55
-RouteRecognizer$1.ENCODE_AND_DECODE_PATH_SEGMENTS = true;
-RouteRecognizer$1.Normalizer = {
-  normalizeSegment: normalizeSegment$1,
-  normalizePath: normalizePath$1,
-  encodePathSegment: encodePathSegment$1
+RouteRecognizer.ENCODE_AND_DECODE_PATH_SEGMENTS = true;
+RouteRecognizer.Normalizer = {
+  normalizeSegment: normalizeSegment,
+  normalizePath: normalizePath,
+  encodePathSegment: encodePathSegment
 };
-RouteRecognizer$1.prototype.map = map$2;
+RouteRecognizer.prototype.map = map$1;
 
 function buildTransitionAborted() {
   let error = new Error('TransitionAborted');
@@ -21793,7 +21793,7 @@ function throwIfAborted(maybe) {
   }
 }
 const slice$1 = Array.prototype.slice;
-const hasOwnProperty$1 = Object.prototype.hasOwnProperty;
+const hasOwnProperty = Object.prototype.hasOwnProperty;
 /**
   Determines if an object is Promise by checking if it is "thenable".
 **/
@@ -21802,7 +21802,7 @@ function isPromise(p) {
 }
 function merge$1(hash, other) {
   for (let prop in other) {
-    if (hasOwnProperty$1.call(other, prop)) {
+    if (hasOwnProperty.call(other, prop)) {
       hash[prop] = other[prop];
     }
   }
@@ -21888,8 +21888,8 @@ function getChangelist(oldObject, newObject) {
   coerceQueryParamsToString(newObject);
   // Calculate removals
   for (key in oldObject) {
-    if (hasOwnProperty$1.call(oldObject, key)) {
-      if (!hasOwnProperty$1.call(newObject, key)) {
+    if (hasOwnProperty.call(oldObject, key)) {
+      if (!hasOwnProperty.call(newObject, key)) {
         didChange = true;
         results.removed[key] = oldObject[key];
       }
@@ -21897,10 +21897,10 @@ function getChangelist(oldObject, newObject) {
   }
   // Calculate changes
   for (key in newObject) {
-    if (hasOwnProperty$1.call(newObject, key)) {
+    if (hasOwnProperty.call(newObject, key)) {
       let oldElement = oldObject[key];
       let newElement = newObject[key];
-      if (isArray$3(oldElement) && isArray$3(newElement)) {
+      if (isArray$1(oldElement) && isArray$1(newElement)) {
         if (oldElement.length !== newElement.length) {
           results.changed[key] = newObject[key];
           didChange = true;
@@ -21920,7 +21920,7 @@ function getChangelist(oldObject, newObject) {
   }
   return didChange ? results : undefined;
 }
-function isArray$3(obj) {
+function isArray$1(obj) {
   return Array.isArray(obj);
 }
 function promiseLabel(label) {
@@ -23099,7 +23099,7 @@ class Route extends EmberObject.extend(ActionHandler, Evented) {
         aQp.values = params;
         let cacheKey = calculateCacheKey(aQp.route.fullRouteName, aQp.parts, aQp.values);
         let value = cache.lookup(cacheKey, prop, aQp.undecoratedDefaultValue);
-        set$2(controller, prop, value);
+        set$1(controller, prop, value);
       });
       let qpValues = getQueryParamsFor(this, transition[STATE_SYMBOL]);
       setProperties(controller, qpValues);
@@ -23386,7 +23386,7 @@ class Route extends EmberObject.extend(ActionHandler, Evented) {
   */
   setupController(controller, context, _transition) {
     if (controller && context !== undefined) {
-      set$2(controller, 'model', context);
+      set$1(controller, 'model', context);
     }
   }
 
@@ -24033,7 +24033,7 @@ Route.reopen({
               replaceUrl = false;
             }
           }
-          set$2(controller, qp.prop, value);
+          set$1(controller, qp.prop, value);
           qpUpdated = true;
         }
 
@@ -25007,7 +25007,7 @@ let Router$2 = class Router {
     this._changedQueryParams = undefined;
     this.currentSequence = 0;
     this.log = logger;
-    this.recognizer = new RouteRecognizer$1();
+    this.recognizer = new RouteRecognizer();
     this.reset();
   }
   /**
@@ -25972,7 +25972,7 @@ class EmberRouter extends EmberObject.extend(Evented) {
       updateURL(path) {
         once(() => {
           location.setURL(path);
-          set$2(router, 'currentURL', path);
+          set$1(router, 'currentURL', path);
         });
       }
 
@@ -26034,7 +26034,7 @@ class EmberRouter extends EmberObject.extend(Evented) {
         if (location.replaceURL) {
           let doReplaceURL = () => {
             location.replaceURL(url);
-            set$2(router, 'currentURL', url);
+            set$1(router, 'currentURL', url);
           };
           once(doReplaceURL);
         } else {
@@ -26384,11 +26384,11 @@ class EmberRouter extends EmberObject.extend(Evented) {
     let owner = getOwner$1(this);
     if ('string' === typeof location) {
       let resolvedLocation = owner.lookup(`location:${location}`);
-      location = set$2(this, 'location', resolvedLocation);
+      location = set$1(this, 'location', resolvedLocation);
     }
     if (location !== null && typeof location === 'object') {
       if (rootURL) {
-        set$2(location, 'rootURL', rootURL);
+        set$1(location, 'rootURL', rootURL);
       }
 
       // ensure that initState is called AFTER the rootURL is set on
@@ -27024,9 +27024,9 @@ function updatePaths(router) {
   let currentRouteName = info.name;
   let location = router.location;
   let currentURL = location.getURL();
-  set$2(router, 'currentPath', path);
-  set$2(router, 'currentRouteName', currentRouteName);
-  set$2(router, 'currentURL', currentURL);
+  set$1(router, 'currentPath', path);
+  set$1(router, 'currentRouteName', currentRouteName);
+  set$1(router, 'currentURL', currentURL);
 }
 function didBeginTransition(transition, router) {
   let routerState = new RouterState(router, router._routerMicrolib, transition[STATE_SYMBOL]);
@@ -27665,7 +27665,7 @@ class AliasedProperty extends ComputedDescriptor {
     return ret;
   }
   set(obj, _keyName, value) {
-    return set$2(obj, this.altKey, value);
+    return set$1(obj, this.altKey, value);
   }
   readOnly() {
     this.set = AliasedProperty_readOnlySet;
@@ -27679,7 +27679,7 @@ function AliasedProperty_readOnlySet(obj, keyName) {
 }
 function AliasedProperty_oneWaySet(obj, keyName, value) {
   defineProperty(obj, keyName, null);
-  return set$2(obj, keyName, value);
+  return set$1(obj, keyName, value);
 }
 
 /**
@@ -28078,7 +28078,7 @@ class Service extends FrameworkObject {
   static isServiceFactory = true;
 }
 
-const index$4 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const index$5 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: Service,
 	inject,
@@ -31089,7 +31089,7 @@ APPEND_OPCODES.add(41, (vm, {
       name: "in-element",
       args: args,
       instance: null
-    }), registerDestructor(block, () => {
+    }), registerDestructor$1(block, () => {
       vm.env.debugRenderTree?.willDestroy(block);
     });
   }
@@ -31500,7 +31500,7 @@ class ComponentElementOperations {
         instance: instance
       }), vm.env.debugRenderTree.didRender(state, bounds),
       // For tearing down the debugRenderTree
-      vm.associateDestroyable(state), vm.updateWith(new DebugRenderTreeUpdateOpcode(state)), vm.updateWith(new DebugRenderTreeDidRenderOpcode(state, bounds)), registerDestructor(state, () => {
+      vm.associateDestroyable(state), vm.updateWith(new DebugRenderTreeUpdateOpcode(state)), vm.updateWith(new DebugRenderTreeDidRenderOpcode(state, bounds)), registerDestructor$1(state, () => {
         vm.env.debugRenderTree?.willDestroy(state);
       });
     }
@@ -31595,7 +31595,7 @@ APPEND_OPCODES.add(99, (vm, {
         bucket: bucket
       } = node;
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- @fixme
-      vm.env.debugRenderTree.create(bucket, node), registerDestructor(instance, () => {
+      vm.env.debugRenderTree.create(bucket, node), registerDestructor$1(instance, () => {
         vm.env.debugRenderTree?.willDestroy(bucket);
       }), vm.updateWith(new DebugRenderTreeUpdateOpcode(bucket));
     });else {
@@ -31606,7 +31606,7 @@ APPEND_OPCODES.add(99, (vm, {
         args: args,
         template: moduleName,
         instance: valueForRef(selfRef)
-      }), registerDestructor(instance, () => {
+      }), registerDestructor$1(instance, () => {
         vm.env.debugRenderTree?.willDestroy(instance);
       }), vm.updateWith(new DebugRenderTreeUpdateOpcode(instance));
     }
@@ -32952,7 +32952,7 @@ function invokeHelper(context, definition, computeArgs) {
 }
 class OnModifierState {
   constructor(element, args) {
-    this.tag = createUpdatableTag(), this.listener = null, this.element = element, this.args = args, registerDestructor(this, () => {
+    this.tag = createUpdatableTag(), this.listener = null, this.element = element, this.args = args, registerDestructor$1(this, () => {
       let {
         element: element,
         listener: listener
@@ -33210,14 +33210,14 @@ const badProtocols = ["javascript:", "vbscript:"],
   badTagsForDataURI = ["EMBED"],
   badAttributes = ["href", "src", "background", "action"],
   badAttributesForDataURI = ["src"];
-function has$1(array, item) {
+function has(array, item) {
   return -1 !== array.indexOf(item);
 }
 function checkURI(tagName, attribute) {
-  return (null === tagName || has$1(badTags, tagName)) && has$1(badAttributes, attribute);
+  return (null === tagName || has(badTags, tagName)) && has(badAttributes, attribute);
 }
 function checkDataURI(tagName, attribute) {
-  return null !== tagName && has$1(badTagsForDataURI, tagName) && has$1(badAttributesForDataURI, attribute);
+  return null !== tagName && has(badTagsForDataURI, tagName) && has(badAttributesForDataURI, attribute);
 }
 function requiresSanitization(tagName, attribute) {
   return checkURI(tagName, attribute) || checkDataURI(tagName, attribute);
@@ -33260,7 +33260,7 @@ function sanitizeAttributeValue(element, attribute, value) {
       };
       throw new Error('@glimmer/runtime needs a valid "globalThis.URL"');
     }()), _protocolForUrlImplementation(url));
-    if (has$1(badProtocols, protocol)) return `unsafe:${str}`;
+    if (has(badProtocols, protocol)) return `unsafe:${str}`;
   }
   var url;
   return checkDataURI(tagName, attribute) ? `unsafe:${str}` : str;
@@ -33298,7 +33298,7 @@ class DynamicAttribute {
 }
 class SimpleDynamicAttribute extends DynamicAttribute {
   set(dom, value, _env) {
-    const normalizedValue = normalizeValue$1(value);
+    const normalizedValue = normalizeValue(value);
     if (null !== normalizedValue) {
       const {
         name: name,
@@ -33308,7 +33308,7 @@ class SimpleDynamicAttribute extends DynamicAttribute {
     }
   }
   update(value, _env) {
-    const normalizedValue = normalizeValue$1(value),
+    const normalizedValue = normalizeValue(value),
       {
         element: element,
         name: name
@@ -33394,7 +33394,7 @@ class OptionSelectedDynamicAttribute extends DefaultDynamicProperty {
     this.attribute.element.selected = !!value;
   }
 }
-function normalizeValue$1(value) {
+function normalizeValue(value) {
   return false === value || null == value || void 0 === value.toString ? null : true === value ? "" :
   // onclick function etc in SSR
   "function" == typeof value ? null : String(value);
@@ -33632,7 +33632,7 @@ class AppendingBlockImpl {
 }
 class RemoteBlock extends AppendingBlockImpl {
   constructor(parent) {
-    super(parent), registerDestructor(this, () => {
+    super(parent), registerDestructor$1(this, () => {
       // In general, you only need to clear the root of a hierarchy, and should never
       // need to clear any child nodes. This is an important constraint that gives us
       // a strong guarantee that clearing a subtree is a single DOM operation.
@@ -33904,7 +33904,7 @@ class UpdatingVMFrame {
 }
 class RenderResultImpl {
   constructor(env, updating, bounds, drop) {
-    this.env = env, this.updating = updating, this.bounds = bounds, this.drop = drop, associateDestroyableChild(this, drop), registerDestructor(this, () => clear(this.bounds));
+    this.env = env, this.updating = updating, this.bounds = bounds, this.drop = drop, associateDestroyableChild(this, drop), registerDestructor$1(this, () => clear(this.bounds));
   }
   rerender({
     alwaysRevalidate = false
@@ -34821,7 +34821,7 @@ function rehydrationBuilder(env, cursor) {
   return RehydrateTree.forInitialRender(env, cursor);
 }
 
-const index$3 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const index$4 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	ConcreteBounds,
 	CurriedValue,
@@ -34866,7 +34866,7 @@ const index$3 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	isWhitespace: isWhitespace$1,
 	normalizeProperty,
 	on: on$1,
-	registerDestructor,
+	registerDestructor: registerDestructor$1,
 	rehydrationBuilder,
 	reifyArgs,
 	reifyNamed,
@@ -36144,8 +36144,8 @@ class ComponentStateBucket {
     this.classRef = null;
     this.argsRevision = args === null ? 0 : valueForTag(argsTag);
     this.rootRef = createConstRef(component);
-    registerDestructor(this, () => this.willDestroy(), true);
-    registerDestructor(this, () => this.component.destroy());
+    registerDestructor$1(this, () => this.willDestroy(), true);
+    registerDestructor$1(this, () => this.component.destroy());
   }
   willDestroy() {
     let {
@@ -38721,7 +38721,7 @@ function toBool(predicate) {
   if (isProxy(predicate)) {
     consumeTag(tagForProperty(predicate, 'content'));
     return Boolean(get$2(predicate, 'isTruthy'));
-  } else if (isArray$5(predicate)) {
+  } else if (isArray$3(predicate)) {
     consumeTag(tagForProperty(predicate, '[]'));
     return predicate.length !== 0;
   } else if (isHTMLSafe(predicate)) {
@@ -38739,7 +38739,7 @@ setGlobalContext({
   getProp: _getProp,
   setProp: _setProp,
   getPath: get$2,
-  setPath: set$2,
+  setPath: set$1,
   scheduleDestroy(destroyable, destructor) {
     schedule('actions', null, destructor, destroyable);
   },
@@ -38813,7 +38813,7 @@ const normalizeClassHelper = internalHelper(({
   @module ember
 */
 
-const resolve$1 = internalHelper(({
+const resolve = internalHelper(({
   positional
 }, owner) => {
   let fullNameRef = positional[0];
@@ -39308,7 +39308,7 @@ const BUILTIN_KEYWORD_HELPERS = {
   '-hash': hash$1,
   '-each-in': eachIn,
   '-normalize-class': normalizeClassHelper,
-  '-resolve': resolve$1,
+  '-resolve': resolve,
   '-track-array': trackArray,
   '-mount': mountHelper,
   '-outlet': outletHelper,
@@ -39708,7 +39708,7 @@ class RendererState {
   #removedRoots = [];
   constructor(data, renderer) {
     this.#data = data;
-    registerDestructor(this, () => {
+    registerDestructor$1(this, () => {
       this.clearAllRoots(renderer);
     });
   }
@@ -40132,7 +40132,7 @@ class ApplicationInstance extends EngineInstance {
       this.rootElement = this.application.rootElement;
     }
     if (options.location) {
-      set$2(this.router, 'location', options.location);
+      set$1(this.router, 'location', options.location);
     }
     this.application.runInstanceInitializers(this);
     if (options.isInteractive) {
@@ -41159,10 +41159,10 @@ class Engine extends Namespace.extend(RegistryProxyMixin) {
     @private
   */
   static buildRegistry(namespace) {
-    let registry = new Registry$1({
+    let registry = new Registry({
       resolver: resolverFor(namespace)
     });
-    registry.set = set$2;
+    registry.set = set$1;
     registry.register('application:main', namespace, {
       instantiate: false
     });
@@ -42259,7 +42259,7 @@ function commonSetupRegistry(registry) {
   registry.register('service:router', RouterService);
 }
 
-const index$2 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const index$3 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	_loaded,
 	default: Application,
@@ -42950,7 +42950,7 @@ function setupGlobal(app, importCallback) {
  * @param {Application} app your `@ember/application` Application sub-class
  */
 function setupInspector (app) {
-  setupGlobal(app, () => __vitePreload(() => import('./modules-4-12-D7ktjktJ.js'),true              ?[]:void 0,import.meta.url));
+  setupGlobal(app, () => __vitePreload(() => import('./modules-4-12-BkpRPaUJ.js'),true              ?[]:void 0,import.meta.url));
 }
 
 const defineModule0 = Object.assign({}, {});
@@ -43823,14 +43823,14 @@ var seq = new type('tag:yaml.org,2002:seq', {
     return data !== null ? data : [];
   }
 });
-var map$1 = new type('tag:yaml.org,2002:map', {
+var map = new type('tag:yaml.org,2002:map', {
   kind: 'mapping',
   construct: function (data) {
     return data !== null ? data : {};
   }
 });
 var failsafe = new schema({
-  explicit: [str, seq, map$1]
+  explicit: [str, seq, map]
 });
 function resolveYamlNull(data) {
   if (data === null) return true;
@@ -44423,14 +44423,14 @@ function resolveYamlSet(data) {
 function constructYamlSet(data) {
   return data !== null ? data : {};
 }
-var set$1 = new type('tag:yaml.org,2002:set', {
+var set = new type('tag:yaml.org,2002:set', {
   kind: 'mapping',
   resolve: resolveYamlSet,
   construct: constructYamlSet
 });
 var _default = core.extend({
   implicit: [timestamp, merge],
-  explicit: [binary, omap, pairs, set$1]
+  explicit: [binary, omap, pairs, set]
 });
 
 /*eslint-disable max-len,no-use-before-define*/
@@ -45860,7 +45860,7 @@ function encodeHex(character) {
 }
 var QUOTING_TYPE_SINGLE = 1,
   QUOTING_TYPE_DOUBLE = 2;
-function State$2(options) {
+function State(options) {
   this.schema = options['schema'] || _default;
   this.indent = Math.max(1, options['indent'] || 2);
   this.noArrayIndent = options['noArrayIndent'] || false;
@@ -46558,7 +46558,7 @@ function inspectNode(object, objects, duplicatesIndexes) {
 }
 function dump$1(input, options) {
   options = options || {};
-  var state = new State$2(options);
+  var state = new State(options);
   if (!state.noRefs) getDuplicateReferences(input, state);
   var value = input;
   if (state.replacer) {
@@ -46593,10 +46593,10 @@ var YAMLException = exception;
 var types = {
   binary: binary,
   float: float,
-  map: map$1,
+  map: map,
   null: _null,
   pairs: pairs,
-  set: set$1,
+  set: set,
   timestamp: timestamp,
   bool: bool,
   int: int$1,
@@ -46751,7 +46751,7 @@ class ApplicationController extends Controller {
     decorateMethodV2(this.prototype, "removeLoader", [action]);
   }
   cycleThemeMode() {
-    // Cycle: light → dark → auto → light
+    // Cycle: light -> dark -> auto -> light
     switch (this.themeMode) {
       case 'light':
         this.themeMode = 'dark';
@@ -46843,6 +46843,265 @@ const amdModule14 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.definePropert
 function setComponentManager(manager, obj) {
   return setComponentManager$1(manager, obj);
 }
+
+/**
+  Ember manages the lifecycles and lifetimes of many built in constructs, such
+  as components, and does so in a hierarchical way - when a parent component is
+  destroyed, all of its children are destroyed as well.
+
+  This destroyables API exposes the basic building blocks for destruction:
+
+  * registering a function to be ran when an object is destroyed
+  * checking if an object is in a destroying state
+  * associate an object as a child of another so that the child object will be destroyed
+    when the associated parent object is destroyed.
+
+  @module @ember/destroyable
+  @public
+*/
+
+/**
+  This function is used to associate a destroyable object with a parent. When the parent
+  is destroyed, all registered children will also be destroyed.
+
+  ```js
+  class CustomSelect extends Component {
+    constructor(...args) {
+      super(...args);
+
+      // obj is now a child of the component. When the component is destroyed,
+      // obj will also be destroyed, and have all of its destructors triggered.
+      this.obj = associateDestroyableChild(this, {});
+    }
+  }
+  ```
+
+  Returns the associated child for convenience.
+
+  @method associateDestroyableChild
+  @for @ember/destroyable
+  @param {Object|Function} parent the destroyable to entangle the child destroyables lifetime with
+  @param {Object|Function} child the destroyable to be entangled with the parents lifetime
+  @returns {Object|Function} the child argument
+  @static
+  @public
+*/
+
+/**
+ Receives a destroyable, and returns true if the destroyable has begun destroying. Otherwise returns
+ false.
+
+  ```js
+  let obj = {};
+  isDestroying(obj); // false
+  destroy(obj);
+  isDestroying(obj); // true
+  // ...sometime later, after scheduled destruction
+  isDestroyed(obj); // true
+  isDestroying(obj); // true
+  ```
+
+  @method isDestroying
+  @for @ember/destroyable
+  @param {Object|Function} destroyable the object to check
+  @returns {Boolean}
+  @static
+  @public
+*/
+
+/**
+  Receives a destroyable, and returns true if the destroyable has finished destroying. Otherwise
+  returns false.
+
+  ```js
+  let obj = {};
+
+  isDestroyed(obj); // false
+  destroy(obj);
+
+  // ...sometime later, after scheduled destruction
+
+  isDestroyed(obj); // true
+  ```
+
+  @method isDestroyed
+  @for @ember/destroyable
+  @param {Object|Function} destroyable the object to check
+  @returns {Boolean}
+  @static
+  @public
+*/
+
+/**
+  Initiates the destruction of a destroyable object. It runs all associated destructors, and then
+  destroys all children recursively.
+
+  ```js
+  let obj = {};
+
+  registerDestructor(obj, () => console.log('destroyed!'));
+
+  destroy(obj); // this will schedule the destructor to be called
+
+  // ...some time later, during scheduled destruction
+
+  // destroyed!
+  ```
+
+  Destruction via `destroy()` follows these steps:
+
+  1, Mark the destroyable such that `isDestroying(destroyable)` returns `true`
+  2, Call `destroy()` on each of the destroyable's associated children
+  3, Schedule calling the destroyable's destructors
+  4, Schedule setting destroyable such that `isDestroyed(destroyable)` returns `true`
+
+  This results in the entire tree of destroyables being first marked as destroying,
+  then having all of their destructors called, and finally all being marked as isDestroyed.
+  There won't be any in between states where some items are marked as `isDestroying` while
+  destroying, while others are not.
+
+  @method destroy
+  @for @ember/destroyable
+  @param {Object|Function} destroyable the object to destroy
+  @static
+  @public
+*/
+
+/**
+  This function asserts that all objects which have associated destructors or associated children
+  have been destroyed at the time it is called. It is meant to be a low level hook that testing
+  frameworks can use to hook into and validate that all destroyables have in fact been destroyed.
+
+  This function requires that `enableDestroyableTracking` was called previously, and is only
+  available in non-production builds.
+
+  @method assertDestroyablesDestroyed
+  @for @ember/destroyable
+  @static
+  @public
+*/
+
+/**
+  This function instructs the destroyable system to keep track of all destroyables (their
+  children, destructors, etc). This enables a future usage of `assertDestroyablesDestroyed`
+  to be used to ensure that all destroyable tasks (registered destructors and associated children)
+  have completed when `assertDestroyablesDestroyed` is called.
+
+  @method enableDestroyableTracking
+  @for @ember/destroyable
+  @static
+  @public
+*/
+
+/**
+  Receives a destroyable object and a destructor function, and associates the
+  function with it. When the destroyable is destroyed with destroy, or when its
+  parent is destroyed, the destructor function will be called.
+
+  ```js
+  import Component from '@glimmer/component';
+  import { registerDestructor } from '@ember/destroyable';
+
+  class Modal extends Component {
+    @service resize;
+
+    constructor(...args) {
+      super(...args);
+
+      this.resize.register(this, this.layout);
+
+      registerDestructor(this, () => this.resize.unregister(this));
+    }
+  }
+  ```
+
+  Multiple destructors can be associated with a given destroyable, and they can be
+  associated over time, allowing libraries to dynamically add destructors as needed.
+  `registerDestructor` also returns the associated destructor function, for convenience.
+
+  The destructor function is passed a single argument, which is the destroyable itself.
+  This allows the function to be reused multiple times for many destroyables, rather
+  than creating a closure function per destroyable.
+
+  ```js
+  import Component from '@glimmer/component';
+  import { registerDestructor } from '@ember/destroyable';
+
+  function unregisterResize(instance) {
+    instance.resize.unregister(instance);
+  }
+
+  class Modal extends Component {
+    @service resize;
+
+    constructor(...args) {
+      super(...args);
+
+      this.resize.register(this, this.layout);
+
+      registerDestructor(this, unregisterResize);
+    }
+  }
+  ```
+
+  @method registerDestructor
+  @for @ember/destroyable
+  @param {Object|Function} destroyable the destroyable to register the destructor function with
+  @param {Function} destructor the destructor to run when the destroyable object is destroyed
+  @static
+  @public
+*/
+function registerDestructor(destroyable, destructor) {
+  return registerDestructor$1(destroyable, destructor);
+}
+
+/**
+  Receives a destroyable and a destructor function, and de-associates the destructor
+  from the destroyable.
+
+  ```js
+  import Component from '@glimmer/component';
+  import { registerDestructor, unregisterDestructor } from '@ember/destroyable';
+
+  class Modal extends Component {
+    @service modals;
+
+    constructor(...args) {
+      super(...args);
+
+      this.modals.add(this);
+
+      this.modalDestructor = registerDestructor(this, () => this.modals.remove(this));
+    }
+
+    @action pinModal() {
+      unregisterDestructor(this, this.modalDestructor);
+    }
+  }
+  ```
+
+  @method unregisterDestructor
+  @for @ember/destroyable
+  @param {Object|Function} destroyable the destroyable to unregister the destructor function from
+  @param {Function} destructor the destructor to remove from the destroyable
+  @static
+  @public
+*/
+function unregisterDestructor(destroyable, destructor) {
+  return unregisterDestructor$1(destroyable, destructor);
+}
+
+const index$2 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+	__proto__: null,
+	assertDestroyablesDestroyed,
+	associateDestroyableChild,
+	destroy,
+	enableDestroyableTracking,
+	isDestroyed,
+	isDestroying,
+	registerDestructor,
+	unregisterDestructor
+}, Symbol.toStringTag, { value: 'Module' }));
 
 const DESTROYING = new WeakMap();
 const DESTROYED = new WeakMap();
@@ -47552,7 +47811,7 @@ class Defuse extends Helper {
   }
 }
 
-const TEMPLATE$M = templateFactory(
+const TEMPLATE$O = templateFactory(
 /*
   {{#in-element this.headElement insertBefore=null}}
   <title>{{this.config.pageTitle}}</title>
@@ -47574,8 +47833,6 @@ const TEMPLATE$M = templateFactory(
   "isStrictMode": false
 });
 
-// Injects page title and optional custom CSS into document.head.
-// Replaces ember-cli-head (HeadLayout + HeadContent + head-data service).
 class HeadLayout extends GlimmerComponent {
   static {
     decorateFieldV2(this.prototype, "config", [service('oxi-config')]);
@@ -47585,7 +47842,7 @@ class HeadLayout extends GlimmerComponent {
     return this.args.headElement || document.head;
   }
 }
-setComponentTemplate(TEMPLATE$M, HeadLayout);
+setComponentTemplate(TEMPLATE$O, HeadLayout);
 
 // NOTE: this uses assignment to *require* that the `glimmerSetModifierManager`
 // is legally assignable to this type, i.e. that variance is properly upheld.
@@ -52995,7 +53252,7 @@ const tippyInit = modifier(function tippyInit(element, [], {
   return () => instance.destroy();
 });
 
-const TEMPLATE$L = templateFactory(
+const TEMPLATE$N = templateFactory(
 /*
   <span {{tippy-init
     placement=@placement
@@ -53013,7 +53270,7 @@ const TEMPLATE$L = templateFactory(
   "isStrictMode": false
 });
 
-const Tippy = setComponentTemplate(TEMPLATE$L, templateOnly());
+const Tippy = setComponentTemplate(TEMPLATE$N, templateOnly());
 
 // SAFETY: we need to provide interfaces that Glint can declaration-merge with
 // to provide appropriate completions. In each case, the imported item is
@@ -53140,7 +53397,7 @@ class BsModalInitModifier extends ClassBasedModifier {
   }
 }
 
-const TEMPLATE$K = templateFactory(
+const TEMPLATE$M = templateFactory(
 /*
   <div class="modal-header" ...attributes>
     {{yield}}
@@ -53158,9 +53415,9 @@ const TEMPLATE$K = templateFactory(
   "isStrictMode": false
 });
 
-const bsModalHeader = setComponentTemplate(TEMPLATE$K, templateOnly());
+const bsModalHeader = setComponentTemplate(TEMPLATE$M, templateOnly());
 
-const TEMPLATE$J = templateFactory(
+const TEMPLATE$L = templateFactory(
 /*
   <div class="modal-body" ...attributes>
     {{yield}}
@@ -53174,9 +53431,9 @@ const TEMPLATE$J = templateFactory(
   "isStrictMode": false
 });
 
-const bsModalBody = setComponentTemplate(TEMPLATE$J, templateOnly());
+const bsModalBody = setComponentTemplate(TEMPLATE$L, templateOnly());
 
-const TEMPLATE$I = templateFactory(
+const TEMPLATE$K = templateFactory(
 /*
   <div class="modal-footer" ...attributes>
     {{yield}}
@@ -53190,9 +53447,9 @@ const TEMPLATE$I = templateFactory(
   "isStrictMode": false
 });
 
-const bsModalFooter = setComponentTemplate(TEMPLATE$I, templateOnly());
+const bsModalFooter = setComponentTemplate(TEMPLATE$K, templateOnly());
 
-const TEMPLATE$H = templateFactory(
+const TEMPLATE$J = templateFactory(
 /*
   <div
     class="modal {{if @fade "fade"}}"
@@ -53262,9 +53519,9 @@ class BsModal extends GlimmerComponent {
     return parts.join(' ');
   }
 }
-setComponentTemplate(TEMPLATE$H, BsModal);
+setComponentTemplate(TEMPLATE$J, BsModal);
 
-const TEMPLATE$G = templateFactory(
+const TEMPLATE$I = templateFactory(
 /*
   <button
     type="button"
@@ -53296,9 +53553,9 @@ class BsButton extends GlimmerComponent {
     decorateMethodV2(this.prototype, "handleClick", [action]);
   }
 }
-setComponentTemplate(TEMPLATE$G, BsButton);
+setComponentTemplate(TEMPLATE$I, BsButton);
 
-const TEMPLATE$F = templateFactory(
+const TEMPLATE$H = templateFactory(
 /*
   {{yield this.click this.clickable.loading}}
 
@@ -53368,7 +53625,7 @@ let OxiClickableComponent$1 = class OxiClickableComponent extends GlimmerCompone
   }
   click(event) {
     if (this.clickable.confirm) {
-      set$2(this.clickable, "loading", true);
+      set$1(this.clickable, "loading", true);
       this.showConfirmDialog = true;
     } else {
       this.executeAction();
@@ -53429,16 +53686,16 @@ let OxiClickableComponent$1 = class OxiClickableComponent extends GlimmerCompone
     decorateMethodV2(this.prototype, "executeAction", [action]);
   }
   resetConfirmState() {
-    set$2(this.clickable, "loading", false);
+    set$1(this.clickable, "loading", false);
     this.showConfirmDialog = false;
   }
   static {
     decorateMethodV2(this.prototype, "resetConfirmState", [action]);
   }
 };
-setComponentTemplate(TEMPLATE$F, OxiClickableComponent$1);
+setComponentTemplate(TEMPLATE$H, OxiClickableComponent$1);
 
-const TEMPLATE$E = templateFactory(
+const TEMPLATE$G = templateFactory(
 /*
   <OxiBase::Clickable @clickable={{this.clickable}} as |clickHandler isLoading|>
     {{!-- <a href> mode --}}
@@ -53530,9 +53787,44 @@ class OxiClickableComponent extends GlimmerComponent {
     return Clickable.fromHash(this.args.button);
   }
 }
-setComponentTemplate(TEMPLATE$E, OxiClickableComponent);
+setComponentTemplate(TEMPLATE$G, OxiClickableComponent);
 
-const TEMPLATE$D = templateFactory(
+const TEMPLATE$F = templateFactory(
+/*
+  <!-- components/oxi-section/button -->
+<OxiBase::Button @button={{this.button}}>
+    {{#if @def.image}}
+        <img src={{@def.image}} alt="" />
+        <br/>
+    {{/if}}
+    {{@def.label}}
+</OxiBase::Button>
+
+*/
+{
+  "id": "SIaMB5K2",
+  "block": "[[[3,\" components/oxi-section/button \"],[1,\"\\n\"],[8,[32,0],null,[[\"@button\"],[[30,0,[\"button\"]]]],[[\"default\"],[[[[1,\"\\n\"],[41,[30,1,[\"image\"]],[[[1,\"        \"],[10,\"img\"],[15,\"src\",[30,1,[\"image\"]]],[14,\"alt\",\"\"],[12],[13],[1,\"\\n        \"],[10,\"br\"],[12],[13],[1,\"\\n\"]],[]],null],[1,\"    \"],[1,[30,1,[\"label\"]]],[1,\"\\n\"]],[]]]]],[1,\"\\n\"]],[\"@def\"],[\"if\",\"img\",\"br\"]]",
+  "moduleName": "/build/app/components/oxi-section/button/index.hbs",
+  "scope": () => [OxiClickableComponent],
+  "isStrictMode": false
+});
+
+class OxiSectionButtonComponent extends GlimmerComponent {
+  get button() {
+    return {
+      format: 'tile',
+      ...this.args.def
+    };
+  }
+}
+setComponentTemplate(TEMPLATE$F, OxiSectionButtonComponent);
+
+const __vite_glob_0_0$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+	__proto__: null,
+	default: OxiSectionButtonComponent
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const TEMPLATE$E = templateFactory(
 /*
   <!-- components/oxi-section/cards -->
 {{#if this.cards}}
@@ -53642,9 +53934,9 @@ class OxiSectionCardsComponent extends GlimmerComponent {
     return cards;
   }
 }
-setComponentTemplate(TEMPLATE$D, OxiSectionCardsComponent);
+setComponentTemplate(TEMPLATE$E, OxiSectionCardsComponent);
 
-const __vite_glob_0_0$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const __vite_glob_0_1$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: OxiSectionCardsComponent
 }, Symbol.toStringTag, { value: 'Module' }));
@@ -53701,14 +53993,20 @@ function ChartPie(element, opts, data) {
     title.textContent = opts.title;
   }
   let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  if (opts.legend_position === 'right' || opts.legend_position === 'left') {
+    addClass(root, `u-legend-${opts.legend_position}`);
+  }
   const wrap = placeDiv(WRAP, root);
   wrap.appendChild(svg);
-  wrap.style.width = opts.width + 'px';
-  wrap.style.height = opts.height + 'px';
-  svg.setAttribute('width', '100%');
-  svg.setAttribute('height', '100%');
+  const AUTO_SIZE_DEFAULT = 200;
+  const autoWidth = opts.width === 'auto';
+  const autoHeight = opts.height === 'auto';
+  // Initial size — will be corrected by ResizeObserver if auto
+  wrap.style.width = (autoWidth ? AUTO_SIZE_DEFAULT : opts.width) + 'px';
+  wrap.style.height = (autoHeight ? AUTO_SIZE_DEFAULT : opts.height) + 'px';
+  svg.setAttribute('class', 'pie-chart-svg');
   svg.setAttribute('viewBox', '0 0 100 100');
-  svg.setAttribute('preserveAspectRatio', 'xMidYMax');
+  svg.setAttribute('preserveAspectRatio', 'xMidYMin');
   let filled = 0;
   for (let row of data) {
     row.shift(); // time
@@ -53745,6 +54043,46 @@ function ChartPie(element, opts, data) {
     }
   }
   element.appendChild(root);
+  if (!autoWidth && !autoHeight) return;
+  const legendSide = opts.legend_position === 'right' || opts.legend_position === 'left';
+  const legendEl = root.querySelector('.u-legend');
+  const titleEl = root.querySelector('.u-title');
+
+  // Snapshot the height once. If zero the container is sized by its content,
+  // so fall back to a square (width-based) size.
+  const initialHeight = Math.floor(element.getBoundingClientRect().height);
+  const fixedHeight = autoHeight ? initialHeight || null : opts.height;
+  let lastCanvasWidth = null;
+  function resize() {
+    // Read the element's own rendered width - the CSS layout has already
+    // constrained it to the available space in its container.
+    const availWidth = autoWidth ? Math.max(1, Math.floor(element.getBoundingClientRect().width)) : opts.width;
+    const columnGap = autoWidth && legendSide ? Math.ceil(parseFloat(getComputedStyle(root).columnGap) || 0) : 0;
+    const legendWidth = autoWidth && legendSide && legendEl ? legendEl.offsetWidth : 0;
+    const titleHeight = autoHeight && titleEl ? titleEl.offsetHeight : 0;
+    const w = autoWidth ? Math.max(1, availWidth - columnGap - legendWidth) : opts.width;
+    if (w === lastCanvasWidth) return;
+    lastCanvasWidth = w;
+    root.style.maxWidth = availWidth + 'px';
+    const availH = fixedHeight ? Math.max(1, fixedHeight - titleHeight) : 0;
+    const h = autoHeight ? availH || w : opts.height; // square fallback when height unknown
+    wrap.style.width = w + 'px';
+    wrap.style.height = h + 'px';
+  }
+
+  // Initial size
+  resize();
+  const observer = new ResizeObserver(entries => {
+    const entry = entries[0];
+    if (!entry) return;
+    if (autoWidth && entry.contentRect.width < 1) return;
+    resize();
+  });
+
+  // Observe element's parent: element itself grows/shrinks with content,
+  // so we watch the containing block which is sized by CSS layout.
+  observer.observe(element.parentElement || element);
+  element._pieCleanup = () => observer.disconnect();
 }
 
 // From https://github.com/leeoniya/uPlot/blob/1.6.3/src/opts.js#L65
@@ -53799,6 +54137,16 @@ function reducedAlphaColor(cssColor) {
   Line and Bar chart class
 */
 async function ChartLineBar(element, opts, data) {
+  // uPlot calls new Intl.NumberFormat(navigator.language) when it first loads.
+  // Guard against invalid language tags (e.g. Playwright sets it to "undefined").
+  if (!navigator.language || navigator.language === 'undefined') {
+    try {
+      Object.defineProperty(Navigator.prototype, 'language', {
+        get: () => 'en-US',
+        configurable: true
+      });
+    } catch (e) {}
+  }
   const [{
     default: uPlot
   }, {
@@ -53833,7 +54181,13 @@ async function ChartLineBar(element, opts, data) {
     class: opts.cssClass,
     legend: {
       show: opts.legend_label,
-      live: opts.legend_value
+      live: opts.legend_value,
+      ...(opts.legend_label && (opts.legend_position === 'right' || opts.legend_position === 'left') && {
+        mount: (self, legendEl) => {
+          self.root.classList.add(`u-legend-${opts.legend_position}`);
+          self.root.appendChild(legendEl);
+        }
+      })
     },
     scales: {
       x: {
@@ -53931,6 +54285,9 @@ async function ChartLineBar(element, opts, data) {
     }
     uplotOptions.series.push(seriesOpts);
 
+    // Bar charts draw values on top of each bar via the plugin, so no y-axis needed.
+    if (opts.type == 'bar') continue;
+
     // add up to 2 axis (left and right)
     if (uplotOptions.axes.length < 3) {
       let axis = {
@@ -53938,7 +54295,7 @@ async function ChartLineBar(element, opts, data) {
         space: Math.max((opts.bar_vertical ? opts.width : opts.height) / 20, 15),
         //labelSize: 150,
         size: 60,
-        stroke: opts.type == 'bar' ? 'black' : color
+        stroke: color
       };
       // special treatment for percent
       if (scale == '%') uPlot.assign(axis, {
@@ -53959,20 +54316,106 @@ async function ChartLineBar(element, opts, data) {
       uplotOptions.axes.push(axis);
     }
   }
-  new uPlot(uplotOptions, uplotData, (uplot, init) => {
-    element.appendChild(uplot.root);
-    init();
+  function createChart(width, height) {
+    uplotOptions.width = width;
+    uplotOptions.height = height;
+    return new uPlot(uplotOptions, uplotData, (uplot, init) => {
+      element.appendChild(uplot.root);
+      init();
+    });
+  }
+  const autoWidth = opts.width === 'auto';
+  const autoHeight = opts.height === 'auto';
+
+  // FIXED size
+  if (!autoWidth && !autoHeight) {
+    createChart(opts.width, opts.height);
+    return;
+  }
+
+  // AUTO size
+  const AUTO_HEIGHT_DEFAULT = 200;
+  let chart = null;
+  let lastCanvasWidth = null;
+  // legendReserved: the fixed amount to subtract from availWidth for the side legend
+  // (legendWidth + columnGap). Measured once on first render; label text never changes.
+  let legendReserved = 0;
+
+  // Snapshot the container height before first render. If zero the container
+  // is sized by its content, so use the fallback.
+  const initialHeight = Math.floor(element.getBoundingClientRect().height);
+  let fixedHeight = autoHeight ? initialHeight || AUTO_HEIGHT_DEFAULT : opts.height;
+  const legendSide = opts.legend_position === 'right' || opts.legend_position === 'left';
+
+  // Initial render: create chart, measure title and legend, recreate once if needed.
+  function initialRender() {
+    const availWidth = autoWidth ? Math.max(1, Math.floor(element.getBoundingClientRect().width)) : opts.width;
+    chart = createChart(availWidth, fixedHeight);
+
+    // Measure and subtract title height once so it does not overflow the container.
+    const titleEl = element.querySelector('.u-title');
+    if (titleEl && titleEl.offsetHeight > 0) {
+      fixedHeight = Math.max(1, fixedHeight - titleEl.offsetHeight);
+      chart.destroy();
+      element.innerHTML = '';
+      chart = createChart(availWidth, fixedHeight);
+    }
+
+    // When legend is on the side, measure legend width + column-gap and subtract
+    // from canvas width so canvas + gap + legend fits the container.
+    if (autoWidth && legendSide) {
+      const legendEl = element.querySelector('.u-legend');
+      const uplotRoot = element.querySelector('.uplot');
+      if (legendEl && uplotRoot) {
+        const columnGap = Math.ceil(parseFloat(getComputedStyle(uplotRoot).columnGap) || 0);
+        const legendWidth = Math.ceil(legendEl.getBoundingClientRect().width);
+        if (legendWidth > 0 && legendWidth < availWidth) {
+          legendReserved = columnGap + legendWidth;
+          const canvasWidth = availWidth - legendReserved;
+          chart.destroy();
+          element.innerHTML = '';
+          chart = createChart(canvasWidth, fixedHeight);
+          lastCanvasWidth = canvasWidth;
+          return;
+        }
+      }
+    }
+    lastCanvasWidth = availWidth;
+  }
+  initialRender();
+  const observer = new ResizeObserver(entries => {
+    const entry = entries[0];
+    if (!entry) return;
+    if (autoWidth && entry.contentRect.width < 1) return;
+    const availWidth = autoWidth ? Math.max(1, Math.floor(element.getBoundingClientRect().width)) : opts.width;
+    const canvasWidth = availWidth - legendReserved;
+    if (canvasWidth === lastCanvasWidth) return;
+    lastCanvasWidth = canvasWidth;
+    chart.setSize({
+      width: canvasWidth,
+      height: fixedHeight
+    });
   });
+
+  // Observe element's parent: element itself grows/shrinks with uPlot content,
+  // so we watch the containing block which is sized by CSS layout.
+  observer.observe(element.parentElement || element);
+
+  // Store cleanup function so the Ember component can disconnect the observer
+  element._uplotCleanup = () => {
+    observer.disconnect();
+    if (chart) chart.destroy();
+  };
 }
 
-const TEMPLATE$C = templateFactory(
+const TEMPLATE$D = templateFactory(
 /*
-  <div class={{this.guid}} {{on-init this.plot}}></div>
+  <div class="oxi-chart {{this.guid}}" {{on-init this.plot}}></div>
 
 */
 {
-  "id": "GdfscxsC",
-  "block": "[[[11,0],[16,0,[30,0,[\"guid\"]]],[4,[32,0],[[30,0,[\"plot\"]]],null],[12],[13],[1,\"\\n\"]],[],[\"div\"]]",
+  "id": "lENucOfP",
+  "block": "[[[11,0],[16,0,[29,[\"oxi-chart \",[30,0,[\"guid\"]]]]],[4,[32,0],[[30,0,[\"plot\"]]],null],[12],[13],[1,\"\\n\"]],[],[\"div\"]]",
   "moduleName": "/build/app/components/oxi-base/chart/index.hbs",
   "scope": () => [OnInitModifier],
   "isStrictMode": false
@@ -53991,8 +54434,8 @@ class OxiChartComponent extends GlimmerComponent {
       Option defaults
     */
     const defaults = {
-      width: 400,
-      height: 200,
+      width: 'auto',
+      height: 'auto',
       title: "",
       cssClass: null,
       type: 'line',
@@ -54001,6 +54444,7 @@ class OxiChartComponent extends GlimmerComponent {
       // Only 'line' and 'bar' chart:
       legend_value: false,
       legend_date_format: '{YYYY}-{MM}-{DD}, {HH}:{mm}:{ss}',
+      legend_position: 'bottom',
       x_is_timestamp: true,
       bar_vertical: false
     };
@@ -54045,14 +54489,20 @@ class OxiChartComponent extends GlimmerComponent {
     } else {
       throw new Error(`Unknown chart type '${type}'`);
     }
+    if (element._uplotCleanup) {
+      registerDestructor(this, () => element._uplotCleanup());
+    }
+    if (element._pieCleanup) {
+      registerDestructor(this, () => element._pieCleanup());
+    }
   }
   static {
     decorateMethodV2(this.prototype, "plot", [action]);
   }
 }
-setComponentTemplate(TEMPLATE$C, OxiChartComponent);
+setComponentTemplate(TEMPLATE$D, OxiChartComponent);
 
-const TEMPLATE$B = templateFactory(
+const TEMPLATE$C = templateFactory(
 /*
   <!-- components/oxi-section/chart -->
 <OxiBase::Chart @data={{@def.data}} @options={{this.options}} />
@@ -54077,9 +54527,9 @@ let OxiSectionKeyvalueComponent$1 = class OxiSectionKeyvalueComponent extends Gl
     };
   }
 };
-setComponentTemplate(TEMPLATE$B, OxiSectionKeyvalueComponent$1);
+setComponentTemplate(TEMPLATE$C, OxiSectionKeyvalueComponent$1);
 
-const __vite_glob_0_1$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const __vite_glob_0_2$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: OxiSectionKeyvalueComponent$1
 }, Symbol.toStringTag, { value: 'Module' }));
@@ -54395,7 +54845,7 @@ const _importSync20 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.definePrope
   module.default;
 }
 
-const TEMPLATE$A = templateFactory(
+const TEMPLATE$B = templateFactory(
 /*
   <!-- components/oxi-section/form/field/bool -->
 <div class="form-check">
@@ -54429,7 +54879,7 @@ class OxiFieldBoolComponent extends GlimmerComponent {
     decorateMethodV2(this.prototype, "onInput", [action]);
   }
 }
-setComponentTemplate(TEMPLATE$A, OxiFieldBoolComponent);
+setComponentTemplate(TEMPLATE$B, OxiFieldBoolComponent);
 
 const __vite_glob_0_0 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
@@ -56617,7 +57067,7 @@ if (typeof window !== "undefined") {
   window.flatpickr = flatpickr;
 }
 
-const TEMPLATE$z = templateFactory(
+const TEMPLATE$A = templateFactory(
 /*
   <input
   class="ember-flatpickr-input"
@@ -56705,9 +57155,9 @@ class EmberFlatpickr extends GlimmerComponent {
   _onOpen() {}
   _onReady() {}
 }
-setComponentTemplate(TEMPLATE$z, EmberFlatpickr);
+setComponentTemplate(TEMPLATE$A, EmberFlatpickr);
 
-const TEMPLATE$y = templateFactory(
+const TEMPLATE$z = templateFactory(
 /*
   <!-- components/oxi-section/form/field/datetime -->
 <div class="row">
@@ -56854,14 +57304,14 @@ class OxiFieldDatetimeComponent extends GlimmerComponent {
     decorateMethodV2(this.prototype, "datePicked", [action]);
   }
 }
-setComponentTemplate(TEMPLATE$y, OxiFieldDatetimeComponent);
+setComponentTemplate(TEMPLATE$z, OxiFieldDatetimeComponent);
 
 const __vite_glob_0_1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: OxiFieldDatetimeComponent
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const TEMPLATE$x = templateFactory(
+const TEMPLATE$y = templateFactory(
 /*
   <!-- components/oxi-section/form/field/password -->
 <input
@@ -56892,14 +57342,14 @@ class OxiFieldPasswordComponent extends GlimmerComponent {
     decorateMethodV2(this.prototype, "onInput", [action]);
   }
 }
-setComponentTemplate(TEMPLATE$x, OxiFieldPasswordComponent);
+setComponentTemplate(TEMPLATE$y, OxiFieldPasswordComponent);
 
-const __vite_glob_0_2$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const __vite_glob_0_2 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: OxiFieldPasswordComponent
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const TEMPLATE$w = templateFactory(
+const TEMPLATE$x = templateFactory(
 /*
   <!-- components/oxi-section/form/field/passwordverify -->
 {{#if this.isFixed}}
@@ -57008,14 +57458,14 @@ class OxiFieldPasswordverifyComponent extends GlimmerComponent {
     decorateMethodV2(this.prototype, "confirmPasswordChange", [action]);
   }
 }
-setComponentTemplate(TEMPLATE$w, OxiFieldPasswordverifyComponent);
+setComponentTemplate(TEMPLATE$x, OxiFieldPasswordverifyComponent);
 
 const __vite_glob_0_3$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: OxiFieldPasswordverifyComponent
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const TEMPLATE$v = templateFactory(
+const TEMPLATE$w = templateFactory(
 /*
   <!-- components/oxi-section/form/field/rawtext -->
 <input
@@ -57046,14 +57496,14 @@ class OxiFieldRawtextComponent extends GlimmerComponent {
     decorateMethodV2(this.prototype, "onInput", [action]);
   }
 }
-setComponentTemplate(TEMPLATE$v, OxiFieldRawtextComponent);
+setComponentTemplate(TEMPLATE$w, OxiFieldRawtextComponent);
 
 const __vite_glob_0_4$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: OxiFieldRawtextComponent
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const TEMPLATE$u = templateFactory(
+const TEMPLATE$v = templateFactory(
 /*
   {{#if @showIf}}
     <div class="input-group has-validation">
@@ -57071,7 +57521,7 @@ const TEMPLATE$u = templateFactory(
   "isStrictMode": false
 });
 
-const OxiBaseInputGroup = setComponentTemplate(TEMPLATE$u, templateOnly());
+const OxiBaseInputGroup = setComponentTemplate(TEMPLATE$v, templateOnly());
 
 /*! choices.js v11.2.1 | © 2026 Josh Johnson | https://github.com/Choices-js/Choices#readme */
 
@@ -58579,7 +59029,7 @@ function _toPropertyKey$1(t) {
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-function isArray$2(value) {
+function isArray(value) {
   return !Array.isArray ? getTag(value) === '[object Array]' : Array.isArray(value);
 }
 function baseToString(value) {
@@ -58590,7 +59040,7 @@ function baseToString(value) {
   let result = value + '';
   return result == '0' && 1 / value == -Infinity ? '-0' : result;
 }
-function toString$1(value) {
+function toString(value) {
   return value == null ? '' : baseToString(value);
 }
 function isString(value) {
@@ -58663,7 +59113,7 @@ function createKey(key) {
   let src = null;
   let weight = 1;
   let getFn = null;
-  if (isString(key) || isArray$2(key)) {
+  if (isString(key) || isArray(key)) {
     src = key;
     path = createKeyPath(key);
     id = createKeyId(key);
@@ -58692,10 +59142,10 @@ function createKey(key) {
   };
 }
 function createKeyPath(key) {
-  return isArray$2(key) ? key : key.split('.');
+  return isArray(key) ? key : key.split('.');
 }
 function createKeyId(key) {
-  return isArray$2(key) ? key.join('.') : key;
+  return isArray(key) ? key.join('.') : key;
 }
 function get(obj, path) {
   let list = [];
@@ -58717,8 +59167,8 @@ function get(obj, path) {
       // If we're at the last value in the path, and if it's a string/number/bool,
       // add it to the list
       if (index === path.length - 1 && (isString(value) || isNumber(value) || isBoolean(value))) {
-        list.push(toString$1(value));
-      } else if (isArray$2(value)) {
+        list.push(toString(value));
+      } else if (isArray(value)) {
         arr = true;
         // Search each item in the array.
         for (let i = 0, len = value.length; i < len; i += 1) {
@@ -58906,7 +59356,7 @@ class FuseIndex {
       if (!isDefined(value)) {
         return;
       }
-      if (isArray$2(value)) {
+      if (isArray(value)) {
         let subRecords = [];
         const stack = [{
           nestedArrIndex: -1,
@@ -58927,7 +59377,7 @@ class FuseIndex {
               n: this.norm.get(value)
             };
             subRecords.push(subRecord);
-          } else if (isArray$2(value)) {
+          } else if (isArray(value)) {
             value.forEach((item, k) => {
               stack.push({
                 nestedArrIndex: k,
@@ -59751,7 +60201,7 @@ const KeyType = {
 };
 const isExpression = query => !!(query[LogicalOperator.AND] || query[LogicalOperator.OR]);
 const isPath = query => !!query[KeyType.PATH];
-const isLeaf = query => !isArray$2(query) && isObject(query) && !isExpression(query);
+const isLeaf = query => !isArray(query) && isObject(query) && !isExpression(query);
 const convertToExplicit = query => ({
   [LogicalOperator.AND]: Object.keys(query).map(key => ({
     [key]: query[key]
@@ -59760,7 +60210,7 @@ const convertToExplicit = query => ({
 
 // When `auto` is `true`, the parse function will infer and initialize and add
 // the appropriate `Searcher` instance
-function parse$3(query, options, {
+function parse$1(query, options, {
   auto = true
 } = {}) {
   const next = query => {
@@ -59790,7 +60240,7 @@ function parse$3(query, options, {
     };
     keys.forEach(key => {
       const value = query[key];
-      if (isArray$2(value)) {
+      if (isArray(value)) {
         value.forEach(item => {
           node.children.push(next(item));
         });
@@ -59980,7 +60430,7 @@ class Fuse {
     return results;
   }
   _searchLogical(query) {
-    const expression = parse$3(query, this.options);
+    const expression = parse$1(query, this.options);
     const evaluate = (node, item, idx) => {
       if (!node.children) {
         const {
@@ -60087,7 +60537,7 @@ class Fuse {
       return [];
     }
     let matches = [];
-    if (isArray$2(value)) {
+    if (isArray(value)) {
       value.forEach(({
         v: text,
         i: idx,
@@ -60140,7 +60590,7 @@ Fuse.createIndex = createIndex;
 Fuse.parseIndex = parseIndex;
 Fuse.config = Config;
 {
-  Fuse.parseQuery = parse$3;
+  Fuse.parseQuery = parse$1;
 }
 {
   register(ExtendedSearch);
@@ -62548,7 +62998,7 @@ var Choices = /** @class */function () {
   return Choices;
 }();
 
-const TEMPLATE$t = templateFactory(
+const TEMPLATE$u = templateFactory(
 /*
   <OxiBase::InputGroup
     @showIf={{not (or @noInputGroup @inline)}}
@@ -62649,6 +63099,7 @@ class OxiSelectComponent extends GlimmerComponent {
       }
     });
     if (this.args.onInsert) this.args.onInsert(element);
+    if (this.args.setFocusInfo) this.args.setFocusInfo(this.#choicesObj.containerOuter.element, true);
     this.notifyOnChange();
   }
   static {
@@ -62678,9 +63129,9 @@ class OxiSelectComponent extends GlimmerComponent {
     decorateMethodV2(this.prototype, "clear", [action]);
   }
 }
-setComponentTemplate(TEMPLATE$t, OxiSelectComponent);
+setComponentTemplate(TEMPLATE$u, OxiSelectComponent);
 
-const TEMPLATE$s = templateFactory(
+const TEMPLATE$t = templateFactory(
 /*
   <!-- components/oxi-section/form/field/select -->
 {{#if this.isStatic}}
@@ -62713,8 +63164,8 @@ const TEMPLATE$s = templateFactory(
                 @showClearButton={{@content.is_optional}}
                 @noInputGroup={{@content.editable}}
                 @inline={{@content.inline}}
+                @setFocusInfo={{@setFocusInfo}}
                 required={{not @content.is_optional}}
-                {{on-init @setFocusInfo true}}
             />
         {{/if}}
         {{#if @content.editable}}
@@ -62734,8 +63185,8 @@ const TEMPLATE$s = templateFactory(
 
 */
 {
-  "id": "IfOTMnpK",
-  "block": "[[[3,\" components/oxi-section/form/field/select \"],[1,\"\\n\"],[41,[30,0,[\"isStatic\"]],[[[1,\"    \"],[11,0],[24,0,\"oxi-no-input\"],[4,[32,0],[[30,1],false],null],[12],[1,\"\\n        \"],[1,[30,2,[\"options\",\"0\",\"label\"]]],[1,\"\\n    \"],[13],[1,\"\\n\"]],[]],[[[1,\"    \"],[8,[32,1],null,[[\"@showIf\"],[[30,2,[\"editable\"]]]],[[\"default\"],[[[[1,\"\\n\"],[41,[30,0,[\"customMode\"]],[[[1,\"            \"],[11,\"input\"],[24,0,\"form-control\"],[16,2,[30,2,[\"value\"]]],[16,\"placeholder\",[30,2,[\"placeholder\"]]],[16,\"required\",[28,[32,2],[[30,2,[\"is_optional\"]]],null]],[24,4,\"text\"],[4,[32,3],[\"input\",[30,0,[\"onCustomInput\"]]],null],[4,[32,0],[[30,0,[\"onCustomInsert\"]]],null],[4,[32,0],[[30,1],true],null],[12],[13],[1,\"\\n\"]],[]],[[[1,\"            \"],[8,[32,4],[[16,\"required\",[28,[32,2],[[30,2,[\"is_optional\"]]],null]],[4,[32,0],[[30,1],true],null]],[[\"@list\",\"@selected\",\"@onChange\",\"@placeholder\",\"@showClearButton\",\"@noInputGroup\",\"@inline\"],[[30,2,[\"options\"]],[30,2,[\"value\"]],[30,0,[\"optionSelected\"]],[30,0,[\"placeholder\"]],[30,2,[\"is_optional\"]],[30,2,[\"editable\"]],[30,2,[\"inline\"]]]],null],[1,\"\\n\"]],[]]],[41,[30,2,[\"editable\"]],[[[1,\"            \"],[8,[32,5],[[24,0,\"bg-secondary-subtle border-secondary\"]],[[\"@type\",\"@active\",\"@onClick\"],[\"sm\",[30,0,[\"customMode\"]],[30,0,[\"toggleCustomMode\"]]]],[[\"default\"],[[[[1,\"\\n                \"],[10,1],[15,0,[29,[\"bi \",[52,[30,0,[\"customMode\"]],\"bi-check-circle-fill\",\"bi-circle\"]]]],[12],[13],[1,\"\\n                \"],[1,[28,[32,6],[\"component.oxifield_select.custom_value\"],null]],[1,\"\\n            \"]],[]]]]],[1,\"\\n\"]],[]],null],[1,\"        \"],[41,[30,3],[[[10,0],[14,0,\"invalid-feedback\"],[12],[1,[30,3]],[13]],[]],null],[1,\"\\n    \"]],[]]]]],[1,\"\\n\"]],[]]]],[\"@setFocusInfo\",\"@content\",\"@error\"],[\"if\",\"div\",\"input\",\"span\"]]",
+  "id": "PMT2EMWl",
+  "block": "[[[3,\" components/oxi-section/form/field/select \"],[1,\"\\n\"],[41,[30,0,[\"isStatic\"]],[[[1,\"    \"],[11,0],[24,0,\"oxi-no-input\"],[4,[32,0],[[30,1],false],null],[12],[1,\"\\n        \"],[1,[30,2,[\"options\",\"0\",\"label\"]]],[1,\"\\n    \"],[13],[1,\"\\n\"]],[]],[[[1,\"    \"],[8,[32,1],null,[[\"@showIf\"],[[30,2,[\"editable\"]]]],[[\"default\"],[[[[1,\"\\n\"],[41,[30,0,[\"customMode\"]],[[[1,\"            \"],[11,\"input\"],[24,0,\"form-control\"],[16,2,[30,2,[\"value\"]]],[16,\"placeholder\",[30,2,[\"placeholder\"]]],[16,\"required\",[28,[32,2],[[30,2,[\"is_optional\"]]],null]],[24,4,\"text\"],[4,[32,3],[\"input\",[30,0,[\"onCustomInput\"]]],null],[4,[32,0],[[30,0,[\"onCustomInsert\"]]],null],[4,[32,0],[[30,1],true],null],[12],[13],[1,\"\\n\"]],[]],[[[1,\"            \"],[8,[32,4],[[16,\"required\",[28,[32,2],[[30,2,[\"is_optional\"]]],null]]],[[\"@list\",\"@selected\",\"@onChange\",\"@placeholder\",\"@showClearButton\",\"@noInputGroup\",\"@inline\",\"@setFocusInfo\"],[[30,2,[\"options\"]],[30,2,[\"value\"]],[30,0,[\"optionSelected\"]],[30,0,[\"placeholder\"]],[30,2,[\"is_optional\"]],[30,2,[\"editable\"]],[30,2,[\"inline\"]],[30,1]]],null],[1,\"\\n\"]],[]]],[41,[30,2,[\"editable\"]],[[[1,\"            \"],[8,[32,5],[[24,0,\"bg-secondary-subtle border-secondary\"]],[[\"@type\",\"@active\",\"@onClick\"],[\"sm\",[30,0,[\"customMode\"]],[30,0,[\"toggleCustomMode\"]]]],[[\"default\"],[[[[1,\"\\n                \"],[10,1],[15,0,[29,[\"bi \",[52,[30,0,[\"customMode\"]],\"bi-check-circle-fill\",\"bi-circle\"]]]],[12],[13],[1,\"\\n                \"],[1,[28,[32,6],[\"component.oxifield_select.custom_value\"],null]],[1,\"\\n            \"]],[]]]]],[1,\"\\n\"]],[]],null],[1,\"        \"],[41,[30,3],[[[10,0],[14,0,\"invalid-feedback\"],[12],[1,[30,3]],[13]],[]],null],[1,\"\\n    \"]],[]]]]],[1,\"\\n\"]],[]]]],[\"@setFocusInfo\",\"@content\",\"@error\"],[\"if\",\"div\",\"input\",\"span\"]]",
   "moduleName": "/build/app/components/oxi-section/form/field/select/index.hbs",
   "scope": () => [OnInitModifier, OxiBaseInputGroup, Not, on, OxiSelectComponent, BsButton, THelper],
   "isStrictMode": false
@@ -62781,7 +63232,7 @@ class OxiFieldSelectComponent extends GlimmerComponent {
     }
   }
   optionSelected(value) {
-    debug$1("oxifield-select (" + this.args.content.name + "): optionSelected(" + value + ")");
+    debug$1(`oxifield-select (${this.args.content.name}): optionSelected(${value})`);
     this.args.onChange(value);
   }
   static {
@@ -62812,14 +63263,14 @@ class OxiFieldSelectComponent extends GlimmerComponent {
     decorateMethodV2(this.prototype, "onCustomInput", [action]);
   }
 }
-setComponentTemplate(TEMPLATE$s, OxiFieldSelectComponent);
+setComponentTemplate(TEMPLATE$t, OxiFieldSelectComponent);
 
 const __vite_glob_0_5$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: OxiFieldSelectComponent
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const TEMPLATE$r = templateFactory(
+const TEMPLATE$s = templateFactory(
 /*
   <!-- components/oxi-section/form/field/static -->
 <div class="oxi-no-input" {{on-init @setFocusInfo false}}>
@@ -62841,14 +63292,14 @@ const TEMPLATE$r = templateFactory(
   "isStrictMode": false
 });
 
-const index = setComponentTemplate(TEMPLATE$r, templateOnly());
+const index = setComponentTemplate(TEMPLATE$s, templateOnly());
 
-const __vite_glob_0_6 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const __vite_glob_0_6$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: index
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const TEMPLATE$q = templateFactory(
+const TEMPLATE$r = templateFactory(
 /*
   <!-- components/oxi-section/form/field/text -->
 {{!-- template-lint-disable no-invalid-interactive --}}
@@ -63056,7 +63507,7 @@ class OxiFieldTextComponent extends GlimmerComponent {
         }
         this.searchResults = doc;
         if (doc[0] != null) {
-          set$2(doc[0], "active", true);
+          set$1(doc[0], "active", true);
         }
         this.isDropdownOpen = true;
       }).catch(err => {
@@ -63106,10 +63557,10 @@ class OxiFieldTextComponent extends GlimmerComponent {
       return;
     }
     let a = results.find(i => i.active == true);
-    set$2(a, "active", false);
+    set$1(a, "active", false);
     let index = (results.indexOf(a) + diff + results.length) % results.length;
     a = results[index];
-    return set$2(a, "active", true);
+    return set$1(a, "active", true);
   }
   onFocus() {
     if (this.isAutoComplete) {
@@ -63157,14 +63608,14 @@ class OxiFieldTextComponent extends GlimmerComponent {
     decorateMethodV2(this.prototype, "selectResult", [action]);
   }
 }
-setComponentTemplate(TEMPLATE$q, OxiFieldTextComponent);
+setComponentTemplate(TEMPLATE$r, OxiFieldTextComponent);
 
-const __vite_glob_0_7 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const __vite_glob_0_7$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: OxiFieldTextComponent
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const TEMPLATE$p = templateFactory(
+const TEMPLATE$q = templateFactory(
 /*
   <BsButton
     class="oxi-btn-exceptional btn-sm"
@@ -63296,9 +63747,9 @@ class Autofill extends GlimmerComponent {
     });
   }
 }
-setComponentTemplate(TEMPLATE$p, Autofill);
+setComponentTemplate(TEMPLATE$q, Autofill);
 
-const TEMPLATE$o = templateFactory(
+const TEMPLATE$p = templateFactory(
 /*
   <!-- components/oxi-section/form/field/textarea -->
 <div class="row">
@@ -63537,14 +63988,14 @@ class OxiFieldTextareaComponent extends GlimmerComponent {
     this.args.onChange(value);
   }
 }
-setComponentTemplate(TEMPLATE$o, OxiFieldTextareaComponent);
+setComponentTemplate(TEMPLATE$p, OxiFieldTextareaComponent);
 
 const __vite_glob_0_8 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: OxiFieldTextareaComponent
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const TEMPLATE$n = templateFactory(
+const TEMPLATE$o = templateFactory(
 /*
   <!-- components/oxi-section/form/field -->
 <div class="row {{if @field.is_optional "optional" "required"}} {{@field.class}} py-1">
@@ -63628,9 +64079,42 @@ const TEMPLATE$n = templateFactory(
   "isStrictMode": false
 });
 
-const fieldModules = Object.fromEntries(Object.entries(/* #__PURE__ */ Object.assign({"./bool/index.js": __vite_glob_0_0,"./datetime/index.js": __vite_glob_0_1,"./password/index.js": __vite_glob_0_2$1,"./passwordverify/index.js": __vite_glob_0_3$1,"./rawtext/index.js": __vite_glob_0_4$1,"./select/index.js": __vite_glob_0_5$1,"./static/index.js": __vite_glob_0_6,"./text/index.js": __vite_glob_0_7,"./textarea/index.js": __vite_glob_0_8
+const fieldModules = Object.fromEntries(Object.entries(/* #__PURE__ */ Object.assign({"./bool/index.js": __vite_glob_0_0,"./datetime/index.js": __vite_glob_0_1,"./password/index.js": __vite_glob_0_2,"./passwordverify/index.js": __vite_glob_0_3$1,"./rawtext/index.js": __vite_glob_0_4$1,"./select/index.js": __vite_glob_0_5$1,"./static/index.js": __vite_glob_0_6$1,"./text/index.js": __vite_glob_0_7$1,"./textarea/index.js": __vite_glob_0_8
 
 })).map(([path, mod]) => [path.replace(/^\.\/(.+)\/index\.js$/, '$1'), mod]));
+
+/**
+ * Dispatcher for form field sub-components.
+ * Reads the field type from `@field.type` and dynamically loads the matching
+ * sub-component from `oxi-section/form/field/<type>/`.
+ *
+ * ```html
+ * <OxiSection::Form::Field
+ *     @field={{field}}
+ *     @setValue={{this.setValue}}
+ *     @setName={{fn this.setName field}}
+ *     @setError={{fn this.setError field}}
+ *     @setFocusInfo={{fn this.setFocusInfo field}}
+ *     @encodeFields={{this.encodeFields}}
+ *     @onSubmit={{this.submit}}
+ *     @addClone={{this.addClone}}
+ *     @delClone={{this.delClone}}
+ * />
+ * ```
+ *
+ * @param { Field } field - The {@link Field} data object for this row.
+ * @param { function } setValue - Callback to update the field value: `(field, value)`.
+ * @param { function } setName - Callback to rename a dynamic input field: `(value)`.
+ * @param { function } setError - Callback to set a validation error message: `(message)`.
+ * @param { function } setFocusInfo - Callback to register a DOM element for focus management: `(field, element, takesInput)`.
+ * @param { function } encodeFields - Callback to encode sibling field values for autocomplete requests.
+ * @param { function } onSubmit - Callback invoked when Enter is pressed inside the field.
+ * @param { function } [addClone] - Callback to add a clone of a clonable field.
+ * @param { function } [delClone] - Callback to remove a clone of a clonable field.
+ *
+ * @class OxiSection::Form::Field
+ * @extends Component
+ */
 class OxiFieldMainComponent extends GlimmerComponent {
   static {
     decorateFieldV2(this.prototype, "backend", [service('oxi-backend')]);
@@ -63719,9 +64203,9 @@ class OxiFieldMainComponent extends GlimmerComponent {
     decorateMethodV2(this.prototype, "onKeydown", [action]);
   }
 }
-setComponentTemplate(TEMPLATE$n, OxiFieldMainComponent);
+setComponentTemplate(TEMPLATE$o, OxiFieldMainComponent);
 
-const TEMPLATE$m = templateFactory(
+const TEMPLATE$n = templateFactory(
 /*
   {{#if (or this.hasButtons (has-block))}}
     <div class="oxi-button-container mt-3">
@@ -63811,9 +64295,9 @@ class OxiButtonContainerComponent extends GlimmerComponent {
     return this.buttons.length > 0;
   }
 }
-setComponentTemplate(TEMPLATE$m, OxiButtonContainerComponent);
+setComponentTemplate(TEMPLATE$n, OxiButtonContainerComponent);
 
-const TEMPLATE$l = templateFactory(
+const TEMPLATE$m = templateFactory(
 /*
   <!-- components/oxi-section/form -->
 {{!
@@ -63942,7 +64426,7 @@ class OxiSectionFormComponent extends GlimmerComponent {
         }
         // process presets (array of key/value pairs): insert clones
         // NOTE: this does NOT support dynamic input fields
-        if (isArray$5(field.value)) {
+        if (isArray$3(field.value)) {
           let values = field.value.length ? field.value : [""];
           // add clones to field list
           result.push(...values.map(v => {
@@ -64132,9 +64616,11 @@ class OxiSectionFormComponent extends GlimmerComponent {
   }
 
   /**
-   * @param field { hash } - field definition (gets passed in via this components' template, i.e. is a reference to this components' "model")
-   * @param value { string } - the field's new value
-   * @param skipValidityChecks { bool } - set to `true` to skip validity checks
+   * Set a field's value, run validation, handle dependants and `actionOnChange`.
+   *
+   * @param { Field } field - Field object to update (gets passed in via this components' template, i.e. is a reference to this components' "model").
+   * @param { string } value - New value to assign.
+   * @param { boolean } [skipValidityChecks=false] - Skip regex and required-field validation.
    * @memberOf OxiSection::Form
    */
   setFieldValue(field, value, skipValidityChecks = false) {
@@ -64213,7 +64699,10 @@ class OxiSectionFormComponent extends GlimmerComponent {
   }
 
   /**
-   * @param field { hash } - field definition (gets passed in via this components' template, i.e. is a reference to this components' "model")
+   * Change the submitted name of a dynamic input field (key/value pair type).
+   *
+   * @param { Field } field - Field object whose name should change (gets passed in via this components' template, i.e. is a reference to this components' "model").
+   * @param { string } name - New field name (key).
    * @memberOf OxiSection::Form
    */
   setFieldName(field, name) {
@@ -64222,7 +64711,12 @@ class OxiSectionFormComponent extends GlimmerComponent {
   }
 
   /**
-   * @param field { hash } - field definition (gets passed in via this components' template, i.e. is a reference to this components' "model")
+   * Set or clear the validation error message for a field.
+   * Also updates the DOM element's `setCustomValidity` state.
+   *
+   * @param { Field } field - Field object to update (gets passed in via this components' template, i.e. is a reference to this components' "model").
+   * @param { string|null } message - Error message, or `null`/`""` to clear.
+   * @param { boolean } [isServerError=false] - If `true`, stored as a server-side error (not reset on user input).
    * @memberOf OxiSection::Form
    */
   static {
@@ -64240,12 +64734,15 @@ class OxiSectionFormComponent extends GlimmerComponent {
     let domElement = this.domElementsByFieldId[field._id];
     if (!domElement) return;
     if (!message) message = ''; // setCustomValidity() requires empty string to reset error
-    if (domElement) domElement.setCustomValidity(message);
+    if (domElement && typeof domElement.setCustomValidity === 'function') domElement.setCustomValidity(message);
   }
 
   /**
-   * @param fieldNames { array } - the list of field names to encode
-   * @param renameMap { Map } - optional mappings: source field name => target field name
+   * Encode a subset of fields into a plain object suitable for a backend request.
+   * Called by sub-components (e.g. file-upload fields) that need to bundle sibling field values.
+   *
+   * @param { string[] } fieldNames - Names of the fields to encode.
+   * @param { Map } [renameMap] - Optional source-name to target-name mappings applied before encoding.
    * @memberOf OxiSection::Form
    */
   static {
@@ -64267,14 +64764,17 @@ class OxiSectionFormComponent extends GlimmerComponent {
   }
 
   /**
-   * Sub components of {@link OxiSection::Form::Field} should call this by using
-   * the `{{on-init}}` modifier:
+   * Register a DOM element for a field so focus and custom validity can be managed.
+   * Called by sub-components of {@link OxiSection::Form::Field} via the `{{on-init}}` modifier using the passed `@setFocusInfo wrapper`:
    * ```html
    * {{on-init @setFocusInfo true}}
    * {{on-init @setFocusInfo false}}
    * ```
-   * depending on if it is an editable input field that may sensibly receive
-   * the focus.
+   * "on-init" automatically passed the element as first argument. `true` should be passed as second argument if the element is an editable input that may sensibly receive focus.
+   *
+   * @param { Field } field - Field object (injected in the template via `(fn ...)`).
+   * @param { HTMLElement } element - The rendered DOM input element.
+   * @param { boolean } takesInput - Whether the element accepts user input (and should participate in focus management).
    * @memberOf OxiSection::Form
    */
   registerField(field, element, takesInput) {
@@ -64351,14 +64851,14 @@ class OxiSectionFormComponent extends GlimmerComponent {
     decorateMethodV2(this.prototype, "submit", [action]);
   }
 }
-setComponentTemplate(TEMPLATE$l, OxiSectionFormComponent);
+setComponentTemplate(TEMPLATE$m, OxiSectionFormComponent);
 
-const __vite_glob_0_2 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const __vite_glob_0_3 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: OxiSectionFormComponent
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const TEMPLATE$k = templateFactory(
+const TEMPLATE$l = templateFactory(
 /*
   <div class="row justify-content-end" ...attributes>
     {{#if @pages.length}}
@@ -64416,9 +64916,9 @@ const TEMPLATE$k = templateFactory(
   "isStrictMode": false
 });
 
-const OxiSectionGridPagination = setComponentTemplate(TEMPLATE$k, templateOnly());
+const OxiSectionGridPagination = setComponentTemplate(TEMPLATE$l, templateOnly());
 
-const TEMPLATE$j = templateFactory(
+const TEMPLATE$k = templateFactory(
 /*
   <button
     type="button"
@@ -64438,9 +64938,9 @@ const TEMPLATE$j = templateFactory(
   "isStrictMode": false
 });
 
-const bsDropdownToggle = setComponentTemplate(TEMPLATE$j, templateOnly());
+const bsDropdownToggle = setComponentTemplate(TEMPLATE$k, templateOnly());
 
-const TEMPLATE$i = templateFactory(
+const TEMPLATE$j = templateFactory(
 /*
   <li ...attributes>
     {{yield}}
@@ -64454,9 +64954,9 @@ const TEMPLATE$i = templateFactory(
   "isStrictMode": false
 });
 
-const bsDropdownMenuItem = setComponentTemplate(TEMPLATE$i, templateOnly());
+const bsDropdownMenuItem = setComponentTemplate(TEMPLATE$j, templateOnly());
 
-const TEMPLATE$h = templateFactory(
+const TEMPLATE$i = templateFactory(
 /*
   <ul class="dropdown-menu" ...attributes>
     {{yield (hash
@@ -64473,9 +64973,9 @@ const TEMPLATE$h = templateFactory(
   "isStrictMode": false
 });
 
-const bsDropdownMenu = setComponentTemplate(TEMPLATE$h, templateOnly());
+const bsDropdownMenu = setComponentTemplate(TEMPLATE$i, templateOnly());
 
-const TEMPLATE$g = templateFactory(
+const TEMPLATE$h = templateFactory(
 /*
   <div class="dropdown">
     {{yield (hash
@@ -64493,9 +64993,9 @@ const TEMPLATE$g = templateFactory(
   "isStrictMode": false
 });
 
-const BsDropdown = setComponentTemplate(TEMPLATE$g, templateOnly());
+const BsDropdown = setComponentTemplate(TEMPLATE$h, templateOnly());
 
-const TEMPLATE$f = templateFactory(
+const TEMPLATE$g = templateFactory(
 /*
   <!-- components/oxi-section/grid -->
 {{#if @def.pager}}
@@ -64884,11 +65384,11 @@ class OxiSectionGridComponent extends GlimmerComponent {
       action: button.action
     };
     request[button.selection] = this.sortedData.filter(i => i.checked).map(i => i.originalData[index]);
-    set$2(button, "loading", true);
+    set$1(button, "loading", true);
     try {
       await this.content.requestPage(request);
     } finally {
-      set$2(button, "loading", false);
+      set$1(button, "loading", false);
     }
   }
 
@@ -64959,23 +65459,26 @@ class OxiSectionGridComponent extends GlimmerComponent {
     decorateMethodV2(this.prototype, "sort", [action]);
   }
 }
-setComponentTemplate(TEMPLATE$f, OxiSectionGridComponent);
+setComponentTemplate(TEMPLATE$g, OxiSectionGridComponent);
 
-const __vite_glob_0_3 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const __vite_glob_0_4 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: OxiSectionGridComponent
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const TEMPLATE$e = templateFactory(
+const TEMPLATE$f = templateFactory(
 /*
   <!-- components/oxi-section/keyvalue -->
 {{#if this.items.length}}
 
-    {{#if @isCompact}}
+    {{#if @meta.isCompact}}
 
         <span class="oxi-keyvalue">
             {{#each this.items as |item|}}
-                <span class="{{item.className}} oxi-keyvalue-items">
+                {{#if item.isHead}}
+                    <b>{{item.value}}</b><br>
+                {{else}}
+                    <span class="{{item.className}} oxi-keyvalue-item">
                         {{#if item.preamble}}<i>{{item.preamble}}</i><br/>{{/if}}
                         {{#if item.label}}
                             <span class="text-secondary fw-bold {{if @meta.isInfoBox "oxi-keyvalue-label-infobox" "oxi-keyvalue-label"}}">
@@ -64992,7 +65495,8 @@ const TEMPLATE$e = templateFactory(
                                 <span class="glyphicon glyphicon-refresh"></span>
                             </span>
                         {{/if}}
-                </span>
+                    </span>
+                {{/if}}
             {{/each}}
         </span>
 
@@ -65038,8 +65542,8 @@ const TEMPLATE$e = templateFactory(
 
 */
 {
-  "id": "/aQ9yZBQ",
-  "block": "[[[3,\" components/oxi-section/keyvalue \"],[1,\"\\n\"],[41,[30,0,[\"items\",\"length\"]],[[[1,\"\\n\"],[41,[30,1],[[[1,\"\\n        \"],[10,1],[14,0,\"oxi-keyvalue\"],[12],[1,\"\\n\"],[42,[28,[37,3],[[28,[37,3],[[30,0,[\"items\"]]],null]],null],null,[[[1,\"                \"],[10,1],[15,0,[29,[[30,2,[\"className\"]],\" oxi-keyvalue-items\"]]],[12],[1,\"\\n                        \"],[41,[30,2,[\"preamble\"]],[[[10,\"i\"],[12],[1,[30,2,[\"preamble\"]]],[13],[10,\"br\"],[12],[13]],[]],null],[1,\"\\n\"],[41,[30,2,[\"label\"]],[[[1,\"                            \"],[10,1],[15,0,[29,[\"text-secondary fw-bold \",[52,[30,3,[\"isInfoBox\"]],\"oxi-keyvalue-label-infobox\",\"oxi-keyvalue-label\"]]]],[12],[1,[30,2,[\"label\"]]],[1,\":\"],[13],[1,\"\\n\"]],[]],null],[1,\"                        \"],[8,[32,0],null,[[\"@format\",\"@value\",\"@truncate\"],[[30,2,[\"format\"]],[30,2,[\"value\"]],[30,3,[\"isInfoBox\"]]]],null],[1,\"\\n\"],[41,[30,2,[\"_refreshing\"]],[[[1,\"                            \"],[10,1],[14,0,\"position-absolute top-0 end-0 badge bg-primary-subtle\"],[12],[1,\"\\n                                \"],[10,1],[14,0,\"glyphicon glyphicon-refresh\"],[12],[13],[1,\"\\n                            \"],[13],[1,\"\\n\"]],[]],null],[1,\"                \"],[13],[1,\"\\n\"]],[2]],null],[1,\"        \"],[13],[1,\"\\n\\n\"]],[]],[[[1,\"\\n        \"],[10,0],[14,0,\"container-fluid oxi-keyvalue\"],[12],[1,\"\\n\"],[42,[28,[37,3],[[28,[37,3],[[30,0,[\"items\"]]],null]],null],null,[[[1,\"                \"],[10,0],[15,0,[29,[\"row \",[30,4,[\"className\"]],\" py-1 px-2\"]]],[12],[1,\"\\n\"],[41,[30,4,[\"isHead\"]],[[[1,\"                    \"],[10,0],[14,0,\"col-12 px-0 border-2 border-bottom mt-2 fst-italic\"],[12],[1,[30,4,[\"value\"]]],[13],[1,\"\\n\"]],[]],[[[41,[30,0,[\"hasLabels\"]],[[[1,\"                        \"],[10,0],[15,0,[29,[\"col-auto px-0 text-secondary fw-bold \",[52,[30,3,[\"isInfoBox\"]],\"oxi-keyvalue-label-infobox\",\"oxi-keyvalue-label\"]]]],[12],[1,[30,4,[\"label\"]]],[13],[1,\"\\n                        \"],[10,0],[14,0,\"col px-2 d-none d-md-block oxi-keyvalue-dots\"],[12],[1,\"\\n                        \"],[13],[1,\"\\n\"]],[]],null],[1,\"                    \"],[10,0],[15,0,[29,[[52,[30,0,[\"hasLabels\"]],[52,[30,3,[\"isInfoBox\"]],\"col-md-8 col-lg-6\",\"col-md-7 col-lg-8 col-xl-9\"],\"col-12\"],\" px-0 ps-3 ps-md-1\"]]],[12],[1,\"\\n                        \"],[41,[30,4,[\"preamble\"]],[[[10,\"i\"],[12],[1,[30,4,[\"preamble\"]]],[13],[10,\"br\"],[12],[13]],[]],null],[1,\"\\n                        \"],[8,[32,0],null,[[\"@format\",\"@value\",\"@truncate\"],[[30,4,[\"format\"]],[30,4,[\"value\"]],[30,3,[\"isInfoBox\"]]]],null],[1,\"\\n\"],[41,[30,4,[\"_refreshing\"]],[[[1,\"                            \"],[10,1],[14,0,\"position-absolute top-0 end-0 badge bg-primary-subtle\"],[12],[1,\"\\n                                \"],[10,1],[14,0,\"glyphicon glyphicon-refresh\"],[12],[13],[1,\"\\n                            \"],[13],[1,\"\\n\"]],[]],null],[1,\"                    \"],[13],[1,\"\\n\"]],[]]],[1,\"                \"],[13],[1,\"\\n\"]],[4]],null],[1,\"        \"],[13],[1,\"\\n\\n\"]],[]]],[1,\"\\n    \"],[8,[32,1],null,[[\"@buttons\"],[[30,5,[\"buttons\"]]]],null],[1,\"\\n\"]],[]],null]],[\"@isCompact\",\"item\",\"@meta\",\"item\",\"@def\"],[\"if\",\"span\",\"each\",\"-track-array\",\"i\",\"br\",\"div\"]]",
+  "id": "9AoDp3y5",
+  "block": "[[[3,\" components/oxi-section/keyvalue \"],[1,\"\\n\"],[41,[30,0,[\"items\",\"length\"]],[[[1,\"\\n\"],[41,[30,1,[\"isCompact\"]],[[[1,\"\\n        \"],[10,1],[14,0,\"oxi-keyvalue\"],[12],[1,\"\\n\"],[42,[28,[37,3],[[28,[37,3],[[30,0,[\"items\"]]],null]],null],null,[[[41,[30,2,[\"isHead\"]],[[[1,\"                    \"],[10,\"b\"],[12],[1,[30,2,[\"value\"]]],[13],[10,\"br\"],[12],[13],[1,\"\\n\"]],[]],[[[1,\"                    \"],[10,1],[15,0,[29,[[30,2,[\"className\"]],\" oxi-keyvalue-item\"]]],[12],[1,\"\\n                        \"],[41,[30,2,[\"preamble\"]],[[[10,\"i\"],[12],[1,[30,2,[\"preamble\"]]],[13],[10,\"br\"],[12],[13]],[]],null],[1,\"\\n\"],[41,[30,2,[\"label\"]],[[[1,\"                            \"],[10,1],[15,0,[29,[\"text-secondary fw-bold \",[52,[30,1,[\"isInfoBox\"]],\"oxi-keyvalue-label-infobox\",\"oxi-keyvalue-label\"]]]],[12],[1,[30,2,[\"label\"]]],[1,\":\"],[13],[1,\"\\n\"]],[]],null],[1,\"                        \"],[8,[32,0],null,[[\"@format\",\"@value\",\"@truncate\"],[[30,2,[\"format\"]],[30,2,[\"value\"]],[30,1,[\"isInfoBox\"]]]],null],[1,\"\\n\"],[41,[30,2,[\"_refreshing\"]],[[[1,\"                            \"],[10,1],[14,0,\"position-absolute top-0 end-0 badge bg-primary-subtle\"],[12],[1,\"\\n                                \"],[10,1],[14,0,\"glyphicon glyphicon-refresh\"],[12],[13],[1,\"\\n                            \"],[13],[1,\"\\n\"]],[]],null],[1,\"                    \"],[13],[1,\"\\n\"]],[]]]],[2]],null],[1,\"        \"],[13],[1,\"\\n\\n\"]],[]],[[[1,\"\\n        \"],[10,0],[14,0,\"container-fluid oxi-keyvalue\"],[12],[1,\"\\n\"],[42,[28,[37,3],[[28,[37,3],[[30,0,[\"items\"]]],null]],null],null,[[[1,\"                \"],[10,0],[15,0,[29,[\"row \",[30,3,[\"className\"]],\" py-1 px-2\"]]],[12],[1,\"\\n\"],[41,[30,3,[\"isHead\"]],[[[1,\"                    \"],[10,0],[14,0,\"col-12 px-0 border-2 border-bottom mt-2 fst-italic\"],[12],[1,[30,3,[\"value\"]]],[13],[1,\"\\n\"]],[]],[[[41,[30,0,[\"hasLabels\"]],[[[1,\"                        \"],[10,0],[15,0,[29,[\"col-auto px-0 text-secondary fw-bold \",[52,[30,1,[\"isInfoBox\"]],\"oxi-keyvalue-label-infobox\",\"oxi-keyvalue-label\"]]]],[12],[1,[30,3,[\"label\"]]],[13],[1,\"\\n                        \"],[10,0],[14,0,\"col px-2 d-none d-md-block oxi-keyvalue-dots\"],[12],[1,\"\\n                        \"],[13],[1,\"\\n\"]],[]],null],[1,\"                    \"],[10,0],[15,0,[29,[[52,[30,0,[\"hasLabels\"]],[52,[30,1,[\"isInfoBox\"]],\"col-md-8 col-lg-6\",\"col-md-7 col-lg-8 col-xl-9\"],\"col-12\"],\" px-0 ps-3 ps-md-1\"]]],[12],[1,\"\\n                        \"],[41,[30,3,[\"preamble\"]],[[[10,\"i\"],[12],[1,[30,3,[\"preamble\"]]],[13],[10,\"br\"],[12],[13]],[]],null],[1,\"\\n                        \"],[8,[32,0],null,[[\"@format\",\"@value\",\"@truncate\"],[[30,3,[\"format\"]],[30,3,[\"value\"]],[30,1,[\"isInfoBox\"]]]],null],[1,\"\\n\"],[41,[30,3,[\"_refreshing\"]],[[[1,\"                            \"],[10,1],[14,0,\"position-absolute top-0 end-0 badge bg-primary-subtle\"],[12],[1,\"\\n                                \"],[10,1],[14,0,\"glyphicon glyphicon-refresh\"],[12],[13],[1,\"\\n                            \"],[13],[1,\"\\n\"]],[]],null],[1,\"                    \"],[13],[1,\"\\n\"]],[]]],[1,\"                \"],[13],[1,\"\\n\"]],[3]],null],[1,\"        \"],[13],[1,\"\\n\\n\"]],[]]],[1,\"\\n    \"],[8,[32,1],null,[[\"@buttons\"],[[30,4,[\"buttons\"]]]],null],[1,\"\\n\"]],[]],null]],[\"@meta\",\"item\",\"item\",\"@def\"],[\"if\",\"span\",\"each\",\"-track-array\",\"b\",\"br\",\"i\",\"div\"]]",
   "moduleName": "/build/app/components/oxi-section/keyvalue/index.hbs",
   "scope": () => [OxiFormattedComponent, OxiButtonContainerComponent],
   "isStrictMode": false
@@ -65080,18 +65584,18 @@ class OxiSectionKeyvalueComponent extends GlimmerComponent {
 
     // refresh function
     let refreshRequest = () => {
-      set$2(item, '_refreshing', true);
+      set$1(item, '_refreshing', true);
       this.content.requestUpdate({
         action: uri
       }).then(doc => {
         if (!doc.value) return;
-        set$2(item, "value", doc.value);
+        set$1(item, "value", doc.value);
         // item.value = doc.value
         if (!this.isDestroying && !this.isDestroyed) {
           this.content.addTimer(this, `${this.#id}/${item._id}`, refreshRequest, timeout);
         }
       }).finally(() => {
-        set$2(item, '_refreshing', false);
+        set$1(item, '_refreshing', false);
       });
     };
 
@@ -65101,89 +65605,136 @@ class OxiSectionKeyvalueComponent extends GlimmerComponent {
     refreshRequest();
   }
 }
-setComponentTemplate(TEMPLATE$e, OxiSectionKeyvalueComponent);
+setComponentTemplate(TEMPLATE$f, OxiSectionKeyvalueComponent);
 
-const __vite_glob_0_4 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const __vite_glob_0_5 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: OxiSectionKeyvalueComponent
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const TEMPLATE$e = templateFactory(
+/*
+  <!-- components/oxi-section/text -->
+<OxiBase::ButtonContainer @buttons={{@def.buttons}} />
+
+*/
+{
+  "id": "OB0kcYOd",
+  "block": "[[[3,\" components/oxi-section/text \"],[1,\"\\n\"],[8,[32,0],null,[[\"@buttons\"],[[30,1,[\"buttons\"]]]],null],[1,\"\\n\"]],[\"@def\"],[]]",
+  "moduleName": "/build/app/components/oxi-section/text/index.hbs",
+  "scope": () => [OxiButtonContainerComponent],
+  "isStrictMode": false
+});
+
+class OxiSectionTextComponent extends GlimmerComponent {}
+setComponentTemplate(TEMPLATE$e, OxiSectionTextComponent);
+
+const __vite_glob_0_6 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+	__proto__: null,
+	default: OxiSectionTextComponent
 }, Symbol.toStringTag, { value: 'Module' }));
 
 const TEMPLATE$d = templateFactory(
 /*
   <!-- components/oxi-section/tiles -->
 {{#if @def.tiles.length}}
-    <div class="row">
-        <div class="mx-auto">
-            <p class="text-{{this.align}}">
-                {{#each this.tiles as |tile|}}
-                    {{#if (eq tile.type "button")}}
-                        <OxiBase::Button @button={{tile.content}}>
-                            {{#if tile.content.image}}
-                                <img src={{tile.content.image}} alt="" role="presentation"/>
-                                <br/>
-                            {{/if}}
-                            {{tile.content.label}}
-                        </OxiBase::Button>
-                    {{/if}}
-                    {{#if (eq tile.type "newline")}}
-                        <br/>
+    <div class="oxi-tiles">
+        {{#each this.rows as |row|}}
+            <div class="oxi-tiles-row oxi-tiles-cols-{{this.maxcol}}">
+                {{#each row as |tile|}}
+                    {{#if (eq tile.type "empty")}}
+                        <div class="oxi-tiles-cell oxi-tiles-cell--empty oxi-tiles-cell--colspan-{{tile.colspan}}"></div>
+                    {{else}}
+                        <div class="oxi-tiles-cell oxi-tiles-cell--colspan-{{tile.colspan}}">
+                            <OxiSection @content={{tile}} @meta={{hash renderAsCard=@def.borders}}/>
+                        </div>
                     {{/if}}
                 {{/each}}
-            </p>
-        </div>
+            </div>
+        {{/each}}
     </div>
 {{/if}}
 
 */
 {
-  "id": "jN3UkPpO",
-  "block": "[[[3,\" components/oxi-section/tiles \"],[1,\"\\n\"],[41,[30,1,[\"tiles\",\"length\"]],[[[1,\"    \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n        \"],[10,0],[14,0,\"mx-auto\"],[12],[1,\"\\n            \"],[10,2],[15,0,[29,[\"text-\",[30,0,[\"align\"]]]]],[12],[1,\"\\n\"],[42,[28,[37,4],[[28,[37,4],[[30,0,[\"tiles\"]]],null]],null],null,[[[41,[28,[32,0],[[30,2,[\"type\"]],\"button\"],null],[[[1,\"                        \"],[8,[32,1],null,[[\"@button\"],[[30,2,[\"content\"]]]],[[\"default\"],[[[[1,\"\\n\"],[41,[30,2,[\"content\",\"image\"]],[[[1,\"                                \"],[10,\"img\"],[15,\"src\",[30,2,[\"content\",\"image\"]]],[14,\"alt\",\"\"],[14,\"role\",\"presentation\"],[12],[13],[1,\"\\n                                \"],[10,\"br\"],[12],[13],[1,\"\\n\"]],[]],null],[1,\"                            \"],[1,[30,2,[\"content\",\"label\"]]],[1,\"\\n                        \"]],[]]]]],[1,\"\\n\"]],[]],null],[41,[28,[32,0],[[30,2,[\"type\"]],\"newline\"],null],[[[1,\"                        \"],[10,\"br\"],[12],[13],[1,\"\\n\"]],[]],null]],[2]],null],[1,\"            \"],[13],[1,\"\\n        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\"]],[]],null]],[\"@def\",\"tile\"],[\"if\",\"div\",\"p\",\"each\",\"-track-array\",\"img\",\"br\"]]",
+  "id": "9k5k05Is",
+  "block": "[[[3,\" components/oxi-section/tiles \"],[1,\"\\n\"],[41,[30,1,[\"tiles\",\"length\"]],[[[1,\"    \"],[10,0],[14,0,\"oxi-tiles\"],[12],[1,\"\\n\"],[42,[28,[37,3],[[28,[37,3],[[30,0,[\"rows\"]]],null]],null],null,[[[1,\"            \"],[10,0],[15,0,[29,[\"oxi-tiles-row oxi-tiles-cols-\",[30,0,[\"maxcol\"]]]]],[12],[1,\"\\n\"],[42,[28,[37,3],[[28,[37,3],[[30,2]],null]],null],null,[[[41,[28,[32,0],[[30,3,[\"type\"]],\"empty\"],null],[[[1,\"                        \"],[10,0],[15,0,[29,[\"oxi-tiles-cell oxi-tiles-cell--empty oxi-tiles-cell--colspan-\",[30,3,[\"colspan\"]]]]],[12],[13],[1,\"\\n\"]],[]],[[[1,\"                        \"],[10,0],[15,0,[29,[\"oxi-tiles-cell oxi-tiles-cell--colspan-\",[30,3,[\"colspan\"]]]]],[12],[1,\"\\n                            \"],[8,[32,1],null,[[\"@content\",\"@meta\"],[[30,3],[28,[32,2],null,[[\"renderAsCard\"],[[30,1,[\"borders\"]]]]]]],null],[1,\"\\n                        \"],[13],[1,\"\\n\"]],[]]]],[3]],null],[1,\"            \"],[13],[1,\"\\n\"]],[2]],null],[1,\"    \"],[13],[1,\"\\n\"]],[]],null]],[\"@def\",\"row\",\"tile\"],[\"if\",\"div\",\"each\",\"-track-array\"]]",
   "moduleName": "/build/app/components/oxi-section/tiles/index.hbs",
-  "scope": () => [Eq, OxiClickableComponent],
+  "scope": () => [Eq, OxiSectionComponent, hash],
   "isStrictMode": false
 });
 
-class OxiSectionTilesComponent extends GlimmerComponent {
-  get tiles() {
-    let tiles = this.args.def.tiles || [];
-    let maxcol = this.args.def.maxcol;
-    if (!maxcol) return tiles;
+const EMPTY_TILE = {
+  type: 'empty',
+  colspan: 1
+};
 
-    // insert a newline after maxcol columns
-    let result = [];
-    let newline = {
-      type: 'newline'
+/**
+ * Draw a grid of tiles, each rendered via {@link OxiSection}.
+ *
+ * ```html
+ * <OxiSection::Tiles @def={{this.def}} />
+ * ```
+ *
+ * @param { object } def - Section definition:
+ *   - `label` { string } - Section heading. Default: `""`
+ *   - `description` { string } - Subheading shown below the label. Default: `""`
+ *   - `maxcol` { number } - Maximum tiles per row. Default: `4`
+ *   - `borders` { boolean } - Render each tile as a card with a border. Default: `false`
+ *   - `tiles` { array } - List of tile descriptors. Each entry is either:
+ *     - A standard {@link OxiSection} definition with `type` set to any section
+ *       type (`'button'`, `'keyvalue'`, `'form'`, `'grid'`, `'text'`, `'chart'`,
+ *       `'cards'`, ...) and a matching `content` object. An optional `colspan`
+ *       { number } property makes the tile span that many columns (default: `1`).
+ *     - `'newline'` to force a row break at that position
+ *
+ * @class OxiSection::Tiles
+ * @extends Component
+ */
+class OxiSectionTilesComponent extends GlimmerComponent {
+  // Returns an array of rows, each row padded to maxcol with empty tiles.
+  // Splits on type:"newline" and enforces maxcol (default 4).
+  // Each tile object is normalized to include a `colspan` property.
+  get rows() {
+    let tiles = this.args.def.tiles || [];
+    let maxcol = this.maxcol;
+    let rows = [];
+    let currentRow = [];
+    let currentWidth = 0;
+    const flush = () => {
+      const remaining = maxcol - currentWidth;
+      if (remaining > 0) currentRow.push({
+        ...EMPTY_TILE,
+        colspan: remaining
+      });
+      rows.push(currentRow);
+      currentRow = [];
+      currentWidth = 0;
     };
-    let col = 0;
     for (const t of tiles) {
-      if (++col > maxcol) {
-        result.push(newline);
-        col = 0;
+      if (t === 'newline' || t.type === 'newline') {
+        if (currentRow.length) flush();
+        continue;
       }
-      let newTile = {
+      const colspan = Math.min(t.colspan ?? 1, maxcol);
+      if (currentWidth + colspan > maxcol) flush();
+      currentRow.push({
         ...t,
-        content: {
-          ...t.content
-        } // explicitely copy content so Ember does not complain if we set format below
-      };
-      if (t.type == 'newline') {
-        col = 0;
-      } else {
-        newTile.content.format = 'tile'; // button format
-      }
-      result.push(newTile);
+        colspan
+      });
+      currentWidth += colspan;
+      if (currentWidth >= maxcol) flush();
     }
-    return result;
+    if (currentRow.length) flush();
+    return rows;
   }
-  get align() {
-    let defaultAlign = 'left';
-    let align = this.args.def.align || defaultAlign;
-    return align.match(/^(left|right|center)$/) ? align : defaultAlign;
+  get maxcol() {
+    return this.args.def.maxcol ?? 4;
   }
 }
 setComponentTemplate(TEMPLATE$d, OxiSectionTilesComponent);
 
-const __vite_glob_0_5 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const __vite_glob_0_7 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: OxiSectionTilesComponent
 }, Symbol.toStringTag, { value: 'Module' }));
@@ -65195,41 +65746,42 @@ const TEMPLATE$c = templateFactory(
 
     <div class="card bg-body-tertiary mb-3 ms-md-3">
 
-        {{#if (or @content.content.label @content.content.description)}}
-            <div class="card-header px-2 {{unless @content.compact "py-2"}}">
-                {{#if @content.content.label}}
-                    <h4>{{@content.content.label}}</h4>
-                {{/if}}
-                {{#if @content.content.description}}
-                    {{defuse @content.content.description}}
-                {{/if}}
+        {{#if this.label}}
+            <div class="card-header px-2 {{unless this.meta.isCompact "py-2"}}">
+                <h4 class="oxi-section-label">{{this.label}}</h4>
             </div>
         {{/if}}
 
-        <div class="card-body px-0 {{unless @content.compact "py-2"}}" {{on-init this.initialized}}>
+        <div class="card-body px-2 {{unless this.meta.isCompact "py-2"}}" {{on-init this.initialized}}>
+            {{#if @content.content.description}}
+                <div class="oxi-section-description">
+                    {{defuse @content.content.description}}
+                </div>
+            {{/if}}
+
             <this.sectionComponent
-                @def={{this.sectionData}}
-                @isCompact={{@content.compact}}
-                @meta={{@meta}}
+                @def={{this.data}}
+                @meta={{this.meta}}
             />
         </div>
     </div>
 
 {{else}}
 
-    <div class="mt-1 {{if @content.compact "oxi-compact" "mb-3"}}">
-        {{#if @content.content.label}}
-            <h4>{{@content.content.label}}</h4>
+    <div class="mt-1 {{if this.meta.isCompact "oxi-compact" "mb-3"}}">
+        {{#if this.label}}
+            <h4 class="oxi-section-label">{{this.label}}</h4>
         {{/if}}
         {{#if @content.content.description}}
-            <div class={{unless @content.compact "mb-3"}}>{{defuse @content.content.description}}</div>
+            <div class="oxi-section-description {{unless this.meta.isCompact "mb-3"}}">
+                {{defuse @content.content.description}}
+            </div>
         {{/if}}
 
-        <div {{on-init this.initialized}} class={{unless (or @meta.isInfoBox @content.compact) "ms-md-3"}}>
+        <div {{on-init this.initialized}} class={{unless (or this.meta.isInfoBox this.meta.isCompact) "ms-md-3"}}>
             <this.sectionComponent
-                @def={{this.sectionData}}
-                @isCompact={{@content.compact}}
-                @meta={{@meta}}
+                @def={{this.data}}
+                @meta={{this.meta}}
             />
         </div>
     </div>
@@ -65237,14 +65789,14 @@ const TEMPLATE$c = templateFactory(
 {{/if}}
 */
 {
-  "id": "CTh9dygZ",
-  "block": "[[[3,\" components/oxi-section \"],[1,\"\\n\"],[41,[30,1,[\"renderAsCard\"]],[[[1,\"\\n    \"],[10,0],[14,0,\"card bg-body-tertiary mb-3 ms-md-3\"],[12],[1,\"\\n\\n\"],[41,[28,[32,0],[[30,2,[\"content\",\"label\"]],[30,2,[\"content\",\"description\"]]],null],[[[1,\"            \"],[10,0],[15,0,[29,[\"card-header px-2 \",[52,[51,[30,2,[\"compact\"]]],\"py-2\"]]]],[12],[1,\"\\n\"],[41,[30,2,[\"content\",\"label\"]],[[[1,\"                    \"],[10,\"h4\"],[12],[1,[30,2,[\"content\",\"label\"]]],[13],[1,\"\\n\"]],[]],null],[41,[30,2,[\"content\",\"description\"]],[[[1,\"                    \"],[1,[28,[32,1],[[30,2,[\"content\",\"description\"]]],null]],[1,\"\\n\"]],[]],null],[1,\"            \"],[13],[1,\"\\n\"]],[]],null],[1,\"\\n        \"],[11,0],[16,0,[29,[\"card-body px-0 \",[52,[51,[30,2,[\"compact\"]]],\"py-2\"]]]],[4,[32,2],[[30,0,[\"initialized\"]]],null],[12],[1,\"\\n            \"],[8,[30,0,[\"sectionComponent\"]],null,[[\"@def\",\"@isCompact\",\"@meta\"],[[30,0,[\"sectionData\"]],[30,2,[\"compact\"]],[30,1]]],null],[1,\"\\n        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\\n\"]],[]],[[[1,\"\\n    \"],[10,0],[15,0,[29,[\"mt-1 \",[52,[30,2,[\"compact\"]],\"oxi-compact\",\"mb-3\"]]]],[12],[1,\"\\n\"],[41,[30,2,[\"content\",\"label\"]],[[[1,\"            \"],[10,\"h4\"],[12],[1,[30,2,[\"content\",\"label\"]]],[13],[1,\"\\n\"]],[]],null],[41,[30,2,[\"content\",\"description\"]],[[[1,\"            \"],[10,0],[15,0,[52,[51,[30,2,[\"compact\"]]],\"mb-3\"]],[12],[1,[28,[32,1],[[30,2,[\"content\",\"description\"]]],null]],[13],[1,\"\\n\"]],[]],null],[1,\"\\n        \"],[11,0],[16,0,[52,[51,[28,[32,0],[[30,1,[\"isInfoBox\"]],[30,2,[\"compact\"]]],null]],\"ms-md-3\"]],[4,[32,2],[[30,0,[\"initialized\"]]],null],[12],[1,\"\\n            \"],[8,[30,0,[\"sectionComponent\"]],null,[[\"@def\",\"@isCompact\",\"@meta\"],[[30,0,[\"sectionData\"]],[30,2,[\"compact\"]],[30,1]]],null],[1,\"\\n        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\\n\"]],[]]]],[\"@meta\",\"@content\"],[\"if\",\"div\",\"unless\",\"h4\"]]",
+  "id": "mKySF5BU",
+  "block": "[[[3,\" components/oxi-section \"],[1,\"\\n\"],[41,[30,1,[\"renderAsCard\"]],[[[1,\"\\n    \"],[10,0],[14,0,\"card bg-body-tertiary mb-3 ms-md-3\"],[12],[1,\"\\n\\n\"],[41,[30,0,[\"label\"]],[[[1,\"            \"],[10,0],[15,0,[29,[\"card-header px-2 \",[52,[51,[30,0,[\"meta\",\"isCompact\"]]],\"py-2\"]]]],[12],[1,\"\\n                \"],[10,\"h4\"],[14,0,\"oxi-section-label\"],[12],[1,[30,0,[\"label\"]]],[13],[1,\"\\n            \"],[13],[1,\"\\n\"]],[]],null],[1,\"\\n        \"],[11,0],[16,0,[29,[\"card-body px-2 \",[52,[51,[30,0,[\"meta\",\"isCompact\"]]],\"py-2\"]]]],[4,[32,0],[[30,0,[\"initialized\"]]],null],[12],[1,\"\\n\"],[41,[30,2,[\"content\",\"description\"]],[[[1,\"                \"],[10,0],[14,0,\"oxi-section-description\"],[12],[1,\"\\n                    \"],[1,[28,[32,1],[[30,2,[\"content\",\"description\"]]],null]],[1,\"\\n                \"],[13],[1,\"\\n\"]],[]],null],[1,\"\\n            \"],[8,[30,0,[\"sectionComponent\"]],null,[[\"@def\",\"@meta\"],[[30,0,[\"data\"]],[30,0,[\"meta\"]]]],null],[1,\"\\n        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\\n\"]],[]],[[[1,\"\\n    \"],[10,0],[15,0,[29,[\"mt-1 \",[52,[30,0,[\"meta\",\"isCompact\"]],\"oxi-compact\",\"mb-3\"]]]],[12],[1,\"\\n\"],[41,[30,0,[\"label\"]],[[[1,\"            \"],[10,\"h4\"],[14,0,\"oxi-section-label\"],[12],[1,[30,0,[\"label\"]]],[13],[1,\"\\n\"]],[]],null],[41,[30,2,[\"content\",\"description\"]],[[[1,\"            \"],[10,0],[15,0,[29,[\"oxi-section-description \",[52,[51,[30,0,[\"meta\",\"isCompact\"]]],\"mb-3\"]]]],[12],[1,\"\\n                \"],[1,[28,[32,1],[[30,2,[\"content\",\"description\"]]],null]],[1,\"\\n            \"],[13],[1,\"\\n\"]],[]],null],[1,\"\\n        \"],[11,0],[16,0,[52,[51,[28,[32,2],[[30,0,[\"meta\",\"isInfoBox\"]],[30,0,[\"meta\",\"isCompact\"]]],null]],\"ms-md-3\"]],[4,[32,0],[[30,0,[\"initialized\"]]],null],[12],[1,\"\\n            \"],[8,[30,0,[\"sectionComponent\"]],null,[[\"@def\",\"@meta\"],[[30,0,[\"data\"]],[30,0,[\"meta\"]]]],null],[1,\"\\n        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\\n\"]],[]]]],[\"@meta\",\"@content\"],[\"if\",\"div\",\"unless\",\"h4\"]]",
   "moduleName": "/build/app/components/oxi-section/index.hbs",
-  "scope": () => [Or, Defuse, OnInitModifier],
+  "scope": () => [OnInitModifier, Defuse, Or],
   "isStrictMode": false
 });
 
-const sectionModules = Object.fromEntries(Object.entries(/* #__PURE__ */ Object.assign({"./cards/index.js": __vite_glob_0_0$1,"./chart/index.js": __vite_glob_0_1$1,"./form/index.js": __vite_glob_0_2,"./grid/index.js": __vite_glob_0_3,"./keyvalue/index.js": __vite_glob_0_4,"./tiles/index.js": __vite_glob_0_5
+const sectionModules = Object.fromEntries(Object.entries(/* #__PURE__ */ Object.assign({"./button/index.js": __vite_glob_0_0$1,"./cards/index.js": __vite_glob_0_1$1,"./chart/index.js": __vite_glob_0_2$1,"./form/index.js": __vite_glob_0_3,"./grid/index.js": __vite_glob_0_4,"./keyvalue/index.js": __vite_glob_0_5,"./text/index.js": __vite_glob_0_6,"./tiles/index.js": __vite_glob_0_7
 
 })).map(([path, mod]) => [path.replace(/^\.\/(.+)\/index\..+$/, '$1'), mod]));
 class OxiSectionComponent extends GlimmerComponent {
@@ -65252,7 +65804,7 @@ class OxiSectionComponent extends GlimmerComponent {
     debug$1(`oxi-section: importing ./${this.args.content.type}`);
     return sectionModules[this.args.content.type]?.default;
   }
-  get sectionData() {
+  get data() {
     return {
       ...this.args.content?.content,
       // map some inconsistently placed properties into the section data
@@ -65262,6 +65814,16 @@ class OxiSectionComponent extends GlimmerComponent {
       // used by oxi-section/form
       className: this.args.content?.className // used by oxi-section/grid
     };
+  }
+  get meta() {
+    return {
+      ...(this.args.meta ?? {}),
+      isCompact: this.args.content?.compact ? true : false
+    };
+  }
+  get label() {
+    // Button labels are on the button, not above
+    return this.args.content.type === 'button' ? null : this.args.content?.content?.label;
   }
   initialized() {
     if (this.args.onInit) this.args.onInit();
@@ -65818,12 +66380,15 @@ const TEMPLATE$6 = templateFactory(
         </a>
 
     {{else if (eq "email" this.format)}}
-        {{#each this.valueArray as |val|}}
-            <a href="mailto:{{val}}" class="oxi-formatted-email {{@class}}">
-                <OxiBase::Label @text={{val}} />
-            </a>
-            <br/>
-        {{/each}}
+        <ul class="oxi-formatted-email {{@class}}">
+            {{#each this.valueArray as |val|}}
+                <li>
+                    <a href="mailto:{{val}}">
+                        <OxiBase::Label @text={{val}} />
+                    </a>
+                </li>
+            {{/each}}
+        </ul>
 
     {{else if (eq "tooltip" this.format)}}
         {{! "d-inline-flex" prevents labels from taking the whole width and
@@ -65940,8 +66505,8 @@ const TEMPLATE$6 = templateFactory(
 
 */
 {
-  "id": "My0mokxP",
-  "block": "[[[44,[[30,1]],[[[1,\"\\n\"],[41,[28,[32,0],[\"dummy-placeholder\",[30,0,[\"format\"]]],null],[[[1,\"\\n\"]],[]],[[[41,[28,[32,1],[[28,[32,2],[[30,0,[\"format\"]]],null],[28,[32,0],[\"text\",[30,0,[\"format\"]]],null]],null],[[[1,\"        \"],[8,[32,3],null,[[\"@text\",\"@tooltip\",\"@class\"],[[30,2],[52,[30,3],[30,2]],[29,[\"oxi-formatted-text \",[52,[30,3],\"oxi-truncate\"],\" \",[30,4]]]]],null],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"raw\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[8,[32,3],null,[[\"@text\",\"@raw\",\"@raw_tooltip\",\"@class\"],[[30,0,[\"valueStr\"]],true,[52,[30,3],[30,2]],[29,[\"oxi-formatted-raw \",[52,[30,3],\"oxi-truncate\"],\" \",[30,4]]]]],null],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"subject\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[8,[32,3],null,[[\"@text\",\"@tooltip\",\"@class\"],[[30,2],[52,[30,3],[30,2]],[29,[\"oxi-formatted-subject \",[52,[30,3],\"oxi-truncate\"],\" d-inline-flex \",[30,4]]]]],null],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"nl2br\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[10,1],[15,0,[29,[\"oxi-formatted-nl2br \",[30,4]]]],[12],[1,\"\\n            \"],[42,[28,[37,4],[[28,[37,4],[[30,0,[\"valueSplitByNewline\"]]],null]],null],null,[[[1,\" \"],[1,[30,5]],[10,\"br\"],[12],[13],[1,\" \"]],[5]],null],[1,\"\\n        \"],[13],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"timestamp\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[10,1],[15,0,[29,[\"oxi-formatted-timestamp \",[30,4]]]],[12],[1,\"\\n            \"],[1,[30,0,[\"timestamp\"]]],[1,\"\\n        \"],[13],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"styled\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[10,1],[15,0,[29,[\"oxi-formatted-styled styled-\",[30,0,[\"styledValue\",\"style\"]],\" \",[30,4]]]],[12],[1,\"\\n            \"],[1,[30,0,[\"styledValue\",\"label\"]]],[1,\"\\n        \"],[13],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"certstatus\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[8,[32,3],null,[[\"@text\",\"@raw\",\"@tooltip\",\"@class\"],[[30,2,[\"label\"]],true,[30,2,[\"tooltip\"]],[29,[\"oxi-formatted-certstatus certstatus-\",[28,[32,4],[[28,[32,5],[[30,2,[\"value\"]],[30,2,[\"label\"]]],null]],null],\" \",[30,4]]]]],null],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"link\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[8,[32,6],null,[[\"@spec\",\"@class\"],[[30,2],[29,[\"oxi-formatted-link \",[30,4]]]]],null],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"extlink\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[10,3],[15,6,[30,2,[\"page\"]]],[15,\"target\",[28,[32,5],[[30,2,[\"target\"]],\"_blank\"],null]],[15,\"title\",[30,2,[\"tooltip\"]]],[15,0,[29,[\"oxi-formatted-extlink \",[30,4]]]],[12],[1,\"\\n            \"],[8,[32,3],null,[[\"@text\",\"@raw\"],[[30,2,[\"label\"]],true]],null],[1,\"\\n        \"],[13],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"email\",[30,0,[\"format\"]]],null],[[[42,[28,[37,4],[[28,[37,4],[[30,0,[\"valueArray\"]]],null]],null],null,[[[1,\"            \"],[10,3],[15,6,[29,[\"mailto:\",[30,6]]]],[15,0,[29,[\"oxi-formatted-email \",[30,4]]]],[12],[1,\"\\n                \"],[8,[32,3],null,[[\"@text\"],[[30,6]]],null],[1,\"\\n            \"],[13],[1,\"\\n            \"],[10,\"br\"],[12],[13],[1,\"\\n\"]],[6]],null],[1,\"\\n\"]],[]],[[[41,[28,[32,0],[\"tooltip\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[8,[32,3],null,[[\"@text\",\"@tooltip\",\"@tooltip_page\",\"@tooltip_page_args\",\"@class\"],[[30,2,[\"value\"]],[30,2,[\"tooltip\"]],[30,2,[\"tooltip_page\"]],[30,2,[\"tooltip_page_args\"]],[29,[\"oxi-formatted-tooltip d-inline-flex \",[30,4]]]]],null],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"code\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[11,\"code\"],[16,\"title\",[29,[[28,[32,7],[\"component.oxi_code.copy\"],null]]]],[16,0,[29,[\"oxi-formatted-code \",[30,4]]]],[4,[32,8],[\"dblclick\",[30,0,[\"selectCode\"]]],null],[12],[1,[30,0,[\"valueStr\"]]],[13],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"asciidata\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[8,[32,9],null,[[\"@value\",\"@class\"],[[30,2],[29,[\"oxi-formatted-asciidata \",[30,4]]]]],null],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"download\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[8,[32,10],null,[[\"@type\",\"@data\",\"@mimeType\",\"@fileName\",\"@autoDownload\",\"@hide\",\"@class\"],[[30,2,[\"type\"]],[30,2,[\"data\"]],[30,2,[\"mimetype\"]],[30,2,[\"filename\"]],[30,2,[\"autodownload\"]],[30,2,[\"hide\"]],[29,[\"oxi-formatted-download \",[30,4]]]]],null],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"arbitrary\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[8,[32,11],null,[[\"@value\",\"@class\"],[[30,2],\"oxi-formatted-arbitrary\"]],null],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"unilist\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[10,\"dl\"],[15,0,[29,[\"oxi-formatted-unilist \",[30,4]]]],[12],[1,\"\\n\"],[42,[28,[37,4],[[28,[37,4],[[30,2]],null]],null],null,[[[41,[30,7,[\"label\"]],[[[1,\"                    \"],[10,\"dt\"],[14,0,\"pt-1\"],[12],[1,[30,7,[\"label\"]]],[13],[1,\"\\n\"]],[]],null],[1,\"                \"],[10,\"dd\"],[15,0,[29,[\"m-0 \",[52,[30,7,[\"label\"]],\"ps-3\",\"pt-1\"]]]],[12],[1,\"\\n                    \"],[8,[32,12],null,[[\"@format\",\"@value\",\"@truncate\"],[[30,7,[\"format\"]],[30,7,[\"value\"]],[30,3]]],null],[1,\"\\n                \"],[13],[1,\"\\n\"]],[7]],null],[1,\"        \"],[13],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"deflist\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[10,\"dl\"],[15,0,[29,[\"oxi-formatted-deflist \",[30,4]]]],[12],[1,\"\\n\"],[42,[28,[37,4],[[28,[37,4],[[30,2]],null]],null],null,[[[1,\"                \"],[10,\"dt\"],[12],[1,[30,8,[\"label\"]]],[13],[1,\"\\n\"],[42,[28,[37,4],[[28,[37,4],[[28,[32,13],[[30,8,[\"value\"]]],null]],null]],null],null,[[[1,\"                    \"],[10,\"dd\"],[14,0,\"m-0\"],[12],[1,\"\\n                        \"],[8,[32,11],null,[[\"@value\",\"@raw\"],[[30,9],[52,[28,[32,0],[[30,8,[\"format\"]],\"raw\"],null],true,false]]],null],[1,\"\\n                    \"],[13],[1,\"\\n\"]],[9]],null]],[8]],null],[1,\"        \"],[13],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"ullist\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[10,\"ul\"],[15,0,[29,[\"oxi-formatted-ullist list-unstyled \",[30,4]]]],[12],[1,\"\\n\"],[42,[28,[37,4],[[28,[37,4],[[30,2]],null]],null],null,[[[1,\"                \"],[10,\"li\"],[12],[1,\"\\n                    \"],[8,[32,11],null,[[\"@value\"],[[30,10]]],null],[1,\"\\n                \"],[13],[1,\"\\n\"]],[10]],null],[1,\"        \"],[13],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"rawlist\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[10,\"ul\"],[15,0,[29,[\"oxi-formatted-rawlist list-unstyled \",[30,4]]]],[12],[1,\"\\n            \"],[42,[28,[37,4],[[28,[37,4],[[30,2]],null]],null],null,[[[1,\" \"],[10,\"li\"],[12],[8,[32,3],null,[[\"@text\",\"@raw\"],[[30,11],true]],null],[1,\" \"],[13],[1,\" \"]],[11]],null],[1,\"\\n        \"],[13],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"linklist\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[10,\"ul\"],[15,0,[29,[\"oxi-formatted-linklist list-unstyled \",[30,4]]]],[12],[1,\"\\n\"],[42,[28,[37,4],[[28,[37,4],[[30,2]],null]],null],null,[[[1,\"                \"],[10,\"li\"],[12],[1,\"\\n\"],[41,[28,[32,0],[[30,12,[\"format\"]],\"extlink\"],null],[[[1,\"                        \"],[10,3],[15,6,[30,12,[\"page\"]]],[15,\"target\",[28,[32,5],[[30,12,[\"target\"]],\"_blank\"],null]],[15,\"title\",[30,12,[\"tooltip\"]]],[12],[1,\"\\n                            \"],[8,[32,3],null,[[\"@text\",\"@raw\"],[[30,12,[\"label\"]],true]],null],[1,\"\\n                        \"],[13],[1,\"\\n\"]],[]],[[[41,[30,12,[\"page\"]],[[[1,\"                        \"],[8,[32,6],null,[[\"@spec\"],[[30,12]]],null],[1,\"\\n\"]],[]],[[[1,\"                        \"],[8,[32,3],null,[[\"@text\",\"@tooltip\"],[[30,12,[\"label\"]],[30,12,[\"tooltip\"]]]],null],[1,\"\\n                    \"]],[]]]],[]]],[1,\"                \"],[13],[1,\"\\n\"]],[12]],null],[1,\"        \"],[13],[1,\"\\n\\n\"]],[]],[[[1,\"        (error: unknown field format \\\"\"],[1,[30,0,[\"format\"]]],[1,\"\\\")\\n\\n    \"]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]],[1,\"\\n\"]],[2]]]],[\"@value\",\"v\",\"@truncate\",\"@class\",\"line\",\"val\",\"item\",\"val\",\"ddVal\",\"val\",\"val\",\"val\"],[\"let\",\"if\",\"span\",\"each\",\"-track-array\",\"br\",\"a\",\"code\",\"dl\",\"dt\",\"dd\",\"ul\",\"li\"]]",
+  "id": "FZk8o8kB",
+  "block": "[[[44,[[30,1]],[[[1,\"\\n\"],[41,[28,[32,0],[\"dummy-placeholder\",[30,0,[\"format\"]]],null],[[[1,\"\\n\"]],[]],[[[41,[28,[32,1],[[28,[32,2],[[30,0,[\"format\"]]],null],[28,[32,0],[\"text\",[30,0,[\"format\"]]],null]],null],[[[1,\"        \"],[8,[32,3],null,[[\"@text\",\"@tooltip\",\"@class\"],[[30,2],[52,[30,3],[30,2]],[29,[\"oxi-formatted-text \",[52,[30,3],\"oxi-truncate\"],\" \",[30,4]]]]],null],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"raw\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[8,[32,3],null,[[\"@text\",\"@raw\",\"@raw_tooltip\",\"@class\"],[[30,0,[\"valueStr\"]],true,[52,[30,3],[30,2]],[29,[\"oxi-formatted-raw \",[52,[30,3],\"oxi-truncate\"],\" \",[30,4]]]]],null],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"subject\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[8,[32,3],null,[[\"@text\",\"@tooltip\",\"@class\"],[[30,2],[52,[30,3],[30,2]],[29,[\"oxi-formatted-subject \",[52,[30,3],\"oxi-truncate\"],\" d-inline-flex \",[30,4]]]]],null],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"nl2br\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[10,1],[15,0,[29,[\"oxi-formatted-nl2br \",[30,4]]]],[12],[1,\"\\n            \"],[42,[28,[37,4],[[28,[37,4],[[30,0,[\"valueSplitByNewline\"]]],null]],null],null,[[[1,\" \"],[1,[30,5]],[10,\"br\"],[12],[13],[1,\" \"]],[5]],null],[1,\"\\n        \"],[13],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"timestamp\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[10,1],[15,0,[29,[\"oxi-formatted-timestamp \",[30,4]]]],[12],[1,\"\\n            \"],[1,[30,0,[\"timestamp\"]]],[1,\"\\n        \"],[13],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"styled\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[10,1],[15,0,[29,[\"oxi-formatted-styled styled-\",[30,0,[\"styledValue\",\"style\"]],\" \",[30,4]]]],[12],[1,\"\\n            \"],[1,[30,0,[\"styledValue\",\"label\"]]],[1,\"\\n        \"],[13],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"certstatus\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[8,[32,3],null,[[\"@text\",\"@raw\",\"@tooltip\",\"@class\"],[[30,2,[\"label\"]],true,[30,2,[\"tooltip\"]],[29,[\"oxi-formatted-certstatus certstatus-\",[28,[32,4],[[28,[32,5],[[30,2,[\"value\"]],[30,2,[\"label\"]]],null]],null],\" \",[30,4]]]]],null],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"link\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[8,[32,6],null,[[\"@spec\",\"@class\"],[[30,2],[29,[\"oxi-formatted-link \",[30,4]]]]],null],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"extlink\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[10,3],[15,6,[30,2,[\"page\"]]],[15,\"target\",[28,[32,5],[[30,2,[\"target\"]],\"_blank\"],null]],[15,\"title\",[30,2,[\"tooltip\"]]],[15,0,[29,[\"oxi-formatted-extlink \",[30,4]]]],[12],[1,\"\\n            \"],[8,[32,3],null,[[\"@text\",\"@raw\"],[[30,2,[\"label\"]],true]],null],[1,\"\\n        \"],[13],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"email\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[10,\"ul\"],[15,0,[29,[\"oxi-formatted-email \",[30,4]]]],[12],[1,\"\\n\"],[42,[28,[37,4],[[28,[37,4],[[30,0,[\"valueArray\"]]],null]],null],null,[[[1,\"                \"],[10,\"li\"],[12],[1,\"\\n                    \"],[10,3],[15,6,[29,[\"mailto:\",[30,6]]]],[12],[1,\"\\n                        \"],[8,[32,3],null,[[\"@text\"],[[30,6]]],null],[1,\"\\n                    \"],[13],[1,\"\\n                \"],[13],[1,\"\\n\"]],[6]],null],[1,\"        \"],[13],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"tooltip\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[8,[32,3],null,[[\"@text\",\"@tooltip\",\"@tooltip_page\",\"@tooltip_page_args\",\"@class\"],[[30,2,[\"value\"]],[30,2,[\"tooltip\"]],[30,2,[\"tooltip_page\"]],[30,2,[\"tooltip_page_args\"]],[29,[\"oxi-formatted-tooltip d-inline-flex \",[30,4]]]]],null],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"code\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[11,\"code\"],[16,\"title\",[29,[[28,[32,7],[\"component.oxi_code.copy\"],null]]]],[16,0,[29,[\"oxi-formatted-code \",[30,4]]]],[4,[32,8],[\"dblclick\",[30,0,[\"selectCode\"]]],null],[12],[1,[30,0,[\"valueStr\"]]],[13],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"asciidata\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[8,[32,9],null,[[\"@value\",\"@class\"],[[30,2],[29,[\"oxi-formatted-asciidata \",[30,4]]]]],null],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"download\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[8,[32,10],null,[[\"@type\",\"@data\",\"@mimeType\",\"@fileName\",\"@autoDownload\",\"@hide\",\"@class\"],[[30,2,[\"type\"]],[30,2,[\"data\"]],[30,2,[\"mimetype\"]],[30,2,[\"filename\"]],[30,2,[\"autodownload\"]],[30,2,[\"hide\"]],[29,[\"oxi-formatted-download \",[30,4]]]]],null],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"arbitrary\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[8,[32,11],null,[[\"@value\",\"@class\"],[[30,2],\"oxi-formatted-arbitrary\"]],null],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"unilist\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[10,\"dl\"],[15,0,[29,[\"oxi-formatted-unilist \",[30,4]]]],[12],[1,\"\\n\"],[42,[28,[37,4],[[28,[37,4],[[30,2]],null]],null],null,[[[41,[30,7,[\"label\"]],[[[1,\"                    \"],[10,\"dt\"],[14,0,\"pt-1\"],[12],[1,[30,7,[\"label\"]]],[13],[1,\"\\n\"]],[]],null],[1,\"                \"],[10,\"dd\"],[15,0,[29,[\"m-0 \",[52,[30,7,[\"label\"]],\"ps-3\",\"pt-1\"]]]],[12],[1,\"\\n                    \"],[8,[32,12],null,[[\"@format\",\"@value\",\"@truncate\"],[[30,7,[\"format\"]],[30,7,[\"value\"]],[30,3]]],null],[1,\"\\n                \"],[13],[1,\"\\n\"]],[7]],null],[1,\"        \"],[13],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"deflist\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[10,\"dl\"],[15,0,[29,[\"oxi-formatted-deflist \",[30,4]]]],[12],[1,\"\\n\"],[42,[28,[37,4],[[28,[37,4],[[30,2]],null]],null],null,[[[1,\"                \"],[10,\"dt\"],[12],[1,[30,8,[\"label\"]]],[13],[1,\"\\n\"],[42,[28,[37,4],[[28,[37,4],[[28,[32,13],[[30,8,[\"value\"]]],null]],null]],null],null,[[[1,\"                    \"],[10,\"dd\"],[14,0,\"m-0\"],[12],[1,\"\\n                        \"],[8,[32,11],null,[[\"@value\",\"@raw\"],[[30,9],[52,[28,[32,0],[[30,8,[\"format\"]],\"raw\"],null],true,false]]],null],[1,\"\\n                    \"],[13],[1,\"\\n\"]],[9]],null]],[8]],null],[1,\"        \"],[13],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"ullist\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[10,\"ul\"],[15,0,[29,[\"oxi-formatted-ullist list-unstyled \",[30,4]]]],[12],[1,\"\\n\"],[42,[28,[37,4],[[28,[37,4],[[30,2]],null]],null],null,[[[1,\"                \"],[10,\"li\"],[12],[1,\"\\n                    \"],[8,[32,11],null,[[\"@value\"],[[30,10]]],null],[1,\"\\n                \"],[13],[1,\"\\n\"]],[10]],null],[1,\"        \"],[13],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"rawlist\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[10,\"ul\"],[15,0,[29,[\"oxi-formatted-rawlist list-unstyled \",[30,4]]]],[12],[1,\"\\n            \"],[42,[28,[37,4],[[28,[37,4],[[30,2]],null]],null],null,[[[1,\" \"],[10,\"li\"],[12],[8,[32,3],null,[[\"@text\",\"@raw\"],[[30,11],true]],null],[1,\" \"],[13],[1,\" \"]],[11]],null],[1,\"\\n        \"],[13],[1,\"\\n\\n\"]],[]],[[[41,[28,[32,0],[\"linklist\",[30,0,[\"format\"]]],null],[[[1,\"        \"],[10,\"ul\"],[15,0,[29,[\"oxi-formatted-linklist list-unstyled \",[30,4]]]],[12],[1,\"\\n\"],[42,[28,[37,4],[[28,[37,4],[[30,2]],null]],null],null,[[[1,\"                \"],[10,\"li\"],[12],[1,\"\\n\"],[41,[28,[32,0],[[30,12,[\"format\"]],\"extlink\"],null],[[[1,\"                        \"],[10,3],[15,6,[30,12,[\"page\"]]],[15,\"target\",[28,[32,5],[[30,12,[\"target\"]],\"_blank\"],null]],[15,\"title\",[30,12,[\"tooltip\"]]],[12],[1,\"\\n                            \"],[8,[32,3],null,[[\"@text\",\"@raw\"],[[30,12,[\"label\"]],true]],null],[1,\"\\n                        \"],[13],[1,\"\\n\"]],[]],[[[41,[30,12,[\"page\"]],[[[1,\"                        \"],[8,[32,6],null,[[\"@spec\"],[[30,12]]],null],[1,\"\\n\"]],[]],[[[1,\"                        \"],[8,[32,3],null,[[\"@text\",\"@tooltip\"],[[30,12,[\"label\"]],[30,12,[\"tooltip\"]]]],null],[1,\"\\n                    \"]],[]]]],[]]],[1,\"                \"],[13],[1,\"\\n\"]],[12]],null],[1,\"        \"],[13],[1,\"\\n\\n\"]],[]],[[[1,\"        (error: unknown field format \\\"\"],[1,[30,0,[\"format\"]]],[1,\"\\\")\\n\\n    \"]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]]],[]]],[1,\"\\n\"]],[2]]]],[\"@value\",\"v\",\"@truncate\",\"@class\",\"line\",\"val\",\"item\",\"val\",\"ddVal\",\"val\",\"val\",\"val\"],[\"let\",\"if\",\"span\",\"each\",\"-track-array\",\"br\",\"a\",\"ul\",\"li\",\"code\",\"dl\",\"dt\",\"dd\"]]",
   "moduleName": "/build/app/components/oxi-base/formatted/index.hbs",
   "scope": () => [Eq, Or, Not, OxiLabelComponent, Lc, Try, OxiFormattedLinkComponent, THelper, on, OxiFormattedAsciidataComponent, OxiDownloadComponent, OxiFormattedArbitraryComponent, OxiFormattedComponent, Arrayify],
   "isStrictMode": false
@@ -66181,7 +66746,7 @@ class ApplicationFooter extends GlimmerComponent {
 }
 setComponentTemplate(TEMPLATE$3, ApplicationFooter);
 
-const template$3 = templateFactory(
+const template$2 = templateFactory(
 /*
   {{!-- <HeadLayout/> injects title + custom CSS into document.head via {{#in-element}} --}}
 <HeadLayout/>
@@ -66236,7 +66801,7 @@ const template$3 = templateFactory(
 
 const amdModule15 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
-	default: template$3
+	default: template$2
 }, Symbol.toStringTag, { value: 'Module' }));
 
 class IndexRoute extends Route {
@@ -66691,7 +67256,7 @@ class OxiStatusComponent extends GlimmerComponent {
 }
 setComponentTemplate(TEMPLATE$2, OxiStatusComponent);
 
-const template$2 = templateFactory(
+const template$1 = templateFactory(
 /*
   {{#let this.model.popup as |popup|}}
     <BsModal
@@ -66760,14 +67325,14 @@ const template$2 = templateFactory(
 
 const amdModule20 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
-	default: template$2
+	default: template$1
 }, Symbol.toStringTag, { value: 'Module' }));
 
 class OpenXpkiRoute extends Route {
   static {
-    decorateFieldV2(this.prototype, "config", [service('oxi-config')]);
+    decorateFieldV2(this.prototype, "oxiConfig", [service('oxi-config')]);
   }
-  #config = (initializeDeferredDecorator(this, "config"), void 0);
+  #oxiConfig = (initializeDeferredDecorator(this, "oxiConfig"), void 0);
   static {
     decorateFieldV2(this.prototype, "content", [service('oxi-content')]);
   }
@@ -66793,10 +67358,26 @@ class OpenXpkiRoute extends Route {
   };
   previousParams = [];
 
-  // // Reserved Ember function
-  // async beforeModel(transition) {
-  //     let page = transition.to.parent.params.page // to = openxpki.index
-  // }
+  // Reserved Ember function
+  async beforeModel(transition) {
+    // Install Pretender mock server before model() does first HTTP request.
+    // This cannot be done in the "test" child route's beforeModel() because
+    // the parent model() hook runs first.
+    if (environment$1.environment === 'development') {
+      const page = transition.to.params?.page ?? transition.to.parent?.params?.page;
+      if (page === 'test' || page?.startsWith('openxpki.test.')) {
+        // dynamic import to keep test code out of production bundles
+        const {
+          setupPretender
+        } = await __vitePreload(async () => { const {
+          setupPretender
+        } = await Promise.resolve().then(() => amdModule24);return {
+          setupPretender
+        }},true              ?void 0:void 0,import.meta.url);
+        await setupPretender();
+      }
+    }
+  }
 
   // Reserved Ember function
   async model(params, transition) {
@@ -66806,7 +67387,7 @@ class OpenXpkiRoute extends Route {
     // URL-configurable pager variables for <OxiSection::Grid> :
     let limit = transition.to.queryParams.limit ?? null;
     let startat = transition.to.queryParams.startat ?? null;
-    await this.config.ready; // localconfig.js might change rootURL, so first thing is to query it
+    await this.oxiConfig.ready; // localconfig.js might change rootURL, so first thing is to query it
 
     const equalArrays = (a1, a2) => a1.size === a2.size && a1.every((key, i) => a1.at(i) === a2.at(i));
 
@@ -67114,7 +67695,7 @@ class And extends Helper {
   }
 }
 
-const template$1 = templateFactory(
+const template = templateFactory(
 /*
   <OxiBase::Navbar @items={{this.model.navEntries}}>
     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
@@ -67242,11 +67823,11 @@ const template$1 = templateFactory(
             {{/each}}
         </div>
     </div>
-</div>
 
-{{!-- Contents of sub-routes (i.e. /openxpki/popup) if any.
-      "Each template will be rendered into the {{outlet}} of its parent route's template." --}}
-{{outlet}}
+    {{!-- Contents of sub-routes (i.e. /openxpki/popup, /openxpki/test) if any.
+          "Each template will be rendered into the {{outlet}} of its parent route's template." --}}
+    {{outlet}}
+</div>
 
 <BsModal
     @open={{if this.model.error true false}}
@@ -67281,8 +67862,8 @@ const template$1 = templateFactory(
 
 */
 {
-  "id": "tbqUKFoa",
-  "block": "[[[8,[32,0],null,[[\"@items\"],[[30,0,[\"model\",\"navEntries\"]]]],[[\"default\"],[[[[1,\"\\n    \"],[10,\"ul\"],[14,0,\"navbar-nav ms-auto mb-2 mb-lg-0\"],[12],[1,\"\\n\"],[41,[30,0,[\"model\",\"user\"]],[[[1,\"            \"],[10,\"li\"],[14,0,\"nav-item\"],[12],[1,\"\\n                \"],[8,[32,1],[[24,0,\"nav-link py-1 ps-2 px-lg-2\"]],[[\"@spec\",\"@onClick\"],[[28,[32,2],null,[[\"label\",\"icon\"],[[28,[32,3],[\"site.logout\"],null],\"glyphicon-log-out\"]]],[30,0,[\"logout\"]]]],null],[1,\"\\n            \"],[13],[1,\"\\n\"]],[]],null],[1,\"    \"],[13],[1,\"\\n\"]],[]]]]],[1,\"\\n\\n\"],[10,0],[15,0,[29,[\"container-fluid pe-md-3 \",[30,0,[\"model\",\"top\",\"page\",\"className\"]]]]],[12],[1,\"\\n\"],[1,\"    \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n        \"],[10,0],[14,0,\"col oxi-message\"],[12],[1,\"\\n            \"],[10,0],[14,0,\"alert alert-danger\"],[15,\"hidden\",[28,[32,4],[[28,[32,5],[[28,[32,4],[[30,0,[\"content\",\"user\"]]],null],[30,0,[\"oldBrowser\"]]],null]],null]],[12],[1,\"\\n                \"],[1,[28,[32,6],[\"site.old_browser\"],[[\"browser\"],[[30,0,[\"oldBrowser\"]]]]]],[1,\"\\n            \"],[13],[1,\"\\n        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\\n    \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n        \"],[10,0],[14,0,\"col oxi-pagehead\"],[12],[1,\"\\n\"],[42,[28,[37,5],[[28,[37,5],[[30,0,[\"breadcrumbs\"]]],null]],null],null,[[[44,[[28,[32,7],[\"badge rounded-pill oxi-breadcrumb mb-3 \",[30,1,[\"class\"]]],null]],[[[41,[30,1,[\"page\"]],[[[1,\"                    \"],[11,3],[16,0,[29,[\"btn \",[30,2]]]],[24,\"role\",\"button\"],[4,[32,8],[\"click\",[28,[32,9],[[30,0,[\"content\",\"gotoBreadcrumb\"]],[30,1]],null]],null],[12],[1,\"\\n                        \"],[1,[30,1,[\"label\"]]],[1,\"\\n                    \"],[13],[1,\"\\n\"]],[]],[[[1,\"                    \"],[10,1],[15,0,[29,[[30,2]]]],[12],[1,\"\\n                        \"],[1,[30,1,[\"label\"]]],[1,\"\\n                    \"],[13],[1,\"\\n\"]],[]]],[41,[51,[28,[32,10],[[30,1],[30,0,[\"breadcrumbs\",\"lastObject\"]]],null]],[[[1,\"                    \"],[10,\"i\"],[14,0,\"glyphicon glyphicon-chevron-right text-secondary mx-2\"],[12],[13],[1,\"\\n\"]],[]],null]],[2]]]],[1]],null],[1,\"\\n\"],[1,\"            \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n                \"],[8,[32,11],null,[[\"@def\"],[[30,0,[\"model\",\"status\"]]]],null],[1,\"\\n            \"],[13],[1,\"\\n\\n        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\\n\"],[1,\"    \"],[10,0],[14,0,\"row row-cols-1 row-cols-md-2 justify-content-between\"],[12],[1,\"\\n        \"],[10,0],[14,0,\"col col-md-auto oxi-pagehead\"],[12],[1,\"\\n            \"],[10,\"h3\"],[12],[1,\"\\n\"],[41,[30,0,[\"model\",\"top\",\"page\",\"label\"]],[[[1,\"                    \"],[1,[30,0,[\"model\",\"top\",\"page\",\"label\"]]],[1,\"\\n\"]],[]],null],[41,[30,0,[\"model\",\"isAutoRefresh\"]],[[[1,\"                    \"],[10,1],[14,0,\"alert alert-info py-2 ms-2 fs-6\"],[14,\"role\",\"alert\"],[12],[1,\"\\n                        \"],[10,1],[14,0,\"glyphicon glyphicon-refresh spin-slow\"],[12],[13],[1,\"\\n                         \"],[1,[28,[32,6],[\"site.banner.autorefresh\"],null]],[1,\"\\n                    \"],[13],[1,\"\\n\"]],[]],null],[1,\"            \"],[13],[1,\"\\n        \"],[13],[1,\"\\n        \"],[11,0],[24,0,\"col col-md-auto oxi-pagehead\"],[4,[32,12],[[30,0,[\"setTempCopyElement\"]]],null],[12],[1,\"\\n\"],[41,[30,0,[\"workflowCopyIdButton\"]],[[[1,\"                \"],[8,[32,13],[[24,0,\"btn-sm oxi-btn-copy-workflow-id\"]],[[\"@button\"],[[30,0,[\"workflowCopyIdButton\"]]]],null],[1,\"\\n\"]],[]],null],[42,[28,[37,5],[[28,[37,5],[[30,0,[\"model\",\"top\",\"page\",\"buttons\"]]],null]],null],null,[[[1,\"                \"],[8,[32,13],[[24,0,\"btn-sm\"]],[[\"@button\"],[[30,3]]],null],[1,\"\\n\"]],[3]],null],[1,\"        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\\n    \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n        \"],[10,0],[14,0,\"col oxi-main\"],[12],[1,\"\\n\"],[41,[30,0,[\"model\",\"top\",\"page\",\"description\"]],[[[1,\"                \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n                    \"],[10,0],[14,0,\"col mb-3\"],[12],[1,\"\\n                        \"],[1,[28,[32,14],[[30,0,[\"model\",\"top\",\"page\",\"description\"]]],null]],[1,\"\\n                    \"],[13],[1,\"\\n                \"],[13],[1,\"\\n\"]],[]],null],[1,\"\\n\"],[42,[28,[37,5],[[28,[37,5],[[30,0,[\"model\",\"top\",\"main\"]]],null]],null],null,[[[1,\"                \"],[3,\" this.model.top.main item \"],[1,\"\\n\"],[1,\"                \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n                    \"],[10,0],[15,0,[29,[\"col \",[52,[28,[32,10],[[30,4,[\"type\"]],\"form\"],null],\"col-xl-10\"]]]],[12],[1,\"\\n                        \"],[8,[32,15],null,[[\"@content\",\"@meta\"],[[30,4],[28,[32,2],null,[[\"sectionNo\",\"renderAsCard\"],[[30,5],[28,[32,5],[[28,[32,4],[[30,4,[\"compact\"]]],null],[28,[32,10],[[30,4,[\"type\"]],\"keyvalue\"],null],[28,[32,4],[[30,4,[\"content\",\"buttons\"]]],null]],null]]]]]],null],[1,\"\\n                    \"],[13],[1,\"\\n                \"],[13],[1,\"\\n\"]],[4,5]],null],[1,\"        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\"],[13],[1,\"\\n\\n\"],[46,[28,[37,13],null,null],null,null,null],[1,\"\\n\\n\"],[8,[32,16],null,[[\"@open\",\"@closeButton\",\"@fade\",\"@backdrop\",\"@backdropClose\",\"@size\"],[[52,[30,0,[\"model\",\"error\"]],true,false],true,true,true,false,\"lg\"]],[[\"default\"],[[[[1,\"\\n    \"],[8,[30,6,[\"header\"]],null,null,[[\"default\"],[[[[1,\"\\n        \"],[10,\"h4\"],[14,0,\"modal-title\"],[12],[1,[28,[32,6],[\"error_popup.header\"],null]],[13],[1,\"\\n    \"]],[]]]]],[1,\"\\n    \"],[8,[30,6,[\"body\"]],null,null,[[\"default\"],[[[[1,\"\\n        \"],[8,[32,17],null,[[\"@value\",\"@raw\"],[[30,0,[\"model\",\"error\"]],true]],null],[1,\"\\n    \"]],[]]]]],[1,\"\\n    \"],[8,[30,6,[\"footer\"]],null,null,[[\"default\"],[[[[1,\"\\n        \"],[8,[32,18],[[24,0,\"oxi-btn-primary\"],[4,[32,8],[\"click\",[30,0,[\"reload\"]]],null]],[[\"@type\"],[\"\"]],[[\"default\"],[[[[1,[28,[32,6],[\"error_popup.reload\"],null]]],[]]]]],[1,\"\\n        \"],[8,[32,18],[[24,0,\"oxi-btn-optional\"],[4,[32,8],[\"click\",[30,6,[\"close\"]]],null]],[[\"@type\"],[\"\"]],[[\"default\"],[[[[1,[28,[32,6],[\"site.close_popup\"],null]]],[]]]]],[1,\"\\n    \"]],[]]]]],[1,\"\\n\"]],[6]]]]],[1,\"\\n\\n\"],[41,[30,0,[\"model\",\"loadingBanner\"]],[[[1,\"    \"],[10,0],[14,0,\"dimmer\"],[12],[13],[1,\"\\n    \"],[10,0],[14,0,\"oxi-loading-banner\"],[12],[1,\"\\n        \"],[10,\"h4\"],[14,0,\"alert alert-info\"],[14,\"role\",\"alert\"],[12],[1,\"\\n            \"],[10,1],[14,0,\"glyphicon glyphicon-refresh spin\"],[12],[13],[1,\"\\n             \"],[1,[30,0,[\"model\",\"loadingBanner\"]]],[1,\"\\n        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\"]],[]],null]],[\"bc\",\"css\",\"btn\",\"entry\",\"index\",\"Modal\"],[\"ul\",\"if\",\"li\",\"div\",\"each\",\"-track-array\",\"let\",\"a\",\"span\",\"unless\",\"i\",\"h3\",\"component\",\"-outlet\",\"h4\"]]",
+  "id": "oWfTh/KK",
+  "block": "[[[8,[32,0],null,[[\"@items\"],[[30,0,[\"model\",\"navEntries\"]]]],[[\"default\"],[[[[1,\"\\n    \"],[10,\"ul\"],[14,0,\"navbar-nav ms-auto mb-2 mb-lg-0\"],[12],[1,\"\\n\"],[41,[30,0,[\"model\",\"user\"]],[[[1,\"            \"],[10,\"li\"],[14,0,\"nav-item\"],[12],[1,\"\\n                \"],[8,[32,1],[[24,0,\"nav-link py-1 ps-2 px-lg-2\"]],[[\"@spec\",\"@onClick\"],[[28,[32,2],null,[[\"label\",\"icon\"],[[28,[32,3],[\"site.logout\"],null],\"glyphicon-log-out\"]]],[30,0,[\"logout\"]]]],null],[1,\"\\n            \"],[13],[1,\"\\n\"]],[]],null],[1,\"    \"],[13],[1,\"\\n\"]],[]]]]],[1,\"\\n\\n\"],[10,0],[15,0,[29,[\"container-fluid pe-md-3 \",[30,0,[\"model\",\"top\",\"page\",\"className\"]]]]],[12],[1,\"\\n\"],[1,\"    \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n        \"],[10,0],[14,0,\"col oxi-message\"],[12],[1,\"\\n            \"],[10,0],[14,0,\"alert alert-danger\"],[15,\"hidden\",[28,[32,4],[[28,[32,5],[[28,[32,4],[[30,0,[\"content\",\"user\"]]],null],[30,0,[\"oldBrowser\"]]],null]],null]],[12],[1,\"\\n                \"],[1,[28,[32,6],[\"site.old_browser\"],[[\"browser\"],[[30,0,[\"oldBrowser\"]]]]]],[1,\"\\n            \"],[13],[1,\"\\n        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\\n    \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n        \"],[10,0],[14,0,\"col oxi-pagehead\"],[12],[1,\"\\n\"],[42,[28,[37,5],[[28,[37,5],[[30,0,[\"breadcrumbs\"]]],null]],null],null,[[[44,[[28,[32,7],[\"badge rounded-pill oxi-breadcrumb mb-3 \",[30,1,[\"class\"]]],null]],[[[41,[30,1,[\"page\"]],[[[1,\"                    \"],[11,3],[16,0,[29,[\"btn \",[30,2]]]],[24,\"role\",\"button\"],[4,[32,8],[\"click\",[28,[32,9],[[30,0,[\"content\",\"gotoBreadcrumb\"]],[30,1]],null]],null],[12],[1,\"\\n                        \"],[1,[30,1,[\"label\"]]],[1,\"\\n                    \"],[13],[1,\"\\n\"]],[]],[[[1,\"                    \"],[10,1],[15,0,[29,[[30,2]]]],[12],[1,\"\\n                        \"],[1,[30,1,[\"label\"]]],[1,\"\\n                    \"],[13],[1,\"\\n\"]],[]]],[41,[51,[28,[32,10],[[30,1],[30,0,[\"breadcrumbs\",\"lastObject\"]]],null]],[[[1,\"                    \"],[10,\"i\"],[14,0,\"glyphicon glyphicon-chevron-right text-secondary mx-2\"],[12],[13],[1,\"\\n\"]],[]],null]],[2]]]],[1]],null],[1,\"\\n\"],[1,\"            \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n                \"],[8,[32,11],null,[[\"@def\"],[[30,0,[\"model\",\"status\"]]]],null],[1,\"\\n            \"],[13],[1,\"\\n\\n        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\\n\"],[1,\"    \"],[10,0],[14,0,\"row row-cols-1 row-cols-md-2 justify-content-between\"],[12],[1,\"\\n        \"],[10,0],[14,0,\"col col-md-auto oxi-pagehead\"],[12],[1,\"\\n            \"],[10,\"h3\"],[12],[1,\"\\n\"],[41,[30,0,[\"model\",\"top\",\"page\",\"label\"]],[[[1,\"                    \"],[1,[30,0,[\"model\",\"top\",\"page\",\"label\"]]],[1,\"\\n\"]],[]],null],[41,[30,0,[\"model\",\"isAutoRefresh\"]],[[[1,\"                    \"],[10,1],[14,0,\"alert alert-info py-2 ms-2 fs-6\"],[14,\"role\",\"alert\"],[12],[1,\"\\n                        \"],[10,1],[14,0,\"glyphicon glyphicon-refresh spin-slow\"],[12],[13],[1,\"\\n                         \"],[1,[28,[32,6],[\"site.banner.autorefresh\"],null]],[1,\"\\n                    \"],[13],[1,\"\\n\"]],[]],null],[1,\"            \"],[13],[1,\"\\n        \"],[13],[1,\"\\n        \"],[11,0],[24,0,\"col col-md-auto oxi-pagehead\"],[4,[32,12],[[30,0,[\"setTempCopyElement\"]]],null],[12],[1,\"\\n\"],[41,[30,0,[\"workflowCopyIdButton\"]],[[[1,\"                \"],[8,[32,13],[[24,0,\"btn-sm oxi-btn-copy-workflow-id\"]],[[\"@button\"],[[30,0,[\"workflowCopyIdButton\"]]]],null],[1,\"\\n\"]],[]],null],[42,[28,[37,5],[[28,[37,5],[[30,0,[\"model\",\"top\",\"page\",\"buttons\"]]],null]],null],null,[[[1,\"                \"],[8,[32,13],[[24,0,\"btn-sm\"]],[[\"@button\"],[[30,3]]],null],[1,\"\\n\"]],[3]],null],[1,\"        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\\n    \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n        \"],[10,0],[14,0,\"col oxi-main\"],[12],[1,\"\\n\"],[41,[30,0,[\"model\",\"top\",\"page\",\"description\"]],[[[1,\"                \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n                    \"],[10,0],[14,0,\"col mb-3\"],[12],[1,\"\\n                        \"],[1,[28,[32,14],[[30,0,[\"model\",\"top\",\"page\",\"description\"]]],null]],[1,\"\\n                    \"],[13],[1,\"\\n                \"],[13],[1,\"\\n\"]],[]],null],[1,\"\\n\"],[42,[28,[37,5],[[28,[37,5],[[30,0,[\"model\",\"top\",\"main\"]]],null]],null],null,[[[1,\"                \"],[3,\" this.model.top.main item \"],[1,\"\\n\"],[1,\"                \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n                    \"],[10,0],[15,0,[29,[\"col \",[52,[28,[32,10],[[30,4,[\"type\"]],\"form\"],null],\"col-xl-10\"]]]],[12],[1,\"\\n                        \"],[8,[32,15],null,[[\"@content\",\"@meta\"],[[30,4],[28,[32,2],null,[[\"sectionNo\",\"renderAsCard\"],[[30,5],[28,[32,5],[[28,[32,4],[[30,4,[\"compact\"]]],null],[28,[32,10],[[30,4,[\"type\"]],\"keyvalue\"],null],[28,[32,4],[[30,4,[\"content\",\"buttons\"]]],null]],null]]]]]],null],[1,\"\\n                    \"],[13],[1,\"\\n                \"],[13],[1,\"\\n\"]],[4,5]],null],[1,\"        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\\n\"],[1,\"    \"],[46,[28,[37,13],null,null],null,null,null],[1,\"\\n\"],[13],[1,\"\\n\\n\"],[8,[32,16],null,[[\"@open\",\"@closeButton\",\"@fade\",\"@backdrop\",\"@backdropClose\",\"@size\"],[[52,[30,0,[\"model\",\"error\"]],true,false],true,true,true,false,\"lg\"]],[[\"default\"],[[[[1,\"\\n    \"],[8,[30,6,[\"header\"]],null,null,[[\"default\"],[[[[1,\"\\n        \"],[10,\"h4\"],[14,0,\"modal-title\"],[12],[1,[28,[32,6],[\"error_popup.header\"],null]],[13],[1,\"\\n    \"]],[]]]]],[1,\"\\n    \"],[8,[30,6,[\"body\"]],null,null,[[\"default\"],[[[[1,\"\\n        \"],[8,[32,17],null,[[\"@value\",\"@raw\"],[[30,0,[\"model\",\"error\"]],true]],null],[1,\"\\n    \"]],[]]]]],[1,\"\\n    \"],[8,[30,6,[\"footer\"]],null,null,[[\"default\"],[[[[1,\"\\n        \"],[8,[32,18],[[24,0,\"oxi-btn-primary\"],[4,[32,8],[\"click\",[30,0,[\"reload\"]]],null]],[[\"@type\"],[\"\"]],[[\"default\"],[[[[1,[28,[32,6],[\"error_popup.reload\"],null]]],[]]]]],[1,\"\\n        \"],[8,[32,18],[[24,0,\"oxi-btn-optional\"],[4,[32,8],[\"click\",[30,6,[\"close\"]]],null]],[[\"@type\"],[\"\"]],[[\"default\"],[[[[1,[28,[32,6],[\"site.close_popup\"],null]]],[]]]]],[1,\"\\n    \"]],[]]]]],[1,\"\\n\"]],[6]]]]],[1,\"\\n\\n\"],[41,[30,0,[\"model\",\"loadingBanner\"]],[[[1,\"    \"],[10,0],[14,0,\"dimmer\"],[12],[13],[1,\"\\n    \"],[10,0],[14,0,\"oxi-loading-banner\"],[12],[1,\"\\n        \"],[10,\"h4\"],[14,0,\"alert alert-info\"],[14,\"role\",\"alert\"],[12],[1,\"\\n            \"],[10,1],[14,0,\"glyphicon glyphicon-refresh spin\"],[12],[13],[1,\"\\n             \"],[1,[30,0,[\"model\",\"loadingBanner\"]]],[1,\"\\n        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\"]],[]],null]],[\"bc\",\"css\",\"btn\",\"entry\",\"index\",\"Modal\"],[\"ul\",\"if\",\"li\",\"div\",\"each\",\"-track-array\",\"let\",\"a\",\"span\",\"unless\",\"i\",\"h3\",\"component\",\"-outlet\",\"h4\"]]",
   "moduleName": "/build/app/route-pods/openxpki/template.hbs",
   "scope": () => [OxiNavbarComponent, OxiMenuItemComponent, hash, THelper, Not, And, THelper, concat, on, fn, Eq, OxiStatusComponent, OnInitModifier, OxiClickableComponent, Defuse, OxiSectionComponent, BsModal, OxiFormattedArbitraryComponent, BsButton],
   "isStrictMode": false
@@ -67290,2767 +67871,46 @@ const template$1 = templateFactory(
 
 const amdModule22 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
-	default: template$1
+	default: template
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const _testButton$1 = {
-  label: "Button",
-  format: "primary",
-  tooltip: "This should do it",
-  disabled: false
-};
-let buttons = [ContainerButton.fromHash({
-  label: "External link",
-  format: "failure",
-  tooltip: "Just fyi",
-  href: "https://www.openxpki.org",
-  target: "_blank"
-}), ContainerButton.fromHash({
-  label: "External link (with confirmation)",
-  format: "exceptional",
-  tooltip: "Just fyi",
-  href: "https://www.openxpki.org",
-  target: "_blank",
-  confirm: {
-    label: "Really sure?",
-    description: "This opens an external page."
+const section_button = [{
+  type: 'button',
+  content: {
+    label: 'Button',
+    format: 'primary',
+    page: 'test'
   }
-}), ContainerButton.fromHash(_testButton$1), ContainerButton.fromHash({
-  ..._testButton$1,
-  label: "With confirmation",
-  confirm: {
-    label: "Really sure?",
-    description: "Think about it one more time."
-  },
-  break_before: 1
-}), ContainerButton.fromHash({
-  ..._testButton$1,
-  label: "Disabled",
-  disabled: true,
-  break_after: 1
-})];
-for (const format of ['primary', 'submit', 'loading', 'cancel', 'reset', 'expected', 'failure', 'optional', 'alternative', 'exceptional', 'terminate', 'tile', 'card', 'info']) {
-  buttons.push(ContainerButton.fromHash({
-    ..._testButton$1,
-    format,
-    label: format
-  }));
-}
+}, {
+  type: 'button',
+  content: {
+    label: 'Submit',
+    format: 'submit',
+    action: 'test!submit'
+  }
+}, {
+  type: 'button',
+  content: {
+    label: 'External link',
+    format: 'optional',
+    href: 'https://www.openxpki.org',
+    target: '_blank'
+  }
+}, {
+  type: 'button',
+  content: {
+    label: 'Request certificate',
+    image: 'img/request.png',
+    page: 'workflow!index!wf_type!certificate_signing_request_v2'
+  }
+}];
 
-const amdModule23 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const amdModule27 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
-	default: buttons
+	default: section_button
 }, Symbol.toStringTag, { value: 'Module' }));
 
-var createObject = Object.create;
-function createMap() {
-  var map = createObject(null);
-  map["__"] = undefined;
-  delete map["__"];
-  return map;
-}
-var Target = function Target(path, matcher, delegate) {
-  this.path = path;
-  this.matcher = matcher;
-  this.delegate = delegate;
-};
-Target.prototype.to = function to(target, callback) {
-  var delegate = this.delegate;
-  if (delegate && delegate.willAddRoute) {
-    target = delegate.willAddRoute(this.matcher.target, target);
-  }
-  this.matcher.add(this.path, target);
-  if (callback) {
-    if (callback.length === 0) {
-      throw new Error("You must have an argument in the function passed to `to`");
-    }
-    this.matcher.addChild(this.path, target, callback, this.delegate);
-  }
-};
-var Matcher = function Matcher(target) {
-  this.routes = createMap();
-  this.children = createMap();
-  this.target = target;
-};
-Matcher.prototype.add = function add(path, target) {
-  this.routes[path] = target;
-};
-Matcher.prototype.addChild = function addChild(path, target, callback, delegate) {
-  var matcher = new Matcher(target);
-  this.children[path] = matcher;
-  var match = generateMatch(path, matcher, delegate);
-  if (delegate && delegate.contextEntered) {
-    delegate.contextEntered(target, match);
-  }
-  callback(match);
-};
-function generateMatch(startingPath, matcher, delegate) {
-  function match(path, callback) {
-    var fullPath = startingPath + path;
-    if (callback) {
-      callback(generateMatch(fullPath, matcher, delegate));
-    } else {
-      return new Target(fullPath, matcher, delegate);
-    }
-  }
-  return match;
-}
-function addRoute(routeArray, path, handler) {
-  var len = 0;
-  for (var i = 0; i < routeArray.length; i++) {
-    len += routeArray[i].path.length;
-  }
-  path = path.substr(len);
-  var route = {
-    path: path,
-    handler: handler
-  };
-  routeArray.push(route);
-}
-function eachRoute(baseRoute, matcher, callback, binding) {
-  var routes = matcher.routes;
-  var paths = Object.keys(routes);
-  for (var i = 0; i < paths.length; i++) {
-    var path = paths[i];
-    var routeArray = baseRoute.slice();
-    addRoute(routeArray, path, routes[path]);
-    var nested = matcher.children[path];
-    if (nested) {
-      eachRoute(routeArray, nested, callback, binding);
-    } else {
-      callback.call(binding, routeArray);
-    }
-  }
-}
-var map = function (callback, addRouteCallback) {
-  var matcher = new Matcher();
-  callback(generateMatch("", matcher, this.delegate));
-  eachRoute([], matcher, function (routes) {
-    if (addRouteCallback) {
-      addRouteCallback(this, routes);
-    } else {
-      this.add(routes);
-    }
-  }, this);
-};
-
-// Normalizes percent-encoded values in `path` to upper-case and decodes percent-encoded
-// values that are not reserved (i.e., unicode characters, emoji, etc). The reserved
-// chars are "/" and "%".
-// Safe to call multiple times on the same path.
-// Normalizes percent-encoded values in `path` to upper-case and decodes percent-encoded
-function normalizePath(path) {
-  return path.split("/").map(normalizeSegment).join("/");
-}
-// We want to ensure the characters "%" and "/" remain in percent-encoded
-// form when normalizing paths, so replace them with their encoded form after
-// decoding the rest of the path
-var SEGMENT_RESERVED_CHARS = /%|\//g;
-function normalizeSegment(segment) {
-  if (segment.length < 3 || segment.indexOf("%") === -1) {
-    return segment;
-  }
-  return decodeURIComponent(segment).replace(SEGMENT_RESERVED_CHARS, encodeURIComponent);
-}
-// We do not want to encode these characters when generating dynamic path segments
-// See https://tools.ietf.org/html/rfc3986#section-3.3
-// sub-delims: "!", "$", "&", "'", "(", ")", "*", "+", ",", ";", "="
-// others allowed by RFC 3986: ":", "@"
-//
-// First encode the entire path segment, then decode any of the encoded special chars.
-//
-// The chars "!", "'", "(", ")", "*" do not get changed by `encodeURIComponent`,
-// so the possible encoded chars are:
-// ['%24', '%26', '%2B', '%2C', '%3B', '%3D', '%3A', '%40'].
-var PATH_SEGMENT_ENCODINGS = /%(?:2(?:4|6|B|C)|3(?:B|D|A)|40)/g;
-function encodePathSegment(str) {
-  return encodeURIComponent(str).replace(PATH_SEGMENT_ENCODINGS, decodeURIComponent);
-}
-var escapeRegex = /(\/|\.|\*|\+|\?|\||\(|\)|\[|\]|\{|\}|\\)/g;
-var isArray$1 = Array.isArray;
-var hasOwnProperty = Object.prototype.hasOwnProperty;
-function getParam(params, key) {
-  if (typeof params !== "object" || params === null) {
-    throw new Error("You must pass an object as the second argument to `generate`.");
-  }
-  if (!hasOwnProperty.call(params, key)) {
-    throw new Error("You must provide param `" + key + "` to `generate`.");
-  }
-  var value = params[key];
-  var str = typeof value === "string" ? value : "" + value;
-  if (str.length === 0) {
-    throw new Error("You must provide a param `" + key + "`.");
-  }
-  return str;
-}
-var eachChar = [];
-eachChar[0 /* Static */] = function (segment, currentState) {
-  var state = currentState;
-  var value = segment.value;
-  for (var i = 0; i < value.length; i++) {
-    var ch = value.charCodeAt(i);
-    state = state.put(ch, false, false);
-  }
-  return state;
-};
-eachChar[1 /* Dynamic */] = function (_, currentState) {
-  return currentState.put(47 /* SLASH */, true, true);
-};
-eachChar[2 /* Star */] = function (_, currentState) {
-  return currentState.put(-1 /* ANY */, false, true);
-};
-eachChar[4 /* Epsilon */] = function (_, currentState) {
-  return currentState;
-};
-var regex = [];
-regex[0 /* Static */] = function (segment) {
-  return segment.value.replace(escapeRegex, "\\$1");
-};
-regex[1 /* Dynamic */] = function () {
-  return "([^/]+)";
-};
-regex[2 /* Star */] = function () {
-  return "(.+)";
-};
-regex[4 /* Epsilon */] = function () {
-  return "";
-};
-var generate = [];
-generate[0 /* Static */] = function (segment) {
-  return segment.value;
-};
-generate[1 /* Dynamic */] = function (segment, params) {
-  var value = getParam(params, segment.value);
-  if (RouteRecognizer.ENCODE_AND_DECODE_PATH_SEGMENTS) {
-    return encodePathSegment(value);
-  } else {
-    return value;
-  }
-};
-generate[2 /* Star */] = function (segment, params) {
-  return getParam(params, segment.value);
-};
-generate[4 /* Epsilon */] = function () {
-  return "";
-};
-var EmptyObject = Object.freeze({});
-var EmptyArray = Object.freeze([]);
-// The `names` will be populated with the paramter name for each dynamic/star
-// segment. `shouldDecodes` will be populated with a boolean for each dyanamic/star
-// segment, indicating whether it should be decoded during recognition.
-function parse$2(segments, route, types) {
-  // normalize route as not starting with a "/". Recognition will
-  // also normalize.
-  if (route.length > 0 && route.charCodeAt(0) === 47 /* SLASH */) {
-    route = route.substr(1);
-  }
-  var parts = route.split("/");
-  var names = undefined;
-  var shouldDecodes = undefined;
-  for (var i = 0; i < parts.length; i++) {
-    var part = parts[i];
-    var flags = 0;
-    var type = 0;
-    if (part === "") {
-      type = 4 /* Epsilon */;
-    } else if (part.charCodeAt(0) === 58 /* COLON */) {
-      type = 1 /* Dynamic */;
-    } else if (part.charCodeAt(0) === 42 /* STAR */) {
-      type = 2 /* Star */;
-    } else {
-      type = 0 /* Static */;
-    }
-    flags = 2 << type;
-    if (flags & 12 /* Named */) {
-      part = part.slice(1);
-      names = names || [];
-      names.push(part);
-      shouldDecodes = shouldDecodes || [];
-      shouldDecodes.push((flags & 4 /* Decoded */) !== 0);
-    }
-    if (flags & 14 /* Counted */) {
-      types[type]++;
-    }
-    segments.push({
-      type: type,
-      value: normalizeSegment(part)
-    });
-  }
-  return {
-    names: names || EmptyArray,
-    shouldDecodes: shouldDecodes || EmptyArray
-  };
-}
-function isEqualCharSpec(spec, char, negate) {
-  return spec.char === char && spec.negate === negate;
-}
-// A State has a character specification and (`charSpec`) and a list of possible
-// subsequent states (`nextStates`).
-//
-// If a State is an accepting state, it will also have several additional
-// properties:
-//
-// * `regex`: A regular expression that is used to extract parameters from paths
-//   that reached this accepting state.
-// * `handlers`: Information on how to convert the list of captures into calls
-//   to registered handlers with the specified parameters
-// * `types`: How many static, dynamic or star segments in this route. Used to
-//   decide which route to use if multiple registered routes match a path.
-//
-// Currently, State is implemented naively by looping over `nextStates` and
-// comparing a character specification against a character. A more efficient
-// implementation would use a hash of keys pointing at one or more next states.
-var State = function State(states, id, char, negate, repeat) {
-  this.states = states;
-  this.id = id;
-  this.char = char;
-  this.negate = negate;
-  this.nextStates = repeat ? id : null;
-  this.pattern = "";
-  this._regex = undefined;
-  this.handlers = undefined;
-  this.types = undefined;
-};
-State.prototype.regex = function regex$1() {
-  if (!this._regex) {
-    this._regex = new RegExp(this.pattern);
-  }
-  return this._regex;
-};
-State.prototype.get = function get(char, negate) {
-  var this$1$1 = this;
-  var nextStates = this.nextStates;
-  if (nextStates === null) {
-    return;
-  }
-  if (isArray$1(nextStates)) {
-    for (var i = 0; i < nextStates.length; i++) {
-      var child = this$1$1.states[nextStates[i]];
-      if (isEqualCharSpec(child, char, negate)) {
-        return child;
-      }
-    }
-  } else {
-    var child$1 = this.states[nextStates];
-    if (isEqualCharSpec(child$1, char, negate)) {
-      return child$1;
-    }
-  }
-};
-State.prototype.put = function put(char, negate, repeat) {
-  var state;
-  // If the character specification already exists in a child of the current
-  // state, just return that state.
-  if (state = this.get(char, negate)) {
-    return state;
-  }
-  // Make a new state for the character spec
-  var states = this.states;
-  state = new State(states, states.length, char, negate, repeat);
-  states[states.length] = state;
-  // Insert the new state as a child of the current state
-  if (this.nextStates == null) {
-    this.nextStates = state.id;
-  } else if (isArray$1(this.nextStates)) {
-    this.nextStates.push(state.id);
-  } else {
-    this.nextStates = [this.nextStates, state.id];
-  }
-  // Return the new state
-  return state;
-};
-// Find a list of child states matching the next character
-State.prototype.match = function match(ch) {
-  var this$1$1 = this;
-  var nextStates = this.nextStates;
-  if (!nextStates) {
-    return [];
-  }
-  var returned = [];
-  if (isArray$1(nextStates)) {
-    for (var i = 0; i < nextStates.length; i++) {
-      var child = this$1$1.states[nextStates[i]];
-      if (isMatch(child, ch)) {
-        returned.push(child);
-      }
-    }
-  } else {
-    var child$1 = this.states[nextStates];
-    if (isMatch(child$1, ch)) {
-      returned.push(child$1);
-    }
-  }
-  return returned;
-};
-function isMatch(spec, char) {
-  return spec.negate ? spec.char !== char && spec.char !== -1 /* ANY */ : spec.char === char || spec.char === -1 /* ANY */;
-}
-// This is a somewhat naive strategy, but should work in a lot of cases
-// A better strategy would properly resolve /posts/:id/new and /posts/edit/:id.
-//
-// This strategy generally prefers more static and less dynamic matching.
-// Specifically, it
-//
-//  * prefers fewer stars to more, then
-//  * prefers using stars for less of the match to more, then
-//  * prefers fewer dynamic segments to more, then
-//  * prefers more static segments to more
-function sortSolutions(states) {
-  return states.sort(function (a, b) {
-    var ref = a.types || [0, 0, 0];
-    var astatics = ref[0];
-    var adynamics = ref[1];
-    var astars = ref[2];
-    var ref$1 = b.types || [0, 0, 0];
-    var bstatics = ref$1[0];
-    var bdynamics = ref$1[1];
-    var bstars = ref$1[2];
-    if (astars !== bstars) {
-      return astars - bstars;
-    }
-    if (astars) {
-      if (astatics !== bstatics) {
-        return bstatics - astatics;
-      }
-      if (adynamics !== bdynamics) {
-        return bdynamics - adynamics;
-      }
-    }
-    if (adynamics !== bdynamics) {
-      return adynamics - bdynamics;
-    }
-    if (astatics !== bstatics) {
-      return bstatics - astatics;
-    }
-    return 0;
-  });
-}
-function recognizeChar(states, ch) {
-  var nextStates = [];
-  for (var i = 0, l = states.length; i < l; i++) {
-    var state = states[i];
-    nextStates = nextStates.concat(state.match(ch));
-  }
-  return nextStates;
-}
-var RecognizeResults = function RecognizeResults(queryParams) {
-  this.length = 0;
-  this.queryParams = queryParams || {};
-};
-RecognizeResults.prototype.splice = Array.prototype.splice;
-RecognizeResults.prototype.slice = Array.prototype.slice;
-RecognizeResults.prototype.push = Array.prototype.push;
-function findHandler(state, originalPath, queryParams) {
-  var handlers = state.handlers;
-  var regex = state.regex();
-  if (!regex || !handlers) {
-    throw new Error("state not initialized");
-  }
-  var captures = originalPath.match(regex);
-  var currentCapture = 1;
-  var result = new RecognizeResults(queryParams);
-  result.length = handlers.length;
-  for (var i = 0; i < handlers.length; i++) {
-    var handler = handlers[i];
-    var names = handler.names;
-    var shouldDecodes = handler.shouldDecodes;
-    var params = EmptyObject;
-    var isDynamic = false;
-    if (names !== EmptyArray && shouldDecodes !== EmptyArray) {
-      for (var j = 0; j < names.length; j++) {
-        isDynamic = true;
-        var name = names[j];
-        var capture = captures && captures[currentCapture++];
-        if (params === EmptyObject) {
-          params = {};
-        }
-        if (RouteRecognizer.ENCODE_AND_DECODE_PATH_SEGMENTS && shouldDecodes[j]) {
-          params[name] = capture && decodeURIComponent(capture);
-        } else {
-          params[name] = capture;
-        }
-      }
-    }
-    result[i] = {
-      handler: handler.handler,
-      params: params,
-      isDynamic: isDynamic
-    };
-  }
-  return result;
-}
-function decodeQueryParamPart(part) {
-  // http://www.w3.org/TR/html401/interact/forms.html#h-17.13.4.1
-  part = part.replace(/\+/gm, "%20");
-  var result;
-  try {
-    result = decodeURIComponent(part);
-  } catch (error) {
-    result = "";
-  }
-  return result;
-}
-var RouteRecognizer = function RouteRecognizer() {
-  this.names = createMap();
-  var states = [];
-  var state = new State(states, 0, -1 /* ANY */, true, false);
-  states[0] = state;
-  this.states = states;
-  this.rootState = state;
-};
-RouteRecognizer.prototype.add = function add(routes, options) {
-  var currentState = this.rootState;
-  var pattern = "^";
-  var types = [0, 0, 0];
-  var handlers = new Array(routes.length);
-  var allSegments = [];
-  var isEmpty = true;
-  var j = 0;
-  for (var i = 0; i < routes.length; i++) {
-    var route = routes[i];
-    var ref = parse$2(allSegments, route.path, types);
-    var names = ref.names;
-    var shouldDecodes = ref.shouldDecodes;
-    // preserve j so it points to the start of newly added segments
-    for (; j < allSegments.length; j++) {
-      var segment = allSegments[j];
-      if (segment.type === 4 /* Epsilon */) {
-        continue;
-      }
-      isEmpty = false;
-      // Add a "/" for the new segment
-      currentState = currentState.put(47 /* SLASH */, false, false);
-      pattern += "/";
-      // Add a representation of the segment to the NFA and regex
-      currentState = eachChar[segment.type](segment, currentState);
-      pattern += regex[segment.type](segment);
-    }
-    handlers[i] = {
-      handler: route.handler,
-      names: names,
-      shouldDecodes: shouldDecodes
-    };
-  }
-  if (isEmpty) {
-    currentState = currentState.put(47 /* SLASH */, false, false);
-    pattern += "/";
-  }
-  currentState.handlers = handlers;
-  currentState.pattern = pattern + "$";
-  currentState.types = types;
-  var name;
-  if (typeof options === "object" && options !== null && options.as) {
-    name = options.as;
-  }
-  if (name) {
-    // if (this.names[name]) {
-    //   throw new Error("You may not add a duplicate route named `" + name + "`.");
-    // }
-    this.names[name] = {
-      segments: allSegments,
-      handlers: handlers
-    };
-  }
-};
-RouteRecognizer.prototype.handlersFor = function handlersFor(name) {
-  var route = this.names[name];
-  if (!route) {
-    throw new Error("There is no route named " + name);
-  }
-  var result = new Array(route.handlers.length);
-  for (var i = 0; i < route.handlers.length; i++) {
-    var handler = route.handlers[i];
-    result[i] = handler;
-  }
-  return result;
-};
-RouteRecognizer.prototype.hasRoute = function hasRoute(name) {
-  return !!this.names[name];
-};
-RouteRecognizer.prototype.generate = function generate$1(name, params) {
-  var route = this.names[name];
-  var output = "";
-  if (!route) {
-    throw new Error("There is no route named " + name);
-  }
-  var segments = route.segments;
-  for (var i = 0; i < segments.length; i++) {
-    var segment = segments[i];
-    if (segment.type === 4 /* Epsilon */) {
-      continue;
-    }
-    output += "/";
-    output += generate[segment.type](segment, params);
-  }
-  if (output.charAt(0) !== "/") {
-    output = "/" + output;
-  }
-  if (params && params.queryParams) {
-    output += this.generateQueryString(params.queryParams);
-  }
-  return output;
-};
-RouteRecognizer.prototype.generateQueryString = function generateQueryString(params) {
-  var pairs = [];
-  var keys = Object.keys(params);
-  keys.sort();
-  for (var i = 0; i < keys.length; i++) {
-    var key = keys[i];
-    var value = params[key];
-    if (value == null) {
-      continue;
-    }
-    var pair = encodeURIComponent(key);
-    if (isArray$1(value)) {
-      for (var j = 0; j < value.length; j++) {
-        var arrayPair = key + "[]" + "=" + encodeURIComponent(value[j]);
-        pairs.push(arrayPair);
-      }
-    } else {
-      pair += "=" + encodeURIComponent(value);
-      pairs.push(pair);
-    }
-  }
-  if (pairs.length === 0) {
-    return "";
-  }
-  return "?" + pairs.join("&");
-};
-RouteRecognizer.prototype.parseQueryString = function parseQueryString(queryString) {
-  var pairs = queryString.split("&");
-  var queryParams = {};
-  for (var i = 0; i < pairs.length; i++) {
-    var pair = pairs[i].split("="),
-      key = decodeQueryParamPart(pair[0]),
-      keyLength = key.length,
-      isArray = false,
-      value = void 0;
-    if (pair.length === 1) {
-      value = "true";
-    } else {
-      // Handle arrays
-      if (keyLength > 2 && key.slice(keyLength - 2) === "[]") {
-        isArray = true;
-        key = key.slice(0, keyLength - 2);
-        if (!queryParams[key]) {
-          queryParams[key] = [];
-        }
-      }
-      value = pair[1] ? decodeQueryParamPart(pair[1]) : "";
-    }
-    if (isArray) {
-      queryParams[key].push(value);
-    } else {
-      queryParams[key] = value;
-    }
-  }
-  return queryParams;
-};
-RouteRecognizer.prototype.recognize = function recognize(path) {
-  var results;
-  var states = [this.rootState];
-  var queryParams = {};
-  var isSlashDropped = false;
-  var hashStart = path.indexOf("#");
-  if (hashStart !== -1) {
-    path = path.substr(0, hashStart);
-  }
-  var queryStart = path.indexOf("?");
-  if (queryStart !== -1) {
-    var queryString = path.substr(queryStart + 1, path.length);
-    path = path.substr(0, queryStart);
-    queryParams = this.parseQueryString(queryString);
-  }
-  if (path.charAt(0) !== "/") {
-    path = "/" + path;
-  }
-  var originalPath = path;
-  if (RouteRecognizer.ENCODE_AND_DECODE_PATH_SEGMENTS) {
-    path = normalizePath(path);
-  } else {
-    path = decodeURI(path);
-    originalPath = decodeURI(originalPath);
-  }
-  var pathLen = path.length;
-  if (pathLen > 1 && path.charAt(pathLen - 1) === "/") {
-    path = path.substr(0, pathLen - 1);
-    originalPath = originalPath.substr(0, originalPath.length - 1);
-    isSlashDropped = true;
-  }
-  for (var i = 0; i < path.length; i++) {
-    states = recognizeChar(states, path.charCodeAt(i));
-    if (!states.length) {
-      break;
-    }
-  }
-  var solutions = [];
-  for (var i$1 = 0; i$1 < states.length; i$1++) {
-    if (states[i$1].handlers) {
-      solutions.push(states[i$1]);
-    }
-  }
-  states = sortSolutions(solutions);
-  var state = solutions[0];
-  if (state && state.handlers) {
-    // if a trailing slash was dropped and a star segment is the last segment
-    // specified, put the trailing slash back
-    if (isSlashDropped && state.pattern && state.pattern.slice(-5) === "(.+)$") {
-      originalPath = originalPath + "/";
-    }
-    results = findHandler(state, originalPath, queryParams);
-  }
-  return results;
-};
-RouteRecognizer.VERSION = "0.3.4";
-// Set to false to opt-out of encoding and decoding path segments.
-// See https://github.com/tildeio/route-recognizer/pull/55
-RouteRecognizer.ENCODE_AND_DECODE_PATH_SEGMENTS = true;
-RouteRecognizer.Normalizer = {
-  normalizeSegment: normalizeSegment,
-  normalizePath: normalizePath,
-  encodePathSegment: encodePathSegment
-};
-RouteRecognizer.prototype.map = map;
-
-/**
- * Minimal Event interface implementation
- *
- * Original implementation by Sven Fuchs: https://gist.github.com/995028
- * Modifications and tests by Christian Johansen.
- *
- * @author Sven Fuchs (svenfuchs@artweb-design.de)
- * @author Christian Johansen (christian@cjohansen.no)
- * @license BSD
- *
- * Copyright (c) 2011 Sven Fuchs, Christian Johansen
- */
-
-var _Event = function Event(type, bubbles, cancelable, target) {
-  this.type = type;
-  this.bubbles = bubbles;
-  this.cancelable = cancelable;
-  this.target = target;
-};
-_Event.prototype = {
-  stopPropagation: function () {},
-  preventDefault: function () {
-    this.defaultPrevented = true;
-  }
-};
-
-/*
-  Used to set the statusText property of an xhr object
-*/
-var httpStatusCodes = {
-  100: "Continue",
-  101: "Switching Protocols",
-  200: "OK",
-  201: "Created",
-  202: "Accepted",
-  203: "Non-Authoritative Information",
-  204: "No Content",
-  205: "Reset Content",
-  206: "Partial Content",
-  300: "Multiple Choice",
-  301: "Moved Permanently",
-  302: "Found",
-  303: "See Other",
-  304: "Not Modified",
-  305: "Use Proxy",
-  307: "Temporary Redirect",
-  400: "Bad Request",
-  401: "Unauthorized",
-  402: "Payment Required",
-  403: "Forbidden",
-  404: "Not Found",
-  405: "Method Not Allowed",
-  406: "Not Acceptable",
-  407: "Proxy Authentication Required",
-  408: "Request Timeout",
-  409: "Conflict",
-  410: "Gone",
-  411: "Length Required",
-  412: "Precondition Failed",
-  413: "Request Entity Too Large",
-  414: "Request-URI Too Long",
-  415: "Unsupported Media Type",
-  416: "Requested Range Not Satisfiable",
-  417: "Expectation Failed",
-  422: "Unprocessable Entity",
-  500: "Internal Server Error",
-  501: "Not Implemented",
-  502: "Bad Gateway",
-  503: "Service Unavailable",
-  504: "Gateway Timeout",
-  505: "HTTP Version Not Supported"
-};
-
-/*
-  Cross-browser XML parsing. Used to turn
-  XML responses into Document objects
-  Borrowed from JSpec
-*/
-function parseXML(text) {
-  var xmlDoc;
-  if (typeof DOMParser != "undefined") {
-    var parser = new DOMParser();
-    xmlDoc = parser.parseFromString(text, "text/xml");
-  } else {
-    xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
-    xmlDoc.async = "false";
-    xmlDoc.loadXML(text);
-  }
-  return xmlDoc;
-}
-
-/*
-  Without mocking, the native XMLHttpRequest object will throw
-  an error when attempting to set these headers. We match this behavior.
-*/
-var unsafeHeaders = {
-  "Accept-Charset": true,
-  "Accept-Encoding": true,
-  "Connection": true,
-  "Content-Length": true,
-  "Cookie": true,
-  "Cookie2": true,
-  "Content-Transfer-Encoding": true,
-  "Date": true,
-  "Expect": true,
-  "Host": true,
-  "Keep-Alive": true,
-  "Referer": true,
-  "TE": true,
-  "Trailer": true,
-  "Transfer-Encoding": true,
-  "Upgrade": true,
-  "User-Agent": true,
-  "Via": true
-};
-
-/*
-  Adds an "event" onto the fake xhr object
-  that just calls the same-named method. This is
-  in case a library adds callbacks for these events.
-*/
-function _addEventListener(eventName, xhr) {
-  xhr.addEventListener(eventName, function (event) {
-    var listener = xhr["on" + eventName];
-    if (listener && typeof listener == "function") {
-      listener.call(event.target, event);
-    }
-  });
-}
-function EventedObject() {
-  this._eventListeners = {};
-  var events = ["loadstart", "progress", "load", "abort", "loadend"];
-  for (var i = events.length - 1; i >= 0; i--) {
-    _addEventListener(events[i], this);
-  }
-}
-EventedObject.prototype = {
-  /*
-    Duplicates the behavior of native XMLHttpRequest's addEventListener function
-  */
-  addEventListener: function addEventListener(event, listener) {
-    this._eventListeners[event] = this._eventListeners[event] || [];
-    this._eventListeners[event].push(listener);
-  },
-  /*
-    Duplicates the behavior of native XMLHttpRequest's removeEventListener function
-  */
-  removeEventListener: function removeEventListener(event, listener) {
-    var listeners = this._eventListeners[event] || [];
-    for (var i = 0, l = listeners.length; i < l; ++i) {
-      if (listeners[i] == listener) {
-        return listeners.splice(i, 1);
-      }
-    }
-  },
-  /*
-    Duplicates the behavior of native XMLHttpRequest's dispatchEvent function
-  */
-  dispatchEvent: function dispatchEvent(event) {
-    var type = event.type;
-    var listeners = this._eventListeners[type] || [];
-    for (var i = 0; i < listeners.length; i++) {
-      if (typeof listeners[i] == "function") {
-        listeners[i].call(this, event);
-      } else {
-        listeners[i].handleEvent(event);
-      }
-    }
-    return !!event.defaultPrevented;
-  },
-  /*
-    Triggers an `onprogress` event with the given parameters.
-  */
-  _progress: function _progress(lengthComputable, loaded, total) {
-    var event = new _Event('progress');
-    event.target = this;
-    event.lengthComputable = lengthComputable;
-    event.loaded = loaded;
-    event.total = total;
-    this.dispatchEvent(event);
-  }
-};
-
-/*
-  Constructor for a fake window.XMLHttpRequest
-*/
-function FakeXMLHttpRequest() {
-  EventedObject.call(this);
-  this.readyState = FakeXMLHttpRequest.UNSENT;
-  this.requestHeaders = {};
-  this.requestBody = null;
-  this.status = 0;
-  this.statusText = "";
-  this.upload = new EventedObject();
-  this.onabort = null;
-  this.onerror = null;
-  this.onload = null;
-  this.onloadend = null;
-  this.onloadstart = null;
-  this.onprogress = null;
-  this.onreadystatechange = null;
-  this.ontimeout = null;
-}
-FakeXMLHttpRequest.prototype = new EventedObject();
-
-// These status codes are available on the native XMLHttpRequest
-// object, so we match that here in case a library is relying on them.
-FakeXMLHttpRequest.UNSENT = 0;
-FakeXMLHttpRequest.OPENED = 1;
-FakeXMLHttpRequest.HEADERS_RECEIVED = 2;
-FakeXMLHttpRequest.LOADING = 3;
-FakeXMLHttpRequest.DONE = 4;
-var FakeXMLHttpRequestProto = {
-  UNSENT: 0,
-  OPENED: 1,
-  HEADERS_RECEIVED: 2,
-  LOADING: 3,
-  DONE: 4,
-  async: true,
-  withCredentials: false,
-  /*
-    Duplicates the behavior of native XMLHttpRequest's open function
-  */
-  open: function open(method, url, async, username, password) {
-    this.method = method;
-    this.url = url;
-    this.async = typeof async == "boolean" ? async : true;
-    this.username = username;
-    this.password = password;
-    this.responseText = null;
-    this.response = this.responseText;
-    this.responseXML = null;
-    this.responseURL = url;
-    this.requestHeaders = {};
-    this.sendFlag = false;
-    this._readyStateChange(FakeXMLHttpRequest.OPENED);
-  },
-  /*
-    Duplicates the behavior of native XMLHttpRequest's setRequestHeader function
-  */
-  setRequestHeader: function setRequestHeader(header, value) {
-    verifyState(this);
-    if (unsafeHeaders[header] || /^(Sec-|Proxy-)/.test(header)) {
-      throw new Error("Refused to set unsafe header \"" + header + "\"");
-    }
-    if (this.requestHeaders[header]) {
-      this.requestHeaders[header] += "," + value;
-    } else {
-      this.requestHeaders[header] = value;
-    }
-  },
-  /*
-    Duplicates the behavior of native XMLHttpRequest's send function
-  */
-  send: function send(data) {
-    verifyState(this);
-    if (!/^(get|head)$/i.test(this.method)) {
-      var hasContentTypeHeader = false;
-      Object.keys(this.requestHeaders).forEach(function (key) {
-        if (key.toLowerCase() === 'content-type') {
-          hasContentTypeHeader = true;
-        }
-      });
-      if (!hasContentTypeHeader && !(data || '').toString().match('FormData')) {
-        this.requestHeaders["Content-Type"] = "text/plain;charset=UTF-8";
-      }
-      this.requestBody = data;
-    }
-    this.errorFlag = false;
-    this.sendFlag = this.async;
-    this._readyStateChange(FakeXMLHttpRequest.OPENED);
-    if (typeof this.onSend == "function") {
-      this.onSend(this);
-    }
-    this.dispatchEvent(new _Event("loadstart", false, false, this));
-  },
-  /*
-    Duplicates the behavior of native XMLHttpRequest's abort function
-  */
-  abort: function abort() {
-    this.aborted = true;
-    this.responseText = null;
-    this.response = this.responseText;
-    this.errorFlag = true;
-    this.requestHeaders = {};
-    this.dispatchEvent(new _Event("abort", false, false, this));
-    if (this.readyState > FakeXMLHttpRequest.UNSENT && this.sendFlag) {
-      this._readyStateChange(FakeXMLHttpRequest.UNSENT);
-      this.sendFlag = false;
-    }
-    if (typeof this.onerror === "function") {
-      this.onerror();
-    }
-  },
-  /*
-    Duplicates the behavior of native XMLHttpRequest's getResponseHeader function
-  */
-  getResponseHeader: function getResponseHeader(header) {
-    if (this.readyState < FakeXMLHttpRequest.HEADERS_RECEIVED) {
-      return null;
-    }
-    if (/^Set-Cookie2?$/i.test(header)) {
-      return null;
-    }
-    header = header.toLowerCase();
-    for (var h in this.responseHeaders) {
-      if (h.toLowerCase() == header) {
-        return this.responseHeaders[h];
-      }
-    }
-    return null;
-  },
-  /*
-    Duplicates the behavior of native XMLHttpRequest's getAllResponseHeaders function
-  */
-  getAllResponseHeaders: function getAllResponseHeaders() {
-    if (this.readyState < FakeXMLHttpRequest.HEADERS_RECEIVED) {
-      return "";
-    }
-    var headers = "";
-    for (var header in this.responseHeaders) {
-      if (this.responseHeaders.hasOwnProperty(header) && !/^Set-Cookie2?$/i.test(header)) {
-        headers += header + ": " + this.responseHeaders[header] + "\r\n";
-      }
-    }
-    return headers;
-  },
-  /*
-   Duplicates the behavior of native XMLHttpRequest's overrideMimeType function
-   */
-  overrideMimeType: function overrideMimeType(mimeType) {
-    if (typeof mimeType === "string") {
-      this.forceMimeType = mimeType.toLowerCase();
-    }
-  },
-  /*
-    Places a FakeXMLHttpRequest object into the passed
-    state.
-  */
-  _readyStateChange: function _readyStateChange(state) {
-    this.readyState = state;
-    if (typeof this.onreadystatechange == "function") {
-      this.onreadystatechange(new _Event("readystatechange"));
-    }
-    this.dispatchEvent(new _Event("readystatechange"));
-    if (this.readyState == FakeXMLHttpRequest.DONE) {
-      this.dispatchEvent(new _Event("load", false, false, this));
-    }
-    if (this.readyState == FakeXMLHttpRequest.UNSENT || this.readyState == FakeXMLHttpRequest.DONE) {
-      this.dispatchEvent(new _Event("loadend", false, false, this));
-    }
-  },
-  /*
-    Sets the FakeXMLHttpRequest object's response headers and
-    places the object into readyState 2
-  */
-  _setResponseHeaders: function _setResponseHeaders(headers) {
-    this.responseHeaders = {};
-    for (var header in headers) {
-      if (headers.hasOwnProperty(header)) {
-        this.responseHeaders[header] = headers[header];
-      }
-    }
-    if (this.forceMimeType) {
-      this.responseHeaders['Content-Type'] = this.forceMimeType;
-    }
-    if (this.async) {
-      this._readyStateChange(FakeXMLHttpRequest.HEADERS_RECEIVED);
-    } else {
-      this.readyState = FakeXMLHttpRequest.HEADERS_RECEIVED;
-    }
-  },
-  /*
-    Sets the FakeXMLHttpRequest object's response body and
-    if body text is XML, sets responseXML to parsed document
-    object
-  */
-  _setResponseBody: function _setResponseBody(body) {
-    verifyRequestSent(this);
-    verifyHeadersReceived(this);
-    verifyResponseBodyType(body);
-    var chunkSize = this.chunkSize || 10;
-    var index = 0;
-    this.responseText = "";
-    this.response = this.responseText;
-    do {
-      if (this.async) {
-        this._readyStateChange(FakeXMLHttpRequest.LOADING);
-      }
-      this.responseText += body.substring(index, index + chunkSize);
-      this.response = this.responseText;
-      index += chunkSize;
-    } while (index < body.length);
-    var type = this.getResponseHeader("Content-Type");
-    if (this.responseText && (!type || /(text\/xml)|(application\/xml)|(\+xml)/.test(type))) {
-      try {
-        this.responseXML = parseXML(this.responseText);
-      } catch (e) {
-        // Unable to parse XML - no biggie
-      }
-    }
-    if (this.async) {
-      this._readyStateChange(FakeXMLHttpRequest.DONE);
-    } else {
-      this.readyState = FakeXMLHttpRequest.DONE;
-    }
-  },
-  /*
-    Forces a response on to the FakeXMLHttpRequest object.
-     This is the public API for faking responses. This function
-    takes a number status, headers object, and string body:
-     ```
-    xhr.respond(404, {Content-Type: 'text/plain'}, "Sorry. This object was not found.")
-     ```
-  */
-  respond: function respond(status, headers, body) {
-    this._setResponseHeaders(headers || {});
-    this.status = typeof status == "number" ? status : 200;
-    this.statusText = httpStatusCodes[this.status];
-    this._setResponseBody(body || "");
-  }
-};
-for (var property in FakeXMLHttpRequestProto) {
-  FakeXMLHttpRequest.prototype[property] = FakeXMLHttpRequestProto[property];
-}
-function verifyState(xhr) {
-  if (xhr.readyState !== FakeXMLHttpRequest.OPENED) {
-    throw new Error("INVALID_STATE_ERR");
-  }
-  if (xhr.sendFlag) {
-    throw new Error("INVALID_STATE_ERR");
-  }
-}
-function verifyRequestSent(xhr) {
-  if (xhr.readyState == FakeXMLHttpRequest.DONE) {
-    throw new Error("Request done");
-  }
-}
-function verifyHeadersReceived(xhr) {
-  if (xhr.async && xhr.readyState != FakeXMLHttpRequest.HEADERS_RECEIVED) {
-    throw new Error("No headers received");
-  }
-}
-function verifyResponseBodyType(body) {
-  if (typeof body != "string") {
-    var error = new Error("Attempted to respond to fake XMLHttpRequest with " + body + ", which is not a string.");
-    error.name = "InvalidBodyException";
-    throw error;
-  }
-}
-
-var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
-
-/**
- * Check if we're required to add a port number.
- *
- * @see https://url.spec.whatwg.org/#default-port
- * @param {Number|String} port Port number we need to check
- * @param {String} protocol Protocol we need to check against.
- * @returns {Boolean} Is it a default port for the given protocol
- * @api private
- */
-var requiresPort = function required(port, protocol) {
-  protocol = protocol.split(':')[0];
-  port = +port;
-  if (!port) return false;
-  switch (protocol) {
-    case 'http':
-    case 'ws':
-      return port !== 80;
-    case 'https':
-    case 'wss':
-      return port !== 443;
-    case 'ftp':
-      return port !== 21;
-    case 'gopher':
-      return port !== 70;
-    case 'file':
-      return false;
-  }
-  return port !== 0;
-};
-var has = Object.prototype.hasOwnProperty,
-  undef;
-
-/**
- * Decode a URI encoded string.
- *
- * @param {String} input The URI encoded string.
- * @returns {String|Null} The decoded string.
- * @api private
- */
-function decode(input) {
-  try {
-    return decodeURIComponent(input.replace(/\+/g, ' '));
-  } catch (e) {
-    return null;
-  }
-}
-
-/**
- * Simple query string parser.
- *
- * @param {String} query The query string that needs to be parsed.
- * @returns {Object}
- * @api public
- */
-function querystring(query) {
-  var parser = /([^=?&]+)=?([^&]*)/g,
-    result = {},
-    part;
-  while (part = parser.exec(query)) {
-    var key = decode(part[1]),
-      value = decode(part[2]);
-
-    //
-    // Prevent overriding of existing properties. This ensures that build-in
-    // methods like `toString` or __proto__ are not overriden by malicious
-    // querystrings.
-    //
-    // In the case if failed decoding, we want to omit the key/value pairs
-    // from the result.
-    //
-    if (key === null || value === null || key in result) continue;
-    result[key] = value;
-  }
-  return result;
-}
-
-/**
- * Transform a query string to an object.
- *
- * @param {Object} obj Object that should be transformed.
- * @param {String} prefix Optional prefix.
- * @returns {String}
- * @api public
- */
-function querystringify(obj, prefix) {
-  prefix = prefix || '';
-  var pairs = [],
-    value,
-    key;
-
-  //
-  // Optionally prefix with a '?' if needed
-  //
-  if ('string' !== typeof prefix) prefix = '?';
-  for (key in obj) {
-    if (has.call(obj, key)) {
-      value = obj[key];
-
-      //
-      // Edge cases where we actually want to encode the value to an empty
-      // string instead of the stringified value.
-      //
-      if (!value && (value === null || value === undef || isNaN(value))) {
-        value = '';
-      }
-      key = encodeURIComponent(key);
-      value = encodeURIComponent(value);
-
-      //
-      // If we failed to encode the strings, we should bail out as we don't
-      // want to add invalid strings to the query.
-      //
-      if (key === null || value === null) continue;
-      pairs.push(key + '=' + value);
-    }
-  }
-  return pairs.length ? prefix + pairs.join('&') : '';
-}
-
-//
-// Expose the module.
-//
-var stringify = querystringify;
-var parse$1 = querystring;
-var querystringify_1 = {
-  stringify: stringify,
-  parse: parse$1
-};
-var slashes = /^[A-Za-z][A-Za-z0-9+-.]*:\/\//,
-  protocolre = /^([a-z][a-z0-9.+-]*:)?(\/\/)?([\\/]+)?([\S\s]*)/i,
-  windowsDriveLetter = /^[a-zA-Z]:/,
-  whitespace = '[\\x09\\x0A\\x0B\\x0C\\x0D\\x20\\xA0\\u1680\\u180E\\u2000\\u2001\\u2002\\u2003\\u2004\\u2005\\u2006\\u2007\\u2008\\u2009\\u200A\\u202F\\u205F\\u3000\\u2028\\u2029\\uFEFF]',
-  left = new RegExp('^' + whitespace + '+');
-
-/**
- * Trim a given string.
- *
- * @param {String} str String to trim.
- * @public
- */
-function trimLeft(str) {
-  return (str ? str : '').toString().replace(left, '');
-}
-
-/**
- * These are the parse rules for the URL parser, it informs the parser
- * about:
- *
- * 0. The char it Needs to parse, if it's a string it should be done using
- *    indexOf, RegExp using exec and NaN means set as current value.
- * 1. The property we should set when parsing this value.
- * 2. Indication if it's backwards or forward parsing, when set as number it's
- *    the value of extra chars that should be split off.
- * 3. Inherit from location if non existing in the parser.
- * 4. `toLowerCase` the resulting value.
- */
-var rules = [['#', 'hash'],
-// Extract from the back.
-['?', 'query'],
-// Extract from the back.
-function sanitize(address, url) {
-  // Sanitize what is left of the address
-  return isSpecial(url.protocol) ? address.replace(/\\/g, '/') : address;
-}, ['/', 'pathname'],
-// Extract from the back.
-['@', 'auth', 1],
-// Extract from the front.
-[NaN, 'host', undefined, 1, 1],
-// Set left over value.
-[/:(\d+)$/, 'port', undefined, 1],
-// RegExp the back.
-[NaN, 'hostname', undefined, 1, 1] // Set left over.
-];
-
-/**
- * These properties should not be copied or inherited from. This is only needed
- * for all non blob URL's as a blob URL does not include a hash, only the
- * origin.
- *
- * @type {Object}
- * @private
- */
-var ignore = {
-  hash: 1,
-  query: 1
-};
-
-/**
- * The location object differs when your code is loaded through a normal page,
- * Worker or through a worker using a blob. And with the blobble begins the
- * trouble as the location object will contain the URL of the blob, not the
- * location of the page where our code is loaded in. The actual origin is
- * encoded in the `pathname` so we can thankfully generate a good "default"
- * location from it so we can generate proper relative URL's again.
- *
- * @param {Object|String} loc Optional default location object.
- * @returns {Object} lolcation object.
- * @public
- */
-function lolcation(loc) {
-  var globalVar;
-  if (typeof window !== 'undefined') globalVar = window;else if (typeof commonjsGlobal !== 'undefined') globalVar = commonjsGlobal;else if (typeof self !== 'undefined') globalVar = self;else globalVar = {};
-  var location = globalVar.location || {};
-  loc = loc || location;
-  var finaldestination = {},
-    type = typeof loc,
-    key;
-  if ('blob:' === loc.protocol) {
-    finaldestination = new Url(unescape(loc.pathname), {});
-  } else if ('string' === type) {
-    finaldestination = new Url(loc, {});
-    for (key in ignore) delete finaldestination[key];
-  } else if ('object' === type) {
-    for (key in loc) {
-      if (key in ignore) continue;
-      finaldestination[key] = loc[key];
-    }
-    if (finaldestination.slashes === undefined) {
-      finaldestination.slashes = slashes.test(loc.href);
-    }
-  }
-  return finaldestination;
-}
-
-/**
- * Check whether a protocol scheme is special.
- *
- * @param {String} The protocol scheme of the URL
- * @return {Boolean} `true` if the protocol scheme is special, else `false`
- * @private
- */
-function isSpecial(scheme) {
-  return scheme === 'file:' || scheme === 'ftp:' || scheme === 'http:' || scheme === 'https:' || scheme === 'ws:' || scheme === 'wss:';
-}
-
-/**
- * @typedef ProtocolExtract
- * @type Object
- * @property {String} protocol Protocol matched in the URL, in lowercase.
- * @property {Boolean} slashes `true` if protocol is followed by "//", else `false`.
- * @property {String} rest Rest of the URL that is not part of the protocol.
- */
-
-/**
- * Extract protocol information from a URL with/without double slash ("//").
- *
- * @param {String} address URL we want to extract from.
- * @param {Object} location
- * @return {ProtocolExtract} Extracted information.
- * @private
- */
-function extractProtocol(address, location) {
-  address = trimLeft(address);
-  location = location || {};
-  var match = protocolre.exec(address);
-  var protocol = match[1] ? match[1].toLowerCase() : '';
-  var forwardSlashes = !!match[2];
-  var otherSlashes = !!match[3];
-  var slashesCount = 0;
-  var rest;
-  if (forwardSlashes) {
-    if (otherSlashes) {
-      rest = match[2] + match[3] + match[4];
-      slashesCount = match[2].length + match[3].length;
-    } else {
-      rest = match[2] + match[4];
-      slashesCount = match[2].length;
-    }
-  } else {
-    if (otherSlashes) {
-      rest = match[3] + match[4];
-      slashesCount = match[3].length;
-    } else {
-      rest = match[4];
-    }
-  }
-  if (protocol === 'file:') {
-    if (slashesCount >= 2) {
-      rest = rest.slice(2);
-    }
-  } else if (isSpecial(protocol)) {
-    rest = match[4];
-  } else if (protocol) {
-    if (forwardSlashes) {
-      rest = rest.slice(2);
-    }
-  } else if (slashesCount >= 2 && isSpecial(location.protocol)) {
-    rest = match[4];
-  }
-  return {
-    protocol: protocol,
-    slashes: forwardSlashes || isSpecial(protocol),
-    slashesCount: slashesCount,
-    rest: rest
-  };
-}
-
-/**
- * Resolve a relative URL pathname against a base URL pathname.
- *
- * @param {String} relative Pathname of the relative URL.
- * @param {String} base Pathname of the base URL.
- * @return {String} Resolved pathname.
- * @private
- */
-function resolve(relative, base) {
-  if (relative === '') return base;
-  var path = (base || '/').split('/').slice(0, -1).concat(relative.split('/')),
-    i = path.length,
-    last = path[i - 1],
-    unshift = false,
-    up = 0;
-  while (i--) {
-    if (path[i] === '.') {
-      path.splice(i, 1);
-    } else if (path[i] === '..') {
-      path.splice(i, 1);
-      up++;
-    } else if (up) {
-      if (i === 0) unshift = true;
-      path.splice(i, 1);
-      up--;
-    }
-  }
-  if (unshift) path.unshift('');
-  if (last === '.' || last === '..') path.push('');
-  return path.join('/');
-}
-
-/**
- * The actual URL instance. Instead of returning an object we've opted-in to
- * create an actual constructor as it's much more memory efficient and
- * faster and it pleases my OCD.
- *
- * It is worth noting that we should not use `URL` as class name to prevent
- * clashes with the global URL instance that got introduced in browsers.
- *
- * @constructor
- * @param {String} address URL we want to parse.
- * @param {Object|String} [location] Location defaults for relative paths.
- * @param {Boolean|Function} [parser] Parser for the query string.
- * @private
- */
-function Url(address, location, parser) {
-  address = trimLeft(address);
-  if (!(this instanceof Url)) {
-    return new Url(address, location, parser);
-  }
-  var relative,
-    extracted,
-    parse,
-    instruction,
-    index,
-    key,
-    instructions = rules.slice(),
-    type = typeof location,
-    url = this,
-    i = 0;
-
-  //
-  // The following if statements allows this module two have compatibility with
-  // 2 different API:
-  //
-  // 1. Node.js's `url.parse` api which accepts a URL, boolean as arguments
-  //    where the boolean indicates that the query string should also be parsed.
-  //
-  // 2. The `URL` interface of the browser which accepts a URL, object as
-  //    arguments. The supplied object will be used as default values / fall-back
-  //    for relative paths.
-  //
-  if ('object' !== type && 'string' !== type) {
-    parser = location;
-    location = null;
-  }
-  if (parser && 'function' !== typeof parser) parser = querystringify_1.parse;
-  location = lolcation(location);
-
-  //
-  // Extract protocol information before running the instructions.
-  //
-  extracted = extractProtocol(address || '', location);
-  relative = !extracted.protocol && !extracted.slashes;
-  url.slashes = extracted.slashes || relative && location.slashes;
-  url.protocol = extracted.protocol || location.protocol || '';
-  address = extracted.rest;
-
-  //
-  // When the authority component is absent the URL starts with a path
-  // component.
-  //
-  if (extracted.protocol === 'file:' && (extracted.slashesCount !== 2 || windowsDriveLetter.test(address)) || !extracted.slashes && (extracted.protocol || extracted.slashesCount < 2 || !isSpecial(url.protocol))) {
-    instructions[3] = [/(.*)/, 'pathname'];
-  }
-  for (; i < instructions.length; i++) {
-    instruction = instructions[i];
-    if (typeof instruction === 'function') {
-      address = instruction(address, url);
-      continue;
-    }
-    parse = instruction[0];
-    key = instruction[1];
-    if (parse !== parse) {
-      url[key] = address;
-    } else if ('string' === typeof parse) {
-      if (~(index = address.indexOf(parse))) {
-        if ('number' === typeof instruction[2]) {
-          url[key] = address.slice(0, index);
-          address = address.slice(index + instruction[2]);
-        } else {
-          url[key] = address.slice(index);
-          address = address.slice(0, index);
-        }
-      }
-    } else if (index = parse.exec(address)) {
-      url[key] = index[1];
-      address = address.slice(0, index.index);
-    }
-    url[key] = url[key] || (relative && instruction[3] ? location[key] || '' : '');
-
-    //
-    // Hostname, host and protocol should be lowercased so they can be used to
-    // create a proper `origin`.
-    //
-    if (instruction[4]) url[key] = url[key].toLowerCase();
-  }
-
-  //
-  // Also parse the supplied query string in to an object. If we're supplied
-  // with a custom parser as function use that instead of the default build-in
-  // parser.
-  //
-  if (parser) url.query = parser(url.query);
-
-  //
-  // If the URL is relative, resolve the pathname against the base URL.
-  //
-  if (relative && location.slashes && url.pathname.charAt(0) !== '/' && (url.pathname !== '' || location.pathname !== '')) {
-    url.pathname = resolve(url.pathname, location.pathname);
-  }
-
-  //
-  // Default to a / for pathname if none exists. This normalizes the URL
-  // to always have a /
-  //
-  if (url.pathname.charAt(0) !== '/' && isSpecial(url.protocol)) {
-    url.pathname = '/' + url.pathname;
-  }
-
-  //
-  // We should not add port numbers if they are already the default port number
-  // for a given protocol. As the host also contains the port number we're going
-  // override it with the hostname which contains no port number.
-  //
-  if (!requiresPort(url.port, url.protocol)) {
-    url.host = url.hostname;
-    url.port = '';
-  }
-
-  //
-  // Parse down the `auth` for the username and password.
-  //
-  url.username = url.password = '';
-  if (url.auth) {
-    instruction = url.auth.split(':');
-    url.username = instruction[0] || '';
-    url.password = instruction[1] || '';
-  }
-  url.origin = url.protocol !== 'file:' && isSpecial(url.protocol) && url.host ? url.protocol + '//' + url.host : 'null';
-
-  //
-  // The href is just the compiled result.
-  //
-  url.href = url.toString();
-}
-
-/**
- * This is convenience method for changing properties in the URL instance to
- * insure that they all propagate correctly.
- *
- * @param {String} part          Property we need to adjust.
- * @param {Mixed} value          The newly assigned value.
- * @param {Boolean|Function} fn  When setting the query, it will be the function
- *                               used to parse the query.
- *                               When setting the protocol, double slash will be
- *                               removed from the final url if it is true.
- * @returns {URL} URL instance for chaining.
- * @public
- */
-function set(part, value, fn) {
-  var url = this;
-  switch (part) {
-    case 'query':
-      if ('string' === typeof value && value.length) {
-        value = (fn || querystringify_1.parse)(value);
-      }
-      url[part] = value;
-      break;
-    case 'port':
-      url[part] = value;
-      if (!requiresPort(value, url.protocol)) {
-        url.host = url.hostname;
-        url[part] = '';
-      } else if (value) {
-        url.host = url.hostname + ':' + value;
-      }
-      break;
-    case 'hostname':
-      url[part] = value;
-      if (url.port) value += ':' + url.port;
-      url.host = value;
-      break;
-    case 'host':
-      url[part] = value;
-      if (/:\d+$/.test(value)) {
-        value = value.split(':');
-        url.port = value.pop();
-        url.hostname = value.join(':');
-      } else {
-        url.hostname = value;
-        url.port = '';
-      }
-      break;
-    case 'protocol':
-      url.protocol = value.toLowerCase();
-      url.slashes = !fn;
-      break;
-    case 'pathname':
-    case 'hash':
-      if (value) {
-        var char = part === 'pathname' ? '/' : '#';
-        url[part] = value.charAt(0) !== char ? char + value : value;
-      } else {
-        url[part] = value;
-      }
-      break;
-    default:
-      url[part] = value;
-  }
-  for (var i = 0; i < rules.length; i++) {
-    var ins = rules[i];
-    if (ins[4]) url[ins[1]] = url[ins[1]].toLowerCase();
-  }
-  url.origin = url.protocol !== 'file:' && isSpecial(url.protocol) && url.host ? url.protocol + '//' + url.host : 'null';
-  url.href = url.toString();
-  return url;
-}
-
-/**
- * Transform the properties back in to a valid and full URL string.
- *
- * @param {Function} stringify Optional query stringify function.
- * @returns {String} Compiled version of the URL.
- * @public
- */
-function toString(stringify) {
-  if (!stringify || 'function' !== typeof stringify) stringify = querystringify_1.stringify;
-  var query,
-    url = this,
-    protocol = url.protocol;
-  if (protocol && protocol.charAt(protocol.length - 1) !== ':') protocol += ':';
-  var result = protocol + (url.slashes || isSpecial(url.protocol) ? '//' : '');
-  if (url.username) {
-    result += url.username;
-    if (url.password) result += ':' + url.password;
-    result += '@';
-  }
-  result += url.host + url.pathname;
-  query = 'object' === typeof url.query ? stringify(url.query) : url.query;
-  if (query) result += '?' !== query.charAt(0) ? '?' + query : query;
-  if (url.hash) result += url.hash;
-  return result;
-}
-Url.prototype = {
-  set: set,
-  toString: toString
-};
-
-//
-// Expose the URL parser and some additional properties that might be useful for
-// others or testing.
-//
-Url.extractProtocol = extractProtocol;
-Url.location = lolcation;
-Url.trimLeft = trimLeft;
-Url.qs = querystringify_1;
-var urlParse = Url;
-
-/**
- * parseURL - decompose a URL into its parts
- * @param  {String} url a URL
- * @return {Object} parts of the URL, including the following
- *
- * 'https://www.yahoo.com:1234/mypage?test=yes#abc'
- *
- * {
- *   host: 'www.yahoo.com:1234',
- *   protocol: 'https:',
- *   search: '?test=yes',
- *   hash: '#abc',
- *   href: 'https://www.yahoo.com:1234/mypage?test=yes#abc',
- *   pathname: '/mypage',
- *   fullpath: '/mypage?test=yes'
- * }
- */
-function parseURL(url) {
-  var parsedUrl = new urlParse(url);
-  if (!parsedUrl.host) {
-    // eslint-disable-next-line no-self-assign
-    parsedUrl.href = parsedUrl.href; // IE: load the host and protocol
-  }
-  var pathname = parsedUrl.pathname;
-  if (pathname.charAt(0) !== '/') {
-    pathname = '/' + pathname; // IE: prepend leading slash
-  }
-  var host = parsedUrl.host;
-  if (parsedUrl.port === '80' || parsedUrl.port === '443') {
-    host = parsedUrl.hostname; // IE: remove default port
-  }
-  return {
-    host: host,
-    protocol: parsedUrl.protocol,
-    search: parsedUrl.query,
-    hash: parsedUrl.hash,
-    href: parsedUrl.href,
-    pathname: pathname,
-    fullpath: pathname + (parsedUrl.query || '') + (parsedUrl.hash || '')
-  };
-}
-
-/**
- * Registry
- *
- * A registry is a map of HTTP verbs to route recognizers.
- */
-var Registry = /** @class */function () {
-  function Registry(/* host */
-  ) {
-    // Herein we keep track of RouteRecognizer instances
-    // keyed by HTTP method. Feel free to add more as needed.
-    this.verbs = {
-      GET: new RouteRecognizer(),
-      PUT: new RouteRecognizer(),
-      POST: new RouteRecognizer(),
-      DELETE: new RouteRecognizer(),
-      PATCH: new RouteRecognizer(),
-      HEAD: new RouteRecognizer(),
-      OPTIONS: new RouteRecognizer()
-    };
-  }
-  return Registry;
-}();
-
-/**
- * Hosts
- *
- * a map of hosts to Registries, ultimately allowing
- * a per-host-and-port, per HTTP verb lookup of RouteRecognizers
- */
-var Hosts = /** @class */function () {
-  function Hosts() {
-    this.registries = {};
-  }
-  /**
-   * Hosts#forURL - retrieve a map of HTTP verbs to RouteRecognizers
-   *                for a given URL
-   *
-   * @param  {String} url a URL
-   * @return {Registry}   a map of HTTP verbs to RouteRecognizers
-   *                      corresponding to the provided URL's
-   *                      hostname and port
-   */
-  Hosts.prototype.forURL = function (url) {
-    var host = parseURL(url).host;
-    var registry = this.registries[host];
-    if (registry === undefined) {
-      registry = this.registries[host] = new Registry(/*host*/);
-    }
-    return registry.verbs;
-  };
-  return Hosts;
-}();
-var global$1 = typeof globalThis !== 'undefined' && globalThis || typeof self !== 'undefined' && self || typeof global$1 !== 'undefined' && global$1;
-var support = {
-  searchParams: 'URLSearchParams' in global$1,
-  iterable: 'Symbol' in global$1 && 'iterator' in Symbol,
-  blob: 'FileReader' in global$1 && 'Blob' in global$1 && function () {
-    try {
-      new Blob();
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }(),
-  formData: 'FormData' in global$1,
-  arrayBuffer: 'ArrayBuffer' in global$1
-};
-function isDataView(obj) {
-  return obj && DataView.prototype.isPrototypeOf(obj);
-}
-if (support.arrayBuffer) {
-  var viewClasses = ['[object Int8Array]', '[object Uint8Array]', '[object Uint8ClampedArray]', '[object Int16Array]', '[object Uint16Array]', '[object Int32Array]', '[object Uint32Array]', '[object Float32Array]', '[object Float64Array]'];
-  var isArrayBufferView = ArrayBuffer.isView || function (obj) {
-    return obj && viewClasses.indexOf(Object.prototype.toString.call(obj)) > -1;
-  };
-}
-function normalizeName(name) {
-  if (typeof name !== 'string') {
-    name = String(name);
-  }
-  if (/[^a-z0-9\-#$%&'*+.^_`|~!]/i.test(name) || name === '') {
-    throw new TypeError('Invalid character in header field name: "' + name + '"');
-  }
-  return name.toLowerCase();
-}
-function normalizeValue(value) {
-  if (typeof value !== 'string') {
-    value = String(value);
-  }
-  return value;
-}
-
-// Build a destructive iterator for the value list
-function iteratorFor(items) {
-  var iterator = {
-    next: function () {
-      var value = items.shift();
-      return {
-        done: value === undefined,
-        value: value
-      };
-    }
-  };
-  if (support.iterable) {
-    iterator[Symbol.iterator] = function () {
-      return iterator;
-    };
-  }
-  return iterator;
-}
-function Headers(headers) {
-  this.map = {};
-  if (headers instanceof Headers) {
-    headers.forEach(function (value, name) {
-      this.append(name, value);
-    }, this);
-  } else if (Array.isArray(headers)) {
-    headers.forEach(function (header) {
-      this.append(header[0], header[1]);
-    }, this);
-  } else if (headers) {
-    Object.getOwnPropertyNames(headers).forEach(function (name) {
-      this.append(name, headers[name]);
-    }, this);
-  }
-}
-Headers.prototype.append = function (name, value) {
-  name = normalizeName(name);
-  value = normalizeValue(value);
-  var oldValue = this.map[name];
-  this.map[name] = oldValue ? oldValue + ', ' + value : value;
-};
-Headers.prototype['delete'] = function (name) {
-  delete this.map[normalizeName(name)];
-};
-Headers.prototype.get = function (name) {
-  name = normalizeName(name);
-  return this.has(name) ? this.map[name] : null;
-};
-Headers.prototype.has = function (name) {
-  return this.map.hasOwnProperty(normalizeName(name));
-};
-Headers.prototype.set = function (name, value) {
-  this.map[normalizeName(name)] = normalizeValue(value);
-};
-Headers.prototype.forEach = function (callback, thisArg) {
-  for (var name in this.map) {
-    if (this.map.hasOwnProperty(name)) {
-      callback.call(thisArg, this.map[name], name, this);
-    }
-  }
-};
-Headers.prototype.keys = function () {
-  var items = [];
-  this.forEach(function (value, name) {
-    items.push(name);
-  });
-  return iteratorFor(items);
-};
-Headers.prototype.values = function () {
-  var items = [];
-  this.forEach(function (value) {
-    items.push(value);
-  });
-  return iteratorFor(items);
-};
-Headers.prototype.entries = function () {
-  var items = [];
-  this.forEach(function (value, name) {
-    items.push([name, value]);
-  });
-  return iteratorFor(items);
-};
-if (support.iterable) {
-  Headers.prototype[Symbol.iterator] = Headers.prototype.entries;
-}
-function consumed(body) {
-  if (body.bodyUsed) {
-    return Promise.reject(new TypeError('Already read'));
-  }
-  body.bodyUsed = true;
-}
-function fileReaderReady(reader) {
-  return new Promise(function (resolve, reject) {
-    reader.onload = function () {
-      resolve(reader.result);
-    };
-    reader.onerror = function () {
-      reject(reader.error);
-    };
-  });
-}
-function readBlobAsArrayBuffer(blob) {
-  var reader = new FileReader();
-  var promise = fileReaderReady(reader);
-  reader.readAsArrayBuffer(blob);
-  return promise;
-}
-function readBlobAsText(blob) {
-  var reader = new FileReader();
-  var promise = fileReaderReady(reader);
-  reader.readAsText(blob);
-  return promise;
-}
-function readArrayBufferAsText(buf) {
-  var view = new Uint8Array(buf);
-  var chars = new Array(view.length);
-  for (var i = 0; i < view.length; i++) {
-    chars[i] = String.fromCharCode(view[i]);
-  }
-  return chars.join('');
-}
-function bufferClone(buf) {
-  if (buf.slice) {
-    return buf.slice(0);
-  } else {
-    var view = new Uint8Array(buf.byteLength);
-    view.set(new Uint8Array(buf));
-    return view.buffer;
-  }
-}
-function Body() {
-  this.bodyUsed = false;
-  this._initBody = function (body) {
-    /*
-      fetch-mock wraps the Response object in an ES6 Proxy to
-      provide useful test harness features such as flush. However, on
-      ES5 browsers without fetch or Proxy support pollyfills must be used;
-      the proxy-pollyfill is unable to proxy an attribute unless it exists
-      on the object before the Proxy is created. This change ensures
-      Response.bodyUsed exists on the instance, while maintaining the
-      semantic of setting Request.bodyUsed in the constructor before
-      _initBody is called.
-    */
-    this.bodyUsed = this.bodyUsed;
-    this._bodyInit = body;
-    if (!body) {
-      this._bodyText = '';
-    } else if (typeof body === 'string') {
-      this._bodyText = body;
-    } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
-      this._bodyBlob = body;
-    } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
-      this._bodyFormData = body;
-    } else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) {
-      this._bodyText = body.toString();
-    } else if (support.arrayBuffer && support.blob && isDataView(body)) {
-      this._bodyArrayBuffer = bufferClone(body.buffer);
-      // IE 10-11 can't handle a DataView body.
-      this._bodyInit = new Blob([this._bodyArrayBuffer]);
-    } else if (support.arrayBuffer && (ArrayBuffer.prototype.isPrototypeOf(body) || isArrayBufferView(body))) {
-      this._bodyArrayBuffer = bufferClone(body);
-    } else {
-      this._bodyText = body = Object.prototype.toString.call(body);
-    }
-    if (!this.headers.get('content-type')) {
-      if (typeof body === 'string') {
-        this.headers.set('content-type', 'text/plain;charset=UTF-8');
-      } else if (this._bodyBlob && this._bodyBlob.type) {
-        this.headers.set('content-type', this._bodyBlob.type);
-      } else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) {
-        this.headers.set('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
-      }
-    }
-  };
-  if (support.blob) {
-    this.blob = function () {
-      var rejected = consumed(this);
-      if (rejected) {
-        return rejected;
-      }
-      if (this._bodyBlob) {
-        return Promise.resolve(this._bodyBlob);
-      } else if (this._bodyArrayBuffer) {
-        return Promise.resolve(new Blob([this._bodyArrayBuffer]));
-      } else if (this._bodyFormData) {
-        throw new Error('could not read FormData body as blob');
-      } else {
-        return Promise.resolve(new Blob([this._bodyText]));
-      }
-    };
-    this.arrayBuffer = function () {
-      if (this._bodyArrayBuffer) {
-        var isConsumed = consumed(this);
-        if (isConsumed) {
-          return isConsumed;
-        }
-        if (ArrayBuffer.isView(this._bodyArrayBuffer)) {
-          return Promise.resolve(this._bodyArrayBuffer.buffer.slice(this._bodyArrayBuffer.byteOffset, this._bodyArrayBuffer.byteOffset + this._bodyArrayBuffer.byteLength));
-        } else {
-          return Promise.resolve(this._bodyArrayBuffer);
-        }
-      } else {
-        return this.blob().then(readBlobAsArrayBuffer);
-      }
-    };
-  }
-  this.text = function () {
-    var rejected = consumed(this);
-    if (rejected) {
-      return rejected;
-    }
-    if (this._bodyBlob) {
-      return readBlobAsText(this._bodyBlob);
-    } else if (this._bodyArrayBuffer) {
-      return Promise.resolve(readArrayBufferAsText(this._bodyArrayBuffer));
-    } else if (this._bodyFormData) {
-      throw new Error('could not read FormData body as text');
-    } else {
-      return Promise.resolve(this._bodyText);
-    }
-  };
-  if (support.formData) {
-    this.formData = function () {
-      return this.text().then(decode$1);
-    };
-  }
-  this.json = function () {
-    return this.text().then(JSON.parse);
-  };
-  return this;
-}
-
-// HTTP methods whose capitalization should be normalized
-var methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT'];
-function normalizeMethod(method) {
-  var upcased = method.toUpperCase();
-  return methods.indexOf(upcased) > -1 ? upcased : method;
-}
-function Request(input, options) {
-  if (!(this instanceof Request)) {
-    throw new TypeError('Please use the "new" operator, this DOM object constructor cannot be called as a function.');
-  }
-  options = options || {};
-  var body = options.body;
-  if (input instanceof Request) {
-    if (input.bodyUsed) {
-      throw new TypeError('Already read');
-    }
-    this.url = input.url;
-    this.credentials = input.credentials;
-    if (!options.headers) {
-      this.headers = new Headers(input.headers);
-    }
-    this.method = input.method;
-    this.mode = input.mode;
-    this.signal = input.signal;
-    if (!body && input._bodyInit != null) {
-      body = input._bodyInit;
-      input.bodyUsed = true;
-    }
-  } else {
-    this.url = String(input);
-  }
-  this.credentials = options.credentials || this.credentials || 'same-origin';
-  if (options.headers || !this.headers) {
-    this.headers = new Headers(options.headers);
-  }
-  this.method = normalizeMethod(options.method || this.method || 'GET');
-  this.mode = options.mode || this.mode || null;
-  this.signal = options.signal || this.signal;
-  this.referrer = null;
-  if ((this.method === 'GET' || this.method === 'HEAD') && body) {
-    throw new TypeError('Body not allowed for GET or HEAD requests');
-  }
-  this._initBody(body);
-  if (this.method === 'GET' || this.method === 'HEAD') {
-    if (options.cache === 'no-store' || options.cache === 'no-cache') {
-      // Search for a '_' parameter in the query string
-      var reParamSearch = /([?&])_=[^&]*/;
-      if (reParamSearch.test(this.url)) {
-        // If it already exists then set the value with the current time
-        this.url = this.url.replace(reParamSearch, '$1_=' + new Date().getTime());
-      } else {
-        // Otherwise add a new '_' parameter to the end with the current time
-        var reQueryString = /\?/;
-        this.url += (reQueryString.test(this.url) ? '&' : '?') + '_=' + new Date().getTime();
-      }
-    }
-  }
-}
-Request.prototype.clone = function () {
-  return new Request(this, {
-    body: this._bodyInit
-  });
-};
-function decode$1(body) {
-  var form = new FormData();
-  body.trim().split('&').forEach(function (bytes) {
-    if (bytes) {
-      var split = bytes.split('=');
-      var name = split.shift().replace(/\+/g, ' ');
-      var value = split.join('=').replace(/\+/g, ' ');
-      form.append(decodeURIComponent(name), decodeURIComponent(value));
-    }
-  });
-  return form;
-}
-function parseHeaders(rawHeaders) {
-  var headers = new Headers();
-  // Replace instances of \r\n and \n followed by at least one space or horizontal tab with a space
-  // https://tools.ietf.org/html/rfc7230#section-3.2
-  var preProcessedHeaders = rawHeaders.replace(/\r?\n[\t ]+/g, ' ');
-  // Avoiding split via regex to work around a common IE11 bug with the core-js 3.6.0 regex polyfill
-  // https://github.com/github/fetch/issues/748
-  // https://github.com/zloirock/core-js/issues/751
-  preProcessedHeaders.split('\r').map(function (header) {
-    return header.indexOf('\n') === 0 ? header.substr(1, header.length) : header;
-  }).forEach(function (line) {
-    var parts = line.split(':');
-    var key = parts.shift().trim();
-    if (key) {
-      var value = parts.join(':').trim();
-      headers.append(key, value);
-    }
-  });
-  return headers;
-}
-Body.call(Request.prototype);
-function Response(bodyInit, options) {
-  if (!(this instanceof Response)) {
-    throw new TypeError('Please use the "new" operator, this DOM object constructor cannot be called as a function.');
-  }
-  if (!options) {
-    options = {};
-  }
-  this.type = 'default';
-  this.status = options.status === undefined ? 200 : options.status;
-  this.ok = this.status >= 200 && this.status < 300;
-  this.statusText = options.statusText === undefined ? '' : '' + options.statusText;
-  this.headers = new Headers(options.headers);
-  this.url = options.url || '';
-  this._initBody(bodyInit);
-}
-Body.call(Response.prototype);
-Response.prototype.clone = function () {
-  return new Response(this._bodyInit, {
-    status: this.status,
-    statusText: this.statusText,
-    headers: new Headers(this.headers),
-    url: this.url
-  });
-};
-Response.error = function () {
-  var response = new Response(null, {
-    status: 0,
-    statusText: ''
-  });
-  response.type = 'error';
-  return response;
-};
-var redirectStatuses = [301, 302, 303, 307, 308];
-Response.redirect = function (url, status) {
-  if (redirectStatuses.indexOf(status) === -1) {
-    throw new RangeError('Invalid status code');
-  }
-  return new Response(null, {
-    status: status,
-    headers: {
-      location: url
-    }
-  });
-};
-var DOMException = global$1.DOMException;
-try {
-  new DOMException();
-} catch (err) {
-  DOMException = function (message, name) {
-    this.message = message;
-    this.name = name;
-    var error = Error(message);
-    this.stack = error.stack;
-  };
-  DOMException.prototype = Object.create(Error.prototype);
-  DOMException.prototype.constructor = DOMException;
-}
-function fetch$1(input, init) {
-  return new Promise(function (resolve, reject) {
-    var request = new Request(input, init);
-    if (request.signal && request.signal.aborted) {
-      return reject(new DOMException('Aborted', 'AbortError'));
-    }
-    var xhr = new XMLHttpRequest();
-    function abortXhr() {
-      xhr.abort();
-    }
-    xhr.onload = function () {
-      var options = {
-        status: xhr.status,
-        statusText: xhr.statusText,
-        headers: parseHeaders(xhr.getAllResponseHeaders() || '')
-      };
-      options.url = 'responseURL' in xhr ? xhr.responseURL : options.headers.get('X-Request-URL');
-      var body = 'response' in xhr ? xhr.response : xhr.responseText;
-      setTimeout(function () {
-        resolve(new Response(body, options));
-      }, 0);
-    };
-    xhr.onerror = function () {
-      setTimeout(function () {
-        reject(new TypeError('Network request failed'));
-      }, 0);
-    };
-    xhr.ontimeout = function () {
-      setTimeout(function () {
-        reject(new TypeError('Network request failed'));
-      }, 0);
-    };
-    xhr.onabort = function () {
-      setTimeout(function () {
-        reject(new DOMException('Aborted', 'AbortError'));
-      }, 0);
-    };
-    function fixUrl(url) {
-      try {
-        return url === '' && global$1.location.href ? global$1.location.href : url;
-      } catch (e) {
-        return url;
-      }
-    }
-    xhr.open(request.method, fixUrl(request.url), true);
-    if (request.credentials === 'include') {
-      xhr.withCredentials = true;
-    } else if (request.credentials === 'omit') {
-      xhr.withCredentials = false;
-    }
-    if ('responseType' in xhr) {
-      if (support.blob) {
-        xhr.responseType = 'blob';
-      } else if (support.arrayBuffer && request.headers.get('Content-Type') && request.headers.get('Content-Type').indexOf('application/octet-stream') !== -1) {
-        xhr.responseType = 'arraybuffer';
-      }
-    }
-    if (init && typeof init.headers === 'object' && !(init.headers instanceof Headers)) {
-      Object.getOwnPropertyNames(init.headers).forEach(function (name) {
-        xhr.setRequestHeader(name, normalizeValue(init.headers[name]));
-      });
-    } else {
-      request.headers.forEach(function (value, name) {
-        xhr.setRequestHeader(name, value);
-      });
-    }
-    if (request.signal) {
-      request.signal.addEventListener('abort', abortXhr);
-      xhr.onreadystatechange = function () {
-        // DONE (success or failure)
-        if (xhr.readyState === 4) {
-          request.signal.removeEventListener('abort', abortXhr);
-        }
-      };
-    }
-    xhr.send(typeof request._bodyInit === 'undefined' ? null : request._bodyInit);
-  });
-}
-fetch$1.polyfill = true;
-if (!global$1.fetch) {
-  global$1.fetch = fetch$1;
-  global$1.Headers = Headers;
-  global$1.Request = Request;
-  global$1.Response = Response;
-}
-var FakeFetch = /*#__PURE__*/Object.freeze({
-  __proto__: null,
-  Headers: Headers,
-  Request: Request,
-  Response: Response,
-  get DOMException() {
-    return DOMException;
-  },
-  fetch: fetch$1
-});
-function createPassthrough(fakeXHR, nativeXMLHttpRequest) {
-  // event types to handle on the xhr
-  var evts = ['error', 'timeout', 'abort', 'readystatechange'];
-  // event types to handle on the xhr.upload
-  var uploadEvents = [];
-  // properties to copy from the native xhr to fake xhr
-  var lifecycleProps = ['readyState', 'responseText', 'response', 'responseXML', 'responseURL', 'status', 'statusText'];
-  var xhr = fakeXHR._passthroughRequest = new nativeXMLHttpRequest();
-  xhr.open(fakeXHR.method, fakeXHR.url, fakeXHR.async, fakeXHR.username, fakeXHR.password);
-  if (fakeXHR.responseType === 'arraybuffer') {
-    lifecycleProps = ['readyState', 'response', 'status', 'statusText'];
-    xhr.responseType = fakeXHR.responseType;
-  }
-  // use onload if the browser supports it
-  if ('onload' in xhr) {
-    evts.push('load');
-  }
-  // add progress event for async calls
-  // avoid using progress events for sync calls, they will hang https://bugs.webkit.org/show_bug.cgi?id=40996.
-  if (fakeXHR.async && fakeXHR.responseType !== 'arraybuffer') {
-    evts.push('progress');
-    uploadEvents.push('progress');
-  }
-  // update `propertyNames` properties from `fromXHR` to `toXHR`
-  function copyLifecycleProperties(propertyNames, fromXHR, toXHR) {
-    for (var i = 0; i < propertyNames.length; i++) {
-      var prop = propertyNames[i];
-      if (prop in fromXHR) {
-        toXHR[prop] = fromXHR[prop];
-      }
-    }
-  }
-  // fire fake event on `eventable`
-  function dispatchEvent(eventable, eventType, event) {
-    eventable.dispatchEvent(event);
-    if (eventable['on' + eventType]) {
-      eventable['on' + eventType](event);
-    }
-  }
-  // set the on- handler on the native xhr for the given eventType
-  function createHandler(eventType) {
-    xhr['on' + eventType] = function (event) {
-      copyLifecycleProperties(lifecycleProps, xhr, fakeXHR);
-      dispatchEvent(fakeXHR, eventType, event);
-    };
-  }
-  // set the on- handler on the native xhr's `upload` property for
-  // the given eventType
-  function createUploadHandler(eventType) {
-    if (xhr.upload && fakeXHR.upload && fakeXHR.upload['on' + eventType]) {
-      xhr.upload['on' + eventType] = function (event) {
-        dispatchEvent(fakeXHR.upload, eventType, event);
-      };
-    }
-  }
-  var i;
-  for (i = 0; i < evts.length; i++) {
-    createHandler(evts[i]);
-  }
-  for (i = 0; i < uploadEvents.length; i++) {
-    createUploadHandler(uploadEvents[i]);
-  }
-  if (fakeXHR.async) {
-    xhr.timeout = fakeXHR.timeout;
-    xhr.withCredentials = fakeXHR.withCredentials;
-  }
-  // XMLHttpRequest.timeout default initializes to 0, and is not allowed to be used for
-  // synchronous XMLHttpRequests requests in a document environment. However, when a XHR
-  // polyfill does not sets the timeout value, it will throw in React Native environment.
-  // TODO:
-  // synchronous XHR is deprecated, make async the default as XMLHttpRequest.open(),
-  // and throw error if sync XHR has timeout not 0
-  if (!xhr.timeout && xhr.timeout !== 0) {
-    xhr.timeout = 0; // default XMLHttpRequest timeout
-  }
-  for (var h in fakeXHR.requestHeaders) {
-    xhr.setRequestHeader(h, fakeXHR.requestHeaders[h]);
-  }
-  return xhr;
-}
-function interceptor(ctx) {
-  function FakeRequest() {
-    // super()
-    FakeXMLHttpRequest.call(this);
-  }
-  FakeRequest.prototype = Object.create(FakeXMLHttpRequest.prototype);
-  FakeRequest.prototype.constructor = FakeRequest;
-  // extend
-  FakeRequest.prototype.send = function send() {
-    this.sendArguments = arguments;
-    if (!ctx.pretender.running) {
-      throw new Error('You shut down a Pretender instance while there was a pending request. ' + 'That request just tried to complete. Check to see if you accidentally shut down ' + 'a pretender earlier than you intended to');
-    }
-    FakeXMLHttpRequest.prototype.send.apply(this, arguments);
-    if (ctx.pretender.checkPassthrough(this)) {
-      this.passthrough();
-    } else {
-      ctx.pretender.handleRequest(this);
-    }
-  };
-  FakeRequest.prototype.passthrough = function passthrough() {
-    if (!this.sendArguments) {
-      throw new Error('You attempted to passthrough a FakeRequest that was never sent. ' + 'Call `.send()` on the original request first');
-    }
-    var xhr = createPassthrough(this, ctx.pretender._nativeXMLHttpRequest);
-    xhr.send.apply(xhr, this.sendArguments);
-    return xhr;
-  };
-  FakeRequest.prototype._passthroughCheck = function (method, args) {
-    if (this._passthroughRequest) {
-      return this._passthroughRequest[method].apply(this._passthroughRequest, args);
-    }
-    return FakeXMLHttpRequest.prototype[method].apply(this, args);
-  };
-  FakeRequest.prototype.abort = function abort() {
-    return this._passthroughCheck('abort', arguments);
-  };
-  FakeRequest.prototype.getResponseHeader = function getResponseHeader() {
-    return this._passthroughCheck('getResponseHeader', arguments);
-  };
-  FakeRequest.prototype.getAllResponseHeaders = function getAllResponseHeaders() {
-    return this._passthroughCheck('getAllResponseHeaders', arguments);
-  };
-  if (ctx.pretender._nativeXMLHttpRequest.prototype._passthroughCheck) {
-    // eslint-disable-next-line no-console
-    console.warn('You created a second Pretender instance while there was already one running. ' + 'Running two Pretender servers at once will lead to unexpected results and will ' + 'be removed entirely in a future major version.' + 'Please call .shutdown() on your instances when you no longer need them to respond.');
-  }
-  return FakeRequest;
-}
-var NoopArray = /** @class */function () {
-  function NoopArray() {
-    this.length = 0;
-  }
-  NoopArray.prototype.push = function () {
-    return 0;
-  };
-  return NoopArray;
-}();
-function scheduleProgressEvent(request, startTime, totalTime) {
-  var totalSize = 0;
-  var body = request.requestBody;
-  if (body) {
-    if (body instanceof FormData) {
-      body.forEach(function (value) {
-        if (value instanceof File) {
-          totalSize += value.size;
-        } else {
-          totalSize += value.length;
-        }
-      });
-    } else {
-      // Support Blob, BufferSource, USVString, ArrayBufferView
-      totalSize = body.byteLength || body.size || body.length || 0;
-    }
-  }
-  setTimeout(function () {
-    if (!request.aborted && !request.status) {
-      var elapsedTime = new Date().getTime() - startTime.getTime();
-      var progressTransmitted = totalTime <= 0 ? 0 : elapsedTime / totalTime * totalSize;
-      // ProgressEvent expects loaded, total
-      // https://xhr.spec.whatwg.org/#interface-progressevent
-      request.upload._progress(true, progressTransmitted, totalSize);
-      request._progress(true, progressTransmitted, totalSize);
-      scheduleProgressEvent(request, startTime, totalTime);
-    } else if (request.status) {
-      // we're done, send a final progress event with loaded === total
-      request.upload._progress(true, totalSize, totalSize);
-      request._progress(true, totalSize, totalSize);
-    }
-  }, 50);
-}
-function isArray(array) {
-  return Object.prototype.toString.call(array) === '[object Array]';
-}
-var PASSTHROUGH = {};
-function verbify(verb) {
-  return function (path, handler, async) {
-    return this.register(verb, path, handler, async);
-  };
-}
-var Pretender = /** @class */function () {
-  function Pretender() {
-    var _this = this;
-    this.hosts = new Hosts();
-    this.handlers = [];
-    this.get = verbify('GET');
-    this.post = verbify('POST');
-    this.put = verbify('PUT');
-    this.delete = verbify('DELETE');
-    this.patch = verbify('PATCH');
-    this.head = verbify('HEAD');
-    this.options = verbify('OPTIONS');
-    this.passthrough = PASSTHROUGH;
-    var lastArg = arguments[arguments.length - 1];
-    var options = typeof lastArg === 'object' ? lastArg : null;
-    var shouldNotTrack = options && options.trackRequests === false;
-    this.handledRequests = shouldNotTrack ? new NoopArray() : [];
-    this.passthroughRequests = shouldNotTrack ? new NoopArray() : [];
-    this.unhandledRequests = shouldNotTrack ? new NoopArray() : [];
-    this.requestReferences = [];
-    this.forcePassthrough = options && options.forcePassthrough === true;
-    this.disableUnhandled = options && options.disableUnhandled === true;
-    // reference the native XMLHttpRequest object so
-    // it can be restored later
-    this._nativeXMLHttpRequest = self.XMLHttpRequest;
-    this.running = false;
-    var ctx = {
-      pretender: this
-    };
-    this.ctx = ctx;
-    // capture xhr requests, channeling them into
-    // the route map.
-    self.XMLHttpRequest = interceptor(ctx);
-    // polyfill fetch when xhr is ready
-    this._fetchProps = FakeFetch ? ['fetch', 'Headers', 'Request', 'Response'] : [];
-    this._fetchProps.forEach(function (name) {
-      _this['_native' + name] = self[name];
-      self[name] = FakeFetch[name];
-    }, this);
-    // 'start' the server
-    this.running = true;
-    // trigger the route map DSL.
-    var argLength = options ? arguments.length - 1 : arguments.length;
-    for (var i = 0; i < argLength; i++) {
-      this.map(arguments[i]);
-    }
-  }
-  Pretender.prototype.map = function (maps) {
-    maps.call(this);
-  };
-  Pretender.prototype.register = function (verb, url, handler, async) {
-    if (!handler) {
-      throw new Error('The function you tried passing to Pretender to handle ' + verb + ' ' + url + ' is undefined or missing.');
-    }
-    var handlerInstance = handler;
-    handlerInstance.numberOfCalls = 0;
-    handlerInstance.async = async;
-    this.handlers.push(handlerInstance);
-    var registry = this.hosts.forURL(url)[verb];
-    registry.add([{
-      path: parseURL(url).fullpath,
-      handler: handlerInstance
-    }]);
-    return handlerInstance;
-  };
-  Pretender.prototype.checkPassthrough = function (request) {
-    var verb = request.method.toUpperCase();
-    var path = parseURL(request.url).fullpath;
-    var recognized = this.hosts.forURL(request.url)[verb].recognize(path);
-    var match = recognized && recognized[0];
-    if (match && match.handler === PASSTHROUGH || this.forcePassthrough) {
-      this.passthroughRequests.push(request);
-      this.passthroughRequest(verb, path, request);
-      return true;
-    }
-    return false;
-  };
-  Pretender.prototype.handleRequest = function (request) {
-    var verb = request.method.toUpperCase();
-    var path = request.url;
-    var handler = this._handlerFor(verb, path, request);
-    if (handler) {
-      handler.handler.numberOfCalls++;
-      var async_1 = handler.handler.async;
-      this.handledRequests.push(request);
-      var pretender_1 = this;
-      var _handleRequest_1 = function (statusHeadersAndBody) {
-        if (!isArray(statusHeadersAndBody)) {
-          var note = 'Remember to `return [status, headers, body];` in your route handler.';
-          throw new Error('Nothing returned by handler for ' + path + '. ' + note);
-        }
-        var status = statusHeadersAndBody[0];
-        var headers = pretender_1.prepareHeaders(statusHeadersAndBody[1]);
-        var body = pretender_1.prepareBody(statusHeadersAndBody[2], headers);
-        pretender_1.handleResponse(request, async_1, function () {
-          request.respond(status, headers, body);
-          pretender_1.handledRequest(verb, path, request);
-        });
-      };
-      try {
-        var result = handler.handler(request);
-        if (result && typeof result.then === 'function') {
-          // `result` is a promise, resolve it
-          result.then(function (resolvedResult) {
-            _handleRequest_1(resolvedResult);
-          });
-        } else {
-          _handleRequest_1(result);
-        }
-      } catch (error) {
-        this.erroredRequest(verb, path, request, error);
-        this.resolve(request);
-      }
-    } else {
-      if (!this.disableUnhandled) {
-        this.unhandledRequests.push(request);
-        this.unhandledRequest(verb, path, request);
-      }
-    }
-  };
-  Pretender.prototype.handleResponse = function (request, strategy, callback) {
-    var delay = typeof strategy === 'function' ? strategy() : strategy;
-    delay = typeof delay === 'boolean' || typeof delay === 'number' ? delay : 0;
-    if (delay === false) {
-      callback();
-    } else {
-      var pretender_2 = this;
-      pretender_2.requestReferences.push({
-        request: request,
-        callback: callback
-      });
-      if (delay !== true) {
-        scheduleProgressEvent(request, new Date(), delay);
-        setTimeout(function () {
-          pretender_2.resolve(request);
-        }, delay);
-      }
-    }
-  };
-  Pretender.prototype.resolve = function (request) {
-    for (var i = 0, len = this.requestReferences.length; i < len; i++) {
-      var res = this.requestReferences[i];
-      if (res.request === request) {
-        res.callback();
-        this.requestReferences.splice(i, 1);
-        break;
-      }
-    }
-  };
-  Pretender.prototype.requiresManualResolution = function (verb, path) {
-    var handler = this._handlerFor(verb.toUpperCase(), path, {});
-    if (!handler) {
-      return false;
-    }
-    var async = handler.handler.async;
-    return typeof async === 'function' ? async() === true : async === true;
-  };
-  Pretender.prototype.prepareBody = function (body, _headers) {
-    return body;
-  };
-  Pretender.prototype.prepareHeaders = function (headers) {
-    return headers;
-  };
-  Pretender.prototype.handledRequest = function (_verb, _path, _request) {
-    /* no-op */
-  };
-  Pretender.prototype.passthroughRequest = function (_verb, _path, _request) {
-    /* no-op */
-  };
-  Pretender.prototype.unhandledRequest = function (verb, path, _request) {
-    throw new Error('Pretender intercepted ' + verb + ' ' + path + ' but no handler was defined for this type of request');
-  };
-  Pretender.prototype.erroredRequest = function (verb, path, _request, error) {
-    error.message = 'Pretender intercepted ' + verb + ' ' + path + ' but encountered an error: ' + error.message;
-    throw error;
-  };
-  Pretender.prototype.shutdown = function () {
-    var _this = this;
-    self.XMLHttpRequest = this._nativeXMLHttpRequest;
-    this._fetchProps.forEach(function (name) {
-      self[name] = _this['_native' + name];
-    }, this);
-    this.ctx.pretender = undefined;
-    // 'stop' the server
-    this.running = false;
-  };
-  Pretender.prototype._handlerFor = function (verb, url, request) {
-    var registry = this.hosts.forURL(url)[verb];
-    var matches = registry.recognize(parseURL(url).fullpath);
-    var match = matches ? matches[0] : null;
-    if (match) {
-      request.params = match.params;
-      request.queryParams = matches.queryParams;
-    }
-    return match;
-  };
-  Pretender.parseURL = parseURL;
-  Pretender.Hosts = Hosts;
-  Pretender.Registry = Registry;
-  return Pretender;
-}();
-Pretender.parseURL = parseURL;
-Pretender.Hosts = Hosts;
-Pretender.Registry = Registry;
-
-const section_chart = [{
+let line = {
   type: 'chart',
   className: 'test-chart',
   content: {
@@ -70074,7 +67934,8 @@ const section_chart = [{
     },
     data: [[1609462800, '290', '53.6'], [1609549260, '289', '51.3'], [1609635720, '287', '51.8'], [1609722180, '275', '52.7'], [1609808640, '270', '53.4'], [1609895100, '262', '56.0'], [1609981560, '268', '56.0'], [1610068020, '273', '57.0'], [1610154480, '260', '56.1'], [1610240940, '271', '57.6'], [1610327400, '281', '58.3'], [1610413860, '291', '60.4'], [1610500320, '292', '61.0'], [1610586780, '292', '62.5'], [1610673240, '292', '63.0'], [1610759700, '293', '66.0'], [1610846160, '293', '65.9'], [1610932620, '293', '65.1'], [1611019080, '293', '63.8'], [1611105540, '293', '64.1'], [1611192000, '292', '61.1'], [1611278460, '293', '63.5'], [1611364920, '293', '62.5'], [1611451380, '292', '60.7'], [1611537840, '293', '61.3'], [1611624300, '293', '60.8'], [1611710760, '293', '61.1'], [1611797220, '293', '60.8'], [1611883680, '293', '60.8'], [1611970140, '293', '62.3'], [1612056600, '293', '63.7'], [1612143060, '294', '65.2'], [1612229520, '293', '61.4'], [1612315980, '294', '62.5'], [1612402440, '293', '60.3'], [1612488900, '293', '60.1'], [1612575360, '293', '61.0'], [1612661820, '294', '61.6'], [1612748280, '294', '62.5'], [1612834740, '294', '63.5'], [1612921200, '294', '60.7'], [1613007660, '293', '59.8'], [1613094120, '293', '59.7'], [1613180580, '293', '58.3'], [1613267040, '293', '58.9'], [1613353500, '293', '57.3'], [1613439960, '293', '57.4'], [1613526420, '293', '58.8'], [1613612880, '293', '58.5'], [1613699340, '293', '57.8'], [1613785800, '293', '58.4'], [1613872260, '293', '58.1'], [1613958720, '293', '57.3'], [1614045180, '293', '57.1'], [1614131640, '293', '57.8'], [1614218100, '293', '58.0'], [1614304560, '293', '57.9'], [1614391020, '294', '58.6'], [1614477480, '294', '59.7'], [1614563940, '294', '58.4'], [1614650400, '294', '59.1'], [1614736860, '294', '60.0'], [1614823320, '294', '60.1'], [1614909780, '294', '57.7'], [1614996240, '293', '57.1'], [1615082700, '293', '56.9'], [1615169160, '293', '56.8'], [1615255620, '293', '55.9'], [1615342080, '293', '56.3'], [1615428540, '293', '56.2'], [1615515000, '293', '56.6'], [1615601460, '293', '56.7'], [1615687920, '293', '55.6'], [1615774380, '293', '55.7'], [1615860840, '293', '52.7'], [1615947300, '292', '51.4'], [1616033760, '292', '52.3'], [1616120220, '293', '52.6'], [1616206680, '293', '52.8'], [1616293140, '293', '53.7'], [1616379600, '293', '53.4'], [1616466060, '293', '53.4'], [1616552520, '293', '53.6'], [1616638980, '293', '54.3'], [1616725440, '293', '54.7'], [1616811900, '293', '55.1'], [1616898360, '293', '53.2'], [1616984820, '293', '54.0'], [1617071280, '293', '52.9'], [1617157740, '292', '51.3'], [1617244200, '292', '51.7'], [1617330660, '292', '48.7'], [1617417120, '292', '49.6'], [1617503580, '292', '48.8'], [1617590040, '292', '49.2'], [1617676500, '292', '49.9'], [1617762960, '292', '48.7'], [1617849420, '292', '50.2'], [1617935880, '292', '50.3']]
   }
-}, {
+};
+let bar = {
   type: 'chart',
   className: 'test-chart',
   content: {
@@ -70099,26 +67960,8 @@ const section_chart = [{
     },
     data: [['2018', '23.8', '53.6', '37.4'], ['2019', '19.6', '43.3', '63.4'], ['2020', '4.2', '51.8', '47.4']]
   }
-}, {
-  type: 'chart',
-  className: 'test-chart',
-  content: {
-    options: {
-      type: 'bar',
-      title: 'Bar: one group',
-      width: 250,
-      height: 150,
-      series: [{
-        label: 'Requested'
-      }, {
-        label: 'Renewed'
-      }, {
-        label: 'Revoked'
-      }]
-    },
-    data: [['2019', '23.8', '53.6', '37.4']]
-  }
-}, {
+};
+let pie = {
   type: 'chart',
   className: 'test-chart',
   content: {
@@ -70128,31 +67971,70 @@ const section_chart = [{
       width: 250,
       height: 150,
       series: [{
-        label: 'Requested'
+        label: 'Requested',
+        color: 'rgba(0, 100, 200, 0.9)'
       }, {
-        label: 'Renewed'
+        label: 'Renewed',
+        color: 'rgba(200, 200, 200, 1)'
       }, {
-        label: 'Revoked'
+        label: 'Revoked',
+        color: 'rgba(200, 30, 100, 0.9)'
       }, {
         label: 'Unchanged'
       }]
     },
     data: [['2019', '14', '44', '30', '12']]
   }
-}];
+};
+let line_right = structuredClone(line);
+let line_left = structuredClone(line);
+line_right.content.options.legend_position = 'right';
+line_left.content.options.legend_position = 'left';
+let bar_right = structuredClone(bar);
+let bar_left = structuredClone(bar);
+bar_right.content.options.legend_position = 'right';
+bar_left.content.options.legend_position = 'left';
+let pie_right = structuredClone(pie);
+let pie_left = structuredClone(pie);
+pie_right.content.options.legend_position = 'right';
+pie_left.content.options.legend_position = 'left';
+const section_chart = [{
+  type: 'chart',
+  className: 'test-chart',
+  content: {
+    label: "Chart",
+    options: {
+      type: 'bar',
+      title: 'Bar: one group',
+      width: 250,
+      height: 150,
+      series: [{
+        label: 'Requested',
+        color: 'rgba(0, 100, 200, 0.9)'
+      }, {
+        label: 'Renewed',
+        color: 'rgba(200, 200, 200, 1)'
+      }, {
+        label: 'Revoked',
+        color: 'rgba(200, 30, 100, 0.9)'
+      }]
+    },
+    data: [['2019', '23.8', '53.6', '37.4']]
+  }
+}, line, bar, pie, line_right, bar_right, pie_right, line_left, bar_left, pie_left];
 
-const amdModule27 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const amdModule30 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: section_chart
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const _testButton = {
+const _testButton$1 = {
   label: "Button",
   format: "primary",
   tooltip: "This should do it",
   disabled: false
 };
-const section_form = [{
+const section_form_text = [{
   type: "form",
   action: "login!text",
   reset: "login!text",
@@ -70230,20 +68112,29 @@ const section_form = [{
         button_label: "Per Smartcard erzeugen"
       }
     }],
-    buttons: [ContainerButton.fromHash(_testButton), ContainerButton.fromHash({
-      ..._testButton,
+    buttons: [{
+      ..._testButton$1
+    }, {
+      ..._testButton$1,
       label: "With confirmation",
       confirm: {
         label: "Really sure?",
         description: "Think about it one more time."
       }
-    }), ContainerButton.fromHash({
-      ..._testButton,
+    }, {
+      ..._testButton$1,
       label: "Disabled",
       disabled: true
-    })]
+    }]
   }
-}, {
+}];
+
+const amdModule36 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+	__proto__: null,
+	default: section_form_text
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const section_form_select = [{
   type: "form",
   action: "login!password",
   reset: "login!password",
@@ -70380,7 +68271,14 @@ const section_form = [{
       }]
     }]
   }
-}, {
+}];
+
+const amdModule35 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+	__proto__: null,
+	default: section_form_select
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const section_form_dependants = [{
   type: "form",
   action: "login!password",
   reset: "login!password",
@@ -70424,7 +68322,7 @@ const section_form = [{
           value: 2,
           options: [{
             value: 1,
-            label: "Vær så god"
+            label: "Vaer sa god"
           }, {
             value: 2,
             label: "Ingen problemer",
@@ -70439,14 +68337,14 @@ const section_form = [{
     }, {
       type: "select",
       name: "select_dependants2",
-      label: "Level 1",
+      label: "Only one option - Level 1",
       options: [{
         value: 1,
         label: "Only option",
         dependants: [{
           type: "select",
           name: "select_dep_dependants",
-          label: "Level 2 - Sub-select",
+          label: "Only one option - Level 2",
           options: [{
             value: 3,
             label: "Only Option"
@@ -70455,7 +68353,14 @@ const section_form = [{
       }]
     }]
   }
-}, {
+}];
+
+const amdModule33 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+	__proto__: null,
+	default: section_form_dependants
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const section_form_password = [{
   type: "form",
   action: "login!password",
   reset: "login!password",
@@ -70479,12 +68384,19 @@ const section_form = [{
       tooltip: "Rinse and repeat"
     }]
   }
-}, {
+}];
+
+const amdModule34 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+	__proto__: null,
+	default: section_form_password
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const section_form_datetime = [{
   type: "form",
   action: "login!password",
   reset: "login!password",
   content: {
-    label: "oxi-section/form #3",
+    label: "Datetime",
     title: "Datetime",
     fields: [{
       type: "datetime",
@@ -70519,7 +68431,14 @@ const section_form = [{
       is_optional: 1
     }]
   }
-}, {
+}];
+
+const amdModule32 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+	__proto__: null,
+	default: section_form_datetime
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const section_form_cloneable = [{
   type: "form",
   action: "login!password",
   reset: "login!password",
@@ -70557,7 +68476,14 @@ const section_form = [{
       }]
     }]
   }
-}, {
+}];
+
+const amdModule31 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+	__proto__: null,
+	default: section_form_cloneable
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const section_form_various = [{
   type: "form",
   action: "login!password",
   reset: "login!password",
@@ -70632,12 +68558,19 @@ const section_form = [{
       }
     }]
   }
-}, {
+}];
+
+const amdModule38 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+	__proto__: null,
+	default: section_form_various
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const section_form_tooltips = [{
   type: "form",
   action: "login!password",
   reset: "login!password",
   content: {
-    label: "oxi-section/form #6",
+    label: "Tooltips",
     title: "Tooltips",
     fields: [{
       type: "rawtext",
@@ -70661,9 +68594,70 @@ const section_form = [{
   }
 }];
 
-const amdModule28 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const amdModule37 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
-	default: section_form
+	default: section_form_tooltips
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const _testButton = {
+  label: "Button",
+  format: "primary",
+  tooltip: "This should do it",
+  disabled: false
+};
+const buttons = [{
+  label: "Link",
+  format: "failure",
+  tooltip: "Just fyi",
+  href: "https://www.openxpki.org",
+  target: "_blank",
+  break_before: 1
+}, {
+  label: "Link (confirm)",
+  format: "exceptional",
+  tooltip: "Just fyi",
+  href: "https://www.openxpki.org",
+  target: "_blank",
+  confirm: {
+    label: "Really sure?",
+    description: "This opens an external page."
+  }
+}, {
+  ..._testButton
+}, {
+  ..._testButton,
+  label: "With confirmation",
+  confirm: {
+    label: "Really sure?",
+    description: "Think about it one more time."
+  }
+}, {
+  ..._testButton,
+  label: "Disabled",
+  disabled: true,
+  break_after: 1
+}];
+for (const format of ['primary', 'submit', 'expected', 'loading', 'exceptional', 'terminate', 'cancel', 'failure', 'reset', 'alternative', 'optional', 'info', 'tile', 'card']) {
+  buttons.push({
+    ..._testButton,
+    format,
+    label: format
+  });
+}
+const section_button_format = [{
+  type: "form",
+  action: "login!text",
+  reset: "login!text",
+  content: {
+    label: "Button formats",
+    fields: [],
+    buttons
+  }
+}];
+
+const amdModule26 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+	__proto__: null,
+	default: section_button_format
 }, Symbol.toStringTag, { value: 'Module' }));
 
 function additionalGridRows() {
@@ -70680,11 +68674,11 @@ function additionalGridRows() {
   }
   return result;
 }
-const section_grid = {
+const section_grid = [{
   type: "grid",
   className: "certificate",
   content: {
-    label: "oxi-section/grid",
+    label: "Grid",
     empty: "No data available",
     buttons: [{
       section: "Some"
@@ -70775,18 +68769,19 @@ const section_grid = {
       value: "unknown"
     }], ...additionalGridRows()]
   }
-};
+}];
 
-const amdModule29 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const amdModule39 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: section_grid
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const section_keyvalue = {
+// prettier-ignore
+const section_keyvalue = [{
   type: "keyvalue",
   content: {
-    label: "oxi-section/keyvalue",
-    description: "",
+    label: "Key-Value",
+    description: "This is a first test",
     data: [{
       format: "head",
       value: "Scalar types:"
@@ -71044,42 +69039,127 @@ const section_keyvalue = {
     }, {
       format: "head",
       label: "head"
-    }],
-    buttons: [{
-      format: "expected",
-      page: "certificate!search!query!rJdrIbg1P6xsE6b9RtQCXp291SE",
-      label: "Reload Search Form"
-    }, {
-      format: "alternative",
-      page: "redirect!certificate!result!id!rJdrIbg1P6xsE6b9RtQCXp291SE",
-      label: "Refresh Result",
-      break_after: 1
-    }, {
-      label: "New Search",
-      format: "failure",
-      page: "certificate!search"
-    }, {
-      label: "Export Result",
-      format: "optional",
-      target: "_blank",
-      href: "/cgi-bin/webui.fcgi?page=certificate!export!id!rJdrIbg1P6xsE6b9RtQCXp291SE"
     }]
+    // buttons: [
+    //     {
+    //         format: "expected",
+    //         page: "certificate!search!query!rJdrIbg1P6xsE6b9RtQCXp291SE",
+    //         label: "Reload Search Form",
+    //     },
+    //     {
+    //         format: "alternative",
+    //         page: "redirect!certificate!result!id!rJdrIbg1P6xsE6b9RtQCXp291SE",
+    //         label: "Refresh Result",
+    //         break_after: 1,
+    //     },
+    //     {
+    //         label: "New Search",
+    //         format: "failure",
+    //         page: "certificate!search"
+    //     },
+    //     {
+    //         label: "Export Result",
+    //         format: "optional",
+    //         target: "_blank",
+    //         href: "/cgi-bin/webui.fcgi?page=certificate!export!id!rJdrIbg1P6xsE6b9RtQCXp291SE"
+    //     }
+    // ],
   }
-};
+}];
 
-const amdModule30 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const amdModule40 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: section_keyvalue
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const section_tiles = {
+// prettier-ignore
+const section_tiles = [{
   type: "tiles",
   content: {
-    label: "oxi-section/tiles",
+    label: "Tiles",
     description: "",
     maxcol: 4,
-    align: 'left',
+    borders: 1,
     tiles: [{
+      type: "text",
+      colspan: 2,
+      content: {
+        description: "Take a deep dive into masterly distilled information and mind-blowingly sustainable diagrams—the insights are absolutely game-changing.<br><i>#DataDriven #Innovation #ContinuousLearning</i>"
+      }
+    }, {
+      type: 'chart',
+      className: 'test-chart',
+      content: {
+        options: {
+          type: 'bar',
+          title: 'Bar',
+          legend_position: 'right',
+          series: [{
+            label: 'Requested',
+            color: 'rgba(0, 100, 200, 0.9)',
+            scale: '%'
+          }, {
+            label: 'Renewed',
+            color: 'rgba(200, 200, 200, 1)',
+            scale: '%'
+          }, {
+            label: 'Revoked',
+            color: 'rgba(200, 30, 100, 0.9)',
+            scale: '%'
+          }]
+        },
+        data: [['2018', '23.8', '53.6', '37.4'], ['2019', '19.6', '43.3', '63.4'], ['2020', '4.2', '51.8', '47.4']]
+      }
+    }, {
+      type: 'chart',
+      className: 'test-chart',
+      content: {
+        options: {
+          type: 'pie',
+          title: 'Pie',
+          legend_position: 'right',
+          series: [{
+            label: 'Requested'
+          }, {
+            label: 'Renewed'
+          }, {
+            label: 'Revoked'
+          }, {
+            label: 'Unchanged'
+          }]
+        },
+        data: [['2019', '14', '44', '30', '12']]
+      }
+    }, {
+      type: "keyvalue",
+      content: {
+        data: [{
+          format: "timestamp",
+          label: "timestamp",
+          value: 1617495633
+        }, {
+          format: "styled",
+          label: "styled",
+          value: "attention:hear my words"
+        }, {
+          format: "certstatus",
+          label: "certstatus",
+          value: {
+            value: "issued",
+            label: "<i>Issued</i>",
+            tooltip: "It's issued"
+          }
+        }, {
+          format: "link",
+          label: "link",
+          value: {
+            page: "workflow!load!wf_id!13567",
+            label: 13567,
+            target: "top"
+          }
+        }]
+      }
+    }, 'newline', {
       type: 'button',
       content: {
         label: 'Request certificate',
@@ -71093,9 +69173,7 @@ const section_tiles = {
         image: 'img/revoke.png',
         page: 'workflow!index!wf_type!certificate_revocation_request_v2'
       }
-    }, {
-      type: 'newline'
-    }, {
+    }, 'newline', {
       type: 'button',
       content: {
         label: 'SCEP Workflow Search',
@@ -71132,17 +69210,17 @@ const section_tiles = {
       }
     }]
   }
-};
+}];
 
-const amdModule31 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const amdModule42 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: section_tiles
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const section_cards = {
+const section_cards = [{
   type: "cards",
   content: {
-    label: "oxi-section/cards",
+    label: "Cards",
     description: "Please select a realm for your certificate request:",
     cards: [{
       label: 'Terra',
@@ -71169,17 +69247,17 @@ const section_cards = {
       href: 'https://www.openxpki.org'
     }]
   }
-};
+}];
 
-const amdModule26 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const amdModule29 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: section_cards
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const section_cards_vertical = {
+const section_cards_vertical = [{
   type: "cards",
   content: {
-    label: "oxi-section/cards (vertical)",
+    label: "Cards (vertical)",
     description: "Please select a realm for your certificate request:",
     vertical: true,
     cards: [{
@@ -71207,460 +69285,153 @@ const section_cards_vertical = {
       href: 'https://www.openxpki.org'
     }]
   }
-};
+}];
 
-const amdModule25 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const amdModule28 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: section_cards_vertical
 }, Symbol.toStringTag, { value: 'Module' }));
 
-class TestController extends Controller {
-  static {
-    decorateFieldV2(this.prototype, "oxiLocale", [service('oxi-locale')]);
+// prettier-ignore
+const section_text = [{
+  "type": "text",
+  "content": {
+    "label": "Text",
+    "description": "Generates a new RA certificate and registers it as active RA token.",
+    "buttons": [{
+      "page": "openxpki.test.text",
+      "label": "Start Workflow"
+    }]
   }
-  #oxiLocale = (initializeDeferredDecorator(this, "oxiLocale"), void 0);
-  static {
-    decorateFieldV2(this.prototype, "selectedFormIndex", [tracked], function () {
-      return 0;
-    });
-  }
-  #selectedFormIndex = (initializeDeferredDecorator(this, "selectedFormIndex"), void 0);
-  static {
-    decorateFieldV2(this.prototype, "themeMode", [tracked], function () {
-      return localStorage.getItem('oxi-theme-mode') || 'auto';
-    });
-  }
-  #themeMode = (initializeDeferredDecorator(this, "themeMode"), void 0);
-  get effectiveTheme() {
-    if (this.themeMode === 'auto') return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    return this.themeMode;
-  }
-  get themeIcon() {
-    switch (this.themeMode) {
-      case 'dark':
-        return 'bi-moon-fill';
-      case 'light':
-        return 'bi-sun-fill';
-      case 'auto':
-        return 'bi-circle-half';
-      default:
-        return 'bi-sun-fill';
-    }
-  }
-  get themeButtonClass() {
-    switch (this.themeMode) {
-      case 'dark':
-        return 'btn-outline-info';
-      case 'light':
-        return 'btn-outline-secondary bg-warning-subtle';
-      case 'auto':
-        return this.effectiveTheme === 'dark' ? 'btn-outline-info' : 'btn-outline-secondary bg-warning-subtle';
-      default:
-        return 'btn-outline-secondary';
-    }
-  }
-  buttons = [];
-  charts = section_chart;
-  forms = section_form;
-  sections = [section_grid, section_keyvalue, section_tiles, section_cards, section_cards_vertical];
-  test_buttons = buttons;
-  localconfig = `
-header:
-    logo: img/logo.png
-    title: Test page
-`;
-  localRequestPath = 'test-server';
-  localRequestUrl = 'http://localhost:7780/' + this.localRequestPath;
-  get formNavButtons() {
-    let buttons = [];
-    this.forms.forEach((form, i) => {
-      buttons.push(ContainerButton.fromHash({
-        format: "optional",
-        label: form.content.title,
-        onClick: async btn => this.setCurrentForm(i)
-      }));
-    });
-    return buttons;
-  }
-  #toUrlParams(entries) {
-    let result = [];
-    let URLPARAM_FIND = /[!'()~]|%20/g;
-    let URLPARAM_REPLACE = {
-      '!': '%21',
-      "'": '%27',
-      '(': '%28',
-      ')': '%29',
-      '~': '%7E',
-      '%20': '+'
-    };
-    let serialize = v => encodeURIComponent(v ?? '').replace(URLPARAM_FIND, match => URLPARAM_REPLACE[match]);
-    Object.keys(entries).forEach(k => result.push(serialize(k) + '=' + serialize(entries[k])));
-    return result.join('&');
-  }
-  async localRequest() {
-    console.log('Sending request to localhost...');
-    let data = {
-      colour: 'blue',
-      time: new Date().getTime()
-    };
-    let url = this.localRequestUrl + '?' + this.#toUrlParams(data);
-    let fetchParams = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-      }
-    };
-    return fetch(url, fetchParams).then(response => {
-      console.log('Response from local server:', response);
-      if (response.ok) {
-        return response.json();
-      }
-      // Handle non-2xx HTTP status codes
-      else {
-        console.error(response.status);
-      }
-    }).then(doc => {
-      console.log('Decoded JSON: ', doc);
-    });
-  }
-  constructor() {
-    super(...arguments);
-    this.oxiLocale.locale = 'de-DE';
-    this.buttons = [ContainerButton.fromHash({
-      format: "expected",
-      label: "de-DE",
-      onClick: async btn => this.setLang("de-DE")
-    }), ContainerButton.fromHash({
-      format: "expected",
-      label: "en-US",
-      onClick: async btn => this.setLang("en-US")
-    }), ContainerButton.fromHash({
-      format: "expected",
-      label: 'Local request - ' + this.localRequestUrl,
-      tooltip: "morbo -l http://*:7780 ./test-server.pl",
-      onClick: async btn => this.localRequest()
-    })];
+}];
 
-    /*
-     * set up request interceptor / server mockup
-     */
-    const server = new Pretender();
+const amdModule41 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+	__proto__: null,
+	default: section_text
+}, Symbol.toStringTag, { value: 'Module' }));
 
-    // simulate localconfig.yaml
-    server.get(`${environment$1.rootURL}localconfig.yaml`, request => [
-    // eslint-disable-line ember/classic-decorator-no-classic-methods
-    200, {
-      "Content-type": "application/yaml"
-    }, this.localconfig]);
-    let emptyResponse = () => new Promise(resolve => {
-      let response = [200, {
-        'Content-Type': 'application/javascript'
-      }, '{}'];
-      resolve(response);
-    });
+const SESSION_ID = 'mock-session-test-1';
+const RTOKEN = 'mock-rtoken-test-1';
 
-    /* ************************
-     * GET requests
-     */
-    server.get(`${environment$1.rootURL}cgi-bin/webui.fcgi`, req => {
-      // eslint-disable-line ember/classic-decorator-no-classic-methods
-      console.info(`MOCKUP SERVER> GET request: ${req.url}`);
-      console.info(Object.entries(req.queryParams).map(e => `MOCKUP SERVER> ${e[0]} = ${e[1]}`).join("\n"));
-      console.debug(req);
+// Helper: derive nav label from the first section's content label.
+const label = main => main[0].content.label;
 
-      /*
-       * dynamic tooltip - text
-       */
-      if (req.queryParams?.page == 'tooltip!user!123') {
-        let result = {
-          type: "text",
-          content: {
-            description: "Fred&nbsp;<b>Flintstone</b>"
-          }
-        };
-        return [200, {
-          "Content-Type": "application/json"
-        }, JSON.stringify(result)];
-      }
+// nav() builds a clickable nav entry from a page key and its main content.
+const nav = (key, main) => ({
+  label: label(main),
+  key,
+  page: key,
+  main
+});
+const FORM_SECTIONS = [nav('openxpki.test.form-text', section_form_text), nav('openxpki.test.form-select', section_form_select), nav('openxpki.test.form-dependants', section_form_dependants), nav('openxpki.test.form-password', section_form_password), nav('openxpki.test.form-datetime', section_form_datetime), nav('openxpki.test.form-cloneable', section_form_cloneable), nav('openxpki.test.form-various', section_form_various), nav('openxpki.test.form-tooltips', section_form_tooltips)];
+const SECTIONS = [nav('openxpki.test.keyvalue', section_keyvalue), nav('openxpki.test.grid', section_grid), nav('openxpki.test.button', section_button), nav('openxpki.test.button-format', section_button_format), nav('openxpki.test.cards', section_cards), nav('openxpki.test.cards-vertical', section_cards_vertical), nav('openxpki.test.charts', section_chart), nav('openxpki.test.tiles', section_tiles), nav('openxpki.test.text', section_text)];
 
-      /*
-       * dynamic tooltip - chart
-       */
-      if (req.queryParams?.page == 'tooltip!chart') {
-        let result = {
-          type: 'chart',
-          className: 'test-chart',
-          content: {
-            options: {
-              type: 'pie',
-              title: 'Pie',
-              width: 300,
-              height: 150,
-              series: [{
-                label: 'Requested'
-              }, {
-                label: 'Renewed'
-              }, {
-                label: 'Revoked'
-              }]
-            },
-            data: [['2019', '14', '44', '30']]
-          }
-        };
-        return [200, {
-          "Content-Type": "application/json"
-        }, JSON.stringify(result)];
-      }
-      return emptyResponse();
-    }, 1000);
+// Bootstrap response: sets up session, CSRF token, locale, and the test menu.
+// This is what oxi-content.js:#bootstrap() expects from page=bootstrap!structure.
+// Must include: rtoken, structure, session_id, language.
+// Must NOT include a meaningful `main` - that is fetched separately.
+const bootstrapResponse = {
+  session_id: SESSION_ID,
+  rtoken: RTOKEN,
+  language: 'en',
+  structure: [{
+    label: 'Form',
+    entries: FORM_SECTIONS.map(({
+      label,
+      key,
+      page
+    }) => ({
+      label,
+      key,
+      page
+    }))
+  }, ...SECTIONS],
+  user: {
+    name: 'test',
+    role: 'admin',
+    realname: 'Test User',
+    role_label: 'Admin'
+  },
+  pki_realm: 'test',
+  page: {},
+  status: {}
+};
+const PAGE_BUTTONS = [{
+  label: 'de-DE',
+  format: 'optional',
+  action: 'test!lang!de-DE'
+}, {
+  label: 'en-US',
+  format: 'optional',
+  action: 'test!lang!en-US'
+}, {
+  label: 'Local request',
+  format: 'optional',
+  href: 'http://localhost:7780/test-server',
+  target: '_blank'
+}];
 
-    /*
-     * Autofill
-     */
-    server.get('/autofill', req => {
-      // eslint-disable-line ember/classic-decorator-no-classic-methods
-      console.info(`MOCKUP SERVER> autofill request`);
-      console.info(Object.entries(req.queryParams).map(e => `MOCKUP SERVER> ${e[0]} = ${e[1]}`).join("\n"));
-      console.debug(req);
-      let result = req.queryParams;
-      return [200, {
-        "Content-Type": "application/json"
-      }, JSON.stringify(result)];
-    });
+// Keyed lookup used by the Pretender handler.
+// session_id must be the same stable value so that #isBootstrapNeeded() returns false
+// after the initial bootstrap (a changing session_id would re-trigger bootstrap on
+// every page navigation, causing an infinite loop).
+const pages = Object.fromEntries([...SECTIONS, ...FORM_SECTIONS].map(s => [s.key, {
+  session_id: SESSION_ID,
+  page: {
+    buttons: PAGE_BUTTONS
+  },
+  main: s.main,
+  status: {}
+}]));
 
-    /* ************************
-     * POST requests
-     */
-    server.post(`${environment$1.rootURL}cgi-bin/webui.fcgi`, req => {
-      let headers = req.requestHeaders;
-      let contentType = headers[Object.keys(headers).find(el => el.toLowerCase() == 'content-type')];
-      console.info(`MOCKUP SERVER> POST request: ${req.url}`);
-      console.debug(req);
-      let params;
-      if (contentType.match(/^application\/x-www-form-urlencoded/)) {
-        params = decodeURIComponent(req.requestBody.replace(/\+/g, ' ')).split('&').join("\n");
-      } else {
-        params = JSON.parse(req.requestBody);
-      }
-      console.info('MOCKUP SERVER> parameters:', params);
+const amdModule23 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+	__proto__: null,
+	bootstrapResponse,
+	pages
+}, Symbol.toStringTag, { value: 'Module' }));
 
-      /*
-       * autocomplete
-       */
-      if (params?.action == 'text!autocomplete') {
-        let val = params.text_autocomplete;
-        let forest = params.forest || '(not provided)';
-        let comment = params.the_comment || '(not provided)';
-        if (params._encrypted_jwt_secure_param != 'fake_jwt_token') throw new Error('Encrypted JWT token was not sent');
-        console.info(`MOCKUP SERVER> autocomplete - value: ${val}, forest: ${forest}, the_comment: ${comment}`);
-        let result;
-        if ('boom' === val) {
-          result = {
-            error: 'There is no spoon.'
-          };
-        } else if ('void' === val) {
-          result = [];
-        } else {
-          result = [{
-            label: `Bag - ${comment}`,
-            value: `${val}-123`
-          }, {
-            label: `Box - ${comment}`,
-            value: `${val}-567`
-          }, {
-            label: `Bucket - ${comment}`,
-            value: `${val}-890`
-          }];
-        }
-        return [200, {
-          "Content-Type": "application/json"
-        }, JSON.stringify(result)];
-      }
-      return emptyResponse();
-    });
-    server.unhandledRequest = (verb, path, req) => {
-      // pass through a request to a locally running server
-      if (path.includes(this.localRequestPath)) {
-        console.debug("MOCKUP SERVER> Passing through request to backend");
-        return req.passthrough();
-      }
-
-      // otherwise show request
-      console.info("MOCKUP SERVER> Unhandled request", verb, path, req);
-    };
-    server.handledRequest = function (verb, path, req) {};
-  }
-  setLang(lang) {
-    this.oxiLocale.locale = lang;
-  }
-  static {
-    decorateMethodV2(this.prototype, "setLang", [action]);
-  }
-  cycleThemeMode() {
-    switch (this.themeMode) {
-      case 'light':
-        this.themeMode = 'dark';
-        break;
-      case 'dark':
-        this.themeMode = 'auto';
-        break;
-      case 'auto':
-        this.themeMode = 'light';
-        break;
-      default:
-        this.themeMode = 'auto';
-    }
-    document.documentElement.setAttribute('data-bs-theme', this.effectiveTheme);
-    localStorage.setItem('oxi-theme-mode', this.themeMode);
-  }
-  static {
-    decorateMethodV2(this.prototype, "cycleThemeMode", [action]);
-  }
-  async setCurrentForm(index) {
-    this.selectedFormIndex = index;
-  }
+let server = null;
+bootstrapResponse.language;
+async function setupPretender() {
+  return;
+}
+function shutdownPretender() {
+  server?.shutdown();
+  server = null;
 }
 
 const amdModule24 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
-	default: TestController
+	setupPretender,
+	shutdownPretender
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const template = templateFactory(
-/*
-  {{!-- template-lint-disable no-forbidden-elements --}}
-<style type="text/css">
-    .test-chart { border: solid 1px #aaa; margin: 3pt; }
-    .crosses > div > dl > dt::before {
-        display: inline-block;
-        width: 1em;
-        content: "\2717";
-        color: #e00;
-    }
+class TestRoute extends Route {
+  async beforeModel() {
+    const {
+      setupPretender
+    } = await __vitePreload(async () => { const {
+      setupPretender
+    } = await Promise.resolve().then(() => amdModule24);return {
+      setupPretender
+    }},true              ?void 0:void 0,import.meta.url);
+    await setupPretender(); // no-op if already set up by the parent route's beforeModel
+  }
+  async deactivate() {
+    const {
+      shutdownPretender
+    } = await __vitePreload(async () => { const {
+      shutdownPretender
+    } = await Promise.resolve().then(() => amdModule24);return {
+      shutdownPretender
+    }},true              ?void 0:void 0,import.meta.url);
+    shutdownPretender();
+  }
+}
 
-    [data-bs-theme=dark] .crosses > div > dl > dt::before {
-        color: #e06060;
-    }
-
-    .crosses > div > dl > dd {
-        padding-left: 1em;
-    }
-
-    .row .card {
-        margin-bottom: 2rem;
-    }
-</style>
-
-<div class="container-fluid">
-    {{!
-        Language buttons
-    }}
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="card border-secondary">
-                <div class="card-body d-flex align-items-center gap-2">
-                    <OxiBase::ButtonContainer @buttons={{this.buttons}} />
-                    <div class="oxi-dark-mode-switch">
-                        <button
-                            type="button"
-                            class="btn btn-sm {{this.themeButtonClass}}"
-                            title="{{t (concat 'theme.' this.themeMode)}}"
-                            {{on "click" this.cycleThemeMode}}
-                        >
-                            <i class="bi {{this.themeIcon}}"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{!
-        Charts
-    }}
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="card border-secondary">
-                <div class="card-header bg-secondary"></div>
-                <div class="card-body">
-                    <div class="row">
-                        {{#each this.charts as |chart|}}
-                            <div class="col">
-                                <OxiSection @content={{chart}}/>
-                            </div>
-                        {{/each}}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{!
-        Forms
-    }}
-    <div class="row">
-        <div class="col-lg-12">
-            <OxiBase::ButtonContainer @buttons={{this.formNavButtons}} />
-
-            {{#each this.forms as |form index|}}
-                {{#if (eq index this.selectedFormIndex) }}
-                    <div class="card border-secondary">
-                        <div class="card-header bg-secondary"></div>
-                        <div class="card-body">
-                            <OxiSection @content={{form}}/>
-                        </div>
-                    </div>
-                {{/if}}
-            {{/each}}
-        </div>
-    </div>
-
-    {{!
-        Buttons
-    }}
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="card border-secondary">
-                <div class="card-header bg-secondary"></div>
-                <div class="card-body">
-                    <form>
-                        <OxiBase::ButtonContainer @buttons={{this.test_buttons}} />
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{!
-        Various sections
-    }}
-    <div class="row">
-        <div class="col-lg-12">
-            {{#each this.sections as |sectionDef|}}
-                <div class="card border-secondary">
-                    <div class="card-header bg-secondary"></div>
-                    <div class="card-body">
-                        <OxiSection @content={{sectionDef}}/>
-                    </div>
-                </div>
-            {{/each}}
-        </div>
-    </div>
-</div>
-
-
-*/
-{
-  "id": "yQ/mfThL",
-  "block": "[[[10,\"style\"],[14,4,\"text/css\"],[12],[1,\"\\n    .test-chart { border: solid 1px #aaa; margin: 3pt; }\\n    .crosses > div > dl > dt::before {\\n        display: inline-block;\\n        width: 1em;\\n        content: \\\"\\\\2717\\\";\\n        color: #e00;\\n    }\\n\\n    [data-bs-theme=dark] .crosses > div > dl > dt::before {\\n        color: #e06060;\\n    }\\n\\n    .crosses > div > dl > dd {\\n        padding-left: 1em;\\n    }\\n\\n    .row .card {\\n        margin-bottom: 2rem;\\n    }\\n\"],[13],[1,\"\\n\\n\"],[10,0],[14,0,\"container-fluid\"],[12],[1,\"\\n\"],[1,\"    \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n        \"],[10,0],[14,0,\"col-lg-12\"],[12],[1,\"\\n            \"],[10,0],[14,0,\"card border-secondary\"],[12],[1,\"\\n                \"],[10,0],[14,0,\"card-body d-flex align-items-center gap-2\"],[12],[1,\"\\n                    \"],[8,[32,0],null,[[\"@buttons\"],[[30,0,[\"buttons\"]]]],null],[1,\"\\n                    \"],[10,0],[14,0,\"oxi-dark-mode-switch\"],[12],[1,\"\\n                        \"],[11,\"button\"],[16,0,[29,[\"btn btn-sm \",[30,0,[\"themeButtonClass\"]]]]],[16,\"title\",[29,[[28,[32,1],[[28,[32,2],[\"theme.\",[30,0,[\"themeMode\"]]],null]],null]]]],[24,4,\"button\"],[4,[32,3],[\"click\",[30,0,[\"cycleThemeMode\"]]],null],[12],[1,\"\\n                            \"],[10,\"i\"],[15,0,[29,[\"bi \",[30,0,[\"themeIcon\"]]]]],[12],[13],[1,\"\\n                        \"],[13],[1,\"\\n                    \"],[13],[1,\"\\n                \"],[13],[1,\"\\n            \"],[13],[1,\"\\n        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\\n\"],[1,\"    \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n        \"],[10,0],[14,0,\"col-lg-12\"],[12],[1,\"\\n            \"],[10,0],[14,0,\"card border-secondary\"],[12],[1,\"\\n                \"],[10,0],[14,0,\"card-header bg-secondary\"],[12],[13],[1,\"\\n                \"],[10,0],[14,0,\"card-body\"],[12],[1,\"\\n                    \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n\"],[42,[28,[37,5],[[28,[37,5],[[30,0,[\"charts\"]]],null]],null],null,[[[1,\"                            \"],[10,0],[14,0,\"col\"],[12],[1,\"\\n                                \"],[8,[32,4],null,[[\"@content\"],[[30,1]]],null],[1,\"\\n                            \"],[13],[1,\"\\n\"]],[1]],null],[1,\"                    \"],[13],[1,\"\\n                \"],[13],[1,\"\\n            \"],[13],[1,\"\\n        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\\n\"],[1,\"    \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n        \"],[10,0],[14,0,\"col-lg-12\"],[12],[1,\"\\n            \"],[8,[32,0],null,[[\"@buttons\"],[[30,0,[\"formNavButtons\"]]]],null],[1,\"\\n\\n\"],[42,[28,[37,5],[[28,[37,5],[[30,0,[\"forms\"]]],null]],null],null,[[[41,[28,[32,5],[[30,3],[30,0,[\"selectedFormIndex\"]]],null],[[[1,\"                    \"],[10,0],[14,0,\"card border-secondary\"],[12],[1,\"\\n                        \"],[10,0],[14,0,\"card-header bg-secondary\"],[12],[13],[1,\"\\n                        \"],[10,0],[14,0,\"card-body\"],[12],[1,\"\\n                            \"],[8,[32,4],null,[[\"@content\"],[[30,2]]],null],[1,\"\\n                        \"],[13],[1,\"\\n                    \"],[13],[1,\"\\n\"]],[]],null]],[2,3]],null],[1,\"        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\\n\"],[1,\"    \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n        \"],[10,0],[14,0,\"col-lg-12\"],[12],[1,\"\\n            \"],[10,0],[14,0,\"card border-secondary\"],[12],[1,\"\\n                \"],[10,0],[14,0,\"card-header bg-secondary\"],[12],[13],[1,\"\\n                \"],[10,0],[14,0,\"card-body\"],[12],[1,\"\\n                    \"],[10,\"form\"],[12],[1,\"\\n                        \"],[8,[32,0],null,[[\"@buttons\"],[[30,0,[\"test_buttons\"]]]],null],[1,\"\\n                    \"],[13],[1,\"\\n                \"],[13],[1,\"\\n            \"],[13],[1,\"\\n        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\\n\"],[1,\"    \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n        \"],[10,0],[14,0,\"col-lg-12\"],[12],[1,\"\\n\"],[42,[28,[37,5],[[28,[37,5],[[30,0,[\"sections\"]]],null]],null],null,[[[1,\"                \"],[10,0],[14,0,\"card border-secondary\"],[12],[1,\"\\n                    \"],[10,0],[14,0,\"card-header bg-secondary\"],[12],[13],[1,\"\\n                    \"],[10,0],[14,0,\"card-body\"],[12],[1,\"\\n                        \"],[8,[32,4],null,[[\"@content\"],[[30,4]]],null],[1,\"\\n                    \"],[13],[1,\"\\n                \"],[13],[1,\"\\n\"]],[4]],null],[1,\"        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\"],[13],[1,\"\\n\\n\"]],[\"chart\",\"form\",\"index\",\"sectionDef\"],[\"style\",\"div\",\"button\",\"i\",\"each\",\"-track-array\",\"if\",\"form\"]]",
-  "moduleName": "/build/app/route-pods/test/template.hbs",
-  "scope": () => [OxiButtonContainerComponent, THelper, concat, on, OxiSectionComponent, Eq],
-  "isStrictMode": false
-});
-
-const amdModule32 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const amdModule25 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
-	default: template
+	default: TestRoute
 }, Symbol.toStringTag, { value: 'Module' }));
 
 {
@@ -71691,11 +69462,16 @@ Router.map(function () {
     this.route("popup", {
       path: "/popup/:popup_page"
     });
+    if (environment$1.environment === 'development') {
+      this.route('test', {
+        path: '/test'
+      });
+    }
   });
   if (environment$1.environment === 'development') this.route("test");
 });
 
-const amdModule33 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const amdModule43 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: Router
 }, Symbol.toStringTag, { value: 'Module' }));
@@ -71707,7 +69483,7 @@ class HeadDataService extends Service {
   #config = (initializeDeferredDecorator(this, "config"), void 0);
 }
 
-const amdModule34 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const amdModule44 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: HeadDataService
 }, Symbol.toStringTag, { value: 'Module' }));
@@ -71798,7 +69574,7 @@ class OxiBackendService extends Service {
   }
 }
 
-const amdModule35 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const amdModule45 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: OxiBackendService
 }, Symbol.toStringTag, { value: 'Module' }));
@@ -71925,7 +69701,7 @@ class OxiConfigService extends Service {
   }
 }
 
-const amdModule36 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const amdModule46 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: OxiConfigService
 }, Symbol.toStringTag, { value: 'Module' }));
@@ -72603,7 +70379,7 @@ class OxiContentService extends Service {
   #handleServerException(status_code) {
     // Check custom exception handlers
     for (let handler of this.serverExceptions) {
-      let codes = isArray$5(handler.status_code) ? handler.status_code : [handler.status_code];
+      let codes = isArray$3(handler.status_code) ? handler.status_code : [handler.status_code];
       if (codes.find(c => c == status_code)) {
         // Show message
         if (handler.message) {
@@ -72741,7 +70517,7 @@ class OxiContentService extends Service {
   }
 }
 
-const amdModule37 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const amdModule47 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: OxiContentService
 }, Symbol.toStringTag, { value: 'Module' }));
@@ -72774,7 +70550,7 @@ class OxiLocaleService extends Service {
   }
 }
 
-const amdModule38 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const amdModule48 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: OxiLocaleService
 }, Symbol.toStringTag, { value: 'Module' }));
@@ -73108,7 +70884,7 @@ let PageTitleService = (_dec = service('router'), _dec2 = service('-document'), 
   initializer: null
 }), _class);
 
-const amdModule39 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const amdModule49 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: PageTitleService
 }, Symbol.toStringTag, { value: 'Module' }));
@@ -76455,7 +74231,7 @@ class IntlService extends Service {
   }
 }
 
-const amdModule40 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const amdModule50 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: IntlService
 }, Symbol.toStringTag, { value: 'Module' }));
@@ -76489,7 +74265,7 @@ const head = templateFactory(
   "isStrictMode": false
 });
 
-const amdModule41 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const amdModule51 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
 	default: head
 }, Symbol.toStringTag, { value: 'Module' }));
@@ -76519,25 +74295,35 @@ const compatModules = Object.assign({}, defineModule0, {
   "openxpki/route-pods/openxpki/popup/template": amdModule20,
   "openxpki/route-pods/openxpki/route": amdModule21,
   "openxpki/route-pods/openxpki/template": amdModule22,
-  "openxpki/route-pods/test/buttons": amdModule23,
-  "openxpki/route-pods/test/controller": amdModule24,
-  "openxpki/route-pods/test/section-cards-vertical": amdModule25,
-  "openxpki/route-pods/test/section-cards": amdModule26,
-  "openxpki/route-pods/test/section-chart": amdModule27,
-  "openxpki/route-pods/test/section-form": amdModule28,
-  "openxpki/route-pods/test/section-grid": amdModule29,
-  "openxpki/route-pods/test/section-keyvalue": amdModule30,
-  "openxpki/route-pods/test/section-tiles": amdModule31,
-  "openxpki/route-pods/test/template": amdModule32,
-  "openxpki/router": amdModule33,
-  "openxpki/services/head-data": amdModule34,
-  "openxpki/services/oxi-backend": amdModule35,
-  "openxpki/services/oxi-config": amdModule36,
-  "openxpki/services/oxi-content": amdModule37,
-  "openxpki/services/oxi-locale": amdModule38,
-  "openxpki/services/page-title": amdModule39,
-  "openxpki/services/intl": amdModule40,
-  "openxpki/templates/head": amdModule41
+  "openxpki/route-pods/openxpki/test/mock-responses": amdModule23,
+  "openxpki/route-pods/openxpki/test/pretender-setup": amdModule24,
+  "openxpki/route-pods/openxpki/test/route": amdModule25,
+  "openxpki/route-pods/openxpki/test/section-button-format": amdModule26,
+  "openxpki/route-pods/openxpki/test/section-button": amdModule27,
+  "openxpki/route-pods/openxpki/test/section-cards-vertical": amdModule28,
+  "openxpki/route-pods/openxpki/test/section-cards": amdModule29,
+  "openxpki/route-pods/openxpki/test/section-chart": amdModule30,
+  "openxpki/route-pods/openxpki/test/section-form-cloneable": amdModule31,
+  "openxpki/route-pods/openxpki/test/section-form-datetime": amdModule32,
+  "openxpki/route-pods/openxpki/test/section-form-dependants": amdModule33,
+  "openxpki/route-pods/openxpki/test/section-form-password": amdModule34,
+  "openxpki/route-pods/openxpki/test/section-form-select": amdModule35,
+  "openxpki/route-pods/openxpki/test/section-form-text": amdModule36,
+  "openxpki/route-pods/openxpki/test/section-form-tooltips": amdModule37,
+  "openxpki/route-pods/openxpki/test/section-form-various": amdModule38,
+  "openxpki/route-pods/openxpki/test/section-grid": amdModule39,
+  "openxpki/route-pods/openxpki/test/section-keyvalue": amdModule40,
+  "openxpki/route-pods/openxpki/test/section-text": amdModule41,
+  "openxpki/route-pods/openxpki/test/section-tiles": amdModule42,
+  "openxpki/router": amdModule43,
+  "openxpki/services/head-data": amdModule44,
+  "openxpki/services/oxi-backend": amdModule45,
+  "openxpki/services/oxi-config": amdModule46,
+  "openxpki/services/oxi-content": amdModule47,
+  "openxpki/services/oxi-locale": amdModule48,
+  "openxpki/services/page-title": amdModule49,
+  "openxpki/services/intl": amdModule50,
+  "openxpki/templates/head": amdModule51
 }, exportFastbootModules);
 
 class App extends Application {
@@ -76550,4 +74336,4 @@ loadInitializers(App, environment$1.modulePrefix, compatModules);
 
 App.create(environment$1.APP);
 
-export { DEBUG_INJECTION_FUNCTIONS as $, tagFor as A, valueForTag as B, Component as C, isObject$2 as D, EmberObject as E, combine as F, tagForProperty as G, alias as H, Input$1 as I, ENV as J, context$1 as K, getENV as L, MutableArray as M, getLookup as N, global$1$1 as O, PROPERTY_DID_CHANGE as P, setLookup as Q, Meta as R, counters as S, Textarea as T, UNDEFINED as U, meta$1 as V, setMeta as W, set$2 as X, ASYNC_OBSERVERS as Y, ComputedDescriptor as Z, ComputedProperty as _, componentCapabilities as a, TargetActionSupport as a$, Libraries as a0, NAMESPACES as a1, NAMESPACES_BY_ID as a2, PROXY_CONTENT as a3, SYNC_OBSERVERS as a4, TrackedDescriptor as a5, _getPath as a6, _getProp as a7, _setProp as a8, activateObserver as a9, LIBRARIES as aA, makeComputedDecorator as aB, markObjectAsDirty as aC, nativeDescDecorator as aD, notifyPropertyChange as aE, on$3 as aF, processAllNamespaces as aG, processNamespace as aH, removeListener as aI, removeNamespace as aJ, removeObserver as aK, replaceInNativeArray as aL, revalidateObservers as aM, sendEvent as aN, setClassicDecorator as aO, setSearchDisabled as aP, setProperties as aQ, setUnprocessedMixins as aR, tagForObject as aS, tracked as aT, trySet as aU, ActionHandler as aV, Comparable as aW, ContainerProxyMixin as aX, MutableEnumerable as aY, RSVP$1 as aZ, RegistryProxyMixin as a_, addListener as aa, addNamespace as ab, addObserver as ac, autoComputed as ad, beginPropertyChanges as ae, changeProperties as af, computed as ag, defineDecorator as ah, defineProperty as ai, defineValue as aj, descriptorForDecorator as ak, descriptorForProperty as al, endPropertyChanges as am, expandProperties as an, findNamespace as ao, findNamespaces as ap, flushAsyncObservers as aq, getProperties as ar, hasListeners as as, hasUnknownProperty as at, inject$2 as au, isClassicDecorator as av, isComputed as aw, isConst as ax, isElementDescriptor as ay, isSearchDisabled as az, getComponentTemplate as b, hash$2 as b$, ProxyMixin as b0, contentFor as b1, onerrorDefault as b2, Cache$1 as b3, GUID_KEY as b4, ROOT as b5, checkHasSuper as b6, makeDictionary as b7, enumerableSymbol as b8, generateGuid as b9, clearViewElement as bA, constructStyleDeprecationMessage as bB, getChildViews as bC, getElementView as bD, getRootViews as bE, getViewBoundingClientRect as bF, getViewBounds as bG, getViewClientRects as bH, getViewElement as bI, getViewId as bJ, isSimpleClick as bK, setElementView as bL, setViewElement as bM, Mixin as bN, FrameworkObject as bO, EventTarget as bP, Promise$1 as bQ, all as bR, allSettled as bS, asap as bT, async as bU, cast as bV, configure as bW, RSVP as bX, defer as bY, denodeify as bZ, filter as b_, getDebugName$1$1 as ba, getName as bb, intern$1 as bc, isInternalSymbol as bd, isProxy as be, lookupDescriptor as bf, observerListenerMetaFor as bg, setListeners as bh, setName as bi, setObservers as bj, setProxy as bk, setWithMandatorySetter as bl, setupMandatorySetter as bm, symbol as bn, teardownMandatorySetter as bo, toString$3 as bp, uuid$1 as bq, wrap as br, ActionSupport as bs, ComponentLookup as bt, CoreView as bu, EventDispatcher as bv, MUTABLE_CELL as bw, states as bx, addChildView as by, clearElementView as bz, createCache as c, hashSettled as c0, map$3 as c1, off as c2, on$2 as c3, race as c4, reject as c5, resolve$3 as c6, rethrow as c7, index$2 as c8, namespace as c9, index$6 as ca, index$5 as cb, index$e as cc, index$8 as cd, mutable as ce, index$1 as cf, index$a as cg, index$b as ch, index$3 as ci, index$c as cj, index$d as ck, index$7 as cl, core$1 as cm, evented as cn, observable as co, _importSync20$4 as cp, index$9 as cq, index$4 as cr, version as cs, setComponentTemplate as d, assertDestroyablesDestroyed as e, associateDestroyableChild as f, getValue$1 as g, destroy as h, enableDestroyableTracking as i, isDestroyed as j, isDestroying as k, guidFor as l, setCustomTagFor as m, get$2 as n, objectAt as o, peekMeta as p, replace as q, registerDestructor as r, setComponentManager as s, consumeTag as t, unregisterDestructor as u, arrayContentWillChange as v, arrayContentDidChange as w, addArrayObserver as x, removeArrayObserver as y, validateTag as z };
+export { _getProp as $, getENV as A, getLookup as B, Component as C, global$1 as D, EmberObject as E, setLookup as F, Meta as G, counters as H, Input$1 as I, meta$1 as J, setMeta as K, set$1 as L, MutableArray as M, ASYNC_OBSERVERS as N, ComputedDescriptor as O, PROPERTY_DID_CHANGE as P, ComputedProperty as Q, DEBUG_INJECTION_FUNCTIONS as R, Libraries as S, Textarea as T, UNDEFINED as U, NAMESPACES as V, NAMESPACES_BY_ID as W, PROXY_CONTENT as X, SYNC_OBSERVERS as Y, TrackedDescriptor as Z, _getPath as _, componentCapabilities as a, makeDictionary as a$, _setProp as a0, activateObserver as a1, addListener as a2, addNamespace as a3, addObserver as a4, autoComputed as a5, beginPropertyChanges as a6, changeProperties as a7, computed as a8, defineDecorator as a9, removeListener as aA, removeNamespace as aB, removeObserver as aC, replaceInNativeArray as aD, revalidateObservers as aE, sendEvent as aF, setClassicDecorator as aG, setSearchDisabled as aH, setProperties as aI, setUnprocessedMixins as aJ, tagForObject as aK, tracked as aL, trySet as aM, ActionHandler as aN, Comparable as aO, ContainerProxyMixin as aP, MutableEnumerable as aQ, RSVP$1 as aR, RegistryProxyMixin as aS, TargetActionSupport as aT, ProxyMixin as aU, contentFor as aV, onerrorDefault as aW, Cache$1 as aX, GUID_KEY as aY, ROOT as aZ, checkHasSuper as a_, defineProperty as aa, defineValue as ab, descriptorForDecorator as ac, descriptorForProperty as ad, endPropertyChanges as ae, expandProperties as af, findNamespace as ag, findNamespaces as ah, flushAsyncObservers as ai, getProperties as aj, hasListeners as ak, hasUnknownProperty as al, inject$2 as am, isClassicDecorator as an, isComputed as ao, isConst as ap, isElementDescriptor as aq, isSearchDisabled as ar, LIBRARIES as as, makeComputedDecorator as at, markObjectAsDirty as au, nativeDescDecorator as av, notifyPropertyChange as aw, on$3 as ax, processAllNamespaces as ay, processNamespace as az, getComponentTemplate as b, rethrow as b$, enumerableSymbol as b0, generateGuid as b1, getDebugName$1$1 as b2, getName as b3, intern$1 as b4, isInternalSymbol as b5, isProxy as b6, lookupDescriptor as b7, observerListenerMetaFor as b8, setListeners as b9, getViewElement as bA, getViewId as bB, isSimpleClick as bC, setElementView as bD, setViewElement as bE, Mixin as bF, FrameworkObject as bG, EventTarget as bH, Promise$1 as bI, all as bJ, allSettled as bK, asap as bL, async as bM, cast as bN, configure as bO, RSVP as bP, defer as bQ, denodeify as bR, filter as bS, hash$2 as bT, hashSettled as bU, map$2 as bV, off as bW, on$2 as bX, race as bY, reject as bZ, resolve$3 as b_, setName as ba, setObservers as bb, setProxy as bc, setWithMandatorySetter as bd, setupMandatorySetter as be, symbol as bf, teardownMandatorySetter as bg, toString$2 as bh, uuid$1 as bi, wrap as bj, ActionSupport as bk, ComponentLookup as bl, CoreView as bm, EventDispatcher as bn, MUTABLE_CELL as bo, states as bp, addChildView as bq, clearElementView as br, clearViewElement as bs, constructStyleDeprecationMessage as bt, getChildViews as bu, getElementView as bv, getRootViews as bw, getViewBoundingClientRect as bx, getViewBounds as by, getViewClientRects as bz, createCache as c, index$3 as c0, namespace as c1, index$7 as c2, index$6 as c3, index$f as c4, index$2 as c5, index$9 as c6, mutable as c7, index$1 as c8, index$b as c9, index$c as ca, index$4 as cb, index$d as cc, index$e as cd, index$8 as ce, core$1 as cf, evented as cg, observable as ch, _importSync20$4 as ci, index$a as cj, index$5 as ck, version as cl, setComponentTemplate as d, guidFor as e, setCustomTagFor as f, getValue$1 as g, get$2 as h, consumeTag as i, arrayContentWillChange as j, arrayContentDidChange as k, addArrayObserver as l, removeArrayObserver as m, valueForTag as n, objectAt as o, peekMeta as p, isObject$2 as q, replace as r, setComponentManager as s, tagFor as t, combine as u, validateTag as v, tagForProperty as w, alias as x, ENV as y, context$1 as z };
