@@ -16,6 +16,7 @@ import { defineConfig, globalIgnores } from 'eslint/config';
 
 import emberPlugin from 'eslint-plugin-ember';
 import emberParser from 'ember-eslint-parser';
+import babelParser from '@babel/eslint-parser';
 import qunit from 'eslint-plugin-qunit';
 import n from 'eslint-plugin-n';
 import prettierRecommended from 'eslint-plugin-prettier/recommended';
@@ -36,6 +37,14 @@ export default defineConfig([
   {
     files: ['**/*.{js,ts}'],
     languageOptions: {
+      parser: babelParser,
+      parserOptions: {
+        requireConfigFile: false,
+        babelOptions: {
+          configFile: false,
+          plugins: [['@babel/plugin-proposal-decorators', { legacy: true }]],
+        },
+      },
       ecmaVersion: 'latest',
       sourceType: 'module',
       globals: {
@@ -52,6 +61,9 @@ export default defineConfig([
       // Example tweaks:
       'no-console': 'warn',
       'ember/no-jquery': 'error',
+
+      // Crashes with @babel/eslint-parser due to AST differences
+      'ember/no-tracked-properties-from-args': 'off',
     },
   },
 
