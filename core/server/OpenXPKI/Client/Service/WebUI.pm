@@ -27,6 +27,7 @@ validation, and JSON response serialization.
 # Core modules
 use MIME::Base64;
 use List::Util qw ( max );
+use Carp;
 
 # CPAN modules
 use Crypt::JWT qw( encode_jwt decode_jwt );
@@ -379,21 +380,65 @@ has realm_mode => (
 },
 );
 
-=head2 realm_layout
+=head2 realm_selection_page
 
-Shortcut for config value C<realm.layout> that defines how to show the realm selection:
-C<"card"> or C<"list">. Default: C<"card">. Auto-initialized.
+The requested realm selection page C<PAGE>, read from URL C</webui/index-PAGE>.
+The default is C<"default"> (if URL is C</webui/index>).
+
+Defines  the config path to be queried for the realm selection page layout:
+C<webui.*.realm.selection.PAGE>.
+
+Set in L</prepare>. Unknown page names will be changed to C<"default">.
+
+=head2 is_realm_selection_page
+
+Set to C<1> if the current page is the realm selection page (I<realm_mode>
+C<"path"> only).
 
 =cut
-has realm_layout => (
+sub realm_selection_page;
+sub is_realm_selection_page;
+has realm_selection_page => (
+    init_arg => undef,
+    is => 'rw',
+    isa => 'Str',
+    lazy => 1,
+    predicate => 'is_realm_selection_page',
+    default => sub { confess "Attempt to read realm selection page before it was set" },
+);
+
+=head2 realm_selection_conf
+
+Config hash C<realm.selection.PAGE> that contains the realm selection definition.
+Auto-initialized.
+
+Ensures at least the C<layout> key is always present (defaults to 'card'):
+
+    say $self->realm_selection_conf->{layout};
+
+Legacy config values C<realm.layout> and C<global.realm_layout> are mapped into
+C<realm.selection.PAGE.layout>.
+
+Must be called after L</realm_selection_page> was set.
+
+=cut
+has realm_selection_conf => (
     init_arg => undef,
     is => 'ro',
-    isa => enum([qw(
-        card
-        list
-    )]),
+    isa => 'HashRef',
     lazy => 1,
-    default => sub ($self) { $self->config->get('realm.layout') || $self->config->get('global.realm_layout') || 'card' },
+    default => sub ($self) {
+        # realm.selection may be a plain string or a hash with a "layout" key
+        my $conf = $self->config->get_hash(['realm', 'selection', $self->realm_selection_page]) // {};
+        if (not $conf->{layout}) {
+            $conf->{layout} =
+                # TODO Legacy config options for realm selection layout: realm.layout and global.realm_layout
+                $self->config->get('realm.layout')
+             || $self->config->get('global.realm_layout')
+             || 'card';
+        }
+        return $conf;
+    },
 );
 
 =head2 script_url
@@ -630,20 +675,6 @@ has current_auth_stack => (
     predicate => 'has_current_auth_stack',
 );
 
-=head2 is_realm_selection_page
-
-Set to C<1> if the current page is the realm selection page (I<realm_mode>
-C<"path"> only).
-
-=cut
-sub is_realm_selection_page;
-has is_realm_selection_page => (
-    init_arg => undef,
-    is => 'rw',
-    isa => 'Bool',
-    default => 0,
-);
-
 =head2 request_params
 
 L<OpenXPKI::Client::Service::WebUI::RequestParams> instance that parses and
@@ -822,11 +853,11 @@ sub prepare ($self, $c) {
         # Interpret last part of the URL path as realm
         my $realm = $c->stash('realm');
 
-        # Prepare realm selection
-        if ('index' eq $realm) {
+        # Request to realm selection page: "/webui/index" or "/webui/index-page"
+        if (my ($page) = $realm =~ /\Aindex(?:\-(.+))?\z/) {
             $self->log->debug('- special path "index"');
             $self->session->param('pki_realm', undef);
-            $self->is_realm_selection_page(1);
+            $self->realm_selection_page($page // 'default');
 
         # Realm already stored in session
         } elsif (my $session_realm = $self->session->param('pki_realm')) {

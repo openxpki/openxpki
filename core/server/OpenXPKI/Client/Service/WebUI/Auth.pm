@@ -32,6 +32,7 @@ use OpenXPKI qw( -class -typeconstraints );
 
 # Core modules
 use Encode;
+use List::Util qw( min max any );
 use MIME::Base64 qw( encode_base64 decode_base64 );
 
 # CPAN modules
@@ -150,6 +151,7 @@ sub _build_realm_path_map ($self) {
         my ($realm, $stack) = split (/\s*;\s*/, $realm_map->{$url_alias});
         $map->{$realm} //= [];
         push $map->{$realm}->@*, {
+            url_alias => $url_alias,
             url => $self->webui->url_path_for($url_alias) . '/',
             stack => $stack,
         }
@@ -157,6 +159,64 @@ sub _build_realm_path_map ($self) {
     $self->log->trace('URL path and auth stacks by realm: ' . Dumper($map)) if $self->log->is_trace;
     return $map;
 }
+
+=head2 realm_selection_layout
+
+Returns the C<realm.selection.PAGE.layout> config value that defines the layout
+of the realm selection: C<"card">, C<"list">, or C<"grouped">. Default: C<"card">.
+Auto-initialized.
+
+=cut
+has realm_selection_layout => (
+    init_arg => undef,
+    is => 'ro',
+    isa => enum([qw(
+        card
+        list
+        grouped
+    )]),
+    lazy => 1,
+    default => sub ($self) { $self->webui->realm_selection_conf->{layout} },
+);
+
+=head2 realm_selection_groups
+
+Returns the C<realm.selection.PAGE.groups> config list if
+C<realm.selection.PAGE.layout == "grouped">, an empty I<ArrayRef> otherwise.
+Auto-initialized.
+
+=cut
+sub realm_selection_groups;
+has realm_selection_groups => (
+    init_arg => undef,
+    is => 'ro',
+    isa => 'ArrayRef',
+    lazy => 1,
+    default => sub ($self) {
+        return [] unless $self->realm_selection_layout eq 'grouped';
+        return $self->webui->realm_selection_conf->{groups} // [];
+    },
+);
+
+=head2 realm_selection_group_cols
+
+Global column count for the C<"grouped"> realm selection layout.
+Reads the top-level C<cols> key from C<realm.layout>. Default: C<6>.
+Returns C<-1> when L</realm_selection_layout> is not C<"grouped">. Auto-initialized.
+
+=cut
+
+sub realm_selection_group_cols;
+has realm_selection_group_cols => (
+    init_arg => undef,
+    is       => 'ro',
+    isa      => 'Int',
+    lazy     => 1,
+    default  => sub ($self) {
+        return -1 unless $self->realm_selection_layout eq 'grouped';
+        return $self->webui->realm_selection_conf->{cols} // 6;
+    },
+);
 
 =head2 last_reply
 
@@ -336,7 +396,22 @@ sub _handle_GET_PKI_REALM ($self, $realm) {
 
     my $realms = $self->last_reply->{PARAMS}->{PKI_REALMS};
 
-    my $safe_realm_str = sub {
+    my $layout = $self->realm_selection_layout;
+    # Auto-layout modes "card" and "list"
+    if ('card' eq $layout or 'list' eq $layout) {
+        return $self->_realm_selection_card_list_layout($realms);
+
+    # Custom layout mode "grouped"
+    } elsif ('grouped' eq $layout) {
+        return $self->_realm_selection_grouped_layout($realms);
+
+    } else {
+        die "Unknown realm selection layout mode '$layout'\n";
+    }
+}
+
+sub _realm_selection_card_list_layout ($self, $realms) {
+    my $css_class_from_realm = sub {
         my $r = lc(shift);
         $r =~ s/[_\s]/-/g;
         $r =~ s/[^a-z0-9-]//g;
@@ -369,7 +444,7 @@ sub _handle_GET_PKI_REALM ($self, $realm) {
                     footer => $footer,
                     image => $realms->{$realm}->{IMAGE},
                     color => $realms->{$realm}->{COLOR},
-                    css_class => $safe_realm_str->($realm),
+                    css_class => $css_class_from_realm->($realm),
                     href => $def->{url},
                 };
             }
@@ -385,7 +460,7 @@ sub _handle_GET_PKI_REALM ($self, $realm) {
                 description => $realms->{$_}->{DESCRIPTION},
                 image => $realms->{$_}->{IMAGE},
                 color => $realms->{$_}->{COLOR},
-                css_class => $safe_realm_str->($_),
+                css_class => $css_class_from_realm->($_),
                 action => 'login!realm',
                 action_params => {
                     pki_realm => $realms->{$_}->{NAME},
@@ -395,7 +470,223 @@ sub _handle_GET_PKI_REALM ($self, $realm) {
             keys %{$realms};
     }
 
-    return $self->page_obj->init_realm_cards(\@cards, $self->webui->realm_layout eq 'list' ? 1 : 0);
+    return $self->page_obj->init_realm_cards(\@cards, $self->realm_selection_layout eq 'list' ? 1 : 0);
+}
+
+sub _realm_selection_grouped_layout ($self, $realms) {
+    my $maxcol = $self->realm_selection_group_cols;
+
+    my $css_class_from_realm = sub {
+        my $r = lc(shift);
+        $r =~ s/[_\s]/-/g;
+        $r =~ s/[^a-z0-9-]//g;
+        $r =~ s/-+/-/g;
+        "oxi-realm-tile-$r"
+    };
+
+    # Phase 1: build per-group tile data
+    my @groups;
+    for my $group_def ($self->realm_selection_groups->@*) {
+        # A scalar "newline" item marks previous group as "last in row"
+        if (not ref $group_def and 'newline' eq $group_def) {
+            $groups[-1]->{stretch} = 1 if @groups;
+            next;
+        }
+
+        my @tiles;
+        my $group_width = 0;
+        my $row_width = 0;  # width of the current row; group_width = max across all rows
+        my $tile_count = 0;
+
+        for my $btn_def ($group_def->{items}->@*) {
+            # newline starts a new row; group width is the max of all row widths
+            if (not ref $btn_def and 'newline' eq $btn_def) {
+                $group_width = max($group_width, $row_width);
+                $row_width = 0;
+                push @tiles, 'newline';
+                next;
+            }
+
+            my $target = $btn_def->{target} or next;
+
+            # Path mode: target is a url_alias (key from webui.default.realm.map);
+            # realm_path_map is keyed by realm name, with url_alias inside each entry
+            my ($realm, $realm_data, $path_def);
+            if ('path' eq $self->webui->realm_mode) {
+                for my $r (keys $self->realm_path_map->%*) {
+                    ($path_def) = grep { $_->{url_alias} eq $target } $self->realm_path_map->{$r}->@*;
+                    if ($path_def) { $realm = $r; last }
+                }
+                if (not $realm) {
+                    $self->log->warn("URL path '$target' referenced in realm.layout.group is not defined in realm.map");
+                    next;
+                }
+            } else {
+                $realm = $target;
+            }
+            $realm_data = $realms->{$realm};
+            if (not $realm_data) {
+                $self->log->warn("Realm '$realm' referenced in realm.layout.group / realm.map not found in server's realm list");
+                next;
+            }
+
+            # Limit colspan to [1, $maxcol]
+            my $colspan = max(1, min($btn_def->{colspan} // 1, $maxcol));
+
+            my $label  = $btn_def->{label}       // $realm_data->{LABEL};
+            my $desc   = $btn_def->{description} // $realm_data->{DESCRIPTION};
+            my $format = $btn_def->{format};
+            my $icon   = $btn_def->{icon};
+            my $image  = $icon ? undef : ($btn_def->{image} // $realm_data->{IMAGE});
+
+            my $tile = {
+                type     => 'button',
+                label    => $label,
+                description => $desc,
+                cssClass => join(' ', $css_class_from_realm->($realm), $btn_def->{cssClass} // ()),
+                colspan  => $colspan,
+                content  => {
+                    $format ? (format => $format) : (),
+                    $icon   ? (icon   => $icon)   : (),
+                    $image  ? (image  => $image)  : (),
+                },
+            };
+
+            # Path mode: one tile for the specific url_alias
+            if ('path' eq $self->webui->realm_mode) {
+                my $stack = $path_def->{stack};
+                my $footer = $btn_def->{footer};
+                $footer //= $stack
+                    ? ($realm_data->{AUTH_STACKS}->{$stack}
+                        ? $realm_data->{AUTH_STACKS}->{$stack}->{label}
+                        : $stack)
+                    : '';
+                $tile->{content}->{href}   = $path_def->{url};
+                $tile->{content}->{footer} = $footer if $footer;
+
+            # Select / hostname mode: target is the realm name
+            } else {
+                $tile->{content}->{action}        = 'login!realm';
+                $tile->{content}->{action_params} = { pki_realm => $target };
+            }
+
+            push @tiles, $tile;
+            $row_width += $colspan;
+            $tile_count++;
+        }
+        $group_width = max($group_width, $row_width);
+
+        my $has_header = length($group_def->{label} // '')
+                      || length($group_def->{description} // '');
+
+        if ($tile_count == 0) {
+            next unless $has_header;
+            # text-only group: no tile items, width resolved during band packing
+        }
+
+        push @groups, {
+            width       => $group_width,
+            label       => $group_def->{label},
+            description => $group_def->{description},
+            _has_header => $has_header,
+            items       => [@tiles],
+            # Stretch group to full width if text-only
+            stretch     => ($tile_count == 0 ? 1 : 0),
+        };
+    }
+
+    # Phase 2: pack groups into bands (a band is a horizontal strip of one or
+    # more groups placed side by side; groups wrap to a new band when the total
+    # width would exceed $maxcol).
+    my (@bands, @current_band);
+    my $width = 0;
+
+    my $close_band = sub {
+        return unless @current_band;
+        push @bands, [@current_band];
+        @current_band = ();
+        $width = 0;
+    };
+
+    for my $group (@groups) {
+        $close_band->() if $width + $group->{width} > $maxcol;
+        push @current_band, $group;
+        $width += $group->{width};
+        # A stretch group fills the rest of the band and closes it immediately.
+        if ($group->{stretch}) {
+            $group->{width} += $maxcol - $width;
+            $close_band->();
+        }
+    }
+    $close_band->();
+
+    # Phase 3: emit flat tile list from bands
+    my @flat_tiles;
+    for my $band (@bands) {
+        push @flat_tiles, 'newline' if @flat_tiles;
+
+        # Pre-split each group's tiles into rows by accumulating colspans;
+        # 'newline' sentinels in the items list force a row break within the group.
+        my @group_rows;
+        for my $group ($band->@*) {
+            my (@rows, @row, $used);
+            $used = 0;
+
+            my $flush = sub {
+                return unless @row;
+                push @row, { type => 'empty', colspan => $group->{width} - $used } if $used < $group->{width};
+                push @rows, [@row];
+                @row = ();
+                $used = 0;
+            };
+
+            for my $tile ($group->{items}->@*) {
+                if (not ref $tile and 'newline' eq $tile) { $flush->(); next }
+                $flush->() if $used + $tile->{colspan} > $group->{width};
+                push @row, $tile;
+                $used += $tile->{colspan};
+                $flush->() if $used >= $group->{width};
+            }
+            $flush->();
+            push @group_rows, \@rows;
+        }
+
+        # Text-tile row: only if at least one group in this band has a text heading.
+        # The trailing newline is only emitted when tile-content rows follow.
+        my $band_height = max(map { scalar $_->@* } @group_rows);
+        if (any { $_->{_has_header} } $band->@*) {
+            for my $group ($band->@*) {
+                push @flat_tiles, $group->{_has_header}
+                    ? {
+                        type => 'text',
+                        colspan => $group->{width},
+                        border => 0,
+                        cssClass => 'oxi-realm-selection-group-text',
+                        content => {
+                            label => $group->{label},
+                            description => $group->{description},
+                        },
+                    }
+                    : {
+                        type => 'empty',
+                        colspan => $group->{width},
+                    };
+            }
+            push @flat_tiles, 'newline' if $band_height > 0;
+        }
+
+        # column-alignment: pad groups with fewer tile-rows than the tallest in the band
+        for my $row_idx (0 .. $band_height - 1) {
+            for my $g (0 .. $#{$band}) {
+                push @flat_tiles, $row_idx < @{$group_rows[$g]}
+                    ? @{$group_rows[$g]->[$row_idx]}
+                    : { type => 'empty', colspan => $band->[$g]->{width} };
+            }
+            push @flat_tiles, 'newline' unless $row_idx == $band_height - 1;
+        }
+    }
+
+    return $self->page_obj->init_realm_selection(\@flat_tiles, $maxcol);
 }
 
 sub _handle_GET_AUTHENTICATION_STACK ($self, $auth_stack) {

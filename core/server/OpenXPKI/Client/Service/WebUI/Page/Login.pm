@@ -46,6 +46,43 @@ sub init_realm_cards ($self, $realms, $as_list) {
     return $self;
 }
 
+=head2 init_realm_selection
+
+Renders realm selection as a single OxiSection::Tiles section using a flat
+pre-computed tile list with embedded text tiles and newline separators.
+
+B<Parameters>
+
+=over
+
+=item * C<$flat_tiles> I<ArrayRef> - flat list of tile definitions and C<"newline">
+sentinels as produced by C<Auth::_realm_selection_grouped_layout>.
+
+=item * C<$maxcol> I<Int> - global column count for the grid.
+
+=back
+
+=cut
+signature_for init_realm_selection => (
+    method     => 1,
+    positional => [ 'ArrayRef', 'Int' ],
+);
+sub init_realm_selection ($self, $flat_tiles, $maxcol) {
+    $self->set_page(
+        label       => 'I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN',
+        description => 'I18N_OPENXPKI_UI_LOGIN_REALM_SELECTION_DESC',
+    );
+    $self->main->add_section({
+        type    => 'tiles',
+        content => {
+            border => 1,
+            maxcol => $maxcol,
+            tiles  => $flat_tiles,
+        },
+    });
+    return $self;
+}
+
 sub init_auth_stack ($self, $stacks) {
     my @stacks = sort { lc($a->{label}) cmp lc($b->{label}) } @{$stacks};
 

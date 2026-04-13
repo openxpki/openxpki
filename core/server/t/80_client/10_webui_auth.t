@@ -69,7 +69,7 @@ use OpenXPKI::Client::Service::WebUI::Auth;
 #   env       - hashref of fake webserver ENV vars (SSL_*, REMOTE_USER, etc.)
 #   params    - hashref of fake request params (username, password, etc.)
 #   realm_mode        - 'select' (default), 'path', or 'hostname'
-#   realm_layout      - 'cards' (default) or 'list'
+#   realm_selection_layout - 'cards' (default) or 'list'
 #   base_url          - default 'https://host/'
 #   has_x_client_header - bool: simulate X-OPENXPKI-Client header present
 # ---------------------------------------------------------------------------
@@ -143,7 +143,7 @@ sub make_webui {
         _ui_response         => $ui_response,
         _base_url            => $base_url,
         _realm_mode          => $args{realm_mode}   // 'select',
-        _realm_layout        => $args{realm_layout} // 'cards',
+        _realm_selection_layout   => $args{realm_selection_layout} // 'cards',
         _logout_called       => 0,
         _init_client_called  => 0,
         _ping_replies        => $args{ping_replies} // [],
@@ -158,7 +158,7 @@ sub make_webui {
         base_url     => sub { $_[0]->{_base_url} },
         script_url   => sub { $_[0]->{_base_url} },
         realm_mode   => sub { $_[0]->{_realm_mode} },
-        realm_layout => sub { $_[0]->{_realm_layout} },
+        realm_selection_layout => sub { $_[0]->{_realm_selection_layout} },
         param        => sub { $params->{$_[1]} },
         url_path_for => sub { '/' . $_[1] },
         is_realm_selection_page => sub { 0 },
