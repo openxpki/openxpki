@@ -1,11 +1,13 @@
 <!-- components/oxi-section/button -->
 <OxiBase::Button @button={{this.button}}>
     {{#if @def.image}}
-        <img src={{@def.image}} alt="" />
-        <br/>
+        <div class="oxi-section-button-image">
+            <img src={{@def.image}} alt="" />
+        </div>
     {{else if this.icon}}
-        <span class="fs-2 {{this.icon}} oxi-section-button-icon"></span>
-        <br/>
+        <div class="oxi-section-button-icon {{this.icon}}"></div>
     {{/if}}
-    {{@def.label}}
+    <div class="text-start">
+        {{@def.description}}
+    </div>
 </OxiBase::Button>

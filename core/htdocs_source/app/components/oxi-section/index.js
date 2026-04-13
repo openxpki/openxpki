@@ -73,15 +73,15 @@ export default class OxiSectionComponent extends Component {
     }
 
     /**
-     * Returns the section heading label, or `null` for `type: "button"` sections
-     * where the label lives on the button itself.
+     * Returns the section description, or `null` for `type: "button"` sections
+     * where the description lives on the button itself.
      * @memberOf OxiSection
      */
-    get label() {
+    get description() {
         // Button labels are on the button, not above
         return this.args.content.type === 'button'
             ? null
-            : this.args.content?.content?.label
+            : this.args.content?.content?.description
     }
 
     /**

@@ -833,6 +833,18 @@ div.oxifield-upload {
 @container (min-width: 1400px) { @include bootstrap-responsive-utilities(xxl); }
 
 /******************************************************************************
+ * <OxiSection::Button>
+ */
+.oxi-section-button-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.oxi-section-button-image {
+    margin-bottom: 1rem;
+}
+
+/******************************************************************************
  * Buttons
  */
 

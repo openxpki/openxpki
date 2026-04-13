@@ -3,16 +3,16 @@
 
     <div class="card bg-body-tertiary mb-3 ms-md-3">
 
-        {{#if this.label}}
+        {{#if @content.content.label}}
             <div class="card-header px-2 {{unless this.meta.isCompact "py-2"}}">
-                <h4 class="oxi-section-label">{{this.label}}</h4>
+                <h4 class="oxi-section-label">{{@content.content.label}}</h4>
             </div>
         {{/if}}
 
         <div class="card-body px-2 {{unless this.meta.isCompact "py-2"}}" {{on-init this.initialized}}>
-            {{#if @content.content.description}}
+            {{#if this.description}}
                 <div class="oxi-section-description">
-                    {{defuse @content.content.description}}
+                    {{defuse this.description}}
                 </div>
             {{/if}}
 
@@ -26,12 +26,12 @@
 {{else}}
 
     <div class="mt-1 {{if this.meta.isCompact "oxi-compact" "mb-3"}}">
-        {{#if this.label}}
-            <h4 class="oxi-section-label">{{this.label}}</h4>
+        {{#if @content.content.label}}
+            <h4 class="oxi-section-label">{{@content.content.label}}</h4>
         {{/if}}
-        {{#if @content.content.description}}
+        {{#if this.description}}
             <div class="oxi-section-description {{unless this.meta.isCompact "mb-3"}}">
-                {{defuse @content.content.description}}
+                {{defuse this.description}}
             </div>
         {{/if}}
 
