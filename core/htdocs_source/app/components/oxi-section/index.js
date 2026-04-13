@@ -14,8 +14,8 @@ import { debug } from '@ember/debug'
  * @param { string } content.type - Section type key, e.g. `'keyvalue'`, `'form'`, `'grid'`,
  *   `'button'`, `'text'`, `'chart'`, `'cards'`, `'tiles'`. Determines which sub-component is loaded.
  * @param { object } content.content - Data passed to the sub-component as `@def`. May
- *   contain a `label` and `description` shown as heading/subheading (except
- *   for `type: 'button'` where the label lives on the button itself).
+ *   contain a `label`, `description` and `footer` shown as heading/subheading/footer text (except
+ *   for `type: 'button'` where the description lives on the button itself).
  * @param { string } [content.action] - Form submit action (forwarded to `oxi-section/form`).
  * @param { string } [content.reset] - Form reset action (forwarded to `oxi-section/form`).
  * @param { string } [content.className] - Extra CSS class (forwarded to `oxi-section/grid`).

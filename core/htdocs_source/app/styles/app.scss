@@ -179,6 +179,14 @@ div.required .choices.oxi-inline-select {
   border: 1px solid transparent;
 }
 
+.oxi-section-footer {
+    margin-top: 1.5rem;
+    /* No margin if section is displayed in card mode */
+    .card > & {
+        margin-top: 0;
+    }
+}
+
 /******************************************************************************
  * Vertical resize "button" bar
  */

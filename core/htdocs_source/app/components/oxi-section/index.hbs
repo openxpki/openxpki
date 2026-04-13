@@ -21,6 +21,13 @@
                 @meta={{this.meta}}
             />
         </div>
+
+        {{#if @content.content.footer}}
+            <div class="card-footer text-body-secondary oxi-section-footer">
+                {{defuse @content.content.footer}}
+            </div>
+        {{/if}}
+
     </div>
 
 {{else}}
@@ -41,6 +48,13 @@
                 @meta={{this.meta}}
             />
         </div>
+
+        {{#if @content.content.footer}}
+            <div class="oxi-section-footer">
+                {{defuse @content.content.footer}}
+            </div>
+        {{/if}}
+
     </div>
 
 {{/if}}
