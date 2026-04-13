@@ -375,7 +375,9 @@ sub _handle_GET_PKI_REALM ($self, $realm) {
             }
         }
 
-    # other modes: realm cards are actions that set the "pki_realm" parameter
+    # "select" and "hostname" modes: realm cards are actions that set the
+    # "pki_realm" parameter. "hostname" mode will only reach this code if the
+    # current request's host was not found in `webui.default.realm.map`.
     } else {
         @cards =
             map { {
