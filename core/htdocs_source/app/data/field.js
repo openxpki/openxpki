@@ -88,6 +88,11 @@ export default class Field extends Base {
         return false
     }
 
+    /**
+     * Enforces invariants after deserialization. Currently ensures that `editable`
+     * cannot be combined with `hasDependants` (forcibly clears `editable` and emits a warning).
+     * @memberOf Field
+     */
     validate() {
         if (this.editable && this.hasDependants) {
             warn(`${this.constructor.name} instance "${this[this.constructor._idField] ?? '<unknown>'}": attribute "enabled" cannot be set while field has dependants.`, { id: 'oxi.data.field' })

@@ -45,9 +45,15 @@ function addClass(el, c) {
     c != null && el.classList.add(c);
 }
 
-/*
-  Pie chart class
-*/
+/**
+ * Renders an SVG-based pie chart into `element`, reusing uPlot's CSS class names
+ * for consistent legend styling. Attaches a `ResizeObserver` when `opts.width`
+ * or `opts.height` is `"auto"` and stores a cleanup callback on `element._pieCleanup`.
+ *
+ * @param { HTMLElement } element - Container element to render into.
+ * @param { object } opts - Chart options (see {@link OxiBase::Chart} for the full schema).
+ * @param { array } data - Row-major data: `[ [x1, pct1, pct2, ...], ... ]` (x value is discarded).
+ */
 export default function ChartPie(element, opts, data) {
 
     // https://github.com/leeoniya/uPlot/blob/1.6.4/src/uPlot.js#L270

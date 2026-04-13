@@ -103,6 +103,11 @@ export default class EmberFlatpickr extends Component {
         };
     });
 
+    /**
+     * Tears down the flatpickr instance when the component leaves the DOM.
+     * Calls `@onDestroyed` if provided.
+     * @memberOf EmberFlatpickr
+     */
     willDestroy() {
         super.willDestroy();
         this.args.onDestroyed?.();
@@ -110,7 +115,19 @@ export default class EmberFlatpickr extends Component {
         this.flatpickrRef = undefined;
     }
 
+    /**
+     * No-op default for the flatpickr `onClose` event.
+     * @memberOf EmberFlatpickr
+     */
     _onClose() {}
+    /**
+     * No-op default for the flatpickr `onOpen` event.
+     * @memberOf EmberFlatpickr
+     */
     _onOpen() {}
+    /**
+     * No-op default for the flatpickr `onReady` event.
+     * @memberOf EmberFlatpickr
+     */
     _onReady() {}
 }

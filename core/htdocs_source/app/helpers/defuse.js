@@ -15,6 +15,10 @@ import { htmlSafe } from '@ember/template'
  * @module helper/defuse
  */
 export default class Defuse extends Helper {
+    /**
+     * Strips `<script>` tags and `onXxx`/`javascript:` attributes from `html`, then returns it as an Ember `htmlSafe` string.
+     * @memberOf module:helper/defuse
+     */
     compute([html]) {
         if (html === null || html === undefined) return ""
         let type = typeof html

@@ -11,6 +11,10 @@ import { htmlSafe } from '@ember/template'
  * @module helper/html
  */
 export default class Html extends Helper {
+    /**
+     * Wraps `html` in an Ember `htmlSafe` string. Returns `""` for null/undefined; returns `[type]` for non-scalar values.
+     * @memberOf module:helper/html
+     */
     compute([html]) {
         if (html === null || html === undefined) return ""
 

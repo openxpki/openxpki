@@ -1,9 +1,12 @@
 import Service, { service } from '@ember/service';
 
-/*
- * This service is auto-injected into app/templates/head.hbs by Ember CLI.
- * An instance of this service can be accessed via 'this.model'
- * in app/templates/head.hbs.
+/**
+ * Exposes {@link module:service/oxi-config} to `app/templates/head.hbs`.
+ *
+ * Ember CLI auto-injects this service into `head.hbs`, where it is available
+ * as `this.model`.
+ *
+ * @module service/head-data
  */
 export default class HeadDataService extends Service {
     @service('oxi-config') config;

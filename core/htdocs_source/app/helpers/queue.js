@@ -10,6 +10,10 @@ import Helper from "@ember/component/helper"
  * @module helper/queue
  */
 export default class Queue extends Helper {
+    /**
+     * Returns a function that sequentially calls every action in `actions` when invoked.
+     * @memberOf module:helper/queue
+     */
     compute([...actions]) {
         return function() {
             for (const action of actions) {

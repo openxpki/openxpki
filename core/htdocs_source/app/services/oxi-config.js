@@ -72,12 +72,24 @@ export default class OxiConfigService extends Service {
         return baseUrl.replace(/(tests)?\/?$/, '') + '/' + path.replace(/^\//, '')
     }
 
+    /**
+     * Absolute URL of the WebUI client service.
+     * Derived from `localConfig.backendPath` or defaults to `cgi-bin/webui.fcgi`.
+     *
+     * @returns {string}
+     */
     get backendUrl() {
         // default to relative path to support URL-based realms
         let path = this.localConfig.backendPath || 'cgi-bin/webui.fcgi'
         return this.#rel2absUrl(path)
     }
 
+    /**
+     * Absolute URL of the custom CSS file defined by `localConfig.customCSSPath`
+     * (or the deprecated `customCssPath`). Returns `null` if not configured.
+     *
+     * @returns {string|null}
+     */
     get customCSSUrl() {
         let url = this.localConfig.customCSSPath ?? this.localConfig.customCssPath
         if (!url) return null
@@ -87,6 +99,11 @@ export default class OxiConfigService extends Service {
         return absUrl
     }
 
+    /**
+     * Inline CSS string from `localConfig.customCSS`. Returns `null` if not set.
+     *
+     * @returns {string|null}
+     */
     get customCSS() {
         let css = this.localConfig.customCSS
         if (! css) return null
@@ -94,10 +111,22 @@ export default class OxiConfigService extends Service {
         return css
     }
 
+    /**
+     * Copyright year from `localConfig.copyrightYear`, falling back to the
+     * build-time value from `ENV.buildYear`.
+     *
+     * @returns {string|number}
+     */
     get copyrightYear() {
         return this.localConfig.copyrightYear || ENV.buildYear
     }
 
+    /**
+     * Header configuration object from `localConfig.header`, or `null` if the
+     * value is not a plain object (e.g. if it is a string - see `oldHeader`).
+     *
+     * @returns {object|null}
+     */
     get header() {
         let header = this.localConfig.header
         // if YAML parameter 'header' is an object
@@ -107,11 +136,23 @@ export default class OxiConfigService extends Service {
         return null
     }
 
+    /**
+     * Absolute URL of the logo image. Derived from `header.logo` or defaults
+     * to `img/logo.png`.
+     *
+     * @returns {string}
+     */
     get logoUrl() {
         let path = this.header?.logo || 'img/logo.png'
         return this.#rel2absUrl(path)
     }
 
+    /**
+     * Returns `localConfig.header` when it is a plain string (deprecated format)
+     * and logs a deprecation warning. Returns `null` otherwise.
+     *
+     * @returns {string|null}
+     */
     get oldHeader() {
         // if YAML parameter 'header' is a string (or undefined)
         if (!this.header && this.localConfig.header) {
@@ -122,14 +163,31 @@ export default class OxiConfigService extends Service {
         return null
     }
 
+    /**
+     * Footer text or configuration from `localConfig.footer`.
+     *
+     * @returns {string|object|undefined}
+     */
     get footer() {
         return this.localConfig.footer
     }
 
+    /**
+     * Browser page title from `localConfig.pageTitle`, defaulting to
+     * `'OpenXPKI - Open Source Trustcenter'`.
+     *
+     * @returns {string}
+     */
     get pageTitle() {
         return this.localConfig.pageTitle || 'OpenXPKI - Open Source Trustcenter'
     }
 
+    /**
+     * Tooltip delay in milliseconds from `localConfig.accessibility.tooltipDelay`.
+     * Logs a warning and returns `500` if the configured value is not a valid integer.
+     *
+     * @returns {number}
+     */
     get tooltipDelay() {
         let rawDelay = this.localConfig.accessibility?.tooltipDelay
         let delay = Number.parseInt(rawDelay)

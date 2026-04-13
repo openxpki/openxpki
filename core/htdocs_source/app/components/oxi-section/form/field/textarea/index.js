@@ -8,13 +8,13 @@ import { debug } from '@ember/debug';
  * Multi-line textarea field implementation, with optional file upload and drag-and-drop.
  * Binary file content is base64-encoded before being passed to `onChange`.
  *
- * @param { object } content - Plain field hash (from {@link Field}):
- *   - `value` { string } - Initial text content.
- *   - `placeholder` { string } - Placeholder text.
- *   - `rows` { number } - Number of visible rows. Default: `10`.
- *   - `is_optional` { boolean } - When falsy the textarea is marked required.
- *   - `allow_upload` { boolean } - Show a file-upload button and accept drag-and-drop.
- *   - `autofill` { object } - Autofill config forwarded to `OxiSection::Form::AutoFill`.
+ * @param { object } content - Plain field hash (from {@link Field}).
+ * @param { string } [content.value] - Initial text content.
+ * @param { string } [content.placeholder] - Placeholder text.
+ * @param { number } [content.rows] - Number of visible rows. Default: `10`.
+ * @param { boolean } [content.is_optional] - When falsy the textarea is marked required.
+ * @param { boolean } [content.allow_upload] - Show a file-upload button and accept drag-and-drop.
+ * @param { object } [content.autofill] - Autofill config forwarded to {@link OxiSection::Form::AutoFill}.
  * @param { function } onChange - Callback invoked with the new value (string or ArrayBuffer for binary files).
  * @param { function } setFocusInfo - Callback to register the textarea element for focus management.
  * @param { function } encodeFields - Callback to encode sibling field values (forwarded to autofill).
@@ -40,9 +40,22 @@ export default class OxiFieldTextareaComponent extends Component {
         if (this.textOutput) this.setValue(this.textOutput);
     }
 
+    /**
+     * Returns the number of visible textarea rows (default: `10`).
+     * @memberOf OxiSection::Form::Field::Textarea
+     */
     get rows() { return this.args.content?.rows || 10 }
+
+    /**
+     * Returns `true` when a non-empty value (text or binary) is set.
+     * @memberOf OxiSection::Form::Field::Textarea
+     */
     get hasContent() { return this.value ? true : false }
 
+    /**
+     * Prevents Enter key from bubbling up to the parent form's submit handler inside a textarea.
+     * @memberOf OxiSection::Form::Field::Textarea
+     */
     @action
     onKeydown(event) {
         // prevent form submit when hitting ENTER
@@ -51,21 +64,38 @@ export default class OxiFieldTextareaComponent extends Component {
         }
     }
 
+    /**
+     * Stores a reference to the hidden `<input type="file">` element so it can be triggered programmatically.
+     * @memberOf OxiSection::Form::Field::Textarea
+     */
     @action
     setFileUploadElement(element) {
         this.fileUploadElement = element;
     }
 
+    /**
+     * Propagates a manual text-input change to `setValue`.
+     * @memberOf OxiSection::Form::Field::Textarea
+     */
     @action
     onInput(evt) {
         this.setValue(evt.target.value);
     }
 
+    /**
+     * Programmatically clicks the hidden file input to open the system file picker.
+     * @memberOf OxiSection::Form::Field::Textarea
+     */
     @action
     openFileUpload() {
         this.fileUploadElement.click();
     }
 
+    /**
+     * Handles file selection via the `<input type="file">` element.
+     * Resets the input value after reading so the same file can be re-selected.
+     * @memberOf OxiSection::Form::Field::Textarea
+     */
     @action
     async fileSelected(evt) {
         if (evt.target.type !== "file") { return }
@@ -79,6 +109,11 @@ export default class OxiFieldTextareaComponent extends Component {
         }
     }
 
+    /**
+     * Handles a file dropped onto the textarea via drag-and-drop.
+     * No-op when `allow_upload` is not set.
+     * @memberOf OxiSection::Form::Field::Textarea
+     */
     @action
     async fileDropped(evt) {
         evt.stopPropagation()
@@ -92,6 +127,11 @@ export default class OxiFieldTextareaComponent extends Component {
         }
     }
 
+    /**
+     * Sets the drag-over drop effect to `'copy'` so the OS cursor reflects the drop action.
+     * No-op when `allow_upload` is not set.
+     * @memberOf OxiSection::Form::Field::Textarea
+     */
     @action
     showCopyEffect(evt) {
         evt.stopPropagation();
@@ -100,6 +140,10 @@ export default class OxiFieldTextareaComponent extends Component {
         evt.dataTransfer.dropEffect = 'copy'; // show as "copy" action
     }
 
+    /**
+     * Clears the current value, text output, filename and unlocks the text input.
+     * @memberOf OxiSection::Form::Field::Textarea
+     */
     @action
     resetInput() {
         this.setValue(null);
@@ -145,6 +189,11 @@ export default class OxiFieldTextareaComponent extends Component {
         }
     }
 
+    /**
+     * Receives a string from the autofill component, converts it to an ArrayBuffer via a Blob,
+     * and delegates to `setFileData` so the content is handled identically to a dropped file.
+     * @memberOf OxiSection::Form::Field::Textarea
+     */
     @action
     setAutofill(val, sourceLabel) {
         // convert string to ArrayBuffer

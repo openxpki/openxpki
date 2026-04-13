@@ -8,6 +8,15 @@ import agents from 'virtual:browser-release-dates'
 import copy from 'copy-text-to-clipboard'
 import Link from 'openxpki/data/link'
 
+/**
+ * Controller for the main `/openxpki/:page` route.
+ *
+ * Handles query parameters (`startat`, `limit`, `force`, `trigger`),
+ * browser-age detection, logout, page reload, and workflow-ID clipboard copy.
+ *
+ * @class OpenXpkiController
+ * @extends Controller
+ */
 export default class OpenXpkiController extends Controller {
     @service('intl') intl
     @service('oxi-config') config
@@ -36,6 +45,11 @@ export default class OpenXpkiController extends Controller {
     // button to copy workflow ID to clipboard
     tempCopyElement = null
 
+    /**
+     * Returns a {@link Link} for the "copy workflow ID" button when the current
+     * page has a `workflow_id`, or `null` otherwise.
+     * @memberOf OpenXpkiController
+     */
     get workflowCopyIdButton() {
         if (this.model?.top?.page?.workflow_id) {
             return Link.fromHash({
@@ -49,11 +63,22 @@ export default class OpenXpkiController extends Controller {
         }
     }
 
+    /**
+     * Returns the breadcrumb entries (filtered to items with a label) as an
+     * Ember Array so `.lastObject` is available in templates.
+     * @memberOf OpenXpkiController
+     */
     get breadcrumbs() {
         let bc = (this.model.breadcrumbs || []).filter(el => el.label)
         return A(bc) // Ember Array allows to query .lastObject
     }
 
+    /**
+     * Returns a human-readable browser name+version string when the detected
+     * browser is older than 2 years, or `null` if the browser is current or
+     * unrecognised.
+     * @memberOf OpenXpkiController
+     */
     get oldBrowser() {
         const old_age = 2 * 365
 
@@ -104,6 +129,10 @@ export default class OpenXpkiController extends Controller {
         return `${agent.browser} ${known_version}`
     }
 
+    /**
+     * Clears the active tenant and navigates to the logout page.
+     * @memberOf OpenXpkiController
+     */
     @action
     logout(event) {
         if (event) { event.stopPropagation(); event.preventDefault() }
@@ -111,16 +140,29 @@ export default class OpenXpkiController extends Controller {
         this.content.openPage({ name: 'logout', target: this.content.TARGET.TOP, force: true, params: { trigger: 'nav' } })
     }
 
+    /**
+     * Reloads the current page via `window.location.reload()`.
+     * @memberOf OpenXpkiController
+     */
     @action
     reload() {
         return window.location.reload();
     }
 
+    /**
+     * Stores a DOM element used as anchor for the clipboard textarea,
+     * ensuring the copy stays within any active focus trap (e.g. a modal).
+     * @memberOf OpenXpkiController
+     */
     @action
     setTempCopyElement(element) {
         this.tempCopyElement = element
     }
 
+    /**
+     * Copies the current workflow ID to the clipboard.
+     * @memberOf OpenXpkiController
+     */
     @action
     async copyWorkflowIdToClipboard(/*event*/) {
         // target = DOM element where the temporary textarea will be appended,

@@ -9,14 +9,14 @@ import { guidFor } from '@ember/object/internals'
  * Single-line text input field implementation, with optional autocomplete drop-down.
  * Pasted text is cleaned up (leading/trailing quotes and whitespace stripped).
  *
- * @param { object } content - Plain field hash (from {@link Field}):
- *   - `value` { string } - Initial value.
- *   - `placeholder` { string } - Placeholder text.
- *   - `is_optional` { boolean } - When falsy the input is marked required.
- *   - `autocomplete_query` { object } - Optional. Enables autocomplete:
- *     - `action` { string } - Required. Backend action to query for suggestions.
- *     - `params` { object } - Optional. Maps backend parameter names to other field names
- *       whose current values are included in the query.
+ * @param { object } content - Plain field hash (from {@link Field}).
+ * @param { string } [content.value] - Initial value.
+ * @param { string } [content.placeholder] - Placeholder text.
+ * @param { boolean } [content.is_optional] - When falsy the input is marked required.
+ * @param { object } [content.autocomplete_query] - Enables autocomplete.
+ * @param { string } content.autocomplete_query.action - Backend action to query for suggestions.
+ * @param { object } [content.autocomplete_query.params] - Maps backend parameter names to other
+ *   field names whose current values are included in the query.
  * @param { function } onChange - Callback invoked with `(value, skipValidityChecks)`.
  *   `skipValidityChecks` is `true` while an autocomplete selection is in progress.
  * @param { function } setFocusInfo - Callback to register the input element for focus management.
@@ -78,16 +78,29 @@ export default class OxiFieldTextComponent extends Component {
         }
     }
 
+    /**
+     * Returns `true` when `content.autocomplete_query` is configured.
+     * @memberOf OxiSection::Form::Field::Text
+     */
     get isAutoComplete() {
         return !!this.args.content.autocomplete_query;
     }
 
+    /**
+     * Propagates a keyboard input change to `setValue`.
+     * @memberOf OxiSection::Form::Field::Text
+     */
     @action
     onInput(evt) {
         let inputField = event.target
         this.setValue(inputField.value) // do NOT clean up manually typed text ("the 's-Gravenhage bug")
     }
 
+    /**
+     * Custom paste handler that strips leading/trailing quotes and whitespace from the pasted text
+     * before calling `setValue`, and restores the correct cursor position after Ember's render cycle.
+     * @memberOf OxiSection::Form::Field::Text
+     */
     // Own "paste" implementation to allow for text cleanup
     @action
     onPaste(event) {
@@ -187,6 +200,12 @@ export default class OxiFieldTextComponent extends Component {
         }, 0.3);
     }
 
+    /**
+     * Handles keyboard navigation inside the autocomplete drop-down:
+     * Enter selects the active result, Escape closes the drop-down,
+     * ArrowUp/ArrowDown move the active highlight.
+     * @memberOf OxiSection::Form::Field::Text
+     */
     @action
     onKeydown(evt) {
         if (this.isDropdownOpen == false) return;
@@ -227,6 +246,11 @@ export default class OxiFieldTextComponent extends Component {
         return emSet(a, "active", true);
     }
 
+    /**
+     * On focus, re-runs the autocomplete query when other sibling fields are referenced
+     * (as their values may have changed), or simply re-shows the cached result list.
+     * @memberOf OxiSection::Form::Field::Text
+     */
     @action
     onFocus() {
         if (this.isAutoComplete) {
@@ -244,12 +268,20 @@ export default class OxiFieldTextComponent extends Component {
         }
     }
 
+    /**
+     * Closes the autocomplete drop-down and cancels any pending debounced query timer on blur.
+     * @memberOf OxiSection::Form::Field::Text
+     */
     @action
     onBlur() {
         this.isDropdownOpen = false
         this.content.cancelTimer(this.#id)
     }
 
+    /**
+     * Prevents the text input from losing focus when the user clicks inside the autocomplete drop-down list.
+     * @memberOf OxiSection::Form::Field::Text
+     */
     @action
     onMouseDown(evt) {
         if (evt.target.tagName === "INPUT") { return }
@@ -257,6 +289,11 @@ export default class OxiFieldTextComponent extends Component {
         evt.stopPropagation(); evt.preventDefault();
     }
 
+    /**
+     * Selects an autocomplete result: sets `value` to `res.value`, `label` to `res.label`,
+     * notifies the parent via `onChange`, and closes the drop-down.
+     * @memberOf OxiSection::Form::Field::Text
+     */
     @action
     selectResult(res) {
         this.value = res.value;

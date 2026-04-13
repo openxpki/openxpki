@@ -13,6 +13,11 @@ import { service } from '@ember/service';
 export default class UrlFor extends Helper {
     @service router;
 
+    /**
+     * Returns the application-relative URL for the given Ember `route`, optional `model`,
+     * and optional query `params` object.
+     * @memberOf module:helper/url-for
+     */
     compute([ route, model, params = {} ]) {
         return this.router.urlFor(route, model, { queryParams: params });
     }

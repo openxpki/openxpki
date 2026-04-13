@@ -15,10 +15,20 @@ import { debug } from '@ember/debug';
  *   {{yield this.disableAutofillButton this.setAutofillValue to="autofill"}}
  * {{/if}}
  * ```
- * @param { hash } config - the autofill configuration
- * @param { bool } disabled - set to true to disable the button
- * @param { function } encodeFields - function that encodes the given form fields (see {@link component/oxi-section/form})
- * @param { function } valueSetter - function that processes the server response (will be given the response data)
+ * @param { object } config - Autofill configuration.
+ * @param { object } config.request - Backend request config.
+ * @param { string } config.request.url - URL to call.
+ * @param { string } [config.request.method] - HTTP method (`'GET'` or `'POST'`). Default: `'GET'`
+ * @param { object } [config.request.params] - Parameter sources.
+ * @param { object } [config.request.params.user] - Maps backend param names to sibling field names whose values to include.
+ * @param { object } [config.request.params.static] - Static key/value pairs always sent with the request.
+ * @param { string } config.label - Human-readable label used in button text and result messages.
+ * @param { string } [config.button_label] - Custom button label (overrides the generated one).
+ * @param { boolean } [config.autorun] - Trigger the request automatically on component init.
+ * @param { string } [config.convert] - Response conversion hint (reserved for future use).
+ * @param { boolean } [disabled] - Set to `true` to disable the button.
+ * @param { function } encodeFields - Encodes the given form fields (see {@link OxiSection::Form}).
+ * @param { function } valueSetter - Processes the server response (called with the response data).
  * @class OxiSection::Form::AutoFill
  * @extends Component
  */
@@ -99,6 +109,11 @@ export default class Autofill extends Component {
         if (this.autorun) this.query();
     }
 
+    /**
+     * Resolves referenced sibling field values, sends the configured HTTP request to the backend,
+     * and passes the response text to `valueSetter`.
+     * @memberOf OxiSection::Form::AutoFill
+     */
     @action
     query() {
         // resolve referenced fields and their values
@@ -129,6 +144,11 @@ export default class Autofill extends Component {
         });
     }
 
+    /**
+     * Returns the button label, using `button_label` if set, otherwise the i18n key `autofill.button`
+     * parameterized with `label`.
+     * @memberOf OxiSection::Form::AutoFill
+     */
     get buttonLabel() {
         return (this.button_label
             ? this.button_label

@@ -14,6 +14,11 @@ import { service } from '@ember/service';
 export default class HeadLayout extends Component {
     @service('oxi-config') config;
 
+    /**
+     * Returns the target DOM element for portal rendering. Defaults to `document.head`
+     * when no `@headElement` argument is passed.
+     * @memberOf HeadLayout
+     */
     get headElement() {
         return this.args.headElement || document.head;
     }

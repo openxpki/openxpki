@@ -18,10 +18,19 @@ import { action } from '@ember/object';
  * @extends Component
  */
 export default class BsButton extends Component {
+    /**
+     * Returns the Bootstrap variant CSS class derived from `@type` (e.g. `"btn-primary"`),
+     * or an empty string when `@type` is omitted.
+     * @memberOf BsButton
+     */
     get typeClass() {
         return this.args.type ? `btn-${this.args.type}` : '';
     }
 
+    /**
+     * Forwards the native click event to `@onClick` if provided.
+     * @memberOf BsButton
+     */
     @action
     handleClick(event) {
         this.args.onClick?.(event);

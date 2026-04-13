@@ -12,6 +12,21 @@ import copy from 'copy-text-to-clipboard';
  * <OxiBase::Download @type="base64" @data={{this.fileData}} @mimeType="text/plain" @fileName="book.txt" @autoDownload={{true}} @hide={{true}}/>
  * <OxiBase::Download @type="link" @data="img/logo.png" @fileName="openxpki.png" />
  * ```
+ *
+ * @param { string } type - Data type: `"link"` for a plain URL, `"base64"` for Base64-encoded
+ *   binary content, or omit/any other value for plain text content.
+ * @param { string } data - The file content or URL. For `type="link"`: a URL string.
+ *   For `type="base64"`: a Base64-encoded string. Otherwise: plain text.
+ * @param { string } [mimeType] - MIME type for the generated blob. Not used for `type="link"`.
+ *   Auto-detected from content when possible. Default: `'application/binary'` (base64) or
+ *   `'text/plain'` (plain).
+ * @param { string } [fileName] - Suggested download filename. Auto-detected from content when
+ *   possible. Default: `'openxpki.dat'`. Not set by default for `type="link"`.
+ * @param { boolean } [autoDownload] - Trigger the download automatically on render.
+ * @param { boolean } [hide] - Hide the download button. Only effective when `@autoDownload` is
+ *   also `true`.
+ * @param { boolean } [showContent] - Show a read-only text preview of the content (only for
+ *   non-link types and content smaller than 10 KB).
  * @class OxiBase::Download
  */
 export default class OxiDownloadComponent extends Component {
@@ -27,14 +42,27 @@ export default class OxiDownloadComponent extends Component {
 
     baseElement;
 
+    /**
+     * Returns `true` when `@autoDownload` and `@hide` are both set (button is hidden).
+     * @memberOf OxiBase::Download
+     */
     get hide() {
         return this.args.autoDownload && this.args.hide;
     }
 
+    /**
+     * Returns `true` when `@showContent` is set, the type is not a link, and the
+     * raw data is smaller than 10 KB.
+     * @memberOf OxiBase::Download
+     */
     get showContent() {
         return this.args.showContent && !this.isLink && this.rawData.length < 10*1024;
     }
 
+    /**
+     * Returns the button/link label: the filename when known, otherwise the URL.
+     * @memberOf OxiBase::Download
+     */
     get label() {
         return this.fileName ? this.fileName : this.url;
     }
@@ -113,6 +141,10 @@ export default class OxiDownloadComponent extends Component {
         }
     }
 
+    /**
+     * Triggers the file download by creating and clicking a temporary `<a>` element.
+     * @memberOf OxiBase::Download
+     */
     @action
     download() {
         // perform download: create and click <a> element
@@ -130,6 +162,11 @@ export default class OxiDownloadComponent extends Component {
         // URL.revokeObjectURL();
     }
 
+    /**
+     * Copies `rawData` to the clipboard (no-op for link type). Uses `baseElement`
+     * as anchor to stay within any active focus trap.
+     * @memberOf OxiBase::Download
+     */
     @action
     copyToClipboard(/*event*/) {
         if (this.isLink) return;
@@ -139,17 +176,29 @@ export default class OxiDownloadComponent extends Component {
         console.info("Contents copied to clipboard");
     }
 
+    /**
+     * Stores the base DOM element and auto-triggers `download()` if `@autoDownload` is set.
+     * @memberOf OxiBase::Download
+     */
     @action
     onInit(element) {
         this.baseElement = element;
         if (this.args.autoDownload) this.download();
     }
 
+    /**
+     * Updates `fileName` from the filename input field's change event.
+     * @memberOf OxiBase::Download
+     */
     @action
     onFileNameChange(event) {
         this.fileName = event.target.value;
     }
 
+    /**
+     * Converts a binary string to a `Blob` with the given MIME type.
+     * @memberOf OxiBase::Download
+     */
     stringToBlob(source, mimeType) {
         const byteArray = Uint8Array.from(
             source

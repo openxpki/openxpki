@@ -16,37 +16,38 @@ import Pager from 'openxpki/data/pager'
  * <OxiSection::Grid @def={{this.def}} />
  * ```
  *
- * @param { object } def - Section definition:
- *   - `label` { string } - Section heading. Default: `""`
- *   - `description` { string } - Subheading shown below the label. Default: `""`
- *   - `columns` { array } - Column descriptors. Each entry has:
- *     - `sTitle` { string } - Column title (columns whose title starts with `_`
- *       are hidden; `_status` / `_className` provide a per-row CSS class)
- *     - `format` { string } - Cell format hint (e.g. `'certstatus'`, `'timestamp'`, ...)
- *     - `bVisible` { number } - Set to `0` to hide the column. Default: `1`
- *     - `sortkey` { string } - Key used for server-side (or client-side) sorting.
- *       Omit to make the column non-sortable.
- *   - `data` { array } - Row data as a 2-D array; each inner array contains one
- *     value per column (positional, matching `columns`).
- *   - `actions` { array } - Row-level action descriptors (rendered as icon buttons
- *     per row). Column values may be interpolated with `{columnTitle}` placeholders.
- *     Each entry is a {@link GridAction} hash with:
- *     - `label` { string } - Tooltip / label (ignored when there is only one action)
- *     - `icon` { string } - Optional icon name
- *     - `href` / `page` / `action` { string } - Navigation or workflow target
- *   - `buttons` { array } - Toolbar button descriptors. Buttons with a `select`
- *     property become bulk-selection buttons ({@link GridButton}); all others are
- *     standard {@link ContainerButton} entries.
- *   - `pager` { object } - Pagination/sorting state with:
- *     - `pagerurl` { string } - URL used to fetch a new page; absence disables
- *       server-side paging/sorting (client-side fallback is used instead)
- *     - `count` { number } - Total number of items
- *     - `startat` { number } - Zero-based index of the first displayed item
- *     - `limit` { number } - Items per page
- *     - `order` { string } - Currently active sort key
- *     - `reverse` { boolean } - Sort direction
- *     - `pagesizes` { number[] } - Selectable page-size options
- *     - `pagersize` { number } - Max page buttons shown before ellipsis
+ * @param { object } def - Section definition.
+ * @param { string } [def.label] - Section heading. Default: `""`
+ * @param { string } [def.description] - Subheading shown below the label. Default: `""`
+ * @param { array } def.columns - Column descriptors.
+ * @param { string } def.columns[].sTitle - Column title. Columns whose title starts with `_`
+ *   are hidden; `_status` / `_className` provide a per-row CSS class.
+ * @param { string } [def.columns[].format] - Cell format hint (e.g. `'certstatus'`, `'timestamp'`, ...).
+ * @param { number } [def.columns[].bVisible] - Set to `0` to hide the column. Default: `1`
+ * @param { string } [def.columns[].sortkey] - Key used for server-side (or client-side) sorting.
+ *   Omit to make the column non-sortable.
+ * @param { array } def.data - Row data as a 2-D array; each inner array contains one value per
+ *   column (positional, matching `columns`).
+ * @param { array } [def.actions] - Row-level action descriptors (rendered as icon buttons per row).
+ *   Column values may be interpolated with `{columnTitle}` placeholders.
+ *   Each entry is a {@link GridAction} hash.
+ * @param { string } def.actions[].label - Tooltip / label (ignored when there is only one action).
+ * @param { string } [def.actions[].icon] - Icon name.
+ * @param { string } [def.actions[].href] - Link URL target.
+ * @param { string } [def.actions[].page] - OpenXPKI page target.
+ * @param { string } [def.actions[].action] - OpenXPKI action target.
+ * @param { array } [def.buttons] - Toolbar button descriptors. Buttons with a `select` property
+ *   become bulk-selection buttons ({@link GridButton}); all others are standard {@link ContainerButton} entries.
+ * @param { object } [def.pager] - Pagination/sorting state.
+ * @param { string } [def.pager.pagerurl] - URL used to fetch a new page; absence disables
+ *   server-side paging/sorting (client-side fallback is used instead).
+ * @param { number } def.pager.count - Total number of items.
+ * @param { number } def.pager.startat - Zero-based index of the first displayed item.
+ * @param { number } def.pager.limit - Items per page.
+ * @param { string } [def.pager.order] - Currently active sort key.
+ * @param { boolean } [def.pager.reverse] - Sort direction.
+ * @param { number[] } [def.pager.pagesizes] - Selectable page-size options.
+ * @param { number } [def.pager.pagersize] - Max page buttons shown before ellipsis.
  *
  * @class OxiSection::Grid
  * @extends Component
@@ -86,18 +87,45 @@ export default class OxiSectionGridComponent extends Component {
         this.updateButtonState()
     }
 
+    /**
+     * Returns `true` when at least one row action is defined.
+     * @memberOf OxiSection::Grid
+     */
     get hasAction() { return this.actions.length > 0 }
+    /**
+     * Returns `true` when more than one row action is defined (toggles icon-button vs. drop-down rendering).
+     * @memberOf OxiSection::Grid
+     */
     get multipleActions() { return this.actions.length > 1 }
+    /**
+     * Returns the first (and usually only) {@link GridAction} for single-action rows.
+     * @memberOf OxiSection::Grid
+     */
     get firstAction() { return this.actions[0] }
 
+    /**
+     * Returns `true` when a `pagerurl` is set, enabling server-side paging and sorting.
+     * @memberOf OxiSection::Grid
+     */
     get hasPager() { return !!this.pager.pagerurl }
 
+    /**
+     * Returns the subset of columns that are visible (title does not start with `_`, `bVisible != 0`),
+     * each augmented with its original positional `index`.
+     * @memberOf OxiSection::Grid
+     */
     get visibleColumns() {
         return this.rawColumns
         .map( (col, index) => ({ ...col, index }))
         .filter(col => col.sTitle[0] !== "_" && col.bVisible != 0);
     }
 
+    /**
+     * Returns the page descriptor array used by the pager UI, with `prev`/`next` sentinel objects
+     * attached. Returns `[]` when pagination is not needed (all items fit on one page).
+     * Collapses middle pages into an ellipsis entry when total pages exceed `pager.pagersize`.
+     * @memberOf OxiSection::Grid
+     */
     get pages() {
         let pager = this.pager;
         if (!pager) { return [] }
@@ -151,6 +179,13 @@ export default class OxiSectionGridComponent extends Component {
         return o;
     }
 
+    /**
+     * Returns the selectable page-size options filtered to those that make sense given
+     * the total item count (i.e. sizes up to and including the smallest size that covers all items).
+     * Each entry carries `active`, `limit`, `startat`, `order`, and `reverse` fields.
+     * Returns `[]` when no `pagesizes` are configured.
+     * @memberOf OxiSection::Grid
+     */
     get pagesizes() {
         let pager = this.pager;
         if (!pager.pagesizes) { return [] }
@@ -173,6 +208,12 @@ export default class OxiSectionGridComponent extends Component {
         });
     }
 
+    /**
+     * Returns the visible columns enriched with sort state (`isSorted`, `reverse`)
+     * and a `sortPage` descriptor that can be passed to `sort()` to change the sort order.
+     * Uses `sortkey` for server-side sorting and `sTitle` for client-side sorting.
+     * @memberOf OxiSection::Grid
+     */
     get formattedColumns() {
         let results = [];
         for (const column of this.visibleColumns) {
@@ -199,6 +240,15 @@ export default class OxiSectionGridComponent extends Component {
         return results;
     }
 
+    /**
+     * Returns the fully processed row array. Each row contains
+     *  - `className` (from `_status`/`_className` columns),
+     *  - `data` (per-visible-column `{ format, value }` pairs),
+     *  - `checked` state,
+     *  - `originalIndex`, and
+     *  - `actions` with column variables already resolved via `resolveVariables`.
+     * @memberOf OxiSection::Grid
+     */
     get data() {
         let columns = this.formattedColumns
         let titles = this.rawColumns.map(i => i.sTitle)
@@ -234,6 +284,11 @@ export default class OxiSectionGridComponent extends Component {
         return results
     }
 
+    /**
+     * Returns a clone of `gridAction` with `{columnTitle}` placeholders in `href`, `page`,
+     * and `action` replaced by the corresponding cell value from `row`.
+     * @memberOf OxiSection::Grid
+     */
     resolveVariables(gridAction, row) {
         let rowAction = gridAction.clone()
 
@@ -252,6 +307,12 @@ export default class OxiSectionGridComponent extends Component {
         return rowAction
     }
 
+    /**
+     * Returns `data` sorted according to the current `pager` order/reverse state.
+     * Server-side paging: returns `data` as-is (sorting done by backend).
+     * Client-side paging: sorts numerically when both values look like numbers, lexicographically otherwise.
+     * @memberOf OxiSection::Grid
+     */
     // split sorting from row data generation in "get data()" for better performance when re-sorting
     get sortedData() {
         // server-side sorting
@@ -277,18 +338,35 @@ export default class OxiSectionGridComponent extends Component {
         return data;
     }
 
+    /**
+     * Returns `true` when every visible row is checked.
+     * @memberOf OxiSection::Grid
+     */
     get allChecked() {
         return this.sortedData.every(i => i.checked == true)
     }
 
+    /**
+     * Returns `true` when no visible row is checked.
+     * @memberOf OxiSection::Grid
+     */
     get noneChecked() {
         return this.sortedData.every(i => i.checked == false)
     }
 
+    /**
+     * Returns `true` when at least one button carries a `select` property, enabling row checkboxes.
+     * @memberOf OxiSection::Grid
+     */
     get isBulkable() {
         return this.buttons.some(i => i.select);
     }
 
+    /**
+     * Collects the values of the column named by `button.select` for all checked rows
+     * and sends them to the backend action defined by `button.action`.
+     * @memberOf OxiSection::Grid
+     */
     @action
     async selectClick(button) {
         debug('oxi-section/grid - selectClick')
@@ -309,6 +387,10 @@ export default class OxiSectionGridComponent extends Component {
         }
     }
 
+    /**
+     * Toggles the `checked` state of a single row and updates bulk-action button states.
+     * @memberOf OxiSection::Grid
+     */
     // (de-)select single row
     @action
     select(row) {
@@ -317,6 +399,11 @@ export default class OxiSectionGridComponent extends Component {
         this.updateButtonState()
     }
 
+    /**
+     * Checks all rows when any are unchecked; unchecks all rows when all are already checked.
+     * Updates bulk-action button states afterwards.
+     * @memberOf OxiSection::Grid
+     */
     // (de-)select all rows
     @action
     selectAll() {
@@ -327,10 +414,19 @@ export default class OxiSectionGridComponent extends Component {
         this.updateButtonState()
     }
 
+    /**
+     * Enables or disables bulk-action buttons depending on whether any rows are checked.
+     * @memberOf OxiSection::Grid
+     */
     updateButtonState() {
         this.buttons.filter(b => b.select).forEach(b => b.disabled = this.noneChecked)
     }
 
+    /**
+     * Fetches a new data page from the server using `pager.pagerurl` and updates
+     * `rawData` and the pager state. No-ops when `page.disabled` or `page.active`.
+     * @memberOf OxiSection::Grid
+     */
     @action
     updatePage(page) {
         debug('oxi-section/grid - updatePage()')
@@ -350,6 +446,11 @@ export default class OxiSectionGridComponent extends Component {
         });
     }
 
+    /**
+     * Changes the sort order. For server-side paging calls `updatePage`; for client-side
+     * paging updates `pager` state directly (re-render is triggered by tracked property).
+     * @memberOf OxiSection::Grid
+     */
     @action
     sort(page) {
         // server-side sorting

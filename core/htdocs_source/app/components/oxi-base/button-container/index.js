@@ -39,11 +39,19 @@ export default class OxiButtonContainerComponent extends Component {
         if (this.maxButtonsPerRow > 6) this.maxButtonsPerRow = 6
     }
 
+    /**
+     * Returns `true` if any button in the container has a `description`.
+     * @memberOf OxiBase::ButtonContainer
+     */
     get hasDescription() {
         if (!this.buttons) { return false }
         return this.buttons.some(i => i.description)
     }
 
+    /**
+     * Returns `true` when the container has at least one button.
+     * @memberOf OxiBase::ButtonContainer
+     */
     get hasButtons() {
         return this.buttons.length > 0
     }

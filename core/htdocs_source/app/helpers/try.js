@@ -11,6 +11,10 @@ import Helper from "@ember/component/helper";
  * @module helper/try
  */
 export default class Try extends Helper {
+    /**
+     * Returns the first candidate that is not `undefined` or `null`, or `""` when all are absent.
+     * @memberOf module:helper/try
+     */
     compute(candidates) {
         for (let val of candidates) {
             if ((typeof val !== 'undefined') && val !== null) return val;

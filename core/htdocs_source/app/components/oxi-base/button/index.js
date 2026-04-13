@@ -5,55 +5,24 @@ import Clickable from 'openxpki/data/clickable'
 //import ow from 'ow'
 
 /**
- * Button implementation supporting custom inner layout.
+ * Button implementation supporting custom inner layout. Shows either `<a href>` or `<button>`
+ * depending on the button object's properties.
  *
  * ```html
- * <OxiBase::Button @button={{buttonObj}} class="btn btn-secondary">
- *     {{buttonObj.label}}
+ * <OxiBase::Button @button={{...}} class="btn btn-secondary">
+ *     Click me
  * </OxiBase::Button>
  * ```
  *
- * The component has two modes and shows either `<a href/>` or `<button/>`.
- *
- * @param { Clickable } buttonObj - a {@link Clickable} object where the following properties are relevant:
- * Common properties for all modes:
- * ```javascript
- * {
- *     format: "primary",
- *     disabled: false,
- *     confirm: { ... },
- * }
- * ```
- * Mode 1 `<a href>`:
- * ```javascript
- * {
- *     ...
- *     href: "https://www.openxpki.org", // mandatory
- *     target: "_blank",
- * }
- * ```
- * Mode 2 `<button>` with `onClick` handler:
- * ```javascript
- * {
- *     ...
- *     // callback: Must return a Promise! Button object will be passed as parameter
- *     onClick: this.clickHandler,
- * }
- * ```
- * Mode 3 `<button>` with `page`:
- * ```javascript
- * {
- *     ...
- *     page: 'workflow!index!wf_type!request_checker', // mandatory
- * }
- * ```
- * Mode 4 `<button>` with `action`:
- * ```javascript
- * {
- *     ...
- *     action: 'workflow!select!wf_action!global_cancel!wf_id!34', // mandatory
- * }
- * ```
+ * @param { object } button - a {@link Clickable} object. Common properties for all modes:
+ * @param { string } [button.format] - Button style format (e.g. `"primary"`, `"optional"`).
+ * @param { boolean } [button.disabled] - Whether the button is disabled.
+ * @param { object } [button.confirm] - Confirmation dialog config shown before the action fires.
+ * @param { string } [button.href] - Mode 1: renders as `<a href>`. Mandatory for link mode.
+ * @param { string } [button.target] - Mode 1: link target, e.g. `"_blank"`.
+ * @param { function } [button.onClick] - Mode 2: renders as `<button>` with click handler. Must return a Promise. Button object is passed as parameter.
+ * @param { string } [button.page] - Mode 3: renders as `<button>` that navigates to a page,<br>e.g. `"workflow!index!wf_type!request_checker"`.
+ * @param { string } [button.action] - Mode 4: renders as `<button>` that triggers an action,<br>e.g. `"workflow!select!wf_action!global_cancel!wf_id!34"`.
  * @class OxiBase::Button
  * @extends Component
  */
@@ -90,6 +59,11 @@ export default class OxiClickableComponent extends Component {
 
     @tracked showConfirmDialog = false
 
+    /**
+     * Returns the CSS class for the current button format (or `"oxi-btn-loading"` while
+     * the button is in a loading state). Falls back to `"oxi-btn-optional"` for unknown formats.
+     * @memberOf OxiBase::Button
+     */
     get formatCSSClass() {
         if (this.args.button.loading) { return "oxi-btn-loading" }
 
@@ -103,6 +77,10 @@ export default class OxiClickableComponent extends Component {
         return cssClass
     }
 
+    /**
+     * Returns `@button` as a {@link Clickable} instance.
+     * @memberOf OxiBase::Button
+     */
     get clickable() {
         return Clickable.fromHash(this.args.button)
     }

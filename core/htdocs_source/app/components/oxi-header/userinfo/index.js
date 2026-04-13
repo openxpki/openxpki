@@ -17,6 +17,11 @@ export default class ApplicationHeaderUserinfo extends Component {
     @service('oxi-content') content;
     @controller('openxpki') openxpki;
 
+    /**
+     * Returns a display string for the active tenant, combining label and value when they differ.
+     * Returns `null` when no tenant is active or the user has no tenant list.
+     * @memberOf OxiHeader::UserInfo
+     */
     get currentTenant() {
         if (!this.content.tenant || !this.content.user.tenants) return null;
 
@@ -26,11 +31,20 @@ export default class ApplicationHeaderUserinfo extends Component {
         return tenant.label === tenant.value ? tenant.label : `${tenant.label} (${tenant.value})`;
     }
 
+    /**
+     * Returns `true` when the user has more than one tenant, used to show the tenant switcher drop-down.
+     * @memberOf OxiHeader::UserInfo
+     */
     get hasMultipleTenants() {
         if (!this.content.user.tenants) return false;
         return (this.content.user.tenants.length > 1);
     }
 
+    /**
+     * Returns the tenant descriptor object matching the currently active tenant,
+     * or `[]` when no active tenant is set.
+     * @memberOf OxiHeader::UserInfo
+     */
     get tenants() {
         if (!this.content.tenant) return [];
         let tenants = this.content.user.tenants;
@@ -42,6 +56,11 @@ export default class ApplicationHeaderUserinfo extends Component {
         return [];
     }
 
+    /**
+     * Switches the active tenant and navigates to the welcome page.
+     * No-op when the selected tenant is already active.
+     * @memberOf OxiHeader::UserInfo
+     */
     @action
     selectTenant(tenant) {
         if (tenant == this.content.tenant) return

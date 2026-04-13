@@ -12,6 +12,10 @@ import Helper from "@ember/component/helper";
  * @module helper/and
  */
 export default class And extends Helper {
+    /**
+     * Returns `true` when all of `args` are truthy.
+     * @memberOf module:helper/and
+     */
     compute(args) {
         return !!args.reduce((ac, val) => ac && !!val); // true if all are true
     }

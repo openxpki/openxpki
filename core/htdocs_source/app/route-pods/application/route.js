@@ -1,3 +1,8 @@
+/**
+ * Root application route. All other routes render into its template's `{{outlet}}`.
+ *
+ * @module route/application
+ */
 import Route from '@ember/routing/route';
 /*
 import { action } from '@ember/object';

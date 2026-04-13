@@ -33,9 +33,22 @@ function reducedAlphaColor(cssColor) {
     }
 }
 
-/*
-  Line and Bar chart class
-*/
+/**
+ * Renders a uPlot-powered line or bar chart into `element`.
+ * Lazy-imports `uplot` and {@link SeriesBarsPlugin} to avoid a top-level
+ * `Intl.NumberFormat` crash when `navigator.language` is invalid.
+ * When `opts.width` or `opts.height` is `"auto"`, a `ResizeObserver` keeps
+ * the chart sized to its container; a cleanup function is stored on
+ * `element._uplotCleanup` for the Ember component to call on teardown.
+ *
+ * @param { HTMLElement } element - Container element to render into.
+ * @param { object } opts - Chart options (see {@link OxiBase::Chart} for the full schema).
+ * @param { array } opts.type - `"line"` or `"bar"`.
+ * @param { number|string } opts.width - Width in px or `"auto"`.
+ * @param { number|string } opts.height - Height in px or `"auto"`.
+ * @param { array } opts.series - Series definitions.
+ * @param { array } data - Row-major data array: `[ [x1, a1, b1], [x2, a2, b2], ... ]`.
+ */
 export default async function ChartLineBar(element, opts, data) {
     // uPlot calls new Intl.NumberFormat(navigator.language) when it first loads.
     // Guard against invalid language tags (e.g. Playwright sets it to "undefined").

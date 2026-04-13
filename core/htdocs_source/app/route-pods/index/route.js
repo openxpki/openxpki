@@ -2,6 +2,11 @@ import Route from '@ember/routing/route'
 import { service } from '@ember/service'
 import { debug } from '@ember/debug'
 
+/**
+ * Index route (`/`). Immediately redirects to `/openxpki/welcome`.
+ *
+ * @module route/index
+ */
 export default class IndexRoute extends Route {
     @service router
 

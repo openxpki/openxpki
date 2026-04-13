@@ -10,28 +10,26 @@ import { guidFor } from '@ember/object/internals'
  * <OxiSection::KeyValue @def={{this.def}} />
  * ```
  *
- * @param { object } def - Section definition:
- *   - `label` { string } - Section heading. Default: `""`
- *   - `description` { string } - Subheading shown below the label. Default: `""`
- *   - `data` { array } - List of items to display. Each entry is an object with:
- *     - `label` { string } - Row label shown in the left column. Omit to hide the label column entirely.
- *     - `value` { string } - The value to display, passed to {@link OxiBase::Formatted}.
- *     - `format` { string } - Format identifier for {@link OxiBase::Formatted} (e.g. `'raw'`, `'link'`, `'datetime'`).
- *       Items with `format: 'raw'` and an empty value are hidden.
- *     - `preamble` { string } - Optional italicised text rendered above the value.
- *     - `className` { string } - Optional extra CSS class added to the row element.
- *     - `refresh` { object } - Optional auto-refresh config:
- *       - `uri` { string } - Required. Action URI called to fetch an updated value.
- *       - `timeout` { number } - Required. Milliseconds between refresh calls.
- *     - `format: 'head'` - Special marker: renders the `value` as a full-width section divider
- *       instead of a normal key/value row.
- *   - `buttons` { array } - Optional list of button definitions rendered below the items
- *     via {@link OxiBase::ButtonContainer}.
- *
- * @param { object } meta - Rendering metadata:
- *   - `isInfoBox` { boolean } - Adjusts column widths and label CSS for infobox context.
- *   - `isCompact` { boolean } - When true, renders all items inline (suitable for use
-*       inside a compact container such as an infobox tile) instead of the default grid layout.
+ * @param { object } def - Section definition.
+ * @param { string } [def.label] - Section heading. Default: `""`
+ * @param { string } [def.description] - Subheading shown below the label. Default: `""`
+ * @param { array } def.data - List of items to display.
+ * @param { string } [def.data[].label] - Row label shown in the left column. Omit to hide the label column entirely.
+ * @param { string } def.data[].value - The value to display, passed to {@link OxiBase::Formatted}.
+ * @param { string } [def.data[].format] - Format identifier for {@link OxiBase::Formatted} (e.g. `'raw'`, `'link'`, `'datetime'`).
+ *   Items with `format: 'raw'` and an empty value are hidden.
+ *   Use `'head'` as a special marker to render the value as a full-width section divider.
+ * @param { string } [def.data[].preamble] - Italicised text rendered above the value.
+ * @param { string } [def.data[].className] - Extra CSS class added to the row element.
+ * @param { object } [def.data[].refresh] - Auto-refresh config.
+ * @param { string } def.data[].refresh.uri - Action URI called to fetch an updated value.
+ * @param { number } def.data[].refresh.timeout - Milliseconds between refresh calls.
+ * @param { array } [def.buttons] - List of button definitions rendered below the items
+ *   via {@link OxiBase::ButtonContainer}.
+ * @param { object } [meta] - Rendering metadata.
+ * @param { boolean } [meta.isInfoBox] - Adjusts column widths and label CSS for infobox context.
+ * @param { boolean } [meta.isCompact] - When true, renders all items inline (suitable for use
+ *   inside a compact container such as an infobox tile) instead of the default grid layout.
  *
  * @class OxiSection::KeyValue
  * @extends Component
@@ -43,6 +41,11 @@ export default class OxiSectionKeyvalueComponent extends Component {
 
     #id = guidFor(this)
 
+    /**
+     * Returns `true` when at least one item has a non-null/non-zero `label`.
+     * Controls whether the label column is rendered.
+     * @memberOf OxiSection::KeyValue
+     */
     get hasLabels() {
         return this.items.filter(i => typeof i.label !== 'undefined' && i.label !== 0 && i.label !== null).length > 0
     }
@@ -62,6 +65,12 @@ export default class OxiSectionKeyvalueComponent extends Component {
         this.items = items.filter(item => item.format !== 'raw' || item.value !== '')
     }
 
+    /**
+     * Starts a periodic auto-refresh for a single keyvalue item, immediately
+     * fetching the value and scheduling subsequent fetches per `item.refresh.timeout`.
+     * Cancels any existing timer for the same item before starting.
+     * @memberOf OxiSection::KeyValue
+     */
     startRefresh(item) {
         let timeout = item.refresh.timeout
         let uri = item.refresh.uri

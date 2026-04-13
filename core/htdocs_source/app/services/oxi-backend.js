@@ -9,6 +9,25 @@ import ENV from 'openxpki/config/environment';
  * @module service/oxi-backend
  */
 export default class OxiBackendService extends Service {
+    /**
+     * Send an HTTP request to the given URL.
+     *
+     * For `GET` requests, `data` is serialized as URL query parameters.
+     * For `POST` requests, `data` is sent as JSON body (default) or with the
+     * given `contentType`.
+     *
+     * Always adds `X-Requested-With` and `X-OPENXPKI-Client` headers. In
+     * development mode also adds `X-OpenXPKI-Ember-HTTP-Proxy` so the backend
+     * skips the `Secure` cookie flag when running behind the HTTP dev proxy.
+     *
+     * @param { object } params
+     * @param { string } params.url - Request URL
+     * @param { string } [params.method] - HTTP method. Default: `'GET'`
+     * @param { object } [params.headers] - Additional HTTP headers
+     * @param { object } [params.data] - Request payload / query parameters
+     * @param { string } [params.contentType] - Content-Type for POST requests. Default: `'application/json'`
+     * @returns {Promise<Response>} Fetch `Response` promise; network errors are logged and re-thrown
+     */
     request({ url, method = 'GET', headers = {}, data, contentType }) {
         // type validation
         //assert(method, enums(['GET', 'POST']));

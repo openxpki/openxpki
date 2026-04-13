@@ -12,6 +12,10 @@ import Helper from "@ember/component/helper";
  * @module helper/arrayify
  */
 export default class Arrayify extends Helper {
+    /**
+     * Wraps a scalar in a one-element array, passes arrays through (copied), and returns `[]` for `undefined`.
+     * @memberOf module:helper/arrayify
+     */
     compute([strOrArray]) {
         if (strOrArray === null) return [null];
         if (Array.isArray(strOrArray)) return strOrArray.slice();

@@ -8,21 +8,35 @@ import { service } from '@ember/service'
  * ```html
  * <OxiBase::MenuItem
  *   @spec={{entry}}
- *   @afterClick={{this.function}}
+ *   @isSubmenu={{true}}
+ *   @onClick={{this.closeDropdown}}
  * />
  * ```
  *
  * @param { hash } spec - menu item specification:
- * ```javascript
- * { label: 1, page: "Major", url, icon, entries },
- * ```
- * @param { callback } afterClick - function to run after the menu item was clicked (usually a function to close a dropdown)
+ * @param { string } spec.label - display text for the menu item
+ * @param { string } [spec.page] - internal OpenXPKI page name to navigate to
+ * @param { string } [spec.url] - external URL to open (used when `page` is not set)
+ * @param { string } [spec.icon] - icon class; prefix `glyphicon-` or `bi-` is
+ *   auto-expanded to `glyphicon <icon>` / `bi <icon>` respectively
+ * @param { boolean } [spec.active] - marks the item as the currently active page
+ * @param { Array } [spec.entries] - if present the item has sub-entries and clicking
+ *   it only triggers `@onClick` (no navigation)
+ * @param { boolean } [isSubmenu] - when true, `aria-current` is set to `"true"` instead
+ *   of `"page"` for active items
+ * @param { function } [onClick] - callback invoked before navigation (e.g. to close a
+ *   dropdown); receives no arguments
  * @class OxiBase::MenuItem
  */
 export default class OxiMenuItemComponent extends Component {
     @service('oxi-content') content
     @service router;
 
+    /**
+     * Returns the `href` for the anchor element: the Ember route URL for `spec.page`,
+     * `spec.url` for external links, or `"#"` for sub-menu parents.
+     * @memberOf OxiBase::MenuItem
+     */
     get href() {
         if (this.args.spec.entries) return "#"
         if (this.args.spec.page) return this.router.urlFor("openxpki", this.args.spec.page);
@@ -30,6 +44,11 @@ export default class OxiMenuItemComponent extends Component {
         return "#"
     }
 
+    /**
+     * Returns the resolved icon CSS class string, expanding `glyphicon-*` and `bi-*`
+     * prefixes to their full class pairs, or `null` when no icon is configured.
+     * @memberOf OxiBase::MenuItem
+     */
     get icon() {
         let icon = this.args.spec.icon
         if (! icon) return null
@@ -38,6 +57,11 @@ export default class OxiMenuItemComponent extends Component {
         return icon
     }
 
+    /**
+     * Handles a click on the menu item: navigates to `spec.page`, opens `spec.url`,
+     * or invokes `@onClick` for sub-menu parents.
+     * @memberOf OxiBase::MenuItem
+     */
     @action
     openTarget(event) {
         if (event) { event.stopPropagation(); event.preventDefault() }

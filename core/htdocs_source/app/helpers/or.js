@@ -12,6 +12,10 @@ import Helper from "@ember/component/helper";
  * @module helper/or
  */
 export default class Or extends Helper {
+    /**
+     * Returns `true` when at least one of `args` is truthy.
+     * @memberOf module:helper/or
+     */
     compute(args) {
         return !!args.reduce((ac, val) => ac || !!val); // true if all are true
     }

@@ -20,18 +20,21 @@ import Choices from 'choices.js'
  * />
  * ```
  *
- * @param { array } list - List of hashes defining the options.
- * Each hash is expected to have these keys:
+ * @param { array } list - List of option hashes, each with `value` and `label` keys:
  * ```javascript
  * [
  *     { value: 1, label: "Major" },
  *     { value: 2, label: "Tom" },
  * ]
  * ```
- * @param { string } selected - currently selected value
- * @param { callback } onChange - called if a selection was made.
- * It gets passed two arguments: *value* and *label* of the selected item.
- * The callback is also called initially to set the value of the first list item.
+ * @param { string } selected - Currently selected value.
+ * @param { function } onChange - Called when a selection is made, with `(value, label)` of the
+ *   selected item. Also called initially to report the first item's value.
+ * @param { function } [onInsert] - Called after the Choices.js element is inserted into the DOM.
+ * @param { function } [setFocusInfo] - Callback to register the Choices.js outer element for focus management.
+ * @param { boolean } [inline] - Render the select inline (no `form-control` wrapper).
+ * @param { string } [placeholder] - Placeholder text shown when nothing is selected.
+ * @param { boolean } [showClearButton] - Show a clear button once a value is selected.
  * @class OxiBase::Select
  */
 export default class OxiSelectComponent extends Component {
@@ -40,6 +43,11 @@ export default class OxiSelectComponent extends Component {
     #choicesObj = null
     @tracked allowClearing = false
 
+    /**
+     * Returns the CSS class(es) for the underlying `<select>` element.
+     * Inline mode omits the `form-control` wrapper.
+     * @memberOf OxiBase::Select
+     */
     get cssClasses() {
         return (this.args.inline
             ? 'oxi-inline-select'
@@ -47,6 +55,11 @@ export default class OxiSelectComponent extends Component {
         )
     }
 
+    /**
+     * Returns the placeholder string, converting an empty `""` to `"…"` so
+     * Choices.js recognises it. Returns `null` when no placeholder is configured.
+     * @memberOf OxiBase::Select
+     */
     get placeholder() {
         let label = this.args.placeholder ?? null
         // convert empty to non-empty string so Choice.js will recognize placeholder
@@ -55,14 +68,21 @@ export default class OxiSelectComponent extends Component {
         return label
     }
 
+    /**
+     * Redirects browser focus to the Choices.js outer container element.
+     * @memberOf OxiBase::Select
+     */
     @action
     focussed(element) {
         // "redirect" focus to the dynamically created Choices.js object
         if (this.#choicesObj) this.#choicesObj.containerOuter.element.focus()
     }
 
-    // initially trigger the onChange event to handle the case
-    // when the calling code has no "current selection" defined.
+    /**
+     * Initialises the Choices.js widget on insert and fires `@onChange` once to
+     * report the initial selection.
+     * @memberOf OxiBase::Select
+     */
     @action
     startup(element) {
         this.#choicesObj = new Choices(element, {
@@ -100,6 +120,11 @@ export default class OxiSelectComponent extends Component {
         this.notifyOnChange()
     }
 
+    /**
+     * Reads the currently selected item from Choices.js and calls `@onChange`
+     * with its value and label. Also enables the clear button when `@showClearButton` is set.
+     * @memberOf OxiBase::Select
+     */
     @action
     notifyOnChange() {
         let item = this.#choicesObj.getValue()
@@ -116,6 +141,10 @@ export default class OxiSelectComponent extends Component {
         this.args.onChange(item.element.value, item.element.label)
     }
 
+    /**
+     * Clears the current selection and calls `@onChange(null, null)`.
+     * @memberOf OxiBase::Select
+     */
     @action
     clear() {
         this.allowClearing = false

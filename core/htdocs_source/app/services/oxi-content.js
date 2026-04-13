@@ -69,16 +69,36 @@ export default class OxiContentService extends Service {
 
     LOGIN_PAGES = ['login', 'login!logout', 'logout']
 
+    /**
+     * CSS class encoding the current PKI realm name, e.g. `"oxi-realm-democa"`.
+     * Returns an empty string when no realm is set.
+     *
+     * @returns {string}
+     */
     get realmCssClass() {
         if (!this.realm) return ''
         return 'oxi-realm-' + this.safeCssLabel(this.realm)
     }
 
+    /**
+     * CSS class encoding the current tenant name, e.g. `"tenant-acme"`.
+     * Returns an empty string when no tenant is set.
+     *
+     * @returns {string}
+     */
     get tenantCssClass() {
         if (!this.tenant) return ''
         return 'tenant-' + this.safeCssLabel(this.tenant)
     }
 
+    /**
+     * Converts an arbitrary label into a safe CSS class name segment:
+     * lowercased, spaces and underscores replaced with dashes, non-alphanumeric
+     * characters removed, and consecutive dashes collapsed.
+     *
+     * @param {string} label
+     * @returns {string}
+     */
     safeCssLabel(label) {
         return label
           .toLowerCase()
@@ -87,6 +107,11 @@ export default class OxiContentService extends Service {
           .replace(/-+/g, '-')
     }
 
+    /**
+     * Whether an auto-refresh timer is currently active for the current page.
+     *
+     * @returns {boolean}
+     */
     get isAutoRefresh() {
         return this.refreshTimers.has(`${this.#id}/page_refresh`)
     }
@@ -461,6 +486,11 @@ export default class OxiContentService extends Service {
         }
     }
 
+    /**
+     * Set the active tenant.
+     *
+     * @param {string} tenant - Tenant identifier
+     */
     setTenant(tenant) {
         this.tenant = tenant
     }
@@ -505,6 +535,13 @@ export default class OxiContentService extends Service {
         }
     }
 
+    /**
+     * Returns `true` if the given DOM element is fully within the current viewport
+     * and has non-zero dimensions.
+     *
+     * @param {Element} el - DOM element to check
+     * @returns {boolean}
+     */
     isElementVisible(el) {
         let rect = el.getBoundingClientRect()
         return (

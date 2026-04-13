@@ -4,6 +4,20 @@ import { debug } from '@ember/debug'
 import config from 'openxpki/config/environment'
 
 /**
+ * Route for `/openxpki/:page`. Loads the requested page (main content area)
+ * via {@link module:service/oxi-content}.
+ *
+ * The child route `/openxpki/:page/popup/:popup_page` (see {@link module:route/openxpki/popup})
+ * loads the modal overlay content independently.
+ *
+ * Repeated model refreshes triggered by popup transitions are suppressed: the
+ * model hook compares the current params against the previous ones and skips
+ * the backend request when they are unchanged.
+ *
+ * In development mode, if the target page is `test` (or starts with
+ * `openxpki.test.`), a Pretender mock server is installed in `beforeModel()`
+ * before the first HTTP request so that test pages can run without a real backend.
+ *
  * @module route/openxpki
  */
 export default class OpenXpkiRoute extends Route {

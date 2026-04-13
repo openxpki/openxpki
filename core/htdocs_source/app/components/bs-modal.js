@@ -30,16 +30,29 @@ import { action } from '@ember/object';
 export default class BsModal extends Component {
     @tracked _close = null;
 
+    /**
+     * Stores the `hide()` function provided by {@link BsModalInitModifier} so
+     * the modal can be closed programmatically via `close()`.
+     * @memberOf BsModal
+     */
     @action
     registerClose(fn) {
         this._close = fn;
     }
 
+    /**
+     * Hides the modal by calling the registered Bootstrap `hide()` function.
+     * @memberOf BsModal
+     */
     @action
     close() {
         this._close?.();
     }
 
+    /**
+     * Builds the `modal-dialog` CSS class string from `@size` and `@scrollable`.
+     * @memberOf BsModal
+     */
     get dialogClass() {
         const parts = ['modal-dialog'];
         if (this.args.size) {

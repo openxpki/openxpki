@@ -10,22 +10,21 @@ import { debug } from '@ember/debug'
  * <OxiSection @content={{this.section}} @meta={{this.meta}} @onInit={{this.onInit}} />
  * ```
  *
- * @param { object } content - Section descriptor object:
- *   - `type` { string } - Section type key, e.g. `'keyvalue'`, `'form'`, `'grid'`,
- *     `'button'`, `'text'`, `'chart'`, `'cards'`, `'tiles'`. Determines which
- *     sub-component is loaded.
- *   - `content` { object } - Data passed to the sub-component as `@def`. May
- *     contain a `label` and `description` shown as heading/subheading (except
- *     for `type: 'button'` where the label lives on the button itself).
- *   - `action` { string } - Form submit action (forwarded to `oxi-section/form`).
- *   - `reset` { string } - Form reset action (forwarded to `oxi-section/form`).
- *   - `className` { string } - Extra CSS class (forwarded to `oxi-section/grid`).
- *   - `compact` { boolean } - Reduce padding/margin for embedded use.
- * @param { object } meta - Rendering metadata provided by the parent page:
- *   - `renderAsCard` { boolean } - Wrap the section in a Bootstrap card.
- *   - `isInfoBox` { boolean } - Suppress the left margin indent.
- * @param { function } [onInit] - Optional callback invoked once the section
- *   DOM element has been inserted (via the `on-init` modifier).
+ * @param { object } content - Section descriptor object.
+ * @param { string } content.type - Section type key, e.g. `'keyvalue'`, `'form'`, `'grid'`,
+ *   `'button'`, `'text'`, `'chart'`, `'cards'`, `'tiles'`. Determines which sub-component is loaded.
+ * @param { object } content.content - Data passed to the sub-component as `@def`. May
+ *   contain a `label` and `description` shown as heading/subheading (except
+ *   for `type: 'button'` where the label lives on the button itself).
+ * @param { string } [content.action] - Form submit action (forwarded to `oxi-section/form`).
+ * @param { string } [content.reset] - Form reset action (forwarded to `oxi-section/form`).
+ * @param { string } [content.className] - Extra CSS class (forwarded to `oxi-section/grid`).
+ * @param { boolean } [content.compact] - Reduce padding/margin for embedded use.
+ * @param { object } [meta] - Rendering metadata provided by the parent page.
+ * @param { boolean } [meta.renderAsCard] - Wrap the section in a Bootstrap card.
+ * @param { boolean } [meta.isInfoBox] - Suppress the left margin indent.
+ * @param { function } [onInit] - Callback invoked once the section DOM element has been inserted
+ *   (via the `on-init` modifier).
  *
  * @class OxiSection
  * @extends Component
@@ -37,11 +36,21 @@ const sectionModules = Object.fromEntries(
 )
 
 export default class OxiSectionComponent extends Component {
+    /**
+     * Returns the resolved sub-component class for `content.type`, or `undefined`
+     * when the type is unknown.
+     * @memberOf OxiSection
+     */
     get sectionComponent() {
         debug(`oxi-section: importing ./${this.args.content.type}`)
         return sectionModules[this.args.content.type]?.default
     }
 
+    /**
+     * Returns the section content merged with top-level section properties
+     * (`action`, `reset`, `className`) that sub-components expect inside `@def`.
+     * @memberOf OxiSection
+     */
     get data() {
         return {
             ...this.args.content?.content,
@@ -52,6 +61,10 @@ export default class OxiSectionComponent extends Component {
         }
     }
 
+    /**
+     * Returns the merged metadata object, adding `isCompact` derived from `content.compact`.
+     * @memberOf OxiSection
+     */
     get meta() {
         return {
             ...(this.args.meta ?? {}),
@@ -59,6 +72,11 @@ export default class OxiSectionComponent extends Component {
         }
     }
 
+    /**
+     * Returns the section heading label, or `null` for `type: "button"` sections
+     * where the label lives on the button itself.
+     * @memberOf OxiSection
+     */
     get label() {
         // Button labels are on the button, not above
         return this.args.content.type === 'button'
@@ -66,6 +84,10 @@ export default class OxiSectionComponent extends Component {
             : this.args.content?.content?.label
     }
 
+    /**
+     * Invokes `@onInit` once after the section element has been inserted into the DOM.
+     * @memberOf OxiSection
+     */
     @action
     initialized() {
         if (this.args.onInit) this.args.onInit();

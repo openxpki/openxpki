@@ -19,41 +19,39 @@ import ChartLineBar from './chart-line-bar';
  *   values for each series:
  *   `[ [x1, a1, b1, ...], [x2, a2, b2, ...], ... ]`
  *
- * @param { object } options - Display options for the chart:
+ * @param { object } options - Display options for the chart.
  *
- *   **Layout**
- *   - `type` { string } - Chart type: `'line'` (default), `'bar'`, or `'pie'`
- *   - `width` { number|string } - Chart width in px, or `'auto'` to fill the container width. Default: `'auto'`
- *   - `height` { number|string } - Chart height in px, or `'auto'` to fill the container height. Default: `'auto'`
- *   - `title` { string } - Chart title shown above the plot. Default: `""`
- *   - `cssClass` { string } - Extra CSS class added to the uPlot root element. Default: `null`
+ * Layout:
+ * @param { string } [options.type] - Chart type: `'line'` (default), `'bar'`, or `'pie'`.
+ * @param { number|string } [options.width] - Chart width in px, or `'auto'` to fill the container. Default: `'auto'`
+ * @param { number|string } [options.height] - Chart height in px, or `'auto'` to fill the container. Default: `'auto'`
+ * @param { string } [options.title] - Chart title shown above the plot. Default: `""`
+ * @param { string } [options.cssClass] - Extra CSS class added to the uPlot root element. Default: `null`
  *
- *   **X axis** (line/bar only)
- *   - `x_is_timestamp` { boolean } - Treat X values as Unix timestamps (seconds).
- *     Default: `true`
- *   - `bar_vertical` { boolean } - Render bar chart with vertical bars (i.e. horizontal layout).
- *     Default: `false`
+ * X axis (line/bar only):
+ * @param { boolean } [options.x_is_timestamp] - Treat X values as Unix timestamps (seconds). Default: `true`
+ * @param { boolean } [options.bar_vertical] - Render bar chart with vertical bars (horizontal layout). Default: `false`
  *
- *   **Legend**
- *   - `legend_label` { boolean } - Show series labels in the legend.
- *     Default: `true` when `options.series` is provided, `false` otherwise
- *   - `legend_value` { boolean } - Show live data values at the cursor position in the legend
- *     (line/bar only). Default: `false`
- *   - `legend_position` { string } - Legend placement: `'bottom'` (default), `'right'`, or `'left'`
- *   - `legend_date_format` { string } - Date format string for the X value shown in the legend
- *     (line chart with `x_is_timestamp` only).
- *     Tokens: `{YYYY}` `{MM}` `{DD}` `{HH}` `{mm}` `{ss}`.
- *     Default: `'{YYYY}-{MM}-{DD}, {HH}:{mm}:{ss}'`
+ * Legend:
+ * @param { boolean } [options.legend_label] - Show series labels in the legend.
+ *   Default: `true` when `options.series` is provided, `false` otherwise.
+ * @param { boolean } [options.legend_value] - Show live data values at the cursor position in the legend
+ *   (line/bar only). Default: `false`
+ * @param { string } [options.legend_position] - Legend placement: `'bottom'` (default), `'right'`, or `'left'`.
+ * @param { string } [options.legend_date_format] - Date format string for the X value shown in the legend
+ *   (line chart with `x_is_timestamp` only).
+ *   Tokens: `{YYYY}` `{MM}` `{DD}` `{HH}` `{mm}` `{ss}`.
+ *   Default: `'{YYYY}-{MM}-{DD}, {HH}:{mm}:{ss}'`
  *
- *   **Series** (array of per-series objects, one entry per data column after X)
- *   - `series` { array } - Series configuration. Each entry may contain:
- *     - `label` { string } - Series label shown in the legend. Default: `''`
- *     - `color` { string } - CSS color string for the stroke/fill. Default: auto-generated palette
- *     - `fill` { string } - Fill color (line chart only). Default: `color` at 10 % opacity
- *     - `line_width` { number } - Stroke width in CSS px (line chart only). Default: `1`
- *     - `scale` { string|Array } - Y scale to bind this series to.
- *       Use `'auto'` (default) for a shared auto-ranging scale, `'%'` for a 0–100 % scale,
- *       or a two-element array `[min, max]` to create a fixed-range scale.
+ * Series (one entry per data column after X):
+ * @param { array } [options.series] - Per-series configuration.
+ * @param { string } [options.series[].label] - Series label shown in the legend. Default: `''`
+ * @param { string } [options.series[].color] - CSS color string for the stroke/fill. Default: auto-generated palette.
+ * @param { string } [options.series[].fill] - Fill color (line chart only). Default: `color` at 10 % opacity.
+ * @param { number } [options.series[].line_width] - Stroke width in CSS px (line chart only). Default: `1`
+ * @param { string|Array } [options.series[].scale] - Y scale to bind this series to.
+ *   Use `'auto'` (default) for a shared auto-ranging scale, `'%'` for a 0-100 % scale,
+ *   or a two-element array `[min, max]` to create a fixed-range scale.
  *
  * @class OxiBase::Chart
  */
@@ -116,6 +114,12 @@ export default class OxiChartComponent extends Component {
         );
     }
 
+    /**
+     * Renders the chart into `element` by delegating to {@link ChartLineBar} or
+     * {@link ChartPie} based on `options.type`. Registers cleanup destructors for
+     * `ResizeObserver` teardown.
+     * @memberOf OxiBase::Chart
+     */
     @action
     async plot(element) {
         const type = this.args.options.type;

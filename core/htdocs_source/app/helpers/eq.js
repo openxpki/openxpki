@@ -12,6 +12,10 @@ import Helper from "@ember/component/helper";
  * @module helper/eq
  */
 export default class Eq extends Helper {
+    /**
+     * Returns `true` when `a == b`.
+     * @memberOf module:helper/eq
+     */
     compute([a, b]) {
         return a == b;
     }

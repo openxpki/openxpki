@@ -3,6 +3,13 @@ import { tracked } from '@glimmer/tracking'
 import { action } from '@ember/object'
 import { service } from '@ember/service'
 
+/**
+ * Controller for the `/openxpki/:page/popup/:popup_page` route.
+ * Manages the `popupBackButton` query parameter and the back-navigation action.
+ *
+ * @class OpenXpkiPopupController
+ * @extends Controller
+ */
 export default class OpenXpkiController extends Controller {
     @service('oxi-content') content
 
@@ -18,6 +25,10 @@ export default class OpenXpkiController extends Controller {
     queryParams = [ 'popupBackButton' ]
     @tracked popupBackButton = false
 
+    /**
+     * Navigates back in browser history (used by the popup back button).
+     * @memberOf OpenXpkiPopupController
+     */
     @action
     goBack() {
         history.back()

@@ -11,6 +11,13 @@ import config from "./config/environment";
 import setupInspector from "@embroider/legacy-inspector-support/ember-source-4.12";
 import compatModules from "@embroider/virtual/compat-modules";
 
+/**
+ * Root Ember application class. Wires the resolver, compat modules, and the
+ * Ember Inspector devtools extension.
+ *
+ * @class App
+ * @extends Application
+ */
 export default class App extends Application {
   modulePrefix = config.modulePrefix;
   podModulePrefix = config.podModulePrefix;

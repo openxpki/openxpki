@@ -33,6 +33,10 @@ export default class OxiClickableComponent extends Component {
     clickable = null
     @tracked showConfirmDialog = false
 
+    /**
+     * Returns `true` when the clickable has an `href` (link mode).
+     * @memberOf OxiBase::Clickable
+     */
     get isLink() {
         return this.clickable.href ? true : false
     }
@@ -42,6 +46,11 @@ export default class OxiClickableComponent extends Component {
         this.clickable = Clickable.fromHash(this.args.clickable)
     }
 
+    /**
+     * Handles a click: shows a confirmation dialog if `clickable.confirm` is set,
+     * otherwise calls `executeAction()` directly.
+     * @memberOf OxiBase::Clickable
+     */
     @action
     click(event) {
         debug("oxi-base/clickable: click")
@@ -61,6 +70,11 @@ export default class OxiClickableComponent extends Component {
         }
     }
 
+    /**
+     * Executes the clickable's action: calls `onClick`, opens a link, triggers a backend
+     * action, or navigates to a page. Resets the confirm state first.
+     * @memberOf OxiBase::Clickable
+     */
     @action
     executeAction() {
         this.resetConfirmState()
@@ -103,6 +117,10 @@ export default class OxiClickableComponent extends Component {
         }
     }
 
+    /**
+     * Clears the loading state and hides the confirmation dialog.
+     * @memberOf OxiBase::Clickable
+     */
     @action
     resetConfirmState() {
         emSet(this.clickable, "loading", false)

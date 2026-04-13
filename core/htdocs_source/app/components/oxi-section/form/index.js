@@ -17,16 +17,16 @@ import { next } from '@ember/runloop'
  * <OxiSection::Form @def={{this.def}} @meta={{this.meta}} />
  * ```
  *
- * @param { object } def - Section definition:
- *   - `action` { string } - Backend action name to call on submit.
- *   - `fields` { array } - List of field definition hashes (see {@link Field}).
- *   - `submit_label` { string } - Label for the submit button. Default: i18n key `component.oxisection_form.submit`.
- *   - `reset` { string } - If set, a reset button is shown; value is the page to navigate to.
- *   - `reset_label` { string } - Label for the reset button. Default: i18n key `component.oxisection_form.reset`.
- *   - `buttons` { array } - Additional {@link ContainerButton} definitions appended after submit/reset.
- * @param { object } [meta] - Optional metadata passed down from the page:
- *   - `isPopup` { boolean } - Whether the form is rendered inside a popup.
- *   - `sectionNo` { number } - Section index used to prioritize focus assignment.
+ * @param { object } def - Section definition.
+ * @param { string } def.action - Backend action name to call on submit.
+ * @param { array } def.fields - List of field definition hashes (see {@link Field}).
+ * @param { string } [def.submit_label] - Label for the submit button. Default: i18n key `component.oxisection_form.submit`.
+ * @param { string } [def.reset] - If set, a reset button is shown; value is the page to navigate to.
+ * @param { string } [def.reset_label] - Label for the reset button. Default: i18n key `component.oxisection_form.reset`.
+ * @param { array } [def.buttons] - Additional {@link ContainerButton} definitions appended after submit/reset.
+ * @param { object } [meta] - Metadata passed down from the page.
+ * @param { boolean } [meta.isPopup] - Whether the form is rendered inside a popup.
+ * @param { number } [meta.sectionNo] - Section index used to prioritize focus assignment.
  *
  * @class OxiSection::Form
  * @extends Component
@@ -44,6 +44,11 @@ export default class OxiSectionFormComponent extends Component {
     dependants = {} // dependent fields by parent field name
     #actionOnChangeSeq = new Map() // field.name -> latest request sequence number
 
+    /**
+     * Returns the ordered list of {@link ContainerButton} objects to render below the form:
+     * submit button (with loading state), optional reset button, then any extra `def.buttons`.
+     * @memberOf OxiSection::Form
+     */
     get buttons() {
         let buttons = []
 
@@ -67,6 +72,11 @@ export default class OxiSectionFormComponent extends Component {
         return buttons
     }
 
+    /**
+     * Returns `true` for fields that should be rendered visibly (i.e. not `hidden` or `encrypted`).
+     * Used as a filter callback.
+     * @memberOf OxiSection::Form
+     */
     hiddenFieldFilter(f) {
         return f.type !== "hidden" && f.type !== "encrypted"
     }
@@ -198,6 +208,11 @@ export default class OxiSectionFormComponent extends Component {
         }
     }
 
+    /**
+     * Returns a deduplicated list of field names in their original order.
+     * Used to iterate over logical fields regardless of clonable duplicates.
+     * @memberOf OxiSection::Form
+     */
     get uniqueFieldNames() {
         let result = []
         for (const field of this.fields) {
@@ -206,10 +221,19 @@ export default class OxiSectionFormComponent extends Component {
         return result
     }
 
+    /**
+     * Returns the subset of fields that are not of type `hidden` or `encrypted`.
+     * @memberOf OxiSection::Form
+     */
     get visibleFields() {
         return this.fields.filter(this.hiddenFieldFilter)
     }
 
+    /**
+     * Inserts a blank clone of `field` directly after it and updates clone metadata.
+     * No-op when `field._canAdd` is `false`.
+     * @memberOf OxiSection::Form
+     */
     @action
     addClone(field) {
         if (field._canAdd === false) return
@@ -220,6 +244,11 @@ export default class OxiSectionFormComponent extends Component {
         this.#updateCloneFields()
     }
 
+    /**
+     * Removes `field` from the field list and updates clone metadata.
+     * No-op when `field._canDelete` is `false`.
+     * @memberOf OxiSection::Form
+     */
     @action
     delClone(field) {
         if (field._canDelete === false) return
@@ -441,6 +470,11 @@ export default class OxiSectionFormComponent extends Component {
         return this.#encodeFields({ fieldNames, renameMap, includeEmpty: true })
     }
 
+    /**
+     * Returns the number of non-hidden fields in the original `def.fields` definition.
+     * Used by templates to decide layout (e.g. single-field compactness).
+     * @memberOf OxiSection::Form
+     */
     get originalFieldCount() {
         return this.args.def.fields.filter(this.hiddenFieldFilter).length
     }
@@ -482,6 +516,12 @@ export default class OxiSectionFormComponent extends Component {
         this.content.registerFocusElement(meta.isPopup, true, element, meta.sectionNo, index)
     }
 
+    /**
+     * Validates all fields, encodes non-empty field values, and submits them to
+     * `def.action`. Sets `loading` during the request. On response, applies any
+     * per-field server-side error messages returned in `status.field_errors`.
+     * @memberOf OxiSection::Form
+     */
     @action
     async submit() {
         debug(`oxi-section/form (${this.args.def.action}): submit`)
