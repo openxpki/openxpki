@@ -3,6 +3,9 @@
     {{#if @def.image}}
         <img src={{@def.image}} alt="" />
         <br/>
+    {{else if this.icon}}
+        <span class="fs-2 {{this.icon}} oxi-section-button-icon"></span>
+        <br/>
     {{/if}}
     {{@def.label}}
 </OxiBase::Button>

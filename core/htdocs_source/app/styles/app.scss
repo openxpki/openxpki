@@ -729,6 +729,10 @@ div.oxifield-upload {
     flex-direction: column;
     justify-content: center;
   }
+
+  .oxi-section-button-icon {
+    color: color-mix(in srgb, var(--bs-btn-color) 75%, var(--bs-body-bg));
+  }
 }
 
 // Bootstrap responsive classes re-implemented as container queries so that

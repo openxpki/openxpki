@@ -152,6 +152,20 @@ export default [{
                     page: 'crl!index',
                 },
             },
+            {
+                type: 'button', content: {
+                    label: 'PKI Operation',
+                    icon: 'glyphicon-wrench',
+                    page: 'info',
+                },
+            },
+            {
+                type: 'button', content: {
+                    label: 'Mobile Devices',
+                    icon: 'bi-phone-flip',
+                    page: 'mobile',
+                },
+            },
         ],
     },
 }]
