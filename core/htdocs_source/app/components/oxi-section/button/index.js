@@ -9,7 +9,9 @@ import Component from '@glimmer/component'
  *
  * @param { object } def - Section definition (passed through to {@link OxiBase::Button}).
  * @param { string } def.label - Button label text.
- * @param { string } [def.image] - URL of an image shown above the label.
+ * @param { string } [def.description] - Subtext rendered below the label inside the tile.
+ * @param { string } [def.image] - URL of an image shown above the label (takes precedence over `icon`).
+ * @param { string } [def.icon] - Icon class name; `glyphicon-*` / `bi-*` prefixes are expanded automatically.
  * @param { string } [def.tooltip] - Tooltip text.
  * @param { string } [def.format] - Button style override. Default: `'tile'`
  * @param { boolean } [def.disabled] - Disable the button.

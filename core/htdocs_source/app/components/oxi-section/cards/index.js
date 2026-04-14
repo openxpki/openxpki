@@ -10,8 +10,6 @@ import Clickable from 'openxpki/data/clickable'
  * ```
  *
  * @param { object } def - Card section definition.
- * @param { string } [def.label] - Section heading.
- * @param { string } [def.description] - Subheading shown below the label.
  * @param { boolean } [def.vertical] - Stack cards vertically instead of horizontally. Default: `false`
  * @param { array } def.cards - List of card descriptors.
  * @param { string } def.cards[].label - Card title.

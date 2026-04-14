@@ -11,8 +11,6 @@ import { guidFor } from '@ember/object/internals'
  * ```
  *
  * @param { object } def - Section definition.
- * @param { string } [def.label] - Section heading. Default: `""`
- * @param { string } [def.description] - Subheading shown below the label. Default: `""`
  * @param { array } def.data - List of items to display.
  * @param { string } [def.data[].label] - Row label shown in the left column. Omit to hide the label column entirely.
  * @param { string } def.data[].value - The value to display, passed to {@link OxiBase::Formatted}.

@@ -4,25 +4,28 @@ import { debug } from '@ember/debug'
 
 /**
  * Universal section dispatcher - renders a single content section by
- * dynamically loading the sub-component that matches `@content.type`.
+ * dynamically loading the sub-component that matches `@def.type`.
  *
  * ```html
- * <OxiSection @content={{this.section}} @meta={{this.meta}} @onInit={{this.onInit}} />
+ * <OxiSection @def={{this.section}} @meta={{this.meta}} @onInit={{this.onInit}} />
  * ```
  *
- * @param { object } content - Section descriptor object.
- * @param { string } content.type - Section type key, e.g. `'keyvalue'`, `'form'`, `'grid'`,
+ * @param { object } def - Section descriptor object.
+ * @param { string } def.type - Section type key, e.g. `'keyvalue'`, `'form'`, `'grid'`,
  *   `'button'`, `'text'`, `'chart'`, `'cards'`, `'tiles'`. Determines which sub-component is loaded.
- * @param { object } content.content - Data passed to the sub-component as `@def`. May
- *   contain a `label`, `description` and `footer` shown as heading/subheading/footer text (except
- *   for `type: 'button'` where the description lives on the button itself).
- * @param { string } [content.action] - Form submit action (forwarded to `oxi-section/form`).
- * @param { string } [content.reset] - Form reset action (forwarded to `oxi-section/form`).
- * @param { string } [content.className] - Extra CSS class (forwarded to `oxi-section/grid`).
- * @param { boolean } [content.compact] - Reduce padding/margin for embedded use.
- * @param { object } [meta] - Rendering metadata provided by the parent page.
+ * @param { string } [def.label] - Heading text rendered above the section.
+ * @param { string } [def.description] - Subheading text rendered below the label
+ *   (suppressed for `type: 'button'` where the description lives on the button itself).
+ * @param { string } [def.cssClass] - Extra CSS class(es) added to the top level `<div>` of this section.
+ * @param { boolean } [def.compact] - Reduce padding/margin for embedded use.
+ * @param { object } def.content - Data passed to the sub-component as `@def`.
+ * @param { string } [def.content.label] - Legacy alias for `def.label`.
+ * @param { string } [def.content.description] - Legacy alias for `def.description`.
+ * @param { string } [def.content.footer] - Footer text rendered below the section body.
+ * @param { object } [meta] - Rendering metadata provided by the parent component.
  * @param { boolean } [meta.renderAsCard] - Wrap the section in a Bootstrap card.
  * @param { boolean } [meta.isInfoBox] - Suppress the left margin indent.
+ * @param { string } [cssClass] - Extra CSS class added to the top-level element of this component.
  * @param { function } [onInit] - Callback invoked once the section DOM element has been inserted
  *   (via the `on-init` modifier).
  *

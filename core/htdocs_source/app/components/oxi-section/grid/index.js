@@ -17,8 +17,6 @@ import Pager from 'openxpki/data/pager'
  * ```
  *
  * @param { object } def - Section definition.
- * @param { string } [def.label] - Section heading. Default: `""`
- * @param { string } [def.description] - Subheading shown below the label. Default: `""`
  * @param { array } def.columns - Column descriptors.
  * @param { string } def.columns[].sTitle - Column title. Columns whose title starts with `_`
  *   are hidden; `_status` / `_className` provide a per-row CSS class.
@@ -26,6 +24,9 @@ import Pager from 'openxpki/data/pager'
  * @param { number } [def.columns[].bVisible] - Set to `0` to hide the column. Default: `1`
  * @param { string } [def.columns[].sortkey] - Key used for server-side (or client-side) sorting.
  *   Omit to make the column non-sortable.
+ * @param { string } [def.empty] - Message shown in the table body when there are no data rows.
+ *   Default: `"&nbsp;"` (non-breaking space).
+ * @param { string } [def.footer] - Text rendered in a `<tfoot>` row below the table body.
  * @param { array } def.data - Row data as a 2-D array; each inner array contains one value per
  *   column (positional, matching `columns`).
  * @param { array } [def.actions] - Row-level action descriptors (rendered as icon buttons per row).
