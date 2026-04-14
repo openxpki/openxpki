@@ -24,9 +24,9 @@ function additionalGridRows() {
 
 export default [{
     type: "grid",
-    className: "certificate",
+    label: "Grid",
+    cssClass: "certificate",
     content: {
-        label: "Grid",
         empty: "No data available",
         buttons: [
             {

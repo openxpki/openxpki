@@ -1,6 +1,6 @@
 let line = {
     type: 'chart',
-    className: 'test-chart',
+    cssClass: 'test-chart',
     content: {
         options: {
             type: 'line',
@@ -29,7 +29,7 @@ let line = {
 
 let bar = {
     type: 'chart',
-    className: 'test-chart',
+    cssClass: 'test-chart',
     content: {
         options: {
             type: 'bar',
@@ -60,7 +60,7 @@ let bar = {
 
 let pie = {
     type: 'chart',
-    className: 'test-chart',
+    cssClass: 'test-chart',
     content: {
         options: {
             type: 'pie',
@@ -107,9 +107,9 @@ pie_left.content.options.legend_position = 'left';
 export default [
     {
         type: 'chart',
-        className: 'test-chart',
+        label: "Chart",
+        cssClass: 'test-chart',
         content: {
-            label: "Chart",
             options: {
                 type: 'bar',
                 title: 'Bar: one group',

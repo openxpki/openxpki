@@ -42,22 +42,27 @@ export default class OxiSectionComponent extends Component {
      * @memberOf OxiSection
      */
     get sectionComponent() {
-        debug(`oxi-section: importing ./${this.args.content.type}`)
-        return sectionModules[this.args.content.type]?.default
+        debug(`oxi-section: importing ./${this.args.def.type}`)
+        return sectionModules[this.args.def.type]?.default
     }
 
     /**
      * Returns the section content merged with top-level section properties
-     * (`action`, `reset`, `className`) that sub-components expect inside `@def`.
+     * (`action`, `reset`) that sub-components expect inside `@def`.
      * @memberOf OxiSection
      */
     get data() {
         return {
-            ...this.args.content?.content,
-            // map some inconsistently placed properties into the section data
-            action:     this.args.content?.action,       // used by oxi-section/form
-            reset:      this.args.content?.reset,        // used by oxi-section/form
-            className:  this.args.content?.className,    // used by oxi-section/grid
+            ...this.args.def?.content,
+            // Button labels are on the button, not within the common section component
+            ...(this.args.def.type === 'button' ? {
+                description: this.args.def?.description ?? this.args.def?.content?.description,
+            } : {}),
+            // Legacy compatibility to some inconsistently placed properties
+            ...(this.args.def.type === 'form' ? {
+                action: this.args.def?.content?.action ?? this.args.def?.action,
+                reset:  this.args.def?.content?.reset ?? this.args.def?.reset,
+            } : {}),
         }
     }
 
@@ -68,20 +73,39 @@ export default class OxiSectionComponent extends Component {
     get meta() {
         return {
             ...(this.args.meta ?? {}),
-            isCompact: this.args.content?.compact ? true : false,
+            isCompact: this.args.def?.compact ? true : false,
         }
     }
 
     /**
+     * Returns the section label.
+     * @memberOf OxiSection
+     */
+    get label() {
+        return this.args.def?.label
+            ?? this.args.def?.content?.label;
+    }
+
+    /**
      * Returns the section description, or `null` for `type: "button"` sections
-     * where the description lives on the button itself.
+     * where the description is the button label.
      * @memberOf OxiSection
      */
     get description() {
-        // Button labels are on the button, not above
-        return this.args.content.type === 'button'
-            ? null
-            : this.args.content?.content?.description
+        // Button descriptions are on the button, not above
+        return this.args.def.type !== 'button' ? (
+              this.args.def?.description
+           ?? this.args.def?.content?.description
+           ) : null
+    }
+
+    /**
+     * Returns the section footer.
+     * @memberOf OxiSection
+     */
+    get footer() {
+        return this.args.def?.footer
+            ?? this.args.def?.content?.footer;
     }
 
     /**

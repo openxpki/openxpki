@@ -20,7 +20,7 @@ const SESSION_ID = 'mock-session-test-1'
 const RTOKEN     = 'mock-rtoken-test-1'
 
 // Helper: derive nav label from the first section's content label.
-const label = (main) => main[0].content.label
+const label = (main) => main[0].label ?? main[0].description ?? '[?]'
 
 // nav() builds a clickable nav entry from a page key and its main content.
 const nav = (key, main) => ({ label: label(main), key, page: key, main })

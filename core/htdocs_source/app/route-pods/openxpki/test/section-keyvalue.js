@@ -1,9 +1,9 @@
 // prettier-ignore
 export default [{
     type: "keyvalue",
+    label: "Key-Value",
+    description: "This is a first test",
     content: {
-        label: "Key-Value",
-        description: "This is a first test",
         data: [
             {
                 format: "head",

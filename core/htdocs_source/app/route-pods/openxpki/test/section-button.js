@@ -1,29 +1,33 @@
 export default [
     {
-        type: 'button', content: {
-            label: 'Button',
+        type: 'button',
+        description: 'Button',
+        content: {
             format: 'primary',
             page: 'test',
         },
     },
     {
-        type: 'button', content: {
-            label: 'Submit',
+        type: 'button',
+        description: 'Submit',
+        content: {
             format: 'submit',
             action: 'test!submit',
         },
     },
     {
-        type: 'button', content: {
-            label: 'External link',
+        type: 'button',
+        description: 'External link',
+        content: {
             format: 'optional',
             href: 'https://www.openxpki.org',
             target: '_blank',
         },
     },
     {
-        type: 'button', content: {
-            label: 'Request certificate',
+        type: 'button',
+        description: 'Request certificate',
+        content: {
             image: 'img/request.png',
             page: 'workflow!index!wf_type!certificate_signing_request_v2',
         },

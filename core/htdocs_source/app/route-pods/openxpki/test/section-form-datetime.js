@@ -1,11 +1,10 @@
 export default [
     {
         type: "form",
-        action: "login!password",
-        reset: "login!password",
+        label: "Datetime",
         content: {
-            label: "Datetime",
-            title: "Datetime",
+            action: "login!password",
+            reset: "login!password",
             fields: [
                 {
                     type: "datetime",

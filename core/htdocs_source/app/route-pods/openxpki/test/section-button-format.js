@@ -63,10 +63,10 @@ for (const format of [
 
 export default [{
     type: "form",
+    label: "Button formats",
     action: "login!text",
     reset: "login!text",
     content: {
-        label: "Button formats",
         fields: [],
         buttons,
     },

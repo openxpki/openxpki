@@ -43,7 +43,7 @@
 
             {{#each popup.main as |mainEntry index|}}
                 <OxiSection
-                    @content={{mainEntry}}
+                    @def={{mainEntry}}
                     @meta={{hash isPopup=true sectionNo=index}}
                 />
             {{/each}}

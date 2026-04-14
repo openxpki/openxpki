@@ -1,11 +1,10 @@
 export default [
     {
         type: "form",
-        action: "login!password",
-        reset: "login!password",
+        label: "Cloneable fields",
         content: {
-            label: "Cloneable fields",
-            title: "Cloneable fields",
+            action: "login!password",
+            reset: "login!password!reset",
             fields: [
                 {
                     type: "text",

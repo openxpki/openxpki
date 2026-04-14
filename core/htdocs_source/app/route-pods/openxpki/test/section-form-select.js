@@ -1,11 +1,10 @@
 export default [
     {
         type: "form",
-        action: "login!password",
-        reset: "login!password",
+        label: "Bool + Select",
         content: {
-            label: "Bool + Select",
-            title: "Bool + Select",
+            action: "login!password",
+            reset: "login!password",
             fields: [
                 {
                     type: "bool",

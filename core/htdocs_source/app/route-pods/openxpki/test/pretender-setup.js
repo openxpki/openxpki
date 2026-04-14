@@ -31,7 +31,7 @@ export async function setupPretender() {
         if (page === 'tooltip!chart') {
             return [200, { 'Content-Type': 'application/json' }, JSON.stringify({
                 type: 'chart',
-                className: 'test-chart',
+                cssClass: 'test-chart',
                 content: {
                     options: { type: 'pie', title: 'Pie', width: 300, height: 150,
                                series: [{ label: 'Requested' }, { label: 'Renewed' }, { label: 'Revoked' }] },

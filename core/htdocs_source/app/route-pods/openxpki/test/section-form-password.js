@@ -1,11 +1,10 @@
 export default [
     {
         type: "form",
-        action: "login!password",
-        reset: "login!password",
+        label: "Password",
         content: {
-            label: "Password",
-            title: "Password",
+            action: "login!password",
+            reset: "login!password",
             fields: [
                 {
                     type: "password",

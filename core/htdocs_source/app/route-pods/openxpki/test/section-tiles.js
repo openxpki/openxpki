@@ -1,9 +1,9 @@
 // prettier-ignore
 export default [{
     type: "tiles",
+    label: "Tiles",
+    description: "",
     content: {
-        label: "Tiles",
-        description: "",
         maxcol: 4,
         border: 1,
         tiles: [
@@ -39,7 +39,7 @@ export default [{
             'newline',
             {
                 type: 'chart',
-                className: 'test-chart',
+                cssClass: 'test-chart',
                 content: {
                     options: {
                         type: 'bar',
@@ -68,7 +68,7 @@ export default [{
             },
             {
                 type: 'chart',
-                className: 'test-chart',
+                cssClass: 'test-chart',
                 content: {
                     options: {
                         type: 'pie',

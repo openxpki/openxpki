@@ -1,11 +1,10 @@
 export default [
     {
         type: "form",
-        action: "login!password",
-        reset: "login!password",
+        label: "Various",
         content: {
-            label: "Various",
-            title: "Various",
+            action: "login!password",
+            reset: "login!password",
             fields: [
                 {
                     type: "rawtext",

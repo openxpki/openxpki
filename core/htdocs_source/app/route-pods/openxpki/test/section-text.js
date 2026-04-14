@@ -1,10 +1,10 @@
 // prettier-ignore
 export default [{
     "type": "text",
+    "label": "Text",
+    "description": "Generates a new RA certificate and registers it as active RA token.",
+    "footer": "This text should help you understand everything from first principles.",
     "content": {
-        "label": "Text",
-        "description": "Generates a new RA certificate and registers it as active RA token.",
-        "footer": "This text should help you understand everything from first principles.",
         "buttons": [
             {
                 "page": "openxpki.test.text",

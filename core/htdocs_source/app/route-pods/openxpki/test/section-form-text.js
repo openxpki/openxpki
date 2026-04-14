@@ -8,11 +8,10 @@ const _testButton = {
 export default [
     {
         type: "form",
-        action: "login!text",
-        reset: "login!text",
+        label: "Text",
         content: {
-            label: "Text",
-            title: "Text",
+            action: "login!text",
+            reset: "login!text",
             fields: [
                 {
                     type: "text",

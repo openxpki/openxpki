@@ -1,8 +1,8 @@
 export default [{
     type: "cards",
+    label: "Cards",
+    description: "Please select a realm for your certificate request:",
     content: {
-        label: "Cards",
-        description: "Please select a realm for your certificate request:",
         cards: [
             {
                 label: 'Terra',

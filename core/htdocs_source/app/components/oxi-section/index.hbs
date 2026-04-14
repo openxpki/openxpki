@@ -1,11 +1,11 @@
 <!-- components/oxi-section -->
 {{#if @meta.renderAsCard}}
 
-    <div class="card bg-body-tertiary mb-3 ms-md-3">
+    <div class="card bg-body-tertiary mb-3 ms-md-3 {{@def.cssClass}}">
 
-        {{#if @content.content.label}}
+        {{#if this.label}}
             <div class="card-header px-2 {{unless this.meta.isCompact "py-2"}}">
-                <h4 class="oxi-section-label">{{@content.content.label}}</h4>
+                <h4 class="oxi-section-label">{{this.label}}</h4>
             </div>
         {{/if}}
 
@@ -22,9 +22,9 @@
             />
         </div>
 
-        {{#if @content.content.footer}}
+        {{#if this.footer}}
             <div class="card-footer text-body-secondary oxi-section-footer">
-                {{defuse @content.content.footer}}
+                {{defuse this.footer}}
             </div>
         {{/if}}
 
@@ -32,9 +32,9 @@
 
 {{else}}
 
-    <div class="mt-1 {{if this.meta.isCompact "oxi-compact" "mb-3"}}">
-        {{#if @content.content.label}}
-            <h4 class="oxi-section-label">{{@content.content.label}}</h4>
+    <div class="mt-1 {{if this.meta.isCompact "oxi-compact" "mb-3"}} {{@def.cssClass}}">
+        {{#if this.label}}
+            <h4 class="oxi-section-label">{{this.label}}</h4>
         {{/if}}
         {{#if this.description}}
             <div class="oxi-section-description {{unless this.meta.isCompact "mb-3"}}">
@@ -49,9 +49,9 @@
             />
         </div>
 
-        {{#if @content.content.footer}}
+        {{#if this.footer}}
             <div class="oxi-section-footer">
-                {{defuse @content.content.footer}}
+                {{defuse this.footer}}
             </div>
         {{/if}}
 

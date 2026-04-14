@@ -116,7 +116,7 @@
                 <div class="row">
                     <div class="col {{if (eq entry.type "form") "col-xl-10"}}">
                         <OxiSection
-                            @content={{entry}}
+                            @def={{entry}}
                             @meta={{hash sectionNo=index renderAsCard=(and (not entry.compact) (eq entry.type "keyvalue") (not entry.content.buttons))}}
                         />
                     </div>

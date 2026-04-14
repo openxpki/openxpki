@@ -1,11 +1,10 @@
 export default [
     {
         type: "form",
-        action: "login!password",
-        reset: "login!password",
+        label: "Select with dependants",
         content: {
-            label: "Select with dependants",
-            title: "Select with dependants",
+            action: "login!password",
+            reset: "login!password",
             fields: [
                 {
                     type: "select",
