@@ -97,7 +97,7 @@ sub init_list ($self, $args) {
 
     $self->main->add_section({
         type => 'grid',
-        className => 'crl',
+        cssClass => 'crl',
         content => {
             actions => [{
                 page => 'crl!detail!crl_key!{crl_key}',

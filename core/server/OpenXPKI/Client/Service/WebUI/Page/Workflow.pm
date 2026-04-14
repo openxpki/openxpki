@@ -288,7 +288,7 @@ sub __render_task_list ($self, $item) {
 
     $self->main->add_section({
         type => 'grid',
-        className => 'workflow',
+        cssClass => 'workflow',
         content => {
             label => $item->{label},
             description => $item->{description},
@@ -681,7 +681,7 @@ sub render_from_workflow {
                     $self->log->trace('Adding grid ' . Dumper $field) if $self->log->is_trace;
                     $self->main->add_section({
                         type => 'grid',
-                        className => $field->{className} || 'workflow',
+                        cssClass => $field->{className} || 'workflow',
                         content => {
                             label => $field->{label} || '',
                             actions => ($field->{action} ? [{
@@ -701,7 +701,7 @@ sub render_from_workflow {
                     $self->log->trace('Adding chart ' . Dumper $field) if $self->log->is_trace;
                     $self->main->add_section({
                         type => 'chart',
-                        className => $field->{className}//'',
+                        cssClass => $field->{className} // '',
                         content => {
                             label => $field->{label} || '',
                             options => $field->{options},

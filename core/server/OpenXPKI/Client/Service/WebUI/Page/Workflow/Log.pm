@@ -32,7 +32,7 @@ sub init_log ($self, $args) {
 
     $self->main->add_section({
         type => 'grid',
-        className => 'workflow',
+        cssClass => 'workflow',
         content => {
             columns => [
                 { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_LOG_TIMESTAMP_LABEL', format => 'timestamp'},

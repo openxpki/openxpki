@@ -41,7 +41,7 @@ sub init_issuer ($self, $args) {
 
     $self->main->add_section({
         type => 'grid',
-        className => 'cacertificate',
+        cssClass => 'cacertificate',
         content => {
             actions => [{
                 page => 'certificate!detail!identifier!{identifier}',

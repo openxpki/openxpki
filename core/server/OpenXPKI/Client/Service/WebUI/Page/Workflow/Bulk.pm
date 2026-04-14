@@ -101,7 +101,7 @@ sub action_bulk ($self) {
 
         $self->main->add_section({
             type => 'grid',
-            className => 'workflow',
+            cssClass => 'workflow',
             content => {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_FAILED_ITEMS_LABEL',
                 description => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_FAILED_ITEMS_DESC',
@@ -126,7 +126,7 @@ sub action_bulk ($self) {
 
         $self->main->add_section({
             type => 'grid',
-            className => 'workflow',
+            cssClass => 'workflow',
             content => {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_SUCCESS_ITEMS_LABEL',
                 description => $params{async} ?

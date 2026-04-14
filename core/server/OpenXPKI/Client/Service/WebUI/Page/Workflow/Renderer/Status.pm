@@ -36,7 +36,7 @@ sub render_process_status ($self, $args, $wf_action, $param = undef) {
 
     $self->main->add_section({
         type => 'grid',
-        className => 'proc',
+        cssClass => 'proc',
         content => {
             columns => [
                 { sTitle => 'PID' },
@@ -263,7 +263,7 @@ sub render_system_status ($self, $args, $wf_action, $param = undef) {
 
     $self->main->add_section({
         type => 'grid',
-        className => 'nodes',
+        cssClass => 'nodes',
         content => {
             label => 'I18N_OPENXPKI_UI_NODE_STATUS_LIST',
             columns => [
@@ -334,7 +334,7 @@ sub _render_token_details ($self, $wf_info) {
 
         $self->main->add_section({
             type => 'grid',
-            className => 'token',
+            cssClass => 'token',
             content => {
                 label => 'I18N_OPENXPKI_UI_TOKEN_OF_TYPE ' . $type,
                 columns => [

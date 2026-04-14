@@ -46,7 +46,7 @@ sub init_history ($self, $args) {
 
     $self->main->add_section({
         type => 'grid',
-        className => 'workflow',
+        cssClass => 'workflow',
         content => {
             columns => [
                 { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_EXEC_TIME_LABEL' }, #, format => 'datetime'},

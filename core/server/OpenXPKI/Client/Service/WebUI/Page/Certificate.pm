@@ -276,7 +276,7 @@ sub init_result ($self, $args) {
 
     $self->main->add_section({
         type => 'grid',
-        className => 'certificate',
+        cssClass => 'certificate',
         content => {
             actions => [{
                 page => 'certificate!detail!identifier!{identifier}',
@@ -526,7 +526,7 @@ sub init_mine ($self, $args) {
 
     $self->main->add_section({
         type => 'grid',
-        className => 'certificate',
+        cssClass => 'certificate',
         content => {
             actions => [{
                 page => 'certificate!detail!identifier!{identifier}',
@@ -945,7 +945,7 @@ sub init_related ($self, $args) {
 
     $self->main->add_section({
         type => 'grid',
-        className => 'workflow',
+        cssClass => 'workflow',
         content => {
             label => 'I18N_OPENXPKI_UI_CERTIFICATE_RELATED_WORKFLOW_LABEL',
             actions => [{

@@ -30,7 +30,7 @@ sub init_index ($self, $args) {
 
     $self->main->add_section({
         type => 'grid',
-        className => 'secret',
+        cssClass => 'secret',
         content => {
             actions => [{
                 page => 'secret!manage!id!{_id}',

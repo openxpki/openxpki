@@ -114,7 +114,7 @@ sub init_result ($self, $args) {
 
     $self->main->add_section({
         type => 'grid',
-        className => 'workflow',
+        cssClass => 'workflow',
         content => {
             actions => [{
                 page => 'workflow!info!wf_id!{serial}',

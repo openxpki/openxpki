@@ -32,7 +32,7 @@ sub render_report_list ($self, $args, $wf_action, $param = undef) {
 
     $self->main->add_section({
         type => 'grid',
-        className => 'report',
+        cssClass => 'report',
         content => {
             columns => [
                 { sTitle => "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_NAME" },
