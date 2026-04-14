@@ -19,7 +19,7 @@ import Component from '@glimmer/component';
  * @class OxiSection::Chart
  * @extends Component
  */
-export default class OxiSectionKeyvalueComponent extends Component {
+export default class OxiSectionChartComponent extends Component {
     /**
      * Returns the merged options hash, mapping `def.className` to `options.cssClass`
      * for compatibility with {@link OxiBase::Chart}.

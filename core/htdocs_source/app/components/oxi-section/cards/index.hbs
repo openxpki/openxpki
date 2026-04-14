@@ -6,8 +6,7 @@
         {{#each this.cards as |card|}}
             <OxiBase::Button
                 @button={{card._clickable}}
-                class={{card.css_class}}
-                class="card w-100 mx-0 my-4 p-0 text-start"
+                class="card w-100 mx-0 my-4 p-0 text-start {{card.css_class}}"
                 style={{if card.color (concat "background-color: " card.color)}}
             >
                 {{#if card.label}}
@@ -51,8 +50,7 @@
             <div class="col">
                 <OxiBase::Button
                     @button={{card._clickable}}
-                    class={{card.css_class}}
-                    class="card h-100 w-100 m-0 p-0 text-start align-items-center"
+                    class="card h-100 w-100 m-0 p-0 text-start align-items-center {{card.css_class}}"
                     style={{if card.color (concat "background-color: " card.color)}}
                 >
                     {{#if card.label}}
@@ -63,7 +61,7 @@
                         </div>
                     {{/if}}
                     {{#if card.image}}
-                        <img src={{card.image}} class="m-3" />
+                        <img src={{card.image}} alt="" class="m-3" />
                     {{/if}}
                     {{#if card.description}}
                         <div class="card-body">
