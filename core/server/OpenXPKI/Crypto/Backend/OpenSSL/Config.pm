@@ -264,6 +264,7 @@ sub __get_engine
     my $engine_name = $self->{ENGINE}->get_engine();
     return unless($engine_name);
 
+    # read from crypto configuration - we do not expect any injection here
     # note - engine section is a multi-line string
     # so we get a mixed format here
     return ('[ engine_section ]',
@@ -283,6 +284,7 @@ sub __get_req_section
     ##! 4: "start"
     my $self = shift;
 
+    # both subs are already sanitized so no need to check here again
     my @req_dn = $self->__get_subject_dn();
     my @req_ext = $self->__get_extensions('req_ext');
 
@@ -325,8 +327,10 @@ sub __get_subject_dn
         # rdn is a list of two-element objects holding tagname and value
         my @item = @$rdn;
         my $first = shift @item;
+        _validate_config_line($first->[0].$first->[1]);
         push @tmp_array, sprintf '%01d.%s = "%s"', $rdnidx++, $first->[0], $first->[1];
         push @tmp_array, map {
+            _validate_config_line($_->[0].$_->[1]);
             # multivalued RDNs are build with the "plus" sign
             sprintf '+%s = "%s"', $_->[0], $_->[1];
         } @item if (@item);
@@ -431,6 +435,7 @@ sub __get_extensions
                 $type = "OCSP"       if ($pair->[0] eq "OCSP");
                 foreach my $http (@{$pair->[1]})
                 {
+                    _validate_config_line($http);
                     # substitute commas and semicolons in the URI,
                     # as they will otherwise be misinterpreted by
                     # openssl as seperators
@@ -480,6 +485,7 @@ sub __get_extensions
             my $i = 0;
             foreach my $cdp (@{$profile->get_extension("cdp")})
             {
+                _validate_config_line($cdp);
                 push @sections, "URI.$i=$cdp";
                 $i++;
             }
@@ -499,11 +505,13 @@ sub __get_extensions
 
             foreach my $item (@policy) {
                 if (!ref $item) {
+                    _validate_config_line($item);
                     push @policies, $item;
                 } else {
                     $sn++;
                     push @policies, '@policysection'.$sn;
 
+                    _validate_config_line($item->{oid});
                     push @psection, "[ policysection$sn ]";
                     push @psection, "policyIdentifier = " . $item->{oid};
 
@@ -514,6 +522,7 @@ sub __get_extensions
                     }
 
                     foreach my $note (@{$item->{user_notice}}) {
+                        _validate_config_line($note);
                         $nn++;
                         push @psection, "userNotice.$nn = \@notice$nn";
                         push @notices, "[ notice$nn ]";
@@ -613,31 +622,35 @@ sub __get_extensions
                         # not handle DNs with comma in the subparts
                         my %idx;
                         # multi valued components need a prefix in dirName
-                        my @sec = map {
-                            my($k,$v) = split /=/, $_,2;
-                            ($idx{$k}++).'.'.$_;
-                        } reverse split(/,/, $entry->[1]);
-                        unshift @sec, "", "[dirname_sect_${sectidx}]";
-                        push @sections, @sec;
+                        push @sections, ("[dirname_sect_${sectidx}]");
+                        foreach my $rdn (reverse split(/,/, $entry->[1])) {
+                            _validate_config_line($rdn);
+                            my($k,$v) = split /=/, $rdn,2;
+                            push @sections, sprintf("%01d.%s", $idx{$k}++, $rdn);
+                        }
                     } else {
                         # ...otherwise we assume that it is a decoded ASN.1 representation
                         # of the DN.
                         my $idx = 0;
                         my @sec;
                         # walk through each rdn
+                        push @sections, ("[dirname_sect_${sectidx}]");
                         foreach my $rdn (@{$entry->[1]{'rdnSequence'}}) {
                             my $attr_prefix = '';
                             # walk through each attribute of the rnd
                             foreach my $attr (@{$rdn}) {
-                                push @sec, ($idx++).'.'.$attr_prefix.$attr->{'type'}.'='.(%{$attr->{'value'}})[1];
+                                my $val = sprintf('%01d.%s%s=%s', $idx++, $attr_prefix,
+                                    $attr->{'type'}, (%{$attr->{'value'}})[1]);
+
                                 $attr_prefix = '+'; # the subsequent attributes start with a + prefix
+                                _validate_config_line($val);
+                                push @sections, $val;
                             }
-                            unshift @sec, "", "[dirname_sect_${sectidx}]";
-                            push @sections, @sec;
                         }
                     }
                     push @tmp_array, "dirName.${sectidx}=dirname_sect_${sectidx}";
                 } else {
+                    _validate_config_line($entry->[0].$entry->[1]);
                     push @tmp_array, sprintf '%s.%01d = "%s"', $entry->[0], $sectidx, $entry->[1];
                 }
 
@@ -657,8 +670,9 @@ sub __get_extensions
         }
         elsif ($name eq "netscape_ca_cdp")
         {
+
             push @config, "nsCaRevocationUrl = $critical".
-                join ("", @{$profile->get_extension("netscape_ca_cdp")});
+                _validate_config_line(join ("", @{$profile->get_extension("netscape_ca_cdp")}));
         }
         elsif ($name eq "netscape_cdp")
         {
@@ -686,13 +700,15 @@ sub __get_extensions
         {
             my $string = join ("", @{$profile->get_extension("netscape_comment")});
             $string =~ s/\n/ /g;
+            _validate_config_line($string);
             push @config, "nsComment = $critical \"$string\"";
         }
         else
         {
             OpenXPKI::Exception->throw (
                 message => "unexpected named extension in openssl profile",
-                params  => {NAME => $name});
+                params  => {NAME => $name}
+            );
         }
     }
 
@@ -702,15 +718,31 @@ sub __get_extensions
         # Additional lines define a sequence
         my @val = @{$profile->get_extension($oid)};
         my $string = shift @val;
-
+        _validate_config_line($string);
         if ($profile->is_critical_extension($oid)) {
             push @config, "$oid=critical,$string";
         } else {
             push @config, "$oid=$string";
         }
 
+        # lines can be section headers or field=value assignments
+        foreach my $line (@val) {
+
+            # section header is allowed here
+            next if ( $line =~ m{\A\[\x20*\w+\x20*\]\z} );
+
+            # content line must start with fieldX=
+            # and not contain anything special chars on the right
+            next if ( $line =~ m{\Afield\d+\x20*=[\x20-\x7F]+\z});
+
+            OpenXPKI::Exception->throw(
+                message => 'unexpected line found in oid section',
+                params => { value => $line }
+            )
+        }
+
         # if there are lines left, it goes into the section part
-        push @sections, '# Section for oid '. $oid, @val,'';
+        push @sections, '# Section for oid '. $oid, @val, '';
     }
 
     # the list always has the section head as element
@@ -727,6 +759,26 @@ sub __get_extensions
 
 
 }
+
+
+# Prevent injection of newlines / sections into the config
+sub _validate_config_line {
+
+    my $val = shift;
+
+    OpenXPKI::Exception->throw(
+        message => 'unexpected newline found in config line',
+        params => { value =>$val }
+    ) if ( $val =~ m{[\n\r"]} );
+
+    OpenXPKI::Exception->throw(
+        message => 'unexpected section found in subject_alt_name',
+        params => { value =>$val }
+    ) if ( $val =~ m{\A\s*\[.+\]} );
+
+    return $val;
+}
+
 
 sub get_config_filename
 {
