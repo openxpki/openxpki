@@ -1,13 +1,13 @@
 [data-bs-theme=light] {
     --oxi-body-color: #2e3134;
     --oxi-form-input-color: var(--bs-body-color);
-    --oxi-form-input-required-bg-color: #fff3c2;
-    --oxi-form-input-optional-bg-color: #f9f6ea;
+    --oxi-form-input-required-bg-color: #fdf3ca;
+    --oxi-form-input-optional-bg-color: #f9f9f9;
 }
 
 [data-bs-theme=dark] {
     --oxi-body-color: #acafb2;
     --oxi-form-input-color: rgb(222, 226, 230);
-    --oxi-form-input-required-bg-color: #36342a;
-    --oxi-form-input-optional-bg-color: #2d2a24;
+    --oxi-form-input-required-bg-color: #1f1c0a;
+    --oxi-form-input-optional-bg-color: #0d0d0d;
 }
