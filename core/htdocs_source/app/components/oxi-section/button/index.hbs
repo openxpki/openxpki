@@ -7,7 +7,9 @@
     {{else if this.icon}}
         <div class="oxi-section-button-icon {{this.icon}}"></div>
     {{/if}}
-    <div class="text-start">
-        {{@def.description}}
-    </div>
+    {{#if @def.description}}
+        <div class="oxi-section-button-description">
+            {{@def.description}}
+        </div>
+    {{/if}}
 </OxiBase::Button>

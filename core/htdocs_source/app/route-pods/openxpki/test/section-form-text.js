@@ -9,6 +9,7 @@ export default [
     {
         type: "form",
         label: "Text",
+        description: "Consider this to be a test and consider yourself examined.",
         content: {
             action: "login!text",
             reset: "login!text",

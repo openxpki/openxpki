@@ -13,7 +13,7 @@ import Component from '@glimmer/component'
  * @param { string } [def.image] - URL of an image shown above the label (takes precedence over `icon`).
  * @param { string } [def.icon] - Icon class name; `glyphicon-*` / `bi-*` prefixes are expanded automatically.
  * @param { string } [def.tooltip] - Tooltip text.
- * @param { string } [def.format] - Button style override. Default: `'tile'`
+ * @param { string } [def.format] - Button style override. Default: `'tile'` which results in CSS class `oxi-btn-tile`
  * @param { boolean } [def.disabled] - Disable the button.
  * @param { object } [def.confirm] - Confirmation popup config (`label`, `description`,
  *   `confirm_label`, `cancel_label`).

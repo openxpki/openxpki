@@ -4,11 +4,11 @@ export default [{
     label: "Tiles",
     description: "",
     content: {
-        maxcol: 4,
         border: 1,
+        maxcol: 4,
         tiles: [
             {
-                type: "text", colspan: 2, content: {
+                type: "text", colspan: 2, border: 0, cssClass: "oxi-realm-selection-group-text", content: {
                     description: "Take a deep dive into masterly distilled information and mind-blowingly sustainable diagrams—the insights are absolutely game-changing.<br><i>#DataDriven #Innovation #ContinuousLearning</i>",
                 }
             },
@@ -16,8 +16,10 @@ export default [{
             {
                 type: 'button', content: {
                     label: 'PKI Operation',
+                    format: 'primary',
                     icon: 'glyphicon-wrench',
                     page: 'info',
+                    href: 'https://example.org',
                 },
             },
             {
@@ -37,6 +39,11 @@ export default [{
                 },
             },
             'newline',
+            {
+                type: "text", colspan: 4, border: 0, cssClass: "oxi-realm-selection-group-text", content: {
+                    description: "Take a deep dive into masterly distilled information and mind-blowingly sustainable diagrams—the insights are absolutely game-changing.<br><i>#DataDriven #Innovation #ContinuousLearning</i>",
+                }
+            },
             {
                 type: 'chart',
                 cssClass: 'test-chart',
@@ -93,7 +100,9 @@ export default [{
                 }
             },
             {
-                type: "keyvalue", content: {
+                type: "keyvalue",
+                label: 'Key-Value',
+                content: {
                     data: [
                         {
                             format: "timestamp",

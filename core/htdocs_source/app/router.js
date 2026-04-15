@@ -4,9 +4,9 @@ import config from 'openxpki/config/environment'
 /**
  * Ember application router. Defines the URL-to-route mapping:
  *
- * - `/`                          -> {@link IndexRoute}
- * - `/openxpki/:page`            -> {@link OpenXpkiRoute}
- * - `/openxpki/:page/popup/:pp`  -> OpenXpkiRoute.popup child route
+ * - `/` - {@link IndexRoute}
+ * - `/openxpki/:page` - {@link OpenXpkiRoute}
+ * - `/openxpki/:page/popup/:pp` - {@link OpenXpkiRoute::Popup} child route
  *
  * The `/test` route is only registered in the `development` environment.
  *

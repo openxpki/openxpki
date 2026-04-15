@@ -1,18 +1,16 @@
 <!-- components/oxi-section/tiles -->
 {{#if @def.tiles.length}}
-    <div class="oxi-tiles">
-        {{#each this.rows as |row|}}
-            <div class="oxi-tiles-row oxi-tiles-cols-{{this.maxcol}}">
-                {{#each row as |tile|}}
-                    {{#if (eq tile.type "empty")}}
-                        <div class="oxi-tiles-cell oxi-tiles-cell--empty oxi-tiles-cell--colspan-{{tile.colspan}}"></div>
-                    {{else}}
-                        <div class="oxi-tiles-cell oxi-tiles-cell--colspan-{{tile.colspan}}">
-                            <OxiSection @def={{tile}} @meta={{hash renderAsCard=@def.border}}/>
-                        </div>
-                    {{/if}}
-                {{/each}}
-            </div>
-        {{/each}}
-    </div>
+    {{#each this.rows as |row|}}
+        <div class="oxi-tiles-row oxi-tiles-cols-{{this.maxcol}}">
+            {{#each row as |tile|}}
+                {{#if (eq tile.type "empty")}}
+                    <div class="oxi-tiles-cell oxi-tiles-cell--empty oxi-tiles-cell--colspan-{{tile.colspan}}"></div>
+                {{else}}
+                    <div class="oxi-tiles-cell oxi-tiles-cell--colspan-{{tile.colspan}} {{if tile._renderAsCard "oxi-tiles-card"}}">
+                        <OxiSection @def={{tile}} @meta={{hash renderAsCard=tile._renderAsCard}}/>
+                    </div>
+                {{/if}}
+            {{/each}}
+        </div>
+    {{/each}}
 {{/if}}

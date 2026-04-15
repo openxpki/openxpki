@@ -318,6 +318,13 @@ div.required .choices.oxi-inline-select {
   content: "\e056";
 }
 
+.oxi-section-description {
+  margin-bottom: 0.75rem;
+  .oxi-compact & {
+    margin-bottom: 0;
+  }
+}
+
 /******************************************************************************
  * Grid
  */
@@ -700,15 +707,19 @@ div.oxifield-upload {
 }
 
 /******************************************************************************
- * Tiles
+ * <OxiSection::Tiles>
  */
 
-.oxi-tiles {
+.oxi-section-tiles {
+  display: grid;
+
   .oxi-tiles-row {
     display: grid;
     align-items: stretch;
+    gap: 1rem;
     grid-template-columns: 1fr; // single column below md
     > * { min-width: 0; }
+
     @media (min-width: 768px) {
       @for $i from 1 through 12 {
         &.oxi-tiles-cols-#{$i} { grid-template-columns: repeat(#{$i}, 1fr); }
@@ -719,6 +730,17 @@ div.oxifield-upload {
   @media (min-width: 768px) {
     @for $i from 2 through 12 {
       .oxi-tiles-cell--colspan-#{$i} { grid-column: span #{$i}; }
+    }
+  }
+
+  /* Vertical gap below rows except below texts describing a tile group */
+  .oxi-tiles-row + .oxi-tiles-row:not(:has(.oxi-realm-selection-group-text)) {
+    margin-bottom: 1.5rem;
+  }
+
+  .oxi-realm-selection-group-text {
+    .oxi-section-description {
+      margin-bottom: 0.5rem;
     }
   }
 
@@ -738,8 +760,44 @@ div.oxifield-upload {
     justify-content: center;
   }
 
-  .oxi-section-button-icon {
-    color: color-mix(in srgb, var(--bs-btn-color) 75%, var(--bs-body-bg));
+  /* Change appearance of nested section headers */
+  .oxi-tiles-cell .oxi-section-label {
+    font-size: 1.25rem;
+  }
+
+  /* A tile with borders (@renderAsCard = 1) */
+  .oxi-tiles-card {
+    /* <OxiSection::Button> */
+    .card-body.oxi-section-button {
+      /* Stretch and center content */
+      & > button,
+      & > a {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        row-gap: 1rem;
+      }
+      /* Expand clickable area to first parent with "position: relative" (= tile card) */
+      & > button::after,
+      & > a::after {
+        content: '';
+        position: absolute;
+        inset: 0; /* shorthand for top:0; right:0; bottom:0; left:0 */
+        z-index: 1;
+        cursor: pointer;
+      }
+    }
+    /* Card header before an <OxiSection::Button> */
+    .card-header:has(+ .card-body.oxi-section-button) {
+      text-align: center;
+    }
+    /* Card footer that follows an <OxiSection::Button> */
+    .card-body.oxi-section-button + * {
+      text-align: center;
+    }
   }
 }
 
@@ -845,11 +903,6 @@ div.oxifield-upload {
  */
 .oxi-section-button-icon {
     font-size: 2.5rem;
-    margin-bottom: 1rem;
-}
-
-.oxi-section-button-image {
-    margin-bottom: 1rem;
 }
 
 /******************************************************************************
@@ -1001,8 +1054,23 @@ div.oxifield-upload {
 }
 
 .oxi-btn-tile {
-  background: transparent;
-  border: 1px solid transparent;
+  color: color-mix(in srgb, var(--bs-btn-color) 75%, var(--bs-body-bg));
+
+  &:hover, &:active, &.active, &:focus-visible {
+    background-image: linear-gradient(rgba(0,0,0,0.08), rgba(0,0,0,0.08));
+  }
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 0px #fff, 0 0 0 4px rgba(61, 133, 184, 0.7);
+  }
+  [data-bs-theme=dark] & {
+    &:hover, &:active, &.active, &:focus-visible {
+      background-image: linear-gradient(rgba(255,255,255,0.12), rgba(255,255,255,0.12));
+    }
+    &:focus-visible {
+      box-shadow: 0 0 0 0px #222, 0 0 0 4px rgba(42, 84, 122, 0.8);
+    }
+  }
 }
 
 .oxi-btn-card {
