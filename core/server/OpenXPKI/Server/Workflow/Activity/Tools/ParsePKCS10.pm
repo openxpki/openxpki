@@ -11,6 +11,7 @@ use Template;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Crypt::DN;
 use OpenXPKI::Serialization::Simple;
+use OpenXPKI::Util;
 use Workflow::Exception qw(configuration_error workflow_error);
 
 sub execute {
@@ -30,6 +31,7 @@ sub execute {
 
     my $subject_prefix = $self->param('subject_prefix') || 'cert_';
     my $verify_signature = $self->param('verify_signature') ? 1 : 0;
+    my $skip_sanitize = $self->param('skip_sanitize') ? 1 : 0;
 
     my $target_key = $self->param('target_key');
 
@@ -164,11 +166,14 @@ sub execute {
     # Map SAN keys from ASN1 names to openssl format (all uppercased)
     # TODO this should go to a central location
     my $san_map = {
-        otherName => 'otherName',
+        # TODO otherName is returned as hash with OID and stringified value
+        # need to find a suitable way to extract and encode this
+        #otherName => 'otherName',
         rfc822Name => 'email',
         dNSName => 'DNS',
         x400Address => '', # not supported by openssl
-        directoryName => 'dirName',
+        # the parser chokes on dirName - needs investigatin
+        #directoryName => 'dirName',
         ediPartyName => '', # not supported by openssl
         uniformResourceIdentifier => 'URI',
         iPAddress  => 'IP',
@@ -190,7 +195,15 @@ sub execute {
             next;
         }
 
-        my @items = $decoded->subjectAltName( $san );
+        my @items;
+        # no sanitazion is wanted - map values directly
+        if ($skip_sanitize) {
+            @items = $decoded->subjectAltName( $san );
+        } else {
+            @items = $self->sanitize_san_item( $san, $decoded->subjectAltName( $san ) );
+        }
+
+        next unless @items;
 
         # san hash
         $csr_san->{ $san_type } = \@items;
@@ -319,6 +332,38 @@ sub execute {
     return 1;
 }
 
+sub sanitize_san_item {
+
+    my ($self, $san_type, @values) = @_;
+
+    my %type_map = (
+        dNSName                   => 'Hostname',
+        rfc822Name                => 'Email',
+        iPAddress                 => 'IP',
+        uniformResourceIdentifier => 'URI',
+        registeredID              => 'OID',
+        directoryName             => 'ParsedDN',
+        otherName                 => 'GeneralNameNoBreak',
+    );
+
+    my $type_name = $type_map{$san_type};
+
+    my @valid;
+    for my $value (@values) {
+        next unless (defined $value && $value ne '');
+        if ($type_name && !OpenXPKI::Util->validate($type_name, $value)) {
+            CTX('log')->application()->warn(
+                sprintf("Ignoring invalid SAN value for type %s: %s", $san_type, $value)
+            );
+            next;
+        }
+        push @valid, $value;
+    }
+
+    return @valid;
+
+}
+
 # wrapper method to handle extraction of attributes and extensions
 sub hande_extensions {
 
@@ -369,8 +414,11 @@ OpenXPKI::Server::Workflow::Activity::Tools::ParsePKCS10
 
 =head1 Description
 
-Take a pkcs10 container and extract information to the context. If a
-profile name and style are given and the profile has a ui section, the
+Take a pkcs10 container and extract information to the context. A basic format
+validation is done on extracted SAN items to catch broken data early, malformed
+data is filtered out and a warning is issued.
+
+If a profile name and style are given and the profile has a ui section, the
 data extracted from the CSR is used to prefill the profile ui fields.
 Otherwise the extracted subject and san information is put "as is" into
 the context. Output definition is given below.
@@ -410,6 +458,11 @@ parameter is deleted from the context. It is recommended to check the
 PCKS#10 container on upload already using the validator. Note that at least
 the default backend will refuse broken signatures on the request to issue,
 so you B<MUST> handle this.
+
+=item skip_sanitize
+
+If set to a true value, the SAN item validation is skipped and any content
+is mapped.
 
 =item subject_prefix
 
@@ -501,6 +554,8 @@ Only in plain mode. All SAN items as nested array list. Each item of the
 list is a two item array with name and value of one SAN item. The names
 are given as required to build then openssl extension file (otherName,
 email, DNS, dirName, URI, IP, RID).
+
+B<Note>: C<otherName> and C<dirName> are not yet supported and not extracted.
 
 =item csr_key_alg
 
