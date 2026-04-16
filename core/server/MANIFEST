@@ -689,6 +689,7 @@ OpenXPKI/Server/NICE/Null.pm
 OpenXPKI/Server/NICE/Factory.pm
 OpenXPKI/Server/NICE/Local.pm
 
+OpenXPKI/Server/NICE/Role/GenerateSerial.pm
 OpenXPKI/Server/NICE/Role/KeyGenerationLocal.pm
 OpenXPKI/Server/NICE/Role/KeyInDataPool.pm
 OpenXPKI/Server/NICE/Role/RevokeCertificate.pm

@@ -6,6 +6,7 @@ with qw(
     OpenXPKI::Server::NICE::Role::KeyGenerationLocal
     OpenXPKI::Server::NICE::Role::KeyInDataPool
     OpenXPKI::Server::NICE::Role::RevokeCertificate
+    OpenXPKI::Server::NICE::Role::GenerateSerial
 );
 
 use OpenXPKI::Crypto::Profile::Certificate;
@@ -246,18 +247,9 @@ sub issueCertificate {
         }
     }
 
-
-    my $rand_length = $profile->get_randomized_serial_bytes();
-    my $increasing  = $profile->get_increasing_serials();
-
-    # determine serial number (atomically)
-    my $serial = $profile->create_random_serial(
-        $increasing
-            ? (PREFIX => CTX('dbi')->next_id('certificate'))
-            : (),
-        RANDOM_LENGTH => $profile->get_randomized_serial_bytes(),
-    );
-    ##! 32: 'propagating serial number: ' . $serial
+    # generate_serial returns Math::BigInt
+    # we want the binary representation here ->bstr
+    my $serial = $self->generate_serial()->bstr;
     $profile->set_serial($serial);
 
     if (defined $notbefore) {
