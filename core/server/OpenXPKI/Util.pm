@@ -10,6 +10,10 @@ use File::Spec;
 use IO::Dir 1.03;
 use Exporter qw( import );
 use Digest::SHA qw( sha1_base64 );
+use Moose::Util::TypeConstraints qw( find_type_constraint );
+
+# Project modules
+use OpenXPKI::Types;
 
 # Symbols to export by default
 our @EXPORT = qw( AUTO_ID );
@@ -186,6 +190,41 @@ sub pem_to_list {
 
     return \@output;
 }
+
+=head2 validate
+
+Validates a scalar value against a named Moose type from L<OpenXPKI::Types>.
+
+    OpenXPKI::Util->validate('Hostname', 'example.com');  # 1
+    OpenXPKI::Util->validate('IP', 'not-an-ip');          # 0
+
+Returns C<1> if the value satisfies the type constraint, C<0> otherwise.
+
+Dies with an error if the type name is unknown.
+
+B<Parameters>
+
+=over
+
+=item * B<$type> I<Str> - name of a type defined in L<OpenXPKI::Types>
+
+=item * B<$value> I<Str> - value to validate
+
+=back
+
+=cut
+
+sub validate {
+    shift if ($_[0] // '') eq __PACKAGE__; # support call via -> and ::
+    my ($type_name, $value) = @_;
+
+    state %cache;
+    my $constraint = ($cache{$type_name} //= find_type_constraint($type_name))
+        or die "Unknown type '$type_name'\n";
+
+    return $constraint->check($value) ? 1 : 0;
+}
+
 
 =head2 is_regular_workflow
 
