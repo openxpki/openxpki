@@ -7,6 +7,7 @@ use Math::BigInt;
 # Project modules
 use OpenXPKI::FileUtils;
 use OpenXPKI::DateTime;
+use OpenXPKI::DN;
 
 # objects for coerce
 use OpenXPKI::Crypt::X509;
@@ -19,13 +20,13 @@ parameters
 
 =head2 AlphaPunct
 
-Text with space and punctuation characters. Allowed: alphanumeric, underscore ("_"),
-other connector punctuation chars, Unicode marks, dash ("-"), colon (":"), space
+Single line text with space and punctuation characters. Allowed: alphanumeric,
+underscore ("_"), other connector punctuation chars, Unicode marks, dash ("-"), colon (":")
 
 =cut
 subtype 'AlphaPunct', # named $re_alpha_string in old API
     as 'Str',
-    where { $_ =~ qr{ \A [ \w \- \. : \s ]* \z }xms },
+    where { $_ =~ qr{ \A [ \w \- \. : \x20 ]* \z }xms },
     message { sprintf "'%s' is not an alphanumeric string plus punctuation chars", ($_ ? "'$_'" : '<undef>') };
 
 =head2 ArrayOrAlphaPunct
@@ -39,6 +40,8 @@ subtype 'ArrayOrAlphaPunct',
 coerce 'ArrayOrAlphaPunct',
     from 'AlphaPunct',
     via { [ $_ ] };
+
+
 
 =head2 PosInt
 
@@ -120,7 +123,7 @@ A PEM encoded certificate
 =cut
 subtype 'PEMCert',
     as 'PEM',
-    where { $_ =~ m{ \A -----BEGIN\ ([\w\s]*)CERTIFICATE----- [^-]+ -----END\ \1CERTIFICATE----- \Z }msx },
+    where { $_ =~ m{ \A -----BEGIN\ ([\w\ ]*)CERTIFICATE----- [^-]+ -----END\ \1CERTIFICATE----- \Z }msx },
     message { sprintf "'%s' is not a PEM encoded certificate", ($_ ? "'$_'" : '<undef>') };
 
 subtype 'X509CertObject',
@@ -137,7 +140,7 @@ A PEM encoded certificate chain
 =cut
 subtype 'PEMCertChain',
     as 'PEM',
-    where { $_ =~ m{ \A ( -----BEGIN\ ([\w\s]*)CERTIFICATE----- [^-]+ -----END\ \2CERTIFICATE----- \s* )+ \Z }msx },
+    where { $_ =~ m{ \A ( -----BEGIN\ ([\w\ ]*)CERTIFICATE----- [^-]+ -----END\ \2CERTIFICATE----- \s* )+ \Z }msx },
     message { sprintf "'%s' is not a PEM encoded certificate chain", ($_ ? "'$_'" : '<undef>') };
 
 =head2 PEMPKCS7
@@ -157,7 +160,7 @@ A PEM encoded private key container
 =cut
 subtype 'PEMPKey',
     as 'PEM',
-    where { $_ =~ m{ \A -----BEGIN\ ([\w\s]*)PRIVATE\ KEY----- [^-]+ -----END\ \1PRIVATE\ KEY----- \Z }msx },
+    where { $_ =~ m{ \A -----BEGIN\ ([\w\ ]*)PRIVATE\ KEY----- [^-]+ -----END\ \1PRIVATE\ KEY----- \Z }msx },
     message { sprintf "'%s' is not a PEM encoded private key container", ($_ ? "'$_'" : '<undef>') };
 
 
@@ -200,7 +203,7 @@ subtype 'ArrayRefOrPEMCertChain',
 coerce 'ArrayRefOrPEMCertChain',
     from 'PEMCertChain',
     # /g matches ALL certificates, results are grouped via () and the result list is put into []
-    via { [ $_ =~ m{ ( -----BEGIN\ [\w\s]*CERTIFICATE----- [^-]+ -----END\ [\w\s]*CERTIFICATE----- ) }gmsx ] };
+    via { [ $_ =~ m{ ( -----BEGIN\ [\w\ ]*CERTIFICATE----- [^-]+ -----END\ [\w\s]*CERTIFICATE----- ) }gmsx ] };
 
 =head2 ArrayRefOrStr
 
@@ -344,18 +347,133 @@ coerce 'Epoch',
     from 'Str',
     via { OpenXPKI::DateTime::get_validity({ VALIDITYFORMAT => 'detect', VALIDITY => $_} )->epoch };
 
-=head1 COERCION
+=head2 SANType
 
-When using any type with a coercion in an API command the C<coerce =E<gt> 1>
-option will automatically be set by L<OpenXPKI::Base::API::PluginMetaClassTrait/add_param_specs>:
-
-    command "doit" => {
-        types => { isa => 'ArrayRefOrCommaList' }, # will set coerce => 1
-    } => sub {
-        my ($self, $params) = @_;
-        print join(", ", @{ $params->types }), "\n";
-    };
+Enumeration of supported Subject Alternative Name types.
 
 =cut
+
+enum 'SANType', [qw( DNS email IP URI dirName RID otherName )];
+
+=head2 GeneralNameNoBreak
+
+A single-line string suitable as an ASN.1 GeneralName value (e.g. for use
+in Subject Alternative Names). Newlines are not permitted.
+
+=cut
+
+subtype 'GeneralNameNoBreak',
+    as 'Str',
+    where { $_ =~ qr{ \A [^\n\r]+ \z }xms },
+    message { sprintf "'%s' must not contain newline characters", ($_ // '<undef>') };
+
+=head2 KeyUsageBit
+
+Enumeration of valid X.509 keyUsage extension bits.
+
+=cut
+
+enum 'KeyUsageBit', [qw(
+    digital_signature  non_repudiation  key_encipherment  data_encipherment
+    key_agreement  key_cert_sign  crl_sign  encipher_only  decipher_only
+)];
+
+=head2 ExtKeyUsageBit
+
+Enumeration of named extendedKeyUsage OIDs (numeric OIDs are also accepted as plain Str).
+
+=cut
+
+enum 'ExtKeyUsageBit', [qw(
+    client_auth  server_auth  email_protection  code_signing
+    time_stamping  ocsp_signing
+)];
+
+=head2 CopyExtensions
+
+Enumeration for the copy_extensions certificate profile setting.
+
+=cut
+
+enum 'CopyExtensions', [qw( none copy copyall )];
+
+=head2 Hostname
+
+A DNS hostname value for Subject Alternative Name (allows leading wildcard).
+
+=cut
+
+subtype 'Hostname',
+    as 'Str',
+    where { $_ =~ qr{ \A [\w\*] [\w\-\.]* \z }xmsi },
+    message { sprintf "'%s' is not a valid SAN hostname", ($_ // '<undef>') };
+
+=head2 IP
+
+An IPv4 or IPv6 address string for Subject Alternative Name.
+
+=cut
+
+subtype 'IP',
+    as 'Str',
+    where {
+        # IPv4
+        $_ =~ qr{ \A \d{1,3} (?: \. \d{1,3} ){3} \z }xms
+        ||
+        # IPv6 (colon-hex, simplified)
+        $_ =~ qr{ \A [0-9A-Fa-f]{1,4} (?: : [0-9A-Fa-f]{0,4} ){2,7} \z }xms
+    },
+    message { sprintf "'%s' is not a valid IPv4 or IPv6 address", ($_ // '<undef>') };
+
+=head2 URI
+
+A URI string for Subject Alternative Name.
+
+=cut
+
+subtype 'URI',
+    as 'Str',
+    where { $_ =~ qr{ \A \w+ :// [^\s]+ \z }xms },
+    message { sprintf "'%s' is not a valid URI", ($_ // '<undef>') };
+
+=head2 PrintableString
+
+An ASN.1 PrintableString value. Allowed characters: A-Z, a-z, 0-9, space,
+and the punctuation characters C<' ( ) + , - . / : = ?>.
+
+=cut
+
+subtype 'PrintableString',
+    as 'Str',
+    where { $_ =~ qr{ \A [ A-Z a-z 0-9 \ ' \( \) \+ , \- \. / : = \? ]* \z }xms },
+    message { sprintf "'%s' contains characters not allowed in an ASN.1 PrintableString", ($_ // '<undef>') };
+
+=head2 OID
+
+An OID string (dotted numeric) for Subject Alternative Name registeredID.
+
+=cut
+
+subtype 'OID',
+    as 'Str',
+    where { $_ =~ qr{ \A \d+ (?: \. \d+ )+ \z }xms },
+    message { sprintf "'%s' is not a valid OID", ($_ // '<undef>') };
+
+=head2 ParsedDN
+
+An RFC 2253 distinguished name as parsed by L<OpenXPKI::DN/get_parsed>:
+a three-dimensional array C<[ [ [attr, val], ... ], ... ]> (RDN → attributes → name/value).
+
+Can be coerced from a DN string via C<OpenXPKI::DN>.
+
+=cut
+
+subtype 'ParsedDN',
+    as 'ArrayRef[ArrayRef[ArrayRef[GeneralNameNoBreak]]]',
+    message { "ParsedDN must be an RDN sequence: [ [ [attr, val], ... ], ... ]" };
+
+coerce 'ParsedDN',
+    from 'Str',
+    via { [ OpenXPKI::DN->new($_)->get_parsed() ] };
 
 1;
