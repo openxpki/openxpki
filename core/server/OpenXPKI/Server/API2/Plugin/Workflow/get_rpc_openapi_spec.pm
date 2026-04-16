@@ -20,7 +20,7 @@ use OpenXPKI::Types;
 use OpenXPKI::Server::API2::Plugin::Workflow::Util;
 
 # Sources for "type" and "format" (subtype):
-#   OpenXPKI::Client::Service::WebUI::Page::Workflow->__render_fields()
+#   OpenXPKI::Client::Service::WebUI::Page::Workflow->render_output_fields()
 #   https://openxpki.readthedocs.io/en/latest/reference/developer/webui.html?highlight=rawlist#formattet-strings-string-format
 
 our %FORMAT_MAP = (

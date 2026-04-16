@@ -35,7 +35,7 @@ sub init_context ($self, $args) {
         type => 'keyvalue',
         content => {
             label => '',
-            data => $self->render_fields( $wf_info, 'context'),
+            data => $self->render_output_fields( $wf_info, 'context'),
         },
     });
 

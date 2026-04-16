@@ -306,11 +306,13 @@ sub __render_task_list ($self, $item) {
 
 =head2 render_from_workflow ( { wf_id, wf_info, wf_action }  )
 
-Internal method that renders the ui components from the current workflow state.
+Render UI components of the B<input> form from the current workflow state.
+
 The info about the current workflow can be passed as a workflow info hash as
-returned by the get_workflow_info api method or simply the workflow
-id. In states with multiple action, the wf_action parameter can tell
-the method to proceed with this state.
+returned by the
+L<OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info>
+API method or simply the workflow ID. In states with multiple action, the
+C<wf_action> parameter can tell the method to proceed with this state.
 
 =head3 activity selection
 
@@ -479,7 +481,7 @@ sub render_from_workflow {
 
             # if there are output rules defined, we add them now
             if ( $wf_info->{state}->{output} ) {
-                push @fields, @{$self->render_fields( $wf_info, $view )};
+                push @fields, @{$self->render_output_fields( $wf_info, $view )};
             }
 
         # if the workflow is currently runnig, show info without buttons
@@ -538,7 +540,7 @@ sub render_from_workflow {
 
             # if there are output rules defined, we add them now
             if ( $wf_info->{state}->{output} ) {
-                push @fields, @{$self->render_fields( $wf_info, $view )};
+                push @fields, @{$self->render_output_fields( $wf_info, $view )};
             }
 
             # if we come here from a failed action the status is set already
@@ -616,7 +618,7 @@ sub render_from_workflow {
             $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILED');
         }
 
-        my $fields = $self->render_fields( $wf_info, $view );
+        my $fields = $self->render_output_fields( $wf_info, $view );
 
         $self->log->trace('Field data ' . Dumper $fields) if $self->log->is_trace;
 
@@ -1349,11 +1351,11 @@ sub render_list_spec {
     return ( \@header, \@column, [ keys(%attrib) ] );
 }
 
-=head2 render_fields
+=head2 render_output_fields
 
 =cut
 
-sub render_fields {
+sub render_output_fields {
 
     my $self = shift;
     my $wf_info = shift;
@@ -1793,7 +1795,7 @@ sub __render_workflow_action_body {
             content => {
                 label => '',
                 description => '',
-                data => $self->render_fields( $wf_info, $view ),
+                data => $self->render_output_fields( $wf_info, $view ),
                 buttons => $self->get_form_buttons( $wf_info ),
         }});
 
