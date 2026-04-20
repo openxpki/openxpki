@@ -9,8 +9,8 @@ with qw(
     OpenXPKI::Server::NICE::Role::GenerateSerial
 );
 
-use OpenXPKI::Crypto::Profile::Certificate;
-use OpenXPKI::Crypto::Profile::CRL;
+use OpenXPKI::Crypt::Profile::Certificate;
+use OpenXPKI::Crypt::Profile::CRL;
 use OpenXPKI::Crypt::X509;
 use OpenXPKI::Crypt::PubKey;
 use OpenXPKI::Crypt::CRL;
@@ -196,9 +196,9 @@ sub issueCertificate {
         );
     }
 
-    my $profile = OpenXPKI::Crypto::Profile::Certificate->new (
-        CA        => $issuing_ca,
-        ID        => $cert_profile,
+    my $profile = OpenXPKI::Crypt::Profile::Certificate->new(
+        issuer_alias => $issuing_ca,
+        profile_name => $cert_profile,
     );
 
     ##! 64: 'propagating cert subject: ' . $csr->{subject}
@@ -207,7 +207,7 @@ sub issueCertificate {
     ##! 64: 'SAN List ' . Dumper ( @subject_alt_names )
     if (scalar @subject_alt_names) {
         ##! 64: 'propagating subject alternative names: ' . Dumper @subject_alt_names
-       $profile->set_subject_alt_name(\@subject_alt_names);
+        $profile->set_subject_alt_name(\@subject_alt_names);
     }
 
     ## 64: 'Extensions ' . Dumper \@extension
@@ -218,32 +218,10 @@ sub issueCertificate {
             if (!$oid || $oid !~ /\A(\d+\.)+\d+\z/) {
                 OpenXPKI::Exception->throw(
                     message => 'I18N_OPENXPKI_SERVER_NICE_LOCAL_UNSUPPORTED_EXTENSION',
-                    param => { NAME => $oid }
+                    params  => { NAME => $oid }
                 );
             }
-
-            # We dont want those to be set from external
-            # (might be used to overwrite essential settings like CA:true )
-            if ($oid =~ /^0?2\.0?5\.0?29\./) {
-                OpenXPKI::Exception->throw (
-                    message => "I18N_OPENXPKI_SERVER_NICE_LOCAL_EXTENSION_NOT_ALLOWED",
-                    params => { NAME => $oid }
-                );
-            }
-            # scalar case
-            if ($ext->{value}) {
-                $profile->set_extension(
-                    NAME     => $oid,
-                    CRITICAL => $ext->{critical} ? 'true' : 'false',
-                    VALUES   => $ext->{value},
-                );
-            } elsif ($ext->{section}) {
-                $profile->set_oid_extension_sequence(
-                    NAME     => $oid,
-                    CRITICAL => $ext->{critical} ? 'true' : 'false',
-                    VALUES   => $ext->{section},
-                );
-            }
+            $profile->add_custom_oid($ext);
         }
     }
 
@@ -314,7 +292,6 @@ sub issueCRL {
     my $pki_realm = CTX('session')->data->pki_realm;
     my $dbi = CTX('dbi');
 
-    my $crl_validity = $param->{validity};
     my $profile = $param->{crl_profile};
 
     my $remove_expired = $param->{remove_expired};
@@ -324,6 +301,10 @@ sub issueCRL {
         message => "I18N_OPENXPKI_SERVER_NICE_LOCAL_CRL_NO_DELTA_CRL_SUPPORT",
     ) if ($param->{delta_crl});
 
+    OpenXPKI::Exception->throw(
+        message => "Passing validity as parameter is no longer supported in IssueCRL"
+    ) if ($param->{validity});
+
     my $serializer = OpenXPKI::Serialization::Simple->new();
 
     # Load meta data of CA from the database
@@ -332,18 +313,12 @@ sub issueCRL {
     # Get the certificate identifier to filter in the database
     my $ca_identifier = $ca_info->{identifier};
 
-    foreach my $pp (qw(validity reason_code remove_expired)) {
-        CTX('log')->deprecated()->error("Passing $pp as parameter to IssueCRL is deprecated and will be removed with the next release!");
-    }
-
     # Build Profile (from ..Workflow::Activity::CRLIssuance::GetCRLProfile)
-    my $crl_profile = OpenXPKI::Crypto::Profile::CRL->new(
-        CA  => $ca_alias,
-        ID => $profile,
-        $crl_validity
-         ? (VALIDITY => { VALIDITYFORMAT => 'relativedate', VALIDITY => $crl_validity }) : (),
+    my $crl_profile = OpenXPKI::Crypt::Profile::CRL->new(
+        issuer_alias => $ca_alias,
+        ($profile     ? (profile_name => $profile) : ()),
         # We need the validity to check for the necessity of a "End of Life" CRL
-        CA_VALIDITY => { VALIDITYFORMAT => 'epoch', VALIDITY => $ca_info->{notafter} }
+        ca_validity => { VALIDITYFORMAT => 'epoch', VALIDITY => $ca_info->{notafter} },
     );
     ##! 16: 'profile: ' . Dumper( $crl_profile )
 
@@ -373,7 +348,7 @@ sub issueCRL {
     my @cert_timestamps; # array with certificate data and timestamp
 
     my $extra_where;
-    my $keep_expired = $crl_profile->{PROFILE}->{KEEP_EXPIRED};
+    my $keep_expired = $crl_profile->keep_expired;
     ##! 32: $keep_expired
 
     if (defined $remove_expired) {
@@ -413,7 +388,10 @@ sub issueCRL {
     }
 
     # deprecated
-    $extra_where->{reason_code} = $param->{reason_code} if ($reason_code);
+    if ($reason_code) {
+        CTX('log')->deprecated()->error("Passing reason_code as parameter to IssueCRL is deprecated and will be removed with the next release!");
+        $extra_where->{reason_code} = $param->{reason_code};
+    }
 
     my $max_revocation_id;
     if ($self->use_revocation_id()) {

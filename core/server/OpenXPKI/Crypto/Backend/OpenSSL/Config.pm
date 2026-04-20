@@ -168,13 +168,13 @@ sub build_config
     # requires a policy item to be set
     push @config, '[ dn_policy ]','domainComponent = optional';
 
-    if (!exists $self->{PROFILE})
-    {
+    if (!exists $self->{PROFILE} || !blessed $self->{PROFILE}) {
+
         # as we might have pkcs10 req without profile we need
         # some req related dummy data here
         push @config, $self->__get_req_section();
 
-    } elsif (blessed $self->{PROFILE} and $self->{PROFILE}->isa('OpenXPKI::Crypto::Profile::CSR')) {
+    } elsif ($self->{PROFILE}->isa('OpenXPKI::Crypt::Profile::CSR')) {
 
         push @config, $self->__get_req_section();
 
@@ -343,58 +343,67 @@ sub __get_ca
     ##! 4: "start"
     my $self = shift;
 
-    my @config = ('', '[ ca ]',
-        'new_certs_dir = '.$self->{CONFDIR},
-        'certificate = '.$self->{ENGINE}->get_certfile(),
-        'private_key = '.$self->{ENGINE}->get_keyfile);
-
-    # Valdities after 2050-01-01 must be encoded as generalized time
-    if (my $notbefore = $self->{PROFILE}->get_notbefore()) {
-        my $startdate = OpenXPKI::DateTime::convert_date({
-            OUTFORMAT => ($notbefore->year > 2049 ? 'generalizedtime' : 'openssltime'),
-            DATE      => $notbefore
-        });
-        push @config, 'default_startdate = '.$startdate;
-    }
-
-    if (my $notafter = $self->{PROFILE}->get_notafter()) {
-        my $enddate = OpenXPKI::DateTime::convert_date({
-            OUTFORMAT => ($notafter->year > 2049 ? 'generalizedtime' : 'openssltime'),
-            DATE      => $notafter,
-        });
-        push @config, 'default_enddate = '.$enddate;
-    }
-
-    if (exists $self->{FILENAME}->{SERIAL}) {
-        push @config,
-            'crlnumber = '.$self->{FILENAME}->{SERIAL},
-            'serial = '.$self->{FILENAME}->{SERIAL};
-    }
+    OpenXPKI::Exception->throw(
+        message => 'serial number file does not exist',
+    ) unless (exists $self->{FILENAME}->{SERIAL});
 
     my $digest = $self->{PROFILE}->get_digest();
-
     OpenXPKI::Exception->throw(
         message => 'MD5 digest is broken and therefore not allowed',
     ) if ($digest =~ /md5/);
 
-    push @config,
-        'default_md        = '.$self->{PROFILE}->get_digest(),
-        'database          = '.$self->{FILENAME}->{DATABASE},
-        'default_crl_days  = '.$self->{PROFILE}->get_nextupdate_in_days(),
-        'default_crl_hours = '.$self->{PROFILE}->get_nextupdate_in_hours(),
-        'x509_extensions   = v3ca',
-        'crl_extensions    = v3ca',
-        'preserve          = YES',
-        'policy            = dn_policy',
-        'name_opt          = RFC2253,-esc_msb',
-        'utf8              = yes',
-        'string_mask       = '.$self->{PROFILE}->get_string_mask(),
-        '';
+    my @config = ('', '[ ca ]',
+        'new_certs_dir   = '.$self->{CONFDIR},
+        'certificate     = '.$self->{ENGINE}->get_certfile(),
+        'private_key     = '.$self->{ENGINE}->get_keyfile,
+        'crlnumber       = '.$self->{FILENAME}->{SERIAL},
+        'serial          = '.$self->{FILENAME}->{SERIAL},
+        'default_md      = '.$digest,
+        'database        = '.$self->{FILENAME}->{DATABASE},
+        'x509_extensions = v3ca',
+        'crl_extensions  = v3ca',
+        'preserve        = yes',
+        'policy          = dn_policy',
+        'name_opt        = RFC2253,-esc_msb',
+        'utf8            = yes',
+        'string_mask     = '.$self->{PROFILE}->get_string_mask(),
+        ''
+    );
 
-    # add the copy_extensions only if set, this prevents adding it to the CRL config
-    my $copy_ext = $self->{PROFILE}->get_copy_extensions();
-    if ($copy_ext && $copy_ext ne 'none') {
-        push @config, 'copy_extensions = '.$copy_ext;
+    if ($self->{PROFILE}->isa('OpenXPKI::Crypt::Profile::Certificate')) {
+
+        if (my $notbefore = $self->{PROFILE}->get_notbefore()) {
+            my $startdate = OpenXPKI::DateTime::convert_date({
+                OUTFORMAT => ($notbefore->year > 2049 ? 'generalizedtime' : 'openssltime'),
+                DATE      => $notbefore
+            });
+            push @config, 'default_startdate = '.$startdate;
+        }
+
+        if (my $notafter = $self->{PROFILE}->get_notafter()) {
+            my $enddate = OpenXPKI::DateTime::convert_date({
+                OUTFORMAT => ($notafter->year > 2049 ? 'generalizedtime' : 'openssltime'),
+                DATE      => $notafter,
+            });
+            push @config, 'default_enddate = '.$enddate;
+        }
+
+        my $copy_ext = $self->{PROFILE}->get_copy_extensions();
+        if ($copy_ext ne 'none') {
+            push @config, 'copy_extensions = '.$copy_ext;
+        }
+
+    } elsif ($self->{PROFILE}->isa('OpenXPKI::Crypt::Profile::CRL')) {
+
+        push @config,
+            'default_crl_days  = '.$self->{PROFILE}->get_nextupdate_in_days(),
+            'default_crl_hours = '.$self->{PROFILE}->get_nextupdate_in_hours();
+
+    } else {
+        OpenXPKI::Exception->throw(
+            message => 'Unknown profile class',
+            params => { class => ref $self->{PROFILE} }
+        );
     }
 
     ##! 4: "end"

@@ -5,7 +5,7 @@ use parent qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Serialization::Simple;
-use OpenXPKI::Crypto::Profile::CSR;
+use OpenXPKI::Crypt::Profile::CSR;
 
 
 sub execute
@@ -33,7 +33,7 @@ sub execute
 
     ##! 64: 'subject alternative names: ' . Dumper $subj_alt_names
     if (ref $subj_alt_names && @{$subj_alt_names} > 0) {
-        $profile = OpenXPKI::Crypto::Profile::CSR->new();
+        $profile = OpenXPKI::Crypt::Profile::CSR->new();
         $profile->set_subject_alt_name($subj_alt_names);
     }
 

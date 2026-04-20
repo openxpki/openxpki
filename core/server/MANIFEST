@@ -212,6 +212,34 @@ OpenXPKI/Crypt/X509.pm
 OpenXPKI/Crypt/PKCS7/CertificateList.pm
 OpenXPKI/Crypt/PKCS7/SCEP.pm
 
+# Moose based profile for crypto layer
+OpenXPKI/Crypt/Profile.pm
+OpenXPKI/Crypt/Profile/CRL.pm
+OpenXPKI/Crypt/Profile/CSR.pm
+OpenXPKI/Crypt/Profile/Certificate.pm
+OpenXPKI/Crypt/Profile/DTO/AuthorityInfoAccess.pm
+OpenXPKI/Crypt/Profile/DTO/AuthorityKeyIdentifier.pm
+OpenXPKI/Crypt/Profile/DTO/BasicConstraints.pm
+OpenXPKI/Crypt/Profile/DTO/CRLDistributionPoints.pm
+OpenXPKI/Crypt/Profile/DTO/CustomOid.pm
+OpenXPKI/Crypt/Profile/DTO/ExtendedKeyUsage.pm
+OpenXPKI/Crypt/Profile/DTO/IssuerAltName.pm
+OpenXPKI/Crypt/Profile/DTO/KeyUsage.pm
+OpenXPKI/Crypt/Profile/DTO/Policy.pm
+OpenXPKI/Crypt/Profile/DTO/PolicyIdentifier.pm
+OpenXPKI/Crypt/Profile/DTO/SubjectKeyIdentifier.pm
+OpenXPKI/Crypt/Profile/Role/Subject.pm
+OpenXPKI/Crypt/Profile/Role/SubjectAltName.pm
+OpenXPKI/Crypt/SubjectAltName.pm
+OpenXPKI/Crypt/SubjectAltName/DNS.pm
+OpenXPKI/Crypt/SubjectAltName/DirName.pm
+OpenXPKI/Crypt/SubjectAltName/Email.pm
+OpenXPKI/Crypt/SubjectAltName/IP.pm
+OpenXPKI/Crypt/SubjectAltName/OtherName.pm
+OpenXPKI/Crypt/SubjectAltName/RID.pm
+OpenXPKI/Crypt/SubjectAltName/URI.pm
+
+
 ## Crypto layer
 
 OpenXPKI/Crypto/API.pm
