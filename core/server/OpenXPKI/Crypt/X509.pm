@@ -237,6 +237,62 @@ has cdp => (
     }
 );
 
+has key_usage => (
+    is => 'ro',
+    init_arg => undef,
+    isa => 'ArrayRef',
+    reader => 'get_key_usage',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        return $self->_cert->KeyUsage() // [];
+    }
+);
+
+has ext_key_usage => (
+    is => 'ro',
+    init_arg => undef,
+    isa => 'ArrayRef',
+    reader => 'get_ext_key_usage',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        return $self->_cert->ExtKeyUsage() // [];
+    }
+);
+
+=head2 get_basic_constraints
+
+Returns a hash reference with keys C<ca> (0 or 1), C<critical> (0 or 1),
+and C<pathlen> (integer or C<undef> if not set).
+
+=cut
+
+has basic_constraints => (
+    is => 'ro',
+    init_arg => undef,
+    isa => 'HashRef',
+    reader => 'get_basic_constraints',
+    lazy => 1,
+    builder => '_build_basic_constraints',
+);
+
+=head2 get_aia
+
+Returns a hash reference with keys C<caIssuer> and C<ocsp>, each containing
+an array reference of URIs parsed from the Authority Information Access extension.
+
+=cut
+
+has authority_info => (
+    is => 'ro',
+    init_arg => undef,
+    isa => 'HashRef',
+    reader => 'get_authority_info',
+    lazy => 1,
+    builder => '_build_authority_info',
+);
+
 around BUILDARGS => sub {
 
     my $orig  = shift;
@@ -311,7 +367,7 @@ sub is_selfsigned {
 =head2 is_ca
 
 returns true if the certificate has the keyUsage keyCertSign and
-BasicContraints "cA" set (critical), false otherwise.
+BasicConstraints "cA" set (critical), false otherwise.
 
 =cut
 
@@ -319,16 +375,10 @@ sub is_ca {
 
     my $self = shift;
 
-    my $keyUsage = $self->_cert->KeyUsage();
-    return 0 unless (grep { 'keyCertSign' } @{$keyUsage});
+    return 0 unless (grep { $_ eq 'keyCertSign' } @{$self->get_key_usage()});
 
-    my $constraint = $self->_cert->BasicConstraints();
-    return 1 if (ref $constraint eq 'ARRAY' &&
-        @{$constraint} == 2 &&
-        $constraint->[0] eq 'critical' &&
-        $constraint->[1] eq 'cA = 1');
-
-    return 0;
+    my $bc = $self->get_basic_constraints();
+    return ($bc->{ca} && $bc->{critical}) ? 1 : 0;
 }
 
 sub _build_san {
@@ -414,6 +464,82 @@ sub _to_db_hash {
     };
     return $hash;
 
+}
+
+sub _build_basic_constraints {
+
+    my $self = shift;
+
+    my ($ext) = grep { $_->{'extnID'} eq '2.5.29.19' }
+        @{$self->_cert->{'tbsCertificate'}->{'extensions'} // []};
+
+    my %bc = (ca => 0, critical => 0, pathlen => undef);
+    return \%bc unless $ext;
+
+    $bc{critical} = $ext->{'critical'} ? 1 : 0;
+
+    require Convert::ASN1;
+    my $asn = Convert::ASN1->new;
+    $asn->prepare(q<
+        BasicConstraints ::= SEQUENCE {
+            cA                  BOOLEAN OPTIONAL,
+            pathLenConstraint   INTEGER OPTIONAL
+        }
+    >) or die "ASN.1 prepare failed: " . $asn->error;
+    my $decoded = $asn->decode($ext->{'extnValue'})
+        or die "ASN.1 decode failed: " . $asn->error;
+    $bc{ca} = ($decoded->{'cA'} ? 1 : 0) if exists $decoded->{'cA'};
+    $bc{pathlen} = $decoded->{'pathLenConstraint'} if exists $decoded->{'pathLenConstraint'};
+    return \%bc;
+}
+
+sub _build_authority_info {
+
+    my $self = shift;
+
+    my ($extvalue) = map {
+        $_->{'extnID'} eq '1.3.6.1.5.5.7.1.1' ? $_->{'extnValue'} : ()
+    } @{$self->_cert->{'tbsCertificate'}->{'extensions'} // []};
+
+    return { caIssuer => [], ocsp => [] } unless $extvalue;
+
+    require Convert::ASN1;
+    my $asn = Convert::ASN1->new;
+    $asn->prepare(q{
+        AuthorityInfoAccessSyntax ::= SEQUENCE OF AccessDescription
+
+        AccessDescription ::= SEQUENCE {
+            accessMethod    OBJECT IDENTIFIER,
+            accessLocation  GeneralName
+        }
+
+        GeneralName ::= CHOICE {
+            otherName     [0]     ANY,
+            rfc822Name    [1]     IA5String,
+            dNSName       [2]     IA5String,
+            x400Address   [3]     ANY,
+            directoryName [4]     ANY,
+            ediPartyName  [5]     ANY,
+            uniformResourceIdentifier [6] IA5String,
+            iPAddress     [7]     OCTET STRING,
+            registeredID  [8]     OBJECT IDENTIFIER
+        }
+    }) or die "ASN.1 prepare failed: " . $asn->error;
+
+    my $parser = $asn->find('AuthorityInfoAccessSyntax')
+        or die "Cannot find AuthorityInfoAccessSyntax in ASN.1 schema";
+    my $decoded = $parser->decode($extvalue) or die $parser->error;
+
+    my %raw;
+    foreach my $desc (@{$decoded}) {
+        next unless $desc->{accessLocation}->{uniformResourceIdentifier};
+        push @{$raw{$desc->{accessMethod}}}, $desc->{accessLocation}->{uniformResourceIdentifier};
+    }
+
+    return {
+        caIssuer => $raw{'1.3.6.1.5.5.7.48.2'} // [],
+        ocsp     => $raw{'1.3.6.1.5.5.7.48.1'} // [],
+    };
 }
 
 __PACKAGE__->meta->make_immutable;
