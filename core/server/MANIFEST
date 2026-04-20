@@ -245,16 +245,11 @@ OpenXPKI/Crypt/SubjectAltName/URI.pm
 OpenXPKI/Crypto/API.pm
 OpenXPKI/Crypto/Backend/API.pm
 OpenXPKI/Crypto/CLI.pm
-OpenXPKI/Crypto/Profile/Base.pm
-OpenXPKI/Crypto/Profile/CSR.pm
-OpenXPKI/Crypto/Profile/Certificate.pm
-OpenXPKI/Crypto/Profile/CRL.pm
 OpenXPKI/Crypto/SecretManager.pm
 OpenXPKI/Crypto/SecretRole.pm
 OpenXPKI/Crypto/Secret/Plain.pm
 
 OpenXPKI/Crypto/Token.pm
-
 
 OpenXPKI/Crypto/TokenManager.pm
 OpenXPKI/Crypto/Toolkit.pm
