@@ -111,10 +111,8 @@ sub __get_fu {
 ##     Dump configuration     ##
 ################################
 
-# dump finally writes the main configuration file
 sub dump
 {
-
     ##! 1: "start"
     my $self = shift;
     my $config = $self->build_config();
@@ -124,7 +122,7 @@ sub dump
         $self->{FILENAME}->{CONFIG} = $self->{CONFDIR}."/openssl.cnf";
 
         ##! 2: "write configuration file " . $self->{FILENAME}->{CONFIG}
-        # writes a "non-temporary" file in the temporary directory
+        # writes a "non-temporary" file inside the temporary directory
         $self->__get_fu()->write_file ({
             FILENAME => $self->{FILENAME}->{CONFIG},
             CONTENT  => $config
@@ -140,14 +138,10 @@ sub dump
 
 }
 
-# this builds and returns the content of the main configuration file
-# and - for ca operations - writes the required artefacts to a tempdir
 sub build_config
 {
     ##! 1: "start"
     my $self = shift;
-
-    ##! 2: "dump common part"
 
     my @config = (
         '## OpenSSL configuration',
@@ -155,97 +149,51 @@ sub build_config
         '',
         'default_ca   = ca');
 
-    # add init with engine section if needed
     if (my @engines = $self->__get_engine()) {
         push @config,
             'openssl_conf = openssl_init',
             '[ openssl_init ]',
             'engines = engine_section',
-            @engines
+            @engines;
     }
 
     # We overwrite the DN by -subj so this is irrelevant but OpenSSL
     # requires a policy item to be set
-    push @config, '[ dn_policy ]','domainComponent = optional';
+    push @config, '[ dn_policy ]', 'domainComponent = optional';
 
-    if (!exists $self->{PROFILE} || !blessed $self->{PROFILE}) {
+    my $profile = $self->{PROFILE};
 
-        # as we might have pkcs10 req without profile we need
-        # some req related dummy data here
+    if (!$profile || !blessed($profile)
+        || $profile->isa('OpenXPKI::Crypt::Profile::CSR'))
+    {
+        # PKCS#10 creation (no profile or CSR profile)
         push @config, $self->__get_req_section();
 
-    } elsif ($self->{PROFILE}->isa('OpenXPKI::Crypt::Profile::CSR')) {
+    } elsif ($profile->isa('OpenXPKI::Crypt::Profile::Certificate')) {
 
-        push @config, $self->__get_req_section();
-
-    } else {
-
-        # recreate in case it was unset
-        $self->__get_fu();
-
-        my $tmpdir = $self->{FU}->get_tmp_dirhandle()->dirname();
-        $self->{CONFDIR} = $tmpdir;
-
-        ##! 4: "write serial file (for CRL and certs)"
-
-        my $serial = $self->{PROFILE}->get_serial();
-        if (defined $serial)
-        {
-            ##! 8: "get tempfilename for serial"
-            $self->{FILENAME}->{SERIAL} = "$tmpdir/serial";
-
-            ##! 8: "serial present"
-            $serial = Math::BigInt->new ($serial);
-            if (not defined $serial)
-            {
-                OpenXPKI::Exception->throw (
-                    message => "I18N_OPENXPKI_CRYPTO_OPENSSL_CONFIG_DUMP_WRONG_SERIAL");
-            }
-            ##! 8: "serial accepted by Math::BigInt"
-            my $hex = unpack('H*', $serial->to_bytes );
-            ##! 8: "hex serial is $hex"
-            $self->{FU}->write_file ({FILENAME => $self->{FILENAME}->{SERIAL},
-                               CONTENT  => $hex});
-
-            ##! 8: "specify a special filename to remove the new cert from the temp file area (see new_certs_dir)"
-            $self->{FILENAME}->{NEW_CERT} = "$tmpdir/$hex.pem";
-
-        }
-
-        ##! 4: "write database files"
-
-        ##! 4: "WARNING:FIXME: ATTR file of index.txt is not safe!"
-        # ATTRFILE should be databasefile.attr
-        # FIXME: we assume this file does not exist
-        # FIXME: is this really safe? OpenSSL require it
-        $self->{FILENAME}->{DATABASE} = "$tmpdir/index.txt";
-        $self->{FILENAME}->{ATTR} = $self->{FILENAME}->{DATABASE}.".attr";
-        if (exists $self->{INDEX_TXT})
-        {
-            ##! 8: "INDEX_TXT present => this is a CRL"
-            $self->{FU}->write_file ({FILENAME => $self->{FILENAME}->{DATABASE},
-                               CONTENT  => $self->{INDEX_TXT}});
-        }
-        else
-        {
-            ##! 8: "no INDEX_TXT => this is a certificate"
-            $self->{FU}->write_file ({FILENAME => $self->{FILENAME}->{DATABASE},
-                               CONTENT  => ""});
-        }
-        $self->{FU}->write_file ({FILENAME => $self->{FILENAME}->{ATTR},
-                           CONTENT  => "unique_subject = no\n"});
-
-        ##! 4: "PROFILE exists => CRL or cert generation"
-        push @config, $self->__get_ca();
-
-        # there might be cases where we do not have any extensions but
-        # as the section is hard coded as reference we need an empty one
-        if (my @v3ext = $self->__get_extensions('v3ca')) {
-            push @config, @v3ext;
+        $self->__prepare_ca_files($profile);
+        push @config, $self->__get_ca_section($profile);
+        if (my @ext = $self->__get_cert_extensions('v3ca', $profile)) {
+            push @config, @ext;
         } else {
             push @config, '[ v3ca ]';
         }
 
+    } elsif ($profile->isa('OpenXPKI::Crypt::Profile::CRL')) {
+
+        $self->__prepare_ca_files($profile);
+        push @config, $self->__get_ca_section($profile);
+        if (my @ext = $self->__get_shared_extensions('v3ca', $profile)) {
+            push @config, @ext;
+        } else {
+            push @config, '[ v3ca ]';
+        }
+
+    } else {
+        OpenXPKI::Exception->throw(
+            message => 'Unknown profile class',
+            params  => { class => ref $profile },
+        );
     }
 
     ##! 16: \@config
@@ -272,11 +220,436 @@ sub __get_engine
         '[ engine_config ]',
         $self->{ENGINE}->get_engine_section(),
         '');
-
 }
 
-# the EV oids are in OpenSSL since 1.0.2 so we dont need them anymore
-# we should find a configurable way of adding external oids
+################################
+##     Sanitization helpers   ##
+################################
+
+# Remove all control characters (including newlines) and escape double quotes.
+# Prevents config injection via user-supplied string values.
+sub _sanitize_value {
+    my ($self, $str) = @_;
+    return '' unless defined $str;
+    $str =~ s/[\x00-\x1F\x7F]/ /g;
+    $str =~ s/"/''/g;
+    return $str;
+}
+
+# Like _sanitize_value but also percent-encodes , and ; which OpenSSL uses
+# as field separators inside extension values.
+sub _sanitize_uri {
+    my ($self, $uri) = @_;
+    $uri = $self->_sanitize_value($uri);
+    $uri =~ s{,}{%2C}g;
+    $uri =~ s{;}{%3B}g;
+    return $uri;
+}
+
+# Returns true only for dotted-decimal OID notation.
+sub _is_valid_oid {
+    my ($self, $oid) = @_;
+    return defined($oid) && $oid =~ /\A\d+(?:\.\d+)+\z/;
+}
+
+################################
+##     CA file preparation    ##
+################################
+
+sub __prepare_ca_files {
+    my ($self, $profile) = @_;
+
+    $self->__get_fu();
+    my $tmpdir = $self->{FU}->get_tmp_dirhandle()->dirname();
+    $self->{CONFDIR} = $tmpdir;
+
+    my $serial = $profile->get_serial();
+    if (defined $serial) {
+        $self->{FILENAME}->{SERIAL} = "$tmpdir/serial";
+        $serial = Math::BigInt->new($serial);
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_CONFIG_DUMP_WRONG_SERIAL",
+        ) unless defined $serial;
+        my $hex = unpack('H*', $serial->to_bytes);
+        $self->{FU}->write_file({
+            FILENAME => $self->{FILENAME}->{SERIAL},
+            CONTENT  => $hex,
+        });
+        $self->{FILENAME}->{NEW_CERT} = "$tmpdir/$hex.pem";
+    }
+
+    # FIXME: The .attr file (index.txt.attr) is written unconditionally but
+    # we assume it does not already exist - this may not be safe in all cases.
+    # OpenSSL requires the file but does not create it automatically.
+    $self->{FILENAME}->{DATABASE} = "$tmpdir/index.txt";
+    $self->{FILENAME}->{ATTR}     = $self->{FILENAME}->{DATABASE} . ".attr";
+
+    if (exists $self->{INDEX_TXT}) {
+        $self->{FU}->write_file({
+            FILENAME => $self->{FILENAME}->{DATABASE},
+            CONTENT  => $self->{INDEX_TXT},
+        });
+    } else {
+        $self->{FU}->write_file({
+            FILENAME => $self->{FILENAME}->{DATABASE},
+            CONTENT  => "",
+        });
+    }
+    $self->{FU}->write_file({
+        FILENAME => $self->{FILENAME}->{ATTR},
+        CONTENT  => "unique_subject = no\n",
+    });
+}
+
+################################
+##     [ca] section builder   ##
+################################
+
+sub __get_ca_section {
+    my ($self, $profile) = @_;
+
+    OpenXPKI::Exception->throw(
+        message => 'serial number file does not exist',
+    ) unless exists $self->{FILENAME}->{SERIAL};
+
+    my $digest = $profile->get_digest();
+    OpenXPKI::Exception->throw(
+        message => 'MD5 digest is broken and therefore not allowed',
+    ) if $digest =~ /md5/;
+
+    my @config = ('', '[ ca ]',
+        'new_certs_dir   = ' . $self->{CONFDIR},
+        'certificate     = ' . $self->{ENGINE}->get_certfile(),
+        'private_key     = ' . $self->{ENGINE}->get_keyfile(),
+        'crlnumber       = ' . $self->{FILENAME}->{SERIAL},
+        'serial          = ' . $self->{FILENAME}->{SERIAL},
+        'default_md      = ' . $digest,
+        'database        = ' . $self->{FILENAME}->{DATABASE},
+        'x509_extensions = v3ca',
+        'crl_extensions  = v3ca',
+        'preserve        = yes',
+        'policy          = dn_policy',
+        'name_opt        = RFC2253,-esc_msb',
+        'utf8            = yes',
+        'string_mask     = ' . $profile->get_string_mask(),
+        '',
+    );
+
+    if ($profile->isa('OpenXPKI::Crypt::Profile::Certificate')) {
+
+        if (my $notbefore = $profile->get_notbefore()) {
+            my $startdate = OpenXPKI::DateTime::convert_date({
+                OUTFORMAT => ($notbefore->year > 2049 ? 'generalizedtime' : 'openssltime'),
+                DATE      => $notbefore,
+            });
+            push @config, 'default_startdate = ' . $startdate;
+        }
+
+        if (my $notafter = $profile->get_notafter()) {
+            my $enddate = OpenXPKI::DateTime::convert_date({
+                OUTFORMAT => ($notafter->year > 2049 ? 'generalizedtime' : 'openssltime'),
+                DATE      => $notafter,
+            });
+            push @config, 'default_enddate = ' . $enddate;
+        }
+
+        my $copy_ext = $profile->get_copy_extensions();
+        if ($copy_ext ne 'none') {
+            push @config, 'copy_extensions = ' . $copy_ext;
+        }
+
+    } elsif ($profile->isa('OpenXPKI::Crypt::Profile::CRL')) {
+
+        push @config,
+            'default_crl_days  = ' . $profile->get_nextupdate_in_days(),
+            'default_crl_hours = ' . $profile->get_nextupdate_in_hours();
+
+    }
+
+    return @config;
+}
+
+################################
+##     Extension builders     ##
+################################
+
+# Extensions for certificate profiles (cert-specific + shared)
+sub __get_cert_extensions {
+    my ($self, $section_name, $profile) = @_;
+
+    my @config   = ("[ $section_name ]");
+    my @sections;
+
+    # — BasicConstraints —
+    if (my $dto = $profile->basic_constraints) {
+        my $crit = $dto->critical ? 'critical,' : '';
+        my @bc = ($dto->ca ? 'CA:true' : 'CA:false');
+        push @bc, sprintf('pathlen:%01d', $dto->path_length)
+            if defined $dto->path_length;
+        push @config, "basicConstraints = $crit" . join(',', @bc);
+    }
+
+    # — KeyUsage —
+    if (my $dto = $profile->key_usage) {
+        my $crit  = $dto->critical ? 'critical,' : '';
+        my %map = (
+            digital_signature => 'digitalSignature',
+            non_repudiation   => 'nonRepudiation',
+            key_encipherment  => 'keyEncipherment',
+            data_encipherment => 'dataEncipherment',
+            key_agreement     => 'keyAgreement',
+            key_cert_sign     => 'keyCertSign',
+            crl_sign          => 'cRLSign',
+            encipher_only     => 'encipherOnly',
+            decipher_only     => 'decipherOnly',
+        );
+        my @bits = map { $map{$_} // () } @{ $dto->bits };
+        push @config, "keyUsage = $crit" . join(',', @bits) if @bits;
+    }
+
+    # — ExtendedKeyUsage —
+    if (my $dto = $profile->extended_key_usage) {
+        my $crit = $dto->critical ? 'critical,' : '';
+        my %map = (
+            client_auth      => 'clientAuth',
+            server_auth      => 'serverAuth',
+            email_protection => 'emailProtection',
+            code_signing     => 'codeSigning',
+            time_stamping    => 'timeStamping',
+            ocsp_signing     => 'OCSPSigning',
+        );
+        my @eku;
+        for my $u (@{ $dto->usages }) {
+            if ($self->_is_valid_oid($u)) {
+                push @eku, $u;
+            } elsif ($map{$u}) {
+                push @eku, $map{$u};
+            } else {
+                CTX('log')->application()->warn("Unknown EKU value: $u");
+            }
+        }
+        push @config, "extendedKeyUsage = $crit" . join(',', @eku) if @eku;
+    }
+
+    # — SubjectKeyIdentifier —
+    if (my $dto = $profile->subject_key_identifier) {
+        my $crit = $dto->critical ? 'critical,' : '';
+        push @config, "subjectKeyIdentifier = ${crit}hash";
+    }
+
+    # — CRL Distribution Points —
+    if (my $dto = $profile->crl_distribution_points) {
+        my $crit = $dto->critical ? 'critical,' : '';
+        push @config, "crlDistributionPoints = ${crit}\@cdp_section";
+        push @sections, '', '[cdp_section]';
+        my $i = 0;
+        for my $uri (@{ $dto->uris }) {
+            push @sections, "URI.$i=" . $self->_sanitize_uri($uri);
+            $i++;
+        }
+        push @sections, '';
+    }
+
+    # — PolicyIdentifier —
+    if (my $dto = $profile->policy_identifier) {
+        my $crit = $dto->critical ? 'critical,' : '';
+        my ($sn, $nn) = (0, 0);
+        my (@policies, @psection, @notices);
+
+        for my $policy (@{ $dto->policies }) {
+            unless ($self->_is_valid_oid($policy->oid)) {
+                CTX('log')->application()->warn(
+                    "Skipping policy with invalid OID: " . ($policy->oid // ''));
+                next;
+            }
+            if ($policy->cps || $policy->user_notice) {
+                $sn++;
+                push @policies, "\@policysection$sn";
+                push @psection, "[ policysection$sn ]";
+                push @psection, "policyIdentifier = " . $policy->oid;
+                my $cc = 0;
+                for my $cps (@{ $policy->cps // [] }) {
+                    push @psection, 'CPS.' . (++$cc) . '="'
+                        . $self->_sanitize_uri($cps) . '"';
+                }
+                for my $note (@{ $policy->user_notice // [] }) {
+                    $nn++;
+                    push @psection, "userNotice.$nn = \@notice$nn";
+                    push @notices, "[ notice$nn ]",
+                        # RFC recommends UTF8String here, but OpenSSL < 1.1 could
+                        # not encode it that way; the UTF8 prefix was introduced
+                        # with OpenSSL 1.1, so we emit a plain string.
+                        'explicitText = "' . $self->_sanitize_value($note) . '"';
+                }
+            } else {
+                push @policies, $policy->oid;
+            }
+        }
+
+        if (@policies) {
+            push @config, "certificatePolicies = $crit" . join(',', @policies), '';
+            push @sections, '# Policies', @psection, '';
+            push @sections, '# Notices', @notices, '' if @notices;
+        }
+    }
+
+    # — SubjectAltName —
+    if ($profile->has_subject_alt_name && scalar @{ $profile->subject_alt_name // [] }) {
+        $self->__build_san_section($profile, \@config, \@sections);
+    }
+
+    # — ocsp_nocheck (fixed OID, no free text) —
+    if ($profile->ocsp_nocheck) {
+        push @config, '1.3.6.1.5.5.7.48.1.5=ASN1:NULL';
+    }
+
+    # — Shared extensions (AKI, AIA, IAN, custom OIDs) —
+    $self->__build_shared_ext_lines($profile, \@config, \@sections);
+
+    return unless @config > 1;
+    push @config, @sections;
+    return @config;
+}
+
+# Extensions for CRL profiles (shared extensions only)
+sub __get_shared_extensions {
+    my ($self, $section_name, $profile) = @_;
+
+    my @config   = ("[ $section_name ]");
+    my @sections;
+    $self->__build_shared_ext_lines($profile, \@config, \@sections);
+
+    return unless @config > 1;
+    push @config, @sections;
+    return @config;
+}
+
+# Shared extension lines: AKI, AIA, IssuerAltName, custom OIDs.
+# Used by both __get_cert_extensions and __get_shared_extensions.
+sub __build_shared_ext_lines {
+    my ($self, $profile, $config, $sections) = @_;
+
+    # — AuthorityKeyIdentifier —
+    if (my $dto = $profile->authority_key_identifier) {
+        my $crit = $dto->critical ? 'critical,' : '';
+        my @parts;
+        push @parts, 'keyid:always'  if $dto->keyid;
+        push @parts, 'issuer:always' if $dto->issuer;
+        push @$config, "authorityKeyIdentifier = $crit" . join(',', @parts)
+            if @parts;
+    }
+
+    # — AuthorityInfoAccess —
+    if (my $dto = $profile->authority_info_access) {
+        my $crit = $dto->critical ? 'critical,' : '';
+        my @aia;
+        push @aia, map { 'caIssuers;URI:' . $self->_sanitize_uri($_) }
+            @{ $dto->ca_issuers // [] };
+        push @aia, map { 'OCSP;URI:'      . $self->_sanitize_uri($_) }
+            @{ $dto->ocsp       // [] };
+        push @$config, "authorityInfoAccess = $crit" . join(',', @aia) if @aia;
+    }
+
+    # — IssuerAltName —
+    # RFC allows the same syntax as SAN here, but we only support the
+    # "issuer:copy" shorthand for now.
+    if (my $dto = $profile->issuer_alt_name) {
+        my $crit = $dto->critical ? 'critical,' : '';
+        push @$config, "issuerAltName = ${crit}issuer:copy";
+    }
+
+    # — Custom OIDs —
+    # The EV OIDs have been in OpenSSL since 1.0.2 so they no longer need
+    # to be injected here. This loop handles arbitrary additional OIDs only.
+    for my $dto (sort { $a->oid cmp $b->oid } @{ $profile->custom_oids }) {
+        unless ($self->_is_valid_oid($dto->oid)) {
+            CTX('log')->application()->warn(
+                "Skipping custom OID with invalid format: " . ($dto->oid // ''));
+            next;
+        }
+        my $val = $dto->get_config_line;
+        push @$config, $self->_sanitize_value($val);
+        if ($dto->is_sequence) {
+            push @$sections,
+                '# Section for OID ' . $dto->oid,
+                '[' . $dto->get_section_name . ']';
+
+            for my $line ( $dto->get_section_lines->@*) {
+                push @$sections, $self->_sanitize_value($line);
+            }
+        }
+    }
+}
+
+# Build the subjectAltName extension lines and supporting sections.
+sub __build_san_section {
+    my ($self, $profile, $config, $sections) = @_;
+
+    my @tmp_array;
+    my %san_idx;
+
+    for my $san (@{ $profile->subject_alt_name }) {
+        my $type    = $san->type;
+        my $sectidx = ++$san_idx{$type};
+
+        if ($san->isa('OpenXPKI::Crypt::SubjectAltName::DirName')) {
+            # ParsedDN: [ [ [attr, val], ... ], ... ]
+            my @sec = ("[dirname_sect_${sectidx}]");
+            my $rdnidx = 0;
+            for my $rdn (@{ $san->value }) {
+                my ($first, @rest) = @$rdn;
+                push @sec, $rdnidx++ . '.'
+                    . $first->[0] . '="'
+                    . $self->_sanitize_value($first->[1]) . '"';
+                push @sec, map {
+                    '+' . $_->[0] . '="' . $self->_sanitize_value($_->[1]) . '"'
+                } @rest;
+            }
+            push @$sections, '', @sec;
+            push @tmp_array, "dirName.${sectidx}=dirname_sect_${sectidx}";
+
+        } elsif ($san->isa('OpenXPKI::Crypt::SubjectAltName::OtherName')) {
+
+            my $oid = $san->oid;
+            # Items are typed already so this should never happen
+            unless ($self->_is_valid_oid($oid)) {
+                CTX('log')->application()->warn(
+                    "Skipping otherName SAN with invalid OID: $oid");
+                next;
+            }
+
+            push @tmp_array, sprintf 'otherName.%d=%s;%s',
+                $sectidx, $oid, $self->_sanitize_value($san->value);
+
+        } elsif ($san->isa('OpenXPKI::Crypt::SubjectAltName::RID')) {
+
+            # RID is of type OID so this should never happen
+            unless ($self->_is_valid_oid($san->value)) {
+                CTX('log')->application()->warn(
+                    "Skipping OID SAN with invalid OID: "
+                    . $san->value);
+                next;
+            }
+            # Important! No quotes here
+            push @tmp_array, sprintf '%s.%01d=%s',
+                $type, $sectidx, $san->value;
+
+        } else {
+            # DNS, email, IP, URI — scalar values
+            push @tmp_array, sprintf '%s.%01d="%s"',
+                $type, $sectidx, $self->_sanitize_value($san->value);
+        }
+    }
+
+    if (@tmp_array) {
+        push @$config, 'subjectAltName=\@san_section';
+        push @$sections, '# SAN Sections', '[san_section]', @tmp_array, '';
+    }
+}
+
+################################
+##     Request section        ##
+################################
 
 sub __get_req_section
 {
@@ -284,10 +657,18 @@ sub __get_req_section
     my $self = shift;
 
     my @req_dn = $self->__get_subject_dn();
-    my @req_ext = $self->__get_extensions('req_ext');
 
-    # we need a dummy section if there is no real data
-    @req_dn = ('[ req_distinguished_name ]','domainComponent = optional') unless(@req_dn);
+    @req_dn = ('[ req_distinguished_name ]', 'domainComponent = optional')
+        unless @req_dn;
+
+    my $profile = $self->{PROFILE};
+    my @req_ext;
+    if ($profile && $profile->has_subject_alt_name
+            && scalar @{ $profile->subject_alt_name // [] }) {
+        my (@ext_lines, @ext_sections);
+        $self->__build_san_section($profile, \@ext_lines, \@ext_sections);
+        @req_ext = ('[ req_ext ]', @ext_lines, @ext_sections) if @ext_lines;
+    }
 
     return ('[ req ]',
         'utf8 = yes',
@@ -298,7 +679,6 @@ sub __get_req_section
         @req_dn,
         @req_ext
     );
-
 }
 
 sub __get_subject_dn
@@ -311,105 +691,33 @@ sub __get_subject_dn
     my $subject = $self->{PROFILE}->get_subject();
     return unless($subject);
 
-    # we need the parsed subject to write it to the config
     if (!ref $subject) {
         my @rdnlist = OpenXPKI::DN->new( $subject )->get_parsed();
         $subject = [reverse @rdnlist];
     }
 
     my @tmp_array = ('[ req_distinguished_name ]');
-    # it seems that openssl just strips any leading digit+dot
-    # so we can have a common index over all RDNs
+    # OpenSSL strips any leading digit+dot from attribute names, so using a
+    # running integer prefix gives us a unique key for each RDN component
+    # without influencing the actual attribute type written into the config.
     my $rdnidx = 0;
     foreach my $rdn (@{$subject}) {
-        # rdn is a list of two-element objects holding tagname and value
         my @item = @$rdn;
         my $first = shift @item;
-        push @tmp_array, sprintf '%01d.%s = "%s"', $rdnidx++, $first->[0], $first->[1];
+        push @tmp_array, sprintf '%01d.%s = "%s"',
+            $rdnidx++, $first->[0], $self->_sanitize_value($first->[1]);
         push @tmp_array, map {
-            # multivalued RDNs are build with the "plus" sign
-            sprintf '+%s = "%s"', $_->[0], $_->[1];
+            sprintf '+%s = "%s"', $_->[0], $self->_sanitize_value($_->[1]);
         } @item if (@item);
     }
 
     return unless(scalar @tmp_array > 1);
 
     return @tmp_array;
-
 }
 
-sub __get_ca
-{
-    ##! 4: "start"
-    my $self = shift;
-
-    OpenXPKI::Exception->throw(
-        message => 'serial number file does not exist',
-    ) unless (exists $self->{FILENAME}->{SERIAL});
-
-    my $digest = $self->{PROFILE}->get_digest();
-    OpenXPKI::Exception->throw(
-        message => 'MD5 digest is broken and therefore not allowed',
-    ) if ($digest =~ /md5/);
-
-    my @config = ('', '[ ca ]',
-        'new_certs_dir   = '.$self->{CONFDIR},
-        'certificate     = '.$self->{ENGINE}->get_certfile(),
-        'private_key     = '.$self->{ENGINE}->get_keyfile,
-        'crlnumber       = '.$self->{FILENAME}->{SERIAL},
-        'serial          = '.$self->{FILENAME}->{SERIAL},
-        'default_md      = '.$digest,
-        'database        = '.$self->{FILENAME}->{DATABASE},
-        'x509_extensions = v3ca',
-        'crl_extensions  = v3ca',
-        'preserve        = yes',
-        'policy          = dn_policy',
-        'name_opt        = RFC2253,-esc_msb',
-        'utf8            = yes',
-        'string_mask     = '.$self->{PROFILE}->get_string_mask(),
-        ''
-    );
-
-    if ($self->{PROFILE}->isa('OpenXPKI::Crypt::Profile::Certificate')) {
-
-        if (my $notbefore = $self->{PROFILE}->get_notbefore()) {
-            my $startdate = OpenXPKI::DateTime::convert_date({
-                OUTFORMAT => ($notbefore->year > 2049 ? 'generalizedtime' : 'openssltime'),
-                DATE      => $notbefore
-            });
-            push @config, 'default_startdate = '.$startdate;
-        }
-
-        if (my $notafter = $self->{PROFILE}->get_notafter()) {
-            my $enddate = OpenXPKI::DateTime::convert_date({
-                OUTFORMAT => ($notafter->year > 2049 ? 'generalizedtime' : 'openssltime'),
-                DATE      => $notafter,
-            });
-            push @config, 'default_enddate = '.$enddate;
-        }
-
-        my $copy_ext = $self->{PROFILE}->get_copy_extensions();
-        if ($copy_ext ne 'none') {
-            push @config, 'copy_extensions = '.$copy_ext;
-        }
-
-    } elsif ($self->{PROFILE}->isa('OpenXPKI::Crypt::Profile::CRL')) {
-
-        push @config,
-            'default_crl_days  = '.$self->{PROFILE}->get_nextupdate_in_days(),
-            'default_crl_hours = '.$self->{PROFILE}->get_nextupdate_in_hours();
-
-    } else {
-        OpenXPKI::Exception->throw(
-            message => 'Unknown profile class',
-            params => { class => ref $self->{PROFILE} }
-        );
-    }
-
-    ##! 4: "end"
-    return @config;
-}
-
+# Used only by the CSR profile path (__get_req_section).
+# Delegates to the shim API on OpenXPKI::Crypt::Profile::CSR.
 sub __get_extensions
 {
     ##! 4: "start"
@@ -440,9 +748,6 @@ sub __get_extensions
                 $type = "OCSP"       if ($pair->[0] eq "OCSP");
                 foreach my $http (@{$pair->[1]})
                 {
-                    # substitute commas and semicolons in the URI,
-                    # as they will otherwise be misinterpreted by
-                    # openssl as seperators
                     $http =~ s{,}{%2C}xmsg;
                     $http =~ s{;}{%3B}xmsg;
                     push @aia, "$type;URI:$http";
@@ -483,7 +788,6 @@ sub __get_extensions
         }
         elsif ($name eq "cdp")
         {
-
             push @config, "crlDistributionPoints = $critical\@cdp_section";
             push @sections, ('','[cdp_section]');
             my $i = 0;
@@ -496,10 +800,7 @@ sub __get_extensions
         }
         elsif ($name eq 'policy_identifier') {
 
-            my $i = 0;
             my @policy = @{ $profile->get_extension('policy_identifier') };
-            ##! 16: '@policy : ' . Dumper \@policy
-
             my $sn = 0;
             my $nn = 0;
             my @policies;
@@ -512,42 +813,33 @@ sub __get_extensions
                 } else {
                     $sn++;
                     push @policies, '@policysection'.$sn;
-
                     push @psection, "[ policysection$sn ]";
                     push @psection, "policyIdentifier = " . $item->{oid};
-
                     my $cc = 0;
                     foreach my $cps (@{$item->{cps}}) {
                         $cc++;
                         push @psection, "CPS.$cc=\"$cps\"";
                     }
-
                     foreach my $note (@{$item->{user_notice}}) {
                         $nn++;
                         push @psection, "userNotice.$nn = \@notice$nn";
                         push @notices, "[ notice$nn ]";
+                        # RFC recommends UTF8String here, but OpenSSL < 1.1 could
+                        # not encode it that way; the UTF8 prefix was introduced
+                        # with OpenSSL 1.1, so we emit a plain string.
                         push @notices, "explicitText = \"$note\"";
-                        # Note - RFC recommends this to be an UTF8 string but
-                        # openssl 1.0 seems not to be able to do so. The UTF8
-                        # prefix was introduced with openssl 1.1
                     }
                 }
             }
 
             if (@policies) {
-                ##! 32: 'sections: ' . Dumper \@psection
-                ##! 32: 'notices: ' . Dumper \@notices
-
                 push @config, "certificatePolicies = $critical" . join(",",@policies),'';
                 push @sections, '# Policies', @psection, '';
                 push @sections, '# Notices', @notices, '';
             }
-
-
         }
         elsif ($name eq "extended_key_usage")
         {
-
             my @eku;
             my @bits = @{$profile->get_extension("extended_key_usage")};
             my $flags = {
@@ -558,18 +850,15 @@ sub __get_extensions
                 time_stamping => 'timeStamping',
                 ocsp_signing => 'OCSPSigning',
             };
-
             foreach my $bit (@bits) {
-                # plain oid
                 if ($bit =~ /^\d+(\.\d+)+$/) {
+                    # plain OID notation
                     push @eku, $bit;
-
-                # known flag
                 } elsif ($flags->{$bit}) {
+                    # known symbolic flag name
                     push @eku, $flags->{$bit};
-
-                # can not happen atm as we whitelist the items in the set call
                 } else {
+                    # should not happen as items are whitelisted at the set call
                     CTX('log')->application()->warn('Unknown extended key usage flag found: ' . $bit);
                 }
             }
@@ -580,8 +869,6 @@ sub __get_extensions
             my @issuers = @{$profile->get_extension("issuer_alt_name")};
             if (scalar @issuers == 1 and $issuers[0] eq 'copy') {
                 push @config, "issuerAltName = ${critical}issuer:copy";
-            } else {
-                # RFC allows same syntax as SAN here but we do not support this for now
             }
         }
         elsif ($name eq "key_usage")
@@ -600,28 +887,21 @@ sub __get_extensions
             my @bits = @{$profile->get_extension("key_usage")};
             my @sku = map { $flags->{$_} } @bits;
             push @config, "keyUsage = $critical" . join(",", @sku) if (@sku);
-
         }
-
         elsif ($name eq "subject_alt_name")
         {
             my $subj_alt_name = $profile->get_extension("subject_alt_name");
             my @tmp_array;
             my $san_idx = {};
             foreach my $entry (@{$subj_alt_name}) {
-
-                # init hash element for san type
                 $san_idx->{$entry->[0]} = 0 unless($san_idx->{$entry->[0]});
                 my $sectidx = ++$san_idx->{$entry->[0]};
-
-                # Handle dirName
                 if ($entry->[0] eq 'dirName') {
-                    # If the value is a scalar, we assume that it is a formatted string.
                     if (ref $entry->[1] eq '') {
-                        # split at comma, this has the side effect that we can
-                        # not handle DNs with comma in the subparts
+                        # If the value is a plain string, split on comma to extract
+                        # individual RDN components. Side effect: DNs that contain a
+                        # literal comma inside a component value are not handled correctly.
                         my %idx;
-                        # multi valued components need a prefix in dirName
                         my @sec = map {
                             my($k,$v) = split /=/, $_,2;
                             ($idx{$k}++).'.'.$_;
@@ -629,17 +909,15 @@ sub __get_extensions
                         unshift @sec, "", "[dirname_sect_${sectidx}]";
                         push @sections, @sec;
                     } else {
-                        # ...otherwise we assume that it is a decoded ASN.1 representation
-                        # of the DN.
+                        # Otherwise the value is a decoded ASN.1 rdnSequence structure.
                         my $idx = 0;
                         my @sec;
-                        # walk through each rdn
                         foreach my $rdn (@{$entry->[1]{'rdnSequence'}}) {
                             my $attr_prefix = '';
-                            # walk through each attribute of the rnd
                             foreach my $attr (@{$rdn}) {
                                 push @sec, ($idx++).'.'.$attr_prefix.$attr->{'type'}.'='.(%{$attr->{'value'}})[1];
-                                $attr_prefix = '+'; # the subsequent attributes start with a + prefix
+                                # subsequent attributes within a multi-valued RDN use the + prefix
+                                $attr_prefix = '+';
                             }
                             unshift @sec, "", "[dirname_sect_${sectidx}]";
                             push @sections, @sec;
@@ -649,53 +927,16 @@ sub __get_extensions
                 } else {
                     push @tmp_array, sprintf '%s.%01d = "%s"', $entry->[0], $sectidx, $entry->[1];
                 }
-
             }
-
             if (scalar @tmp_array) {
                 push @config, 'subjectAltName=\@san_section';
                 push @sections, '# SAN Sections', '[san_section]', @tmp_array, '';
             }
-
         }
         elsif ($name eq "subject_key_identifier")
         {
             my @bits = @{$profile->get_extension("subject_key_identifier")};
-            # shortcut as no other options are supported
             push @config, "subjectKeyIdentifier = ${critical}hash" if (grep /hash/, @bits);
-        }
-        elsif ($name eq "netscape_ca_cdp")
-        {
-            push @config, "nsCaRevocationUrl = $critical".
-                join ("", @{$profile->get_extension("netscape_ca_cdp")});
-        }
-        elsif ($name eq "netscape_cdp")
-        {
-            push @config, "nsRevocationUrl = $critical".
-                join ("", @{$profile->get_extension("netscape_cdp")});
-        }
-        elsif ($name eq "netscape_certificate_type")
-        {
-            my $flags = {
-                ssl_client         => 'client',
-                ssl_server         => 'server',
-                smime_client       => 'email',
-                object_signing     => 'objsign',
-                ssl_client_ca      => 'sslCA',
-                smime_client_ca    => 'emailCA',
-                object_signing_ca  => 'objCA',
-                reserved           => 'reserved',
-            };
-
-            my @bits = @{$profile->get_extension("netscape_certificate_type")};
-            push @config, "nsCertType = $critical".join(",", map { $flags->{$_} } @bits);
-
-        }
-        elsif ($name eq "netscape_comment")
-        {
-            my $string = join ("", @{$profile->get_extension("netscape_comment")});
-            $string =~ s/\n/ /g;
-            push @config, "nsComment = $critical \"$string\"";
         }
         else
         {
@@ -706,35 +947,23 @@ sub __get_extensions
     }
 
     foreach my $oid (sort $profile->get_oid_extensions()) {
-
         # Single line OIDs have only one element in the array
         # Additional lines define a sequence
         my @val = @{$profile->get_extension($oid)};
         my $string = shift @val;
-
         if ($profile->is_critical_extension($oid)) {
             push @config, "$oid=critical,$string";
         } else {
             push @config, "$oid=$string";
         }
-
-        # if there are lines left, it goes into the section part
         push @sections, '# Section for oid '. $oid, @val,'';
     }
 
-    # the list always has the section head as element
     return unless(@config > 1);
-
-    # Append the extra sections
     push @config, @sections;
 
-    ##! 16: "extensions ::= ".join("\n",@config)
-
     ##! 4: "end"
-
     return @config;
-
-
 }
 
 sub get_config_filename
@@ -752,10 +981,7 @@ sub cleanup
     ##! 1: "start"
     my $self = shift;
 
-    ##! 2: "delete profile"
     delete $self->{PROFILE} if (exists $self->{PROFILE});
-
-    ##! 2: "delete index.txt database"
     delete $self->{INDEX_TXT} if (exists $self->{INDEX_TXT});
 
     $self->__cleanup_files();
@@ -790,29 +1016,18 @@ OpenXPKI::Crypto::Backend::OpenSSL::Config
 
 =head1 Description
 
-This module was designed to create an OpenSSL configuration on the fly for
-the various operations of OpenXPKI. The module support the following
-different section types:
+This module creates an OpenSSL configuration on the fly for the various
+operations of OpenXPKI.
 
-=over
+For certificate and CRL signing it consumes L<OpenXPKI::Crypt::Profile::Certificate>
+and L<OpenXPKI::Crypt::Profile::CRL> directly, reading typed DTO attributes
+without any intermediate shim layer.
 
-=item - general OpenSSL configuration
+For PKCS#10 creation L<OpenXPKI::Crypt::Profile::CSR> exposes the compat-shim API
+used by the internal C<__get_extensions> method.
 
-=item - engine configuration
-
-=item - new OIDs
-
-=item - CA configuration
-
-=item - CRL extension configuration
-
-=item - certificate extension configuration
-
-=item - CRL distribution points
-
-=item - subject alternative names
-
-=back
+All string values from profile data are sanitised before being written into
+the configuration to prevent OpenSSL config injection attacks.
 
 =head1 Functions
 
@@ -844,56 +1059,15 @@ Each item in the array must be an array with one or more elements:
 
 =back
 
-The first argument is mandatory, all other element can be empty or
-even left out.
-
-If a revocation time is specified, it is used as the revocation
-timestamp in the generated CRL. The timestamp is specified in seconds since
-epoch.
-
-The reason code is accepted literally. It should be one of
-  'unspecified',
-  'keyCompromise',
-  'CACompromise',
-  'affiliationChanged',
-  'superseded',
-  'cessationOfOperation',
-
-The reason codes
-  'certificateHold',
-  'removeFromCRL'.
-
-are currently not handled correctly and should be avoided. However, they
-will currently simply be passed in the CRL which may not have the desired
-result.
-
-If the reason code is incorrect, a warning is logged and the reason code
-is set to 'unspecified' in order to make sure the certificate gets revoked
-at all.
-
-Invalidity timestamp is only used in conjunction with a reason code of
-keyCompromise. The timestamp is specified in seconds since epoch.
-
 =item - dump
 
 =item - get_config_filename
 
 =back
 
-=head1 Example
-
-my $profile = OpenXPKI::Crypto::Backend::OpenSSL::Config->new (
-              {
-                  TMP    => '/tmp',
-              });
-$profile->set_engine($engine);
-$profile->set_profile($crl_profile);
-$profile->dump();
-my $conf = $profile->get_config_filename();
-... execute an OpenSSL command with "-config $conf" ...
-... or execute an OpenSSL command with "OPENSSL_CONF=$conf openssl" ...
-
 =head1 See Also
 
-OpenXPKI::Crypto::Profile::Base, OpenXPKI::Crypto::Profile::CRL,
-OpenXPKI::Crypto::Profile::Certificate and OpenXPKI::Crypto::Backend::OpenSSL
+L<OpenXPKI::Crypt::Profile>, L<OpenXPKI::Crypt::Profile::Certificate>,
+L<OpenXPKI::Crypt::Profile::CRL>, L<OpenXPKI::Crypto::Backend::OpenSSL>
+
+=cut
