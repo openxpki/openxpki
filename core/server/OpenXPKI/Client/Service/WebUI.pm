@@ -816,13 +816,13 @@ sub _get_cipher ($self) {
 # required by OpenXPKI::Client::Service::Role::Info
 sub declare_routes ($r) {
     # WebUI URLs as of 3.26
-    $r->any(['GET'] => '/webui/<realm>/oidc_redirect')->to(
+    $r->any(['GET'] => '/webui/<realmpath>/oidc_redirect')->to(
         service_class => __PACKAGE__,
         endpoint => 'default',
         operation => 'oidc_redirect',
     );
 
-    $r->any('/webui/<realm>')->to(
+    $r->any('/webui/<realmpath>')->to(
         service_class => __PACKAGE__,
         endpoint => 'default',
     );
@@ -834,7 +834,7 @@ sub prepare ($self, $c) {
 
     # set the method to generate URL paths
     # https://metacpan.org/pod/Mojolicious::Controller#url_for
-    $self->_url_path_for( sub($r) { $c->url_for(realm => $r)->to_string } );
+    $self->_url_path_for( sub($r) { $c->url_for(realmpath => $r)->to_string } );
 
     #
     # Detect realm
@@ -851,10 +851,11 @@ sub prepare ($self, $c) {
         $self->session_cookie->path($self->url_path);
 
         # Interpret last part of the URL path as realm
-        my $realm = $c->stash('realm');
+        my $realmpath = $c->stash('realmpath')
+            or die "Path does not contain realm hint";
 
         # Request to realm selection page: "/webui/index" or "/webui/index-page"
-        if (my ($page) = $realm =~ /\Aindex(?:\-(.+))?\z/) {
+        if (my ($page) = $realmpath =~ /\Aindex(?:\-(.+))?\z/) {
             $self->log->debug('- special path "index"');
             $self->session->param('pki_realm', undef);
             $self->realm_selection_page($page // 'default');
@@ -869,14 +870,14 @@ sub prepare ($self, $c) {
 
         # If the session has no realm set, try to get a realm from the map
         } else {
-            $self->log->debug("- realm '$realm' requested via path - reading config");
-            $current_realm = $self->config->get(['realm','map', $realm]);
+            $self->log->debug("- looking up path->realm mapping for '$realmpath'");
+            $current_realm = $self->config->get(['realm','map', $realmpath]);
 
-            # TODO Remove legacy config
-            $current_realm //= $self->config->get(['realm', $realm]);
+            # TODO Remove legacy config support for path->realm map directly at webui.x.realm
+            $current_realm //= $self->config->get(['realm', $realmpath]);
 
             if (not $current_realm) {
-                $self->log->info("- realm '$realm' unknown (not found in config)");
+                $self->log->info("- realm '$realmpath' unknown (not found in config)");
                 return $self->new_response(404 => 'I18N_OPENXPKI_UI_NO_SUCH_REALM_OR_SERVICE');
             }
         }
@@ -887,18 +888,15 @@ sub prepare ($self, $c) {
         $self->log->debug("- looking for rule to match host '$host'");
         my $realm_map = $self->config->get_hash('realm.map');
 
-        # TODO Remove legacy config support:
+        # TODO Remove legacy config support for host->realm map directly at webui.x.realm
         $realm_map //= $self->config->get_hash('realm');
 
         $self->log->trace('- realm map = ' . Dumper $realm_map ) if $self->log->is_trace;
-        while (my ($pattern, $realm) = each(%$realm_map)) {
-            next unless ($host =~ qr/\A$pattern\z/);
+        if (my ($pattern) = grep { $host =~ qr/\A$_\z/ } keys $realm_map->%*) {
             $self->log->debug("- match: pattern = $pattern") if $self->log->is_trace;
-            $current_realm = $realm;
-            last;
+            $current_realm = $realm_map->{$pattern};
         }
         $self->log->warn("- unable to find matching realm for hostname '$host'") unless $current_realm;
-
     }
 
     if ($current_realm) {
