@@ -42950,7 +42950,7 @@ function setupGlobal(app, importCallback) {
  * @param {Application} app your `@ember/application` Application sub-class
  */
 function setupInspector (app) {
-  setupGlobal(app, () => __vitePreload(() => import('./modules-4-12-s3jxCVIN.js'),true              ?[]:void 0,import.meta.url));
+  setupGlobal(app, () => __vitePreload(() => import('./modules-4-12-JdqTPZiT.js'),true              ?[]:void 0,import.meta.url));
 }
 
 const defineModule0 = Object.assign({}, {});
@@ -43334,6 +43334,12 @@ class Field extends Base {
     }
     return false;
   }
+
+  /**
+   * Enforces invariants after deserialization. Currently ensures that `editable`
+   * cannot be combined with `hasDependants` (forcibly clears `editable` and emits a warning).
+   * @memberOf Field
+   */
   validate() {
     if (this.editable && this.hasDependants) {
       warn(`${this.constructor.name} instance "${this[this.constructor._idField] ?? '<unknown>'}": attribute "enabled" cannot be set while field has dependants.`);
@@ -46691,6 +46697,12 @@ class ApplicationController extends Controller {
       this._applyTheme();
     }
   };
+
+  /**
+   * Returns the resolved theme: `"light"` or `"dark"`.
+   * In `"auto"` mode this follows the OS preference.
+   * @memberOf ApplicationController
+   */
   get effectiveTheme() {
     if (this.themeMode === 'auto') {
       this._osThemeRevision; // consume tracked property to trigger re-render of auto-button
@@ -46699,6 +46711,11 @@ class ApplicationController extends Controller {
       return this.themeMode;
     }
   }
+
+  /**
+   * Returns the Bootstrap icon class name for the current theme mode button.
+   * @memberOf ApplicationController
+   */
   get themeIcon() {
     switch (this.themeMode) {
       case 'dark':
@@ -46711,6 +46728,11 @@ class ApplicationController extends Controller {
         return 'bi-sun-fill';
     }
   }
+
+  /**
+   * Returns the Bootstrap button CSS classes for the current theme mode button.
+   * @memberOf ApplicationController
+   */
   get themeButtonClass() {
     switch (this.themeMode) {
       case 'dark':
@@ -46731,12 +46753,25 @@ class ApplicationController extends Controller {
     this.#systemMode.addEventListener('change', this.#onOsThemeChange);
     this._applyTheme();
   }
+
+  // Writes `data-bs-theme` on `<html>` to apply the effective theme.
   _applyTheme() {
     document.documentElement.setAttribute('data-bs-theme', this.effectiveTheme);
   }
+
+  /**
+   * Toggles between restricted and full page width.
+   * @memberOf ApplicationController
+   */
   toggleWidth() {
     this.restricted_width = !this.restricted_width;
   }
+
+  /**
+   * Removes the static loading banner (`#oxi-loading-banner`) from the DOM.
+   * Called once after the app has rendered its first page.
+   * @memberOf ApplicationController
+   */
   static {
     decorateMethodV2(this.prototype, "toggleWidth", [action]);
   }
@@ -46747,6 +46782,12 @@ class ApplicationController extends Controller {
     if (!el) return;
     el.parentNode.removeChild(el);
   }
+
+  /**
+   * Cycles the theme mode: `"light"` -> `"dark"` -> `"auto"` -> `"light"`.
+   * Persists the choice in `localStorage`.
+   * @memberOf ApplicationController
+   */
   static {
     decorateMethodV2(this.prototype, "removeLoader", [action]);
   }
@@ -46784,6 +46825,11 @@ const amdModule13 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.definePropert
 	default: ApplicationController
 }, Symbol.toStringTag, { value: 'Module' }));
 
+/**
+ * Root application route. All other routes render into its template's `{{outlet}}`.
+ *
+ * @module route/application
+ */
 /*
 import { action } from '@ember/object';
 import { on } from '@ember/object/evented';
@@ -47787,6 +47833,10 @@ const index$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
  * @module helper/defuse
  */
 class Defuse extends Helper {
+  /**
+   * Strips `<script>` tags and `onXxx`/`javascript:` attributes from `html`, then returns it as an Ember `htmlSafe` string.
+   * @memberOf module:helper/defuse
+   */
   compute([html]) {
     if (html === null || html === undefined) return "";
     let type = typeof html;
@@ -47838,6 +47888,11 @@ class HeadLayout extends GlimmerComponent {
     decorateFieldV2(this.prototype, "config", [service('oxi-config')]);
   }
   #config = (initializeDeferredDecorator(this, "config"), void 0);
+  /**
+   * Returns the target DOM element for portal rendering. Defaults to `document.head`
+   * when no `@headElement` argument is passed.
+   * @memberOf HeadLayout
+   */
   get headElement() {
     return this.args.headElement || document.head;
   }
@@ -48127,6 +48182,20 @@ function modifier(fn, options) {
   return setModifierManager(() => MANAGER, fn);
 }
 
+/**
+ * Ember modifier that calls a registration function exactly once when the
+ * element is first inserted into the DOM.
+ *
+ * ```html
+ * <div {{on-init this.registerElement "extra-param"}}></div>
+ * ```
+ *
+ * @param { function } registerFunction - Called with `(element, ...params)` on first insert.
+ * @param { any } [...params] - Additional positional arguments forwarded to `registerFunction`.
+ *
+ * @class OnInitModifier
+ * @extends Modifier
+ */
 class OnInitModifier extends ClassBasedModifier {
   /*
     modify() is called upon every change of any of its arguments or tracked
@@ -48153,6 +48222,10 @@ class OnInitModifier extends ClassBasedModifier {
  * @module helper/try
  */
 class Try extends Helper {
+  /**
+   * Returns the first candidate that is not `undefined` or `null`, or `""` when all are absent.
+   * @memberOf module:helper/try
+   */
   compute(candidates) {
     for (let val of candidates) {
       if (typeof val !== 'undefined' && val !== null) return val;
@@ -51979,6 +52052,10 @@ function fromZonedTime(date, timeZone, options) {
  * @module helper/eq
  */
 class Eq extends Helper {
+  /**
+   * Returns `true` when `a == b`.
+   * @memberOf module:helper/eq
+   */
   compute([a, b]) {
     return a == b;
   }
@@ -51996,6 +52073,10 @@ class Eq extends Helper {
  * @module helper/or
  */
 class Or extends Helper {
+  /**
+   * Returns `true` when at least one of `args` is truthy.
+   * @memberOf module:helper/or
+   */
   compute(args) {
     return !!args.reduce((ac, val) => ac || !!val); // true if all are true
   }
@@ -52011,6 +52092,10 @@ class Or extends Helper {
  * @module helper/not
  */
 class Not extends Helper {
+  /**
+   * Negates `a`. Treats `null` as falsy, empty arrays/objects as falsy, everything else via `!a`.
+   * @memberOf module:helper/not
+   */
   compute([a]) {
     if (a === null) return true;
     if (Array.isArray(a)) return a.length == 0;
@@ -52031,6 +52116,10 @@ class Not extends Helper {
  * @module helper/arrayify
  */
 class Arrayify extends Helper {
+  /**
+   * Wraps a scalar in a one-element array, passes arrays through (copied), and returns `[]` for `undefined`.
+   * @memberOf module:helper/arrayify
+   */
   compute([strOrArray]) {
     if (strOrArray === null) return [null];
     if (Array.isArray(strOrArray)) return strOrArray.slice();
@@ -53233,6 +53322,20 @@ tippy.setDefaultProps({
   render
 });
 
+/**
+ * Ember modifier that attaches a Tippy.js tooltip to the element's parent.
+ * The modified element is used as the tooltip content (HTML is allowed).
+ * Returns a cleanup function that destroys the Tippy instance on teardown.
+ *
+ * ```html
+ * <span {{tippy-init placement="bottom" delay=(array 200 100)}}>Tooltip text</span>
+ * ```
+ *
+ * @param { string } [placement] - Tippy placement string (e.g. `"top"`, `"bottom-start"`). Default: `"top"`.
+ * @param { array } [delay] - Show/hide delay as `[show, hide]` ms. Default: `[0, 50]`.
+ * @param { object } [popperOptions] - Extra options forwarded to Popper.js.
+ * @param { function } [onShow] - Called before the tooltip is shown; return `false` to cancel.
+ */
 const tippyInit = modifier(function tippyInit(element, [], {
   placement,
   delay,
@@ -53363,6 +53466,24 @@ const concat = concat$1;
  */
 const fn = fn$1;
 
+/**
+ * Ember modifier that initialises a Bootstrap `Modal` on the target element
+ * and controls its visibility reactively.
+ *
+ * ```html
+ * <div {{bs-modal-init @open={{this.isOpen}} onHidden=this.onClose onShown=this.onShown backdropClose={{false}} onReady=this.registerHide}}></div>
+ * ```
+ *
+ * @param { boolean } open - When `true` the modal is shown; `false` hides it.
+ * @param { function } [onHidden] - Called when the modal finishes hiding.
+ * @param { function } [onShown] - Called when the modal finishes showing.
+ * @param { boolean } [backdropClose] - When `false` clicking the backdrop does not close the modal.
+ * @param { boolean } [backdrop] - Passed directly to Bootstrap's `backdrop` option. Ignored when `backdropClose` is `false`.
+ * @param { function } [onReady] - Called once after init with a `hide()` function so the parent can close the modal programmatically.
+ *
+ * @class BsModalInitModifier
+ * @extends Modifier
+ */
 class BsModalInitModifier extends ClassBasedModifier {
   _modal = null;
   modify(element, [open], {
@@ -53492,15 +53613,30 @@ class BsModal extends GlimmerComponent {
     });
   }
   #_close = (initializeDeferredDecorator(this, "_close"), void 0);
+  /**
+   * Stores the `hide()` function provided by {@link BsModalInitModifier} so
+   * the modal can be closed programmatically via `close()`.
+   * @memberOf BsModal
+   */
   registerClose(fn) {
     this._close = fn;
   }
+
+  /**
+   * Hides the modal by calling the registered Bootstrap `hide()` function.
+   * @memberOf BsModal
+   */
   static {
     decorateMethodV2(this.prototype, "registerClose", [action]);
   }
   close() {
     this._close?.();
   }
+
+  /**
+   * Builds the `modal-dialog` CSS class string from `@size` and `@scrollable`.
+   * @memberOf BsModal
+   */
   static {
     decorateMethodV2(this.prototype, "close", [action]);
   }
@@ -53543,9 +53679,19 @@ const TEMPLATE$I = templateFactory(
 });
 
 class BsButton extends GlimmerComponent {
+  /**
+   * Returns the Bootstrap variant CSS class derived from `@type` (e.g. `"btn-primary"`),
+   * or an empty string when `@type` is omitted.
+   * @memberOf BsButton
+   */
   get typeClass() {
     return this.args.type ? `btn-${this.args.type}` : '';
   }
+
+  /**
+   * Forwards the native click event to `@onClick` if provided.
+   * @memberOf BsButton
+   */
   handleClick(event) {
     this.args.onClick?.(event);
   }
@@ -53616,6 +53762,10 @@ let OxiClickableComponent$1 = class OxiClickableComponent extends GlimmerCompone
     });
   }
   #showConfirmDialog = (initializeDeferredDecorator(this, "showConfirmDialog"), void 0);
+  /**
+   * Returns `true` when the clickable has an `href` (link mode).
+   * @memberOf OxiBase::Clickable
+   */
   get isLink() {
     return this.clickable.href ? true : false;
   }
@@ -53623,6 +53773,12 @@ let OxiClickableComponent$1 = class OxiClickableComponent extends GlimmerCompone
     super(...arguments);
     this.clickable = Clickable.fromHash(this.args.clickable);
   }
+
+  /**
+   * Handles a click: shows a confirmation dialog if `clickable.confirm` is set,
+   * otherwise calls `executeAction()` directly.
+   * @memberOf OxiBase::Clickable
+   */
   click(event) {
     if (this.clickable.confirm) {
       set$1(this.clickable, "loading", true);
@@ -53638,6 +53794,12 @@ let OxiClickableComponent$1 = class OxiClickableComponent extends GlimmerCompone
       event.preventDefault();
     }
   }
+
+  /**
+   * Executes the clickable's action: calls `onClick`, opens a link, triggers a backend
+   * action, or navigates to a page. Resets the confirm state first.
+   * @memberOf OxiBase::Clickable
+   */
   static {
     decorateMethodV2(this.prototype, "click", [action]);
   }
@@ -53682,6 +53844,11 @@ let OxiClickableComponent$1 = class OxiClickableComponent extends GlimmerCompone
       }
     }
   }
+
+  /**
+   * Clears the loading state and hides the confirmation dialog.
+   * @memberOf OxiBase::Clickable
+   */
   static {
     decorateMethodV2(this.prototype, "executeAction", [action]);
   }
@@ -53770,6 +53937,11 @@ class OxiClickableComponent extends GlimmerComponent {
     });
   }
   #showConfirmDialog = (initializeDeferredDecorator(this, "showConfirmDialog"), void 0);
+  /**
+   * Returns the CSS class for the current button format (or `"oxi-btn-loading"` while
+   * the button is in a loading state). Falls back to `"oxi-btn-optional"` for unknown formats.
+   * @memberOf OxiBase::Button
+   */
   get formatCSSClass() {
     if (this.args.button.loading) {
       return "oxi-btn-loading";
@@ -53783,6 +53955,11 @@ class OxiClickableComponent extends GlimmerComponent {
     }
     return cssClass;
   }
+
+  /**
+   * Returns `@button` as a {@link Clickable} instance.
+   * @memberOf OxiBase::Button
+   */
   get clickable() {
     return Clickable.fromHash(this.args.button);
   }
@@ -53794,27 +53971,51 @@ const TEMPLATE$F = templateFactory(
   <!-- components/oxi-section/button -->
 <OxiBase::Button @button={{this.button}}>
     {{#if @def.image}}
-        <img src={{@def.image}} alt="" />
-        <br/>
+        <div class="oxi-section-button-image">
+            <img src={{@def.image}} alt="" />
+        </div>
+    {{else if this.icon}}
+        <div class="oxi-section-button-icon {{this.icon}}"></div>
     {{/if}}
-    {{@def.label}}
+    {{#if @def.description}}
+        <div class="oxi-section-button-description">
+            {{@def.description}}
+        </div>
+    {{/if}}
 </OxiBase::Button>
 
 */
 {
-  "id": "SIaMB5K2",
-  "block": "[[[3,\" components/oxi-section/button \"],[1,\"\\n\"],[8,[32,0],null,[[\"@button\"],[[30,0,[\"button\"]]]],[[\"default\"],[[[[1,\"\\n\"],[41,[30,1,[\"image\"]],[[[1,\"        \"],[10,\"img\"],[15,\"src\",[30,1,[\"image\"]]],[14,\"alt\",\"\"],[12],[13],[1,\"\\n        \"],[10,\"br\"],[12],[13],[1,\"\\n\"]],[]],null],[1,\"    \"],[1,[30,1,[\"label\"]]],[1,\"\\n\"]],[]]]]],[1,\"\\n\"]],[\"@def\"],[\"if\",\"img\",\"br\"]]",
+  "id": "O8SpvzuZ",
+  "block": "[[[3,\" components/oxi-section/button \"],[1,\"\\n\"],[8,[32,0],null,[[\"@button\"],[[30,0,[\"button\"]]]],[[\"default\"],[[[[1,\"\\n\"],[41,[30,1,[\"image\"]],[[[1,\"        \"],[10,0],[14,0,\"oxi-section-button-image\"],[12],[1,\"\\n            \"],[10,\"img\"],[15,\"src\",[30,1,[\"image\"]]],[14,\"alt\",\"\"],[12],[13],[1,\"\\n        \"],[13],[1,\"\\n\"]],[]],[[[41,[30,0,[\"icon\"]],[[[1,\"        \"],[10,0],[15,0,[29,[\"oxi-section-button-icon \",[30,0,[\"icon\"]]]]],[12],[13],[1,\"\\n    \"]],[]],null]],[]]],[41,[30,1,[\"description\"]],[[[1,\"        \"],[10,0],[14,0,\"oxi-section-button-description\"],[12],[1,\"\\n            \"],[1,[30,1,[\"description\"]]],[1,\"\\n        \"],[13],[1,\"\\n\"]],[]],null]],[]]]]],[1,\"\\n\"]],[\"@def\"],[\"if\",\"div\",\"img\"]]",
   "moduleName": "/build/app/components/oxi-section/button/index.hbs",
   "scope": () => [OxiClickableComponent],
   "isStrictMode": false
 });
 
 class OxiSectionButtonComponent extends GlimmerComponent {
+  /**
+   * Returns the button definition with `format` defaulted to `"tile"`.
+   * @memberOf OxiSection::Button
+   */
   get button() {
     return {
       format: 'tile',
       ...this.args.def
     };
+  }
+
+  /**
+   * Returns the resolved icon CSS class string, expanding `glyphicon-*` / `bi-*` prefixes,
+   * or `null` when no icon is configured.
+   * @memberOf OxiSection::Button
+   */
+  get icon() {
+    let icon = this.args.def.icon;
+    if (!icon) return null;
+    if (icon.match(/^glyphicon-/)) return `glyphicon ${icon}`;
+    if (icon.match(/^bi-/)) return `bi ${icon}`;
+    return icon;
   }
 }
 setComponentTemplate(TEMPLATE$F, OxiSectionButtonComponent);
@@ -53834,8 +54035,7 @@ const TEMPLATE$E = templateFactory(
         {{#each this.cards as |card|}}
             <OxiBase::Button
                 @button={{card._clickable}}
-                class={{card.css_class}}
-                class="card w-100 mx-0 my-4 p-0 text-start"
+                class="card w-100 mx-0 my-4 p-0 text-start {{card.css_class}}"
                 style={{if card.color (concat "background-color: " card.color)}}
             >
                 {{#if card.label}}
@@ -53879,8 +54079,7 @@ const TEMPLATE$E = templateFactory(
             <div class="col">
                 <OxiBase::Button
                     @button={{card._clickable}}
-                    class={{card.css_class}}
-                    class="card h-100 w-100 m-0 p-0 text-start align-items-center"
+                    class="card h-100 w-100 m-0 p-0 text-start align-items-center {{card.css_class}}"
                     style={{if card.color (concat "background-color: " card.color)}}
                 >
                     {{#if card.label}}
@@ -53891,7 +54090,7 @@ const TEMPLATE$E = templateFactory(
                         </div>
                     {{/if}}
                     {{#if card.image}}
-                        <img src={{card.image}} class="m-3" />
+                        <img src={{card.image}} alt="" class="m-3" />
                     {{/if}}
                     {{#if card.description}}
                         <div class="card-body">
@@ -53915,14 +54114,19 @@ const TEMPLATE$E = templateFactory(
 
 */
 {
-  "id": "QvXb9RpU",
-  "block": "[[[3,\" components/oxi-section/cards \"],[1,\"\\n\"],[41,[30,0,[\"cards\"]],[[[41,[30,1,[\"vertical\"]],[[[1,\"\\n        \"],[10,0],[14,0,\"oxi-realm-cards-vertical col-md-10\"],[12],[1,\"\\n\"],[42,[28,[37,3],[[28,[37,3],[[30,0,[\"cards\"]]],null]],null],null,[[[1,\"            \"],[8,[32,0],[[16,0,[30,2,[\"css_class\"]]],[24,0,\"card w-100 mx-0 my-4 p-0 text-start\"],[16,5,[52,[30,2,[\"color\"]],[28,[32,1],[\"background-color: \",[30,2,[\"color\"]]],null]]]],[[\"@button\"],[[30,2,[\"_clickable\"]]]],[[\"default\"],[[[[1,\"\\n\"],[41,[30,2,[\"label\"]],[[[1,\"                    \"],[10,0],[14,0,\"card-header w-100 text-body-secondary bg-dark-subtle text-light\"],[12],[1,\"\\n                        \"],[10,\"h5\"],[14,0,\"card-title\"],[12],[1,\"\\n                            \"],[1,[28,[32,2],[[30,2,[\"label\"]]],null]],[1,\"\\n                        \"],[13],[1,\"\\n                    \"],[13],[1,\"\\n\"]],[]],null],[41,[28,[32,3],[[30,2,[\"description\"]],[30,2,[\"image\"]]],null],[[[1,\"                    \"],[10,0],[14,0,\"row gx-2 py-2\"],[12],[1,\"\\n\"],[41,[30,2,[\"image\"]],[[[1,\"                            \"],[10,0],[14,0,\"col-md-2 text-center d-flex justify-content-center align-items-center\"],[12],[1,\"\\n                                \"],[10,\"img\"],[15,\"src\",[30,2,[\"image\"]]],[12],[13],[1,\"\\n                            \"],[13],[1,\"\\n\"]],[]],null],[1,\"                        \"],[10,0],[15,0,[52,[30,2,[\"image\"]],\"col-md-10\",\"col-md-12\"]],[12],[1,\"\\n                            \"],[10,0],[14,0,\"card-body\"],[12],[1,\"\\n\"],[41,[30,2,[\"description\"]],[[[1,\"                                    \"],[10,2],[14,0,\"card-text\"],[12],[1,\"\\n                                        \"],[1,[28,[32,2],[[30,2,[\"description\"]]],null]],[1,\"\\n                                    \"],[13],[1,\"\\n\"]],[]],null],[1,\"                            \"],[13],[1,\"\\n                        \"],[13],[1,\"\\n                    \"],[13],[1,\"\\n\"]],[]],null],[41,[30,2,[\"footer\"]],[[[1,\"                    \"],[10,0],[14,0,\"card-footer w-100 text-body-secondary text-center\"],[12],[1,\"\\n                        \"],[1,[28,[32,2],[[30,2,[\"footer\"]]],null]],[1,\"\\n                    \"],[13],[1,\"\\n\"]],[]],null],[1,\"            \"]],[]]]]],[1,\"\\n\"]],[2]],null],[1,\"        \"],[13],[1,\"\\n\\n\"]],[]],[[[1,\"\\n        \"],[10,0],[14,0,\"oxi-realm-cards-grid row row-cols-1 row-cols-md-3 g-4\"],[12],[1,\"\\n\"],[42,[28,[37,3],[[28,[37,3],[[30,0,[\"cards\"]]],null]],null],null,[[[1,\"            \"],[10,0],[14,0,\"col\"],[12],[1,\"\\n                \"],[8,[32,0],[[16,0,[30,3,[\"css_class\"]]],[24,0,\"card h-100 w-100 m-0 p-0 text-start align-items-center\"],[16,5,[52,[30,3,[\"color\"]],[28,[32,1],[\"background-color: \",[30,3,[\"color\"]]],null]]]],[[\"@button\"],[[30,3,[\"_clickable\"]]]],[[\"default\"],[[[[1,\"\\n\"],[41,[30,3,[\"label\"]],[[[1,\"                        \"],[10,0],[14,0,\"card-header w-100 text-body-secondary text-center bg-dark-subtle text-light\"],[12],[1,\"\\n                            \"],[10,\"h5\"],[14,0,\"card-title\"],[12],[1,\"\\n                                \"],[1,[28,[32,2],[[30,3,[\"label\"]]],null]],[1,\"\\n                            \"],[13],[1,\"\\n                        \"],[13],[1,\"\\n\"]],[]],null],[41,[30,3,[\"image\"]],[[[1,\"                        \"],[10,\"img\"],[15,\"src\",[30,3,[\"image\"]]],[14,0,\"m-3\"],[12],[13],[1,\"\\n\"]],[]],null],[41,[30,3,[\"description\"]],[[[1,\"                        \"],[10,0],[14,0,\"card-body\"],[12],[1,\"\\n                            \"],[10,2],[14,0,\"card-text\"],[12],[1,\"\\n                                \"],[1,[28,[32,2],[[30,3,[\"description\"]]],null]],[1,\"\\n                            \"],[13],[1,\"\\n                        \"],[13],[1,\"\\n\"]],[]],null],[41,[30,3,[\"footer\"]],[[[1,\"                        \"],[10,0],[14,0,\"card-footer w-100 text-body-secondary text-center\"],[12],[1,\"\\n                            \"],[1,[28,[32,2],[[30,3,[\"footer\"]]],null]],[1,\"\\n                        \"],[13],[1,\"\\n\"]],[]],null],[1,\"                \"]],[]]]]],[1,\"\\n            \"],[13],[1,\"\\n\"]],[3]],null],[1,\"        \"],[13],[1,\"\\n\\n\"]],[]]]],[]],null]],[\"@def\",\"card\",\"card\"],[\"if\",\"div\",\"each\",\"-track-array\",\"h5\",\"img\",\"p\"]]",
+  "id": "tNMOlR29",
+  "block": "[[[3,\" components/oxi-section/cards \"],[1,\"\\n\"],[41,[30,0,[\"cards\"]],[[[41,[30,1,[\"vertical\"]],[[[1,\"\\n        \"],[10,0],[14,0,\"oxi-realm-cards-vertical col-md-10\"],[12],[1,\"\\n\"],[42,[28,[37,3],[[28,[37,3],[[30,0,[\"cards\"]]],null]],null],null,[[[1,\"            \"],[8,[32,0],[[16,0,[29,[\"card w-100 mx-0 my-4 p-0 text-start \",[30,2,[\"css_class\"]]]]],[16,5,[52,[30,2,[\"color\"]],[28,[32,1],[\"background-color: \",[30,2,[\"color\"]]],null]]]],[[\"@button\"],[[30,2,[\"_clickable\"]]]],[[\"default\"],[[[[1,\"\\n\"],[41,[30,2,[\"label\"]],[[[1,\"                    \"],[10,0],[14,0,\"card-header w-100 text-body-secondary bg-dark-subtle text-light\"],[12],[1,\"\\n                        \"],[10,\"h5\"],[14,0,\"card-title\"],[12],[1,\"\\n                            \"],[1,[28,[32,2],[[30,2,[\"label\"]]],null]],[1,\"\\n                        \"],[13],[1,\"\\n                    \"],[13],[1,\"\\n\"]],[]],null],[41,[28,[32,3],[[30,2,[\"description\"]],[30,2,[\"image\"]]],null],[[[1,\"                    \"],[10,0],[14,0,\"row gx-2 py-2\"],[12],[1,\"\\n\"],[41,[30,2,[\"image\"]],[[[1,\"                            \"],[10,0],[14,0,\"col-md-2 text-center d-flex justify-content-center align-items-center\"],[12],[1,\"\\n                                \"],[10,\"img\"],[15,\"src\",[30,2,[\"image\"]]],[12],[13],[1,\"\\n                            \"],[13],[1,\"\\n\"]],[]],null],[1,\"                        \"],[10,0],[15,0,[52,[30,2,[\"image\"]],\"col-md-10\",\"col-md-12\"]],[12],[1,\"\\n                            \"],[10,0],[14,0,\"card-body\"],[12],[1,\"\\n\"],[41,[30,2,[\"description\"]],[[[1,\"                                    \"],[10,2],[14,0,\"card-text\"],[12],[1,\"\\n                                        \"],[1,[28,[32,2],[[30,2,[\"description\"]]],null]],[1,\"\\n                                    \"],[13],[1,\"\\n\"]],[]],null],[1,\"                            \"],[13],[1,\"\\n                        \"],[13],[1,\"\\n                    \"],[13],[1,\"\\n\"]],[]],null],[41,[30,2,[\"footer\"]],[[[1,\"                    \"],[10,0],[14,0,\"card-footer w-100 text-body-secondary text-center\"],[12],[1,\"\\n                        \"],[1,[28,[32,2],[[30,2,[\"footer\"]]],null]],[1,\"\\n                    \"],[13],[1,\"\\n\"]],[]],null],[1,\"            \"]],[]]]]],[1,\"\\n\"]],[2]],null],[1,\"        \"],[13],[1,\"\\n\\n\"]],[]],[[[1,\"\\n        \"],[10,0],[14,0,\"oxi-realm-cards-grid row row-cols-1 row-cols-md-3 g-4\"],[12],[1,\"\\n\"],[42,[28,[37,3],[[28,[37,3],[[30,0,[\"cards\"]]],null]],null],null,[[[1,\"            \"],[10,0],[14,0,\"col\"],[12],[1,\"\\n                \"],[8,[32,0],[[16,0,[29,[\"card h-100 w-100 m-0 p-0 text-start align-items-center \",[30,3,[\"css_class\"]]]]],[16,5,[52,[30,3,[\"color\"]],[28,[32,1],[\"background-color: \",[30,3,[\"color\"]]],null]]]],[[\"@button\"],[[30,3,[\"_clickable\"]]]],[[\"default\"],[[[[1,\"\\n\"],[41,[30,3,[\"label\"]],[[[1,\"                        \"],[10,0],[14,0,\"card-header w-100 text-body-secondary text-center bg-dark-subtle text-light\"],[12],[1,\"\\n                            \"],[10,\"h5\"],[14,0,\"card-title\"],[12],[1,\"\\n                                \"],[1,[28,[32,2],[[30,3,[\"label\"]]],null]],[1,\"\\n                            \"],[13],[1,\"\\n                        \"],[13],[1,\"\\n\"]],[]],null],[41,[30,3,[\"image\"]],[[[1,\"                        \"],[10,\"img\"],[15,\"src\",[30,3,[\"image\"]]],[14,\"alt\",\"\"],[14,0,\"m-3\"],[12],[13],[1,\"\\n\"]],[]],null],[41,[30,3,[\"description\"]],[[[1,\"                        \"],[10,0],[14,0,\"card-body\"],[12],[1,\"\\n                            \"],[10,2],[14,0,\"card-text\"],[12],[1,\"\\n                                \"],[1,[28,[32,2],[[30,3,[\"description\"]]],null]],[1,\"\\n                            \"],[13],[1,\"\\n                        \"],[13],[1,\"\\n\"]],[]],null],[41,[30,3,[\"footer\"]],[[[1,\"                        \"],[10,0],[14,0,\"card-footer w-100 text-body-secondary text-center\"],[12],[1,\"\\n                            \"],[1,[28,[32,2],[[30,3,[\"footer\"]]],null]],[1,\"\\n                        \"],[13],[1,\"\\n\"]],[]],null],[1,\"                \"]],[]]]]],[1,\"\\n            \"],[13],[1,\"\\n\"]],[3]],null],[1,\"        \"],[13],[1,\"\\n\\n\"]],[]]]],[]],null]],[\"@def\",\"card\",\"card\"],[\"if\",\"div\",\"each\",\"-track-array\",\"h5\",\"img\",\"p\"]]",
   "moduleName": "/build/app/components/oxi-section/cards/index.hbs",
   "scope": () => [OxiClickableComponent, concat, Defuse, Or],
   "isStrictMode": false
 });
 
 class OxiSectionCardsComponent extends GlimmerComponent {
+  /**
+   * Returns the card list with a `_clickable` property ({@link Clickable}) injected
+   * into each card for use by the template.
+   * @memberOf OxiSection::Cards
+   */
   get cards() {
     let cards = this.args.def.cards || [];
     // inject _clickable property
@@ -53981,9 +54185,15 @@ function addClass(el, c) {
   c != null && el.classList.add(c);
 }
 
-/*
-  Pie chart class
-*/
+/**
+ * Renders an SVG-based pie chart into `element`, reusing uPlot's CSS class names
+ * for consistent legend styling. Attaches a `ResizeObserver` when `opts.width`
+ * or `opts.height` is `"auto"` and stores a cleanup callback on `element._pieCleanup`.
+ *
+ * @param { HTMLElement } element - Container element to render into.
+ * @param { object } opts - Chart options (see {@link OxiBase::Chart} for the full schema).
+ * @param { array } data - Row-major data: `[ [x1, pct1, pct2, ...], ... ]` (x value is discarded).
+ */
 function ChartPie(element, opts, data) {
   // https://github.com/leeoniya/uPlot/blob/1.6.4/src/uPlot.js#L270
   const root = self.root = placeDiv(UPLOT);
@@ -54133,9 +54343,22 @@ function reducedAlphaColor(cssColor) {
   }
 }
 
-/*
-  Line and Bar chart class
-*/
+/**
+ * Renders a uPlot-powered line or bar chart into `element`.
+ * Lazy-imports `uplot` and {@link SeriesBarsPlugin} to avoid a top-level
+ * `Intl.NumberFormat` crash when `navigator.language` is invalid.
+ * When `opts.width` or `opts.height` is `"auto"`, a `ResizeObserver` keeps
+ * the chart sized to its container; a cleanup function is stored on
+ * `element._uplotCleanup` for the Ember component to call on teardown.
+ *
+ * @param { HTMLElement } element - Container element to render into.
+ * @param { object } opts - Chart options (see {@link OxiBase::Chart} for the full schema).
+ * @param { array } opts.type - `"line"` or `"bar"`.
+ * @param { number|string } opts.width - Width in px or `"auto"`.
+ * @param { number|string } opts.height - Height in px or `"auto"`.
+ * @param { array } opts.series - Series definitions.
+ * @param { array } data - Row-major data array: `[ [x1, a1, b1], [x2, a2, b2], ... ]`.
+ */
 async function ChartLineBar(element, opts, data) {
   // uPlot calls new Intl.NumberFormat(navigator.language) when it first loads.
   // Guard against invalid language tags (e.g. Playwright sets it to "undefined").
@@ -54480,6 +54703,13 @@ class OxiChartComponent extends GlimmerComponent {
       };
     });
   }
+
+  /**
+   * Renders the chart into `element` by delegating to {@link ChartLineBar} or
+   * {@link ChartPie} based on `options.type`. Registers cleanup destructors for
+   * `ResizeObserver` teardown.
+   * @memberOf OxiBase::Chart
+   */
   async plot(element) {
     const type = this.args.options.type;
     if (type == 'line' || type == 'bar') {
@@ -54515,7 +54745,12 @@ const TEMPLATE$C = templateFactory(
   "isStrictMode": false
 });
 
-let OxiSectionKeyvalueComponent$1 = class OxiSectionKeyvalueComponent extends GlimmerComponent {
+class OxiSectionChartComponent extends GlimmerComponent {
+  /**
+   * Returns the merged options hash, mapping `def.className` to `options.cssClass`
+   * for compatibility with {@link OxiBase::Chart}.
+   * @memberOf OxiSection::Chart
+   */
   get options() {
     let add = {};
     if (this.args.def?.className) {
@@ -54526,12 +54761,12 @@ let OxiSectionKeyvalueComponent$1 = class OxiSectionKeyvalueComponent extends Gl
       ...add
     };
   }
-};
-setComponentTemplate(TEMPLATE$C, OxiSectionKeyvalueComponent$1);
+}
+setComponentTemplate(TEMPLATE$C, OxiSectionChartComponent);
 
 const __vite_glob_0_2$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
-	default: OxiSectionKeyvalueComponent$1
+	default: OxiSectionChartComponent
 }, Symbol.toStringTag, { value: 'Module' }));
 
 function esCompat(m) {
@@ -57145,14 +57380,33 @@ class EmberFlatpickr extends GlimmerComponent {
       this.flatpickrRef = undefined;
     };
   });
+
+  /**
+   * Tears down the flatpickr instance when the component leaves the DOM.
+   * Calls `@onDestroyed` if provided.
+   * @memberOf EmberFlatpickr
+   */
   willDestroy() {
     super.willDestroy();
     this.args.onDestroyed?.();
     this.flatpickrRef?.destroy();
     this.flatpickrRef = undefined;
   }
+
+  /**
+   * No-op default for the flatpickr `onClose` event.
+   * @memberOf EmberFlatpickr
+   */
   _onClose() {}
+  /**
+   * No-op default for the flatpickr `onOpen` event.
+   * @memberOf EmberFlatpickr
+   */
   _onOpen() {}
+  /**
+   * No-op default for the flatpickr `onReady` event.
+   * @memberOf EmberFlatpickr
+   */
   _onReady() {}
 }
 setComponentTemplate(TEMPLATE$A, EmberFlatpickr);
@@ -57230,6 +57484,11 @@ class OxiFieldDatetimeComponent extends GlimmerComponent {
     });
   }
   #allowClearing = (initializeDeferredDecorator(this, "allowClearing"), void 0);
+  /**
+   * Returns the resolved IANA timezone string. `"utc"` stays as-is; `"local"` is
+   * replaced with the browser's timezone via `Intl.DateTimeFormat`.
+   * @memberOf OxiSection::Form::Field::Datetime
+   */
   get timezone() {
     let tz = this.args.content.timezone || "utc";
     if (tz === "local") tz = Intl.DateTimeFormat().resolvedOptions().timeZone; // Browser's timezone
@@ -57250,6 +57509,13 @@ class OxiFieldDatetimeComponent extends GlimmerComponent {
       this.allowClearing = true;
     }
   }
+
+  /**
+   * Called by {@link EmberFlatpickr} once the picker is initialized.
+   * Stores the flatpickr instance, normalizes the `"now"` preset to a concrete epoch,
+   * and registers the input element for focus management.
+   * @memberOf OxiSection::Form::Field::Datetime
+   */
   onReady(dates, dateStr, flatpickr) {
     this.flatpickr = flatpickr;
     // For the "now" preset: normalize to a specific epoch so the form submits
@@ -57263,6 +57529,12 @@ class OxiFieldDatetimeComponent extends GlimmerComponent {
     }
     this.args.setFocusInfo(flatpickr.element, true);
   }
+
+  /**
+   * Clears the stored flatpickr reference when the picker is destroyed (modifier re-run or teardown),
+   * preventing stale calls during the gap before the next `onReady`.
+   * @memberOf OxiSection::Form::Field::Datetime
+   */
   static {
     decorateMethodV2(this.prototype, "onReady", [action]);
   }
@@ -57273,12 +57545,22 @@ class OxiFieldDatetimeComponent extends GlimmerComponent {
     // destroy and the next onReady.
     this.flatpickr = undefined;
   }
+
+  /**
+   * Programmatically opens the flatpickr calendar (triggered by the calendar icon button).
+   * @memberOf OxiSection::Form::Field::Datetime
+   */
   static {
     decorateMethodV2(this.prototype, "onFlatpickrDestroyed", [action]);
   }
   openFlatpickr() {
     this.flatpickr?.open();
   }
+
+  /**
+   * Clears the current date selection and resets the tracked `date` property to `null`.
+   * @memberOf OxiSection::Form::Field::Datetime
+   */
   static {
     decorateMethodV2(this.prototype, "openFlatpickr", [action]);
   }
@@ -57286,6 +57568,13 @@ class OxiFieldDatetimeComponent extends GlimmerComponent {
     this.date = null;
     this.flatpickr?.clear();
   }
+
+  /**
+   * Called by {@link EmberFlatpickr} when the user selects or clears a date.
+   * Converts the selected wall-clock date to a UTC epoch and reports it via `onChange`.
+   * Updates `allowClearing` to show/hide the clear button.
+   * @memberOf OxiSection::Form::Field::Datetime
+   */
   static {
     decorateMethodV2(this.prototype, "clearFlatpickr", [action]);
   }
@@ -63047,9 +63336,20 @@ class OxiSelectComponent extends GlimmerComponent {
     });
   }
   #allowClearing = (initializeDeferredDecorator(this, "allowClearing"), void 0);
+  /**
+   * Returns the CSS class(es) for the underlying `<select>` element.
+   * Inline mode omits the `form-control` wrapper.
+   * @memberOf OxiBase::Select
+   */
   get cssClasses() {
     return this.args.inline ? 'oxi-inline-select' : 'form-select text-truncate';
   }
+
+  /**
+   * Returns the placeholder string, converting an empty `""` to `"…"` so
+   * Choices.js recognises it. Returns `null` when no placeholder is configured.
+   * @memberOf OxiBase::Select
+   */
   get placeholder() {
     let label = this.args.placeholder ?? null;
     // convert empty to non-empty string so Choice.js will recognize placeholder
@@ -63057,13 +63357,21 @@ class OxiSelectComponent extends GlimmerComponent {
     if (label === '') label = '…';
     return label;
   }
+
+  /**
+   * Redirects browser focus to the Choices.js outer container element.
+   * @memberOf OxiBase::Select
+   */
   focussed(element) {
     // "redirect" focus to the dynamically created Choices.js object
     if (this.#choicesObj) this.#choicesObj.containerOuter.element.focus();
   }
 
-  // initially trigger the onChange event to handle the case
-  // when the calling code has no "current selection" defined.
+  /**
+   * Initialises the Choices.js widget on insert and fires `@onChange` once to
+   * report the initial selection.
+   * @memberOf OxiBase::Select
+   */
   static {
     decorateMethodV2(this.prototype, "focussed", [action]);
   }
@@ -63102,6 +63410,12 @@ class OxiSelectComponent extends GlimmerComponent {
     if (this.args.setFocusInfo) this.args.setFocusInfo(this.#choicesObj.containerOuter.element, true);
     this.notifyOnChange();
   }
+
+  /**
+   * Reads the currently selected item from Choices.js and calls `@onChange`
+   * with its value and label. Also enables the clear button when `@showClearButton` is set.
+   * @memberOf OxiBase::Select
+   */
   static {
     decorateMethodV2(this.prototype, "startup", [action]);
   }
@@ -63117,6 +63431,11 @@ class OxiSelectComponent extends GlimmerComponent {
     }
     this.args.onChange(item.element.value, item.element.label);
   }
+
+  /**
+   * Clears the current selection and calls `@onChange(null, null)`.
+   * @memberOf OxiBase::Select
+   */
   static {
     decorateMethodV2(this.prototype, "notifyOnChange", [action]);
   }
@@ -63214,6 +63533,12 @@ class OxiFieldSelectComponent extends GlimmerComponent {
     if (val === null || val === undefined || val === '') return false;
     return this.args.content.options.map(o => o.value).indexOf(val) < 0;
   }
+
+  /**
+   * Returns the placeholder text. Translates the special value `'_default'` or a missing
+   * placeholder (on optional fields) to the i18n key `component.oxifield_select.default_placeholder`.
+   * @memberOf OxiSection::Form::Field::Select
+   */
   get placeholder() {
     let label = this.args.content.placeholder;
     if (label == '_default' || !label && this.args.content.is_optional) {
@@ -63221,6 +63546,12 @@ class OxiFieldSelectComponent extends GlimmerComponent {
     }
     return label;
   }
+
+  /**
+   * Returns `true` when there is exactly one option and the field is neither editable nor optional.
+   * In this case the value is pre-selected and the `<select>` is rendered as read-only static text.
+   * @memberOf OxiSection::Form::Field::Select
+   */
   get isStatic() {
     let options = this.args.content.options;
     let isEditable = this.args.content.editable;
@@ -63231,10 +63562,22 @@ class OxiFieldSelectComponent extends GlimmerComponent {
       return false;
     }
   }
+
+  /**
+   * Propagates the selected value to the parent form via `onChange`.
+   * @memberOf OxiSection::Form::Field::Select
+   */
   optionSelected(value) {
     debug$1(`oxifield-select (${this.args.content.name}): optionSelected(${value})`);
     this.args.onChange(value);
   }
+
+  /**
+   * Toggles between the `<select>` drop-down and the free-text custom-value input.
+   * When switching back to select mode, resets to the first option if the current value
+   * is not in the option list.
+   * @memberOf OxiSection::Form::Field::Select
+   */
   static {
     decorateMethodV2(this.prototype, "optionSelected", [action]);
   }
@@ -63246,6 +63589,12 @@ class OxiFieldSelectComponent extends GlimmerComponent {
       this.args.onChange(this.args.content.options[0].value);
     }
   }
+
+  /**
+   * Called when the custom free-text input is inserted into the DOM.
+   * Immediately focuses the element so the user can start typing.
+   * @memberOf OxiSection::Form::Field::Select
+   */
   static {
     decorateMethodV2(this.prototype, "toggleCustomMode", [action]);
   }
@@ -63253,6 +63602,11 @@ class OxiFieldSelectComponent extends GlimmerComponent {
     element.focus(); // to focus after user hit the toggle button
     // oxi-section/form might steal focus again on initial form rendering
   }
+
+  /**
+   * Propagates free-text input changes to the parent form via `onChange`.
+   * @memberOf OxiSection::Form::Field::Select
+   */
   static {
     decorateMethodV2(this.prototype, "onCustomInsert", [action]);
   }
@@ -63408,14 +63762,29 @@ class OxiFieldTextComponent extends GlimmerComponent {
       }
     }
   }
+
+  /**
+   * Returns `true` when `content.autocomplete_query` is configured.
+   * @memberOf OxiSection::Form::Field::Text
+   */
   get isAutoComplete() {
     return !!this.args.content.autocomplete_query;
   }
+
+  /**
+   * Propagates a keyboard input change to `setValue`.
+   * @memberOf OxiSection::Form::Field::Text
+   */
   onInput(evt) {
     let inputField = event.target;
     this.setValue(inputField.value); // do NOT clean up manually typed text ("the 's-Gravenhage bug")
   }
 
+  /**
+   * Custom paste handler that strips leading/trailing quotes and whitespace from the pasted text
+   * before calling `setValue`, and restores the correct cursor position after Ember's render cycle.
+   * @memberOf OxiSection::Form::Field::Text
+   */
   // Own "paste" implementation to allow for text cleanup
   static {
     decorateMethodV2(this.prototype, "onInput", [action]);
@@ -63516,6 +63885,13 @@ class OxiFieldTextComponent extends GlimmerComponent {
       });
     }, 0.3);
   }
+
+  /**
+   * Handles keyboard navigation inside the autocomplete drop-down:
+   * Enter selects the active result, Escape closes the drop-down,
+   * ArrowUp/ArrowDown move the active highlight.
+   * @memberOf OxiSection::Form::Field::Text
+   */
   onKeydown(evt) {
     if (this.isDropdownOpen == false) return;
 
@@ -63562,6 +63938,12 @@ class OxiFieldTextComponent extends GlimmerComponent {
     a = results[index];
     return set$1(a, "active", true);
   }
+
+  /**
+   * On focus, re-runs the autocomplete query when other sibling fields are referenced
+   * (as their values may have changed), or simply re-shows the cached result list.
+   * @memberOf OxiSection::Form::Field::Text
+   */
   onFocus() {
     if (this.isAutoComplete) {
       // If we also send other form field(s) then better refresh the
@@ -63577,6 +63959,11 @@ class OxiFieldTextComponent extends GlimmerComponent {
       }
     }
   }
+
+  /**
+   * Closes the autocomplete drop-down and cancels any pending debounced query timer on blur.
+   * @memberOf OxiSection::Form::Field::Text
+   */
   static {
     decorateMethodV2(this.prototype, "onFocus", [action]);
   }
@@ -63584,6 +63971,11 @@ class OxiFieldTextComponent extends GlimmerComponent {
     this.isDropdownOpen = false;
     this.content.cancelTimer(this.#id);
   }
+
+  /**
+   * Prevents the text input from losing focus when the user clicks inside the autocomplete drop-down list.
+   * @memberOf OxiSection::Form::Field::Text
+   */
   static {
     decorateMethodV2(this.prototype, "onBlur", [action]);
   }
@@ -63595,6 +63987,12 @@ class OxiFieldTextComponent extends GlimmerComponent {
     evt.stopPropagation();
     evt.preventDefault();
   }
+
+  /**
+   * Selects an autocomplete result: sets `value` to `res.value`, `label` to `res.label`,
+   * notifies the parent via `onChange`, and closes the drop-down.
+   * @memberOf OxiSection::Form::Field::Text
+   */
   static {
     decorateMethodV2(this.prototype, "onMouseDown", [action]);
   }
@@ -63709,6 +64107,12 @@ class Autofill extends GlimmerComponent {
     this.valueSetter = this.args.valueSetter;
     if (this.autorun) this.query();
   }
+
+  /**
+   * Resolves referenced sibling field values, sends the configured HTTP request to the backend,
+   * and passes the response text to `valueSetter`.
+   * @memberOf OxiSection::Form::AutoFill
+   */
   query() {
     // resolve referenced fields and their values
     let data = {
@@ -63738,6 +64142,12 @@ class Autofill extends GlimmerComponent {
       }
     });
   }
+
+  /**
+   * Returns the button label, using `button_label` if set, otherwise the i18n key `autofill.button`
+   * parameterized with `label`.
+   * @memberOf OxiSection::Form::AutoFill
+   */
   static {
     decorateMethodV2(this.prototype, "query", [action]);
   }
@@ -63860,36 +64270,72 @@ class OxiFieldTextareaComponent extends GlimmerComponent {
     this.textOutput = this.args.content.value;
     if (this.textOutput) this.setValue(this.textOutput);
   }
+
+  /**
+   * Returns the number of visible textarea rows (default: `10`).
+   * @memberOf OxiSection::Form::Field::Textarea
+   */
   get rows() {
     return this.args.content?.rows || 10;
   }
+
+  /**
+   * Returns `true` when a non-empty value (text or binary) is set.
+   * @memberOf OxiSection::Form::Field::Textarea
+   */
   get hasContent() {
     return this.value ? true : false;
   }
+
+  /**
+   * Prevents Enter key from bubbling up to the parent form's submit handler inside a textarea.
+   * @memberOf OxiSection::Form::Field::Textarea
+   */
   onKeydown(event) {
     // prevent form submit when hitting ENTER
     if (event.key === 'Enter') {
       event.stopPropagation();
     }
   }
+
+  /**
+   * Stores a reference to the hidden `<input type="file">` element so it can be triggered programmatically.
+   * @memberOf OxiSection::Form::Field::Textarea
+   */
   static {
     decorateMethodV2(this.prototype, "onKeydown", [action]);
   }
   setFileUploadElement(element) {
     this.fileUploadElement = element;
   }
+
+  /**
+   * Propagates a manual text-input change to `setValue`.
+   * @memberOf OxiSection::Form::Field::Textarea
+   */
   static {
     decorateMethodV2(this.prototype, "setFileUploadElement", [action]);
   }
   onInput(evt) {
     this.setValue(evt.target.value);
   }
+
+  /**
+   * Programmatically clicks the hidden file input to open the system file picker.
+   * @memberOf OxiSection::Form::Field::Textarea
+   */
   static {
     decorateMethodV2(this.prototype, "onInput", [action]);
   }
   openFileUpload() {
     this.fileUploadElement.click();
   }
+
+  /**
+   * Handles file selection via the `<input type="file">` element.
+   * Resets the input value after reading so the same file can be re-selected.
+   * @memberOf OxiSection::Form::Field::Textarea
+   */
   static {
     decorateMethodV2(this.prototype, "openFileUpload", [action]);
   }
@@ -63906,6 +64352,12 @@ class OxiFieldTextareaComponent extends GlimmerComponent {
       evt.target.value = null;
     }
   }
+
+  /**
+   * Handles a file dropped onto the textarea via drag-and-drop.
+   * No-op when `allow_upload` is not set.
+   * @memberOf OxiSection::Form::Field::Textarea
+   */
   static {
     decorateMethodV2(this.prototype, "fileSelected", [action]);
   }
@@ -63920,6 +64372,12 @@ class OxiFieldTextareaComponent extends GlimmerComponent {
       console.error('oxifield-textarea: error reading dropped file', e);
     }
   }
+
+  /**
+   * Sets the drag-over drop effect to `'copy'` so the OS cursor reflects the drop action.
+   * No-op when `allow_upload` is not set.
+   * @memberOf OxiSection::Form::Field::Textarea
+   */
   static {
     decorateMethodV2(this.prototype, "fileDropped", [action]);
   }
@@ -63929,6 +64387,11 @@ class OxiFieldTextareaComponent extends GlimmerComponent {
     if (!this.args.allow_upload) return;
     evt.dataTransfer.dropEffect = 'copy'; // show as "copy" action
   }
+
+  /**
+   * Clears the current value, text output, filename and unlocks the text input.
+   * @memberOf OxiSection::Form::Field::Textarea
+   */
   static {
     decorateMethodV2(this.prototype, "showCopyEffect", [action]);
   }
@@ -63972,6 +64435,12 @@ class OxiFieldTextareaComponent extends GlimmerComponent {
       this.textOutput = `<${!isSmall ? this.intl.t('component.oxifield_textarea.large_file') : this.intl.t('component.oxifield_textarea.binary_file')}>`;
     }
   }
+
+  /**
+   * Receives a string from the autofill component, converts it to an ArrayBuffer via a Blob,
+   * and delegates to `setFileData` so the content is handled identically to a dropped file.
+   * @memberOf OxiSection::Form::Field::Textarea
+   */
   setAutofill(val, sourceLabel) {
     // convert string to ArrayBuffer
     let reader = new FileReader();
@@ -64128,20 +64597,50 @@ class OxiFieldMainComponent extends GlimmerComponent {
     decorateFieldV2(this.prototype, "config", [service('oxi-config')]);
   }
   #config = (initializeDeferredDecorator(this, "config"), void 0);
+  /**
+   * Returns `true` when the field type is `'bool'`, used by the template to render
+   * a checkbox layout instead of a label/input row.
+   * @memberOf OxiSection::Form::Field
+   */
   get isBool() {
     return this.args.field.type === 'bool';
   }
+
+  /**
+   * Returns a plain-object snapshot of the {@link Field} data object,
+   * stripped of internal underscore-prefixed metadata properties.
+   * Passed to sub-components via `@content`.
+   * @memberOf OxiSection::Form::Field
+   */
   get field() {
     let field = this.args.field.toPlainHash();
     return field;
   }
+
+  /**
+   * Resolves the sub-component class for the current field type by looking it up
+   * in the eagerly-imported `fieldModules` map. Returns `undefined` for unknown types.
+   * @memberOf OxiSection::Form::Field
+   */
   get fieldComponent() {
     debug$1(`oxi-section/form/field: importing ./${this.args.field.type}`);
     return fieldModules[this.args.field.type]?.default;
   }
+
+  /**
+   * Returns `true` when `field.width` is `'small'` (case-insensitive).
+   * Controls the CSS width class of the field wrapper.
+   * @memberOf OxiSection::Form::Field
+   */
   get isSmall() {
     return new String(this.args.field.width || '').toLowerCase() == 'small';
   }
+
+  /**
+   * Returns `true` when `field.width` is `'large'` (case-insensitive).
+   * Controls the CSS width class of the field wrapper.
+   * @memberOf OxiSection::Form::Field
+   */
   get isLarge() {
     return new String(this.args.field.width || '').toLowerCase() == 'large';
   }
@@ -64150,6 +64649,11 @@ class OxiFieldMainComponent extends GlimmerComponent {
    * See
    *   https://atomiks.github.io/tippyjs/v6/all-props/#popperoptions and
    *   https://popper.js.org/docs/v2/modifiers/prevent-overflow/
+   */
+  /**
+   * Returns Popper.js modifier options for the field tooltip (`<Tippy>`).
+   * Disables tethering so the tooltip always stays fully visible even near viewport edges.
+   * @memberOf OxiSection::Form::Field
    */
   get popperOptions() {
     return {
@@ -64161,27 +64665,54 @@ class OxiFieldMainComponent extends GlimmerComponent {
       }]
     };
   }
+
+  /**
+   * Proxies `addClone` to the parent form, passing the current `@field`.
+   * @memberOf OxiSection::Form::Field
+   */
   addClone() {
     this.args.addClone(this.args.field);
   }
+
+  /**
+   * Proxies `delClone` to the parent form, passing the current `@field`.
+   * @memberOf OxiSection::Form::Field
+   */
   static {
     decorateMethodV2(this.prototype, "addClone", [action]);
   }
   delClone() {
     this.args.delClone(this.args.field);
   }
+
+  /**
+   * Called when the user picks a new key in a dynamic input field; proxies to the parent
+   * form's `setName` callback.
+   * @memberOf OxiSection::Form::Field
+   */
   static {
     decorateMethodV2(this.prototype, "delClone", [action]);
   }
   selectFieldType(value) {
     this.args.setName(value);
   }
+
+  /**
+   * Propagates a validation error from a sub-component up to the parent form via `setError`.
+   * @memberOf OxiSection::Form::Field
+   */
   static {
     decorateMethodV2(this.prototype, "selectFieldType", [action]);
   }
   onError(message) {
     this.args.setError(message);
   }
+
+  /**
+   * Keyboard handler attached to every field input. Enter submits the form (except in
+   * textareas); Tab on the last clone in a clonable group adds another clone.
+   * @memberOf OxiSection::Form::Field
+   */
   static {
     decorateMethodV2(this.prototype, "onError", [action]);
   }
@@ -64285,12 +64816,22 @@ class OxiButtonContainerComponent extends GlimmerComponent {
     }
     if (this.maxButtonsPerRow > 6) this.maxButtonsPerRow = 6;
   }
+
+  /**
+   * Returns `true` if any button in the container has a `description`.
+   * @memberOf OxiBase::ButtonContainer
+   */
   get hasDescription() {
     if (!this.buttons) {
       return false;
     }
     return this.buttons.some(i => i.description);
   }
+
+  /**
+   * Returns `true` when the container has at least one button.
+   * @memberOf OxiBase::ButtonContainer
+   */
   get hasButtons() {
     return this.buttons.length > 0;
   }
@@ -64365,6 +64906,11 @@ class OxiSectionFormComponent extends GlimmerComponent {
   dependants = {}; // dependent fields by parent field name
   #actionOnChangeSeq = new Map(); // field.name -> latest request sequence number
 
+  /**
+   * Returns the ordered list of {@link ContainerButton} objects to render below the form:
+   * submit button (with loading state), optional reset button, then any extra `def.buttons`.
+   * @memberOf OxiSection::Form
+   */
   get buttons() {
     let buttons = [];
 
@@ -64387,6 +64933,12 @@ class OxiSectionFormComponent extends GlimmerComponent {
     }
     return buttons;
   }
+
+  /**
+   * Returns `true` for fields that should be rendered visibly (i.e. not `hidden` or `encrypted`).
+   * Used as a filter callback.
+   * @memberOf OxiSection::Form
+   */
   hiddenFieldFilter(f) {
     return f.type !== "hidden" && f.type !== "encrypted";
   }
@@ -64514,6 +65066,12 @@ class OxiSectionFormComponent extends GlimmerComponent {
       clones[clones.length - 1]._lastCloneInGroup = true;
     }
   }
+
+  /**
+   * Returns a deduplicated list of field names in their original order.
+   * Used to iterate over logical fields regardless of clonable duplicates.
+   * @memberOf OxiSection::Form
+   */
   get uniqueFieldNames() {
     let result = [];
     for (const field of this.fields) {
@@ -64523,9 +65081,20 @@ class OxiSectionFormComponent extends GlimmerComponent {
     }
     return result;
   }
+
+  /**
+   * Returns the subset of fields that are not of type `hidden` or `encrypted`.
+   * @memberOf OxiSection::Form
+   */
   get visibleFields() {
     return this.fields.filter(this.hiddenFieldFilter);
   }
+
+  /**
+   * Inserts a blank clone of `field` directly after it and updates clone metadata.
+   * No-op when `field._canAdd` is `false`.
+   * @memberOf OxiSection::Form
+   */
   addClone(field) {
     if (field._canAdd === false) return;
     let fieldCopy = field.clone();
@@ -64534,6 +65103,12 @@ class OxiSectionFormComponent extends GlimmerComponent {
     this.#insertFields(field, fieldCopy);
     this.#updateCloneFields();
   }
+
+  /**
+   * Removes `field` from the field list and updates clone metadata.
+   * No-op when `field._canDelete` is `false`.
+   * @memberOf OxiSection::Form
+   */
   static {
     decorateMethodV2(this.prototype, "addClone", [action]);
   }
@@ -64756,6 +65331,12 @@ class OxiSectionFormComponent extends GlimmerComponent {
       includeEmpty: true
     });
   }
+
+  /**
+   * Returns the number of non-hidden fields in the original `def.fields` definition.
+   * Used by templates to decide layout (e.g. single-field compactness).
+   * @memberOf OxiSection::Form
+   */
   static {
     decorateMethodV2(this.prototype, "encodeFields", [action]);
   }
@@ -64798,6 +65379,13 @@ class OxiSectionFormComponent extends GlimmerComponent {
     let index = this.fields.findIndex(f => f === field);
     this.content.registerFocusElement(meta.isPopup, true, element, meta.sectionNo, index);
   }
+
+  /**
+   * Validates all fields, encodes non-empty field values, and submits them to
+   * `def.action`. Sets `loading` during the request. On response, applies any
+   * per-field server-side error messages returned in `status.field_errors`.
+   * @memberOf OxiSection::Form
+   */
   static {
     decorateMethodV2(this.prototype, "registerField", [action]);
   }
@@ -65012,7 +65600,7 @@ const TEMPLATE$g = templateFactory(
 {{/if}}
 
 <div class="oxi-grid table-responsive">
-    <table class="table table-sm table-bordered table-striped table-hover {{@def.className}}">
+    <table class="table table-sm table-bordered table-striped table-hover">
         <thead>
             <tr>
                 {{#if this.isBulkable}}
@@ -65131,8 +65719,8 @@ const TEMPLATE$g = templateFactory(
 
 */
 {
-  "id": "ntDYmfTo",
-  "block": "[[[3,\" components/oxi-section/grid \"],[1,\"\\n\"],[41,[30,1,[\"pager\"]],[[[1,\"    \"],[10,0],[14,0,\"row mb-2\"],[12],[1,\"\\n        \"],[10,0],[14,0,\"col-12\"],[12],[1,\"\\n            \"],[8,[32,0],null,[[\"@pager\",\"@pages\",\"@pagesizes\",\"@setPage\"],[[30,0,[\"pager\"]],[30,0,[\"pages\"]],[30,0,[\"pagesizes\"]],[30,0,[\"updatePage\"]]]],null],[1,\"\\n        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\"]],[]],null],[1,\"\\n\"],[10,0],[14,0,\"oxi-grid table-responsive\"],[12],[1,\"\\n    \"],[10,\"table\"],[15,0,[29,[\"table table-sm table-bordered table-striped table-hover \",[30,1,[\"className\"]]]]],[12],[1,\"\\n        \"],[10,\"thead\"],[12],[1,\"\\n            \"],[10,\"tr\"],[12],[1,\"\\n\"],[41,[30,0,[\"isBulkable\"]],[[[1,\"                    \"],[11,\"th\"],[24,\"role\",\"button\"],[4,[32,1],[\"click\",[30,0,[\"selectAll\"]]],null],[12],[1,\"\\n                        \"],[10,1],[15,0,[29,[\"oxi-checkbox \",[52,[30,0,[\"allChecked\"]],\"checked\"]]]],[12],[13],[1,\"\\n                        \"],[1,[28,[32,2],[\"component.oxisection_grid.select_all\"],null]],[1,\"\\n                    \"],[13],[1,\"\\n\"]],[]],null],[41,[30,0,[\"multipleActions\"]],[[[1,\"                    \"],[10,\"th\"],[12],[1,\" \"],[13],[1,\"\\n\"]],[]],null],[42,[28,[37,8],[[28,[37,8],[[30,0,[\"formattedColumns\"]]],null]],null],null,[[[41,[30,2,[\"sortable\"]],[[[1,\"                        \"],[11,\"th\"],[16,0,[29,[\"sortable \",[52,[30,2,[\"isSorted\"]],\"bg-secondary text-white\"]]]],[24,\"role\",\"button\"],[4,[32,1],[\"click\",[28,[32,3],[[30,0,[\"sort\"]],[30,2,[\"sortPage\"]]],null]],null],[12],[1,\"\\n                            \"],[10,1],[12],[1,[30,2,[\"sTitle\"]]],[13],[1,\"\\n\"],[41,[30,2,[\"isSorted\"]],[[[1,\"                                \"],[10,0],[14,0,\"btn bg-secondary-subtle btn-sm float-end\"],[12],[1,\"\\n\"],[41,[30,0,[\"pager\",\"reverse\"]],[[[1,\"                                        \"],[10,1],[14,0,\"glyphicon glyphicon-sort-by-attributes-alt\"],[12],[13],[1,\"\\n\"]],[]],[[[1,\"                                        \"],[10,1],[14,0,\"glyphicon glyphicon-sort-by-attributes\"],[12],[13],[1,\"\\n\"]],[]]],[1,\"                                \"],[13],[1,\"\\n\"]],[]],[[[1,\"                                \"],[10,0],[14,0,\"btn bg-secondary-subtle btn-sm float-end\"],[12],[1,\"\\n                                    \"],[10,1],[14,0,\"glyphicon glyphicon-sort-by-attributes text-secondary\"],[12],[13],[1,\"\\n                                \"],[13],[1,\"\\n\"]],[]]],[1,\"                        \"],[13],[1,\"\\n\"]],[]],[[[1,\"                        \"],[10,\"th\"],[12],[1,\"\\n                            \"],[10,1],[12],[1,[30,2,[\"sTitle\"]]],[13],[1,\"\\n                        \"],[13],[1,\"\\n\"]],[]]]],[2]],null],[1,\"            \"],[13],[1,\"\\n        \"],[13],[1,\"\\n        \"],[10,\"tbody\"],[12],[1,\"\\n\"],[42,[28,[37,8],[[28,[37,8],[[30,0,[\"sortedData\"]]],null]],null],null,[[[1,\"                \"],[10,\"tr\"],[15,0,[29,[\"context \",[30,3,[\"className\"]]]]],[15,\"role\",[52,[30,0,[\"hasAction\"]],\"button\"]],[12],[1,\"\\n\"],[41,[30,0,[\"isBulkable\"]],[[[1,\"                        \"],[11,\"td\"],[24,\"role\",\"button\"],[4,[32,1],[\"click\",[28,[32,3],[[30,0,[\"select\"]],[30,3]],null]],null],[12],[1,\"\\n                            \"],[10,1],[15,0,[29,[\"oxi-checkbox \",[52,[30,3,[\"checked\"]],\"checked\"]]]],[12],[13],[1,\"\\n                        \"],[13],[1,\"\\n\"]],[]],null],[41,[30,0,[\"multipleActions\"]],[[[1,\"                        \"],[10,\"td\"],[12],[1,\"\\n                            \"],[8,[32,4],null,null,[[\"default\"],[[[[1,\"\\n                                \"],[8,[30,4,[\"toggle\"]],null,null,[[\"default\"],[[[[10,1],[14,0,\"glyphicon glyphicon-cog\"],[12],[13]],[]]]]],[1,\"\\n                                \"],[8,[30,4,[\"menu\"]],null,[[\"@renderInPlace\"],[true]],[[\"default\"],[[[[1,\"\\n\"],[42,[28,[37,8],[[28,[37,8],[[30,3,[\"actions\"]]],null]],null],null,[[[1,\"                                        \"],[8,[30,5,[\"item\"]],null,null,[[\"default\"],[[[[1,\"\\n                                            \"],[8,[32,5],null,[[\"@clickable\"],[[30,6]]],[[\"default\"],[[[[1,\"\\n                                                \"],[11,\"button\"],[24,0,\"dropdown-item\"],[24,4,\"button\"],[4,[32,1],[\"click\",[30,7]],null],[12],[1,\"\\n                                                    \"],[1,[30,6,[\"label\"]]],[1,\"\\n\"],[41,[30,6,[\"icon\"]],[[[1,\"                                                        \"],[10,1],[15,0,[29,[\"float-end glyphicon glyphicon-\",[30,6,[\"icon\"]]]]],[12],[13],[1,\"\\n\"]],[]],null],[1,\"                                                \"],[13],[1,\"\\n                                            \"]],[7,8]]]]],[1,\"\\n                                        \"]],[]]]]],[1,\"\\n\"]],[6]],null],[1,\"                                \"]],[5]]]]],[1,\"\\n                            \"]],[4]]]]],[1,\"\\n                        \"],[13],[1,\"\\n\"]],[]],null],[42,[28,[37,8],[[28,[37,8],[[30,3,[\"data\"]]],null]],null],null,[[[41,[30,0,[\"hasAction\"]],[[[1,\"                            \"],[8,[32,5],null,[[\"@clickable\"],[[30,3,[\"actions\",\"0\"]]]],[[\"default\"],[[[[1,\"\\n                                \"],[11,\"td\"],[24,\"role\",\"button\"],[4,[32,1],[\"click\",[30,10]],null],[12],[1,\"\\n                                    \"],[8,[32,6],null,[[\"@format\",\"@value\"],[[30,9,[\"format\"]],[30,9,[\"value\"]]]],null],[1,\"\\n                                \"],[13],[1,\"\\n                            \"]],[10,11]]]]],[1,\"\\n\"]],[]],[[[1,\"                            \"],[10,\"td\"],[12],[1,\"\\n                                \"],[8,[32,6],null,[[\"@format\",\"@value\"],[[30,9,[\"format\"]],[30,9,[\"value\"]]]],null],[1,\"\\n                            \"],[13],[1,\"\\n\"]],[]]]],[9]],null],[1,\"                \"],[13],[1,\"\\n\"]],[3]],[[[1,\"                \"],[10,\"tr\"],[12],[10,\"td\"],[15,\"colspan\",[29,[[30,0,[\"formattedColumns\",\"length\"]]]]],[12],[1,\"\\n                    \"],[1,[28,[32,7],[[30,1,[\"empty\"]],\"&nbsp;\"],null]],[1,\"\\n                \"],[13],[13],[1,\"\\n\"]],[]]],[1,\"        \"],[13],[1,\"\\n\"],[41,[30,1,[\"footer\"]],[[[1,\"            \"],[10,\"tfoot\"],[12],[1,\"\\n                \"],[10,\"tr\"],[12],[10,\"td\"],[15,\"colspan\",[29,[[30,0,[\"formattedColumns\",\"length\"]]]]],[12],[1,\"\\n                    \"],[1,[30,1,[\"footer\"]]],[1,\"\\n                \"],[13],[13],[1,\"\\n            \"],[13],[1,\"\\n\"]],[]],null],[1,\"    \"],[13],[1,\"\\n\"],[13],[1,\"\\n\\n\"],[10,0],[14,0,\"row\"],[12],[1,\"\\n    \"],[10,0],[14,0,\"col-lg-6 order-2 order-lg-1\"],[12],[1,\"\\n        \"],[8,[32,8],null,[[\"@buttons\"],[[30,0,[\"buttons\"]]]],null],[1,\"\\n    \"],[13],[1,\"\\n    \"],[10,0],[14,0,\"col-lg-6 order-1 order-lg-2\"],[12],[1,\"\\n\"],[41,[30,1,[\"pager\"]],[[[1,\"            \"],[8,[32,0],[[24,0,\"mt-3\"]],[[\"@pager\",\"@pages\",\"@pagesizes\",\"@setPage\"],[[30,0,[\"pager\"]],[30,0,[\"pages\"]],[30,0,[\"pagesizes\"]],[30,0,[\"updatePage\"]]]],null],[1,\"\\n\"]],[]],null],[1,\"    \"],[13],[1,\"\\n\"],[13],[1,\"\\n\"]],[\"@def\",\"column\",\"row\",\"dd\",\"ddm\",\"rowAction\",\"clickHandler\",\"isLoading\",\"value\",\"clickHandler\",\"isLoading\"],[\"if\",\"div\",\"table\",\"thead\",\"tr\",\"th\",\"span\",\"each\",\"-track-array\",\"tbody\",\"td\",\"button\",\"tfoot\"]]",
+  "id": "W24Dj+ks",
+  "block": "[[[3,\" components/oxi-section/grid \"],[1,\"\\n\"],[41,[30,1,[\"pager\"]],[[[1,\"    \"],[10,0],[14,0,\"row mb-2\"],[12],[1,\"\\n        \"],[10,0],[14,0,\"col-12\"],[12],[1,\"\\n            \"],[8,[32,0],null,[[\"@pager\",\"@pages\",\"@pagesizes\",\"@setPage\"],[[30,0,[\"pager\"]],[30,0,[\"pages\"]],[30,0,[\"pagesizes\"]],[30,0,[\"updatePage\"]]]],null],[1,\"\\n        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\"]],[]],null],[1,\"\\n\"],[10,0],[14,0,\"oxi-grid table-responsive\"],[12],[1,\"\\n    \"],[10,\"table\"],[14,0,\"table table-sm table-bordered table-striped table-hover\"],[12],[1,\"\\n        \"],[10,\"thead\"],[12],[1,\"\\n            \"],[10,\"tr\"],[12],[1,\"\\n\"],[41,[30,0,[\"isBulkable\"]],[[[1,\"                    \"],[11,\"th\"],[24,\"role\",\"button\"],[4,[32,1],[\"click\",[30,0,[\"selectAll\"]]],null],[12],[1,\"\\n                        \"],[10,1],[15,0,[29,[\"oxi-checkbox \",[52,[30,0,[\"allChecked\"]],\"checked\"]]]],[12],[13],[1,\"\\n                        \"],[1,[28,[32,2],[\"component.oxisection_grid.select_all\"],null]],[1,\"\\n                    \"],[13],[1,\"\\n\"]],[]],null],[41,[30,0,[\"multipleActions\"]],[[[1,\"                    \"],[10,\"th\"],[12],[1,\" \"],[13],[1,\"\\n\"]],[]],null],[42,[28,[37,8],[[28,[37,8],[[30,0,[\"formattedColumns\"]]],null]],null],null,[[[41,[30,2,[\"sortable\"]],[[[1,\"                        \"],[11,\"th\"],[16,0,[29,[\"sortable \",[52,[30,2,[\"isSorted\"]],\"bg-secondary text-white\"]]]],[24,\"role\",\"button\"],[4,[32,1],[\"click\",[28,[32,3],[[30,0,[\"sort\"]],[30,2,[\"sortPage\"]]],null]],null],[12],[1,\"\\n                            \"],[10,1],[12],[1,[30,2,[\"sTitle\"]]],[13],[1,\"\\n\"],[41,[30,2,[\"isSorted\"]],[[[1,\"                                \"],[10,0],[14,0,\"btn bg-secondary-subtle btn-sm float-end\"],[12],[1,\"\\n\"],[41,[30,0,[\"pager\",\"reverse\"]],[[[1,\"                                        \"],[10,1],[14,0,\"glyphicon glyphicon-sort-by-attributes-alt\"],[12],[13],[1,\"\\n\"]],[]],[[[1,\"                                        \"],[10,1],[14,0,\"glyphicon glyphicon-sort-by-attributes\"],[12],[13],[1,\"\\n\"]],[]]],[1,\"                                \"],[13],[1,\"\\n\"]],[]],[[[1,\"                                \"],[10,0],[14,0,\"btn bg-secondary-subtle btn-sm float-end\"],[12],[1,\"\\n                                    \"],[10,1],[14,0,\"glyphicon glyphicon-sort-by-attributes text-secondary\"],[12],[13],[1,\"\\n                                \"],[13],[1,\"\\n\"]],[]]],[1,\"                        \"],[13],[1,\"\\n\"]],[]],[[[1,\"                        \"],[10,\"th\"],[12],[1,\"\\n                            \"],[10,1],[12],[1,[30,2,[\"sTitle\"]]],[13],[1,\"\\n                        \"],[13],[1,\"\\n\"]],[]]]],[2]],null],[1,\"            \"],[13],[1,\"\\n        \"],[13],[1,\"\\n        \"],[10,\"tbody\"],[12],[1,\"\\n\"],[42,[28,[37,8],[[28,[37,8],[[30,0,[\"sortedData\"]]],null]],null],null,[[[1,\"                \"],[10,\"tr\"],[15,0,[29,[\"context \",[30,3,[\"className\"]]]]],[15,\"role\",[52,[30,0,[\"hasAction\"]],\"button\"]],[12],[1,\"\\n\"],[41,[30,0,[\"isBulkable\"]],[[[1,\"                        \"],[11,\"td\"],[24,\"role\",\"button\"],[4,[32,1],[\"click\",[28,[32,3],[[30,0,[\"select\"]],[30,3]],null]],null],[12],[1,\"\\n                            \"],[10,1],[15,0,[29,[\"oxi-checkbox \",[52,[30,3,[\"checked\"]],\"checked\"]]]],[12],[13],[1,\"\\n                        \"],[13],[1,\"\\n\"]],[]],null],[41,[30,0,[\"multipleActions\"]],[[[1,\"                        \"],[10,\"td\"],[12],[1,\"\\n                            \"],[8,[32,4],null,null,[[\"default\"],[[[[1,\"\\n                                \"],[8,[30,4,[\"toggle\"]],null,null,[[\"default\"],[[[[10,1],[14,0,\"glyphicon glyphicon-cog\"],[12],[13]],[]]]]],[1,\"\\n                                \"],[8,[30,4,[\"menu\"]],null,[[\"@renderInPlace\"],[true]],[[\"default\"],[[[[1,\"\\n\"],[42,[28,[37,8],[[28,[37,8],[[30,3,[\"actions\"]]],null]],null],null,[[[1,\"                                        \"],[8,[30,5,[\"item\"]],null,null,[[\"default\"],[[[[1,\"\\n                                            \"],[8,[32,5],null,[[\"@clickable\"],[[30,6]]],[[\"default\"],[[[[1,\"\\n                                                \"],[11,\"button\"],[24,0,\"dropdown-item\"],[24,4,\"button\"],[4,[32,1],[\"click\",[30,7]],null],[12],[1,\"\\n                                                    \"],[1,[30,6,[\"label\"]]],[1,\"\\n\"],[41,[30,6,[\"icon\"]],[[[1,\"                                                        \"],[10,1],[15,0,[29,[\"float-end glyphicon glyphicon-\",[30,6,[\"icon\"]]]]],[12],[13],[1,\"\\n\"]],[]],null],[1,\"                                                \"],[13],[1,\"\\n                                            \"]],[7,8]]]]],[1,\"\\n                                        \"]],[]]]]],[1,\"\\n\"]],[6]],null],[1,\"                                \"]],[5]]]]],[1,\"\\n                            \"]],[4]]]]],[1,\"\\n                        \"],[13],[1,\"\\n\"]],[]],null],[42,[28,[37,8],[[28,[37,8],[[30,3,[\"data\"]]],null]],null],null,[[[41,[30,0,[\"hasAction\"]],[[[1,\"                            \"],[8,[32,5],null,[[\"@clickable\"],[[30,3,[\"actions\",\"0\"]]]],[[\"default\"],[[[[1,\"\\n                                \"],[11,\"td\"],[24,\"role\",\"button\"],[4,[32,1],[\"click\",[30,10]],null],[12],[1,\"\\n                                    \"],[8,[32,6],null,[[\"@format\",\"@value\"],[[30,9,[\"format\"]],[30,9,[\"value\"]]]],null],[1,\"\\n                                \"],[13],[1,\"\\n                            \"]],[10,11]]]]],[1,\"\\n\"]],[]],[[[1,\"                            \"],[10,\"td\"],[12],[1,\"\\n                                \"],[8,[32,6],null,[[\"@format\",\"@value\"],[[30,9,[\"format\"]],[30,9,[\"value\"]]]],null],[1,\"\\n                            \"],[13],[1,\"\\n\"]],[]]]],[9]],null],[1,\"                \"],[13],[1,\"\\n\"]],[3]],[[[1,\"                \"],[10,\"tr\"],[12],[10,\"td\"],[15,\"colspan\",[29,[[30,0,[\"formattedColumns\",\"length\"]]]]],[12],[1,\"\\n                    \"],[1,[28,[32,7],[[30,1,[\"empty\"]],\"&nbsp;\"],null]],[1,\"\\n                \"],[13],[13],[1,\"\\n\"]],[]]],[1,\"        \"],[13],[1,\"\\n\"],[41,[30,1,[\"footer\"]],[[[1,\"            \"],[10,\"tfoot\"],[12],[1,\"\\n                \"],[10,\"tr\"],[12],[10,\"td\"],[15,\"colspan\",[29,[[30,0,[\"formattedColumns\",\"length\"]]]]],[12],[1,\"\\n                    \"],[1,[30,1,[\"footer\"]]],[1,\"\\n                \"],[13],[13],[1,\"\\n            \"],[13],[1,\"\\n\"]],[]],null],[1,\"    \"],[13],[1,\"\\n\"],[13],[1,\"\\n\\n\"],[10,0],[14,0,\"row\"],[12],[1,\"\\n    \"],[10,0],[14,0,\"col-lg-6 order-2 order-lg-1\"],[12],[1,\"\\n        \"],[8,[32,8],null,[[\"@buttons\"],[[30,0,[\"buttons\"]]]],null],[1,\"\\n    \"],[13],[1,\"\\n    \"],[10,0],[14,0,\"col-lg-6 order-1 order-lg-2\"],[12],[1,\"\\n\"],[41,[30,1,[\"pager\"]],[[[1,\"            \"],[8,[32,0],[[24,0,\"mt-3\"]],[[\"@pager\",\"@pages\",\"@pagesizes\",\"@setPage\"],[[30,0,[\"pager\"]],[30,0,[\"pages\"]],[30,0,[\"pagesizes\"]],[30,0,[\"updatePage\"]]]],null],[1,\"\\n\"]],[]],null],[1,\"    \"],[13],[1,\"\\n\"],[13],[1,\"\\n\"]],[\"@def\",\"column\",\"row\",\"dd\",\"ddm\",\"rowAction\",\"clickHandler\",\"isLoading\",\"value\",\"clickHandler\",\"isLoading\"],[\"if\",\"div\",\"table\",\"thead\",\"tr\",\"th\",\"span\",\"each\",\"-track-array\",\"tbody\",\"td\",\"button\",\"tfoot\"]]",
   "moduleName": "/build/app/components/oxi-section/grid/index.hbs",
   "scope": () => [OxiSectionGridPagination, on, THelper, fn, BsDropdown, OxiClickableComponent$1, OxiFormattedComponent, Try, OxiButtonContainerComponent],
   "isStrictMode": false
@@ -65176,24 +65764,55 @@ class OxiSectionGridComponent extends GlimmerComponent {
     }) : ContainerButton.fromHash(def));
     this.updateButtonState();
   }
+
+  /**
+   * Returns `true` when at least one row action is defined.
+   * @memberOf OxiSection::Grid
+   */
   get hasAction() {
     return this.actions.length > 0;
   }
+  /**
+   * Returns `true` when more than one row action is defined (toggles icon-button vs. drop-down rendering).
+   * @memberOf OxiSection::Grid
+   */
   get multipleActions() {
     return this.actions.length > 1;
   }
+  /**
+   * Returns the first (and usually only) {@link GridAction} for single-action rows.
+   * @memberOf OxiSection::Grid
+   */
   get firstAction() {
     return this.actions[0];
   }
+
+  /**
+   * Returns `true` when a `pagerurl` is set, enabling server-side paging and sorting.
+   * @memberOf OxiSection::Grid
+   */
   get hasPager() {
     return !!this.pager.pagerurl;
   }
+
+  /**
+   * Returns the subset of columns that are visible (title does not start with `_`, `bVisible != 0`),
+   * each augmented with its original positional `index`.
+   * @memberOf OxiSection::Grid
+   */
   get visibleColumns() {
     return this.rawColumns.map((col, index) => ({
       ...col,
       index
     })).filter(col => col.sTitle[0] !== "_" && col.bVisible != 0);
   }
+
+  /**
+   * Returns the page descriptor array used by the pager UI, with `prev`/`next` sentinel objects
+   * attached. Returns `[]` when pagination is not needed (all items fit on one page).
+   * Collapses middle pages into an ellipsis entry when total pages exceed `pager.pagersize`.
+   * @memberOf OxiSection::Grid
+   */
   get pages() {
     let pager = this.pager;
     if (!pager) {
@@ -65250,6 +65869,14 @@ class OxiSectionGridComponent extends GlimmerComponent {
     };
     return o;
   }
+
+  /**
+   * Returns the selectable page-size options filtered to those that make sense given
+   * the total item count (i.e. sizes up to and including the smallest size that covers all items).
+   * Each entry carries `active`, `limit`, `startat`, `order`, and `reverse` fields.
+   * Returns `[]` when no `pagesizes` are configured.
+   * @memberOf OxiSection::Grid
+   */
   get pagesizes() {
     let pager = this.pager;
     if (!pager.pagesizes) {
@@ -65270,6 +65897,13 @@ class OxiSectionGridComponent extends GlimmerComponent {
       };
     });
   }
+
+  /**
+   * Returns the visible columns enriched with sort state (`isSorted`, `reverse`)
+   * and a `sortPage` descriptor that can be passed to `sort()` to change the sort order.
+   * Uses `sortkey` for server-side sorting and `sTitle` for client-side sorting.
+   * @memberOf OxiSection::Grid
+   */
   get formattedColumns() {
     let results = [];
     for (const column of this.visibleColumns) {
@@ -65294,6 +65928,16 @@ class OxiSectionGridComponent extends GlimmerComponent {
     }
     return results;
   }
+
+  /**
+   * Returns the fully processed row array. Each row contains
+   *  - `className` (from `_status`/`_className` columns),
+   *  - `data` (per-visible-column `{ format, value }` pairs),
+   *  - `checked` state,
+   *  - `originalIndex`, and
+   *  - `actions` with column variables already resolved via `resolveVariables`.
+   * @memberOf OxiSection::Grid
+   */
   get data() {
     let columns = this.formattedColumns;
     let titles = this.rawColumns.map(i => i.sTitle);
@@ -65326,6 +65970,12 @@ class OxiSectionGridComponent extends GlimmerComponent {
     }
     return results;
   }
+
+  /**
+   * Returns a clone of `gridAction` with `{columnTitle}` placeholders in `href`, `page`,
+   * and `action` replaced by the corresponding cell value from `row`.
+   * @memberOf OxiSection::Grid
+   */
   resolveVariables(gridAction, row) {
     let rowAction = gridAction.clone();
     const replace = str => {
@@ -65342,6 +65992,12 @@ class OxiSectionGridComponent extends GlimmerComponent {
     return rowAction;
   }
 
+  /**
+   * Returns `data` sorted according to the current `pager` order/reverse state.
+   * Server-side paging: returns `data` as-is (sorting done by backend).
+   * Client-side paging: sorts numerically when both values look like numbers, lexicographically otherwise.
+   * @memberOf OxiSection::Grid
+   */
   // split sorting from row data generation in "get data()" for better performance when re-sorting
   get sortedData() {
     // server-side sorting
@@ -65365,15 +66021,36 @@ class OxiSectionGridComponent extends GlimmerComponent {
     }
     return data;
   }
+
+  /**
+   * Returns `true` when every visible row is checked.
+   * @memberOf OxiSection::Grid
+   */
   get allChecked() {
     return this.sortedData.every(i => i.checked == true);
   }
+
+  /**
+   * Returns `true` when no visible row is checked.
+   * @memberOf OxiSection::Grid
+   */
   get noneChecked() {
     return this.sortedData.every(i => i.checked == false);
   }
+
+  /**
+   * Returns `true` when at least one button carries a `select` property, enabling row checkboxes.
+   * @memberOf OxiSection::Grid
+   */
   get isBulkable() {
     return this.buttons.some(i => i.select);
   }
+
+  /**
+   * Collects the values of the column named by `button.select` for all checked rows
+   * and sends them to the backend action defined by `button.action`.
+   * @memberOf OxiSection::Grid
+   */
   async selectClick(button) {
     let columns = this.rawColumns.map(i => i.sTitle);
     let index = columns.indexOf(button.select);
@@ -65392,6 +66069,10 @@ class OxiSectionGridComponent extends GlimmerComponent {
     }
   }
 
+  /**
+   * Toggles the `checked` state of a single row and updates bulk-action button states.
+   * @memberOf OxiSection::Grid
+   */
   // (de-)select single row
   static {
     decorateMethodV2(this.prototype, "selectClick", [action]);
@@ -65405,6 +66086,11 @@ class OxiSectionGridComponent extends GlimmerComponent {
     this.updateButtonState();
   }
 
+  /**
+   * Checks all rows when any are unchecked; unchecks all rows when all are already checked.
+   * Updates bulk-action button states afterwards.
+   * @memberOf OxiSection::Grid
+   */
   // (de-)select all rows
   static {
     decorateMethodV2(this.prototype, "select", [action]);
@@ -65419,12 +66105,23 @@ class OxiSectionGridComponent extends GlimmerComponent {
     }
     this.updateButtonState();
   }
+
+  /**
+   * Enables or disables bulk-action buttons depending on whether any rows are checked.
+   * @memberOf OxiSection::Grid
+   */
   static {
     decorateMethodV2(this.prototype, "selectAll", [action]);
   }
   updateButtonState() {
     this.buttons.filter(b => b.select).forEach(b => b.disabled = this.noneChecked);
   }
+
+  /**
+   * Fetches a new data page from the server using `pager.pagerurl` and updates
+   * `rawData` and the pager state. No-ops when `page.disabled` or `page.active`.
+   * @memberOf OxiSection::Grid
+   */
   updatePage(page) {
     if (page.disabled || page.active) {
       return;
@@ -65442,6 +66139,12 @@ class OxiSectionGridComponent extends GlimmerComponent {
       this.pager.setFromHash(page);
     });
   }
+
+  /**
+   * Changes the sort order. For server-side paging calls `updatePage`; for client-side
+   * paging updates `pager` state directly (re-render is triggered by tracked property).
+   * @memberOf OxiSection::Grid
+   */
   static {
     decorateMethodV2(this.prototype, "updatePage", [action]);
   }
@@ -65556,6 +66259,12 @@ class OxiSectionKeyvalueComponent extends GlimmerComponent {
   #content = (initializeDeferredDecorator(this, "content"), void 0);
   items = [];
   #id = guidFor(this);
+
+  /**
+   * Returns `true` when at least one item has a non-null/non-zero `label`.
+   * Controls whether the label column is rendered.
+   * @memberOf OxiSection::KeyValue
+   */
   get hasLabels() {
     return this.items.filter(i => typeof i.label !== 'undefined' && i.label !== 0 && i.label !== null).length > 0;
   }
@@ -65576,6 +66285,13 @@ class OxiSectionKeyvalueComponent extends GlimmerComponent {
     // (this could only happen with format 'raw' and empty values)
     this.items = items.filter(item => item.format !== 'raw' || item.value !== '');
   }
+
+  /**
+   * Starts a periodic auto-refresh for a single keyvalue item, immediately
+   * fetching the value and scheduling subsequent fetches per `item.refresh.timeout`.
+   * Cancels any existing timer for the same item before starting.
+   * @memberOf OxiSection::KeyValue
+   */
   startRefresh(item) {
     let timeout = item.refresh.timeout;
     let uri = item.refresh.uri;
@@ -65638,27 +66354,25 @@ const TEMPLATE$d = templateFactory(
 /*
   <!-- components/oxi-section/tiles -->
 {{#if @def.tiles.length}}
-    <div class="oxi-tiles">
-        {{#each this.rows as |row|}}
-            <div class="oxi-tiles-row oxi-tiles-cols-{{this.maxcol}}">
-                {{#each row as |tile|}}
-                    {{#if (eq tile.type "empty")}}
-                        <div class="oxi-tiles-cell oxi-tiles-cell--empty oxi-tiles-cell--colspan-{{tile.colspan}}"></div>
-                    {{else}}
-                        <div class="oxi-tiles-cell oxi-tiles-cell--colspan-{{tile.colspan}}">
-                            <OxiSection @content={{tile}} @meta={{hash renderAsCard=@def.border}}/>
-                        </div>
-                    {{/if}}
-                {{/each}}
-            </div>
-        {{/each}}
-    </div>
+    {{#each this.rows as |row|}}
+        <div class="oxi-tiles-row oxi-tiles-cols-{{this.maxcol}}">
+            {{#each row as |tile|}}
+                {{#if (eq tile.type "empty")}}
+                    <div class="oxi-tiles-cell oxi-tiles-cell--empty oxi-tiles-cell--colspan-{{tile.colspan}}"></div>
+                {{else}}
+                    <div class="oxi-tiles-cell oxi-tiles-cell--colspan-{{tile.colspan}} {{if tile._renderAsCard "oxi-tiles-card"}}">
+                        <OxiSection @def={{tile}} @meta={{hash renderAsCard=tile._renderAsCard}}/>
+                    </div>
+                {{/if}}
+            {{/each}}
+        </div>
+    {{/each}}
 {{/if}}
 
 */
 {
-  "id": "Ty54Ifb0",
-  "block": "[[[3,\" components/oxi-section/tiles \"],[1,\"\\n\"],[41,[30,1,[\"tiles\",\"length\"]],[[[1,\"    \"],[10,0],[14,0,\"oxi-tiles\"],[12],[1,\"\\n\"],[42,[28,[37,3],[[28,[37,3],[[30,0,[\"rows\"]]],null]],null],null,[[[1,\"            \"],[10,0],[15,0,[29,[\"oxi-tiles-row oxi-tiles-cols-\",[30,0,[\"maxcol\"]]]]],[12],[1,\"\\n\"],[42,[28,[37,3],[[28,[37,3],[[30,2]],null]],null],null,[[[41,[28,[32,0],[[30,3,[\"type\"]],\"empty\"],null],[[[1,\"                        \"],[10,0],[15,0,[29,[\"oxi-tiles-cell oxi-tiles-cell--empty oxi-tiles-cell--colspan-\",[30,3,[\"colspan\"]]]]],[12],[13],[1,\"\\n\"]],[]],[[[1,\"                        \"],[10,0],[15,0,[29,[\"oxi-tiles-cell oxi-tiles-cell--colspan-\",[30,3,[\"colspan\"]]]]],[12],[1,\"\\n                            \"],[8,[32,1],null,[[\"@content\",\"@meta\"],[[30,3],[28,[32,2],null,[[\"renderAsCard\"],[[30,1,[\"border\"]]]]]]],null],[1,\"\\n                        \"],[13],[1,\"\\n\"]],[]]]],[3]],null],[1,\"            \"],[13],[1,\"\\n\"]],[2]],null],[1,\"    \"],[13],[1,\"\\n\"]],[]],null]],[\"@def\",\"row\",\"tile\"],[\"if\",\"div\",\"each\",\"-track-array\"]]",
+  "id": "ZXWJNZAH",
+  "block": "[[[3,\" components/oxi-section/tiles \"],[1,\"\\n\"],[41,[30,1,[\"tiles\",\"length\"]],[[[42,[28,[37,2],[[28,[37,2],[[30,0,[\"rows\"]]],null]],null],null,[[[1,\"        \"],[10,0],[15,0,[29,[\"oxi-tiles-row oxi-tiles-cols-\",[30,0,[\"maxcol\"]]]]],[12],[1,\"\\n\"],[42,[28,[37,2],[[28,[37,2],[[30,2]],null]],null],null,[[[41,[28,[32,0],[[30,3,[\"type\"]],\"empty\"],null],[[[1,\"                    \"],[10,0],[15,0,[29,[\"oxi-tiles-cell oxi-tiles-cell--empty oxi-tiles-cell--colspan-\",[30,3,[\"colspan\"]]]]],[12],[13],[1,\"\\n\"]],[]],[[[1,\"                    \"],[10,0],[15,0,[29,[\"oxi-tiles-cell oxi-tiles-cell--colspan-\",[30,3,[\"colspan\"]],\" \",[52,[30,3,[\"_renderAsCard\"]],\"oxi-tiles-card\"]]]],[12],[1,\"\\n                        \"],[8,[32,1],null,[[\"@def\",\"@meta\"],[[30,3],[28,[32,2],null,[[\"renderAsCard\"],[[30,3,[\"_renderAsCard\"]]]]]]],null],[1,\"\\n                    \"],[13],[1,\"\\n\"]],[]]]],[3]],null],[1,\"        \"],[13],[1,\"\\n\"]],[2]],null]],[]],null]],[\"@def\",\"row\",\"tile\"],[\"if\",\"each\",\"-track-array\",\"div\"]]",
   "moduleName": "/build/app/components/oxi-section/tiles/index.hbs",
   "scope": () => [Eq, OxiSectionComponent, hash],
   "isStrictMode": false
@@ -65676,28 +66390,41 @@ const EMPTY_TILE = {
  * <OxiSection::Tiles @def={{this.def}} />
  * ```
  *
- * @param { object } def - Section definition:
- *   - `label` { string } - Section heading. Default: `""`
- *   - `description` { string } - Subheading shown below the label. Default: `""`
- *   - `maxcol` { number } - Maximum tiles per row. Default: `4`
- *   - `border` { boolean } - Render each tile as a card with a border. Default: `false`
- *   - `tiles` { array } - List of tile descriptors. Each entry is either:
- *     - A standard {@link OxiSection} definition with `type` set to any section
- *       type (`'button'`, `'keyvalue'`, `'form'`, `'grid'`, `'text'`, `'chart'`,
- *       `'cards'`, ...) and a matching `content` object. An optional `colspan`
- *       { number } property makes the tile span that many columns (default: `1`).
- *     - `'newline'` to force a row break at that position
+ * @param { object } def - Section definition.
+ * @param { string } [def.label] - Section heading. Default: `""`
+ * @param { string } [def.description] - Subheading shown below the label. Default: `""`
+ * @param { number } [def.maxcol] - Maximum tiles per row. Default: `4`
+ * @param { boolean } [def.border] - Render each tile as a card with a border. Default: `false`
+ * @param { array } def.tiles - List of tile descriptors. Each entry is either:
+ *   - A standard {@link OxiSection} definition with `type` set to any section
+ *     type (`'button'`, `'keyvalue'`, `'form'`, `'grid'`, `'text'`, `'chart'`,
+ *     `'cards'`, ...) and a matching `content` object. An optional `colspan`
+ *     { number } property makes the tile span that many columns (default: `1`).
+ *     An optional `border` { boolean } property overrides the section-level
+ *     `border` setting for this tile: `true` forces a card border on, `false`
+ *     forces it off, omitting the property inherits the section setting.
+ *   - `'newline'` to force a row break at that position
  *
  * @class OxiSection::Tiles
  * @extends Component
  */
 class OxiSectionTilesComponent extends GlimmerComponent {
-  // Returns an array of rows, each row padded to maxcol with empty tiles.
-  // Splits on type:"newline" and enforces maxcol (default 4).
-  // Each tile object is normalized to include a `colspan` property.
+  /**
+   * Returns an array of rows, each padded to `maxcol` with empty tiles.
+   * Splits on `"newline"` entries and enforces `maxcol`. Each tile object
+   * is normalised to include a `colspan` and `_renderAsCard` property.
+   * @memberOf OxiSection::Tiles
+   */
   get rows() {
     let tiles = this.args.def.tiles || [];
     let maxcol = this.maxcol;
+    const sectionBorder = !!this.args.def.border;
+
+    // Resolve tri-state per-tile border: undefined = inherit, false = off, true = on
+    const renderAsCard = t => {
+      if (t.border === undefined || t.border === null) return sectionBorder;
+      return !!t.border;
+    };
     let rows = [];
     let currentRow = [];
     let currentWidth = 0;
@@ -65705,7 +66432,8 @@ class OxiSectionTilesComponent extends GlimmerComponent {
       const remaining = maxcol - currentWidth;
       if (remaining > 0) currentRow.push({
         ...EMPTY_TILE,
-        colspan: remaining
+        colspan: remaining,
+        _renderAsCard: false
       });
       rows.push(currentRow);
       currentRow = [];
@@ -65720,7 +66448,8 @@ class OxiSectionTilesComponent extends GlimmerComponent {
       if (currentWidth + colspan > maxcol) flush();
       currentRow.push({
         ...t,
-        colspan
+        colspan,
+        _renderAsCard: renderAsCard(t)
       });
       currentWidth += colspan;
       if (currentWidth >= maxcol) flush();
@@ -65728,6 +66457,11 @@ class OxiSectionTilesComponent extends GlimmerComponent {
     if (currentRow.length) flush();
     return rows;
   }
+
+  /**
+   * Returns the maximum number of tile columns per row (default: `4`).
+   * @memberOf OxiSection::Tiles
+   */
   get maxcol() {
     return this.args.def.maxcol ?? 4;
   }
@@ -65744,18 +66478,21 @@ const TEMPLATE$c = templateFactory(
   <!-- components/oxi-section -->
 {{#if @meta.renderAsCard}}
 
-    <div class="card bg-body-tertiary mb-3 ms-md-3">
+    <div class="card bg-body-tertiary {{@def.cssClass}}">
 
         {{#if this.label}}
             <div class="card-header px-2 {{unless this.meta.isCompact "py-2"}}">
-                <h4 class="oxi-section-label">{{this.label}}</h4>
+                <h4 class="oxi-section-label">{{defuse this.label}}</h4>
             </div>
         {{/if}}
 
-        <div class="card-body px-2 {{unless this.meta.isCompact "py-2"}}" {{on-init this.initialized}}>
-            {{#if @content.content.description}}
+        <div
+            {{on-init this.initialized}}
+            class="card-body px-2 oxi-section-{{@def.type}} {{unless this.meta.isCompact "py-2"}}"
+        >
+            {{#if this.description}}
                 <div class="oxi-section-description">
-                    {{defuse @content.content.description}}
+                    {{defuse this.description}}
                 </div>
             {{/if}}
 
@@ -65764,35 +66501,52 @@ const TEMPLATE$c = templateFactory(
                 @meta={{this.meta}}
             />
         </div>
+
+        {{#if this.footer}}
+            <div class="card-footer text-body-secondary oxi-section-footer">
+                {{defuse this.footer}}
+            </div>
+        {{/if}}
+
     </div>
 
 {{else}}
 
-    <div class="mt-1 {{if this.meta.isCompact "oxi-compact" "mb-3"}}">
+    <div class="mt-1 {{if this.meta.isCompact "oxi-compact"}} {{@def.cssClass}}">
         {{#if this.label}}
-            <h4 class="oxi-section-label">{{this.label}}</h4>
+            <h4 class="oxi-section-label">{{defuse this.label}}</h4>
         {{/if}}
-        {{#if @content.content.description}}
-            <div class="oxi-section-description {{unless this.meta.isCompact "mb-3"}}">
-                {{defuse @content.content.description}}
+        {{#if this.description}}
+            <div class="oxi-section-description">
+                {{defuse this.description}}
             </div>
         {{/if}}
 
-        <div {{on-init this.initialized}} class={{unless (or this.meta.isInfoBox this.meta.isCompact) "ms-md-3"}}>
+        <div
+            {{on-init this.initialized}}
+            class="oxi-section-{{@def.type}} {{unless (or this.meta.isInfoBox this.meta.isCompact) "ms-md-3"}}"
+        >
             <this.sectionComponent
                 @def={{this.data}}
                 @meta={{this.meta}}
             />
         </div>
+
+        {{#if this.footer}}
+            <div class="oxi-section-footer">
+                {{defuse this.footer}}
+            </div>
+        {{/if}}
+
     </div>
 
 {{/if}}
 */
 {
-  "id": "mKySF5BU",
-  "block": "[[[3,\" components/oxi-section \"],[1,\"\\n\"],[41,[30,1,[\"renderAsCard\"]],[[[1,\"\\n    \"],[10,0],[14,0,\"card bg-body-tertiary mb-3 ms-md-3\"],[12],[1,\"\\n\\n\"],[41,[30,0,[\"label\"]],[[[1,\"            \"],[10,0],[15,0,[29,[\"card-header px-2 \",[52,[51,[30,0,[\"meta\",\"isCompact\"]]],\"py-2\"]]]],[12],[1,\"\\n                \"],[10,\"h4\"],[14,0,\"oxi-section-label\"],[12],[1,[30,0,[\"label\"]]],[13],[1,\"\\n            \"],[13],[1,\"\\n\"]],[]],null],[1,\"\\n        \"],[11,0],[16,0,[29,[\"card-body px-2 \",[52,[51,[30,0,[\"meta\",\"isCompact\"]]],\"py-2\"]]]],[4,[32,0],[[30,0,[\"initialized\"]]],null],[12],[1,\"\\n\"],[41,[30,2,[\"content\",\"description\"]],[[[1,\"                \"],[10,0],[14,0,\"oxi-section-description\"],[12],[1,\"\\n                    \"],[1,[28,[32,1],[[30,2,[\"content\",\"description\"]]],null]],[1,\"\\n                \"],[13],[1,\"\\n\"]],[]],null],[1,\"\\n            \"],[8,[30,0,[\"sectionComponent\"]],null,[[\"@def\",\"@meta\"],[[30,0,[\"data\"]],[30,0,[\"meta\"]]]],null],[1,\"\\n        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\\n\"]],[]],[[[1,\"\\n    \"],[10,0],[15,0,[29,[\"mt-1 \",[52,[30,0,[\"meta\",\"isCompact\"]],\"oxi-compact\",\"mb-3\"]]]],[12],[1,\"\\n\"],[41,[30,0,[\"label\"]],[[[1,\"            \"],[10,\"h4\"],[14,0,\"oxi-section-label\"],[12],[1,[30,0,[\"label\"]]],[13],[1,\"\\n\"]],[]],null],[41,[30,2,[\"content\",\"description\"]],[[[1,\"            \"],[10,0],[15,0,[29,[\"oxi-section-description \",[52,[51,[30,0,[\"meta\",\"isCompact\"]]],\"mb-3\"]]]],[12],[1,\"\\n                \"],[1,[28,[32,1],[[30,2,[\"content\",\"description\"]]],null]],[1,\"\\n            \"],[13],[1,\"\\n\"]],[]],null],[1,\"\\n        \"],[11,0],[16,0,[52,[51,[28,[32,2],[[30,0,[\"meta\",\"isInfoBox\"]],[30,0,[\"meta\",\"isCompact\"]]],null]],\"ms-md-3\"]],[4,[32,0],[[30,0,[\"initialized\"]]],null],[12],[1,\"\\n            \"],[8,[30,0,[\"sectionComponent\"]],null,[[\"@def\",\"@meta\"],[[30,0,[\"data\"]],[30,0,[\"meta\"]]]],null],[1,\"\\n        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\\n\"]],[]]]],[\"@meta\",\"@content\"],[\"if\",\"div\",\"unless\",\"h4\"]]",
+  "id": "986zlr+7",
+  "block": "[[[3,\" components/oxi-section \"],[1,\"\\n\"],[41,[30,1,[\"renderAsCard\"]],[[[1,\"\\n    \"],[10,0],[15,0,[29,[\"card bg-body-tertiary \",[30,2,[\"cssClass\"]]]]],[12],[1,\"\\n\\n\"],[41,[30,0,[\"label\"]],[[[1,\"            \"],[10,0],[15,0,[29,[\"card-header px-2 \",[52,[51,[30,0,[\"meta\",\"isCompact\"]]],\"py-2\"]]]],[12],[1,\"\\n                \"],[10,\"h4\"],[14,0,\"oxi-section-label\"],[12],[1,[28,[32,0],[[30,0,[\"label\"]]],null]],[13],[1,\"\\n            \"],[13],[1,\"\\n\"]],[]],null],[1,\"\\n        \"],[11,0],[16,0,[29,[\"card-body px-2 oxi-section-\",[30,2,[\"type\"]],\" \",[52,[51,[30,0,[\"meta\",\"isCompact\"]]],\"py-2\"]]]],[4,[32,1],[[30,0,[\"initialized\"]]],null],[12],[1,\"\\n\"],[41,[30,0,[\"description\"]],[[[1,\"                \"],[10,0],[14,0,\"oxi-section-description\"],[12],[1,\"\\n                    \"],[1,[28,[32,0],[[30,0,[\"description\"]]],null]],[1,\"\\n                \"],[13],[1,\"\\n\"]],[]],null],[1,\"\\n            \"],[8,[30,0,[\"sectionComponent\"]],null,[[\"@def\",\"@meta\"],[[30,0,[\"data\"]],[30,0,[\"meta\"]]]],null],[1,\"\\n        \"],[13],[1,\"\\n\\n\"],[41,[30,0,[\"footer\"]],[[[1,\"            \"],[10,0],[14,0,\"card-footer text-body-secondary oxi-section-footer\"],[12],[1,\"\\n                \"],[1,[28,[32,0],[[30,0,[\"footer\"]]],null]],[1,\"\\n            \"],[13],[1,\"\\n\"]],[]],null],[1,\"\\n    \"],[13],[1,\"\\n\\n\"]],[]],[[[1,\"\\n    \"],[10,0],[15,0,[29,[\"mt-1 \",[52,[30,0,[\"meta\",\"isCompact\"]],\"oxi-compact\"],\" \",[30,2,[\"cssClass\"]]]]],[12],[1,\"\\n\"],[41,[30,0,[\"label\"]],[[[1,\"            \"],[10,\"h4\"],[14,0,\"oxi-section-label\"],[12],[1,[28,[32,0],[[30,0,[\"label\"]]],null]],[13],[1,\"\\n\"]],[]],null],[41,[30,0,[\"description\"]],[[[1,\"            \"],[10,0],[14,0,\"oxi-section-description\"],[12],[1,\"\\n                \"],[1,[28,[32,0],[[30,0,[\"description\"]]],null]],[1,\"\\n            \"],[13],[1,\"\\n\"]],[]],null],[1,\"\\n        \"],[11,0],[16,0,[29,[\"oxi-section-\",[30,2,[\"type\"]],\" \",[52,[51,[28,[32,2],[[30,0,[\"meta\",\"isInfoBox\"]],[30,0,[\"meta\",\"isCompact\"]]],null]],\"ms-md-3\"]]]],[4,[32,1],[[30,0,[\"initialized\"]]],null],[12],[1,\"\\n            \"],[8,[30,0,[\"sectionComponent\"]],null,[[\"@def\",\"@meta\"],[[30,0,[\"data\"]],[30,0,[\"meta\"]]]],null],[1,\"\\n        \"],[13],[1,\"\\n\\n\"],[41,[30,0,[\"footer\"]],[[[1,\"            \"],[10,0],[14,0,\"oxi-section-footer\"],[12],[1,\"\\n                \"],[1,[28,[32,0],[[30,0,[\"footer\"]]],null]],[1,\"\\n            \"],[13],[1,\"\\n\"]],[]],null],[1,\"\\n    \"],[13],[1,\"\\n\\n\"]],[]]]],[\"@meta\",\"@def\"],[\"if\",\"div\",\"unless\",\"h4\"]]",
   "moduleName": "/build/app/components/oxi-section/index.hbs",
-  "scope": () => [OnInitModifier, Defuse, Or],
+  "scope": () => [Defuse, OnInitModifier, Or],
   "isStrictMode": false
 });
 
@@ -65800,31 +66554,77 @@ const sectionModules = Object.fromEntries(Object.entries(/* #__PURE__ */ Object.
 
 })).map(([path, mod]) => [path.replace(/^\.\/(.+)\/index\..+$/, '$1'), mod]));
 class OxiSectionComponent extends GlimmerComponent {
+  /**
+   * Returns the resolved sub-component class for `content.type`, or `undefined`
+   * when the type is unknown.
+   * @memberOf OxiSection
+   */
   get sectionComponent() {
-    debug$1(`oxi-section: importing ./${this.args.content.type}`);
-    return sectionModules[this.args.content.type]?.default;
+    debug$1(`oxi-section: importing ./${this.args.def.type}`);
+    return sectionModules[this.args.def.type]?.default;
   }
+
+  /**
+   * Returns the section content merged with top-level section properties
+   * (`action`, `reset`) that sub-components expect inside `@def`.
+   * @memberOf OxiSection
+   */
   get data() {
     return {
-      ...this.args.content?.content,
-      // map some inconsistently placed properties into the section data
-      action: this.args.content?.action,
-      // used by oxi-section/form
-      reset: this.args.content?.reset,
-      // used by oxi-section/form
-      className: this.args.content?.className // used by oxi-section/grid
+      ...this.args.def?.content,
+      // Button labels are on the button, not within the common section component
+      ...(this.args.def.type === 'button' ? {
+        description: this.args.def?.description ?? this.args.def?.content?.description
+      } : {}),
+      // Legacy compatibility to some inconsistently placed properties
+      ...(this.args.def.type === 'form' ? {
+        action: this.args.def?.content?.action ?? this.args.def?.action,
+        reset: this.args.def?.content?.reset ?? this.args.def?.reset
+      } : {})
     };
   }
+
+  /**
+   * Returns the merged metadata object, adding `isCompact` derived from `content.compact`.
+   * @memberOf OxiSection
+   */
   get meta() {
     return {
       ...(this.args.meta ?? {}),
-      isCompact: this.args.content?.compact ? true : false
+      isCompact: this.args.def?.compact ? true : false
     };
   }
+
+  /**
+   * Returns the section label.
+   * @memberOf OxiSection
+   */
   get label() {
-    // Button labels are on the button, not above
-    return this.args.content.type === 'button' ? null : this.args.content?.content?.label;
+    return this.args.def?.label ?? this.args.def?.content?.label;
   }
+
+  /**
+   * Returns the section description, or `null` for `type: "button"` sections
+   * where the description is the button label.
+   * @memberOf OxiSection
+   */
+  get description() {
+    // Button descriptions are on the button, not above
+    return this.args.def.type !== 'button' ? this.args.def?.description ?? this.args.def?.content?.description : null;
+  }
+
+  /**
+   * Returns the section footer.
+   * @memberOf OxiSection
+   */
+  get footer() {
+    return this.args.def?.footer ?? this.args.def?.content?.footer;
+  }
+
+  /**
+   * Invokes `@onInit` once after the section element has been inserted into the DOM.
+   * @memberOf OxiSection
+   */
   initialized() {
     if (this.args.onInit) this.args.onInit();
   }
@@ -65897,12 +66697,22 @@ class OxiLabelComponent extends GlimmerComponent {
     });
   }
   #tooltipContent = (initializeDeferredDecorator(this, "tooltipContent"), void 0);
+  /**
+   * Returns the space-separated CSS classes to apply to the label wrapper.
+   * @memberOf OxiBase::Label
+   */
   get cssClasses() {
     let classes = [];
     if (Array.isArray(this.args.text)) classes.push('d-inline-flex');
     if (this.args.tooltip || this.args.raw_tooltip || this.args.tooltip_page) classes.push('oxi-has-tooltip');
     return classes.join(' ');
   }
+
+  /**
+   * Lazily fetches tooltip content from the backend (`@tooltip_page`) and stores
+   * it in `tooltipContent`. Only fires once; subsequent calls are no-ops.
+   * @memberOf OxiBase::Label
+   */
   fetchTooltip(event) {
     if (this.tooltipContent) return;
     this.content.requestUpdate({
@@ -65928,6 +66738,10 @@ setComponentTemplate(TEMPLATE$b, OxiLabelComponent);
  * @module helper/lc
  */
 class Lc extends Helper {
+  /**
+   * Returns `val` converted to lowercase.
+   * @memberOf module:helper/lc
+   */
   compute([val]) {
     return new String(val).toLowerCase();
   }
@@ -65938,6 +66752,11 @@ class UrlFor extends Helper {
     decorateFieldV2(this.prototype, "router", [service]);
   }
   #router = (initializeDeferredDecorator(this, "router"), void 0);
+  /**
+   * Returns the application-relative URL for the given Ember `route`, optional `model`,
+   * and optional query `params` object.
+   * @memberOf module:helper/url-for
+   */
   compute([route, model, params = {}]) {
     return this.router.urlFor(route, model, {
       queryParams: params
@@ -65979,6 +66798,10 @@ class OxiFormattedLinkComponent extends GlimmerComponent {
     decorateFieldV2(this.prototype, "content", [service('oxi-content')]);
   }
   #content = (initializeDeferredDecorator(this, "content"), void 0);
+  /**
+   * Returns `@spec` as a {@link Link} instance, defaulting `target` to `"popup"`.
+   * @memberOf OxiBase::Formatted::Link
+   */
   get link() {
     return Link.fromHash({
       ...this.args.spec,
@@ -66099,12 +66922,28 @@ class OxiDownloadComponent extends GlimmerComponent {
   // will NOT be set for @type="link"
 
   baseElement;
+
+  /**
+   * Returns `true` when `@autoDownload` and `@hide` are both set (button is hidden).
+   * @memberOf OxiBase::Download
+   */
   get hide() {
     return this.args.autoDownload && this.args.hide;
   }
+
+  /**
+   * Returns `true` when `@showContent` is set, the type is not a link, and the
+   * raw data is smaller than 10 KB.
+   * @memberOf OxiBase::Download
+   */
   get showContent() {
     return this.args.showContent && !this.isLink && this.rawData.length < 10 * 1024;
   }
+
+  /**
+   * Returns the button/link label: the filename when known, otherwise the URL.
+   * @memberOf OxiBase::Download
+   */
   get label() {
     return this.fileName ? this.fileName : this.url;
   }
@@ -66165,6 +67004,11 @@ class OxiDownloadComponent extends GlimmerComponent {
       this.url = URL.createObjectURL(blob);
     }
   }
+
+  /**
+   * Triggers the file download by creating and clicking a temporary `<a>` element.
+   * @memberOf OxiBase::Download
+   */
   download() {
     // perform download: create and click <a> element
     var link = document.createElement('a');
@@ -66180,6 +67024,12 @@ class OxiDownloadComponent extends GlimmerComponent {
     document.body.removeChild(link);
     // URL.revokeObjectURL();
   }
+
+  /**
+   * Copies `rawData` to the clipboard (no-op for link type). Uses `baseElement`
+   * as anchor to stay within any active focus trap.
+   * @memberOf OxiBase::Download
+   */
   static {
     decorateMethodV2(this.prototype, "download", [action]);
   }
@@ -66194,6 +67044,11 @@ class OxiDownloadComponent extends GlimmerComponent {
     /* eslint-disable-next-line no-console */
     console.info("Contents copied to clipboard");
   }
+
+  /**
+   * Stores the base DOM element and auto-triggers `download()` if `@autoDownload` is set.
+   * @memberOf OxiBase::Download
+   */
   static {
     decorateMethodV2(this.prototype, "copyToClipboard", [action]);
   }
@@ -66201,12 +67056,22 @@ class OxiDownloadComponent extends GlimmerComponent {
     this.baseElement = element;
     if (this.args.autoDownload) this.download();
   }
+
+  /**
+   * Updates `fileName` from the filename input field's change event.
+   * @memberOf OxiBase::Download
+   */
   static {
     decorateMethodV2(this.prototype, "onInit", [action]);
   }
   onFileNameChange(event) {
     this.fileName = event.target.value;
   }
+
+  /**
+   * Converts a binary string to a `Blob` with the given MIME type.
+   * @memberOf OxiBase::Download
+   */
   static {
     decorateMethodV2(this.prototype, "onFileNameChange", [action]);
   }
@@ -66300,16 +67165,36 @@ class OxiFormattedArbitraryComponent extends GlimmerComponent {
     });
   }
   #detailsOpen = (initializeDeferredDecorator(this, "detailsOpen"), void 0);
+  /**
+   * Returns the JavaScript `typeof` string for `@value`.
+   * @memberOf OxiBase::Formatted::Arbitrary
+   */
   get type() {
     return typeof this.args.value;
   }
+
+  /**
+   * Returns `true` when `@value` should be rendered as a plain string
+   * (primitives, `null`, and `undefined`).
+   * @memberOf OxiBase::Formatted::Arbitrary
+   */
   get isString() {
     // what we interpret as a string...
     return new RegExp(/^(string|number|undefined)$/).test(this.type) || this.args.value === null;
   }
+
+  /**
+   * Returns `@value` pretty-printed as a JSON string (2-space indent).
+   * @memberOf OxiBase::Formatted::Arbitrary
+   */
   get asJSON() {
     return JSON.stringify(this.args.value, null, 2);
   }
+
+  /**
+   * Toggles the expanded/collapsed state of the JSON details view.
+   * @memberOf OxiBase::Formatted::Arbitrary
+   */
   toggleDetails() {
     this.detailsOpen = !this.detailsOpen;
   }
@@ -66513,12 +67398,27 @@ const TEMPLATE$6 = templateFactory(
 });
 
 class OxiFormattedComponent extends GlimmerComponent {
+  /**
+   * Returns `@format`, defaulting to `"text"` when not provided.
+   * @memberOf OxiBase::Formatted
+   */
   get format() {
     return this.args.format || "text";
   }
+
+  /**
+   * Returns `@value` coerced to a string with carriage returns stripped.
+   * @memberOf OxiBase::Formatted
+   */
   get valueStr() {
     return new String(this.args.value || "").replace(/\r/gm, "");
   }
+
+  /**
+   * Returns `@value` normalized to an array of strings (carriage returns stripped).
+   * Scalars are wrapped in a single-element array; `null`/`undefined` produce `[]`.
+   * @memberOf OxiBase::Formatted
+   */
   get valueArray() {
     let strOrArray = this.args.value;
     let result;
@@ -66533,12 +67433,29 @@ class OxiFormattedComponent extends GlimmerComponent {
     }
     return result.map(e => new String(e || "").replace(/\r/gm, ""));
   }
+
+  /**
+   * Returns `valueStr` split into an array of lines on `\n`.
+   * @memberOf OxiBase::Formatted
+   */
   get valueSplitByNewline() {
     return this.valueStr.split(/\n/);
   }
+
+  /**
+   * Returns a human-readable UTC timestamp string for a Unix epoch `@value`,
+   * or `"---"` for zero/falsy values.
+   * @memberOf OxiBase::Formatted
+   */
   get timestamp() {
     return this.args.value > 0 ? formatInTimeZone(fromUnixTime(parseInt(this.args.value)), 'UTC', 'yyyy-MM-dd HH:mm:ss') + ' UTC' : '---';
   }
+
+  /**
+   * Parses `@value` as `"style:label"` and returns `{ style, label }`.
+   * The style prefix is optional; if absent, `style` is an empty string.
+   * @memberOf OxiBase::Formatted
+   */
   get styledValue() {
     let val = this.args.value || '';
     let m = val.match(/^(([a-z]+):)?(.*)$/m);
@@ -66547,6 +67464,11 @@ class OxiFormattedComponent extends GlimmerComponent {
       label: m[3] || ''
     };
   }
+
+  /**
+   * Selects all text inside the clicked `<code>` element via the browser Selection API.
+   * @memberOf OxiBase::Formatted
+   */
   selectCode(event) {
     let element = event.target;
     if (window.getSelection) {
@@ -66622,16 +67544,32 @@ class ApplicationHeaderUserinfo extends GlimmerComponent {
     decorateFieldV2(this.prototype, "openxpki", [inject$1('openxpki')]);
   }
   #openxpki = (initializeDeferredDecorator(this, "openxpki"), void 0);
+  /**
+   * Returns a display string for the active tenant, combining label and value when they differ.
+   * Returns `null` when no tenant is active or the user has no tenant list.
+   * @memberOf OxiHeader::UserInfo
+   */
   get currentTenant() {
     if (!this.content.tenant || !this.content.user.tenants) return null;
     let tenant = this.content.user.tenants.find(t => t.value == this.content.tenant);
     if (!tenant === undefined) return null;
     return tenant.label === tenant.value ? tenant.label : `${tenant.label} (${tenant.value})`;
   }
+
+  /**
+   * Returns `true` when the user has more than one tenant, used to show the tenant switcher drop-down.
+   * @memberOf OxiHeader::UserInfo
+   */
   get hasMultipleTenants() {
     if (!this.content.user.tenants) return false;
     return this.content.user.tenants.length > 1;
   }
+
+  /**
+   * Returns the tenant descriptor object matching the currently active tenant,
+   * or `[]` when no active tenant is set.
+   * @memberOf OxiHeader::UserInfo
+   */
   get tenants() {
     if (!this.content.tenant) return [];
     let tenants = this.content.user.tenants;
@@ -66642,6 +67580,12 @@ class ApplicationHeaderUserinfo extends GlimmerComponent {
     }
     return [];
   }
+
+  /**
+   * Switches the active tenant and navigates to the welcome page.
+   * No-op when the selected tenant is already active.
+   * @memberOf OxiHeader::UserInfo
+   */
   selectTenant(tenant) {
     if (tenant == this.content.tenant) return;
     this.content.setTenant(tenant);
@@ -67020,6 +67964,12 @@ let OpenXpkiController$1 = class OpenXpkiController extends Controller {
   #loading = (initializeDeferredDecorator(this, "loading"), void 0);
   // button to copy workflow ID to clipboard
   tempCopyElement = null;
+
+  /**
+   * Returns a {@link Link} for the "copy workflow ID" button when the current
+   * page has a `workflow_id`, or `null` otherwise.
+   * @memberOf OpenXpkiController
+   */
   get workflowCopyIdButton() {
     if (this.model?.top?.page?.workflow_id) {
       return Link.fromHash({
@@ -67034,10 +67984,23 @@ let OpenXpkiController$1 = class OpenXpkiController extends Controller {
       return null;
     }
   }
+
+  /**
+   * Returns the breadcrumb entries (filtered to items with a label) as an
+   * Ember Array so `.lastObject` is available in templates.
+   * @memberOf OpenXpkiController
+   */
   get breadcrumbs() {
     let bc = (this.model.breadcrumbs || []).filter(el => el.label);
     return A(bc); // Ember Array allows to query .lastObject
   }
+
+  /**
+   * Returns a human-readable browser name+version string when the detected
+   * browser is older than 2 years, or `null` if the browser is current or
+   * unrecognised.
+   * @memberOf OpenXpkiController
+   */
   get oldBrowser() {
     const old_age = 2 * 365;
 
@@ -67083,6 +68046,11 @@ let OpenXpkiController$1 = class OpenXpkiController extends Controller {
     console.info(`Detected browser "${agent.browser} ${known_version}" is ${age} days old (max. supported browser age: ${old_age} days)`);
     return `${agent.browser} ${known_version}`;
   }
+
+  /**
+   * Clears the active tenant and navigates to the logout page.
+   * @memberOf OpenXpkiController
+   */
   logout(event) {
     if (event) {
       event.stopPropagation();
@@ -67098,18 +68066,34 @@ let OpenXpkiController$1 = class OpenXpkiController extends Controller {
       }
     });
   }
+
+  /**
+   * Reloads the current page via `window.location.reload()`.
+   * @memberOf OpenXpkiController
+   */
   static {
     decorateMethodV2(this.prototype, "logout", [action]);
   }
   reload() {
     return window.location.reload();
   }
+
+  /**
+   * Stores a DOM element used as anchor for the clipboard textarea,
+   * ensuring the copy stays within any active focus trap (e.g. a modal).
+   * @memberOf OpenXpkiController
+   */
   static {
     decorateMethodV2(this.prototype, "reload", [action]);
   }
   setTempCopyElement(element) {
     this.tempCopyElement = element;
   }
+
+  /**
+   * Copies the current workflow ID to the clipboard.
+   * @memberOf OpenXpkiController
+   */
   static {
     decorateMethodV2(this.prototype, "setTempCopyElement", [action]);
   }
@@ -67157,6 +68141,10 @@ class OpenXpkiController extends Controller {
     });
   }
   #popupBackButton = (initializeDeferredDecorator(this, "popupBackButton"), void 0);
+  /**
+   * Navigates back in browser history (used by the popup back button).
+   * @memberOf OpenXpkiPopupController
+   */
   goBack() {
     history.back();
   }
@@ -67204,6 +68192,11 @@ const amdModule19 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.definePropert
  * @module helper/echo
  */
 class Echo extends Helper {
+  /**
+   * Invokes `func` with the remaining positional arguments and returns its result.
+   * Throws when `func` is `undefined` or `null`.
+   * @memberOf module:helper/echo
+   */
   compute([func, ...args]) {
     if (typeof func == 'undefined' || func === null) throw new Error('{{echo}} helper expects a function as first argument');
     return func(...args);
@@ -67238,6 +68231,11 @@ const TEMPLATE$2 = templateFactory(
 });
 
 class OxiStatusComponent extends GlimmerComponent {
+  /**
+   * Maps a severity level string to the corresponding Bootstrap alert CSS class.
+   * Unknown levels default to `"alert-info"`.
+   * @memberOf OxiBase::Status
+   */
   getStatusClass(level) {
     if (level === "error") {
       return "alert-danger";
@@ -67303,7 +68301,7 @@ const template$1 = templateFactory(
 
             {{#each popup.main as |mainEntry index|}}
                 <OxiSection
-                    @content={{mainEntry}}
+                    @def={{mainEntry}}
                     @meta={{hash isPopup=true sectionNo=index}}
                 />
             {{/each}}
@@ -67316,8 +68314,8 @@ const template$1 = templateFactory(
 
 */
 {
-  "id": "zEaqan8F",
-  "block": "[[[44,[[30,0,[\"model\",\"popup\"]]],[[[1,\"    \"],[8,[32,0],null,[[\"@open\",\"@fade\",\"@backdrop\",\"@backdropClose\",\"@size\",\"@scrollable\",\"@onHidden\",\"@onShown\"],[[52,[30,1],true,false],true,true,false,[52,[30,1,[\"page\",\"isLarge\"]],\"xl lg modal-fullscreen-md-down\",\"lg modal-fullscreen-md-down\"],true,[30,0,[\"content\",\"closePopup\"]],[30,0,[\"content\",\"setFocus\"]]]],[[\"default\"],[[[[1,\"\\n        \"],[8,[30,2,[\"header\"]],[[24,0,\"bg-secondary text-white\"]],[[\"@closeButton\"],[false]],[[\"default\"],[[[[1,\"\\n            \"],[10,0],[15,0,[29,[\"container-fluid \",[30,1,[\"page\",\"className\"]]]]],[12],[1,\"\\n                \"],[10,0],[14,0,\"row row-cols-1 row-cols-md-2 justify-content-between\"],[12],[1,\"\\n                    \"],[10,0],[14,0,\"col-md-auto order-1 order-lg-0\"],[12],[1,\"\\n                        \"],[10,\"h4\"],[14,0,\"modal-title\"],[12],[1,\"\\n                            \"],[1,[52,[30,1,[\"page\",\"shortlabel\"]],[30,1,[\"page\",\"shortlabel\"]],[30,1,[\"page\",\"label\"]]]],[1,\"\\n                        \"],[13],[1,\"\\n                    \"],[13],[1,\"\\n                    \"],[10,0],[14,0,\"col-md-auto order-0 order-lg-1\"],[12],[1,\"\\n\"],[42,[28,[37,5],[[28,[37,5],[[30,1,[\"page\",\"buttons\"]]],null]],null],null,[[[1,\"                            \"],[8,[32,1],null,[[\"@button\"],[[30,3]]],null],[1,\"\\n\"]],[3]],null],[1,\"\\n\"],[41,[30,0,[\"popupBackButton\"]],[[[1,\"                            \"],[8,[32,2],[[24,0,\"btn-outline-light\"]],[[\"@type\",\"@onClick\"],[\"\",[30,0,[\"goBack\"]]]],[[\"default\"],[[[[1,\"\\n                                \"],[10,\"i\"],[14,0,\"glyphicon glyphicon-chevron-left\"],[12],[13],[1,\" \"],[1,[28,[32,3],[\"site.back\"],null]],[1,\"\\n                            \"]],[]]]]],[1,\"\\n\"]],[]],null],[1,\"                    \"],[13],[1,\"\\n                \"],[13],[1,\"\\n            \"],[13],[1,\"\\n        \"]],[]]]]],[1,\"\\n        \"],[8,[30,2,[\"body\"]],[[24,\"tabindex\",\"0\"],[4,[32,4],[[28,[32,5],[[30,0,[\"content\",\"registerFocusElement\"]],true,false],null]],null]],null,[[\"default\"],[[[[1,\"\\n            \"],[8,[32,6],null,[[\"@def\"],[[30,0,[\"model\",\"popupStatus\"]]]],null],[1,\"\\n\\n\"],[42,[28,[37,5],[[28,[37,5],[[30,1,[\"main\"]]],null]],null],null,[[[1,\"                \"],[8,[32,7],null,[[\"@content\",\"@meta\"],[[30,4],[28,[32,8],null,[[\"isPopup\",\"sectionNo\"],[true,[30,5]]]]]],null],[1,\"\\n\"]],[4,5]],null],[1,\"        \"]],[]]]]],[1,\"\\n        \"],[8,[30,2,[\"footer\"]],null,null,[[\"default\"],[[[[1,\"\\n            \"],[8,[32,2],[[24,0,\"oxi-btn-optional\"],[4,[32,9],[\"click\",[30,2,[\"close\"]]],null]],[[\"@type\"],[\"\"]],[[\"default\"],[[[[1,[28,[32,3],[\"site.close_popup\"],null]]],[]]]]],[1,\"\\n        \"]],[]]]]],[1,\"\\n    \"]],[2]]]]],[1,\"\\n\"]],[1]]]],[\"popup\",\"Modal\",\"btn\",\"mainEntry\",\"index\"],[\"let\",\"if\",\"div\",\"h4\",\"each\",\"-track-array\",\"i\"]]",
+  "id": "Adl4U5HR",
+  "block": "[[[44,[[30,0,[\"model\",\"popup\"]]],[[[1,\"    \"],[8,[32,0],null,[[\"@open\",\"@fade\",\"@backdrop\",\"@backdropClose\",\"@size\",\"@scrollable\",\"@onHidden\",\"@onShown\"],[[52,[30,1],true,false],true,true,false,[52,[30,1,[\"page\",\"isLarge\"]],\"xl lg modal-fullscreen-md-down\",\"lg modal-fullscreen-md-down\"],true,[30,0,[\"content\",\"closePopup\"]],[30,0,[\"content\",\"setFocus\"]]]],[[\"default\"],[[[[1,\"\\n        \"],[8,[30,2,[\"header\"]],[[24,0,\"bg-secondary text-white\"]],[[\"@closeButton\"],[false]],[[\"default\"],[[[[1,\"\\n            \"],[10,0],[15,0,[29,[\"container-fluid \",[30,1,[\"page\",\"className\"]]]]],[12],[1,\"\\n                \"],[10,0],[14,0,\"row row-cols-1 row-cols-md-2 justify-content-between\"],[12],[1,\"\\n                    \"],[10,0],[14,0,\"col-md-auto order-1 order-lg-0\"],[12],[1,\"\\n                        \"],[10,\"h4\"],[14,0,\"modal-title\"],[12],[1,\"\\n                            \"],[1,[52,[30,1,[\"page\",\"shortlabel\"]],[30,1,[\"page\",\"shortlabel\"]],[30,1,[\"page\",\"label\"]]]],[1,\"\\n                        \"],[13],[1,\"\\n                    \"],[13],[1,\"\\n                    \"],[10,0],[14,0,\"col-md-auto order-0 order-lg-1\"],[12],[1,\"\\n\"],[42,[28,[37,5],[[28,[37,5],[[30,1,[\"page\",\"buttons\"]]],null]],null],null,[[[1,\"                            \"],[8,[32,1],null,[[\"@button\"],[[30,3]]],null],[1,\"\\n\"]],[3]],null],[1,\"\\n\"],[41,[30,0,[\"popupBackButton\"]],[[[1,\"                            \"],[8,[32,2],[[24,0,\"btn-outline-light\"]],[[\"@type\",\"@onClick\"],[\"\",[30,0,[\"goBack\"]]]],[[\"default\"],[[[[1,\"\\n                                \"],[10,\"i\"],[14,0,\"glyphicon glyphicon-chevron-left\"],[12],[13],[1,\" \"],[1,[28,[32,3],[\"site.back\"],null]],[1,\"\\n                            \"]],[]]]]],[1,\"\\n\"]],[]],null],[1,\"                    \"],[13],[1,\"\\n                \"],[13],[1,\"\\n            \"],[13],[1,\"\\n        \"]],[]]]]],[1,\"\\n        \"],[8,[30,2,[\"body\"]],[[24,\"tabindex\",\"0\"],[4,[32,4],[[28,[32,5],[[30,0,[\"content\",\"registerFocusElement\"]],true,false],null]],null]],null,[[\"default\"],[[[[1,\"\\n            \"],[8,[32,6],null,[[\"@def\"],[[30,0,[\"model\",\"popupStatus\"]]]],null],[1,\"\\n\\n\"],[42,[28,[37,5],[[28,[37,5],[[30,1,[\"main\"]]],null]],null],null,[[[1,\"                \"],[8,[32,7],null,[[\"@def\",\"@meta\"],[[30,4],[28,[32,8],null,[[\"isPopup\",\"sectionNo\"],[true,[30,5]]]]]],null],[1,\"\\n\"]],[4,5]],null],[1,\"        \"]],[]]]]],[1,\"\\n        \"],[8,[30,2,[\"footer\"]],null,null,[[\"default\"],[[[[1,\"\\n            \"],[8,[32,2],[[24,0,\"oxi-btn-optional\"],[4,[32,9],[\"click\",[30,2,[\"close\"]]],null]],[[\"@type\"],[\"\"]],[[\"default\"],[[[[1,[28,[32,3],[\"site.close_popup\"],null]]],[]]]]],[1,\"\\n        \"]],[]]]]],[1,\"\\n    \"]],[2]]]]],[1,\"\\n\"]],[1]]]],[\"popup\",\"Modal\",\"btn\",\"mainEntry\",\"index\"],[\"let\",\"if\",\"div\",\"h4\",\"each\",\"-track-array\",\"i\"]]",
   "moduleName": "/build/app/route-pods/openxpki/popup/template.hbs",
   "scope": () => [BsModal, OxiClickableComponent, BsButton, THelper, OnInitModifier, fn, OxiStatusComponent, OxiSectionComponent, hash, on],
   "isStrictMode": false
@@ -67460,12 +68458,23 @@ class OxiMenuItemComponent extends GlimmerComponent {
     decorateFieldV2(this.prototype, "router", [service]);
   }
   #router = (initializeDeferredDecorator(this, "router"), void 0);
+  /**
+   * Returns the `href` for the anchor element: the Ember route URL for `spec.page`,
+   * `spec.url` for external links, or `"#"` for sub-menu parents.
+   * @memberOf OxiBase::MenuItem
+   */
   get href() {
     if (this.args.spec.entries) return "#";
     if (this.args.spec.page) return this.router.urlFor("openxpki", this.args.spec.page);
     if (this.args.spec.url) return this.args.spec.url;
     return "#";
   }
+
+  /**
+   * Returns the resolved icon CSS class string, expanding `glyphicon-*` and `bi-*`
+   * prefixes to their full class pairs, or `null` when no icon is configured.
+   * @memberOf OxiBase::MenuItem
+   */
   get icon() {
     let icon = this.args.spec.icon;
     if (!icon) return null;
@@ -67473,6 +68482,12 @@ class OxiMenuItemComponent extends GlimmerComponent {
     if (icon.match(/^bi-/)) return `bi ${icon}`;
     return icon;
   }
+
+  /**
+   * Handles a click on the menu item: navigates to `spec.page`, opens `spec.url`,
+   * or invokes `@onClick` for sub-menu parents.
+   * @memberOf OxiBase::MenuItem
+   */
   openTarget(event) {
     if (event) {
       event.stopPropagation();
@@ -67536,6 +68551,10 @@ setComponentTemplate(TEMPLATE$1, OxiMenuItemComponent);
  * @module helper/queue
  */
 class Queue extends Helper {
+  /**
+   * Returns a function that sequentially calls every action in `actions` when invoked.
+   * @memberOf module:helper/queue
+   */
   compute([...actions]) {
     return function () {
       for (const action of actions) {
@@ -67637,6 +68656,11 @@ class OxiNavbarComponent extends GlimmerComponent {
     decorateFieldV2(this.prototype, "currentlyOpenDropdown", [tracked]);
   }
   #currentlyOpenDropdown = (initializeDeferredDecorator(this, "currentlyOpenDropdown"), void 0);
+  /**
+   * Returns the CSS classes for a top-level navbar item. Adds a left separator
+   * border for every item after the first.
+   * @memberOf OxiBase::Navbar
+   */
   getRootItemClasses(index) {
     let classes = "py-1 ps-2 px-lg-3";
     if (index != 0) {
@@ -67644,12 +68668,23 @@ class OxiNavbarComponent extends GlimmerComponent {
     }
     return classes;
   }
+
+  /**
+   * Marks the dropdown at `index` as open.
+   * @memberOf OxiBase::Navbar
+   */
   static {
     decorateMethodV2(this.prototype, "getRootItemClasses", [action]);
   }
   openDropdown(index) {
     this.currentlyOpenDropdown = index;
   }
+
+  /**
+   * Closes the open dropdown, unless the new focus target is a child of the same
+   * dropdown (prevents the dropdown from closing when moving between its items).
+   * @memberOf OxiBase::Navbar
+   */
   static {
     decorateMethodV2(this.prototype, "openDropdown", [action]);
   }
@@ -67660,12 +68695,22 @@ class OxiNavbarComponent extends GlimmerComponent {
     }
     this.currentlyOpenDropdown = null;
   }
+
+  /**
+   * Toggles the mobile collapsed state of the navbar.
+   * @memberOf OxiBase::Navbar
+   */
   static {
     decorateMethodV2(this.prototype, "closeDropdown", [action]);
   }
   toggleCollapse() {
     this.isCollapsed = !this.isCollapsed;
   }
+
+  /**
+   * Collapses the mobile navbar (e.g. after a menu item is selected).
+   * @memberOf OxiBase::Navbar
+   */
   static {
     decorateMethodV2(this.prototype, "toggleCollapse", [action]);
   }
@@ -67690,6 +68735,10 @@ setComponentTemplate(TEMPLATE, OxiNavbarComponent);
  * @module helper/and
  */
 class And extends Helper {
+  /**
+   * Returns `true` when all of `args` are truthy.
+   * @memberOf module:helper/and
+   */
   compute(args) {
     return !!args.reduce((ac, val) => ac && !!val); // true if all are true
   }
@@ -67815,7 +68864,7 @@ const template = templateFactory(
                 <div class="row">
                     <div class="col {{if (eq entry.type "form") "col-xl-10"}}">
                         <OxiSection
-                            @content={{entry}}
+                            @def={{entry}}
                             @meta={{hash sectionNo=index renderAsCard=(and (not entry.compact) (eq entry.type "keyvalue") (not entry.content.buttons))}}
                         />
                     </div>
@@ -67862,8 +68911,8 @@ const template = templateFactory(
 
 */
 {
-  "id": "oWfTh/KK",
-  "block": "[[[8,[32,0],null,[[\"@items\"],[[30,0,[\"model\",\"navEntries\"]]]],[[\"default\"],[[[[1,\"\\n    \"],[10,\"ul\"],[14,0,\"navbar-nav ms-auto mb-2 mb-lg-0\"],[12],[1,\"\\n\"],[41,[30,0,[\"model\",\"user\"]],[[[1,\"            \"],[10,\"li\"],[14,0,\"nav-item\"],[12],[1,\"\\n                \"],[8,[32,1],[[24,0,\"nav-link py-1 ps-2 px-lg-2\"]],[[\"@spec\",\"@onClick\"],[[28,[32,2],null,[[\"label\",\"icon\"],[[28,[32,3],[\"site.logout\"],null],\"glyphicon-log-out\"]]],[30,0,[\"logout\"]]]],null],[1,\"\\n            \"],[13],[1,\"\\n\"]],[]],null],[1,\"    \"],[13],[1,\"\\n\"]],[]]]]],[1,\"\\n\\n\"],[10,0],[15,0,[29,[\"container-fluid pe-md-3 \",[30,0,[\"model\",\"top\",\"page\",\"className\"]]]]],[12],[1,\"\\n\"],[1,\"    \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n        \"],[10,0],[14,0,\"col oxi-message\"],[12],[1,\"\\n            \"],[10,0],[14,0,\"alert alert-danger\"],[15,\"hidden\",[28,[32,4],[[28,[32,5],[[28,[32,4],[[30,0,[\"content\",\"user\"]]],null],[30,0,[\"oldBrowser\"]]],null]],null]],[12],[1,\"\\n                \"],[1,[28,[32,6],[\"site.old_browser\"],[[\"browser\"],[[30,0,[\"oldBrowser\"]]]]]],[1,\"\\n            \"],[13],[1,\"\\n        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\\n    \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n        \"],[10,0],[14,0,\"col oxi-pagehead\"],[12],[1,\"\\n\"],[42,[28,[37,5],[[28,[37,5],[[30,0,[\"breadcrumbs\"]]],null]],null],null,[[[44,[[28,[32,7],[\"badge rounded-pill oxi-breadcrumb mb-3 \",[30,1,[\"class\"]]],null]],[[[41,[30,1,[\"page\"]],[[[1,\"                    \"],[11,3],[16,0,[29,[\"btn \",[30,2]]]],[24,\"role\",\"button\"],[4,[32,8],[\"click\",[28,[32,9],[[30,0,[\"content\",\"gotoBreadcrumb\"]],[30,1]],null]],null],[12],[1,\"\\n                        \"],[1,[30,1,[\"label\"]]],[1,\"\\n                    \"],[13],[1,\"\\n\"]],[]],[[[1,\"                    \"],[10,1],[15,0,[29,[[30,2]]]],[12],[1,\"\\n                        \"],[1,[30,1,[\"label\"]]],[1,\"\\n                    \"],[13],[1,\"\\n\"]],[]]],[41,[51,[28,[32,10],[[30,1],[30,0,[\"breadcrumbs\",\"lastObject\"]]],null]],[[[1,\"                    \"],[10,\"i\"],[14,0,\"glyphicon glyphicon-chevron-right text-secondary mx-2\"],[12],[13],[1,\"\\n\"]],[]],null]],[2]]]],[1]],null],[1,\"\\n\"],[1,\"            \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n                \"],[8,[32,11],null,[[\"@def\"],[[30,0,[\"model\",\"status\"]]]],null],[1,\"\\n            \"],[13],[1,\"\\n\\n        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\\n\"],[1,\"    \"],[10,0],[14,0,\"row row-cols-1 row-cols-md-2 justify-content-between\"],[12],[1,\"\\n        \"],[10,0],[14,0,\"col col-md-auto oxi-pagehead\"],[12],[1,\"\\n            \"],[10,\"h3\"],[12],[1,\"\\n\"],[41,[30,0,[\"model\",\"top\",\"page\",\"label\"]],[[[1,\"                    \"],[1,[30,0,[\"model\",\"top\",\"page\",\"label\"]]],[1,\"\\n\"]],[]],null],[41,[30,0,[\"model\",\"isAutoRefresh\"]],[[[1,\"                    \"],[10,1],[14,0,\"alert alert-info py-2 ms-2 fs-6\"],[14,\"role\",\"alert\"],[12],[1,\"\\n                        \"],[10,1],[14,0,\"glyphicon glyphicon-refresh spin-slow\"],[12],[13],[1,\"\\n                         \"],[1,[28,[32,6],[\"site.banner.autorefresh\"],null]],[1,\"\\n                    \"],[13],[1,\"\\n\"]],[]],null],[1,\"            \"],[13],[1,\"\\n        \"],[13],[1,\"\\n        \"],[11,0],[24,0,\"col col-md-auto oxi-pagehead\"],[4,[32,12],[[30,0,[\"setTempCopyElement\"]]],null],[12],[1,\"\\n\"],[41,[30,0,[\"workflowCopyIdButton\"]],[[[1,\"                \"],[8,[32,13],[[24,0,\"btn-sm oxi-btn-copy-workflow-id\"]],[[\"@button\"],[[30,0,[\"workflowCopyIdButton\"]]]],null],[1,\"\\n\"]],[]],null],[42,[28,[37,5],[[28,[37,5],[[30,0,[\"model\",\"top\",\"page\",\"buttons\"]]],null]],null],null,[[[1,\"                \"],[8,[32,13],[[24,0,\"btn-sm\"]],[[\"@button\"],[[30,3]]],null],[1,\"\\n\"]],[3]],null],[1,\"        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\\n    \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n        \"],[10,0],[14,0,\"col oxi-main\"],[12],[1,\"\\n\"],[41,[30,0,[\"model\",\"top\",\"page\",\"description\"]],[[[1,\"                \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n                    \"],[10,0],[14,0,\"col mb-3\"],[12],[1,\"\\n                        \"],[1,[28,[32,14],[[30,0,[\"model\",\"top\",\"page\",\"description\"]]],null]],[1,\"\\n                    \"],[13],[1,\"\\n                \"],[13],[1,\"\\n\"]],[]],null],[1,\"\\n\"],[42,[28,[37,5],[[28,[37,5],[[30,0,[\"model\",\"top\",\"main\"]]],null]],null],null,[[[1,\"                \"],[3,\" this.model.top.main item \"],[1,\"\\n\"],[1,\"                \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n                    \"],[10,0],[15,0,[29,[\"col \",[52,[28,[32,10],[[30,4,[\"type\"]],\"form\"],null],\"col-xl-10\"]]]],[12],[1,\"\\n                        \"],[8,[32,15],null,[[\"@content\",\"@meta\"],[[30,4],[28,[32,2],null,[[\"sectionNo\",\"renderAsCard\"],[[30,5],[28,[32,5],[[28,[32,4],[[30,4,[\"compact\"]]],null],[28,[32,10],[[30,4,[\"type\"]],\"keyvalue\"],null],[28,[32,4],[[30,4,[\"content\",\"buttons\"]]],null]],null]]]]]],null],[1,\"\\n                    \"],[13],[1,\"\\n                \"],[13],[1,\"\\n\"]],[4,5]],null],[1,\"        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\\n\"],[1,\"    \"],[46,[28,[37,13],null,null],null,null,null],[1,\"\\n\"],[13],[1,\"\\n\\n\"],[8,[32,16],null,[[\"@open\",\"@closeButton\",\"@fade\",\"@backdrop\",\"@backdropClose\",\"@size\"],[[52,[30,0,[\"model\",\"error\"]],true,false],true,true,true,false,\"lg\"]],[[\"default\"],[[[[1,\"\\n    \"],[8,[30,6,[\"header\"]],null,null,[[\"default\"],[[[[1,\"\\n        \"],[10,\"h4\"],[14,0,\"modal-title\"],[12],[1,[28,[32,6],[\"error_popup.header\"],null]],[13],[1,\"\\n    \"]],[]]]]],[1,\"\\n    \"],[8,[30,6,[\"body\"]],null,null,[[\"default\"],[[[[1,\"\\n        \"],[8,[32,17],null,[[\"@value\",\"@raw\"],[[30,0,[\"model\",\"error\"]],true]],null],[1,\"\\n    \"]],[]]]]],[1,\"\\n    \"],[8,[30,6,[\"footer\"]],null,null,[[\"default\"],[[[[1,\"\\n        \"],[8,[32,18],[[24,0,\"oxi-btn-primary\"],[4,[32,8],[\"click\",[30,0,[\"reload\"]]],null]],[[\"@type\"],[\"\"]],[[\"default\"],[[[[1,[28,[32,6],[\"error_popup.reload\"],null]]],[]]]]],[1,\"\\n        \"],[8,[32,18],[[24,0,\"oxi-btn-optional\"],[4,[32,8],[\"click\",[30,6,[\"close\"]]],null]],[[\"@type\"],[\"\"]],[[\"default\"],[[[[1,[28,[32,6],[\"site.close_popup\"],null]]],[]]]]],[1,\"\\n    \"]],[]]]]],[1,\"\\n\"]],[6]]]]],[1,\"\\n\\n\"],[41,[30,0,[\"model\",\"loadingBanner\"]],[[[1,\"    \"],[10,0],[14,0,\"dimmer\"],[12],[13],[1,\"\\n    \"],[10,0],[14,0,\"oxi-loading-banner\"],[12],[1,\"\\n        \"],[10,\"h4\"],[14,0,\"alert alert-info\"],[14,\"role\",\"alert\"],[12],[1,\"\\n            \"],[10,1],[14,0,\"glyphicon glyphicon-refresh spin\"],[12],[13],[1,\"\\n             \"],[1,[30,0,[\"model\",\"loadingBanner\"]]],[1,\"\\n        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\"]],[]],null]],[\"bc\",\"css\",\"btn\",\"entry\",\"index\",\"Modal\"],[\"ul\",\"if\",\"li\",\"div\",\"each\",\"-track-array\",\"let\",\"a\",\"span\",\"unless\",\"i\",\"h3\",\"component\",\"-outlet\",\"h4\"]]",
+  "id": "+B4HRt33",
+  "block": "[[[8,[32,0],null,[[\"@items\"],[[30,0,[\"model\",\"navEntries\"]]]],[[\"default\"],[[[[1,\"\\n    \"],[10,\"ul\"],[14,0,\"navbar-nav ms-auto mb-2 mb-lg-0\"],[12],[1,\"\\n\"],[41,[30,0,[\"model\",\"user\"]],[[[1,\"            \"],[10,\"li\"],[14,0,\"nav-item\"],[12],[1,\"\\n                \"],[8,[32,1],[[24,0,\"nav-link py-1 ps-2 px-lg-2\"]],[[\"@spec\",\"@onClick\"],[[28,[32,2],null,[[\"label\",\"icon\"],[[28,[32,3],[\"site.logout\"],null],\"glyphicon-log-out\"]]],[30,0,[\"logout\"]]]],null],[1,\"\\n            \"],[13],[1,\"\\n\"]],[]],null],[1,\"    \"],[13],[1,\"\\n\"]],[]]]]],[1,\"\\n\\n\"],[10,0],[15,0,[29,[\"container-fluid pe-md-3 \",[30,0,[\"model\",\"top\",\"page\",\"className\"]]]]],[12],[1,\"\\n\"],[1,\"    \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n        \"],[10,0],[14,0,\"col oxi-message\"],[12],[1,\"\\n            \"],[10,0],[14,0,\"alert alert-danger\"],[15,\"hidden\",[28,[32,4],[[28,[32,5],[[28,[32,4],[[30,0,[\"content\",\"user\"]]],null],[30,0,[\"oldBrowser\"]]],null]],null]],[12],[1,\"\\n                \"],[1,[28,[32,6],[\"site.old_browser\"],[[\"browser\"],[[30,0,[\"oldBrowser\"]]]]]],[1,\"\\n            \"],[13],[1,\"\\n        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\\n    \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n        \"],[10,0],[14,0,\"col oxi-pagehead\"],[12],[1,\"\\n\"],[42,[28,[37,5],[[28,[37,5],[[30,0,[\"breadcrumbs\"]]],null]],null],null,[[[44,[[28,[32,7],[\"badge rounded-pill oxi-breadcrumb mb-3 \",[30,1,[\"class\"]]],null]],[[[41,[30,1,[\"page\"]],[[[1,\"                    \"],[11,3],[16,0,[29,[\"btn \",[30,2]]]],[24,\"role\",\"button\"],[4,[32,8],[\"click\",[28,[32,9],[[30,0,[\"content\",\"gotoBreadcrumb\"]],[30,1]],null]],null],[12],[1,\"\\n                        \"],[1,[30,1,[\"label\"]]],[1,\"\\n                    \"],[13],[1,\"\\n\"]],[]],[[[1,\"                    \"],[10,1],[15,0,[29,[[30,2]]]],[12],[1,\"\\n                        \"],[1,[30,1,[\"label\"]]],[1,\"\\n                    \"],[13],[1,\"\\n\"]],[]]],[41,[51,[28,[32,10],[[30,1],[30,0,[\"breadcrumbs\",\"lastObject\"]]],null]],[[[1,\"                    \"],[10,\"i\"],[14,0,\"glyphicon glyphicon-chevron-right text-secondary mx-2\"],[12],[13],[1,\"\\n\"]],[]],null]],[2]]]],[1]],null],[1,\"\\n\"],[1,\"            \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n                \"],[8,[32,11],null,[[\"@def\"],[[30,0,[\"model\",\"status\"]]]],null],[1,\"\\n            \"],[13],[1,\"\\n\\n        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\\n\"],[1,\"    \"],[10,0],[14,0,\"row row-cols-1 row-cols-md-2 justify-content-between\"],[12],[1,\"\\n        \"],[10,0],[14,0,\"col col-md-auto oxi-pagehead\"],[12],[1,\"\\n            \"],[10,\"h3\"],[12],[1,\"\\n\"],[41,[30,0,[\"model\",\"top\",\"page\",\"label\"]],[[[1,\"                    \"],[1,[30,0,[\"model\",\"top\",\"page\",\"label\"]]],[1,\"\\n\"]],[]],null],[41,[30,0,[\"model\",\"isAutoRefresh\"]],[[[1,\"                    \"],[10,1],[14,0,\"alert alert-info py-2 ms-2 fs-6\"],[14,\"role\",\"alert\"],[12],[1,\"\\n                        \"],[10,1],[14,0,\"glyphicon glyphicon-refresh spin-slow\"],[12],[13],[1,\"\\n                         \"],[1,[28,[32,6],[\"site.banner.autorefresh\"],null]],[1,\"\\n                    \"],[13],[1,\"\\n\"]],[]],null],[1,\"            \"],[13],[1,\"\\n        \"],[13],[1,\"\\n        \"],[11,0],[24,0,\"col col-md-auto oxi-pagehead\"],[4,[32,12],[[30,0,[\"setTempCopyElement\"]]],null],[12],[1,\"\\n\"],[41,[30,0,[\"workflowCopyIdButton\"]],[[[1,\"                \"],[8,[32,13],[[24,0,\"btn-sm oxi-btn-copy-workflow-id\"]],[[\"@button\"],[[30,0,[\"workflowCopyIdButton\"]]]],null],[1,\"\\n\"]],[]],null],[42,[28,[37,5],[[28,[37,5],[[30,0,[\"model\",\"top\",\"page\",\"buttons\"]]],null]],null],null,[[[1,\"                \"],[8,[32,13],[[24,0,\"btn-sm\"]],[[\"@button\"],[[30,3]]],null],[1,\"\\n\"]],[3]],null],[1,\"        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\\n    \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n        \"],[10,0],[14,0,\"col oxi-main\"],[12],[1,\"\\n\"],[41,[30,0,[\"model\",\"top\",\"page\",\"description\"]],[[[1,\"                \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n                    \"],[10,0],[14,0,\"col mb-3\"],[12],[1,\"\\n                        \"],[1,[28,[32,14],[[30,0,[\"model\",\"top\",\"page\",\"description\"]]],null]],[1,\"\\n                    \"],[13],[1,\"\\n                \"],[13],[1,\"\\n\"]],[]],null],[1,\"\\n\"],[42,[28,[37,5],[[28,[37,5],[[30,0,[\"model\",\"top\",\"main\"]]],null]],null],null,[[[1,\"                \"],[3,\" this.model.top.main item \"],[1,\"\\n\"],[1,\"                \"],[10,0],[14,0,\"row\"],[12],[1,\"\\n                    \"],[10,0],[15,0,[29,[\"col \",[52,[28,[32,10],[[30,4,[\"type\"]],\"form\"],null],\"col-xl-10\"]]]],[12],[1,\"\\n                        \"],[8,[32,15],null,[[\"@def\",\"@meta\"],[[30,4],[28,[32,2],null,[[\"sectionNo\",\"renderAsCard\"],[[30,5],[28,[32,5],[[28,[32,4],[[30,4,[\"compact\"]]],null],[28,[32,10],[[30,4,[\"type\"]],\"keyvalue\"],null],[28,[32,4],[[30,4,[\"content\",\"buttons\"]]],null]],null]]]]]],null],[1,\"\\n                    \"],[13],[1,\"\\n                \"],[13],[1,\"\\n\"]],[4,5]],null],[1,\"        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\\n\"],[1,\"    \"],[46,[28,[37,13],null,null],null,null,null],[1,\"\\n\"],[13],[1,\"\\n\\n\"],[8,[32,16],null,[[\"@open\",\"@closeButton\",\"@fade\",\"@backdrop\",\"@backdropClose\",\"@size\"],[[52,[30,0,[\"model\",\"error\"]],true,false],true,true,true,false,\"lg\"]],[[\"default\"],[[[[1,\"\\n    \"],[8,[30,6,[\"header\"]],null,null,[[\"default\"],[[[[1,\"\\n        \"],[10,\"h4\"],[14,0,\"modal-title\"],[12],[1,[28,[32,6],[\"error_popup.header\"],null]],[13],[1,\"\\n    \"]],[]]]]],[1,\"\\n    \"],[8,[30,6,[\"body\"]],null,null,[[\"default\"],[[[[1,\"\\n        \"],[8,[32,17],null,[[\"@value\",\"@raw\"],[[30,0,[\"model\",\"error\"]],true]],null],[1,\"\\n    \"]],[]]]]],[1,\"\\n    \"],[8,[30,6,[\"footer\"]],null,null,[[\"default\"],[[[[1,\"\\n        \"],[8,[32,18],[[24,0,\"oxi-btn-primary\"],[4,[32,8],[\"click\",[30,0,[\"reload\"]]],null]],[[\"@type\"],[\"\"]],[[\"default\"],[[[[1,[28,[32,6],[\"error_popup.reload\"],null]]],[]]]]],[1,\"\\n        \"],[8,[32,18],[[24,0,\"oxi-btn-optional\"],[4,[32,8],[\"click\",[30,6,[\"close\"]]],null]],[[\"@type\"],[\"\"]],[[\"default\"],[[[[1,[28,[32,6],[\"site.close_popup\"],null]]],[]]]]],[1,\"\\n    \"]],[]]]]],[1,\"\\n\"]],[6]]]]],[1,\"\\n\\n\"],[41,[30,0,[\"model\",\"loadingBanner\"]],[[[1,\"    \"],[10,0],[14,0,\"dimmer\"],[12],[13],[1,\"\\n    \"],[10,0],[14,0,\"oxi-loading-banner\"],[12],[1,\"\\n        \"],[10,\"h4\"],[14,0,\"alert alert-info\"],[14,\"role\",\"alert\"],[12],[1,\"\\n            \"],[10,1],[14,0,\"glyphicon glyphicon-refresh spin\"],[12],[13],[1,\"\\n             \"],[1,[30,0,[\"model\",\"loadingBanner\"]]],[1,\"\\n        \"],[13],[1,\"\\n    \"],[13],[1,\"\\n\"]],[]],null]],[\"bc\",\"css\",\"btn\",\"entry\",\"index\",\"Modal\"],[\"ul\",\"if\",\"li\",\"div\",\"each\",\"-track-array\",\"let\",\"a\",\"span\",\"unless\",\"i\",\"h3\",\"component\",\"-outlet\",\"h4\"]]",
   "moduleName": "/build/app/route-pods/openxpki/template.hbs",
   "scope": () => [OxiNavbarComponent, OxiMenuItemComponent, hash, THelper, Not, And, THelper, concat, on, fn, Eq, OxiStatusComponent, OnInitModifier, OxiClickableComponent, Defuse, OxiSectionComponent, BsModal, OxiFormattedArbitraryComponent, BsButton],
   "isStrictMode": false
@@ -67876,30 +68925,30 @@ const amdModule22 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.definePropert
 
 const section_button = [{
   type: 'button',
+  description: 'Button',
   content: {
-    label: 'Button',
     format: 'primary',
     page: 'test'
   }
 }, {
   type: 'button',
+  description: 'Submit',
   content: {
-    label: 'Submit',
     format: 'submit',
     action: 'test!submit'
   }
 }, {
   type: 'button',
+  description: 'External link',
   content: {
-    label: 'External link',
     format: 'optional',
     href: 'https://www.openxpki.org',
     target: '_blank'
   }
 }, {
   type: 'button',
+  description: 'Request certificate',
   content: {
-    label: 'Request certificate',
     image: 'img/request.png',
     page: 'workflow!index!wf_type!certificate_signing_request_v2'
   }
@@ -67912,7 +68961,7 @@ const amdModule27 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.definePropert
 
 let line = {
   type: 'chart',
-  className: 'test-chart',
+  cssClass: 'test-chart',
   content: {
     options: {
       type: 'line',
@@ -67937,7 +68986,7 @@ let line = {
 };
 let bar = {
   type: 'chart',
-  className: 'test-chart',
+  cssClass: 'test-chart',
   content: {
     options: {
       type: 'bar',
@@ -67963,7 +69012,7 @@ let bar = {
 };
 let pie = {
   type: 'chart',
-  className: 'test-chart',
+  cssClass: 'test-chart',
   content: {
     options: {
       type: 'pie',
@@ -68000,9 +69049,9 @@ pie_right.content.options.legend_position = 'right';
 pie_left.content.options.legend_position = 'left';
 const section_chart = [{
   type: 'chart',
-  className: 'test-chart',
+  label: "Chart",
+  cssClass: 'test-chart',
   content: {
-    label: "Chart",
     options: {
       type: 'bar',
       title: 'Bar: one group',
@@ -68036,11 +69085,11 @@ const _testButton$1 = {
 };
 const section_form_text = [{
   type: "form",
-  action: "login!text",
-  reset: "login!text",
+  label: "Text",
+  description: "Consider this to be a test and consider yourself examined.",
   content: {
-    label: "Text",
-    title: "Text",
+    action: "login!text",
+    reset: "login!text",
     fields: [{
       type: "text",
       name: "text",
@@ -68136,11 +69185,10 @@ const amdModule36 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.definePropert
 
 const section_form_select = [{
   type: "form",
-  action: "login!password",
-  reset: "login!password",
+  label: "Bool + Select",
   content: {
-    label: "Bool + Select",
-    title: "Bool + Select",
+    action: "login!password",
+    reset: "login!password",
     fields: [{
       type: "bool",
       name: "ready_or_not",
@@ -68280,11 +69328,10 @@ const amdModule35 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.definePropert
 
 const section_form_dependants = [{
   type: "form",
-  action: "login!password",
-  reset: "login!password",
+  label: "Select with dependants",
   content: {
-    label: "Select with dependants",
-    title: "Select with dependants",
+    action: "login!password",
+    reset: "login!password",
     fields: [{
       type: "select",
       name: "select_dependants",
@@ -68362,11 +69409,10 @@ const amdModule33 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.definePropert
 
 const section_form_password = [{
   type: "form",
-  action: "login!password",
-  reset: "login!password",
+  label: "Password",
   content: {
-    label: "Password",
-    title: "Password",
+    action: "login!password",
+    reset: "login!password",
     fields: [{
       type: "password",
       name: "pwd",
@@ -68393,11 +69439,10 @@ const amdModule34 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.definePropert
 
 const section_form_datetime = [{
   type: "form",
-  action: "login!password",
-  reset: "login!password",
+  label: "Datetime",
   content: {
-    label: "Datetime",
-    title: "Datetime",
+    action: "login!password",
+    reset: "login!password",
     fields: [{
       type: "datetime",
       name: "dt_now",
@@ -68440,11 +69485,10 @@ const amdModule32 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.definePropert
 
 const section_form_cloneable = [{
   type: "form",
-  action: "login!password",
-  reset: "login!password",
+  label: "Cloneable fields",
   content: {
-    label: "Cloneable fields",
-    title: "Cloneable fields",
+    action: "login!password",
+    reset: "login!password!reset",
     fields: [{
       type: "text",
       name: "plaintext",
@@ -68485,11 +69529,10 @@ const amdModule31 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.definePropert
 
 const section_form_various = [{
   type: "form",
-  action: "login!password",
-  reset: "login!password",
+  label: "Various",
   content: {
-    label: "Various",
-    title: "Various",
+    action: "login!password",
+    reset: "login!password",
     fields: [{
       type: "rawtext",
       name: "rawtext",
@@ -68567,11 +69610,10 @@ const amdModule38 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.definePropert
 
 const section_form_tooltips = [{
   type: "form",
-  action: "login!password",
-  reset: "login!password",
+  label: "Tooltips",
   content: {
-    label: "Tooltips",
-    title: "Tooltips",
+    action: "login!password",
+    reset: "login!password",
     fields: [{
       type: "rawtext",
       name: "rawtext #1",
@@ -68646,10 +69688,10 @@ for (const format of ['primary', 'submit', 'expected', 'loading', 'exceptional',
 }
 const section_button_format = [{
   type: "form",
+  label: "Button formats",
   action: "login!text",
   reset: "login!text",
   content: {
-    label: "Button formats",
     fields: [],
     buttons
   }
@@ -68676,9 +69718,9 @@ function additionalGridRows() {
 }
 const section_grid = [{
   type: "grid",
-  className: "certificate",
+  label: "Grid",
+  cssClass: "certificate",
   content: {
-    label: "Grid",
     empty: "No data available",
     buttons: [{
       section: "Some"
@@ -68779,9 +69821,9 @@ const amdModule39 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.definePropert
 // prettier-ignore
 const section_keyvalue = [{
   type: "keyvalue",
+  label: "Key-Value",
+  description: "This is a first test",
   content: {
-    label: "Key-Value",
-    description: "This is a first test",
     data: [{
       format: "head",
       value: "Scalar types:"
@@ -69075,20 +70117,55 @@ const amdModule40 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.definePropert
 // prettier-ignore
 const section_tiles = [{
   type: "tiles",
+  label: "Tiles",
+  description: "",
   content: {
-    label: "Tiles",
-    description: "",
-    maxcol: 4,
     border: 1,
+    maxcol: 4,
     tiles: [{
       type: "text",
       colspan: 2,
+      border: 0,
+      cssClass: "oxi-realm-selection-group-text",
+      content: {
+        description: "Take a deep dive into masterly distilled information and mind-blowingly sustainable diagrams—the insights are absolutely game-changing.<br><i>#DataDriven #Innovation #ContinuousLearning</i>"
+      }
+    }, 'newline', {
+      type: 'button',
+      content: {
+        label: 'PKI Operation',
+        format: 'primary',
+        icon: 'glyphicon-wrench',
+        page: 'info',
+        href: 'https://example.org'
+      }
+    }, {
+      type: 'button',
+      content: {
+        label: 'Mobile Devices',
+        icon: 'bi-phone-flip',
+        page: 'mobile'
+      }
+    }, {
+      type: 'button',
+      content: {
+        label: 'Terra',
+        description: 'Also called Old Earth. A realm made for those who were born on the blue planet. The Bene Gesserit drew patterns of Old Earth on many planets.',
+        footer: 'Auto-Login',
+        image: 'data:image/webp;base64,UklGRsIdAABXRUJQVlA4WAoAAAAwAAAAYwAAagAASUNDUKACAAAAAAKgbGNtcwRAAABtbnRyUkdCIFhZWiAH5wAEAAUACQANAB1hY3NwQVBQTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA9tYAAQAAAADTLWxjbXMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA1kZXNjAAABIAAAAEBjcHJ0AAABYAAAADZ3dHB0AAABmAAAABRjaGFkAAABrAAAACxyWFlaAAAB2AAAABRiWFlaAAAB7AAAABRnWFlaAAACAAAAABRyVFJDAAACFAAAACBnVFJDAAACFAAAACBiVFJDAAACFAAAACBjaHJtAAACNAAAACRkbW5kAAACWAAAACRkbWRkAAACfAAAACRtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACQAAAAcAEcASQBNAFAAIABiAHUAaQBsAHQALQBpAG4AIABzAFIARwBCbWx1YwAAAAAAAAABAAAADGVuVVMAAAAaAAAAHABQAHUAYgBsAGkAYwAgAEQAbwBtAGEAaQBuAABYWVogAAAAAAAA9tYAAQAAAADTLXNmMzIAAAAAAAEMQgAABd7///MlAAAHkwAA/ZD///uh///9ogAAA9wAAMBuWFlaIAAAAAAAAG+gAAA49QAAA5BYWVogAAAAAAAAJJ8AAA+EAAC2xFhZWiAAAAAAAABilwAAt4cAABjZcGFyYQAAAAAAAwAAAAJmZgAA8qcAAA1ZAAAT0AAACltjaHJtAAAAAAADAAAAAKPXAABUfAAATM0AAJmaAAAmZwAAD1xtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAEcASQBNAFBtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJBTFBIjgcAAA0JBW0bOeo1dz/4M94QIvo/AZKtFUDeVQHzIIBxEj3iQj3WP/HUr4CDxwDY2DZQJS60fZBthoK2bSSPP+7/DkBETIC4qfZbSn0IFFLZkmSbttUTx8a1bdu2eWzbvrZtG8e+tm3btrHmeDr+gYgJmAC/sW3LcmzbVm29z+kORGyFNrm12HQuxI6F7cDOdUmpnM2prcLmtgCRLLjP0XsjgB3hmBgCRMQEIBSxLCRCEW5XYwC7i0ahkEAWu5Y/S0CQQSDa1ab1RG2GRpMQEQTeVdj/T4ZMLWlVjepGgXjqJHD3GHYrM0LyjrL5zIhcjlldjzXcilBIMjgIUolrXMYYEUs2eDdh/ERIuR7Tl/PjBspQIKQWTyWUConeHh+r12008k5AgEzkumY/fnysPmYIgQALkAGBFFoiuDx+/XjZRjf7jljXqPPHj+fjGhKI6wopcg3GpyNjVIN3IkvLklw+fBw3hxCIa8tAEGtGvrk9aIwu7cMK5aLLp6/7Zg0hXlgYjHK9fzfKae+gQ84l6vJpO64hxA4FliMi7n40VLb8QjEUKY3zeV1CiL0KICJ5d+62ealKwnWuNUDsWZaVqXeLq68i1ICMNSJ625YMiZ0LS7loSdvXsDrAKCKRqlK8SiEytQT4ClhA2A2qIvRKEChMJFe3JTeoJdDrADncIYNkXUG0bQmBzCs2akyI65pSYF6/URvySh0hM0XhQUhfpC7HGj0HSbV1pPQFwqPzWGaSki+VKfRZZPWyDNuzCNXFmfLniBzLcWmmKQWXcyyB8hK5cLNunocVSz+OzCDfud5szTyFKtaHAvk5WdKbGPY8QO58MJz0HOrM23MzVRvlfQf4idyKe5c9FbmdD91qPUG2TmczW5k4dRiDbPJhG/Zk5HacoFo81XLamvlKsXw1Bhio+KllT0e2dFddSLD217UwYxnfQeMIjXOGZ4QVd26AZBurZiQTcdJohPpCihmfHpykaQJfJOZswaoWiq1zUsJoCSN1kdKUIEQGjRiIeUcCwj0zhRNweZmXICTLLaNJyZIXg9wKT4rTPbIErXDMCjGUuAXytKBR2J1hZt4hSkJTC7uQxMRlS9Bza546zMz1nMOa2LNtIjwxtyNkjOZltyTLAmtW4E7TOB2el6KEKwkzZwtbAtOBJqWmIYFCwazldgKqVmhWNgosGAqjOWEkI7mblGdkuWoNjGLrFFNWdxNLQ9CbQmhC2EPHboTqwhpM2HJ5zWEgGSPSE1JTeaRoR+Q4E0bTweU8dCPBUpexMl/j6sO6GSCUn0YYNBm5trhR02Bl9NcdzNZ01eF4aQRCiz5d0qCpqGvL23WzARy5bB+WQMzUeIzj28fmeVVdlrdZ1ZqHONH1cGjyNL359qYGeBoOqPtslAfq2uJ26WpNg6D7p6v5TONRhxvKnoRQuO8PhT4DPAY3B3dPwooo/QLzhV213GoYPAMp4adrf4nl6lzCbc0hxs9uhvUF0F1eFzATlOTtWObL5SqtaXsCiK0XcUXjJlIzEN2V4tpuIb0+yy1dzbYVRsh6NbbAAVcDWjaEeLWWeXELaOPUa7DsRgq/EDjUNZQSaG803V7DvLgQ3srKSFs7skwVuah3AKQY55IGGO3Eoqua9ZDD7FHSwvb4s0XYMno5C8pdFcfDUrb3AIqM1sMhhC2DXsRS0X0uHW4PlzK7DeVaPv0kFLLFU/kaFtB0bYP17U1emv3KisRdp59kCIFQ64n8jJ+Dxt56i7h9cziPtvfzNAS4736cIRGAMWo9I8BAUV0V6+Ebh9ra7FzWSRJdd3eQCtqmLRDGtpq2N0cc1tu1z8PsDk7396eA6H731Z2hRdGWMD26iwLHshyXZdvKNq+SMKDAf4oGFEbgJIkDQQMcsbtoAQCcIEgSwD8ahQCBEksYIIRoQFEABCIwHMOQaKnDwTAcBwz3n4YQAgRKZF+7uLukLAAgDKMAAYUwCkOIwCgcIaW+9cMK5kvTS7AAp5WWap3KGvEBjhqwdNgAkG4QfyvtCXaDPAkDQAAIEMJVdEJlRCHgzaGJ+ybyA79IphqxVcN/g9Vk7ziiA5y9V08lGXYF0EUIPcuNUUEEL6slWi3NCSsd1UqybcpKZOmw2X7131/wNF0Dew1QFcAwY2juqKuusn4IMdw6X5XVnrWvznm/LwMQz95fY0xm4p4mrkp0V47X2qgHerhtHTeBvvnvv/36bwtE4drLsgaAjTomq645D+V8pLyzXHezZHNmy92f9gXwRG0WzqmmlPd+qyJYb01dZ87Md2vtccwiy/3n8u0/AHyXIMQAt4Clqkg/E/QVbKgwg0nNtLFTUza2muX3e8uznVJ0JfK2RUO22unBnL7O7Hznfzx/UGU3DQYjjBHgpEE2uCjBG85M7dbaOofpMtLJX7fXcVkV76Swt0pdb11z03OO/Izh7bB65jtGAgCI8kuWJ2wM5ARu8PbdJlv9ECBAglecwA3eWjqi+OzWzy6Xxdnlsji7XBZnFxhkqsa2mWqcALd9ZSHdQ+EswGiJAHZbaBf4pr1sVTjaAuAGG9f9EW680mCKMQBusNEFFOO+oKD36bD0RrhMUFIBVlA4IGYTAADwQQCdASpkAGsAPi0ShkKhoQ0O1zgMAWJZADP09XUFJPsz+a/GPsQ6qYr/b/nh/13qf/TvsC85nzH/s7+2/vJejf/LeoV/MP+N1lHoAfsz6dfsk/2L/yfuV7XF3o/avyA/ar1R/G/lv79+Vfrg4o+nb+y9CP479nvy395/Hn2m/zPgv7y/7n+u+wF+L/zD/Ffln+aXuE7ObUP8B/y/UI9d/of+V/wX7v/5T0cP7X0Q+sXsAfyz+lf8j1W/wHg+/eP8r7AP88/sv/U/zfur/zv/g/y/5o+z787/vP/j/zXwCfy3+r/8L/Afvf/ofnJ9iv7Rf/T3Xf2W/8S24AspIHoXxdvXvBszmiryV+kkilSk+bdvgFo51L3izMqQu5dNhoi6pLqn7F9CekUwVwYz81P+9/rjdg38N0ELsNuAIAf9FoUKE9zjKBK7sDYW1aGXEHqR1YkjziCxCivi3dspG75BnGchyjYuy1DGDb/d6pHQr7RWU6OEVI0DuFVZ1aXRGrkKCV+P4SXbGScq+SY94jtv8SeUogbc04GF98EVXecEIt7ZzWgQLKG5/tzI7EKOieiRlU0uT0GbFpD4N+/d96I+tdhkd/aGB0hbazj18H+21oxRVT5EoLiCOPXqEZQyuYFhE+Sb/i7CbtnBbMCBEw1nmL2kuyAU9BluW89G8sqvuZDjbHwnfemyhEqX0L3fdnZVJfdvOPJAAAD+//5tgGLKpNAKRkJH/21p05vVMI5QYvj7hzE2zhXZaaK5X5+T+ASGitITqv1VSlCs+8HFinBJc6zqgwJ7qntnoT/+GdwOcUAtpd2YuZxwgzxNPouOPZIqF0iCahwWdlOUspRi8s5Gqh/7QGKXlKEzvcE5u84poNSVej5cz4cHueB14QAGug2dKuk3FN7eTWoviImeV72CR6sgFpJpU5jo6MIz1Y6GHheHF7Ju1EcxUpz34rcxhEGWdbDB4/pjO6Jn3kkp/rfnVy1wpQLd+cIUNpus5cSM6Dn7mYYQkavAeyxN3E8oRkejh7P456CJ6ZEAzWtDncU/uGVwnyBlpgr8GQGT207bx2zmGB8w4ZGlr5bTR8Q9o2owBXdSUuF5M9QQclt7VqlCyAYY7Gm2xiU623C6bYinPb06C+KhcbROeJmOq0bucJlaDFbaYvptGo8YiVWkxNp5jynvIgvhN0XXTy4IJsHlcQ6jhm3ZnnTKxhWTrwnvMH9pfO70Yo6UFAT/p3ctC7iOZ01N7cXsbujNw6BDm2agL/ZOcdnSVkmgb5P7ASfoKVaYS3vtXfFC0qdafjGiWhlsXLLnVrj3yv5jGBHwPnJYglDdapxYA2vUF5h1FyYj3JzJuEmJ64Dj8jo0LzqAawXlcnOLz7c/UaMHtoSqLDTy8eeANNCuvbOyhcr2DsxS5/jIucNrA4h3R5tDV4C0pX1Wl3QOr/z23qcJ56UDFHyvy4/ei0ICIaSC6ClbSnRrpUOWFj0HYDCASJ3Ey7NE40vD7JX/HczkqE+ld/UQLPK9x6iNqs6Wnv1KG1L2Cj9eGpZBTlThhqCHOe1i+rL2LVXfFM9OYNFkVqNMJxNyD9HVkKduLLATtHfT9+B9BmSEgp1oSoIkBG7PEzDoO6ddZYPwSUP7oVOxA4STylhROEOUIKu6/rSxBS201VbIkAHVrCpeH0NgGyE3xiDSozMbbLtQkDvOuCYmgWPFWF8j5D9zCTS6/nZyXRUSup7nbS++5mWuUrWUYGaWUlti0Ymi82hNN5IeQULAgbiP/+4LvB2da4+/45B63hDa1v8q+VdmAydx/4KSgJKoaiRV6OS7hnofzSyu2Ak5wRHytWRqL7pZVuh5SXLpsLy2DmR7G897cJDdHZUVSHWo/zznAPzT1SEGDV3BWVP240kAfR/bAOI0eJiGHRVwoOKLA/kHPxclJhPNnroQghMg+I18mTWh/92vVAHV3lVkYEyOCARRTVWYltb0/f9VKDNRgfi36Jh5AY/BSjqRzh/B+7cZD454wxe+kB3HCSHdN8wXNbHRqe6n53K/P7sFRTasEhnAPcxDAyaPvj7EHqvGT/sCqm+diFQosXd+Xx967KSUHqP6SjOx/SgOmd24FM7CR/KFneut43SKyGWYaaQ+O+IotCUcrlJFAt2eiAZNh1/yI0aNwbAi+DDccYnrcTWT1MYhpcjnoMSDw9CcrRXuvYFmc3vVuaxlx9XHnuW+4vwuj2f8fIn1z0lZBxOSc9IhUk/jfEHx1mBt2x41I3+UEt9syLbeIq46ZlpL+2P+lkIEwK7SU/RVca7hLIZm8E/l3mEVqCX6uaYY4l1OP1eaArGOWYQNjpmRtUOlFn9sXwqVvRwmCBawBAH45klzwnvaBum+IW/yS6bOnvKpNS/axVXZkeEnlWXvaXn2xtPyDv4DjCT/Ac2oG86xjra7LWxbRGA1YJ9eyIS6vTH+YJVfHZAD4C5QTGPit/qm7n8muNOihKoCxKVE5ayg3keAbKqFFYmPwdY4nWe6OgmW17Rl/OX42Wl5+Frtdf/FRpuHIMVvSl7BYZSu/QZbN5qX90QmSsBQwLxpY5A11u9/dQTk7G5T72Z/Fs6uyi9lekLmMjcmhcHtexcvu+y1fbg8gWeRAIY05du5ThBQ/xXpzj7E198RJsZ17mkwPNSwr2Luci17W05OtccHXJW8TuaMcLCaaHM4VAkwgB9M2UY5aeOOwcTIgYFP+VNmhvC1tdPxsBEvKrRTd4uhyhKI9evr04tuFPs4sJlDtU0TU9Wk6RHLF7HBydHB1A8NquOBUCppjRcH24et3xXe8Ysv1ne2ogdUfsdL0bZy0MUvh4T62lAW6ZeZUYYhnaR9JgkTLxxzeZgaqZe+RG0vIDgzn8va6WQJ+59SZikeuQVxagpyca5I/STveycx6uyLiyDM0piuzwU1d7KawuHvWEbuBRBfpMoIvB3pGqzzxmrtYQXtboXa82tjrVwMkRoeokC1V7oDdknf57WZ+UY71YXHQ/r3n8XUi/kax33eweo8BdsCcPR8AEdE8Pz57ZpHiIPbchC2fJqekJGs1ppkUzhjfsxuvmXU3efHr6hG9kodYVqYsYW/DEi4APNb8x8LPci+l1rZZMg3DFIoBihrbSYax8H5Y/uzmPdxE1dbzAvLZViyO/9F53p9y7pnWmSQFO2+rwf6IJaPHGPEGQdxWqUOlvCWnn4zGOddxcVjws2aLMkrVu69APhvSIsC5xAt4I5IG/K0nNUPDGgP6ogR4+N+zz2uUu0OAVsf+6n71a4wDN8Yba7bU0rCSjOlBp4ksrzrelfKx4JLWi+zjTQS8qxS/500BKX+5zjka2U3vUUG8LnY6kbFGLTsIvpD5+y140iVkN43AvXE9MwHALg3Voq2vse6//YMke5toigfL6cVZmlpE4wu13YpyyMPUxPcUesJFAbjRvtOXXNt4aAncT6ZtmWxHr3G1VAfnTMktxPSVC//4ALXFbXBPS5Wa+IT2SFRg3emLSSRvsXb4p4NLw9ys0bk3V1lDIX4Ul5+D+7tamQmRM8/KyW6mXmJnOHUqZtL1TuzpHZiEOMCqv11TvqkV7Ic7OQx2mRDB01tJ3VM7Q+F2PF2SB1Ky8EMz67X3OyO2cja6fn94ncyu33Ar8vH2tJ4pQfz3bEs/Frrg5PgvG11PEXk/k7RN8AGTtln8DGqEt21ci4jO9JKU2F9jomvDX3l5+3DfTrkjFAgG+3rxEeGkHtY7AXrcH1zqXAlr9JJhxwSB8j3IvfRFaOqowQZnG8IUHR2aUp0FsaD3QMQqhxeWx+jRl4MPrQOoQJnXdVCIFl1kckvv6edi0yBYM1oISATyp13paKOH3UjbSsYKoXE9k1VD7UlnCZwaiog1zy7vWcB8ENBW5x/BhE1pWxBdPOnAh+E+HtBRaHVoolE+cgpO4ouwD7veGg1zrXz4I9vkZTyB2M2bba3N4b88+BwKarN67dKE/taS5HzRvsh1ysUliQmT1BlLnEHSLjJkx5iWqOhEwlvBC62NDymxNdve38RP4/N8mJthfWtZ+On2tPOFw1TIf/tpi7jjjJHJ+QedPjBYhaLPs0xWvA+Nl6Pqt+4iKioRUcR7dbO8FtHK8jJxVtg/zvIKwctVlwef56Phw0OaNeyQVd8XwrcEM5WbWZ4nihsKy2Pw+kMT4cx0cLfb/Jj0XltxNhPG4ORyFSK1BeWlOmr9nyq5sAMcvwhWVE/ZyXOS8FdnP9IBa1swO0hNFxRFHPiG6jbUefUZCygMK4B5SlccYGDdBQIUoQ2wvrPbKXlQhXwl3h9PLBM7iTxhrT7ZKvhOqLvI9hOPI5z1SSlLrTzvRX4962lIO2ozGrhF788MzBs44E5F1z30XsCS/h64iP5FfwmtdwHCrWlgGq0ljJP3GxPkL884N9e2Qsxmj12HKCez4h+nzgrCJZIPsPmkFBWU0BJY32y2JnxwTGilYimo6HyES/IxvKJz7VU7y4VP/R0rXWnG/NFYZGZUApEezFHqd8CJinI5nKUTA0Ic40GP+JjzRfMKfK7JJEjcAMvay7o1o+NZBWE8Zb6j41T4hE0i14o/IIgeAVq6HAa3EzlaxPKXGCpJ8RxtjSAJVhL1jh2/dYjR792+XTjk+6RcuHh39AONaIf9oxUNE1DdpnX4/lxT6seUBUy97vQ6kykE6zHl02un5uvpzmDJq0F+Zwfcz1JBWXzrtRbxSF7RVkPA3hLMy42EY63dgT//N0S5b2Tgi+cvF17V8QRnjAQd5bkexMSpTYPgAgahk//tblCbz+XgC7lQd8rEMJW6smJAm2oHAgJ2dtLxbt7/+KH39mH89FECZnAFbGWvaKRcGF1ZkqBzcYWmkdNanJ7Gd+aupEvvPZV/iOn/FM7I04KiBQABYi92yzQ610CzIBQelShy7SsVHEqatzHcgsCslFdUHabkKgcXF4Mak7mjReB4zmupuX5uOSh9fIi5nT/mvQ4MBKESKVcr3TFy/Il8kQnADe4cIbS9+PuCt7BrNUk5973KPoPEjdfTGl/I6Mk1Epyv9JJuziE4mfd0hMPavijulnr9kK1HPYb3/Mpj/epjXjxnw7+C7eFCK9cMU//n23co/KK3DZOCRv/q7/+u+sEnx1q2pUqFkFJEesutVDxf5PW5B6km+ZCT7ZlF9YJaC1LF3HskuEklBKRXPFcAgGuCRODQXFeAeeU1RNbELBEx1Y2zhgx9sxzKZnhwdvZZsw1KUacKogfDNBjSih/nAtETqs5AVydFXnF3VKOFkMAzgpt8RjXWYrXvJ/dXTCwKhV1xTDOIPLxnfx8Y8W3zu4RPXH2QSLhv/xqS629aX4R7bHCoE7BtoQbX40cWlVYd+uXuyJ4GAjnzOic/OgbGcJEHCMIdtImm1938IVg1w4Dth23Ni3le6k2S/ok6JAZU9SuGJDXJoRc9Bn+AHUd7fbbfTuqDsEwgE2nNpVhGLrBaGqPXJEhUVn9Q4+cWJYiGz9Ae03TGNzABtuGKpdv7hoBtcMKMZjx682FUgBWeLvGSSMCAGr/eh6L1LZPdI5Ir+l2kImUDsw8fd1EGJidB3rkai8W80I7knj95dX0ghXyHsYzm/vLY8PmhdlHg0pkN3aJfx28Z5/wffYVG/fMA8C/2geJDI/NTqNkjHHnjLQG0IAYFZk1zwRWK9ZI0+PJeKfi3E4L6W2oElW+egUCc8QtEu4kOYf3P72o7BYL9pv6ufZllf8X4GdHqH1I8IcOvDtEW4ZoamEKRiawaM7k/4d9Qk7+IwRPFvkgI+KsL5iUBRvjwWnxV7RDm2f5iw1nekdAeI6WD30azOw+oWtuydHOU/V6X4VuscPrxzS3fjpTfM2Wj75j6ivryexIjxPAbc21KL3uNmTfCN1d79hs/nTl+gutFtbotYm/pZoFwqLXv+168wAKWaSdL4c2TZGvKg/Gw/VWsWAn7s8z9YPP7O/hrN9IuBO315L0O7vadj1CO8T1yahvjoLsJcBnbhbunuW/2Be3jehRbP2iEMxxRv6YZ+dQ3OGTMg7unrKF/zuvchRXs6MBntvTNDJU6NYWb3B+arMpPdjodrG7ayQktELUIIlRwZONpSEIRZJsAZnqCbSG0llDwU4F/v3C+HAoXOqPAdtI8Who65qU3HEcmGSA+KgCGMzBWup3gseClgpqQAAGP4VgBHtcBnScNnEewujL7yPbtv473m+BsdU45L+Jdr1SN9tY+R2spZl80XDRwb+OtoDWo0/Epfu/xw6L3YQpR1dnl+z6ogEXLTvPphCVdZ/FH/tlT01l1ES/16uL/kbqMAoZbtjn6UfNwPXrZJ5CKasiOmczx2u4MkwW/Y+kETkIW6UhEfmAt4aZDmcU0vclh0rcD2WESAlg+XXLA3L2e/a13+NpzFJNKZ80gFK5GF2zk//G4m128KQtBYvN7ChP0QrHk8o4MDpktploh2MkwWw3JIPtAA/6T8SjCkD/UP8gIov99k0doKTufM8IB0UYU+Pyw5mEj2iInAvn5yGJ2YA352juqcgsdG9Wauv4Bm9h1ZsWudSxbyby57hoPbaPz3nb2ePMZiyYDTIzySIEMbp93ppEhrQbkhjguW4pAXxn//6l//+g6dTl7gRg6yWrLfHh0JLiXySIAAAA',
+        page: 'mobile'
+      }
+    }, 'newline', {
+      type: "text",
+      colspan: 4,
+      border: 0,
+      cssClass: "oxi-realm-selection-group-text",
       content: {
         description: "Take a deep dive into masterly distilled information and mind-blowingly sustainable diagrams—the insights are absolutely game-changing.<br><i>#DataDriven #Innovation #ContinuousLearning</i>"
       }
     }, {
       type: 'chart',
-      className: 'test-chart',
+      cssClass: 'test-chart',
       content: {
         options: {
           type: 'bar',
@@ -69112,7 +70189,7 @@ const section_tiles = [{
       }
     }, {
       type: 'chart',
-      className: 'test-chart',
+      cssClass: 'test-chart',
       content: {
         options: {
           type: 'pie',
@@ -69132,6 +70209,7 @@ const section_tiles = [{
       }
     }, {
       type: "keyvalue",
+      label: 'Key-Value',
       content: {
         data: [{
           format: "timestamp",
@@ -69219,9 +70297,9 @@ const amdModule42 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.definePropert
 
 const section_cards = [{
   type: "cards",
+  label: "Cards",
+  description: "Please select a realm for your certificate request:",
   content: {
-    label: "Cards",
-    description: "Please select a realm for your certificate request:",
     cards: [{
       label: 'Terra',
       description: "Also called Old Earth. A realm made for those who were born on the blue planet. The Bene Gesserit drew patterns of Old Earth on many planets.",
@@ -69256,9 +70334,9 @@ const amdModule29 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.definePropert
 
 const section_cards_vertical = [{
   type: "cards",
+  label: "Cards (vertical)",
+  description: "Please select a realm for your certificate request:",
   content: {
-    label: "Cards (vertical)",
-    description: "Please select a realm for your certificate request:",
     vertical: true,
     cards: [{
       label: 'Terra',
@@ -69295,9 +70373,10 @@ const amdModule28 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.definePropert
 // prettier-ignore
 const section_text = [{
   "type": "text",
+  "label": "Text",
+  "description": "Generates a new RA certificate and registers it as active RA token.",
+  "footer": "This text should help you understand everything from first principles.",
   "content": {
-    "label": "Text",
-    "description": "Generates a new RA certificate and registers it as active RA token.",
     "buttons": [{
       "page": "openxpki.test.text",
       "label": "Start Workflow"
@@ -69314,7 +70393,7 @@ const SESSION_ID = 'mock-session-test-1';
 const RTOKEN = 'mock-rtoken-test-1';
 
 // Helper: derive nav label from the first section's content label.
-const label = main => main[0].content.label;
+const label = main => main[0].label ?? main[0].description ?? '[?]';
 
 // nav() builds a clickable nav entry from a page key and its main content.
 const nav = (key, main) => ({
@@ -69447,6 +70526,18 @@ let Router$1;
 }
 var Router$1$1 = Router$1;
 
+/**
+ * Ember application router. Defines the URL-to-route mapping:
+ *
+ * - `/` - {@link IndexRoute}
+ * - `/openxpki/:page` - {@link OpenXpkiRoute}
+ * - `/openxpki/:page/popup/:pp` - {@link OpenXpkiRoute::Popup} child route
+ *
+ * The `/test` route is only registered in the `development` environment.
+ *
+ * @class Router
+ * @extends EmberRouter
+ */
 class Router extends Router$1$1 {
   location = environment$1.locationType;
   rootURL = environment$1.rootURL;
@@ -69496,6 +70587,25 @@ const amdModule44 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.definePropert
  * @module service/oxi-backend
  */
 class OxiBackendService extends Service {
+  /**
+   * Send an HTTP request to the given URL.
+   *
+   * For `GET` requests, `data` is serialized as URL query parameters.
+   * For `POST` requests, `data` is sent as JSON body (default) or with the
+   * given `contentType`.
+   *
+   * Always adds `X-Requested-With` and `X-OPENXPKI-Client` headers. In
+   * development mode also adds `X-OpenXPKI-Ember-HTTP-Proxy` so the backend
+   * skips the `Secure` cookie flag when running behind the HTTP dev proxy.
+   *
+   * @param { object } params
+   * @param { string } params.url - Request URL
+   * @param { string } [params.method] - HTTP method. Default: `'GET'`
+   * @param { object } [params.headers] - Additional HTTP headers
+   * @param { object } [params.data] - Request payload / query parameters
+   * @param { string } [params.contentType] - Content-Type for POST requests. Default: `'application/json'`
+   * @returns {Promise<Response>} Fetch `Response` promise; network errors are logged and re-thrown
+   */
   request({
     url,
     method = 'GET',
@@ -69639,11 +70749,25 @@ class OxiConfigService extends Service {
     if (!path.match(/^\//)) baseUrl += window.location.pathname;
     return baseUrl.replace(/(tests)?\/?$/, '') + '/' + path.replace(/^\//, '');
   }
+
+  /**
+   * Absolute URL of the WebUI client service.
+   * Derived from `localConfig.backendPath` or defaults to `cgi-bin/webui.fcgi`.
+   *
+   * @returns {string}
+   */
   get backendUrl() {
     // default to relative path to support URL-based realms
     let path = this.localConfig.backendPath || 'cgi-bin/webui.fcgi';
     return this.#rel2absUrl(path);
   }
+
+  /**
+   * Absolute URL of the custom CSS file defined by `localConfig.customCSSPath`
+   * (or the deprecated `customCssPath`). Returns `null` if not configured.
+   *
+   * @returns {string|null}
+   */
   get customCSSUrl() {
     let url = this.localConfig.customCSSPath ?? this.localConfig.customCssPath;
     if (!url) return null;
@@ -69652,15 +70776,35 @@ class OxiConfigService extends Service {
     console.log(`Loading custom CSS file: ${absUrl}`);
     return absUrl;
   }
+
+  /**
+   * Inline CSS string from `localConfig.customCSS`. Returns `null` if not set.
+   *
+   * @returns {string|null}
+   */
   get customCSS() {
     let css = this.localConfig.customCSS;
     if (!css) return null;
     console.log(`Injecting custom CSS:`, css);
     return css;
   }
+
+  /**
+   * Copyright year from `localConfig.copyrightYear`, falling back to the
+   * build-time value from `ENV.buildYear`.
+   *
+   * @returns {string|number}
+   */
   get copyrightYear() {
     return this.localConfig.copyrightYear || environment$1.buildYear;
   }
+
+  /**
+   * Header configuration object from `localConfig.header`, or `null` if the
+   * value is not a plain object (e.g. if it is a string - see `oldHeader`).
+   *
+   * @returns {object|null}
+   */
   get header() {
     let header = this.localConfig.header;
     // if YAML parameter 'header' is an object
@@ -69669,10 +70813,24 @@ class OxiConfigService extends Service {
     }
     return null;
   }
+
+  /**
+   * Absolute URL of the logo image. Derived from `header.logo` or defaults
+   * to `img/logo.png`.
+   *
+   * @returns {string}
+   */
   get logoUrl() {
     let path = this.header?.logo || 'img/logo.png';
     return this.#rel2absUrl(path);
   }
+
+  /**
+   * Returns `localConfig.header` when it is a plain string (deprecated format)
+   * and logs a deprecation warning. Returns `null` otherwise.
+   *
+   * @returns {string|null}
+   */
   get oldHeader() {
     // if YAML parameter 'header' is a string (or undefined)
     if (!this.header && this.localConfig.header) {
@@ -69682,12 +70840,32 @@ class OxiConfigService extends Service {
     }
     return null;
   }
+
+  /**
+   * Footer text or configuration from `localConfig.footer`.
+   *
+   * @returns {string|object|undefined}
+   */
   get footer() {
     return this.localConfig.footer;
   }
+
+  /**
+   * Browser page title from `localConfig.pageTitle`, defaulting to
+   * `'OpenXPKI - Open Source Trustcenter'`.
+   *
+   * @returns {string}
+   */
   get pageTitle() {
     return this.localConfig.pageTitle || 'OpenXPKI - Open Source Trustcenter';
   }
+
+  /**
+   * Tooltip delay in milliseconds from `localConfig.accessibility.tooltipDelay`.
+   * Logs a warning and returns `500` if the configured value is not a valid integer.
+   *
+   * @returns {number}
+   */
   get tooltipDelay() {
     let rawDelay = this.localConfig.accessibility?.tooltipDelay;
     let delay = Number.parseInt(rawDelay);
@@ -69837,17 +71015,46 @@ class OxiContentService extends Service {
     BLANK: Symbol("BLANK")
   });
   LOGIN_PAGES = ['login', 'login!logout', 'logout'];
+
+  /**
+   * CSS class encoding the current PKI realm name, e.g. `"oxi-realm-democa"`.
+   * Returns an empty string when no realm is set.
+   *
+   * @returns {string}
+   */
   get realmCssClass() {
     if (!this.realm) return '';
     return 'oxi-realm-' + this.safeCssLabel(this.realm);
   }
+
+  /**
+   * CSS class encoding the current tenant name, e.g. `"tenant-acme"`.
+   * Returns an empty string when no tenant is set.
+   *
+   * @returns {string}
+   */
   get tenantCssClass() {
     if (!this.tenant) return '';
     return 'tenant-' + this.safeCssLabel(this.tenant);
   }
+
+  /**
+   * Converts an arbitrary label into a safe CSS class name segment:
+   * lowercased, spaces and underscores replaced with dashes, non-alphanumeric
+   * characters removed, and consecutive dashes collapsed.
+   *
+   * @param {string} label
+   * @returns {string}
+   */
   safeCssLabel(label) {
     return label.toLowerCase().replace(/[_\s]/g, '-').replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-');
   }
+
+  /**
+   * Whether an auto-refresh timer is currently active for the current page.
+   *
+   * @returns {boolean}
+   */
   get isAutoRefresh() {
     return this.refreshTimers.has(`${this.#id}/page_refresh`);
   }
@@ -70223,6 +71430,12 @@ class OxiContentService extends Service {
       return null;
     }
   }
+
+  /**
+   * Set the active tenant.
+   *
+   * @param {string} tenant - Tenant identifier
+   */
   setTenant(tenant) {
     this.tenant = tenant;
   }
@@ -70262,6 +71475,14 @@ class OxiContentService extends Service {
       }
     }
   }
+
+  /**
+   * Returns `true` if the given DOM element is fully within the current viewport
+   * and has non-zero dimensions.
+   *
+   * @param {Element} el - DOM element to check
+   * @returns {boolean}
+   */
   static {
     decorateMethodV2(this.prototype, "registerFocusElement", [action]);
   }
@@ -70532,6 +71753,14 @@ class OxiLocaleService extends Service {
     super(...arguments);
     this.locale = 'en-us';
   }
+
+  /**
+   * Sets the active locale. Normalizes the value (underscores to dashes,
+   * lowercase) and calls `intl.setLocale()` with `en-us` as fallback.
+   * Logs a warning and does nothing if `locale` is empty or undefined.
+   *
+   * @param {string} locale - Locale string, e.g. `"de_DE"` or `"en-us"`
+   */
   set locale(locale) {
     if (!locale) {
       /* eslint-disable-next-line no-console */
@@ -70542,9 +71771,21 @@ class OxiLocaleService extends Service {
     debug$1("oxi-locale - setting locale to " + this._locale);
     this.intl.setLocale([this._locale, 'en-us']); // use "en-us" as fallback in case of missing translations
   }
+
+  /**
+   * Returns the current normalized locale string (e.g. `"de-de"`).
+   *
+   * @returns {string}
+   */
   get locale() {
     return this._locale;
   }
+
+  /**
+   * Returns the language portion of the locale (e.g. `"de"` from `"de-de"`).
+   *
+   * @returns {string}
+   */
   get shortLocale() {
     return this._locale.split(/[-_]/)[0];
   }
@@ -74326,6 +75567,13 @@ const compatModules = Object.assign({}, defineModule0, {
   "openxpki/templates/head": amdModule51
 }, exportFastbootModules);
 
+/**
+ * Root Ember application class. Wires the resolver, compat modules, and the
+ * Ember Inspector devtools extension.
+ *
+ * @class App
+ * @extends Application
+ */
 class App extends Application {
   modulePrefix = environment$1.modulePrefix;
   podModulePrefix = environment$1.podModulePrefix;
