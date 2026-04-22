@@ -904,7 +904,7 @@ sub prepare ($self, $c) {
         $self->log->debug("- detected realm: '$realm'");
         $self->current_realm($realm);
         if ($stack) {
-            $self->log->debug("- auto-select fixed auth stack based on config: '$stack'");
+            $self->log->debug("- detected fixed auth stack: '$stack'");
             $self->current_auth_stack($stack);
             # mark auth stack so it will be carried over in session renewals
             $self->session->param('is_fixed_auth_stack', 1);
