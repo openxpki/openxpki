@@ -5,7 +5,7 @@
 
         {{#if this.label}}
             <div class="card-header px-2 {{unless this.meta.isCompact "py-2"}}">
-                <h4 class="oxi-section-label">{{this.label}}</h4>
+                <h4 class="oxi-section-label">{{defuse this.label}}</h4>
             </div>
         {{/if}}
 
@@ -37,7 +37,7 @@
 
     <div class="mt-1 {{if this.meta.isCompact "oxi-compact"}} {{@def.cssClass}}">
         {{#if this.label}}
-            <h4 class="oxi-section-label">{{this.label}}</h4>
+            <h4 class="oxi-section-label">{{defuse this.label}}</h4>
         {{/if}}
         {{#if this.description}}
             <div class="oxi-section-description">
