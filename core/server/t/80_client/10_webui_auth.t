@@ -143,7 +143,7 @@ sub make_webui {
         _ui_response         => $ui_response,
         _base_url            => $base_url,
         _realm_mode          => $args{realm_mode}   // 'select',
-        _realm_selection_layout   => $args{realm_selection_layout} // 'cards',
+        _realm_selection_layout   => $args{realm_selection_layout} // 'card',
         _logout_called       => 0,
         _init_client_called  => 0,
         _ping_replies        => $args{ping_replies} // [],
@@ -162,6 +162,7 @@ sub make_webui {
         param        => sub { $params->{$_[1]} },
         url_path_for => sub { '/' . $_[1] },
         is_realm_selection_page => sub { 0 },
+        realm_selection_conf    => sub { { layout => $_[0]->{_realm_selection_layout} } },
         logout_session          => sub { $_[0]->{_logout_called}++ },
         new_frontend_session    => sub {
             $_[0]->{_session} = MockSession->new;
