@@ -25,7 +25,6 @@ import { debug } from '@ember/debug'
  * @param { object } [meta] - Rendering metadata provided by the parent component.
  * @param { boolean } [meta.renderAsCard] - Wrap the section in a Bootstrap card.
  * @param { boolean } [meta.isInfoBox] - Suppress the left margin indent.
- * @param { string } [cssClass] - Extra CSS class added to the top-level element of this component.
  * @param { function } [onInit] - Callback invoked once the section DOM element has been inserted
  *   (via the `on-init` modifier).
  *
