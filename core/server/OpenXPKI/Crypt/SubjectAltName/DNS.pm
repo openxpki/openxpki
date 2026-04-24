@@ -36,7 +36,7 @@ The DNS hostname. A leading wildcard (C<*>) is permitted.
 
 has value => (
     is       => 'ro',
-    isa      => 'Hostname',
+    isa      => 'DNSName',
     required => 1,
 );
 

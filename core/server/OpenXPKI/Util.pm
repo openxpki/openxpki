@@ -196,7 +196,7 @@ sub pem_to_list {
 
 Validates a scalar value against a named Moose type from L<OpenXPKI::Types>.
 
-    OpenXPKI::Util->validate('Hostname', 'example.com');  # 1
+    OpenXPKI::Util->validate('DNSName', 'example.com');  # 1
     OpenXPKI::Util->validate('IP', 'not-an-ip');          # 0
 
 Returns C<1> if the value satisfies the type constraint, C<0> otherwise.
