@@ -3,10 +3,11 @@ use OpenXPKI;
 
 use parent qw( OpenXPKI::Server::Workflow::Activity );
 
-use OpenXPKI::Serialization::Simple;
-use OpenXPKI::Server::Context qw( CTX );
 use Template;
 
+use OpenXPKI::Serialization::Simple;
+use OpenXPKI::Server::Context qw( CTX );
+use Workflow::Exception qw( workflow_error );
 
 sub execute {
     my $self     = shift;
@@ -21,8 +22,6 @@ sub execute {
     my $ser = OpenXPKI::Serialization::Simple->new;
     my $result;
 
-
-
     # Get the profile name and style
     my $profile = $self->param('cert_profile');
     $profile = $context->param('cert_profile') unless($profile);
@@ -30,21 +29,14 @@ sub execute {
     my $style = $self->param('cert_subject_style');
     $style = $context->param('cert_subject_style') unless($style);
 
-    if (!$profile  || !$style) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_RENDER_SUBJECT_NO_PROFILE',
-            params  => {
-                PROFILE => $profile,
-                STYLE   => $style,
-            }
-        );
-    }
+    my $skip_sanitize = $self->param('skip_sanitize') || 0;
 
-    if (!$context->param('cert_subject_parts')) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_RENDER_SUBJECT_NO_SUBJECT_VARS_IN_CONTEXT',
-        );
-    }
+    workflow_error('No profile found in workflow') unless($profile);
+    workflow_error('No subprofile found in workflow') unless($style);
+
+    workflow_error('No cert_subject_parts hash in workflow')
+        unless($context->param('cert_subject_parts'));
+
     # Render the DN - get the input data from the context
     my $subject_vars = $ser->deserialize(  $context->param('cert_subject_parts') );
 
@@ -57,7 +49,7 @@ sub execute {
     } keys %{$subject_vars};
 
 
-    ##! 16: 'Cleaned subject_vars' . join "", map {  "$_: ".$subject_vars->{$_} } keys %$subject_vars
+    ##! 16: 'Cleaned subject_vars ' . Dumper $subject_vars
     CTX('log')->application()->trace("Subject render input vars " . Dumper $subject_vars);
 
     my $cert_subject = CTX('api2')->render_subject_from_template(
@@ -67,18 +59,21 @@ sub execute {
         sanitize => 1
     );
 
-    if (!$cert_subject) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_RENDER_SUBJECT_DN_RESULT_EMPTY',
-            params  => {
-                PROFILE => $profile,
-                STYLE   => $style,
-            }
-        );
-    }
-    ##! 32: 'Subject is ' . $cert_subject
+    workflow_error('Result of render_subject is empty',
+            profile => $profile, style => $style) unless ($cert_subject);
 
+    ##! 32: 'Subject is ' . $cert_subject
     CTX('log')->application()->info("Rendering subject: $cert_subject");
+
+    # Sanitize subject by parsing it via OpenXPKI::DN
+    my $parsed;
+    eval { $parsed = OpenXPKI::DN->new($cert_subject); };
+
+    workflow_error("Unable to parse subject into DN", { cert_subject => $cert_subject })
+        unless($parsed);
+
+    workflow_error("Unable to validate parsed subject", { cert_subject => $cert_subject })
+        unless(OpenXPKI::Util->validate('ParsedDN', [ $parsed->get_parsed() ]));
 
     my $cert_san_parts  = $context->param('cert_san_parts');
     my $extra_san = {};
@@ -101,12 +96,53 @@ sub execute {
 
     ##! 64: "Entries in san_list \n" .  Dumper $san_list;
 
+    my %type_map = (
+        DNS       => 'DNSName',
+        email     => 'Email',
+        IP        => 'IP',
+        URI       => 'URI',
+        RID       => 'OID',
+        dirName   => 'ParsedDN',
+        otherName => 'GeneralNameNoBreak',
+    );
+
+    my $invalid = 0;
+    foreach my $item ($san_list->@*) {
+        ##! 64: $item
+        my ($san_type, $value) = $item->@*;
+        my $type_name = $type_map{$san_type} ||
+            workflow_error("Found unexpected item ($san_type) in SAN list");
+
+        if ($type_name eq 'ParsedDN') {
+            my $parsed;
+            eval { $parsed = OpenXPKI::DN->new($value); };
+            workflow_error("Found unexpected item ($san_type) in SAN list")
+                unless($parsed);
+            $value = [ $parsed->get_parsed() ];
+            ##! 128: $value
+        }
+
+        if (!OpenXPKI::Util->validate($type_name, $value)) {
+            ##! 16: 'failed validation for ' . $type_name
+            ##! 32: $value
+            $invalid++;
+            CTX('log')->application()->warn(
+                sprintf("Found invalid SAN value for type %s: %s", $san_type, $value)
+            );
+        }
+    }
+
+    if ($invalid && !$skip_sanitize) {
+        CTX('log')->application()->error(sprintf('Sanitization failed on %01d items', $invalid));
+        workflow_error('SAN item did not pass type validation');
+    }
+
     # store in context
     $context->param('cert_subject' => $cert_subject);
 
     # Current serialize creates an "UNDEF" string which fails an easy "is empty" test
     if ($san_list) {
-        $context->param('cert_subject_alt_name' => $ser->serialize( $san_list ));
+        $context->param('cert_subject_alt_name' => $san_list );
     } else {
         $context->param('cert_subject_alt_name' => '');
     }
@@ -124,7 +160,7 @@ sub execute {
     if (!$source_ref->{cert_subject_alt_name_parts} && !$source_ref->{cert_subject_alt_name}) {
         $source_ref->{cert_subject_alt_name} = 'PROFILE';
     }
-    $context->param('sources' => $ser->serialize( $source_ref ));
+    $context->param('sources' => $source_ref );
 
 
     return 1;
@@ -142,6 +178,11 @@ OpenXPKI::Server::Workflow::Activity::Tools::RenderSubject
 
 Take the input parameters provided by the ui and render the subject and
 subject alternative according to the profiles template definition.
+
+The result of the rendering process is validated against type specific
+patterns to ensure all items are properly formated. You can skip the
+sanitization step for SAN items by setting I<skip_sanitize>.
+
 The SAN part is made up from two seperate sources:
 
 =head2 templated SAN entries
@@ -231,6 +272,10 @@ Determines the used profile, has priority over context key.
 =item cert_subject_style
 
 Determines the used profile substyle, has priority over context key.
+
+=item skip_sanitize
+
+If set to a true value, the validation of the rendered SAN items is skipped.
 
 =back
 
