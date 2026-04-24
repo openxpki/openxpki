@@ -337,7 +337,7 @@ sub sanitize_san_item {
     my ($self, $san_type, @values) = @_;
 
     my %type_map = (
-        dNSName                   => 'Hostname',
+        dNSName                   => 'DNSName',
         rfc822Name                => 'Email',
         iPAddress                 => 'IP',
         uniformResourceIdentifier => 'URI',

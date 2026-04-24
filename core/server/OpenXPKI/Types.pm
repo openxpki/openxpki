@@ -177,7 +177,7 @@ SQL issues.
 =cut
 subtype 'Email',
     as 'Str',
-    where { $_ =~ m{ \A [\w\-\+\.:]+\@([\w\-]+\.)+(\w+) \z }msx },
+    where { $_ =~ m{ \A [\w\-\+\.]+\@([\w\-]+\.)+(\w+) \z }xms },
     message { sprintf "'%s' is not a valid email address", ($_ ? "'$_'" : '<undef>') };
 
 =head2 ArrayRefOrPEMCertChain
@@ -347,15 +347,15 @@ enum 'SANType', [qw( DNS email IP URI dirName RID otherName )];
 
 =head2 GeneralNameNoBreak
 
-A single-line string suitable as an ASN.1 GeneralName value (e.g. for use
-in Subject Alternative Names). Newlines are not permitted.
+A single-line string suitable as an ASN.1 GeneralName value.
+Control characters (0x00-0x1F, 0x7F ) are disallowed.
 
 =cut
 
 subtype 'GeneralNameNoBreak',
     as 'Str',
-    where { $_ =~ qr{ \A [^\n\r]+ \z }xms },
-    message { sprintf "'%s' must not contain newline characters", ($_ // '<undef>') };
+    where { $_ =~ qr{ \A [^\x00-\x1F\x7F]+ \z }xms },
+    message { sprintf "'%s' must not contain control characters", ($_ // '<undef>') };
 
 =head2 KeyUsageBit
 
@@ -387,20 +387,31 @@ Enumeration for the copy_extensions certificate profile setting.
 
 enum 'CopyExtensions', [qw( none copy copyall )];
 
-=head2 Hostname
+=head2 DNSName
 
-A DNS hostname value for Subject Alternative Name (allows leading wildcard).
+A DNS hostname value (allows leading wildcard C<*.>).
 
 =cut
 
-subtype 'Hostname',
+subtype 'DNSName',
     as 'Str',
-    where { $_ =~ qr{ \A [\w\*] [\w\-\.]* \z }xmsi },
-    message { sprintf "'%s' is not a valid SAN hostname", ($_ // '<undef>') };
+    where { $_ =~ qr{ \A (\*\.)? [a-zA-Z0-9] [a-zA-Z0-9\-]* (\.[a-zA-Z0-9\-]*[a-zA-Z0-9])* \z }xms },
+    message { sprintf "'%s' is not a valid SAN DNS name", ($_ // '<undef>') };
+
+=head2 FQDN
+
+A fully qualified domain name: at least two labels, no wildcard.
+
+=cut
+
+subtype 'FQDN',
+    as 'Str',
+    where { $_ =~ qr{ \A [a-zA-Z0-9] [a-zA-Z0-9\-]* (\.[a-zA-Z0-9\-]*[a-zA-Z0-9])+ \z }xms },
+    message { sprintf "'%s' is not a valid FQDN", ($_ // '<undef>') };
 
 =head2 IP
 
-An IPv4 or IPv6 address string for Subject Alternative Name.
+An IPv4 or IPv6 address string.
 
 =cut
 
@@ -415,15 +426,39 @@ subtype 'IP',
     },
     message { sprintf "'%s' is not a valid IPv4 or IPv6 address", ($_ // '<undef>') };
 
+=head2 IPv4
+
+An IPv4 address string.
+
+=cut
+
+subtype 'IPv4',
+    as 'Str',
+    where { $_ =~ qr{ \A \d{1,3} (?: \. \d{1,3} ){3} \z }xms },
+    message { sprintf "'%s' is not a valid IPv4 address", ($_ // '<undef>') };
+
+=head2 IPv4
+
+An IPv6 address string.
+
+=cut
+
+subtype 'IPv6',
+    as 'Str',
+    where {  $_ =~ qr{ \A [0-9A-Fa-f]{1,4} (?: : [0-9A-Fa-f]{0,4} ){2,7} \z }xms  },
+    message { sprintf "'%s' is not a valid IPv6 address", ($_ // '<undef>') };
+
 =head2 URI
 
-A URI string for Subject Alternative Name.
+A URI string per RFC 3986. Scheme must start with a letter followed by
+letters, digits, C<+>, C<->, or C<.>. The rest may contain any character
+allowed in a URI (including percent-encoded sequences).
 
 =cut
 
 subtype 'URI',
     as 'Str',
-    where { $_ =~ qr{ \A \w+ :// [^\s]+ \z }xms },
+    where { $_ =~ qr{ \A [a-zA-Z][a-zA-Z0-9+\-.]* : [a-zA-Z0-9\-._~:/?#\[\]@!$&'()*+,;=%]+ \z }xms },
     message { sprintf "'%s' is not a valid URI", ($_ // '<undef>') };
 
 =head2 PrintableString
@@ -449,6 +484,23 @@ subtype 'OID',
     where { $_ =~ qr{ \A \d+ (?: \. \d+ )+ \z }xms },
     message { sprintf "'%s' is not a valid OID", ($_ // '<undef>') };
 
+=head2 RDNAttribute
+
+A single attribute within an RDN: a two-element array C<[type, value]> where
+C<type> is either a named RDN attribute (e.g. C<CN>, C<organizationName>) or a
+dotted-numeric OID, and C<value> is a single-line string.
+
+=cut
+
+subtype 'RDNAttribute',
+    as 'ArrayRef',
+    where {
+        @$_ == 2
+        && $_->[0] =~ qr{ \A (?: [A-Za-z][A-Za-z0-9\-]* | \d+ (?:\.\d+)+ ) \z }xms
+        && $_->[1] =~ qr{ \A [^\n\r]+ \z }xms
+    },
+    message { "RDNAttribute must be [rdn_type_or_oid, value] with exactly 2 elements" };
+
 =head2 ParsedDN
 
 An RFC 2253 distinguished name as parsed by L<OpenXPKI::DN/get_parsed>:
@@ -459,7 +511,7 @@ Can be coerced from a DN string via C<OpenXPKI::DN>.
 =cut
 
 subtype 'ParsedDN',
-    as 'ArrayRef[ArrayRef[ArrayRef[GeneralNameNoBreak]]]',
+    as 'ArrayRef[ArrayRef[RDNAttribute]]',
     message { "ParsedDN must be an RDN sequence: [ [ [attr, val], ... ], ... ]" };
 
 coerce 'ParsedDN',
