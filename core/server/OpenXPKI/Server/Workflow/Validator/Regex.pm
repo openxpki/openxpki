@@ -4,6 +4,7 @@ use OpenXPKI;
 use parent qw( Workflow::Validator );
 
 use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Util;
 use Workflow::Exception qw( validation_error );
 use OpenXPKI::Serialization::Simple;
 
@@ -56,49 +57,46 @@ sub validate {
     ##! 16: 'Value ' . Dumper $value
     ##! 16: 'Regex ' . $regex
 
-    # replace named regexes
-    if ($regex eq 'email') {
-        $regex = qr/ \A [\w\+\.\-"'= ]+\@([\w-]+\.)+(\w+) \z /xi;
-    } elsif ($regex eq 'fqdn') {
-        $regex = qr/ \A (([a-z0-9][\w\-]*\.)+)[\w\-]{2,} \z /xi;
+    # Build checker: named types delegate to OpenXPKI::Types via Util::validate,
+    # custom patterns are compiled with the given modifier flags.
+    my $check;
 
-    } elsif ($regex eq 'href') {
-        $regex = qr/ \A http(s)?:\/\/ (([a-z0-9][\w\-]*\.)+)[\w\-]{2,} /xi;
+    my %named_types = map { (lc($_) => $_ ) }
+        ('Email','FQDN','URI','IP','IPv4','IPv6','OID');
+    # legacy name for http urls
+    $named_types{href} = 'URI';
 
-    # or quote the string if no named match
+    if (my $type = $named_types{$regex}) {
+        $check = sub { OpenXPKI::Util::validate($type, $_[0]) };
     } else {
         # Extended Pattern notation, see http://perldoc.perl.org/perlre.html#Extended-Patterns
         $modifier =~ s/\s//g;
-        if ($modifier =~ /[^alupimsx]/ ) {
+        if ($modifier =~ /[^alupimsx]/) {
             OpenXPKI::Exception->throw(
                 message => "I18N_OPENXPKI_VALIDATOR_REGEX_INVALID_MODIFIER",
-                params => {
-                    MODIFIER => $modifier,
-                },
+                params  => { MODIFIER => $modifier },
             );
         }
         $modifier = "(?$modifier)" if ($modifier);
-        $regex = qr/$modifier$regex/;
+        my $re = qr/$modifier$regex/;
+        $check = sub { $_[0] =~ $re };
     }
 
-    # Array Magic
     my @errors;
     ##! 32: 'ref of value ' . ref $value
     if (ref $value eq 'ARRAY' || OpenXPKI::Serialization::Simple::is_serialized($value)) {
         ##! 8: 'Array mode'
         if (!ref $value) {
-            $value = OpenXPKI::Serialization::Simple->new()->deserialize( $value );
+            $value = OpenXPKI::Serialization::Simple->new()->deserialize($value);
         }
         foreach my $val (@{$value}) {
-            # skip empty
             next if (!defined $val || $val eq '');
-            next if ($val =~ $regex);
             ##! 8: 'Failed on ' . $val
-            push @errors, $val;
+            push @errors, $val unless $check->($val);
         }
     } else {
         ##! 8: 'scalar mode'
-        push @errors, $value if ($value !~ $regex);
+        push @errors, $value unless $check->($value);
     }
 
     if (@errors) {
@@ -125,28 +123,36 @@ OpenXPKI::Server::Workflow::Validator::Regex
 
 =head1 DESCRIPTION
 
-Validates the context value referenced by argument against a regex. The regex
-can be passed either as second argument or specified in the param section.
-The value given as argument is always preferred.
+Validates a workflow context value against a regular expression or a named
+format type. The value is passed as the first validator argument; the regex
+(or named type) may be passed as the second argument or set via the C<regex>
+parameter — the argument takes precedence.
+
+Empty and undefined values are silently skipped (use a separate presence
+validator if the field is required).
+
+Array values (native Perl array refs or OpenXPKI-serialized arrays) are
+supported: every non-empty element is checked individually and all failing
+values are collected before the error is raised.
 
 =head1 Configuration
 
-=head2 Example with arguments
+=head2 Example with argument (named type)
 
     class: OpenXPKI::Server::Workflow::Validator::Regex
     arg:
-     - $link
+     - $email_address
      - email
 
-=head2 Example with parameters
+=head2 Example with custom regex in parameters
 
     class: OpenXPKI::Server::Workflow::Validator::Regex
     arg:
      - $link
     param:
-        regex: "\\A http(s)?://[a-zA-Z0-9-\\.]+"
+        regex: "\\A https?://[a-zA-Z0-9.-]+"
         modifier: xi
-        error: Please provide a well-formed URL starting with http://
+        error: Please provide a well-formed URL starting with http(s)://
         field: link
 
 =head2 Parameters
@@ -155,48 +161,66 @@ The value given as argument is always preferred.
 
 =item regex
 
-The regex must be given as pattern without delimiters and modifiers. The
-default modifier is "xi" (case-insensitive, whitespace pattern), you can
-override it using the key "modifier" in the param section. (@see
-http://perldoc.perl.org/perlre.html#Modifiers).
+Either a named format type (see below) or a bare regex pattern B<without>
+delimiters or inline modifiers.  The default modifier is C<xi>
+(case-insensitive, allow whitespace/comments); override with the C<modifier>
+parameter.
 
-Some common formats can also be referenced by name:
+B<Named types> — validated via L<OpenXPKI::Util/validate> against the
+corresponding L<OpenXPKI::Types> constraint:
 
 =over
 
 =item email
 
-Basic check for valid email syntax
+Valid e-mail address syntax (C<Email> type).
 
 =item fqdn
 
-A fully qualified domain name, must have at least one dot, all "word"
-characters are accepted for the domain parts. Last domain part must have
-at least two characters
+Fully qualified domain name with at least two labels (C<FQDN> type).
 
-=item href
+=item uri / href
 
-A lightweight check for a URI to be used as href target, valid if the
-string starts with http(s):// followed by I<fqdn>. The check is "open
-ended", so it allows arbitrary sequences after something that looks
-like a valid FQDN.
+URI with arbitrary scheme (C<URI> type).  C<href> is a legacy alias for
+C<uri>.
+
+=item ip
+
+Any IP address — IPv4 or IPv6 (C<IP> type).
+
+=item ipv4
+
+IPv4 address in dotted-decimal notation (C<IPv4> type).
+
+=item ipv6
+
+IPv6 address (C<IPv6> type).
+
+=item oid
+
+ASN.1 object identifier (C<OID> type).
 
 =back
 
 =item modifier
 
+Regex modifier flags applied when a custom pattern is used (not for named
+types).  Allowed flags: C<a l u p i m s x>.  Whitespace is stripped before
+processing.  Defaults to C<xi>.  See
+L<perlre/Extended-Patterns> for details.
+
 =item error
 
-The error parameter is optional, if set this is shown in the UI if the validator
-fails instead of the default message.
+I18N key or plain text shown in the UI when validation fails.  Defaults to
+a type-specific message for the built-in named types, or
+C<I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED> for custom patterns.
 
 =item field
 
-As the validator only received the value, it does not know which field holds
-the faulty input. If you pass the name of the input field here the UI will
-highlight the field with the error.
+Name of the workflow input field that holds the value being validated.
+When set, the UI highlights the offending field alongside the error message.
 
-B<Note>: You still need to pass the value as argument to the validator as
-there is no way to get it from the field name.
+B<Note:> The value must still be passed explicitly as a validator argument;
+the field name is used only for UI decoration.
 
 =back
