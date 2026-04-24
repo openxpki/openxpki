@@ -105,6 +105,19 @@ sub execute {
     if (my $csr_subject = $decoded->subjectSequence()) {
         my $dn = OpenXPKI::Crypt::DN->new( sequence => $csr_subject );
         $hashed_dn = $dn->as_hash();
+        unless ($skip_sanitize) {
+            foreach my $rdn (keys $hashed_dn->%*) {
+                my @filtered = grep { OpenXPKI::Util->validate('GeneralNameNoBreak', $_) } $hashed_dn->{$rdn}->@*;
+                if (@filtered) {
+                    CTX('log')->application()->warn("RDN $rdn was reduced by sanitize")
+                        if (@filtered != $hashed_dn->{$rdn}->@*);
+                    $hashed_dn->{$rdn} = \@filtered;
+                } else {
+                    CTX('log')->application()->warn("RDN $rdn empty after sanitize");
+                    delete $hashed_dn->{$rdn};
+                }
+            }
+        }
         $param->{csr_subject} = $dn->get_subject();
         ##! 32: 'Subject DN ' . Dumper $hashed_dn
     }
