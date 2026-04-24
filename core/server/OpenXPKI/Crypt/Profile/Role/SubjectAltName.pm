@@ -48,24 +48,47 @@ has subject_alt_name => (
 
 =head1 METHODS
 
-=head2 add_subject_alt_name(\@san)
+=head2 add_subject_alt_name($item)
 
-Accepts a single C<[$type, $value]> pair and appends the corresponding
-L<OpenXPKI::Crypt::SubjectAltName> object to L</subject_alt_name>.
+Appends a single SAN entry to L</subject_alt_name>. C<$item> can be either:
 
-Throws C<I18N_OPENXPKI_CRYPT_PROFILE_UNKNOWN_SAN_TYPE> for unknown types.
+=over
+
+=item * A C<[$type, $value]> arrayref — legacy format; C<$type> must be one of
+C<DNS>, C<email>, C<IP>, C<URI>, C<dirName>, C<RID>, C<otherName>.
+
+=item * An L<OpenXPKI::Crypt::SubjectAltName> object — used directly.
+
+=back
+
+Returns C<$self> for chaining.
 
 =cut
 
 sub add_subject_alt_name {
-    my ($self, $san) = @_;
-    my ($type, $value) = @$san;
-    my $class = $_SAN_CLASS{$type}
-        or OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_CRYPT_PROFILE_UNKNOWN_SAN_TYPE',
-            params  => { TYPE => $type },
+    my ($self, $item) = @_;
+
+    my $obj;
+    # support for legacy format - array with [type, value]
+    if (ref $item eq 'ARRAY') {
+
+        my ($type, $value) = $item->@*;
+        my $class = $_SAN_CLASS{$type}
+            or OpenXPKI::Exception->throw(
+                message => 'Unknown san type passed to add_subject_alt_name',
+                params  => { TYPE => $type },
+            );
+
+        $obj = $class->new(value => $value);
+    } elsif (blessed $item && $item->isa('OpenXPKI::Crypt::SubjectAltName')) {
+        $obj = $item;
+    } else {
+        OpenXPKI::Exception->throw(
+            message => 'Unsupported argument type passed to add_subject_alt_name',
+            params  => { object => ref $item },
         );
-    my $obj = $class->new(value => $value);
+    }
+
     my @list = @{ $self->subject_alt_name // [] };
     push @list, $obj;
     $self->subject_alt_name(\@list);
@@ -74,8 +97,9 @@ sub add_subject_alt_name {
 
 =head2 set_subject_alt_name(\@list)
 
-Bulk-setter that accepts an ArrayRef of C<[$type, $value]> pairs.
-Replaces any previously set SANs.
+Bulk-setter. Replaces any previously set SANs by calling L</add_subject_alt_name>
+for each entry. Each entry may be a C<[$type, $value]> arrayref or an
+L<OpenXPKI::Crypt::SubjectAltName> object.
 
 =cut
 
