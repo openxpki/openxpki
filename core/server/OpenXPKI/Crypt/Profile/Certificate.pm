@@ -472,16 +472,31 @@ sub _build_key_usage {
     my $bp = $self->_ext_basepath('key_usage') or return undef;
     my $config = CTX('config');
 
-    my @all = qw(
-        digital_signature  non_repudiation  key_encipherment  data_encipherment
-        key_agreement  key_cert_sign  crl_sign  encipher_only  decipher_only
+    # camelCase → legacy snake_case aliases for backward-compat config reading
+    # can be replaced by reading enum values from OpenXPKI::Types
+    # when legacy mapping is no longer required
+    my %ku_alias = (
+        digitalSignature => 'digital_signature',
+        nonRepudiation   => 'non_repudiation',
+        keyEncipherment  => 'key_encipherment',
+        dataEncipherment => 'data_encipherment',
+        keyAgreement     => 'key_agreement',
+        keyCertSign      => 'key_cert_sign',
+        cRLSign          => 'crl_sign',
+        encipherOnly     => 'encipher_only',
+        decipherOnly     => 'decipher_only',
     );
-    my @bits = grep { $config->get([@$bp, $_]) } @all;
-    return undef unless @bits;
+
+    my $hash   = $config->get_hash($bp) // {};
+    my @usages = grep {
+        defined $hash->{$_}  ? $hash->{$_} : $hash->{$ku_alias{$_}}
+    } keys %ku_alias;
+
+    return undef unless @usages;
 
     return OpenXPKI::Crypt::Profile::DTO::KeyUsage->new(
         critical => $self->_read_critical($bp) // 0,
-        bits     => \@bits,
+        bits     => \@usages,
     );
 }
 
@@ -490,9 +505,22 @@ sub _build_extended_key_usage {
     my $bp = $self->_ext_basepath('extended_key_usage') or return undef;
     my $config = CTX('config');
 
-    my $hash  = $config->get_hash($bp) // {};
-    my @named = qw(client_auth server_auth email_protection code_signing time_stamping ocsp_signing);
-    my @usages = grep { $hash->{$_} } @named;
+    # camelCase → legacy snake_case aliases for backward-compat config reading
+    # can be replaced by reading enum values from OpenXPKI::Types
+    # when legacy mapping is no longer required
+    my %eku_alias = (
+        clientAuth      => 'client_auth',
+        serverAuth      => 'server_auth',
+        emailProtection => 'email_protection',
+        codeSigning     => 'code_signing',
+        timeStamping    => 'time_stamping',
+        OCSPSigning     => 'ocsp_signing',
+    );
+
+    my $hash   = $config->get_hash($bp) // {};
+    my @usages = grep {
+        defined $hash->{$_}  ? $hash->{$_} : $hash->{$eku_alias{$_}}
+    } keys %eku_alias;
     push @usages, grep { /^\d+(\.\d+)+$/ } keys %$hash;
     return undef unless @usages;
 

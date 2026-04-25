@@ -22,9 +22,9 @@ has critical => (
 
 =head2 bits (ArrayRef[KeyUsageBit], required)
 
-List of enabled key usage bits. Valid values: C<digital_signature>,
-C<non_repudiation>, C<key_encipherment>, C<data_encipherment>, C<key_agreement>,
-C<key_cert_sign>, C<crl_sign>, C<encipher_only>, C<decipher_only>.
+List of enabled key usage bits. Valid values: C<digitalSignature>,
+C<nonRepudiation>, C<keyEncipherment>, C<dataEncipherment>, C<keyAgreement>,
+C<keyCertSign>, C<cRLSign>, C<encipherOnly>, C<decipherOnly>.
 
 =cut
 

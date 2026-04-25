@@ -1,5 +1,6 @@
 package OpenXPKI::Crypt::Profile::DTO::ExtendedKeyUsage;
 use OpenXPKI -class;
+use OpenXPKI::Types;
 
 =head1 NAME
 
@@ -22,14 +23,14 @@ has critical => (
 =head2 usages (ArrayRef[Str], required)
 
 List of enabled extended key usages. Values are either named usages
-(C<client_auth>, C<server_auth>, C<email_protection>, C<code_signing>,
-C<time_stamping>, C<ocsp_signing>) or numeric OID strings.
+(C<clientAuth>, C<serverAuth>, C<emailProtection>, C<codeSigning>,
+C<timeStamping>, C<OCSPSigning>) or numeric OID strings.
 
 =cut
 
 has usages => (
     is       => 'ro',
-    isa      => 'ArrayRef[Str]',
+    isa      => 'ArrayRef[ExtKeyUsageValue]',
     required => 1,
 );
 

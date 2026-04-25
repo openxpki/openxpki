@@ -374,20 +374,31 @@ Enumeration of valid X.509 keyUsage extension bits.
 =cut
 
 enum 'KeyUsageBit', [qw(
-    digital_signature  non_repudiation  key_encipherment  data_encipherment
-    key_agreement  key_cert_sign  crl_sign  encipher_only  decipher_only
+    digitalSignature  nonRepudiation  keyEncipherment  dataEncipherment
+    keyAgreement  keyCertSign  cRLSign  encipherOnly  decipherOnly
 )];
 
 =head2 ExtKeyUsageBit
 
-Enumeration of named extendedKeyUsage OIDs (numeric OIDs are also accepted as plain Str).
+Enumeration of named extendedKeyUsage OIDs.
 
 =cut
 
 enum 'ExtKeyUsageBit', [qw(
-    client_auth  server_auth  email_protection  code_signing
-    time_stamping  ocsp_signing
+    clientAuth  serverAuth  emailProtection  codeSigning
+    timeStamping  OCSPSigning
 )];
+
+=head2 ExtKeyUsageValue
+
+Either a named L</ExtKeyUsageBit> or a numeric OID string (e.g. C<1.3.6.1.5.5.7.3.1>).
+
+=cut
+
+subtype 'ExtKeyUsageValue',
+    as 'Str',
+    where { find_type_constraint('ExtKeyUsageBit')->check($_) || /^\d+(?:\.\d+)+$/ },
+    message { "'$_' is not a valid ExtKeyUsage value (named bit or numeric OID required)" };
 
 =head2 CopyExtensions
 

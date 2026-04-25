@@ -392,43 +392,13 @@ sub __get_cert_extensions {
     # — KeyUsage —
     if (my $dto = $profile->key_usage) {
         my $crit  = $dto->critical ? 'critical,' : '';
-        my %map = (
-            digital_signature => 'digitalSignature',
-            non_repudiation   => 'nonRepudiation',
-            key_encipherment  => 'keyEncipherment',
-            data_encipherment => 'dataEncipherment',
-            key_agreement     => 'keyAgreement',
-            key_cert_sign     => 'keyCertSign',
-            crl_sign          => 'cRLSign',
-            encipher_only     => 'encipherOnly',
-            decipher_only     => 'decipherOnly',
-        );
-        my @bits = map { $map{$_} // () } @{ $dto->bits };
-        push @config, "keyUsage = $crit" . join(',', @bits) if @bits;
+        push @config, "keyUsage = $crit" . join(',', @{ $dto->bits }) if @{ $dto->bits };
     }
 
     # — ExtendedKeyUsage —
     if (my $dto = $profile->extended_key_usage) {
         my $crit = $dto->critical ? 'critical,' : '';
-        my %map = (
-            client_auth      => 'clientAuth',
-            server_auth      => 'serverAuth',
-            email_protection => 'emailProtection',
-            code_signing     => 'codeSigning',
-            time_stamping    => 'timeStamping',
-            ocsp_signing     => 'OCSPSigning',
-        );
-        my @eku;
-        for my $u (@{ $dto->usages }) {
-            if ($self->_is_valid_oid($u)) {
-                push @eku, $u;
-            } elsif ($map{$u}) {
-                push @eku, $map{$u};
-            } else {
-                CTX('log')->application()->warn("Unknown EKU value: $u");
-            }
-        }
-        push @config, "extendedKeyUsage = $crit" . join(',', @eku) if @eku;
+        push @config, "extendedKeyUsage = $crit" . join(',', @{ $dto->usages }) if @{ $dto->usages };
     }
 
     # — SubjectKeyIdentifier —
