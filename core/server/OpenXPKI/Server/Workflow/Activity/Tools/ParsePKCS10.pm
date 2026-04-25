@@ -107,7 +107,7 @@ sub execute {
         $hashed_dn = $dn->as_hash();
         unless ($skip_sanitize) {
             foreach my $rdn (keys $hashed_dn->%*) {
-                my @filtered = grep { OpenXPKI::Util->validate('GeneralNameNoBreak', $_) } $hashed_dn->{$rdn}->@*;
+                my @filtered = grep { OpenXPKI::Util->validate('GeneralName', $_) } $hashed_dn->{$rdn}->@*;
                 if (@filtered) {
                     CTX('log')->application()->warn("RDN $rdn was reduced by sanitize")
                         if (@filtered != $hashed_dn->{$rdn}->@*);
@@ -356,7 +356,7 @@ sub sanitize_san_item {
         uniformResourceIdentifier => 'URI',
         registeredID              => 'OID',
         directoryName             => 'ParsedDN',
-        otherName                 => 'GeneralNameNoBreak',
+        otherName                 => 'GeneralName',
     );
 
     my $type_name = $type_map{$san_type};

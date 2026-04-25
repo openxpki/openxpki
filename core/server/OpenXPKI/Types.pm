@@ -345,14 +345,14 @@ Enumeration of supported Subject Alternative Name types.
 
 enum 'SANType', [qw( DNS email IP URI dirName RID otherName )];
 
-=head2 GeneralNameNoBreak
+=head2 GeneralName
 
 A single-line string suitable as an ASN.1 GeneralName value.
 Control characters (0x00-0x1F, 0x7F ) are disallowed.
 
 =cut
 
-subtype 'GeneralNameNoBreak',
+subtype 'GeneralName',
     as 'Str',
     where { $_ =~ qr{ \A [^\x00-\x1F\x7F]+ \z }xms },
     message { sprintf "'%s' must not contain control characters", ($_ // '<undef>') };
