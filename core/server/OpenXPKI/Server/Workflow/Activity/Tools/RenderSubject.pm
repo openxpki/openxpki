@@ -103,7 +103,7 @@ sub execute {
         URI       => 'URI',
         RID       => 'OID',
         dirName   => 'ParsedDN',
-        otherName => 'GeneralNameNoBreak',
+        otherName => 'GeneralName',
     );
 
     my $invalid = 0;

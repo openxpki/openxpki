@@ -35,7 +35,7 @@ has cps => (
     isa => 'Maybe[ArrayRef[URI]]',
 );
 
-=head2 user_notice (Maybe[ArrayRef[GeneralNameNoBreak]])
+=head2 user_notice (Maybe[ArrayRef[GeneralName]])
 
 Optional list of user notice texts.
 
@@ -43,7 +43,7 @@ Optional list of user notice texts.
 
 has user_notice => (
     is  => 'ro',
-    isa => 'Maybe[ArrayRef[GeneralNameNoBreak]]',
+    isa => 'Maybe[ArrayRef[GeneralName]]',
 );
 
 __PACKAGE__->meta->make_immutable;

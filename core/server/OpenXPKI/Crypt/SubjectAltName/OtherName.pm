@@ -45,7 +45,7 @@ has oid => (
     required => 1,
 );
 
-=head2 value (GeneralNameNoBreak, required)
+=head2 value (GeneralName, required)
 
 The value of the extension, added to the certificate as is, must be a valid
 ASN.1 definition.
@@ -54,7 +54,7 @@ ASN.1 definition.
 
 has value => (
     is       => 'ro',
-    isa      => 'GeneralNameNoBreak',
+    isa      => 'GeneralName',
     required => 1,
 );
 

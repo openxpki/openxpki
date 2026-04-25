@@ -36,7 +36,7 @@ has critical => (
     required => 1,
 );
 
-=head2 value (ArrayRef[GeneralNameNoBreak], required)
+=head2 value (ArrayRef[GeneralName], required)
 
 The extension value lines. May be passed as a plain string to the constructor,
 in which case it is split on C<\r?\n>. Each element may include C<format:>
@@ -47,7 +47,7 @@ section content.
 
 has value => (
     is       => 'ro',
-    isa      => 'ArrayRef[GeneralNameNoBreak]',
+    isa      => 'ArrayRef[GeneralName]',
     required => 1,
 );
 
@@ -142,7 +142,7 @@ sub get_config_line {
 
 }
 
-=head2 get_section_lines (ArrayRef[GeneralNameNoBreak])
+=head2 get_section_lines (ArrayRef[GeneralName])
 
 Returns the value of the sequence as arrayref B<excluding> the section header.
 

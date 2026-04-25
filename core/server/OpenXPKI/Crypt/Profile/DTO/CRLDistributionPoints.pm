@@ -19,7 +19,7 @@ has critical => (
     required => 1,
 );
 
-=head2 uris (ArrayRef[GeneralNameNoBreak], required)
+=head2 uris (ArrayRef[GeneralName], required)
 
 List of CRL distribution point URIs (after Template Toolkit processing).
 
@@ -27,7 +27,7 @@ List of CRL distribution point URIs (after Template Toolkit processing).
 
 has uris => (
     is       => 'ro',
-    isa      => 'ArrayRef[GeneralNameNoBreak]',
+    isa      => 'ArrayRef[GeneralName]',
     required => 1,
 );
 

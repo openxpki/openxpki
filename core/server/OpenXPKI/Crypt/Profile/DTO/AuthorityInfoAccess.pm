@@ -19,7 +19,7 @@ has critical => (
     required => 1,
 );
 
-=head2 ca_issuers (Maybe[ArrayRef[GeneralNameNoBreak]])
+=head2 ca_issuers (Maybe[ArrayRef[GeneralName]])
 
 List of caIssuers access URIs (after Template Toolkit processing).
 
@@ -27,10 +27,10 @@ List of caIssuers access URIs (after Template Toolkit processing).
 
 has ca_issuers => (
     is  => 'ro',
-    isa => 'Maybe[ArrayRef[GeneralNameNoBreak]]',
+    isa => 'Maybe[ArrayRef[GeneralName]]',
 );
 
-=head2 ocsp (Maybe[ArrayRef[GeneralNameNoBreak]])
+=head2 ocsp (Maybe[ArrayRef[GeneralName]])
 
 List of OCSP responder URIs (after Template Toolkit processing).
 
@@ -38,7 +38,7 @@ List of OCSP responder URIs (after Template Toolkit processing).
 
 has ocsp => (
     is  => 'ro',
-    isa => 'Maybe[ArrayRef[GeneralNameNoBreak]]',
+    isa => 'Maybe[ArrayRef[GeneralName]]',
 );
 
 __PACKAGE__->meta->make_immutable;
