@@ -69,7 +69,13 @@ sub get_command {
 
     ## build the command
 
-    my @command = qw( pkeyutl -sign );
+    #my @command = qw( pkeyutl -sign );
+    my @command = (
+    'pkeyutl',
+    '-provider', 'oqsprovider',
+    '-provider', 'default',
+    '-sign'
+    );
     push @command, ("-inkey", $self->{KEYFILE});
 
     push @command, ('-pkeyopt', "digest:$digest");

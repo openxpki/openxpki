@@ -30,7 +30,15 @@ sub get_command
 
     ## build the command
 
-    my @command = qw( cms -verify -binary -inform PEM );
+    #my @command = qw( cms -verify -binary -inform PEM );
+    my @command = (
+    'cms',
+    '-provider', 'oqsprovider',
+    '-provider', 'default',
+    '-verify',
+    '-binary',
+    '-inform', 'PEM'
+    );
     push @command, ("-in", $self->write_temp_file( $self->{PKCS7} ));
     push @command, ("-signer", $self->get_outfile());
 

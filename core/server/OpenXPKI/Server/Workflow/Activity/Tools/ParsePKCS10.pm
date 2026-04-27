@@ -125,6 +125,9 @@ sub execute {
             } elsif ($key_param->{keytype} eq 'ECC') {
                 $param->{csr_key_alg} = 'ec';
                 $param->{csr_key_params} = { key_length =>  $key_param->{keylen}, curve_name => $key_param->{curve} };
+            } elsif ($key_param->{keytype} eq 'p384_mldsa65') {
+                $param->{csr_key_alg} = 'p384_mldsa65';
+                $param->{csr_key_params} = { key_length =>  $key_param->{keylen} };
             }
         };
         if ($EVAL_ERROR) {

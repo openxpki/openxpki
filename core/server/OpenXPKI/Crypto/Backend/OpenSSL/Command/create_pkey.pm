@@ -40,7 +40,12 @@ sub get_command
             message => "no algorithm given for genpkey");
     }
 
-    my @command = qw( genpkey );
+    # my @command = qw( genpkey );
+    my @command = (
+    'genpkey',
+    '-provider', 'oqsprovider',
+    '-provider', 'default'
+    );
     push @command, ('-engine', $engine) if ($engine);
 
     push @command, ('-out', $self->get_outfile());
@@ -66,6 +71,7 @@ sub get_command
     push @command, ('-pass', 'env:pwd');
     $self->set_env ("pwd" => $passwd);
 
+    print STDERR join(" ", @command) . "\n";print STDERR "FINAL_OPENSSL_COMMAND: openssl " . join(" ", @command) . "\n";
     return [ \@command ];
 }
 

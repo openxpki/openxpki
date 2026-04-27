@@ -63,6 +63,11 @@ sub get_command
 
     my $command  = $self->{KEYTYPE} .  " -in  " . $self->write_temp_file( $self->{DATA} );
 
+    if ($self->{KEYTYPE} =~ /mldsa|mlkem|falcon|sphincs/i) {
+    $command = "pkey -provider oqsprovider -provider default -in "
+        . $self->write_temp_file($self->{DATA});
+    }
+
     if ($self->{IN} eq "DER") {
         $command .= " -inform der";
     }

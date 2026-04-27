@@ -58,7 +58,13 @@ sub get_command
 
     ## build the command
 
-    my @command  = ('ca','-gencrl');
+    #my @command  = ('ca','-gencrl');
+    my @command = (
+    'ca',
+    '-provider', 'oqsprovider',
+    '-provider', 'default',
+    '-gencrl'
+    );
     push @command, '-engine', $engine if ($engine);
 
     if ($self->{ENGINE}->get_engine() eq "pkcs11" and

@@ -42,7 +42,12 @@ sub get_command
 
     ## build the command
 
-    my $command  = "req";
+    #my $command  = "req";
+    my @command = (
+    'req',
+    '-provider', 'oqsprovider',
+    '-provider', 'default'
+    );
 
     $command .= " -out ".$self->get_outfile();
     $command .= " -in " . $self->write_temp_file( $self->{DATA} );

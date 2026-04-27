@@ -36,7 +36,13 @@ sub get_command
     }
 
     ## build the command
-    my @command = qw( req -new );
+    #my @command = qw( req -new );
+    my @command = (
+    'req',
+    '-provider', 'oqsprovider',
+    '-provider', 'default',
+    '-new'
+    );
 
     # subject from string via command line
     if ($self->{SUBJECT}) {
@@ -62,6 +68,7 @@ sub get_command
         push @command, ('-passin', 'env:pwd');
         $self->set_env ("pwd" => $passwd);
     }
+    print STDERR "CSR_COMMAND: openssl " . join(" ", @command) . "\n";
     return [ \@command ];
 }
 

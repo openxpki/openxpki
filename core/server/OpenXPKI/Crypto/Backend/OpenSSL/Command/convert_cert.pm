@@ -43,7 +43,8 @@ sub get_command {
             $inform = $self->{IN};
         }
 
-        my $command  = "x509";
+        #my $command  = "x509";
+        my $command = "x509 -provider oqsprovider -provider default";
 
         $command .= " -out ".$self->get_outfile();
         $command .= " -in ". $self->write_temp_file( $self->{DATA} );

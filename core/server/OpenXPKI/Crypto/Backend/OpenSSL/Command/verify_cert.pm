@@ -23,7 +23,12 @@ sub get_command
 
     ## build the command
 
-    my @command = qw( verify );
+    #my @command = qw( verify );
+    my @command = (
+    'verify',
+    '-provider', 'oqsprovider',
+    '-provider', 'default'
+    );
     push @command, ('-CAfile', $self->write_temp_file( $self->{TRUSTED} ) );
 
     push @command, ('-untrusted', $self->write_temp_file( $self->{CHAIN} ) ) if ($self->{CHAIN});

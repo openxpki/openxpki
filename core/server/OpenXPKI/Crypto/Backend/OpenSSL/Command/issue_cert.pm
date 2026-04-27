@@ -53,7 +53,13 @@ sub get_command
 
     ## build the command
 
-    my @command = qw( ca -batch );
+    #my @command = qw( ca -batch );
+    my @command = (
+    'ca',
+    '-provider', 'oqsprovider',
+    '-provider', 'default',
+    '-batch'
+    );
     if ($self->{ENGINE}->get_engine() eq "pkcs11" and
         (ref $self->{ENGINE}) =~ m{^OpenXPKI::Crypto::Backend::OpenSSL::Engine::SafeNetProtectServer$}xms)
     {

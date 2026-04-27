@@ -35,6 +35,8 @@ sub _validate {
     } elsif ($key_alg eq 'ec') {
         $key_params = { key_length =>  '_any', curve_name => $key_gen_params->{CURVE_NAME} };
         # not yet defined
+    } elsif ($key_alg eq 'p384_mldsa65') {
+        $key_params = { key_length =>  $key_gen_params->{KEY_LENGTH} };
     } else {
         validation_error('I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_ALGO_NOT_SUPPORTED');
     }

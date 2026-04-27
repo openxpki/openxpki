@@ -17,10 +17,17 @@ sub get_command
     my $engine = $self->__get_used_engine('PRIV_KEY_OPS');
 
     ## check parameters
-    if ($self->{KEYTYPE} !~ /\A(pkey|rsa)\z/) {
+    if ($self->{KEYTYPE} !~ /\A(pkey|rsa|p384_mldsa65)\z/) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_PKEY_WRONG_KEYTYPE",
             params => { KEYTYPE => $self->{KEYTYPE} });
+    }
+
+    my $keytype = $self->{KEYTYPE};
+
+    # PQC/hybrid keys must use generic EVP pkey command
+    if ($keytype eq 'p384_mldsa65') {
+        $keytype = 'pkey';
     }
 
     if (not exists $self->{OUT})
@@ -43,7 +50,15 @@ sub get_command
 
     ## build the command
 
-    my @command = ($self->{KEYTYPE},
+    #my @command = ($self->{KEYTYPE},
+    #    "-pubout",
+    #    "-in", $self->write_temp_file( $self->{DATA} )
+    #);
+
+    my @command = (
+        $keytype,
+        "-provider", "oqsprovider",
+        "-provider", "default",
         "-pubout",
         "-in", $self->write_temp_file( $self->{DATA} )
     );

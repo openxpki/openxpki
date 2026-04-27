@@ -35,7 +35,8 @@ sub get_command
 
     ## build the command
 
-    my $command  = "crl";
+    #my $command  = "crl";
+    my $command = "crl -provider oqsprovider -provider default";
     $command .= " -out ".$self->get_outfile();
     $command .= " -in " .$self->write_temp_file( $self->{DATA} );
     if (defined $self->{IN} && ($self->{IN} eq 'DER')) {
