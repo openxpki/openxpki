@@ -31,7 +31,6 @@ sub execute {
 
     my $subject_prefix = $self->param('subject_prefix') || 'cert_';
     my $verify_signature = $self->param('verify_signature') ? 1 : 0;
-    my $skip_sanitize = $self->param('skip_sanitize') ? 1 : 0;
 
     my $target_key = $self->param('target_key');
 
@@ -105,19 +104,6 @@ sub execute {
     if (my $csr_subject = $decoded->subjectSequence()) {
         my $dn = OpenXPKI::Crypt::DN->new( sequence => $csr_subject );
         $hashed_dn = $dn->as_hash();
-        unless ($skip_sanitize) {
-            foreach my $rdn (keys $hashed_dn->%*) {
-                my @filtered = grep { OpenXPKI::Util->validate('GeneralName', $_) } $hashed_dn->{$rdn}->@*;
-                if (@filtered) {
-                    CTX('log')->application()->warn("RDN $rdn was reduced by sanitize")
-                        if (@filtered != $hashed_dn->{$rdn}->@*);
-                    $hashed_dn->{$rdn} = \@filtered;
-                } else {
-                    CTX('log')->application()->warn("RDN $rdn empty after sanitize");
-                    delete $hashed_dn->{$rdn};
-                }
-            }
-        }
         $param->{csr_subject} = $dn->get_subject();
         ##! 32: 'Subject DN ' . Dumper $hashed_dn
     }
@@ -208,14 +194,7 @@ sub execute {
             next;
         }
 
-        my @items;
-        # no sanitazion is wanted - map values directly
-        if ($skip_sanitize) {
-            @items = $decoded->subjectAltName( $san );
-        } else {
-            @items = $self->sanitize_san_item( $san, $decoded->subjectAltName( $san ) );
-        }
-
+        my @items = $decoded->subjectAltName( $san );
         next unless @items;
 
         # san hash
@@ -345,37 +324,6 @@ sub execute {
     return 1;
 }
 
-sub sanitize_san_item {
-
-    my ($self, $san_type, @values) = @_;
-
-    my %type_map = (
-        dNSName                   => 'DNSName',
-        rfc822Name                => 'Email',
-        iPAddress                 => 'IP',
-        uniformResourceIdentifier => 'URI',
-        registeredID              => 'OID',
-        directoryName             => 'ParsedDN',
-        otherName                 => 'GeneralName',
-    );
-
-    my $type_name = $type_map{$san_type};
-
-    my @valid;
-    for my $value (@values) {
-        next unless (defined $value && $value ne '');
-        if ($type_name && !OpenXPKI::Util->validate($type_name, $value)) {
-            CTX('log')->application()->warn(
-                sprintf("Ignoring invalid SAN value for type %s: %s", $san_type, $value)
-            );
-            next;
-        }
-        push @valid, $value;
-    }
-
-    return @valid;
-
-}
 
 # wrapper method to handle extraction of attributes and extensions
 sub hande_extensions {
@@ -427,9 +375,7 @@ OpenXPKI::Server::Workflow::Activity::Tools::ParsePKCS10
 
 =head1 Description
 
-Take a pkcs10 container and extract information to the context. A basic format
-validation is done on extracted SAN items to catch broken data early, malformed
-data is filtered out and a warning is issued.
+Take a pkcs10 container and extract information to the context.
 
 If a profile name and style are given and the profile has a ui section, the
 data extracted from the CSR is used to prefill the profile ui fields.
@@ -471,11 +417,6 @@ parameter is deleted from the context. It is recommended to check the
 PCKS#10 container on upload already using the validator. Note that at least
 the default backend will refuse broken signatures on the request to issue,
 so you B<MUST> handle this.
-
-=item skip_sanitize
-
-If set to a true value, the SAN item validation is skipped and any content
-is mapped.
 
 =item subject_prefix
 
