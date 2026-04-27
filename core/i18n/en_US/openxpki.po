@@ -3,15 +3,15 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2026-01-29 15:11+0100\n"
+"PO-Revision-Date: 2026-04-07 18:21+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
-"Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
-"net>\n"
+"Language-Team: OpenXPKI developers list <openxpki-"
+"devel@lists.sourceforge.net>\n"
 "Language: en_US\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.2.2\n"
+"X-Generator: Poedit 3.6\n"
 "X-Poedit-Bookmarks: -1,-1,77,-1,-1,-1,-1,-1,-1,-1\n"
 
 msgid "I18N_OPENXPKI_UI_ACCOUNT_AUTOREGISTRATION_LABEL"
@@ -32,8 +32,26 @@ msgstr "Account Key"
 msgid "I18N_OPENXPKI_UI_ACCOUNT_STATUS_LABEL"
 msgstr "Account State"
 
+msgid "I18N_OPENXPKI_UI_ACME_ACCOUNT_EAB_INFO_LABEL"
+msgstr "EAB Information"
+
+msgid "I18N_OPENXPKI_UI_ACME_ACCOUNT_EAB_KID_LABEL"
+msgstr "EAB Key ID"
+
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "Requested action not found"
+
+msgid "I18N_OPENXPKI_UI_ALIAS_GROUP"
+msgstr "Group"
+
+msgid "I18N_OPENXPKI_UI_ALIAS_GROUP_EXPIRY"
+msgstr "Expiry"
+
+msgid "I18N_OPENXPKI_UI_ALIAS_GROUP_ITEMS_TOTAL"
+msgstr "Items"
+
+msgid "I18N_OPENXPKI_UI_ALIAS_GROUP_ITEMS_VALID"
+msgstr "Valid"
 
 msgid "I18N_OPENXPKI_UI_API_TOKEN"
 msgstr "API-Token/Secret"
@@ -502,9 +520,8 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT"
 msgstr "This is just a prefix"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
-msgstr "unspecified / other reason"
+msgstr "discontinued"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
@@ -885,6 +902,9 @@ msgstr "Domain List"
 msgid "I18N_OPENXPKI_UI_FIELD_ERROR_CODE"
 msgstr "Error Code"
 
+msgid "I18N_OPENXPKI_UI_HEALTH_STATUS"
+msgstr "Health"
+
 # Remove?
 msgid "I18N_OPENXPKI_UI_HOME_LOGOUT_HEAD"
 msgstr "Logout Successful"
@@ -907,6 +927,9 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_IMPORT_CRL_ISSUER_NOT_FOUND"
 msgstr "Unable to find issuer certificate for CRL!"
+
+msgid "I18N_OPENXPKI_UI_INVALIDITY_TIME_OUTSIDE_VALIDITY_WINDOW"
+msgstr "Invalidity time is outside the certificate's validity window"
 
 msgid "I18N_OPENXPKI_UI_INVALID_PROFILE"
 msgstr "Invalid Profile"
@@ -1619,6 +1642,69 @@ msgstr "Report Configuration"
 msgid "I18N_OPENXPKI_UI_REPORT_DOWNLOAD_LABEL"
 msgstr "Download"
 
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_ARCHIVED"
+msgstr "Archived"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_EXCEEDED"
+msgstr "Exceeded"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_EXCEPTION"
+msgstr "Exception"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_FAILED"
+msgstr "Failed"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_FINISHED"
+msgstr "Finished"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_INIT"
+msgstr "Initial"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_MANUAL"
+msgstr "Pending"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_MATURE"
+msgstr "Mature"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_NEAR_EXPIRY"
+msgstr "Near Expiry"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_PAUSE"
+msgstr "Pause"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_RECENT_EXPIRY"
+msgstr "Recently Expired"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_RUNNING"
+msgstr "Running"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_STRAY"
+msgstr "Stray"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_TOTAL_COUNT"
+msgstr "Total"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_TOTAL_DISTINCT"
+msgstr "Distinct"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_TOTAL_EXPIRED"
+msgstr "Expired"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_TOTAL_RENEWED"
+msgstr "Renewed"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_TOTAL_REVOKED"
+msgstr "Revoked"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_VALID_COUNT"
+msgstr "Valid"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_VALID_DISTINTCT"
+msgstr "Valid Distinct"
+
+msgid "I18N_OPENXPKI_UI_REPORT_FIELD_ZOMBIE"
+msgstr "Zombie"
+
 msgid "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_CREATED"
 msgstr "Last Update"
 
@@ -1787,6 +1873,27 @@ msgstr "seconds"
 msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_STARTED"
 msgstr "started"
 
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_ALIAS_GROUPS_LABEL"
+msgstr "Alias Group Status"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_ALIAS_LIST_LABEL"
+msgstr "Alias Details"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_CERTIFICATE_STATS_LABEL"
+msgstr "Certificate Statistics"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_CLUSTER_STATUS_LABEL"
+msgstr "Cluster Status"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_CRL_STATUS_LABEL"
+msgstr "Certificate Revocation List Status"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_TOKEN_LIST_LABEL"
+msgstr "Token Status"
+
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_WORKFLOW_STATS_LABEL"
+msgstr "Workflow Statistics"
+
 msgid "I18N_OPENXPKI_UI_STATUS_SYSTEM_CRITICAL"
 msgstr "Your system status is critical!"
 
@@ -1804,8 +1911,9 @@ msgstr ""
 "Thank you for using OpenXPKI - for support and announcements please "
 "subscribe to our <a href=\"https://lists.sourceforge.net/lists/listinfo/"
 "openxpki-users\">mailinglist</a>.<br> If you need help with your setup or "
-"commercial support, please contact <a href=\"mailto:"
-"openxpki@whiterabbitsecurity.com\">openxpki@whiterabbitsecurity.com.</a>"
+"commercial support, please contact <a "
+"href=\"mailto:openxpki@whiterabbitsecurity.com\">openxpki@whiterabbitsecurity.com."
+"</a>"
 
 msgid "I18N_OPENXPKI_UI_SYSTEM_VERSION_STATUS_LABEL"
 msgstr "System Version"
@@ -2615,6 +2723,9 @@ msgstr "Failed Approval Rules"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVAL_REPORTS_LABEL"
 msgstr "Executed Approval Rules"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_AUTHENTICATION_REPORT_LABEL"
+msgstr "Authentication Report"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_BULKDATA_DESC"
 msgstr "Input data as defined by the field specification. "
 
@@ -2865,6 +2976,9 @@ msgstr "usually not required, use the selector on the right or type a datetime"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_TOOLTIP"
 msgstr "the revocation will be scheduled after the given date"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ELIGIBILITY_RESULT_LABEL"
+msgstr "Eligibility Result"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EMAIL_DESC"
 msgstr " "
 
@@ -2972,6 +3086,9 @@ msgstr ""
 "certificate from the list by clicking on it. Note that the search function "
 "requires a minimum of three letters."
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_ELIGIBLE_LABEL"
+msgstr "Is Eligible"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_REPLACE_LABEL"
 msgstr "Is Replacement"
 
@@ -3050,8 +3167,8 @@ msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTAFTER_DESC"
 msgstr ""
-"Use the calendar or enter the notafter date in the format <tt>DD.MM.YYYY HH:"
-"MM</tt>. If you omit daytime, midnight is assumed. To reset the date to "
+"Use the calendar or enter the notafter date in the format <tt>DD.MM.YYYY "
+"HH:MM</tt>. If you omit daytime, midnight is assumed. To reset the date to "
 "auto, clear the field or type 0. All dates are handled in UTC timezone!"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTAFTER_LABEL"
@@ -3067,8 +3184,8 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_DESC"
 msgstr ""
-"Use the calendar or enter the notbefore date in the format <tt>DD.MM.YYYY HH:"
-"MM</tt>. If you omit daytime, midnight is assumed. To reset the date to "
+"Use the calendar or enter the notbefore date in the format <tt>DD.MM.YYYY "
+"HH:MM</tt>. If you omit daytime, midnight is assumed. To reset the date to "
 "auto, clear the field or type 0.  All dates are handled in UTC timezone!"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_LABEL"
@@ -3260,6 +3377,21 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REQUEST_MODE_LABEL"
 msgstr "Request Mode"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_QUEUE_LABEL"
+msgstr "Revocation Queue"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT_REPLACE"
+msgstr "certificate replace"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
+msgstr "service discontinued"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_COMPROMISE"
+msgstr "key compromised"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_LOST"
+msgstr "key unavailable"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_TIME_DESC"
 msgstr ""
@@ -3730,6 +3862,9 @@ msgstr "Reference Date"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_COUNT"
 msgstr "Valid Certificates"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_DISTINCT"
+msgstr "Valid Distinct Subjects"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_DISTINTCT"
 msgstr "Valid Distinct Subjects"
@@ -4268,6 +4403,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_RESULT_LABEL"
 msgstr "Certificate Metadata"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_STATUS_SUMMARY_SUCCESS_LABEL"
+msgstr "OpenXPKI System Status Summary"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC"
 msgstr "This workflow has finished with success and can not be restarted"
 
@@ -4468,6 +4606,12 @@ msgstr "Issue certificate revocation lists."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_LABEL"
 msgstr "CRL Issuance"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_API_DESC"
+msgstr "Workflow handling revocation via automated APIs."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_API_LABEL"
+msgstr "Certificate Revocation via API"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BULK_DESC"
 msgstr ""
 "This workflow allows the revocation of multiple certificates at once. You "
@@ -4599,5 +4743,23 @@ msgstr "Wake Up"
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "Yes"
 
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_NOT_TRUSTED"
+msgstr "Signer certificate is not trusted."
+
+#~ msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_FIELD_REPORT_DATA_LABEL"
+#~ msgstr "Certificate Detail Report "
+
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_UNKNOWN_TYPE"
 #~ msgstr "Cannot initiate workflow: type unknown"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_SUMMARY_FIELD_REPORT_DATA_LABEL"
+#~ msgstr "Certificate Detail Report "
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_STATUS_SUMMARY_DESC"
+#~ msgstr "Report showing certificate count in several states."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_STATUS_SUMMARY_LABEL"
+#~ msgstr "Certificates Status Report"
