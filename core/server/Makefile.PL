@@ -222,6 +222,7 @@ WriteMakefile(
         'MooseX::NonMoose'              => 0,           # OpenXPKI::Server::Workflow::Validator::PasswordQuality
         'MooseX::Params::Validate'      => '0.21',      # OpenXPKI::Database
         'MooseX::StrictConstructor'     => '0.21',
+        'Email::Valid'                  => 0,
         'Net::DNS'                      => '0.83',
         'Net::LDAP'                     => '0.32',
         'Net::Server'                   => '0.94',

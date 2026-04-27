@@ -4,6 +4,10 @@ use OpenXPKI -typeconstraints;
 # Core modules
 use Math::BigInt;
 
+# CPAN modules
+use Email::Valid;
+use NetAddr::IP;
+
 # Project modules
 use OpenXPKI::FileUtils;
 use OpenXPKI::DateTime;
@@ -177,17 +181,13 @@ subtype 'PEMPubKey',
 
 =head2 Email
 
-An email address (or at least 99% of them).
-
-Allowed characters are word and dash, for the local part also the plus
-sign and a colon. A percent character is NOT allowed to avoid some nasty
-SQL issues.
+A valid email address, validated via L<Email::Valid>.
 
 =cut
 subtype 'Email',
     as 'Str',
-    where { $_ =~ m{ \A [\w\-\+\.]+\@([\w\-]+\.)+(\w+) \z }xms },
-    message { sprintf "'%s' is not a valid email address", ($_ ? "'$_'" : '<undef>') };
+    where { Email::Valid->address($_) },
+    message { sprintf "'%s' is not a valid email address", ($_ // '<undef>') };
 
 =head2 ArrayRefOrPEMCertChain
 
@@ -416,7 +416,7 @@ A DNS hostname value (allows leading wildcard C<*.>).
 
 subtype 'DNSName',
     as 'Str',
-    where { $_ =~ qr{ \A (\*\.)? [a-zA-Z0-9] [a-zA-Z0-9\-]* (\.[a-zA-Z0-9\-]*[a-zA-Z0-9])* \z }xms },
+    where { $_ =~ qr{ \A (\*\.)? [a-zA-Z0-9] ([a-zA-Z0-9\-]*[a-zA-Z0-9])? (\.[a-zA-Z0-9\-]*[a-zA-Z0-9])* \z }xms },
     message { sprintf "'%s' is not a valid SAN DNS name", ($_ // '<undef>') };
 
 =head2 FQDN
@@ -432,41 +432,35 @@ subtype 'FQDN',
 
 =head2 IP
 
-An IPv4 or IPv6 address string.
+An IPv4 or IPv6 address string, validated via L<NetAddr::IP>.
 
 =cut
 
 subtype 'IP',
     as 'Str',
-    where {
-        # IPv4
-        $_ =~ qr{ \A \d{1,3} (?: \. \d{1,3} ){3} \z }xms
-        ||
-        # IPv6 (colon-hex, simplified)
-        $_ =~ qr{ \A [0-9A-Fa-f]{1,4} (?: : [0-9A-Fa-f]{0,4} ){2,7} \z }xms
-    },
+    where { NetAddr::IP->new($_) },
     message { sprintf "'%s' is not a valid IPv4 or IPv6 address", ($_ // '<undef>') };
 
 =head2 IPv4
 
-An IPv4 address string.
+An IPv4 address string, validated via L<NetAddr::IP>.
 
 =cut
 
 subtype 'IPv4',
-    as 'Str',
-    where { $_ =~ qr{ \A \d{1,3} (?: \. \d{1,3} ){3} \z }xms },
+    as 'IP',
+    where { NetAddr::IP->new($_)->version == 4 },
     message { sprintf "'%s' is not a valid IPv4 address", ($_ // '<undef>') };
 
-=head2 IPv4
+=head2 IPv6
 
-An IPv6 address string.
+An IPv6 address string, validated via L<NetAddr::IP>.
 
 =cut
 
 subtype 'IPv6',
-    as 'Str',
-    where {  $_ =~ qr{ \A [0-9A-Fa-f]{1,4} (?: : [0-9A-Fa-f]{0,4} ){2,7} \z }xms  },
+    as 'IP',
+    where { NetAddr::IP->new($_)->version == 6 },
     message { sprintf "'%s' is not a valid IPv6 address", ($_ // '<undef>') };
 
 =head2 URI
@@ -479,7 +473,7 @@ allowed in a URI (including percent-encoded sequences).
 
 subtype 'URI',
     as 'Str',
-    where { $_ =~ qr{ \A [a-zA-Z][a-zA-Z0-9+\-.]* : [a-zA-Z0-9\-._~:/?#\[\]@!$&'()*+,;=%]+ \z }xms },
+    where { $_ =~ qr{ \A [a-zA-Z][a-zA-Z0-9+\-.]* : [a-zA-Z0-9\-._~:/?#\[\]@!\$\&'()*+,;=%]+ \z }xms },
     message { sprintf "'%s' is not a valid URI", ($_ // '<undef>') };
 
 =head2 PrintableString
