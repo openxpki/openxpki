@@ -79,3 +79,4 @@ libworkflow-perl
 libyaml-libyaml-perl
 libyaml-pp-perl
 libppix-regexp-perl
+libemail-valid-perl
