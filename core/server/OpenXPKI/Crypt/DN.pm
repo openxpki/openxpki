@@ -19,7 +19,7 @@ representations.
 =head2 sequence
 
 The internal representation of the DN, must be set at the time of
-constructionand can not be updated later.
+construction and can not be updated later.
 
 The expected format is the DN structure as returned from Convert::ASN1
 which is a list holding the DN components starting with the least

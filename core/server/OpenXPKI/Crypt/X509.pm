@@ -1,11 +1,13 @@
 package OpenXPKI::Crypt::X509;
 use OpenXPKI -class;
 
-use OpenXPKI::DN;
 use Digest::SHA qw(sha1_base64 sha1_hex);
 use OpenXPKI::DateTime;
 use MIME::Base64;
 use Crypt::X509 0.53;
+
+use OpenXPKI::Crypt::DN;
+use OpenXPKI::Crypt::PKCS7; # decode_tag method
 
 has data => (
     is => 'ro',
@@ -417,6 +419,13 @@ sub _build_san {
                         $san_val = sprintf( '%*v02X', ':', $san_val );
                         $san_val =~ s/([[:xdigit:]]{2}):([[:xdigit:]]{2})/$1$2/g;
                     }
+                } elsif ($type eq 'directoryName') {
+                    $san_val = OpenXPKI::Crypt::DN->new( sequence => $san_val->{rdnSequence} )->get_subject();
+                } elsif ($type eq 'otherName') {
+                    # TODO - this needs some improvemnt to not swallow the type
+                    # and support nested values
+                    $san_val = sprintf('%s:%s', $san_val->{type}, decode_tag($san_val->{value}));
+                    $san_val =~ s{[\x00-\x1F\x7F]}{X}g; # should not be the case but who knows
                 }
                 push @san_list, [ $san_type, $san_val ];
             }

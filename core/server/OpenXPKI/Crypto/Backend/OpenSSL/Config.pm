@@ -564,9 +564,11 @@ sub __build_san_section {
 
         if ($san->isa('OpenXPKI::Crypt::SubjectAltName::DirName')) {
             # ParsedDN: [ [ [attr, val], ... ], ... ]
+            # CAVEAT: ParsedDN has the most significant item (usually commonName)
+            # at position 0 but we need the least significant first in the config
             my @sec = ("[dirname_sect_${sectidx}]");
             my $rdnidx = 0;
-            for my $rdn (@{ $san->value }) {
+            for my $rdn (reverse @{ $san->value }) {
                 my ($first, @rest) = @$rdn;
                 push @sec, $rdnidx++ . '.'
                     . $first->[0] . '="'
