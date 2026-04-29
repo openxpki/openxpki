@@ -543,13 +543,20 @@ sub __main_loop {
     my $self = shift;
 
     my $slots_avail_count = $self->max_worker_count();
+
     my $beacon = {
-        version => $OpenXPKI::VERSION::VERSION,
         config => CTX('config')->checksum,
         uptime => $BASETIME,
         node => CTX('config')->hostname,
         last_update => 0,
     };
+
+    if (!Mojo::Loader::load_class('OpenXPKI::Enterprise::VERSION')) {
+        $beacon->{version} = sprintf('v%s ee / v%s core', $OpenXPKI::Enterprise::VERSION::VERSION, $OpenXPKI::VERSION::VERSION);
+    } else {
+        $beacon->{version} = sprintf('v%s community',$OpenXPKI::VERSION::VERSION);
+    }
+
     while (not $TERMINATE) {
         ##! 64: 'Watchdog: do loop'
         try {
