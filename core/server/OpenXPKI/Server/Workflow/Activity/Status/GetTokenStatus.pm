@@ -7,7 +7,6 @@ use List::Util 'uniq';
 use OpenXPKI::Server::Context qw(CTX);
 use OpenXPKI::Serialization::Simple;
 
-
 sub execute {
 
     my $self       = shift;
@@ -17,8 +16,15 @@ sub execute {
     my $node = CTX('config')->hostname;
     my $target_key = $self->param('target_key') || 'token_status';
 
-    my $groups = CTX('api2')->list_token_groups();
-    my @groups = sort { $a cmp $b } uniq values $groups->%*;
+    my $alias_group = $self->param('alias_group');
+
+    my @groups;
+    if ($alias_group) {
+        @groups = ($alias_group);
+    } else {
+        my $groups = CTX('api2')->list_token_groups();
+        @groups = sort { $a cmp $b } uniq values $groups->%*;
+    }
     my @token;
     foreach my $group ( @groups ) {
         my $entries = CTX('api2')->list_active_aliases(
@@ -52,6 +58,8 @@ OpenXPKI::Server::Workflow::Activity::Status::GetTokenStatus
 Iterate over all active aliases in all token groups and test their
 availability. Writes the test result to the given I<target_key>.
 
+Limit execution to a single token group by setting I<alias_group>.
+
 The result is a list of hashes, sorted by group name.
 
     [{
@@ -76,5 +84,10 @@ The result is a list of hashes, sorted by group name.
 =item target_key (default: token_status)
 
 Name of the context key under which the result is stored.
+
+=item alias_group
+
+Name of a single token alias group to check on, default is to check on
+all groups returned by I<list_token_groups>.
 
 =back
