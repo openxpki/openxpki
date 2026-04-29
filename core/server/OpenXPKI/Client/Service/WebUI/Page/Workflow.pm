@@ -753,6 +753,7 @@ sub __render_wf_state ($self, $wf_info, $wf_proc_state, $view) {
                     cssClass => $field->{className} || 'workflow',
                     content => {
                         label => $field->{label} || '',
+                        description => $field->{description} || '',
                         actions => ($field->{action} ? [{
                             page    => $field->{action},
                             label   => '',
@@ -773,6 +774,7 @@ sub __render_wf_state ($self, $wf_info, $wf_proc_state, $view) {
                     cssClass => $field->{className} // '',
                     content => {
                         label => $field->{label} || '',
+                        description => $field->{description} || '',
                         options => $field->{options},
                         data => $field->{value},
                         empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',

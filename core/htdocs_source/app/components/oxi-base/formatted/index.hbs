@@ -173,6 +173,21 @@
             {{/each}}
         </ul>
 
+    {{else if (eq "int" this.format)}}
+        <span class="oxi-formatted-int d-block text-end {{if this.intValue.negative "oxi-numeric-negative"}} {{@class}}">
+            {{this.intValue.text}}
+        </span>
+
+    {{else if (eq "float" this.format)}}
+        <span class="oxi-formatted-float d-block text-end {{if this.floatValue.negative "oxi-numeric-negative"}} {{@class}}">
+            {{this.floatValue.text}}
+        </span>
+
+    {{else if (eq "percent" this.format)}}
+        <span class="oxi-formatted-percent d-block text-end {{if this.percentValue.negative "oxi-numeric-negative"}} {{@class}}">
+            {{this.percentValue.text}}
+        </span>
+
     {{else}}
         (error: unknown field format "{{this.format}}")
 

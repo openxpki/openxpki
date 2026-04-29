@@ -27,7 +27,7 @@
                 {{/if}}
                 {{#each this.formattedColumns as |column|}}
                     {{#if column.sortable}}
-                        <th {{on "click" (fn this.sort column.sortPage)}} class="sortable {{if column.isSorted "bg-secondary text-white"}}" role="button">
+                        <th {{on "click" (fn this.sort column.sortPage)}} class="sortable {{if column.isSorted "bg-secondary text-white"}} {{if column.align (concat "text-" column.align)}}" role="button">
                             <span>{{column.sTitle}}</span>
                             {{#if column.isSorted}}
                                 <div class="btn bg-secondary-subtle btn-sm float-end">
@@ -44,7 +44,7 @@
                             {{/if}}
                         </th>
                     {{else}}
-                        <th>
+                        <th class="{{if column.align (concat "text-" column.align)}}">
                             <span>{{column.sTitle}}</span>
                         </th>
                     {{/if}}
@@ -86,12 +86,12 @@
                         {{#if this.hasAction}}
                             {{!-- template-lint-disable require-presentational-children --}}
                             <OxiBase::Clickable @clickable={{row.actions.[0]}} as |clickHandler isLoading|>
-                                <td {{on "click" clickHandler}} role="button">
+                                <td {{on "click" clickHandler}} role="button" class="{{if value.align (concat "text-" value.align)}}">
                                     <OxiBase::Formatted @format={{value.format}} @value={{value.value}}/>
                                 </td>
                             </OxiBase::Clickable>
                         {{else}}
-                            <td>
+                            <td class="{{if value.align (concat "text-" value.align)}}">
                                 <OxiBase::Formatted @format={{value.format}} @value={{value.value}}/>
                             </td>
                         {{/if}}

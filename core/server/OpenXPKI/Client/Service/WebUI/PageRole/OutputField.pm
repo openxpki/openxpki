@@ -384,7 +384,8 @@ sub __render_grid {
     if ($field->{cols}) {
         $item->{header} = [ map { {
             'sTitle' => $_->{head}//'',
-            ($_->{format} ? ('format' => $_->{format}) : ())
+            ($_->{format} ? ('format' => $_->{format}) : ()),
+            ($_->{align} ?  ('align' => $_->{align}) : ())
         } } $field->{cols}->@* ];
         my @formatted;
         # support for "one line tables"

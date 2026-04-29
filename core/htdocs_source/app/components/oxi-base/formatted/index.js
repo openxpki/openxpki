@@ -111,6 +111,29 @@ export default class OxiFormattedComponent extends Component {
      * Selects all text inside the clicked `<code>` element via the browser Selection API.
      * @memberOf OxiBase::Formatted
      */
+    _parseNumeric(decimals = 0, multiplier = 1, suffix = '') {
+        let v = this.args.value;
+        if (v === null || v === undefined || v === '') return { text: '-', negative: false };
+        let num = parseFloat(v) * multiplier;
+        if (isNaN(num)) return { text: 'NaN', negative: false };
+        return {
+            text: num.toFixed(decimals) + suffix,
+            negative: num < 0,
+        };
+    }
+
+    get intValue() {
+        let v = this.args.value;
+        if (v === null || v === undefined || v === '') return { text: '-', negative: false };
+        let num = parseFloat(v);
+        if (isNaN(num)) return { text: 'NaN', negative: false };
+        return { text: String(Math.trunc(num)), negative: num < 0 };
+    }
+
+    get floatValue() { return this._parseNumeric(2); }
+
+    get percentValue() { return this._parseNumeric(2, 100, '%'); }
+
     @action
     selectCode(event) {
         let element = event.target;

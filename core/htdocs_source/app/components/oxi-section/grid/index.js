@@ -24,6 +24,8 @@ import Pager from 'openxpki/data/pager'
  * @param { number } [def.columns[].bVisible] - Set to `0` to hide the column. Default: `1`
  * @param { string } [def.columns[].sortkey] - Key used for server-side (or client-side) sorting.
  *   Omit to make the column non-sortable.
+ * @param { string } [def.columns[].align] - Text alignment for the column header and cells.
+ *   Accepts Bootstrap suffixes: `start`, `center`, `end`. Omit for browser default.
  * @param { string } [def.empty] - Message shown in the table body when there are no data rows.
  *   Default: `"&nbsp;"` (non-breaking space).
  * @param { string } [def.footer] - Text rendered in a `<tfoot>` row below the table body.
@@ -227,6 +229,7 @@ export default class OxiSectionGridComponent extends Component {
                 index: column.index,
                 sTitle: column.sTitle,
                 format: column.format,
+                align: column.align || '',
                 sortable: !!column.sortkey,
                 isSorted: isSorted,
                 // pager information to change sorting
@@ -274,6 +277,7 @@ export default class OxiSectionGridComponent extends Component {
                 data: columns.map(col => {
                     return {
                         format: col.format,
+                        align: col.align,
                         value: row[col.index],
                     }
                 }),

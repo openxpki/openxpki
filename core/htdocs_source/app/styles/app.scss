@@ -84,6 +84,10 @@ img.toplogo {
   min-height: 100vh;
 }
 
+.oxi-main > .row {
+  margin-bottom: 10px;
+}
+
 .oxi-content {
   background-color: #fff;
 }
@@ -584,6 +588,16 @@ code { white-space: pre; }
   content: "dec";
   font-size: .7em;
   vertical-align: sub;
+}
+
+.oxi-numeric-negative {
+  color: var(--bs-danger);
+}
+
+.oxi-formatted-int,
+.oxi-formatted-float,
+.oxi-formatted-percent {
+  padding-right: 0.5rem;
 }
 
 .oxi-formatted-unilist,
