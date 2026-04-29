@@ -37,6 +37,13 @@ Interval to consider a certificate recently expired.
 
 Interval to consider a certificate recently renewed.
 
+=item * by_issuer
+
+If set, all counts are grouped by C<issuer_identifier>. The return value
+changes from a flat hash to a nested hash with the C<issuer_identifier>
+as keys on the first level. Missing stat values per issuer are filled
+with C<0> (C<by_profile> with an empty hash).
+
 =back
 
 B<Return values>
@@ -53,11 +60,11 @@ command "get_cert_statistic" => {
     recent_renewal  => { isa => 'Str', default => '-000030', },
     valid_at        => { isa => 'Int' },
     pki_realm       => { isa => 'Str' },
+    by_issuer       => { isa => 'Bool', default => 0 },
 } => sub {
     my ($self, $params) = @_;
 
     my $db = CTX('dbi');
-    my $tuple;
     my $result = {};
 
     # For special data types see:
@@ -78,164 +85,184 @@ command "get_cert_statistic" => {
 
     my $valid_at = $params->valid_at // time();
     my $ref_date = DateTime->from_epoch( epoch => $valid_at );
+    my $by_issuer = $params->by_issuer;
+
+    # Helper: run a COUNT query either as a single scalar or grouped by issuer_identifier
+    my $do_count = sub {
+        my ($stat_name, $col, %args) = @_;
+        if (!$by_issuer) {
+            my $row = $db->select_one(%base_query, %args,
+                columns => [ "COUNT($col)|amount" ],
+            );
+            $result->{$stat_name} = sprintf "%01d", $row->{amount} + 0;
+        } else {
+            my $rows = $db->select_arrays(%base_query, %args,
+                columns  => [ 'issuer_identifier', "COUNT($col)|amount" ],
+                group_by => 'issuer_identifier',
+            );
+            $result->{$_->[0]}{$stat_name} = $_->[1] + 0 for @$rows;
+        }
+    };
 
     # total count
-    $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(identifier)|amount' ],
-        where => {
-            %base_conditions
-        }
+    $do_count->('total_count', 'identifier',
+        where => { %base_conditions },
     );
-    $result->{total_count} = sprintf "%01d", $tuple->{amount};
 
     # Revoked
-    $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(identifier)|amount' ],
+    $do_count->('total_revoked', 'identifier',
         where => {
             %base_conditions,
             status => [ 'REVOKED', 'CRL_ISSUANCE_PENDING' ],
-        }
+        },
     );
-    $result->{total_revoked} = sprintf "%01d", $tuple->{amount} + 0;
-
 
     # valid revoked
-    $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(identifier)|amount' ],
+    $do_count->('valid_revoked', 'identifier',
         where => {
             %base_conditions,
-            status => [ 'REVOKED', 'CRL_ISSUANCE_PENDING' ],
-            notbefore => { '<' => $valid_at },
-            notafter  => { '>' => $valid_at },
-        }
-    );
-    $result->{valid_revoked} = sprintf "%01d", $tuple->{amount} + 0;
-
-
-    # Distinct
-    $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(DISTINCT subject)|amount' ],
-        where => {
-            %base_conditions,
-        }
-    );
-    $result->{total_distinct} = sprintf "%01d", $tuple->{amount} + 0;
-
-
-    # Expired
-    $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(identifier)|amount' ],
-        where => {
-            %base_conditions,
-            status => 'ISSUED',
-            notafter => { '<' => $valid_at },
-        }
-    );
-    $result->{total_expired} = sprintf "%01d", $tuple->{amount} + 0;
-
-    # Upcoming
-    $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(identifier)|amount' ],
-        where => {
-            %base_conditions,
-            status => 'ISSUED',
-            notbefore => { '>' => $valid_at },
-        }
-    );
-    $result->{total_upcoming} = sprintf "%01d", $tuple->{amount} + 0;
-
-    # Valid
-    $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(identifier)|amount' ],
-        where => {
-            %base_conditions,
-            status => 'ISSUED',
-            notbefore => { '<' => $valid_at },
-            notafter  => { '>' => $valid_at },
-        }
-    );
-    $result->{valid_count} = sprintf "%01d", $tuple->{amount} + 0;
-
-
-    # Valid distinct
-    $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(DISTINCT subject)|amount' ],
-        where => {
-            %base_conditions,
-            status => 'ISSUED',
-            notbefore => { '<' => $valid_at },
-            notafter  => { '>' => $valid_at },
-        }
-    );
-    $result->{valid_distinct} = sprintf "%01d", $tuple->{amount} + 0;
-
-
-    # Valid by profile
-    $tuple = $db->select_arrays(
-        from_join => 'certificate {req_key=req_key,pki_realm=pki_realm} csr',
-        columns  => [ 'profile', 'COUNT(identifier)|amount' ],
-        where => {
-            %base_conditions,
-            status => 'ISSUED',
+            status    => [ 'REVOKED', 'CRL_ISSUANCE_PENDING' ],
             notbefore => { '<' => $valid_at },
             notafter  => { '>' => $valid_at },
         },
-        group_by => 'csr.profile',
     );
-    ##! 1: $tuple
-    $result->{by_profile} = { map { $_->[0] => $_->[1]  } @{$tuple} };
+
+    # Distinct
+    $do_count->('total_distinct', 'DISTINCT subject',
+        where => { %base_conditions },
+    );
+
+    # Expired
+    $do_count->('total_expired', 'identifier',
+        where => {
+            %base_conditions,
+            status   => 'ISSUED',
+            notafter => { '<' => $valid_at },
+        },
+    );
+
+    # Upcoming
+    $do_count->('total_upcoming', 'identifier',
+        where => {
+            %base_conditions,
+            status    => 'ISSUED',
+            notbefore => { '>' => $valid_at },
+        },
+    );
+
+    # Valid
+    $do_count->('valid_count', 'identifier',
+        where => {
+            %base_conditions,
+            status    => 'ISSUED',
+            notbefore => { '<' => $valid_at },
+            notafter  => { '>' => $valid_at },
+        },
+    );
+
+    # Valid distinct
+    $do_count->('valid_distinct', 'DISTINCT subject',
+        where => {
+            %base_conditions,
+            status    => 'ISSUED',
+            notbefore => { '<' => $valid_at },
+            notafter  => { '>' => $valid_at },
+        },
+    );
+
+    # Valid by profile
+    if (!$by_issuer) {
+        my $tuple = $db->select_arrays(
+            from_join => 'certificate {req_key=req_key,pki_realm=pki_realm} csr',
+            columns   => [ 'profile', 'COUNT(identifier)|amount' ],
+            where     => {
+                %base_conditions,
+                status    => 'ISSUED',
+                notbefore => { '<' => $valid_at },
+                notafter  => { '>' => $valid_at },
+            },
+            group_by => 'csr.profile',
+        );
+        ##! 1: $tuple
+        $result->{by_profile} = { map { $_->[0] => $_->[1] } @{$tuple} };
+    } else {
+        my $tuple = $db->select_arrays(
+            from_join => 'certificate {req_key=req_key,pki_realm=pki_realm} csr',
+            columns   => [ 'certificate.issuer_identifier', 'profile', 'COUNT(identifier)|amount' ],
+            where     => {
+                %base_conditions,
+                status    => 'ISSUED',
+                notbefore => { '<' => $valid_at },
+                notafter  => { '>' => $valid_at },
+            },
+            group_by => [ 'certificate.issuer_identifier', 'csr.profile' ],
+        );
+        for my $row (@$tuple) {
+            $result->{$row->[0]}{by_profile}{$row->[1]} = $row->[2] + 0;
+        }
+    }
 
     # Near expiry
     my $expiry_cutoff = OpenXPKI::DateTime::get_validity({
-        REFERENCEDATE => $ref_date,
-        VALIDITY => $params->near_expiry,
+        REFERENCEDATE  => $ref_date,
+        VALIDITY       => $params->near_expiry,
         VALIDITYFORMAT => 'detect',
     })->epoch();
 
-    $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(identifier)|amount' ],
+    $do_count->('near_expiry', 'identifier',
         where => {
             %base_conditions,
-            status => 'ISSUED',
-            notafter  => { -between => [ $valid_at, $expiry_cutoff  ] },
-        }
+            status   => 'ISSUED',
+            notafter => { -between => [ $valid_at, $expiry_cutoff ] },
+        },
     );
-    $result->{near_expiry} = sprintf "%01d", $tuple->{amount} + 0;
-
 
     # Recent expiry
     $expiry_cutoff = OpenXPKI::DateTime::get_validity({
-        REFERENCEDATE => $ref_date,
-        VALIDITY => $params->recent_expiry,
+        REFERENCEDATE  => $ref_date,
+        VALIDITY       => $params->recent_expiry,
         VALIDITYFORMAT => 'detect',
     })->epoch();
 
-    $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(identifier)|amount' ],
+    $do_count->('recent_expiry', 'identifier',
         where => {
             %base_conditions,
-            status => 'ISSUED',
-            notafter  => { -between => [ $expiry_cutoff, $valid_at ] },
-        }
+            status   => 'ISSUED',
+            notafter => { -between => [ $expiry_cutoff, $valid_at ] },
+        },
     );
-    $result->{recent_expiry} = sprintf "%01d", $tuple->{amount};
 
+    # Recent renewal
     $expiry_cutoff = OpenXPKI::DateTime::get_validity({
-        REFERENCEDATE => $ref_date,
-        VALIDITY => $params->recent_renewal,
+        REFERENCEDATE  => $ref_date,
+        VALIDITY       => $params->recent_renewal,
         VALIDITYFORMAT => 'detect',
     })->epoch();
 
-    $tuple = $db->select_one(
-        from_join => 'certificate certificate.identifier=identifier certificate_attributes|ca',
-        columns  => [ 'COUNT(certificate.identifier)|amount' ],
-        where => {
-            %base_conditions,
-            notafter  => { -between => [ $expiry_cutoff, $valid_at ] },
-            attribute_contentkey => 'system_renewal_cert_identifier',
-        }
-    );
-    $result->{recent_renewed} = sprintf "%01d", $tuple->{amount};
+    if (!$by_issuer) {
+        my $tuple = $db->select_one(
+            from_join => 'certificate certificate.identifier=identifier certificate_attributes|ca',
+            columns   => [ 'COUNT(certificate.identifier)|amount' ],
+            where     => {
+                %base_conditions,
+                notafter             => { -between => [ $expiry_cutoff, $valid_at ] },
+                attribute_contentkey => 'system_renewal_cert_identifier',
+            }
+        );
+        $result->{recent_renewed} = sprintf "%01d", $tuple->{amount};
+    } else {
+        my $rows = $db->select_arrays(
+            from_join => 'certificate certificate.identifier=identifier certificate_attributes|ca',
+            columns   => [ 'certificate.issuer_identifier', 'COUNT(certificate.identifier)|amount' ],
+            where     => {
+                %base_conditions,
+                notafter             => { -between => [ $expiry_cutoff, $valid_at ] },
+                attribute_contentkey => 'system_renewal_cert_identifier',
+            },
+            group_by => 'certificate.issuer_identifier',
+        );
+        $result->{$_->[0]}{recent_renewed} = $_->[1] + 0 for @$rows;
+    }
 
     return $result;
 
