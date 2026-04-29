@@ -40,7 +40,7 @@ sub _evaluate
     } elsif (ref $value eq 'ARRAY') {
 
         condition_error('trueish value is empty list')
-            unless(scalar (keys $value->@*));
+            unless(scalar $value->@*);
 
     } else {
 
