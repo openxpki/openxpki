@@ -245,6 +245,7 @@ coerce 'ArrayRefOrCommaList',
 
 
 =head2 ConfigPath
+
 =cut
 
 subtype 'ConfigPath',
@@ -264,6 +265,17 @@ subtype 'PKIRealm',
     as 'Str';
     where { $_ =~ qr{ \A [ \w \- \. ]* \z }xms },
     message { sprintf "'%s' is not a valid realm name", ($_ ? "'$_'" : '<undef>') };
+
+
+=head2 RelativeDate
+
+A relative datetime spec for OpenXPKI::DateTime
+
+=cut
+subtype 'RelativeDate',
+    as 'Str';
+    where { $_ =~ qr{ \A [+\-](\d\d){1,6} \z }xms },
+    message { sprintf "'%s' is not a valid relative date", ($_ ? "'$_'" : '<undef>') };
 
 =head2 Tenant
 =cut
