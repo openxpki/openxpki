@@ -87,23 +87,17 @@ command "render_yaml_template" => {
     my $log = CTX('log')->system;
     my $oxtt = OpenXPKI::Template->new({ trim_whitespaces => 0 });
 
-    my $yaml;
-    my $has_head;
-    # if template does not start with a word character we add a top level
-    # node to make it a valid and parsable YAML document
-    if ($params->template =~ m{\A\w}) {
-        $yaml = $params->template;
-    } else {
-        $yaml = "OXI_PLACEHOLDER:\n" . $params->template;
-        $has_head = 1;
-    }
-
-    my $result = $oxtt->render($yaml, $params->params);
+    my $result = $oxtt->render($params->template, $params->params);
 
     ##! 64: 'Rendered YAML template: ' . $result
     $log->debug('Rendered YAML template: ' . $result);
 
     return unless($result);
+
+    # Some older YAML parsers might choke on documents that start with a list
+    # or unclean indent on first line - to avoid this we always add the
+    # document separator on top of the rendered output
+    $result = "---\n$result" unless (substr($result,0,3) eq '---');
 
     my $doc;
     my $value;
@@ -117,7 +111,6 @@ command "render_yaml_template" => {
         );
     }
 
-    $value = $value->{OXI_PLACEHOLDER} if ($has_head);
     $log->trace('Parsed Perl structure: ' . Dumper($value)) if $log->is_trace;
     ##! 64: 'Parsed Perl structure: ' . Dumper($value)
     return $value;
