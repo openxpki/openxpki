@@ -26,6 +26,7 @@ sub reset {
             bedroom          => undef,
             terminal         => undef,
             metrics          => undef,
+            ser              => undef,
 
             # user-settable
             api            => undef,

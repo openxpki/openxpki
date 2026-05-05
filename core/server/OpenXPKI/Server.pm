@@ -571,7 +571,7 @@ sub __init_server {
         # we need to get a usable logger as soon as possible, hence:
         # initialize configuration, i18n and log
         OpenXPKI::Server::Init::init({
-            TASKS  => [ 'config_versioned', 'i18n', 'log' ],
+            TASKS  => [ 'config_versioned', 'i18n', 'log', 'serializer' ],
             SILENT => $self->{SILENT},
         });
 

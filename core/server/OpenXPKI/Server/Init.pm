@@ -26,6 +26,7 @@ use OpenXPKI::Server::Log::CLI;
 use OpenXPKI::Server::Notification::Handler;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Workflow::Handler;
+use OpenXPKI::Serialization::Simple;
 
 # define an array of hash refs mapping the task id to the corresponding
 # init code. the order of the array elements is also the default execution
@@ -48,6 +49,7 @@ my @INIT_TASKS = qw(
   server
   bedroom
   terminal
+  serializer
 );
 #
 
@@ -418,6 +420,14 @@ sub __do_init_metrics {
         'metrics' => $metrics
     });
 }
+
+sub __do_init_serializer {
+    ##! 1: "init serializer"
+    OpenXPKI::Server::Context::setcontext({
+        'ser' => OpenXPKI::Serialization::Simple->new()
+    });
+}
+
 
 ###########################################################################
 
