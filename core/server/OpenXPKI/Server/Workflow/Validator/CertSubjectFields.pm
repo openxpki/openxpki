@@ -6,6 +6,7 @@ extends 'OpenXPKI::Server::Workflow::Validator';
 use Workflow::Exception qw( validation_error );
 use Template;
 
+use OpenXPKI::Workflow::Field;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Serialization::Simple;
 
@@ -45,59 +46,23 @@ sub _validate {
     foreach my $field (@$fields) {
 
         my $name = $field->{name};
-        my $min = $field->{min} || 0;
-        my $max = $field->{max} || 0;
-        my $match = $field->{match} || '';
-        my $clonable =  $field->{clonable} || 0;
+        my $obj = OpenXPKI::Workflow::Field->new(
+            field => $field,
+            path => [],
+        );
 
-        my @value;
-        if ( !defined $subject_parts->{ $name } ) {
-            # noop
-        } elsif (ref $subject_parts->{ $name } eq 'ARRAY') {
-            @value = @{$subject_parts->{ $name }};
-        } elsif ( $subject_parts->{ $name } ne '' ) {
-            @value = ( $subject_parts->{ $name } );
-        }
+        my @errors = $obj->validate($subject_parts->{ $name });
 
         # remove from hash to see if all was check
         delete $subject_parts->{ $name };
 
-        # we need to form field name in the json reply
-        $name = sprintf "%s{%s}", $basename, $name if $basename; # search tag: #wf_fields_with_sub_items
-
-        # if the field is a cloneable, the name ends on square brackets
-        if ($clonable) {
-            $name .= '[]';
+        if (@errors && $basename) {
+            # upgrade the name field with the basename
+            $name = sprintf "%s{%s}", $basename, $name;
+            @errors = map { $_->{name} = $name; $_ } @errors;
         }
+        push @fields_with_error, @errors;
 
-        my @nonempty = grep { (defined $_ && $_ ne '') } @value;
-        if (@nonempty < $min) {
-            push @fields_with_error, { name => $name, min => $min,
-                error => 'I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_LESS_THAN_MIN_COUNT' };
-            next FIELD;
-        }
-
-        if ($max && $max < scalar @nonempty) {
-            # push an error to the fields that need to be removed
-            my $ii = scalar @nonempty;
-            do {
-                push @fields_with_error, { name => $name, max => $max, index => --$ii,
-                    error => 'I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_MAX_COUNT_EXCEEDED' };
-            } while ($ii > $max);
-            next FIELD;
-        }
-
-        if ($match) {
-            my $ii = 0;
-            foreach my $val (@nonempty) {
-                if ($val ne '' && $val !~ m{$match}xs) {
-                    # should be a bit smarter to highlight the right one
-                    push @fields_with_error, { name => $name,
-                        error => 'I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_FAILED_REGEX', index => $ii };
-                }
-                $ii++;
-            }
-        }
     }
 
     foreach my $name (keys %$subject_parts) {

@@ -7,7 +7,8 @@ use OpenXPKI::Server::Context qw( CTX );
 has 'config' => (
     is => 'rw',
     isa => 'Connector',
-    required => 1,
+    lazy => 1,
+    default => sub { CTX('config') },
 );
 
 has 'path' => (
@@ -169,14 +170,17 @@ for placeholder, etc.) to get a definition that matches workflow fields.
 
 =cut
 sub transform_profile_field ($self) {
-    $self->log->trace("Field '".$self->field->{id}."': profile spec = " . Dumper $self->field) if $self->log->is_trace;
+
+    my $name = $self->field->{name} // $self->field->{id};
+
+    $self->log->trace("Field '$name': profile spec = " . Dumper $self->field) if $self->log->is_trace;
 
     # type "freetext" -> "text"
     $self->field->{type} = 'text' if ($self->field->{type} // '') eq 'freetext';
 
     # id -> name
-    my $id = delete $self->field->{id};
-    $self->field->{name} = $id;
+    $self->field->{name} ||= $self->field->{id};
+    delete $self->field->{id};
 
     # renewal option
     $self->field->{renew} //= 'preset';
@@ -194,7 +198,70 @@ sub transform_profile_field ($self) {
     # support legacy usage of "description" for "tooltip"
     $self->field->{tooltip} //= $self->field->{description} if $self->field->{description};
 
-    $self->log->trace("Field '$id': transformed to wf spec = " . Dumper $self->field) if $self->log->is_trace;
+    $self->log->trace("Field '$name': transformed to wf spec = " . Dumper $self->field) if $self->log->is_trace;
+}
+
+=head2 validate
+
+Expect a value for the field which can be either a scalar or a list ref.
+
+The method checks if the number of arguments matches min/max/required and
+validates the values against a given regex (via match)
+
+=cut
+sub validate($self, $value) {
+
+    my $field = $self->field;
+    my $name = $field->{name};
+    my $min = $field->{min} || 0;
+    my $max = $field->{max} || 0;
+    my $required = $field->{required} || 0;
+    my $match = $field->{match} || '';
+
+    my @value;
+    if ( !defined $value ) {
+        # noop
+    } elsif (ref $value eq 'ARRAY') {
+        @value = @{$value};
+    } elsif ( $value ne '' ) {
+        @value = ( $value );
+    }
+
+    my @fields_with_error;
+
+    my @nonempty = grep { (defined $_ && $_ ne '') } @value;
+
+    if (@nonempty < $min) {
+        push @fields_with_error, { name => $name, min => $min,
+            error => 'I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_LESS_THAN_MIN_COUNT' };
+
+    } elsif ($max && $max < scalar @nonempty) {
+        # push an error to the fields that need to be removed
+        my $ii = scalar @nonempty;
+        do {
+            push @fields_with_error, { name => $name, max => $max, index => --$ii,
+                error => 'I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_MAX_COUNT_EXCEEDED' };
+        } while ($ii > $max);
+    }
+
+    if ($required && @nonempty == 0) {
+        push @fields_with_error, { name => $name,
+            error => 'I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_REQUIRED_BUT_EMPTY' };
+    }
+
+    if ($match) {
+        my $ii = 0;
+        foreach my $val (@nonempty) {
+            if ($val ne '' && $val !~ m{$match}xs) {
+                # should be a bit smarter to highlight the right one
+                push @fields_with_error, { name => $name,
+                    error => 'I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_FAILED_REGEX', index => $ii };
+            }
+            $ii++;
+        }
+    }
+
+    return @fields_with_error;
 }
 
 __PACKAGE__->meta->make_immutable;
