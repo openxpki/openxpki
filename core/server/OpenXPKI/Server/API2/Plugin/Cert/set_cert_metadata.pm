@@ -50,7 +50,7 @@ exception.
 
 =item merge
 
-Add the new value(s) if they does not already exists, will work with
+Add the new value(s) if they do not already exists, will work with
 scalars and arrays regardless of the existing data.
 
 =back

@@ -21,6 +21,7 @@ export the methods, you need to address them with the plugin name, e.g.
 =cut
 
 use OpenXPKI::Server::Context qw( CTX );
+use YAML::PP;
 
 =head2 get(prefix, value, suffix)
 
@@ -83,6 +84,65 @@ sub get_hash {
 }
 
 
+=head2 hash_to_unilist(section, content)
+
+Transforms the fields of a metadata section into a hash that will render
+as I<unilist>.
+
+C<section> is the section name (e.g. C<owner>, C<entity>).
+C<content> is a HashRef with the field values from the workflow context.
+
+Only fields with a defined value are included. Field order follows the section
+definition in the metadata catalog.
+
+    [% USE Metadata; Metadata.hash_to_unilist('owner', metadata_owner) %]
+
+=cut
+
+sub hash_to_unilist {
+
+    my $self    = shift;
+    my $section = shift;
+    my $content = shift;
+
+    return unless ($section && ref $content eq 'HASH');
+
+    my $fields = CTX('api2')->get_metadata_definition(
+        section => $section, values => $content
+    );
+    return unless @$fields;
+
+    my @result;
+    for my $field (@$fields) {
+        my $value = $content->{$field->{name}};
+        next unless defined $value;
+        next if (ref $value eq 'ARRAY' && !scalar $value->@*);
+
+        # for select fields the value of the selected item (if any)
+        # is set in the field by the preprocessing
+        if (defined $field->{value}) {
+            $value = $field->{value};
+
+        # Items can define a template for visualization
+        } elsif (defined $field->{template}) {
+            $value = CTX('api2')->render_template(
+                template => $field->{template},
+                params => { value => $value },
+            );
+            next if($value eq '');
+
+        }
+
+        push @result, {
+            label => $field->{label} || $field->{name},
+            value => $value,
+        };
+    }
+
+    return YAML::PP->new->dump_string(\@result);
+}
+
+
 =head2 creator(userid)
 
 Split the given userid into namespace and user and call
@@ -100,7 +160,6 @@ I<system> the literal name is returned.
 =cut
 
 sub creator {
-
     my $self = shift;
     my $creator = shift;
 
