@@ -4,6 +4,7 @@ use OpenXPKI;
 use Workflow::Exception qw( configuration_error );
 
 use OpenXPKI::Serialization::Simple;
+use OpenXPKI::Server::Context qw( CTX );
 
 =head2 get_service_config_path
 
@@ -56,29 +57,111 @@ sub get_service_config_path {
 
 }
 
-=head2 get_value_from_context
+=head2 get_param_from_template
 
-Helper to fetch a value from the context.
+Helper to parse a _map parameter pattern into a value
 
-Deserialised the value in case it is an object.
+Will handle dollar-sign notation for context values and
+template strings.
+
+Templates are parsed with input parameters set to
+
+  {
+    context => { full workflow context },
+    workflow => {
+      id => id of current workflow
+    },
+    session => {
+      user => session user
+      role => session role
+      userinfo => userinfo hash from session
+      pki_realm => current session pki_realm
+    },
+    hostname => node hostname
+  }
+
+You can pass additional template params as third argument
 
 =cut
 
-sub get_value_from_context {
+sub get_param_from_template {
 
     my $workflow_class = shift;
-    my $ctxkey = shift;
+    my $args = shift;
+    my $extra = shift || {};
 
-    my $ctx = $workflow_class->workflow()->context()->param( $ctxkey );
-    if (!defined $ctx || $ctx eq '') {
-        return $ctx;
+    # We also support arrays or hashes here so we put the resolver into a sub
+    my $resolve = sub {
+        my $template = shift;
+        if ($template =~ m{\A\$(\S+?)(\.(\S+))?\z}) {
+            my $ctxkey = $1;
+            my $subkey = $3 || '';
+            ##! 16: 'load from context ' . $ctxkey . ' subkey: ' .$subkey
+            my $ctx = $workflow_class->workflow()->context()->param( $ctxkey );
+            if (!defined $ctx || $ctx eq '') {
+                return $ctx;
+            }
+            if ($subkey) {
+                if (ref $ctx eq 'HASH') {
+                    return $ctx->{$subkey};
+                } elsif (ref $ctx eq 'ARRAY' && $subkey =~ /\A\d+\z/) {
+                    return $ctx->[$subkey];
+                } else {
+                    configuration_error("Subkey requested from _map but value is of wrong data type",
+                        template => $template);
+                }
+            } else {
+                return $ctx;
+            }
+        }
+
+        # if it has no template sequence its a literal value
+        if ($template !~ m{\[%}) {
+            ##! 16: 'no template sequence - return as is: ' . $template
+            return $template;
+        }
+
+        ##! 16: 'parse using tt ' . $template
+        my $oxtt = OpenXPKI::Template->new();
+        my $out = $oxtt->render( $template, {
+            %$extra,
+            context => $workflow_class->workflow()->context()->param(),
+            workflow => {
+                id => $workflow_class->workflow()->{id}
+            },
+            session => {
+                user => CTX('session')->data->user,
+                role => CTX('session')->data->role,
+                userinfo => CTX('session')->data->userinfo,
+                pki_realm => CTX('session')->data->pki_realm
+            },
+            hostname => CTX('config')->hostname,
+        });
+    };
+
+
+    if (ref $args eq '') {
+        return $resolve->($args);
     }
-    if (OpenXPKI::Serialization::Simple::is_serialized($ctx)) {
-        ##! 32: ' needs deserialize '
-        my $ser  = OpenXPKI::Serialization::Simple->new();
-        $ctx = $ser->deserialize( $ctx );
+
+    if (ref $args eq 'ARRAY') {
+        my @res = map {
+            my $v = $resolve->($_);
+            $v ne '' ? $v : ();
+        } $args->@*;
+        ##! 64:  \@res
+        return \@res;
+
     }
-    return $ctx;
+
+    if (ref $args eq 'HASH') {
+        my %res = map {
+            my $v = $resolve->($args->{$_});
+            $v ne '' ? ($_ => $v) : ();
+        } keys $args->%*;
+        ##! 64:  \%res
+        return \%res;
+    }
 
 }
 

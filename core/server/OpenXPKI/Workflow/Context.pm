@@ -64,10 +64,21 @@ sub param {
         # syntax available in our application
         return $self->SUPER::param({ $name => undef });
 
+    } elsif ($name) {
+
+        ##! 16: 'query for single parameter'
+        my $val = scalar $self->SUPER::param( $name );
+
+        return CTX('ser')->deserialize($val)
+            if (OpenXPKI::Serialization::Simple::is_serialized($val));
+
+        return $val;
+
     } else {
 
         ##! 16: 'Call without value'
-        return scalar $self->SUPER::param( @_ );
+        return scalar $self->SUPER::param( $name );
+
     }
 
 }

@@ -168,53 +168,7 @@ sub param {
         return unless ($map->{$name});
         ##! 16: 'query for mapped key ' . $name
 
-        my $template = $map->{$name};
-        # shortcut for single context value
-        if ($template =~ m{\A\$(\S+?)(\.(\S+))?\z}) {
-            my $ctxkey = $1;
-            my $subkey = $3 || '';
-            ##! 16: 'load from context ' . $ctxkey . ' subkey: ' .$subkey
-            my $ctx = $self->workflow()->context()->param( $ctxkey );
-            if (!defined $ctx || $ctx eq '') {
-                return $ctx;
-            }
-            if (OpenXPKI::Serialization::Simple::is_serialized($ctx)) {
-                ##! 32: ' needs deserialize '
-                my $ser  = OpenXPKI::Serialization::Simple->new();
-                $ctx = $ser->deserialize( $ctx );
-            }
-            if ($subkey) {
-                if (ref $ctx eq 'HASH') {
-                    return $ctx->{$subkey};
-                } elsif (ref $ctx eq 'ARRAY' && $subkey =~ /\A\d+\z/) {
-                    return $ctx->[$subkey];
-                } else {
-                    configuration_error("Subkey requested from _map but value is of wrong data type");
-                }
-            } else {
-                return $ctx;
-            }
-        } else {
-
-            ##! 16: 'parse using tt ' . $template
-            my $oxtt = OpenXPKI::Template->new();
-            my $out = $oxtt->render( $template, {
-                context => $self->workflow()->context()->param(),
-                workflow => {
-                    id => $self->workflow()->{id}
-                },
-                session => {
-                    user => CTX('session')->data->user,
-                    role => CTX('session')->data->role,
-                    userinfo => CTX('session')->data->userinfo,
-                    pki_realm => CTX('session')->data->pki_realm,
-                },
-                hostname => CTX('config')->hostname,
-            });
-
-            ##! 32: 'tt result ' . $out
-            return $out;
-        }
+        return OpenXPKI::Server::Workflow::Helpers::get_param_from_template($self, $map->{$name});
     }
     return;
 }

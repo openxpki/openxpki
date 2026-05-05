@@ -17,7 +17,7 @@ sub _evaluate
 
     $self->log->info("Evaluate $key to be trueish");
 
-    my $value = $self->_from_context($key);
+    my $value = $self->workflow()->context()->param( $key );
     ##! 32: $value
 
     condition_error('trueish value is undefined') unless(defined $value);
