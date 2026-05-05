@@ -100,7 +100,7 @@ has is_privileged => (
 );
 
 my %internal_command_attributes = (
-    payload => { isa => 'ArrayRef[Str]' },
+    payload => { isa => 'ArrayRef[Str]|HashRef' },
     positional_args => { isa => 'ArrayRef[Str]' }
 );
 
