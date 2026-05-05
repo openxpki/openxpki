@@ -15,6 +15,7 @@ use PPI::Document;
 use YAML::PP;
 
 # Project modules
+use OpenXPKI::FileUtils;
 use OpenXPKI::i18n qw(set_language);
 use OpenXPKI::Client::API;
 use OpenXPKI::Client::API::Response;
@@ -152,7 +153,7 @@ my %opt = ('verbose' => \$verbose);
 # pass_through: anything unknown, ambiguous or invalid will be passed through to @ARGV
 Getopt::Long::Configure('pass_through','bundling');
 
-GetOptions( \%opt, ('verbose|v+','json','json-pretty','auth-key|k=s','auth-config|c=s','pass|p:s','no-auth','socket=s','out|o=s','help','version|V'));
+GetOptions( \%opt, ('verbose|v+','json','json-pretty','auth-key|k=s','auth-config|c=s','pass|p:s','no-auth','socket=s','out|o=s','help','version|V','payload=s'));
 
 if ($opt{version}) {
     if (!Mojo::Loader::load_class('OpenXPKI::Enterprise::VERSION')) {
@@ -265,7 +266,25 @@ catch ($error) {
 
 # reserved internal command parameters
 $params{positional_args} = \@extra_args if @extra_args;
-$params{payload} = \@ARGV if @ARGV;
+
+# params can be passed as JSON blob - overrides any command line key=value items
+if ($opt{payload}) {
+    LOGDIE('Given payload file is not readable: ' . $opt{payload})
+        unless (-r $opt{payload});
+
+    my $blob = OpenXPKI::FileUtils->new->read_file($opt{params});
+    try {
+        $params{payload} = decode_json($blob);
+    } catch ($error) {
+        LOGDIE('Unable to parse parameter file as JSON');
+    }
+
+    LOGDIE('Given parameter file does not contain a hash')
+        unless(ref $params{payload} eq 'HASH');
+
+} elsif (@ARGV) {
+    $params{payload} = \@ARGV;
+}
 
 # TODO - Review if there is a better place for this
 my %auth_args;
@@ -402,7 +421,7 @@ if ($res->state == 200) {
 
 Manage OpenXPKI instances and artefacts:
 
-    %%SCRIPT%% COMMAND [SUBCOMMAND] [OPTIONS] PARAMETERS
+    %%SCRIPT%% COMMAND [SUBCOMMAND] [OPTIONS] PARAMETERS [-- COMMAND PAYLOAD]
 
 Show detailed help on a command or subcommand:
 
@@ -432,6 +451,12 @@ Print output data as compact JSON structure.
 =item --json-pretty
 
 Print output data as formated JSON structure.
+
+=item --payload
+
+Path to a file holding a JSON formatted hash used as PAYLOAD to the command.
+
+This disables reading payload arguments from the command line.
 
 =item --out|o
 
@@ -468,6 +493,33 @@ Do not authenticate even if a login key/config was found.
 Location of the socket to connect to the server.
 
 Default /run/openxpkid/openxpkid.sock
+
+=back
+
+=head1 PARAMETERS
+
+Most commands expect additional parameters, those must be given after the
+main options using I<--key=value>. Parameters and expected values are available
+via the help on each command.
+
+=head1 COMMAND PAYLOAD
+
+Some commands such as the I<api> or I<workflow> subcommand required additional
+parameters which are handed over to the executed action. Those parameters can
+be given in two different ways.
+
+=over
+
+=item
+
+Finish the command using two isolated dashes I<--> and put each parameter
+as I<key=value> after it. Boolean parameter can be given by the parameter name
+alone, e.g. I<force>.
+
+=item
+
+Put the parameters hash into a file using JSON format and specify the path to
+this file with I<--payload command_payload.json>.
 
 =back
 

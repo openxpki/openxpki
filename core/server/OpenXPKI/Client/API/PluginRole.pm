@@ -30,10 +30,30 @@ sub hint_realm ($self, $input_params) {
     return [ map { $_->{name} } ($realms->result || [])->@* ] ;
 }
 
+=head2 build_hash_from_payload I<param> I<allow_bool>
+
+Parse the payload part given to the command into a hash structure.
+
+Expects the I<param> hash of the command, not the payload argument itself!
+
+The I<payload> can either be array ref holding strings of key=value or a
+hash with the keys on the first level.
+
+If I<allow_bool> is set, single words (in array mode) are considered to be a
+boolean true value.
+
+=cut
+
 sub build_hash_from_payload ($self, $param, $allow_bool = 0) {
     return {} unless $param->has_payload;
 
+    # if payload is injected from JSON it is already the expected structure
+    if (ref $param->payload eq 'HASH') {
+        return $param->payload;
+    }
+
     my %result;
+    # payload is a list of "key=value" strings or just "key" for boolean items
     foreach my $arg ($param->payload->@*) {
         my ($key, $val) = split('=', $arg, 2);
         $val = 1 if (not defined $val and $allow_bool);
