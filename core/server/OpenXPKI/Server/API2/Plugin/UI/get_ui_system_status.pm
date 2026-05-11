@@ -26,7 +26,8 @@ Returns a I<HashRef> with informations about critical items of the system:
         worker          => 2,       # worker process count
         workflow        => 1,       # workflow process count
         version         => '...'    # OpenXPKI version string
-        hostname        => oxi-test # Name of the host (from sys::hostname)
+        hostname        => oxi-test # Name of the host (from config)
+        node_id         => node1    # Name of the node (from config)
         config          => { version => .. } # key/values from system.version
     }
 
@@ -72,7 +73,7 @@ command "get_ui_system_status" => {
         worker          => scalar @{$pids->{$OpenXPKI::Defaults::PROC_NAME_WORKER}},
         workflow        => scalar @{$pids->{$OpenXPKI::Defaults::PROC_NAME_WORKFLOW}},
         version         => $OpenXPKI::VERSION::VERSION,
-        hostname        => hostname,
+        hostname        => CTX('config')->hostname,
         node_id         => CTX('config')->node_id,
         config          => $config
     };
