@@ -41,8 +41,9 @@ sub BUILD {
     my $kid2role = {};
     my @keys = CTX('config')->get_keys(['system','cli','auth']);
 
-    my @key_list = map {
-        my $item = CTX('config')->get_hash(['system','cli','auth',$_]);
+    my @key_list;
+    for my $name (@keys) {
+        my $item = CTX('config')->get_hash(['system','cli','auth',$name]);
         next unless ($item->{key});
 
         # key can be given as regular PEM or base64 encoded DER without headers
@@ -54,8 +55,8 @@ sub BUILD {
         $jwk_hash->{kid} = $pubkey->export_key_jwk_thumbprint();
         $kid2role->{$jwk_hash->{kid}} = $item->{role} || '_System';
         $jwk_hash->{name} = $_;
-        $jwk_hash;
-    } @keys;
+        push @key_list, $jwk_hash;
+    };
 
     $self->kid_list(\@key_list);
     $self->kid2role($kid2role);

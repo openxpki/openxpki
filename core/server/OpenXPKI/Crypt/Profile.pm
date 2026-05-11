@@ -203,7 +203,7 @@ sub add_custom_oid {
     # remainder is the section content, likely including addtional section
     # headers. We try to detect this here and do some basic validation.
     # CAVEAT: this might not be compatible with anything our customers did
-    if (ref $ext->{value} eq '' && $ext->{value} ne '') {
+    if (defined $ext->{value} && ref $ext->{value} eq '' && $ext->{value} ne '') {
         $dto = OpenXPKI::Crypt::Profile::DTO::CustomOid->new(
             oid      => $oid,
             critical => $ext->{critical} ? 1 : 0,
