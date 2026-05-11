@@ -93,6 +93,15 @@ has subject_hash => (
     }
 );
 
+has cert_subject_parts => (
+    is => 'ro',
+    init_arg => undef,
+    isa => 'HashRef',
+    lazy => 1,
+    reader => 'get_cert_subject_parts',
+    builder => '_build_cert_subject_parts_hash'
+);
+
 =head2
 
 Returns a pointer to a list of SANs. Each SAN is represented as a pointer to a list
@@ -454,6 +463,20 @@ sub _get_validity {
         DATE      => $date,
         OUTFORMAT => $format,
     });
+}
+
+sub _build_cert_subject_parts_hash {
+    my $self = shift;
+    my $hash = $self->subject_hash();
+
+    my $sans = $self->get_subject_alt_name();
+    for my $san ($sans->@*) {
+        my ($type, $value) = $san->@*;
+        $type = 'SAN_'.uc($type);
+        $hash->{$type} = [] unless(defined $hash->{$type});
+        push @{$hash->{$type}}, $value;
+    }
+    return $hash;
 }
 
 sub _to_db_hash {
