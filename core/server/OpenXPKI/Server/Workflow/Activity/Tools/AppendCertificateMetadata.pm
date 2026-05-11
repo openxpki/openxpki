@@ -1,3 +1,4 @@
+# TODO - should be renamed to PersistCertificateMetadata
 package OpenXPKI::Server::Workflow::Activity::Tools::AppendCertificateMetadata;
 use OpenXPKI -base => 'OpenXPKI::Server::Workflow::Activity';
 
@@ -25,8 +26,8 @@ sub execute {
         configuration_error('Invalid mode ' . $mode);
     }
 
+    my $attr = $self->param('metadata');
 
-    my $attr;
     foreach my $key (keys %{$params}) {
         next unless($key =~ /^meta_(.*)/);
         $attr->{$1} = $params->{$key};
@@ -57,19 +58,35 @@ Add arbitrary key/value items as certificate metadata.
 
 The activitiy will exit silently if cert_identifier is not set.
 
-=head2 Configuration
+=head1 Configuration
 
-    class: OpenXPKI::Server::Workflow::Activity::Tools::AppendCertificateMetadata
-    param:
-       cert_identifier: 0utS7yqMTAy2DLIufyJvoc2GSCs
-       mode: overwrite
-       meta_new_attribute: my_value
+=head2 Individual parameters
+
+  class: OpenXPKI::Server::Workflow::Activity::Tools::AppendCertificateMetadata
+  param:
+    cert_identifier: 0utS7yqMTAy2DLIufyJvoc2GSCs
+    mode: overwrite
+    meta_new_attribute: my_value
 
 This will attach a new metadata item with the key meta_new_attribute and
 value my_value for the given identifier. This information does not depend
 on any metadata settings in the certificates profile!
 
 You can pass multiple attributes prefixed with I<meta_>, the value can
-either be a scalar value or an array. The value hash and the mode will
-passed to I<set_cert_metadata>, check there for the modes and their
-prerequisites.
+either be a scalar value or an array. The value hash and the mode will passed
+to I<set_cert_metadata>, check there for the modes and their prerequisites.
+
+=head2 Passthru parameter
+
+You can also pass a prepared hash with the field name (without the I<meta_>
+prefix) and the values directly as parameter I<metadata>.
+
+  class: OpenXPKI::Server::Workflow::Activity::Tools::AppendCertificateMetadata
+  param:
+    cert_identifier: 0utS7yqMTAy2DLIufyJvoc2GSCs
+    mode: overwrite
+    metadata:
+      new_attribute: my_value
+
+Both modes can be combined, the I<metadata> has is loaded first, and
+individual parameters of the same name will overwrite existing ones.
