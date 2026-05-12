@@ -2,11 +2,10 @@ package OpenXPKI::Service::CLI;
 use OpenXPKI -class;
 with 'OpenXPKI::ServiceRole';
 
-use List::Util qw( first );
-
 use Crypt::JWT qw(decode_jwt);
 use Crypt::PK::ECC;
-use MIME::Base64 qw(decode_base64);
+use MIME::Base64 qw(decode_base64 decode_base64url);
+use JSON qw(decode_json);
 
 use Sys::SigAction qw( sig_alarm set_sig_handler );
 
@@ -24,7 +23,7 @@ use Log::Log4perl::MDC;
 
 has 'kid_list' => (
     is => 'rw',
-    isa => 'ArrayRef',
+    isa => 'HashRef',
     init_arg => undef,
 );
 
@@ -39,9 +38,9 @@ sub BUILD {
     my $self = shift;
 
     my $kid2role = {};
+    my $kid_list = {};
     my @keys = CTX('config')->get_keys(['system','cli','auth']);
 
-    my @key_list;
     for my $name (@keys) {
         my $item = CTX('config')->get_hash(['system','cli','auth',$name]);
         next unless ($item->{key});
@@ -54,11 +53,10 @@ sub BUILD {
         my $jwk_hash = $pubkey->export_key_jwk('public', 1);
         $jwk_hash->{kid} = $pubkey->export_key_jwk_thumbprint();
         $kid2role->{$jwk_hash->{kid}} = $item->{role} || '_System';
-        $jwk_hash->{name} = $_;
-        push @key_list, $jwk_hash;
+        $kid_list->{$jwk_hash->{kid}} = $jwk_hash;
     };
 
-    $self->kid_list(\@key_list);
+    $self->kid_list($kid_list);
     $self->kid2role($kid2role);
 
 };
@@ -115,15 +113,29 @@ sub run {
         my $response;
         try {
 
-            my ($header, $payload) = decode_jwt( token => $msg, kid_keys => { keys => $self->kid_list },
-                decode_header => 1, decode_payload => 0, allow_none => 1 );
+            my ($header_b64) = split /\./, $msg;
+            my $header = decode_json(decode_base64url($header_b64));
 
-            if ($header->{alg} eq 'none') {
+            if (($header->{alg} // '') eq 'none') {
                 ##! 8: 'Regular command'
                 $response = $self->_process_regular_command($msg);
             } else {
                 ##! 8: 'Operator command'
-                $response = $self->_process_operator_command($msg);
+                my $kid = $header->{kid}
+                    or OpenXPKI::Exception->throw(message => 'JWT has no kid header');
+
+                CTX('log')->auth()->error('Key list for authentication is empty')
+                    unless (keys $self->kid_list()->%* > 0);
+
+                my $key = $self->kid_list->{$kid}
+                    or do {
+                        OpenXPKI::Exception->throw(
+                            message => "Unknown JWT key identifier (kid: $kid)"
+                        );
+                    };
+                CTX('log')->auth()->info(sprintf('Got cli connection with key %s using role %s',$kid, $key->{role}));
+
+                $response = $self->_process_operator_command($msg, $key);
             }
 
         } catch ($error) {
@@ -180,8 +192,9 @@ sub _process_operator_command {
 
     my $self  = shift;
     my $msg   = shift;
+    my $key   = shift;
 
-    my ($header, $hash) = decode_jwt( token => $msg, kid_keys => { keys => $self->kid_list }, decode_header => 1 );
+    my ($header, $hash) = decode_jwt( token => $msg, key => $key, decode_header => 1 );
     ##! 64: $header
     $self->_init_session();
     my $kid = $header->{kid};
