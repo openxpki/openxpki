@@ -7,8 +7,7 @@ require overload;
 use Digest::MD5;
 use Digest::SHA qw( hmac_sha256_hex );
 use MIME::Base64;
-use Data::Dumper ();
-use Safe;
+use JSON;
 use Scalar::Util qw( reftype refaddr );
 use Carp;
 
@@ -455,57 +454,12 @@ sub _generate_id ($self) {
 #
 
 sub _freeze ($self, $data) {
-    my $d = Data::Dumper->new([$data], ['D']);
-    $d->Indent(0);
-    $d->Purity(1);
-    $d->Useqq(0);
-    $d->Deepcopy(0);
-    $d->Quotekeys(1);
-    $d->Terse(0);
-    return $d->Dump() . ';$D';
+    return encode_json($data);
 }
 
 sub _thaw ($self, $string) {
-    my ($safe_string) = $string =~ m/^(.*)$/s;
-    my $rv = Safe->new->reval($safe_string);
-    die "Couldn't deserialize session data: $@" if $@;
-    # Re-bless objects from Safe compartment to fix package namespaces
-    _rebless_from_safe($rv);
-    return $rv;
+    return decode_json($string);
 }
-
-# Walk a data structure and re-bless any objects that came from a Safe
-# compartment (their packages would otherwise point into Safe's namespace).
-# Uses old-style subs to preserve @_ aliasing semantics needed for in-place
-# modification of overloaded blessed references.
-sub _rebless_from_safe {
-    my %seen;
-    my @queue = _rebless_values(shift);
-    while (@queue) {
-        defined(my $x = shift @queue) or next;
-        $seen{ refaddr($x) || '' }++ and next;
-        my $r = reftype($x) or next;
-        if    ($r eq 'HASH')                  { push @queue, _rebless_values(@{$x}{keys %$x}) }
-        elsif ($r eq 'ARRAY')                 { push @queue, _rebless_values(@$x) }
-        elsif ($r eq 'SCALAR' || $r eq 'REF') { push @queue, _rebless_values($$x) }
-    }
-}
-
-sub _rebless_values {
-    for (@_) {
-        next unless blessed $_;
-        if (overload::Overloaded($_)) {
-            my $rt = reftype $_;
-            if    ($rt eq 'HASH')                   { $_ = bless { %$_ }, ref $_ }
-            elsif ($rt eq 'ARRAY')                  { $_ = bless [ @$_ ], ref $_ }
-            elsif ($rt eq 'SCALAR' || $rt eq 'REF') { $_ = bless \do { my $o = $$_ }, ref $_ }
-        } else {
-            bless $_, ref $_;
-        }
-    }
-    return @_;
-}
-
 
 #
 # Time parsing
@@ -608,7 +562,7 @@ sub _db_store ($self) {
         params => $self->params,
     });
     # Encrypt if configured
-    $datastr = encode_base64($self->crypt->encrypt($datastr)) if $self->crypt;
+    $datastr = encode_base64($self->crypt->encrypt($datastr),'') if $self->crypt;
 
     my $ip = ($self->log_ip && $ENV{REMOTE_ADDR}) ? $ENV{REMOTE_ADDR} : '';
     my $now = time();
