@@ -39,7 +39,7 @@ if you want to validate the key on your own, the fingerprint is::
 
 ```bash
     $ gpg --print-md sha256 Release.key (Updated 2025-05-16)
-    3FEB1721 48F53252 A6644B65 AD06304F 4751E129 510081E0 042E4E80 1175E3F8
+    1A944DEE E2E97122 3670A2BE 660BDC5D BD776498 5DC99B68 869E4187 C27BA772
 ```
 
 You can also find the key on the github repository in `package/debian/Release.key`.
