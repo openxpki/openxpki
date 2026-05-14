@@ -60,9 +60,11 @@ sub get_input_elements {
                     }
                 );
             # got a default item, create field using default
-            $input->{id} = $input_name;
             $input->{label} = $input_name;
         }
+
+        # ensure name attribute
+        $input->{name} //= $input->{id} //= $input_name;
 
         # convert keys to lower case
         my %lcinput = map { lc $_ => $input->{$_} } keys %{$input};
