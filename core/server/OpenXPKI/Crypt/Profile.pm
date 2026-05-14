@@ -430,19 +430,21 @@ sub _load_issuer_cert {
 }
 
 sub _config_scalar {
-    my ($self, $key) = @_;
+    my $self = shift;
+    my @path = @_;
     my $bp = $self->_profile_basepath;
     my $config = CTX('config');
-    return $config->get([@$bp, $key])
-        // $config->get([$bp->[0], 'default', $key]);
+    return $config->get([@$bp, @path ])
+        // $config->get([$bp->[0], 'default', @path ]);
 }
 
 sub _config_hash {
-    my ($self, $key) = @_;
+    my $self = shift;
+    my @path = @_;
     my $bp = $self->_profile_basepath;
     my $config = CTX('config');
-    return $config->get_hash([@$bp, $key])
-        // $config->get_hash([$bp->[0], 'default', $key]);
+    return $config->get_hash([@$bp, @path])
+        // $config->get_hash([$bp->[0], 'default', @path]);
 }
 
 sub _ext_basepath {

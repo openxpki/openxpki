@@ -169,6 +169,13 @@ sub build_config
         # PKCS#10 creation (no profile or CSR profile)
         push @config, $self->__get_req_section();
 
+    } elsif ($profile->isa('OpenXPKI::Crypt::Profile::SelfSigned')) {
+
+        push @config, $self->__get_selfsigned_section();
+        if (my @ext = $self->__get_cert_extensions('root_ext', $profile)) {
+            push @config, @ext;
+        }
+
     } elsif ($profile->isa('OpenXPKI::Crypt::Profile::Certificate')) {
 
         $self->__prepare_ca_files($profile);
@@ -367,6 +374,31 @@ sub __get_ca_section {
     }
 
     return @config;
+}
+
+
+################################
+##     Self-Signed section    ##
+################################
+
+sub __get_selfsigned_section
+{
+    ##! 4: "start"
+    my $self = shift;
+
+    my @req_dn = $self->__get_subject_dn();
+
+    @req_dn = ('[ req_distinguished_name ]', 'domainComponent = optional')
+        unless @req_dn;
+
+    return ('[ req ]',
+        'utf8 = yes',
+        'string_mask = utf8only',
+        'prompt = no',
+        'distinguished_name = req_distinguished_name',
+        'x509_extensions = root_ext',
+        @req_dn
+    );
 }
 
 ################################

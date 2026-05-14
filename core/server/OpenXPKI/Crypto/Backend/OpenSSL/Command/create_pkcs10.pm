@@ -51,6 +51,7 @@ sub get_command
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_SUBJECT");
     }
 
+    push @command, ('-x509') if ($self->{TOX509});
     push @command, ('-nameopt', 'utf8');
     push @command, ('-engine', $engine) if ($engine);
     push @command, ('-keyform', $keyform) if ($keyform);
@@ -104,6 +105,10 @@ ENGINE_USAGE ::= ALWAYS||PRIV_KEY_OPS too.
 =item * ENGINE_USAGE
 
 =item * PASSWD
+
+=item * TOX509
+
+If set, generates a self-signed certificate instead of a PKCS#10 request.
 
 =back
 

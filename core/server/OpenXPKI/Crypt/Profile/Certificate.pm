@@ -451,7 +451,7 @@ sub _build_basic_constraints {
     my $self = shift;
 
     # Always critical and defaults to false if nothing is set
-    my $constraint = $self->_config_hash('basic_constraints');
+    my $constraint = $self->_config_hash('extensions','basic_constraints');
     my $ca_val = $constraint->{ca}//0;
 
     return OpenXPKI::Crypt::Profile::DTO::BasicConstraints->new(
