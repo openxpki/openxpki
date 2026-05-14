@@ -37,6 +37,7 @@ use MIME::Base64 qw( encode_base64 decode_base64 );
 
 # CPAN modules
 use Crypt::JWT qw( encode_jwt decode_jwt );
+use LWP::UserAgent;
 use URI::Escape;
 
 # Project modules
