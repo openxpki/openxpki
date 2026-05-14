@@ -99,6 +99,11 @@ protected_command "create_alias" => {
     }
 
     OpenXPKI::Exception::Command->throw(
+        message => 'notafter must not be before notbefore',
+        params => {notafter => $notafter, notbefore => $notbefore }
+    ) if ($notafter < $notbefore);
+
+    OpenXPKI::Exception::Command->throw(
         message => 'alias and alias_group are mutually exclusive'
     ) if ($params->has_alias_group && $params->has_alias);
 
