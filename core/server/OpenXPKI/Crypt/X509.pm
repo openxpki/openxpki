@@ -1,13 +1,15 @@
 package OpenXPKI::Crypt::X509;
 use OpenXPKI -class;
 
+# imports the decode_tag and parser
+with 'OpenXPKI::Role::ASN1Parse';
+
 use Digest::SHA qw(sha1_base64 sha1_hex);
 use OpenXPKI::DateTime;
 use MIME::Base64;
 use Crypt::X509 0.53;
 
 use OpenXPKI::Crypt::DN;
-use OpenXPKI::Crypt::PKCS7; # decode_tag method
 
 has data => (
     is => 'ro',
@@ -433,7 +435,8 @@ sub _build_san {
                 } elsif ($type eq 'otherName') {
                     # TODO - this needs some improvemnt to not swallow the type
                     # and support nested values
-                    $san_val = sprintf('%s:%s', $san_val->{type}, decode_tag($san_val->{value}));
+                    my $tagval = decode_tag($san_val->{value}) // encode_base64($san_val->{value}) // '<undef>';
+                    $san_val = sprintf('%s:%s', $san_val->{type}, $tagval);
                     $san_val =~ s{[\x00-\x1F\x7F]}{X}g; # should not be the case but who knows
                 }
                 push @san_list, [ $san_type, $san_val ];

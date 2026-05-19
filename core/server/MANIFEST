@@ -320,6 +320,7 @@ OpenXPKI/DTO/ValidationException.pm
 
 # Collection of reusable items as Moose::Role
 OpenXPKI/Role/ACME.pm
+OpenXPKI/Role/ASN1Parse.pm
 OpenXPKI/Role/DNSValidation.pm
 OpenXPKI/Role/FileUtil.pm
 OpenXPKI/Role/IssuerSerial.pm

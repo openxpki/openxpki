@@ -2,6 +2,7 @@ package OpenXPKI::Crypt::PKCS7::SCEP;
 use OpenXPKI -class;
 
 with 'OpenXPKI::Role::IssuerSerial';
+with 'OpenXPKI::Role::ASN1Parse';
 
 use MIME::Base64;
 use Convert::ASN1 ':tag';
@@ -11,7 +12,7 @@ use Crypt::Digest qw( digest_data );
 use OpenXPKI::Random;
 use OpenXPKI::Crypt::PKCS10;
 use OpenXPKI::Crypt::X509;
-use OpenXPKI::Crypt::PKCS7 qw(encode_tag decode_tag find_oid);
+use OpenXPKI::Crypt::PKCS7 qw(find_oid);
 # CTX is only used to generate random for nonce and keys
 use OpenXPKI::Server::Context qw( CTX );
 
