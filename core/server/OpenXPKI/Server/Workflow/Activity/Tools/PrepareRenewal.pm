@@ -65,6 +65,24 @@ sub execute {
     $context->param(  $prefix.'cert_subject_alt_name' =>
                     $serializer->serialize(\@subject_alt_names));
 
+    # select subject alt names from database
+    $sth = $dbi->select(
+        from   => 'certificate_attributes',
+        columns => [ 'attribute_value' ],
+        where => {
+            attribute_contentkey => 'x509v3_extension',
+            identifier           => $cert_identifier,
+        },
+    );
+    my @cert_extension;
+    while (my $ext = $sth->fetchrow_hashref) {
+        push @cert_extension, $serializer->deserialize($ext->{attribute_value});
+    }
+
+    ##! 64: 'cert_extension: ' . Dumper(\@cert_extension)
+    $context->param(  $prefix.'cert_extension' =>
+                    $serializer->serialize(\@cert_extension));
+
     # look up the certificate profile via the csr table
     ##! 32: ' Look for old csr: ' . $cert->{req_key}
     my $old_profile = CTX('api2')->get_profile_for_cert( identifier => $cert_identifier );

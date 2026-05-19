@@ -70,7 +70,7 @@ has format => (
     is  => 'ro',
     isa => 'Str',
     lazy => 1,
-    default => '',
+    default => sub { return shift->encoding ? 'ASN1' : ''; },
 );
 
 =head2 encoding (Str)

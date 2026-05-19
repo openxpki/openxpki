@@ -199,6 +199,20 @@ sub __persistCertificateInformation {
         );
     }
 
+    my @custom_extensions = @{$x509->get_custom_extension()};
+    ##! 32: 'oids (structured): ' . Dumper \@custom_extensions
+    for my $ext (@custom_extensions) {
+        CTX('dbi')->insert(
+            into => 'certificate_attributes',
+            values => {
+                attribute_key        => AUTO_ID,
+                identifier           => $identifier,
+                attribute_contentkey => 'x509v3_extension',
+                attribute_value      => $serializer->serialize($ext),
+            },
+        );
+    }
+
     # if this originates from a workflow, register the workflow id in the attribute table
     if ($self->_get_workflow()) {
         CTX('dbi')->insert(

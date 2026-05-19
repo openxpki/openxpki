@@ -208,6 +208,8 @@ sub add_custom_oid {
             oid      => $oid,
             critical => $ext->{critical} ? 1 : 0,
             value    => $ext->{value},
+            ($ext->{format} ? (format => $ext->{format}) : ()),
+            ($ext->{encoding} ? (encoding => $ext->{encoding}) : ()),
         );
 
     } elsif (ref $ext->{value} eq 'ARRAY') {

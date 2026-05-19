@@ -128,6 +128,15 @@ has subject_alt_name => (
     builder => '_build_san'
 );
 
+has custom_extension => (
+    is => 'ro',
+    init_arg => undef,
+    isa => 'ArrayRef',
+    reader => 'get_custom_extension',
+    lazy => 1,
+    builder => '_build_oid_ext'
+);
+
 has issuer => (
     is => 'ro',
     init_arg => undef,
@@ -445,6 +454,54 @@ sub _build_san {
     }
 
     return \@san_list;
+}
+
+
+=head2 get_cert_extension_parts
+
+Returns the content of custom_extension as hashref with the oid beeing the
+key of the hash and the original item beeing the value.
+
+=cut
+
+has cert_extension_parts => (
+    is => 'ro',
+    init_arg => undef,
+    isa => 'HashRef',
+    reader => 'get_cert_extension_parts',
+    lazy => 1,
+    default => sub {
+        return { map {  ($_->{oid} => $_) } shift->get_custom_extension->@* };
+    },
+);
+
+
+sub _build_oid_ext {
+
+    my $self = shift;
+
+    my @oid_list;
+    my @oid_ext = @{$self->_cert->{'tbsCertificate'}->{'extensions'}};
+
+	# Walk through extensions and extract only the ones wit a PEN OID
+    foreach my $oid_ext (@oid_ext) {
+
+        next unless (substr($oid_ext->{'extnID'},0,12) eq '1.3.6.1.4.1.');
+
+        my $item = { oid => $oid_ext->{'extnID'} };
+
+        my ($val, $tag) = decode_tag_as_string($oid_ext->{extnValue});
+        if (defined $val && ref $val eq '') {
+            $item->{encoding} = $tag;
+            $item->{value} = $val;
+        } else {
+            # unable to parse - base64 encode what we got
+            $item->{value} = encode_base64($oid_ext->{extnValue});
+        }
+        push @oid_list, $item;
+
+    }
+    return \@oid_list;
 }
 
 sub _get_validity {

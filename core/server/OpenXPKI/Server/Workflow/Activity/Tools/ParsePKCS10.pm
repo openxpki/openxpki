@@ -239,6 +239,9 @@ sub execute {
         $source_ref->{req_extensions} = 'PKCS10';
     }
 
+    # this a callback to be overriden by custom classes
+    $self->handle_custom_extensions($decoded, $param);
+
     # If the profile has NO ui section, we write the parsed hash and the SANs "as is" to the context
     if (!$cert_profile or !$cert_subject_style or !$config->exists(['profile', $cert_profile, 'style', $cert_subject_style, 'ui' ])) {
 
@@ -363,6 +366,12 @@ sub hande_extensions {
 
     }
     return $parsed;
+
+}
+
+sub handle_custom_extensions {
+
+    return;
 
 }
 

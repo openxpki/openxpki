@@ -1,6 +1,8 @@
 package OpenXPKI::Crypt::PKCS10;
 use OpenXPKI -class;
 
+with 'OpenXPKI::Role::ASN1Parse';
+
 use OpenXPKI::DN;
 use Digest::SHA qw(sha1_base64 sha1_hex);
 use OpenXPKI::DateTime;
@@ -181,6 +183,75 @@ has digest => (
         return sha1_hex($self->_pkcs10()->certificationRequest());
     },
 );
+
+=head2 get_custom_extension
+
+Returns an arrayref of custom (Private Enterprise Number) extensions found in
+the CSR. Each entry is a hashref with keys C<oid>, C<encoding>, and C<value>.
+
+Only extensions with OIDs under C<1.3.6.1.4.1.> are returned.
+B<NOTE>: Extensions known to C<Crypt::PKCS10> are excluded as they are mapped
+to their verbose names, this applies mainly to the common Microsoft extensions
+
+=cut
+
+has custom_extension => (
+    is => 'ro',
+    init_arg => undef,
+    isa => 'ArrayRef',
+    reader => 'get_custom_extension',
+    lazy => 1,
+    builder => '_build_oid_ext',
+);
+
+=head2 get_cert_extension_parts
+
+Returns the content of custom_extension as hashref with the oid beeing the
+key of the hash and the original item beeing the value.
+
+=cut
+
+has cert_extension_parts => (
+    is => 'ro',
+    init_arg => undef,
+    isa => 'HashRef',
+    reader => 'get_cert_extension_parts',
+    lazy => 1,
+    default => sub {
+        return { map {  ($_->{oid} => $_) } shift->get_custom_extension->@* };
+    },
+);
+
+sub _build_oid_ext {
+
+    my $self = shift;
+
+    my $attrs = $self->_pkcs10->_attributes;
+    my $ext_list = $attrs->{extensionRequest} // [];
+
+    my @oid_list;
+    foreach my $oid_ext ($ext_list->@*) {
+        # we are just interessted in PEN OIDs extensions
+        # Note: Most of the MS extensions (PEN 311) are translated
+        # to their names in the parser class and will not show up here :(
+        # Walk through extensions and extract only the ones wit a PEN OID
+        next unless (substr($oid_ext->{'extnID'},0,12) eq '1.3.6.1.4.1.');
+
+        my $item = { oid => $oid_ext->{'extnID'} };
+
+        my ($val, $tag) = decode_tag_as_string($oid_ext->{extnValue});
+        if (defined $val && ref $val eq '') {
+            $item->{encoding} = $tag;
+            $item->{value} = $val;
+        } else {
+            # unable to parse - base64 encode what we got
+            $item->{value} = encode_base64($oid_ext->{extnValue});
+        }
+        push @oid_list, $item;
+
+    }
+    return \@oid_list;
+}
 
 around BUILDARGS => sub {
 

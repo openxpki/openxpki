@@ -562,7 +562,7 @@ sub init_detail ($self, $args = {}) {
     my $cert = $self->send_command_v2( 'get_cert', {
         identifier => $cert_identifier,
         format => 'DBINFO',
-        attribute => 'subject_alt_name' }, 1);
+        attribute => ['subject_alt_name','x509v3_extension'] }, 1);
 
     if (!$cert) {
         $self->set_page(
@@ -635,6 +635,22 @@ sub init_detail ($self, $args = {}) {
                 value => \@sanlist,
                 format => 'linklist',
             };
+        }
+        if ($cert_attribute && $cert_attribute->{x509v3_extension}) {
+            my $ser = OpenXPKI::Serialization::Simple->new();
+            my @extlist = map {
+                my $vv = $ser->deserialize($_);
+                {
+                    label => $vv->{oid},
+                    value => $vv->{value},
+                }
+            } @{$cert_attribute->{x509v3_extension}};
+            push @fields, {
+                label => 'I18N_OPENXPKI_UI_CERTIFICATE_X509V3_EXT',
+                value => \@extlist,
+                format => 'unilist',
+            };
+
         }
 
         my $cert_profile = $self->send_command_v2( 'get_profile_for_cert', { identifier => $cert_identifier }, 1) || 'I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_UNKNOWN';
