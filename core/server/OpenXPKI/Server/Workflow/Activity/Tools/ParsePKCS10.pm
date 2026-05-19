@@ -3,13 +3,10 @@ use OpenXPKI;
 
 use parent qw( OpenXPKI::Server::Workflow::Activity );
 
-use Crypt::PKCS10;
-use Digest::SHA qw(sha1_hex);
-use MIME::Base64;
+use OpenXPKI::Crypt::PKCS10;
 use Template;
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Crypt::DN;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Util;
 use Workflow::Exception qw(configuration_error workflow_error);
@@ -53,107 +50,66 @@ sub execute {
     }
 
     # extract subject from CSR and add a context entry for it
-    Crypt::PKCS10->setAPIversion(1);
-
-    my $decoded = Crypt::PKCS10->new( $pkcs10,
-        ignoreNonBase64 => 1,
-        verifySignature => 0 );
-
+    my $decoded;
     my $error;
-    $error = Crypt::PKCS10->error unless($decoded);
+    try {
+        $decoded = OpenXPKI::Crypt::PKCS10->new($pkcs10);
+    } catch ($e) {
+        $error = $e;
+    }
 
     # try to unwrap as PKCS7 renewal request containers if allowed
     if (!$decoded && $self->param('unwrap_pkcs7')) {
-
-        eval{
+        try {
             ##! 16: 'try to parse a PKCS7'
             my $p7 = OpenXPKI::Crypt::PKCS7->new($pkcs10);
             ##! 128: $p7->envelope()
             $pkcs10 = $p7->payload();
-            ##! 32: encode_base64($pkcs10)
-            $decoded = Crypt::PKCS10->new( $pkcs10,
-                ignoreNonBase64 => 1,
-                verifySignature => 0 );
-
-            die Crypt::PKCS10->error unless($decoded);
-
+            $decoded = OpenXPKI::Crypt::PKCS10->new($pkcs10);
             # set target_key to enforce write back to context
             $target_key ||= 'pkcs10';
             $error = undef;
             CTX('log')->application()->info("Input was PKCS7 container, unwrapped payload");
-        };
-        $error = $EVAL_ERROR if($EVAL_ERROR);
+        } catch ($e) {
+            $error = $e;
+        }
     }
 
     workflow_error('PKCS10 structure can not be parsed', { error => $error }) unless($decoded);
 
     if ($verify_signature) {
-        if ($decoded->checkSignature()) {
+        if ($decoded->check_signature()) {
             $param->{'csr_signature_valid'} = 1;
             CTX('log')->application()->debug("PKCS#10 signature valid");
         } else {
             $param->{'csr_signature_valid'} = 0;
-            CTX('log')->application()->warn("PKCS#10 signature invalid ($error)");
+            CTX('log')->application()->warn("PKCS#10 signature invalid");
         }
     }
 
     # write back the cleaned PEM block if target_key is set
-    $param->{$target_key} = $decoded->csrRequest(1) if ($target_key);
+    $param->{$target_key} = $decoded->pem if ($target_key);
 
-    my $hashed_dn;
-    if (my $csr_subject = $decoded->subjectSequence()) {
-        my $dn = OpenXPKI::Crypt::DN->new( sequence => $csr_subject );
-        $hashed_dn = $dn->as_hash();
-        $param->{csr_subject} = $dn->get_subject();
-        ##! 32: 'Subject DN ' . Dumper $hashed_dn
-    }
-    # ensure that this is not undef as we convert it later to hash
-    $hashed_dn //= {};
+    $param->{csr_subject} = $decoded->get_subject();
+    my $hashed_dn = $decoded->get_cert_subject_parts();
+    ##! 32: 'Subject DN ' . Dumper $hashed_dn
+
+    $param->{csr_key_alg} = lc($decoded->get_public_key_alg());
 
     if ($self->param('key_params')) {
-
-        $param->{csr_key_alg} = 'unsupported';
-        $param->{csr_key_params} = {};
-        eval {
-            my $key_param = $decoded->subjectPublicKeyParams();
-            if ($key_param->{keytype} eq 'RSA') {
-                $param->{csr_key_alg} = 'rsa';
-                $param->{csr_key_params} = { key_length =>  $key_param->{keylen} };
-            } elsif ($key_param->{keytype} eq 'DSA') {
-                $param->{csr_key_alg} = 'dsa';
-                $param->{csr_key_params} = { key_length =>  $key_param->{keylen} };
-            } elsif ($key_param->{keytype} eq 'ECC') {
-                $param->{csr_key_alg} = 'ec';
-                $param->{csr_key_params} = { key_length =>  $key_param->{keylen}, curve_name => $key_param->{curve} };
-            }
-        };
-        if ($EVAL_ERROR) {
+        try {
+            $param->{csr_key_params} = $decoded->get_key_params();
+        } catch ($e) {
             CTX('log')->application()->warn("Unable to handle public key");
-            CTX('log')->application()->debug($EVAL_ERROR);
-        }
-
-    } else {
-        my $key_alg = $decoded->pkAlgorithm || '';
-        if( $key_alg eq 'rsaEncryption' ) {
-            $param->{csr_key_alg} = 'rsa';
-        } elsif( $key_alg eq 'ecPublicKey' ) {
-            $param->{csr_key_alg} = 'ec';
-        } elsif( $key_alg eq 'dsa' ) {
-            $param->{csr_key_alg} = 'dsa';
-        } else {
+            CTX('log')->application()->debug($e);
             $param->{csr_key_alg} = 'unsupported';
+            $param->{csr_key_params} = {};
         }
     }
 
-    my @t = $decoded->signatureAlgorithm() =~ m{ (with-?(md5|sha\d+))|((md5|sha\d+)with) }ix;
-    my ($csr_digest) = lc($t[1] || $t[3] || 'unknown');
-    $param->{csr_digest_alg} = $csr_digest;
+    $param->{csr_digest_alg} = $decoded->get_signature_digest();
 
-    $param->{csr_subject_key_identifier} =
-        uc( join ':', ( unpack '(A2)*', sha1_hex(
-                $decoded->{certificationRequestInfo}{subjectPKInfo}{subjectPublicKey}[0]
-        )));
-
+    $param->{csr_subject_key_identifier} = $decoded->get_subject_key_id();
 
     # Get the profile name and style - required for templating
     my $cert_profile = $self->param('cert_profile');
@@ -162,64 +118,22 @@ sub execute {
     my $cert_subject_style = $self->param('cert_subject_style');
     $cert_subject_style = $context->param('cert_subject_style') unless($cert_subject_style);
 
-    # Map SAN keys from ASN1 names to openssl format (all uppercased)
-    # TODO this should go to a central location
-    my $san_map = {
-        # TODO otherName is returned as hash with OID and stringified value
-        # need to find a suitable way to extract and encode this
-        #otherName => 'otherName',
-        rfc822Name => 'email',
-        dNSName => 'DNS',
-        x400Address => '', # not supported by openssl
-        # the parser chokes on dirName - needs investigatin
-        #directoryName => 'dirName',
-        ediPartyName => '', # not supported by openssl
-        uniformResourceIdentifier => 'URI',
-        iPAddress  => 'IP',
-        registeredID => 'RID',
-    };
-
+    # Build SAN structures from normalized get_subject_alt_name()
     my $csr_san = {};
-    my @san_list;
-
-    # Retrieve the registered SAN property names
-
-    my @san_names = $decoded->subjectAltName();
-    # Walk all san keys
-    foreach my $san (@san_names) {
-        my $san_type = $san_map->{$san};
-
-        if (!$san_type) {
-            # type is not supported
-            next;
-        }
-
-        my @items = $decoded->subjectAltName( $san );
-        next unless @items;
-
-        # san hash
-        $csr_san->{ $san_type } = \@items;
-
-        # merge into dn, uppercase key name
-        $hashed_dn->{'SAN_'.uc($san_type)} = \@items;
-
-        # push items to @san_list in the nested array format as required by
-
-        # the csr persister
-        foreach my $value (@items) {
-            push @san_list, [ $san_type, $value ] if ($value);
-        }
-
+    my @san_list = $decoded->get_subject_alt_name()->@*;
+    for my $san_item (@san_list) {
+        my ($san_type, $value) = $san_item->@*;
+        $csr_san->{$san_type} //= [];
+        push @{$csr_san->{$san_type}}, $value;
     }
 
     ##! 32: 'Extracted SAN ' . Dumper $csr_san
-
     ##! 32: 'Merged DN ' . Dumper $hashed_dn
 
     # Request Attributes
     my $attr = $self->param('req_attributes');
-    my $req_attr = $self->hande_extensions( $attr, sub {
-        return $decoded->attributes(shift);
+    my $req_attr = $self->handle_extensions( $attr, sub {
+        return $decoded->get_attribute_value(shift);
     });
 
     if ($req_attr) {
@@ -229,9 +143,8 @@ sub execute {
 
     # Request Extensions
     my $ext = $self->param('req_extensions');
-    my $req_ext = $self->hande_extensions( $ext, sub {
-        my $oid = shift;
-        return $decoded->extensionValue($oid) if ($decoded->extensionPresent($oid));
+    my $req_ext = $self->handle_extensions( $ext, sub {
+        return $decoded->get_extension_value(shift);
     });
 
     if ($req_ext) {
@@ -329,7 +242,7 @@ sub execute {
 
 
 # wrapper method to handle extraction of attributes and extensions
-sub hande_extensions {
+sub handle_extensions {
 
     my $self = shift;
     my $oidlist = shift;

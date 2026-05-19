@@ -4,6 +4,7 @@ use OpenXPKI -class;
 with 'OpenXPKI::Role::ASN1Parse';
 
 use OpenXPKI::DN;
+use OpenXPKI::Crypt::DN;
 use Digest::SHA qw(sha1_base64 sha1_hex);
 use OpenXPKI::DateTime;
 use MIME::Base64;
@@ -184,6 +185,60 @@ has digest => (
     },
 );
 
+=head2 subject_hash
+
+Returns a hashref with the subject DN components, keys are uppercase RDN
+shortnames (e.g. C<CN>, C<OU>), values are arrayrefs of values. Same format
+as C<subject_hash> in L<OpenXPKI::Crypt::X509>.
+
+=cut
+
+has subject_hash => (
+    is => 'ro',
+    init_arg => undef,
+    isa => 'HashRef',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        my $seq = $self->_pkcs10->subjectSequence();
+        return {} unless $seq;
+        return OpenXPKI::Crypt::DN->new( sequence => $seq )->as_hash();
+    }
+);
+
+=head2 get_subject_alt_name
+
+Returns an arrayref of C<[$type, $value]> pairs for all SANs in the request.
+Same format as C<get_subject_alt_name> in L<OpenXPKI::Crypt::X509>.
+
+=cut
+
+has subject_alt_name => (
+    is => 'ro',
+    init_arg => undef,
+    isa => 'ArrayRef',
+    reader => 'get_subject_alt_name',
+    lazy => 1,
+    builder => '_build_san',
+);
+
+=head2 get_cert_subject_parts
+
+Returns the merged hashref of subject DN components and SAN entries (with
+C<SAN_> prefix). Same format and semantics as C<get_cert_subject_parts> in
+L<OpenXPKI::Crypt::X509>.
+
+=cut
+
+has cert_subject_parts => (
+    is => 'ro',
+    init_arg => undef,
+    isa => 'HashRef',
+    reader => 'get_cert_subject_parts',
+    lazy => 1,
+    builder => '_build_cert_subject_parts_hash',
+);
+
 =head2 get_custom_extension
 
 Returns an arrayref of custom (Private Enterprise Number) extensions found in
@@ -222,6 +277,95 @@ has cert_extension_parts => (
     },
 );
 
+=head2 get_public_key_alg
+
+Returns the normalized public key algorithm string: C<RSA>, C<EC>, or C<DSA>.
+Same format as C<get_public_key_alg> in L<OpenXPKI::Crypt::X509>.
+
+=cut
+
+has public_key_alg => (
+    is => 'ro',
+    init_arg => undef,
+    isa => 'Str',
+    reader => 'get_public_key_alg',
+    lazy => 1,
+    default => sub {
+        my $alg = shift->_pkcs10->pkAlgorithm // '';
+        return 'RSA' if $alg eq 'rsaEncryption';
+        return 'EC'  if $alg eq 'ecPublicKey';
+        return 'DSA' if $alg eq 'dsa';
+        return 'unsupported';
+    }
+);
+
+=head2 get_key_params
+
+Returns a hashref with public key parameters: C<key_length> (bits) and for
+EC keys also C<curve_name>.
+
+=cut
+
+has key_params => (
+    is => 'ro',
+    init_arg => undef,
+    isa => 'HashRef',
+    reader => 'get_key_params',
+    lazy => 1,
+    default => sub {
+        my $kp = shift->_pkcs10->subjectPublicKeyParams();
+        return { key_length => $kp->{keylen}, ($kp->{curve} ? (curve_name => $kp->{curve}) : ()) };
+    }
+);
+
+=head2 get_signature_digest
+
+Returns the digest algorithm from the signature, e.g. C<sha256>, C<sha1>.
+
+=cut
+
+has signature_digest => (
+    is => 'ro',
+    init_arg => undef,
+    isa => 'Str',
+    reader => 'get_signature_digest',
+    lazy => 1,
+    default => sub {
+        my @t = shift->_pkcs10->signatureAlgorithm() =~ m{ (with-?(md5|sha\d+))|((md5|sha\d+)with) }ix;
+        return lc($t[1] || $t[3] || 'unknown');
+    }
+);
+
+=head2 check_signature
+
+Returns true if the PKCS#10 signature is cryptographically valid.
+
+=cut
+
+sub cn { shift->subject_hash()->{CN}->[0] }
+
+sub check_signature    { return shift->_pkcs10->checkSignature() }
+
+=head2 get_extension_value (oid/name)
+
+Return the value of the given request extension, undef if not exists.
+
+=cut
+
+sub get_extension_value {
+    return shift->_pkcs10->extensionValue(shift)
+}
+
+=head2 get_attribute_value (oid/name)
+
+Return the value of the given request attribute, undef if not exists.
+
+=cut
+
+sub get_attribute_value  {
+    return shift->_pkcs10->attributes(shift)
+}
+
 sub _build_oid_ext {
 
     my $self = shift;
@@ -251,6 +395,44 @@ sub _build_oid_ext {
 
     }
     return \@oid_list;
+}
+
+
+sub _build_san {
+
+    my $self = shift;
+
+    my $san_map = {
+        rfc822Name               => 'email',
+        dNSName                  => 'DNS',
+        x400Address              => '',
+        ediPartyName             => '',
+        uniformResourceIdentifier => 'URI',
+        iPAddress                => 'IP',
+        registeredID             => 'RID',
+    };
+
+    my @san_list;
+    for my $san ($self->_pkcs10->subjectAltName()) {
+        my $san_type = $san_map->{$san};
+        next unless $san_type;
+        for my $value ($self->_pkcs10->subjectAltName($san)) {
+            push @san_list, [ $san_type, $value ] if $value;
+        }
+    }
+    return \@san_list;
+}
+
+sub _build_cert_subject_parts_hash {
+    my $self = shift;
+    my $hash = $self->subject_hash();
+    for my $san ($self->get_subject_alt_name()->@*) {
+        my ($type, $value) = $san->@*;
+        $type = 'SAN_'.uc($type);
+        $hash->{$type} = [] unless defined $hash->{$type};
+        push @{$hash->{$type}}, $value;
+    }
+    return $hash;
 }
 
 around BUILDARGS => sub {

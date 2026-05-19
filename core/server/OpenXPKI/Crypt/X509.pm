@@ -180,6 +180,15 @@ has public_key_hash => (
     }
 );
 
+has pub_key => (
+    is => 'ro',
+    init_arg => undef,
+    isa => 'Str',
+    reader => 'get_pub_key',
+    lazy => 1,
+    default => sub { shift->_cert->pubkey() }
+);
+
 has public_key_alg => (
     is => 'ro',
     init_arg => undef,
@@ -190,6 +199,24 @@ has public_key_alg => (
         my $self = shift;
         return $self->_cert()->PubKeyAlg();
     }
+);
+
+has key_params => (
+    is => 'ro',
+    init_arg => undef,
+    isa => 'HashRef',
+    reader => 'get_key_params',
+    lazy => 1,
+    builder => '_build_key_params',
+);
+
+has signature_digest => (
+    is => 'ro',
+    init_arg => undef,
+    isa => 'Str',
+    reader => 'get_signature_digest',
+    lazy => 1,
+    default => sub { lc(shift->_cert->SigHashAlg() // 'unknown') }
 );
 
 has authority_key_id => (
