@@ -133,7 +133,7 @@ sub run {
                             message => "Unknown JWT key identifier (kid: $kid)"
                         );
                     };
-                CTX('log')->auth()->info(sprintf('Got cli connection with key %s using role %s',$kid, $key->{role}));
+                CTX('log')->auth()->info(sprintf('Got cli connection with key %s using role %s',$kid, $key->{role}//'<none>'));
 
                 $response = $self->_process_operator_command($msg, $key);
             }
