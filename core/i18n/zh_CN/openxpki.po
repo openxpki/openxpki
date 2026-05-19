@@ -361,6 +361,10 @@ msgstr "在此之前吊销"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_VALID_AT"
 msgstr "有效期"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_X509V3_EXT"
+msgstr "主题"
+
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_AUTHORIZE"
 msgstr "授权"
 
@@ -812,6 +816,10 @@ msgstr "找不到请求的动作"
 
 msgid "I18N_OPENXPKI_UI_ERROR_DURING_PUBLICATION"
 msgstr "在发布期间出现了后端错误"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ERROR_ISSUER_UNKNOWN"
+msgstr "未知"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_ERROR_ON_REMOTE_BACKEND"
@@ -1345,6 +1353,204 @@ msgstr "系统状态"
 msgid "I18N_OPENXPKI_UI_MENU_WORKFLOW_SEARCH"
 msgstr "工作流程搜索"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_METADATA_SECTION_LIFECYCLE_DESC"
+msgstr "操作"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_METADATA_SECTION_LIFECYCLE_LABEL"
+msgstr "操作"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_METADATA_SECTION_OWNER_DESC"
+msgstr "操作"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_METADATA_SECTION_OWNER_LABEL"
+msgstr "操作"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_METADATA_SECTION_SYSTEM_LABEL"
+msgstr "操作"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_APPLICATION_ID"
+msgstr "应用程序名称"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_APPLICATION_ID_DESC"
+msgstr "客户端的应用程序的名称。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_AUTH_ENDPOINT"
+msgstr "显示相关的工作流程"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_CLIENT_IP"
+msgstr "返回总览"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_CLIENT_IP_DESC"
+msgstr "该列表显示了在此域中定义的密钥组的状态。 要登录/注销，请单击该行。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_EMAIL"
+msgstr "密钥算法"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_EMAIL_DESC"
+msgstr "椭圆曲线"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_ENTITY"
+msgstr ""
+"过滤实体名称（通常是通用名称中使用的完全限定域名）。 完全匹配，允许使用通配"
+"符。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_EXPIRY_NOTIFICATION"
+msgstr "主题替代名称"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_EXPIRY_NOTIFICATION_DESC"
+msgstr "主题替代名称"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_INFORMATION"
+msgstr "信息"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_INFORMATION_DESC"
+msgstr "信息"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_INSTALLATION_STATUS"
+msgstr "证书状态"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_INSTALLATION_STATUS_ACTIVE"
+msgstr "授权"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_INSTALLATION_STATUS_DECOMMISSIONED"
+msgstr "已签署"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_INSTALLATION_STATUS_DESC"
+msgstr "证书状态"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_INSTALLATION_STATUS_INACTIVE"
+msgstr ""
+"这结合了吊销和有效性信息，'有效'和'过期'意味着'已请求'加上基于当前时间戳的验"
+"证。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_INSTALLATION_STATUS_PENDING"
+msgstr "即将到来"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_OWNER_CONTACT"
+msgstr "端口"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_OWNER_CONTACT_DESC"
+msgstr "端口号"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_OWNER_GROUP"
+msgstr "UPN"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_OWNER_GROUP_DESC"
+msgstr "组织单元"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_RENEWAL_ENDPOINT"
+msgstr "显示相关的工作流程"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_RENEWAL_ENDPOINT_DESC"
+msgstr "用于请求的服务器端点。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_REQUESTOR_EMAIL"
+msgstr "电子邮件地址"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_REQUESTOR_EMAIL_DESC"
+msgstr "请求者电子邮件地址"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_REQUESTOR_NAME"
+msgstr "过滤请求者的姓名。查询用作子字符串。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_REQUESTOR_NAME_DESC"
+msgstr "请求者姓"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_REQUEST_ENDPOINT"
+msgstr "请求"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_REQUEST_ENDPOINT_DESC"
+msgstr "请求者电子邮件地址"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_SUPPORT_CONTACT"
+msgstr " The server endpoint used for the request."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_SUPPORT_CONTACT_DESC"
+msgstr " The server endpoint used for the request."
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_SYSTEM_ENVIRONMENT"
+msgstr "完整证书状态报告"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_SYSTEM_ENVIRONMENT_DESC"
+msgstr "请确认您确实要执行此操作！"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_SYSTEM_ENVIRONMENT_DEVELOPMENT"
+msgstr "完整证书状态报告"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_SYSTEM_ENVIRONMENT_INTEGRATION"
+msgstr "SCEP注册工作流程正在等待批准。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_SYSTEM_ENVIRONMENT_PRODUCTION"
+msgstr "SCEP注册工作流程正在等待批准。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_SYSTEM_ENVIRONMENT_STAGING"
+msgstr "等待中"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_TASK_REFERENCE"
+msgstr "已过期"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_TASK_REFERENCE_DESC"
+msgstr "使用下面的过滤器搜索工作流程。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_USER_AGENT"
+msgstr "请求"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_USER_AGENT_DESC"
+msgstr ""
+"This workflow handles certificate enrollment requests using the SCEP "
+"interface."
+
 msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_DESCRIPTION"
 msgstr "此页面显示您启动的所有工作流程的列表。"
 
@@ -1572,6 +1778,14 @@ msgstr "如果您没有任何特殊需求，则默认样式通常是最佳选择
 
 msgid "I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_LABEL"
 msgstr "默认配置文件样式"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_CASIGNER_LABEL"
+msgstr "人员（安全电子邮件/身份验证）"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_CA_SIGNER_LABEL"
+msgstr "人员（安全电子邮件/身份验证）"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_CN_DESC"
 msgstr "通用名称"
@@ -1927,6 +2141,26 @@ msgstr "报告名称"
 msgid "I18N_OPENXPKI_UI_REPORT_TIMELINE_LABEL"
 msgstr "报告配置"
 
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_TIMESPEC_LAST_DAY"
+msgstr "报告配置"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_TIMESPEC_LAST_HOUR"
+msgstr "报告配置"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_TIMESPEC_LAST_MONTH"
+msgstr "报告配置"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_TIMESPEC_LAST_YEAR"
+msgstr "报告配置"
+
 msgid "I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID"
 msgstr "无法执行操作-安全令牌无效！"
 
@@ -2094,14 +2328,32 @@ msgstr "该工作流当前由服务器处理，请稍后返回以检查其状态
 msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_STARTED"
 msgstr "已签署"
 
-msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_ALIAS_GROUPS_LABEL"
-msgstr ""
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_ALIAS_GROUPS_DESC"
+msgstr "证书详细报告"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_ALIAS_GROUPS_LABEL"
+msgstr "证书详细报告"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_ALIAS_LIST_DESC"
+msgstr "证书详细报告"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_ALIAS_LIST_LABEL"
-msgstr ""
+msgstr "证书详细报告"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_CERTIFICATE_STATS_DESC"
+msgstr "证书详细报告"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_CERTIFICATE_STATS_LABEL"
+msgstr "证书详细报告"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_CLUSTER_STATUS_DESC"
 msgstr "证书详细报告"
 
 #, fuzzy
@@ -2109,11 +2361,23 @@ msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_CLUSTER_STATUS_LABEL"
 msgstr "证书详细报告"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_CRL_STATUS_DESC"
+msgstr "证书详细报告"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_CRL_STATUS_LABEL"
 msgstr "证书详细报告"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_TOKEN_LIST_DESC"
+msgstr "证书详细报告"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_TOKEN_LIST_LABEL"
+msgstr "证书详细报告"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_WORKFLOW_STATS_DESC"
 msgstr "证书详细报告"
 
 #, fuzzy
@@ -2241,17 +2505,8 @@ msgstr "不存在具有此ID的证书。"
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_IS_NOT_IN_GROUP"
 msgstr "找到了证书，但不在预期的组中。"
 
-msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_FAILED_REGEX"
-msgstr "正则表达式匹配失败。"
-
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_HAS_ERRORS"
 msgstr "一个或多个主题字段有错误。"
-
-msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_LESS_THAN_MIN_COUNT"
-msgstr "标记的字段是必填字段。"
-
-msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_MAX_COUNT_EXCEEDED"
-msgstr "字段数超过了允许的数量。"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_NOT_DEFINED"
 msgstr "在配置文件设置中未定义此字段。"
@@ -2289,6 +2544,22 @@ msgstr "输入验证期间发生错误"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE_INVALID"
 msgstr "以下字段与预期的值类型不匹配"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_FAILED_REGEX"
+msgstr "正则表达式匹配失败。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_LESS_THAN_MIN_COUNT"
+msgstr "标记的字段是必填字段。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_MAX_COUNT_EXCEEDED"
+msgstr "字段数超过了允许的数量。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_REQUIRED_BUT_EMPTY"
+msgstr "必填字段为空"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYREUSE_KEY_ALREADY_EXISTS"
 msgstr "具有相同公钥的证书已经存在！"
@@ -2392,6 +2663,22 @@ msgstr "请仅在确定此信息正确无误的情况下，验证给定的信息
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_LABEL"
 msgstr "批准吊销"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_IMPORT_KEY_DESC"
+msgstr "生成此请求的密钥"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_IMPORT_KEY_LABEL"
+msgstr "生成密钥"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_UPLOAD_CERTIFICATE_DESC"
+msgstr "安排此证书吊销"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_UPLOAD_CERTIFICATE_LABEL"
+msgstr "吊销证书"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_DESC"
 msgstr "初始化"
 
@@ -2457,6 +2744,30 @@ msgstr "请使用以下表格更新信息。"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_BASE_LABEL"
+msgstr "更新资料"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_ENTITY_DESC"
+msgstr "请使用以下表格更新信息。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_ENTITY_LABEL"
+msgstr "更新资料"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_LIFECYCLE_DESC"
+msgstr "请使用以下表格更新信息。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_LIFECYCLE_LABEL"
+msgstr "更新资料"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_OWNER_DESC"
+msgstr "请使用以下表格更新信息。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_OWNER_LABEL"
 msgstr "更新资料"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CLEANUP_DESC"
@@ -2879,6 +3190,18 @@ msgstr "编辑有效期"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_UPDATE_ENDPOINT_AUTH_LABEL"
 msgstr "更新请求"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_UPDATE_ENTITY_LABEL"
+msgstr "更新请求"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_UPDATE_LIFECYCLE_LABEL"
+msgstr "更新请求"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_UPDATE_OWNER_LABEL"
+msgstr "更新请求"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CANCEL_BUTTON"
 msgstr "取消请求"
 
@@ -2969,8 +3292,28 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_BULKDATA_TOOLTIP"
 msgstr "将所需的链证书复制为连接的PEM或PKCS7捆绑包"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CACHE_INTERVAL_LABEL"
+msgstr "链式证书"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_ALIAS_LABEL"
 msgstr "密钥加密方式"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_GENERATE_SIGNER_IMPORT_KEY_DESC"
+msgstr "组件形成证书使用者替代名称。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_GENERATE_SIGNER_IMPORT_KEY_LABEL"
+msgstr "SubjectAltName部分"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_GENERATE_SIGNER_IMPORT_KEY_PASSWORD_DESC"
+msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_GENERATE_SIGNER_IMPORT_KEY_PASSWORD_LABEL"
+msgstr "私钥密码"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_DESC"
@@ -3217,6 +3560,10 @@ msgstr "通常不需要，请使用右侧的选择器或输入日期时间"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_TOOLTIP"
 msgstr "吊销将在给定日期之后进行"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DOWNLOAD_LABEL"
+msgstr "密码"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ELIGIBILITY_RESULT_LABEL"
 msgstr "资格审核结果"
 
@@ -3355,8 +3702,36 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_PARAMS_LABEL"
 msgstr "密钥参数"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_ENTITIY_DESC"
+msgstr "该证书负责人的电子邮件地址。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_ENTITIY_LABEL"
+msgstr "Requestor/Owner"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_HASH"
 msgstr "该证书负责人的电子邮件地址。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_LIFECYCLE_DESC"
+msgstr "该证书负责人的电子邮件地址。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_LIFECYCLE_LABEL"
+msgstr "系统标识符"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_OWNER_DESC"
+msgstr "Requestor/Owner"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_OWNER_LABEL"
+msgstr "Requestor/Owner"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_SYSTEM_LABEL"
+msgstr "系统标识符"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_AUTH_ENDPOINT_LABEL"
@@ -3624,22 +3999,6 @@ msgstr "请求模式"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_QUEUE_LABEL"
 msgstr "吊销队列"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT_REPLACE"
-msgstr "指定您希望吊销证书的原因。"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
-msgstr "未指定/其他原因"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_COMPROMISE"
-msgstr "证书密钥已泄露"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_LOST"
-msgstr "指定您希望吊销证书的原因。"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_TIME_DESC"
@@ -4242,6 +4601,57 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CAPUBLISH_INITIAL_LABEL"
 msgstr "发布证书"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_CHOOSE_KEY_SOURCE_DESC"
+msgstr "证书已颁发，并将根据要求发送给客户端。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_CHOOSE_KEY_SOURCE_HINT"
+msgstr ""
+"您会在下面看到此证书的新元数据。请从下面的操作中进行选择。 中止将终止工作流程"
+"而不将元数据写回到数据库，更新将再次显示该表单，而保存将保留数据并完成工作流"
+"程。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_CHOOSE_KEY_SOURCE_LABEL"
+msgstr "私钥密码"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_ENTER_SUBJECT_DESC"
+msgstr "此工作流程已成功完成，无法重新启动"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_ENTER_SUBJECT_LABEL"
+msgstr "证书主题"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_GENERATE_KEY_LABEL"
+msgstr "生成密钥"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_IMPORT_KEY_LABEL"
+msgstr "附加请求信息"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_KEY_CONFIRMED_LABEL"
+msgstr "私钥密码"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_KEY_DOWNLOAD_READY_DESC"
+msgstr "生成此请求的密钥"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_KEY_DOWNLOAD_READY_LABEL"
+msgstr "私钥密码"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_SUCCESS_DESC"
+msgstr "证书已颁发，并将根据要求发送给客户端。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_SUCCESS_LABEL"
+msgstr "成功"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERTRENEW_FAILURE_DESC"
 msgstr "此工作流程最终失败。"
 
@@ -4725,6 +5135,14 @@ msgstr "将证书信息发布到已定义的存储库。"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_NEWACCOUNT_LABEL"
 msgstr "发布证书"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_GENERATE_SIGNER_DESC"
+msgstr "证书注册工作流程，用于通过自动界面（例如SCEP，RPC）进行证书注册。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_GENERATE_SIGNER_LABEL"
+msgstr "证书注册"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_DESC"
 msgstr "将CA信息（CA证书和CRL）发布到已定义的存储库。"
 
@@ -4876,6 +5294,14 @@ msgstr "私钥下载"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"
 msgstr "类型"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_MANAGE_METADATA_DESC"
+msgstr "更改证书元数据。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_MANAGE_METADATA_LABEL"
+msgstr "更改元数据"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_DESC"
 msgstr "通过电子邮件发送在30天之内到期的所有证书的到期通知。"
 
@@ -5024,8 +5450,8 @@ msgstr "是"
 #~ msgstr "加密密码"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_MENU_USERS"
-#~ msgstr "请求"
+#~ msgid "I18N_OPENXPKI_UI_METADATA_SECTION_NOTIFICATION_LABEL"
+#~ msgstr "Endpoint / Server"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
 #~ msgstr "请先选择配置文件"
@@ -5050,10 +5476,6 @@ msgstr "是"
 #~ msgstr "无可用数据"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_USER_MAIL"
-#~ msgstr "密钥算法"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_USER_REALNAME"
 #~ msgstr "真名"
 
@@ -5068,10 +5490,6 @@ msgstr "是"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_USER_ROLE_USER"
 #~ msgstr "用户ID"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_DESC"
-#~ msgstr "使用下面的过滤器搜索工作流程。"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_USER_SEARCH_LABEL"
@@ -5339,16 +5757,28 @@ msgstr "是"
 #~ msgstr "证书持有者的电子邮件地址"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RESETPASS_RESET_PASSWORD_DESC"
-#~ msgstr " "
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RESETPASS_RESET_PASSWORD_LABEL"
 #~ msgstr "密码"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RESETPASS_RESET_PASSWORD_PLACEHOLDER"
 #~ msgstr "请重新输入密码"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT_REPLACE"
+#~ msgstr "指定您希望吊销证书的原因。"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
+#~ msgstr "未指定/其他原因"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_COMPROMISE"
+#~ msgstr "证书密钥已泄露"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_LOST"
+#~ msgstr "指定您希望吊销证书的原因。"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ADDUSER_CHOOSE_ACTION_DESC"
@@ -5400,13 +5830,6 @@ msgstr "是"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_REVIEW_LABEL"
 #~ msgstr "失败"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDITUSER_CHOOSE_ACTION_DESC"
-#~ msgstr ""
-#~ "您会在下面看到此证书的新元数据。请从下面的操作中进行选择。 中止将终止工作"
-#~ "流程而不将元数据写回到数据库，更新将再次显示该表单，而保存将保留数据并完成"
-#~ "工作流程。"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDITUSER_CHOOSE_ACTION_LABEL"

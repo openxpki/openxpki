@@ -341,6 +341,10 @@ msgstr "指定日時より前に失効:"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_VALID_AT"
 msgstr "指定日時に有効:"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_X509V3_EXT"
+msgstr "件名"
+
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_AUTHORIZE"
 msgstr "認可"
 
@@ -743,6 +747,10 @@ msgstr "要求されたエンティティが見つかりませんでした"
 
 msgid "I18N_OPENXPKI_UI_ERROR_DURING_PUBLICATION"
 msgstr "公開処理中に内部エラーが発生しました。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ERROR_ISSUER_UNKNOWN"
+msgstr "証明書発行者が不明です"
 
 msgid "I18N_OPENXPKI_UI_ERROR_ON_REMOTE_BACKEND"
 msgstr "リモートバックエンドはエラーで応答しました。"
@@ -1217,6 +1225,206 @@ msgstr "システムステータス"
 msgid "I18N_OPENXPKI_UI_MENU_WORKFLOW_SEARCH"
 msgstr "ワークフロー検索"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_METADATA_SECTION_LIFECYCLE_DESC"
+msgstr "実行"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_METADATA_SECTION_LIFECYCLE_LABEL"
+msgstr "実行"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_METADATA_SECTION_OWNER_DESC"
+msgstr "実行"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_METADATA_SECTION_OWNER_LABEL"
+msgstr "実行"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_METADATA_SECTION_SYSTEM_LABEL"
+msgstr "実行"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_APPLICATION_ID"
+msgstr "アプリケーションID"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_APPLICATION_ID_DESC"
+msgstr "アプリケーションまたはシステムのID/参照番号"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_AUTH_ENDPOINT"
+msgstr "関連するワークフローを表示"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_CLIENT_IP"
+msgstr "ログイン方法"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_CLIENT_IP_DESC"
+msgstr ""
+"このレルムに定義されている秘密鍵のグループが一覧表示されます。秘密鍵のグルー"
+"プを選択すると、ログインまたはログアウトできます。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_EMAIL"
+msgstr "キーアルゴリズム"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_EMAIL_DESC"
+msgstr "楕円曲線暗号"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_ENTITY"
+msgstr ""
+"エンティティの名前（通常は共通名で使用されるFQDN）でフィルターします。完全一"
+"致、ワイルドカードが許可されます。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_EXPIRY_NOTIFICATION"
+msgstr "失効通知"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_EXPIRY_NOTIFICATION_DESC"
+msgstr "失効通知"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_INFORMATION"
+msgstr "情報"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_INFORMATION_DESC"
+msgstr "情報"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_INSTALLATION_STATUS"
+msgstr "証明書ステータス"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_INSTALLATION_STATUS_ACTIVE"
+msgstr "認可"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_INSTALLATION_STATUS_DECOMMISSIONED"
+msgstr "発行済み"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_INSTALLATION_STATUS_DESC"
+msgstr "証明書ステータス"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_INSTALLATION_STATUS_INACTIVE"
+msgstr ""
+"これは失効と有効性の情報を組み合わせたもので、'有効'と'期限切れ'は'発行済"
+"み'と同じであり、現在のタイムスタンプに基づいています。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_INSTALLATION_STATUS_PENDING"
+msgstr "有効日前"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_OWNER_CONTACT"
+msgstr "所有者（E-mail）"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_OWNER_CONTACT_DESC"
+msgstr ""
+"証明書の所有者の電子メールアドレス。これは例えば、「期限切れの通知」の送信に"
+"使用されます。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_OWNER_GROUP"
+msgstr "所有者（グループ）"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_OWNER_GROUP_DESC"
+msgstr ""
+"この証明書を所有するサポートグループ。これは、「期限切れ通知」の送信などに使"
+"用されます。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_RENEWAL_ENDPOINT"
+msgstr "関連するワークフローを表示"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_RENEWAL_ENDPOINT_DESC"
+msgstr "リクエストに使用されたサーバーのエンドポイント。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_REQUESTOR_EMAIL"
+msgstr "Eメールアドレス"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_REQUESTOR_EMAIL_DESC"
+msgstr "依頼者のEメール"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_REQUESTOR_NAME"
+msgstr "この依頼者によりリクエストされた証明書のみ表示します。(部分一致)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_REQUESTOR_NAME_DESC"
+msgstr "依頼者の姓"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_REQUEST_ENDPOINT"
+msgstr "リクエスト"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_REQUEST_ENDPOINT_DESC"
+msgstr "依頼者のEメール"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_SUPPORT_CONTACT"
+msgstr "証明書通知のサポート連絡先として使用するメールアドレス。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_SUPPORT_CONTACT_DESC"
+msgstr "証明書通知のサポート連絡先として使用するメールアドレス。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_SYSTEM_ENVIRONMENT"
+msgstr "RAの登録"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_SYSTEM_ENVIRONMENT_DESC"
+msgstr "本当にこのアクションを実行していることを確認してください"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_SYSTEM_ENVIRONMENT_DEVELOPMENT"
+msgstr "RAの登録"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_SYSTEM_ENVIRONMENT_INTEGRATION"
+msgstr "SCEP登録ワークフローは承認待ちです。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_SYSTEM_ENVIRONMENT_PRODUCTION"
+msgstr "SCEP登録ワークフローは承認待ちです。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_SYSTEM_ENVIRONMENT_STAGING"
+msgstr "システム状態に注意が必要です！"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_TASK_REFERENCE"
+msgstr "期限切れ"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_TASK_REFERENCE_DESC"
+msgstr ""
+"Select namespace and, if necessary, search pattern for editing datapool "
+"entries."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_USER_AGENT"
+msgstr "ログイン"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_META_USER_AGENT_DESC"
+msgstr "クライアントが送信したユーザーエージェント"
+
 msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_DESCRIPTION"
 msgstr "あなたが開始したワークフローが一覧で表示されます。"
 
@@ -1409,6 +1617,14 @@ msgstr "特別な要件がない場合は、通常はデフォルトスタイル
 
 msgid "I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_LABEL"
 msgstr "デフォルトのプロファイルスタイル"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_CASIGNER_LABEL"
+msgstr "ユーザプロフィール"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_CA_SIGNER_LABEL"
+msgstr "ユーザプロフィール"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_CN_DESC"
 msgstr "一般名称(CN)"
@@ -1741,6 +1957,22 @@ msgstr "レポート名"
 msgid "I18N_OPENXPKI_UI_REPORT_TIMELINE_LABEL"
 msgstr "証明書ライフサイクルサポート"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_TIMESPEC_LAST_DAY"
+msgstr "証明書ライフサイクルサポート"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_TIMESPEC_LAST_HOUR"
+msgstr "証明書ライフサイクルサポート"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_TIMESPEC_LAST_MONTH"
+msgstr "証明書ライフサイクルサポート"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_TIMESPEC_LAST_YEAR"
+msgstr "証明書ライフサイクルサポート"
+
 msgid "I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID"
 msgstr "アクションを実行できません。セキュリティトークンが無効です。"
 
@@ -1897,14 +2129,32 @@ msgstr "起動時間(秒)"
 msgid "I18N_OPENXPKI_UI_STATUS_RUNNING_PROCESSES_STARTED"
 msgstr "開始時刻"
 
-msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_ALIAS_GROUPS_LABEL"
-msgstr ""
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_ALIAS_GROUPS_DESC"
+msgstr "証明書の詳細レポート"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_ALIAS_GROUPS_LABEL"
+msgstr "証明書の詳細レポート"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_ALIAS_LIST_DESC"
+msgstr "証明書の詳細レポート"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_ALIAS_LIST_LABEL"
-msgstr ""
+msgstr "証明書の詳細レポート"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_CERTIFICATE_STATS_DESC"
+msgstr "証明書の詳細レポート"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_CERTIFICATE_STATS_LABEL"
+msgstr "証明書の詳細レポート"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_CLUSTER_STATUS_DESC"
 msgstr "証明書の詳細レポート"
 
 #, fuzzy
@@ -1912,11 +2162,23 @@ msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_CLUSTER_STATUS_LABEL"
 msgstr "証明書の詳細レポート"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_CRL_STATUS_DESC"
+msgstr "証明書の詳細レポート"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_CRL_STATUS_LABEL"
 msgstr "証明書の詳細レポート"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_TOKEN_LIST_DESC"
+msgstr "証明書の詳細レポート"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_TOKEN_LIST_LABEL"
+msgstr "証明書の詳細レポート"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_WORKFLOW_STATS_DESC"
 msgstr "証明書の詳細レポート"
 
 #, fuzzy
@@ -2033,17 +2295,8 @@ msgstr "このIDの証明書は存在しません。"
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_IS_NOT_IN_GROUP"
 msgstr "このIDの証明書はグループに含まれません。"
 
-msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_FAILED_REGEX"
-msgstr "値は式に当てはまりませんでした。"
-
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_HAS_ERRORS"
 msgstr "1つ以上の件名フィールドにエラーがあります。"
-
-msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_LESS_THAN_MIN_COUNT"
-msgstr "マークされたフィールドは必須です。"
-
-msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_MAX_COUNT_EXCEEDED"
-msgstr "フィールド数が制限を超えています。"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_NOT_DEFINED"
 msgstr "このフィールドはプロファイル設定では定義されていません。"
@@ -2081,6 +2334,22 @@ msgstr "入力の検証中にエラーが発生しました"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE_INVALID"
 msgstr "次のフィールが期待されるタイプと一致しません。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_FAILED_REGEX"
+msgstr "値は式に当てはまりませんでした。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_LESS_THAN_MIN_COUNT"
+msgstr "マークされたフィールドは必須です。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_MAX_COUNT_EXCEEDED"
+msgstr "フィールド数が制限を超えています。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_REQUIRED_BUT_EMPTY"
+msgstr "必須項目が空です。"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYREUSE_KEY_ALREADY_EXISTS"
 msgstr "同じ公開鍵を持つ証明書がすでに存在します。"
@@ -2186,6 +2455,26 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_LABEL"
 msgstr "要求承認"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_IMPORT_KEY_DESC"
+msgstr "このリクエストの鍵を作成する"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_IMPORT_KEY_LABEL"
+msgstr "鍵を作成する"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_UPLOAD_CERTIFICATE_DESC"
+msgstr ""
+"Please paste (or use the upload handle) the PEM encoded certificate you have "
+"received from the external ca to be uploaded. Upload is only possible if the "
+"certificate issuer is known and the certificate key matches the one "
+"requested from this workflow!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_UPLOAD_CERTIFICATE_LABEL"
+msgstr "証明書アップロード"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_DESC"
 msgstr "初期化する"
 
@@ -2251,6 +2540,30 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_BASE_DESC"
 msgstr "以下のフォームを使用して情報を更新してください。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_BASE_LABEL"
+msgstr "証明書のメタデータを変更する"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_ENTITY_DESC"
+msgstr "以下のフォームを使用して情報を更新してください。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_ENTITY_LABEL"
+msgstr "証明書のメタデータを変更する"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_LIFECYCLE_DESC"
+msgstr "以下のフォームを使用して情報を更新してください。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_LIFECYCLE_LABEL"
+msgstr "証明書のメタデータを変更する"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_OWNER_DESC"
+msgstr "以下のフォームを使用して情報を更新してください。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_OWNER_LABEL"
 msgstr "証明書のメタデータを変更する"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CLEANUP_DESC"
@@ -2689,6 +3002,18 @@ msgstr "有効性の変更"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_UPDATE_ENDPOINT_AUTH_LABEL"
 msgstr "認可済み登録機関変更"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_UPDATE_ENTITY_LABEL"
+msgstr "リクエストの更新"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_UPDATE_LIFECYCLE_LABEL"
+msgstr "リクエストの更新"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_UPDATE_OWNER_LABEL"
+msgstr "リクエストの更新"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CANCEL_BUTTON"
 msgstr "リクエストのキャンセル"
 
@@ -2773,8 +3098,28 @@ msgstr "バルクデータ"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_BULKDATA_TOOLTIP"
 msgstr "バルクデータ"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CACHE_INTERVAL_LABEL"
+msgstr "チェーン証明書"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_ALIAS_LABEL"
 msgstr "CAの別名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_GENERATE_SIGNER_IMPORT_KEY_DESC"
+msgstr "証明書を構成する構成要素は別名を使用します。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_GENERATE_SIGNER_IMPORT_KEY_LABEL"
+msgstr "別名の一部"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_GENERATE_SIGNER_IMPORT_KEY_PASSWORD_DESC"
+msgstr "証明書を構成する構成要素は別名を使用します。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_GENERATE_SIGNER_IMPORT_KEY_PASSWORD_LABEL"
+msgstr "秘密鍵のパスワード入力"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_DESC"
 msgstr "リクエストに関する情報。"
@@ -3007,6 +3352,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_TOOLTIP"
 msgstr "所定の日時に失効が予定されている"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DOWNLOAD_LABEL"
+msgstr "パスワード"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ELIGIBILITY_RESULT_LABEL"
 msgstr "資格確認結果"
 
@@ -3147,8 +3496,36 @@ msgstr "キーパラメータ。"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_PARAMS_LABEL"
 msgstr "キーパラメータ"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_ENTITIY_DESC"
+msgstr "この証明書の担当者のメールアドレス"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_ENTITIY_LABEL"
+msgstr "所有者（グループ）"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_HASH"
 msgstr "メタデータ（キー/値）"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_LIFECYCLE_DESC"
+msgstr "この証明書の担当者のメールアドレス"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_LIFECYCLE_LABEL"
+msgstr "システム識別子"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_OWNER_DESC"
+msgstr "所有者（グループ）"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_OWNER_LABEL"
+msgstr "所有者（グループ）"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_SYSTEM_LABEL"
+msgstr "システム識別子"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_AUTH_ENDPOINT_LABEL"
 msgstr "エンドポイント認証"
@@ -3417,22 +3794,6 @@ msgstr "リクエストモード"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_QUEUE_LABEL"
 msgstr "失効キュー"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT_REPLACE"
-msgstr "証明書を失効する理由を指定します。"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
-msgstr "証明書を失効する理由を指定します。"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_COMPROMISE"
-msgstr "証明書鍵が漏洩しました"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_LOST"
-msgstr "証明書を失効する理由を指定します。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_TIME_DESC"
 msgstr "失効日を未来の日付にする場合に設定します。"
@@ -4013,6 +4374,54 @@ msgstr "ユーザによってキャンセルされました"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CAPUBLISH_INITIAL_LABEL"
 msgstr "証明書の発行"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_CHOOSE_KEY_SOURCE_DESC"
+msgstr "証明書が発行され、リクエストに応じてクライアントに送信されます。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_CHOOSE_KEY_SOURCE_HINT"
+msgstr "このリクエストの鍵を作成する"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_CHOOSE_KEY_SOURCE_LABEL"
+msgstr "秘密鍵のパスワード入力"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_ENTER_SUBJECT_DESC"
+msgstr "このワークフローは正常に終了しました。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_ENTER_SUBJECT_LABEL"
+msgstr "状態"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_GENERATE_KEY_LABEL"
+msgstr "鍵を作成する"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_IMPORT_KEY_LABEL"
+msgstr "状態"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_KEY_CONFIRMED_LABEL"
+msgstr "秘密鍵のパスワード入力"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_KEY_DOWNLOAD_READY_DESC"
+msgstr "このリクエストの鍵を作成する"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_KEY_DOWNLOAD_READY_LABEL"
+msgstr "秘密鍵のパスワード入力"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_SUCCESS_DESC"
+msgstr "証明書が発行され、リクエストに応じてクライアントに送信されます。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_SUCCESS_LABEL"
+msgstr "成功"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERTRENEW_FAILURE_DESC"
 msgstr ""
 "This certificate can not be renewed as the preconditions for renewal are not "
@@ -4518,6 +4927,14 @@ msgstr "新しいACMEユーザーアカウントの登録要求"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_NEWACCOUNT_LABEL"
 msgstr "ACMEアカウント登録"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_GENERATE_SIGNER_DESC"
+msgstr "証明書を登録します。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_GENERATE_SIGNER_LABEL"
+msgstr "証明書の登録"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_DESC"
 msgstr "定義されたリポジトリにCA情報（CA証明書およびCRL）を発行します。"
 
@@ -4661,6 +5078,14 @@ msgstr "秘密鍵のダウンロード"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"
 msgstr "タイプ"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_MANAGE_METADATA_DESC"
+msgstr "証明書のメタデータを変更します。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_MANAGE_METADATA_LABEL"
+msgstr "メタデータの変更"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_DESC"
 msgstr ""
 "期限切れになる証明書について、メールで期限切れの通知を送信してください。"
@@ -4763,11 +5188,31 @@ msgid "I18N_OPENXPKI_UI_YES"
 msgstr "はい"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_METADATA_SECTION_NOTIFICATION_LABEL"
+#~ msgstr "有効期限の通知"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_REPORT_FIELD_VALID_REVOKED"
 #~ msgstr "有効性はあるが失効した証明書"
 
 #~ msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_FIELD_REPORT_DATA_LABEL"
 #~ msgstr "証明書の詳細レポート"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT_REPLACE"
+#~ msgstr "証明書を失効する理由を指定します。"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
+#~ msgstr "証明書を失効する理由を指定します。"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_COMPROMISE"
+#~ msgstr "証明書鍵が漏洩しました"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_LOST"
+#~ msgstr "証明書を失効する理由を指定します。"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_SUMMARY_FIELD_REPORT_DATA_LABEL"
