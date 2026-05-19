@@ -102,6 +102,11 @@ a given string or regex.
 
 =over
 
+=item pki_realm
+
+Lookup datapool item in this realm, accepts only the current realm or the
+special realm I<_global>.
+
 =item namespace
 
 check entries in this namespace (required)

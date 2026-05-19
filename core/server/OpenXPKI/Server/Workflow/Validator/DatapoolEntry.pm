@@ -24,6 +24,14 @@ sub _validate {
         configuration_error('Validator::DatapoolEntry requires the namespace parameter');
     }
 
+    if ($self->param('pki_realm')) {
+        if ($self->param('pki_realm') eq '_global') {
+            $params->{pki_realm} = '_global';
+        } elsif($self->param('pki_realm') ne CTX('session')->data->pki_realm) {
+            workflow_error( 'Access to foreign realm is not allowed' );
+        }
+    }
+
     ##! 32: $params
 
     my $msg = CTX('api2')->get_data_pool_entry(%$params);
@@ -65,6 +73,11 @@ value for the opposite check.
 =head2 Parameters
 
 =over
+
+=item pki_realm
+
+Lookup datapool item in this realm, accepts only the current realm or the
+special realm I<_global>.
 
 =item namespace
 
