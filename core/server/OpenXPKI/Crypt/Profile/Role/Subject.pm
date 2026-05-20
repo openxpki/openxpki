@@ -5,7 +5,9 @@ use OpenXPKI -role;
 =head2 subject (ParsedDN, rw)
 
 Subject distinguished name as a parsed RDN sequence.
-Accepts a plain DN string which is coerced via L<OpenXPKI::DN>.
+
+Write access via C<set_subject>, accepts a plain DN string which is coerced
+via L<OpenXPKI::DN>.
 
 =cut
 
@@ -20,20 +22,12 @@ has subject => (
 =head2 get_subject
 
 Returns the subject as an RFC 2253 DN string.
-Throws an exception when no subject has been set.
-
-Use C<< $profile->subject >> directly to access the parsed C<ParsedDN> arrayref.
 
 =cut
 
 sub get_subject {
     my $self = shift;
-    OpenXPKI::Exception->throw(
-        message => 'I18N_OPENXPKI_CRYPT_PROFILE_GET_SUBJECT_NOT_PRESENT',
-    ) unless defined $self->subject && scalar @{ $self->subject };
-    # Reconstruct an RFC 2253 string from the stored ParsedDN so that callers
-    # (e.g. OpenXPKI::Crypto::Backend::OpenSSL::Command::issue_cert) can pass
-    # the result directly to OpenXPKI::DN->new() or use it in regex checks.
+    return '' unless defined $self->subject && scalar @{ $self->subject };
     my $dn_obj = bless { PARSED => $self->subject }, 'OpenXPKI::DN';
     $dn_obj->__build_rdns();
     return $dn_obj->get_rfc_2253_dn();
@@ -46,7 +40,9 @@ Returns the subject as ParsedDN.
 =cut
 
 sub get_parsed_dn {
+
     return shift->subject();
+
 }
 
 1;
