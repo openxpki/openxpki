@@ -35,7 +35,7 @@ my $pkcs10;
 lives_and { $pkcs10 = OpenXPKI::Crypt::PKCS10->new($csr); ok $pkcs10 } "new instance";
 
 is $pkcs10->get_subject_key_id, "51:8B:77:CE:BD:AE:64:4D:7D:5E:56:33:04:07:1A:9A:89:F8:EE:BE", "Subject Key ID";
-is $pkcs10->get_subject, "UID=Molte,CN=Syltetøy,DC=Gardener,DC=Test Deployment,DC=OpenXPKI,DC=org", "Subject";
+is $pkcs10->get_subject, "CN=Syltetøy+UID=Molte,DC=Gardener,DC=Test Deployment,DC=OpenXPKI,DC=org", "Subject";
 is $pkcs10->get_transaction_id, "c8a70ecaa1882ae6ac57bff0e4fb9d44d5b75911", "Transaction ID";
 is $pkcs10->get_digest, "1c3fa3b3781d63ddfca4f5264e2a9ac0d882efb7", "Digest";
 

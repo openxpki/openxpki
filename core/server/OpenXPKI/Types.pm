@@ -13,8 +13,6 @@ use OpenXPKI::FileUtils;
 use OpenXPKI::DateTime;
 use OpenXPKI::DN;
 
-# objects for coerce
-use OpenXPKI::Crypt::X509;
 =head1 NAME
 
 OpenXPKI::Types - Collection of Moose types used for API command
@@ -135,7 +133,7 @@ subtype 'X509CertObject',
 
 coerce 'X509CertObject',
     from 'PEMCert',
-    via { OpenXPKI::Crypt::X509->new($_) };
+    via { require OpenXPKI::Crypt::X509; OpenXPKI::Crypt::X509->new($_) };
 
 =head2 PEMCertChain
 

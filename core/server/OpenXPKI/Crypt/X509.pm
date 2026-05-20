@@ -1,331 +1,109 @@
 package OpenXPKI::Crypt::X509;
 use OpenXPKI -class;
 
-# imports the decode_tag and parser
-with 'OpenXPKI::Role::ASN1Parse';
+with 'OpenXPKI::Role::CertAndReqParser';
 
-use Digest::SHA qw(sha1_base64 sha1_hex);
+use Digest::SHA qw(sha1_hex);
 use OpenXPKI::DateTime;
-use MIME::Base64;
-use Crypt::X509 0.53;
-
 use OpenXPKI::Crypt::DN;
 
-has data => (
-    is => 'ro',
-    required => 1,
-    isa => 'Str',
-);
+sub _asn1_root_node { 'Certificate'  }
+sub _pem_type       { 'CERTIFICATE'  }
 
-has pem => (
-    is => 'ro',
-    init_arg => undef,
-    isa => 'Str',
-    lazy => 1,
-    default => sub {
-        my $self = shift;
-        # convert DER to PEM
-        my $pem = encode_base64($self->data(), '');
-        $pem =~ s{ (.{64}) }{$1\n}xmsg;
-        chomp $pem;
-        return "-----BEGIN CERTIFICATE-----\n$pem\n-----END CERTIFICATE-----";
-    },
-);
+sub get_cert_identifier { shift->get_identifier() }
 
 has db_hash => (
-    is => 'ro',
-    isa => 'HashRef',
-    lazy => 1,
+    is      => 'ro',
+    isa     => 'HashRef',
+    lazy    => 1,
     builder => '_to_db_hash',
 );
 
-has _cert => (
-    is => 'ro',
-    required => 1,
-    isa => 'Crypt::X509',
-);
-
-has cert_identifier => (
-    is => 'rw',
-    init_arg => undef,
-    isa => 'Str',
-    reader => 'get_cert_identifier',
-    lazy => 1,
-    default => sub {
-        my $self = shift;
-        my $cert_identifier = sha1_base64($self->data);
-        ## RFC 3548 URL and filename safe base64
-        $cert_identifier =~ tr/+\//-_/;
-        return $cert_identifier;
-    },
-);
-
-has subject => (
-    is => 'ro',
-    required => 0,
-    isa => 'Str',
-    reader => 'get_subject',
-    lazy => 1,
-    default => sub {
-        my $self = shift;
-        my $csr_subject = $self->_cert()->SubjectSequence();
-        my $dn = OpenXPKI::Crypt::DN->new( sequence => $csr_subject );
-        return $dn->get_subject();
-    }
-);
-
-has subject_hash => (
-    is => 'ro',
-    init_arg => undef,
-    isa => 'HashRef',
-    lazy => 1,
-    default => sub {
-        my $self = shift;
-        my $hash = {};
-        foreach my $comp (reverse @{$self->_cert()->Subject}) {
-            my ($k,$v) = split("=", $comp);
-            # Replace S -> ST and l => L, see #674
-            $k =~ s{\AS=}{ST=};
-            $k =~ s{\Al=}{L=};
-            $hash->{$k} = [] unless($hash->{$k});
-            push @{$hash->{$k}}, $v;
-        }
-        return $hash;
-    }
-);
-
-has cert_subject_parts => (
-    is => 'ro',
-    init_arg => undef,
-    isa => 'HashRef',
-    lazy => 1,
-    reader => 'get_cert_subject_parts',
-    builder => '_build_cert_subject_parts_hash'
-);
-
-=head2
-
-Returns a pointer to a list of SANs. Each SAN is represented as a pointer to a list
-containing two items - the SAN type (IP, DNS, dirName, etc.) and its value. The value
-is represented in its decoded ASN.1 form.
-
-Example return value:
-
-  [
-    [ "DNS", "example.com" ],
-    [ "email", "foo@example.com" ]
-  ]
-
-=cut
-
-has subject_alt_name => (
-    is => 'ro',
-    init_arg => undef,
-    isa => 'ArrayRef',
-    reader => 'get_subject_alt_name',
-    lazy => 1,
-    builder => '_build_san'
-);
-
-has custom_extension => (
-    is => 'ro',
-    init_arg => undef,
-    isa => 'ArrayRef',
-    reader => 'get_custom_extension',
-    lazy => 1,
-    builder => '_build_oid_ext'
-);
-
 has issuer => (
-    is => 'ro',
+    is       => 'ro',
     init_arg => undef,
-    isa => 'Str',
-    reader => 'get_issuer',
-    lazy => 1,
-    default => sub {
+    isa      => 'Str',
+    reader   => 'get_issuer',
+    lazy     => 1,
+    default  => sub {
         my $self = shift;
-        return join ",", map {
-            # Replace S -> ST and l => L, see #674
-            $_ =~ s{\AS=}{ST=}; $_ =~ s{\Al=}{L=}; $_
-        } reverse @{$self->_cert()->Issuer};
+        my $rdn = $self->_parsed->{tbsCertificate}{issuer}{rdnSequence};
+        return OpenXPKI::Crypt::DN->new(sequence => $rdn)->get_subject();
     }
 );
 
-has subject_key_id => (
-    is => 'rw',
-    init_arg => undef,
-    isa => 'Str',
-    reader => 'get_subject_key_id',
-    lazy => 1,
-    default => sub {
-        my $self = shift;
-        my $keyid = $self->_cert()->subject_keyidentifier();
-        if ($keyid) {
-            return uc join ':', ( unpack '(A2)*', unpack 'H*', $keyid );
-        }
-        return $self->get_public_key_hash();
-    }
-);
-
-has public_key_hash => (
-    is => 'rw',
-    init_arg => undef,
-    isa => 'Str',
-    reader => 'get_public_key_hash',
-    lazy => 1,
-    default => sub {
-        my $self = shift;
-        return uc join ':', ( unpack '(A2)*', sha1_hex( $self->_cert()->pubkey() ));
-    }
-);
-
-has pub_key => (
-    is => 'ro',
-    init_arg => undef,
-    isa => 'Str',
-    reader => 'get_pub_key',
-    lazy => 1,
-    default => sub { shift->_cert->pubkey() }
-);
-
-has public_key_alg => (
-    is => 'ro',
-    init_arg => undef,
-    isa => 'Str',
-    reader => 'get_public_key_alg',
-    lazy => 1,
-    default => sub {
-        my $self = shift;
-        return $self->_cert()->PubKeyAlg();
-    }
-);
-
-has key_params => (
-    is => 'ro',
-    init_arg => undef,
-    isa => 'HashRef',
-    reader => 'get_key_params',
-    lazy => 1,
-    builder => '_build_key_params',
-);
-
-has signature_digest => (
-    is => 'ro',
-    init_arg => undef,
-    isa => 'Str',
-    reader => 'get_signature_digest',
-    lazy => 1,
-    default => sub { lc(shift->_cert->SigHashAlg() // 'unknown') }
-);
+sub get_issuer_rdn { return shift->_parsed->{tbsCertificate}{issuer}{rdnSequence} }
 
 has authority_key_id => (
-    is => 'rw',
+    is      => 'ro',
     init_arg => undef,
-    isa => 'Str|Undef',
-    reader => 'get_authority_key_id',
-    lazy => 1,
+    isa     => 'Str|Undef',
+    reader  => 'get_authority_key_id',
+    lazy    => 1,
     default => sub {
         my $self = shift;
-        my $keyid = $self->_cert()->key_identifier();
-        # Auth-Info can be a hash -> not supported yet
-        if (!$keyid || ref $keyid ne '') {
-            return undef;
-        }
-        return uc join ':', ( unpack '(A2)*', ( unpack 'H*', $keyid ) );
+        my $der = $self->_get_ext_der('2.5.29.35') or return undef;
+        my $aki = $self->_asn1('AuthorityKeyIdentifier')->decode($der) or return undef;
+        return undef unless $aki->{keyIdentifier};
+        return uc join ':', (unpack '(A2)*', unpack 'H*', $aki->{keyIdentifier});
     }
 );
 
 has notbefore => (
-    is => 'ro',
+    is      => 'ro',
     init_arg => undef,
-    isa => 'Int',
-    lazy => 1,
-    default => sub {
-        my $self = shift;
-        return $self->_cert()->not_before();
-    }
+    isa     => 'Int',
+    lazy    => 1,
+    default => sub { _asn1_time_to_epoch(shift->_parsed->{tbsCertificate}{validity}{notBefore}) }
 );
 
 has notafter => (
-    is => 'ro',
+    is      => 'ro',
     init_arg => undef,
-    isa => 'Int',
-    lazy => 1,
-    default => sub {
-        my $self = shift;
-        return $self->_cert()->not_after();
-    }
+    isa     => 'Int',
+    lazy    => 1,
+    default => sub { _asn1_time_to_epoch(shift->_parsed->{tbsCertificate}{validity}{notAfter}) }
 );
 
 has serial => (
-    is => 'ro',
+    is      => 'ro',
     init_arg => undef,
-    isa => 'Str',
-    reader => 'get_serial',
-    lazy => 1,
+    isa     => 'Str',
+    reader  => 'get_serial',
+    lazy    => 1,
     default => sub {
         my $self = shift;
-        my $serial = $self->_cert()->serial;
-        if (ref $serial eq 'Math::BigInt') {
-            $serial = $serial->bstr();
-        }
-        return $serial;
+        my $serial = $self->_parsed->{tbsCertificate}{serialNumber};
+        $serial = $serial->bstr() if ref $serial eq 'Math::BigInt';
+        return "$serial";
     }
 );
 
 has cdp => (
-    is => 'ro',
+    is      => 'ro',
     init_arg => undef,
-    isa => 'ArrayRef',
-    reader => 'get_cdp',
-    lazy => 1,
+    isa     => 'ArrayRef',
+    reader  => 'get_cdp',
+    lazy    => 1,
     default => sub {
         my $self = shift;
-        return $self->_cert()->CRLDistributionPoints();
+        my $der = $self->_get_ext_der('2.5.29.31') or return [];
+        my $dps = $self->_asn1('CRLDistributionPoints')->decode($der) or return [];
+        my @uris;
+        for my $dp (@$dps) {
+            next unless $dp->{distributionPoint};
+            my $dpname = $self->_asn1('DistributionPointName')->decode($dp->{distributionPoint});
+            next unless $dpname && $dpname->{fullName};
+            for my $gn (@{$dpname->{fullName}}) {
+                push @uris, $gn->{uniformResourceIdentifier}
+                    if $gn->{uniformResourceIdentifier};
+            }
+        }
+        return \@uris;
     }
 );
 
-has key_usage => (
-    is => 'ro',
-    init_arg => undef,
-    isa => 'ArrayRef',
-    reader => 'get_key_usage',
-    lazy => 1,
-    default => sub {
-        my $self = shift;
-        return $self->_cert->KeyUsage() // [];
-    }
-);
-
-has ext_key_usage => (
-    is => 'ro',
-    init_arg => undef,
-    isa => 'ArrayRef',
-    reader => 'get_ext_key_usage',
-    lazy => 1,
-    default => sub {
-        my $self = shift;
-        return $self->_cert->ExtKeyUsage() // [];
-    }
-);
-
-=head2 get_basic_constraints
-
-Returns a hash reference with keys C<ca> (0 or 1), C<critical> (0 or 1),
-and C<pathlen> (integer or C<undef> if not set).
-
-=cut
-
-has basic_constraints => (
-    is => 'ro',
-    init_arg => undef,
-    isa => 'HashRef',
-    reader => 'get_basic_constraints',
-    lazy => 1,
-    builder => '_build_basic_constraints',
-);
-
-=head2 get_aia
+=head2 get_authority_info
 
 Returns a hash reference with keys C<caIssuer> and C<ocsp>, each containing
 an array reference of URIs parsed from the Authority Information Access extension.
@@ -333,45 +111,31 @@ an array reference of URIs parsed from the Authority Information Access extensio
 =cut
 
 has authority_info => (
-    is => 'ro',
+    is      => 'ro',
     init_arg => undef,
-    isa => 'HashRef',
-    reader => 'get_authority_info',
-    lazy => 1,
+    isa     => 'HashRef',
+    reader  => 'get_authority_info',
+    lazy    => 1,
     builder => '_build_authority_info',
 );
 
-around BUILDARGS => sub {
+=head2 get_subject_info_access
 
-    my $orig  = shift;
-    my $class = shift;
-    my $data = shift;
-
-    if ($data =~ m{-----BEGIN[^-]*CERTIFICATE-----(.+?)-----END[^-]*CERTIFICATE-----}xms ) {
-        $data = decode_base64($1);
-    }
-
-    my $cert = Crypt::X509->new( cert => $data );
-    if ($cert->error) {
-        die $cert->error;
-    }
-
-    return $class->$orig( data => $data, _cert => $cert );
-
-};
-
-=head1 METHODS
-
-=head2 cn
-
-Get the value of the subject CN field.
+Returns a HashRef keyed by accessMethod OID, each value an ArrayRef of URI strings,
+parsed from the SubjectInfoAccess extension (OID 1.3.6.1.5.5.7.1.11).
 
 =cut
 
-sub cn {
-    my $self = shift;
-    return $self->subject_hash()->{CN}->[0];
-}
+has subject_info_access => (
+    is       => 'ro',
+    init_arg => undef,
+    isa      => 'HashRef',
+    reader   => 'get_subject_info_access',
+    lazy     => 1,
+    builder  => '_build_subject_info_access',
+);
+
+=head1 METHODS
 
 =head2 get_notbefore / get_notafter I<format>
 
@@ -383,167 +147,84 @@ object is returned.
 
 sub get_notbefore {
     my $self = shift;
-    return $self->_get_validity( $self->notbefore(), shift );
+    return $self->_get_validity($self->notbefore(), shift);
 }
 
 sub get_notafter {
     my $self = shift;
-    return $self->_get_validity( $self->notafter(), shift );
+    return $self->_get_validity($self->notafter(), shift);
 }
 
 =head2 is_selfsigned
 
-returns true if the certificate is self-signed.
+Returns true if the certificate is self-signed.
 
-Note: the check is (currently) done the subject/authority key identifier
-or by a comparison of subject and issuer DN and not on a cryptographic
-level - so there might be situations where this is not accurate.
+Note: the check is done via subject/authority key identifier or by DN comparison,
+not on a cryptographic level.
 
 =cut
 
 sub is_selfsigned {
-
     my $self = shift;
-    # todo - calculate signature might be better
     if ($self->get_authority_key_id() && $self->get_subject_key_id()) {
         return $self->get_authority_key_id() eq $self->get_subject_key_id();
     }
     return $self->get_issuer eq $self->get_subject;
-
 }
 
 =head2 is_ca
 
-returns true if the certificate has the keyUsage keyCertSign and
+Returns true if the certificate has the keyUsage keyCertSign and
 BasicConstraints "cA" set (critical), false otherwise.
 
 =cut
 
 sub is_ca {
-
     my $self = shift;
-
-    return 0 unless (grep { $_ eq 'keyCertSign' } @{$self->get_key_usage()});
-
-    my $bc = $self->get_basic_constraints();
-    return ($bc->{ca} && $bc->{critical}) ? 1 : 0;
+    my $ku = $self->get_key_usage() or return 0;
+    return 0 unless grep { $_ eq 'keyCertSign' } @{$ku->bits};
+    my $bc = $self->get_basic_constraints() or return 0;
+    return ($bc->ca && $bc->critical) ? 1 : 0;
 }
 
-sub _build_san {
-
+sub _build_authority_info {
     my $self = shift;
-
-    my $san_map = {
-        otherName => 'otherName',
-        rfc822Name => 'email',
-        dNSName => 'DNS',
-        x400Address => '', # not supported by openssl
-        directoryName => 'dirName',
-        ediPartyName => '', # not supported by openssl
-        uniformResourceIdentifier => 'URI',
-        iPAddress  => 'IP',
-        registeredID => 'RID',
+    my $der = $self->_get_ext_der('1.3.6.1.5.5.7.1.1')
+        or return { caIssuer => [], ocsp => [] };
+    my $decoded = $self->_asn1('AuthorityInfoAccess')->decode($der)
+        or return { caIssuer => [], ocsp => [] };
+    my %raw;
+    for my $desc (@$decoded) {
+        next unless $desc->{accessLocation}{uniformResourceIdentifier};
+        push @{$raw{$desc->{accessMethod}}}, $desc->{accessLocation}{uniformResourceIdentifier};
+    }
+    return {
+        caIssuer => $raw{'1.3.6.1.5.5.7.48.2'} // [],
+        ocsp     => $raw{'1.3.6.1.5.5.7.48.1'} // [],
     };
-
-    my @san_list;
-    my $san_exts = $self->_cert->DecodedSubjectAltNames();
-
-	# Walk through all the extensions (though there really should be only)
-    foreach my $san_ext (@$san_exts) {
-        # Walk through all the names in the extension
-        foreach my $name (@$san_ext) {
-            # Walk through the keys of the name (there should only be one)
-            foreach my $type (keys %{$name}) {
-                my $san_type = $san_map->{$type};
-                next unless($san_type);
-                my $san_val = $name->{$type};
-                # IPs are raw byte sequence, copied from Crypt::PKCS10
-                if ($type eq 'iPAddress') {
-                    if( length $san_val == 4 ) {
-                        $san_val = sprintf( '%vd', $san_val );
-                    } else {
-                        $san_val = sprintf( '%*v02X', ':', $san_val );
-                        $san_val =~ s/([[:xdigit:]]{2}):([[:xdigit:]]{2})/$1$2/g;
-                    }
-                } elsif ($type eq 'directoryName') {
-                    $san_val = OpenXPKI::Crypt::DN->new( sequence => $san_val->{rdnSequence} )->get_subject();
-                } elsif ($type eq 'otherName') {
-                    # TODO - this needs some improvemnt to not swallow the type
-                    # and support nested values
-                    my $tagval = decode_tag($san_val->{value}) // encode_base64($san_val->{value}) // '<undef>';
-                    $san_val = sprintf('%s:%s', $san_val->{type}, $tagval);
-                    $san_val =~ s{[\x00-\x1F\x7F]}{X}g; # should not be the case but who knows
-                }
-                push @san_list, [ $san_type, $san_val ];
-            }
-        }
-    }
-
-    return \@san_list;
 }
 
-
-=head2 get_cert_extension_parts
-
-Returns the content of custom_extension as hashref with the oid beeing the
-key of the hash and the original item beeing the value.
-
-=cut
-
-has cert_extension_parts => (
-    is => 'ro',
-    init_arg => undef,
-    isa => 'HashRef',
-    reader => 'get_cert_extension_parts',
-    lazy => 1,
-    default => sub {
-        return { map {  ($_->{oid} => $_) } shift->get_custom_extension->@* };
-    },
-);
-
-
-sub _build_oid_ext {
-
+sub _build_subject_info_access {
     my $self = shift;
-
-    my @oid_list;
-    my @oid_ext = @{$self->_cert->{'tbsCertificate'}->{'extensions'}};
-
-	# Walk through extensions and extract only the ones wit a PEN OID
-    foreach my $oid_ext (@oid_ext) {
-
-        next unless (substr($oid_ext->{'extnID'},0,12) eq '1.3.6.1.4.1.');
-
-        my $item = { oid => $oid_ext->{'extnID'} };
-
-        my ($val, $tag) = decode_tag_as_string($oid_ext->{extnValue});
-        if (defined $val && ref $val eq '') {
-            $item->{encoding} = $tag;
-            $item->{value} = $val;
-        } else {
-            # unable to parse - base64 encode what we got
-            $item->{value} = encode_base64($oid_ext->{extnValue});
-        }
-        push @oid_list, $item;
-
+    my $der = $self->_get_ext_der('1.3.6.1.5.5.7.1.11') or return {};
+    my $decoded = $self->_asn1('AuthorityInfoAccess')->decode($der) or return {};
+    my %result;
+    for my $desc (@$decoded) {
+        next unless $desc->{accessLocation}{uniformResourceIdentifier};
+        push @{$result{$desc->{accessMethod}}}, $desc->{accessLocation}{uniformResourceIdentifier};
     }
-    return \@oid_list;
+    return \%result;
 }
 
 sub _get_validity {
-    my $self = shift;
-    my $date = shift;
+    my $self   = shift;
+    my $date   = shift;
     my $format = shift || '';
 
-    if ($format eq 'epoch') {
-        return $date;
-    }
+    return $date if $format eq 'epoch';
 
-    $date = DateTime->from_epoch( epoch => $date);
-
-    if (!$format) {
-        return $date;
-    }
+    $date = DateTime->from_epoch(epoch => $date);
+    return $date unless $format;
 
     return OpenXPKI::DateTime::convert_date({
         DATE      => $date,
@@ -551,112 +232,24 @@ sub _get_validity {
     });
 }
 
-sub _build_cert_subject_parts_hash {
-    my $self = shift;
-    my $hash = $self->subject_hash();
-
-    my $sans = $self->get_subject_alt_name();
-    for my $san ($sans->@*) {
-        my ($type, $value) = $san->@*;
-        $type = 'SAN_'.uc($type);
-        $hash->{$type} = [] unless(defined $hash->{$type});
-        push @{$hash->{$type}}, $value;
-    }
-    return $hash;
+# Convert::ASN1 decodes UTCTime/GeneralizedTime as epoch integers inside a CHOICE hashref.
+sub _asn1_time_to_epoch {
+    my $time = shift;
+    return $time->{generalTime} // $time->{utcTime};
 }
 
 sub _to_db_hash {
-
     my $self = shift;
-
-    my $hash = {
-        cert_key => $self->get_serial(),
-        identifier      => $self->get_cert_identifier(),
-        data            => $self->pem(),
-        subject         => $self->get_subject(),
-        issuer_dn       => $self->get_issuer(),
-        subject_key_identifier => $self->get_subject_key_id(),
-        authority_key_identifier => $self->get_authority_key_id(),
-        notafter        => $self->notafter(),
-        notbefore       => $self->notbefore(),
-    };
-    return $hash;
-
-}
-
-sub _build_basic_constraints {
-
-    my $self = shift;
-
-    my ($ext) = grep { $_->{'extnID'} eq '2.5.29.19' }
-        @{$self->_cert->{'tbsCertificate'}->{'extensions'} // []};
-
-    my %bc = (ca => 0, critical => 0, pathlen => undef);
-    return \%bc unless $ext;
-
-    $bc{critical} = $ext->{'critical'} ? 1 : 0;
-
-    require Convert::ASN1;
-    my $asn = Convert::ASN1->new;
-    $asn->prepare(q<
-        BasicConstraints ::= SEQUENCE {
-            cA                  BOOLEAN OPTIONAL,
-            pathLenConstraint   INTEGER OPTIONAL
-        }
-    >) or die "ASN.1 prepare failed: " . $asn->error;
-    my $decoded = $asn->decode($ext->{'extnValue'})
-        or die "ASN.1 decode failed: " . $asn->error;
-    $bc{ca} = ($decoded->{'cA'} ? 1 : 0) if exists $decoded->{'cA'};
-    $bc{pathlen} = $decoded->{'pathLenConstraint'} if exists $decoded->{'pathLenConstraint'};
-    return \%bc;
-}
-
-sub _build_authority_info {
-
-    my $self = shift;
-
-    my ($extvalue) = map {
-        $_->{'extnID'} eq '1.3.6.1.5.5.7.1.1' ? $_->{'extnValue'} : ()
-    } @{$self->_cert->{'tbsCertificate'}->{'extensions'} // []};
-
-    return { caIssuer => [], ocsp => [] } unless $extvalue;
-
-    require Convert::ASN1;
-    my $asn = Convert::ASN1->new;
-    $asn->prepare(q{
-        AuthorityInfoAccessSyntax ::= SEQUENCE OF AccessDescription
-
-        AccessDescription ::= SEQUENCE {
-            accessMethod    OBJECT IDENTIFIER,
-            accessLocation  GeneralName
-        }
-
-        GeneralName ::= CHOICE {
-            otherName     [0]     ANY,
-            rfc822Name    [1]     IA5String,
-            dNSName       [2]     IA5String,
-            x400Address   [3]     ANY,
-            directoryName [4]     ANY,
-            ediPartyName  [5]     ANY,
-            uniformResourceIdentifier [6] IA5String,
-            iPAddress     [7]     OCTET STRING,
-            registeredID  [8]     OBJECT IDENTIFIER
-        }
-    }) or die "ASN.1 prepare failed: " . $asn->error;
-
-    my $parser = $asn->find('AuthorityInfoAccessSyntax')
-        or die "Cannot find AuthorityInfoAccessSyntax in ASN.1 schema";
-    my $decoded = $parser->decode($extvalue) or die $parser->error;
-
-    my %raw;
-    foreach my $desc (@{$decoded}) {
-        next unless $desc->{accessLocation}->{uniformResourceIdentifier};
-        push @{$raw{$desc->{accessMethod}}}, $desc->{accessLocation}->{uniformResourceIdentifier};
-    }
-
     return {
-        caIssuer => $raw{'1.3.6.1.5.5.7.48.2'} // [],
-        ocsp     => $raw{'1.3.6.1.5.5.7.48.1'} // [],
+        cert_key                 => $self->get_serial(),
+        identifier               => $self->get_cert_identifier(),
+        data                     => $self->pem(),
+        subject                  => $self->get_subject(),
+        issuer_dn                => $self->get_issuer(),
+        subject_key_identifier   => $self->get_subject_key_id(),
+        authority_key_identifier => $self->get_authority_key_id(),
+        notafter                 => $self->notafter(),
+        notbefore                => $self->notbefore(),
     };
 }
 
