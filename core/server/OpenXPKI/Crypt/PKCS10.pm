@@ -75,9 +75,9 @@ has subject => (
     lazy => 1,
     default => sub {
         my $self = shift;
-        # we should improve Crypt::PKCS10 to return the desired format directly
-        my $subject = $self->_pkcs10()->subject;
-        return OpenXPKI::DN::convert_openssl_dn( $subject ) ;
+        my $csr_subject = $self->_pkcs10()->subjectSequence();
+        my $dn = OpenXPKI::Crypt::DN->new( sequence => $csr_subject );
+        return $dn->get_subject();
     }
 );
 

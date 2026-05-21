@@ -62,16 +62,15 @@ has cert_identifier => (
 
 has subject => (
     is => 'ro',
-    init_arg => undef,
+    required => 0,
     isa => 'Str',
     reader => 'get_subject',
     lazy => 1,
     default => sub {
         my $self = shift;
-        return join ",", map {
-            # Replace S -> ST and l => L, see #674
-            $_ =~ s{\AS=}{ST=}; $_ =~ s{\Al=}{L=}; $_
-        } reverse @{$self->_cert()->Subject};
+        my $csr_subject = $self->_cert()->SubjectSequence();
+        my $dn = OpenXPKI::Crypt::DN->new( sequence => $csr_subject );
+        return $dn->get_subject();
     }
 );
 
