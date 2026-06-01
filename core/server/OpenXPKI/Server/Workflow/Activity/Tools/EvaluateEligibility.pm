@@ -129,8 +129,7 @@ sub execute {
         # check the ref and explicit return to make sure it was not a stupid config
         $res = (defined $plain_result && ref $plain_result eq '' && $plain_result eq '1');
 
-        CTX('log')->application()->debug("Eligibility check without path - result " . (defined $plain_result ? $plain_result : undef));
-
+        CTX('log')->application()->debug("Eligibility check without path - result " . (defined $plain_result ? $plain_result : '<undef>'));
 
     }
 
