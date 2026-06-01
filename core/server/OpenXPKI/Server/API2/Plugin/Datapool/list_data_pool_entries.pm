@@ -104,11 +104,6 @@ command "list_data_pool_entries" => {
 } => sub {
     my ($self, $params) = @_;
 
-    # when called from a workflow we only allow the current realm
-    # NOTE: only check direct caller. if workflow is deeper in the caller
-    # chain we assume it's ok.
-    $self->assert_current_pki_realm_within_workflow($params->pki_realm);
-
     my $sql_params = $self->_make_db_query($params, $params->metadata, $params->values);
 
     my $order_by = $params->has_order ? $params->order : [ 'datapool_key', 'namespace' ];
@@ -165,11 +160,6 @@ command "list_data_pool_entries_count" => {
     %common_params
 } => sub {
     my ($self, $params) = @_;
-
-    # when called from a workflow we only allow the current realm
-    # NOTE: only check direct caller. if workflow is deeper in the caller
-    # chain we assume it's ok.
-    $self->assert_current_pki_realm_within_workflow($params->pki_realm);
 
     my $sql_params = $self->_make_db_query($params);
 
