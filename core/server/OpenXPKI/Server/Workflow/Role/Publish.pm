@@ -79,7 +79,7 @@ sub __walk_targets {
     my $self     = shift;
     my ( $prefix, $target, $publish_key, $data, $param ) = @_;
 
-    CTX('log')->application()->debug('Starting Publication for '. $publish_key .' to targets ' . join(",", @{$target}));
+    CTX('log')->application()->debug(sprintf("Starting Publication for '%s' to targets %s", $publish_key//'<undef>', join(",", @{$target})));
 
     my $on_error = $self->param('on_error') || '';
     my @failed;
@@ -93,9 +93,11 @@ sub __walk_targets {
             next;
         }
         my $res;
-        eval{ $res = $config->set( [ @{$prefix}, $target, $publish_key ], $data, $param ); };
+        my @path = ( @{$prefix}, $target );
+        push @path, $publish_key if (defined $publish_key);
+        eval{ $res = $config->set( \@path, $data, $param ); };
         if (my $eval_err = $EVAL_ERROR) {
-            CTX('log')->application()->debug("Publishing to '".join('.', @{$prefix}, $target, $publish_key)."' failed: $eval_err");
+            CTX('log')->application()->debug("Publishing to '".join('.', @path)."' failed: $eval_err");
             if ($on_error eq 'queue') {
                 push @failed, $target;
                 CTX('log')->application()->info("Publication failed for target $target, requeuing");
@@ -113,9 +115,9 @@ sub __walk_targets {
                 );
             }
         } elsif (!defined $res) {
-            CTX('log')->application->warn("Entity publication to $target for '$publish_key' returned undef");
+            CTX('log')->application->warn(sprintf("Entity publication to $target with key '%s' returned undef", $publish_key//'<undef>'));
         } else {
-            CTX('log')->application->info("Finished entity publication to $target for '$publish_key'");
+            CTX('log')->application->info(sprintf("Finished entity publication to $target with key '%s'", $publish_key//'<undef>'));
         }
     }
 
