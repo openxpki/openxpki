@@ -57,14 +57,14 @@ sub execute {
         }
     }
 
-    # implicit delete is deprecated to we call delete here
+    # implicit delete is deprecated so we call delete here
     if ($params->{ value } eq '') {
         ##! 32: 'Emtpy value - reroute to delete command'
         CTX('api2')->delete_data_pool_entry(
             namespace => $params->{namespace},
             key => $params->{key}
         );
-        CTX('log')->application()->info('Delete (implicit) datapool entry for key '.$params->{key}.' in namespace '.$params->{namespace});
+        CTX('log')->deprecated()->info('Delete (implicit) datapool entry for key '.$params->{key}.' in namespace '.$params->{namespace});
         return 1;
 
     }

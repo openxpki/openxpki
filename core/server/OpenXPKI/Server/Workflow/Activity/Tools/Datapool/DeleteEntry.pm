@@ -8,7 +8,7 @@ use OpenXPKI::Serialization::Simple;
 use OpenXPKI::DateTime;
 use DateTime;
 use Template;
-use Workflow::Exception qw(configuration_error);
+use Workflow::Exception qw(configuration_error workflow_error);
 
 
 sub execute {
@@ -17,15 +17,24 @@ sub execute {
     my $workflow   = shift;
     my $context    = $workflow->context();
     my $serializer = OpenXPKI::Serialization::Simple->new();
-    my $params     = { PKI_REALM => CTX('api2')->get_pki_realm(), };
 
     configuration_error('Mandatory parameter key missing or empty') unless($self->param('key'));
     configuration_error('Mandatory parameter namespace missing or empty') unless($self->param('namespace'));
 
-    CTX('api2')->delete_data_pool_entry(
+    my $params = {
         namespace => $self->param('namespace'),
         key => $self->param('key')
-    );
+    };
+
+    if ($self->param('pki_realm')) {
+        if ($self->param('pki_realm') eq '_global') {
+            $params->{pki_realm} = '_global';
+        } elsif($self->param('pki_realm') ne CTX('session')->data->pki_realm) {
+            workflow_error( 'Access to foreign realm is not allowed' );
+        }
+    }
+
+    CTX('api2')->delete_data_pool_entry(%$params);
 
     CTX('log')->application()->info('Remove datapool entry for key '.$self->param('key').' in namespace '.$self->param('namespace'));
 

@@ -34,6 +34,14 @@ sub execute {
         $params->{newkey} = $newkey;
     }
 
+    if ($self->param('pki_realm')) {
+        if ($self->param('pki_realm') eq '_global') {
+            $params->{pki_realm} = '_global';
+        } elsif($self->param('pki_realm') ne CTX('session')->data->pki_realm) {
+            workflow_error( 'Access to foreign realm is not allowed' );
+        }
+    }
+
     my $expiration_date = $self->param('expiration_date');
     if ($expiration_date) {
         my $then = OpenXPKI::DateTime::get_validity({

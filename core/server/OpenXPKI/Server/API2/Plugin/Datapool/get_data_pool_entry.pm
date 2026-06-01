@@ -83,11 +83,6 @@ command "get_data_pool_entry" => {
     my $key       = $params->key;
     my $realm     = $params->pki_realm;
 
-    # when called from a workflow we only allow the current realm
-    # NOTE: only check direct caller. if workflow is deeper in the caller
-    # chain we assume it's ok.
-    $self->assert_current_pki_realm_within_workflow($realm); # from ::Util
-
     my $result = $self->get_entry($realm, $namespace, $key); # from ::Util
     ##! 64: "Database result: ".Dumper($result)
 

@@ -59,21 +59,6 @@ command "delete_data_pool_entry" => {
 
     my $requested_pki_realm = $params->pki_realm;
 
-    # when called from a workflow we only allow the current realm
-    # NOTE: only check direct caller. if workflow is deeper in the caller
-    # chain we assume it's ok.
-    $self->assert_current_pki_realm_within_workflow($requested_pki_realm);
-
-    ##! 32: "checking if caller is workflow class that tries to access sys.* namespace"
-    my @caller = $self->rawapi->my_caller;
-    if ($caller[0] =~ m{ \A OpenXPKI::Server::Workflow }xms and $params->namespace =~ m{ \A sys\. }xms) {
-        OpenXPKI::Exception->throw(
-            message => 'Access to namespace sys.* not allowed when called from OpenXPKI::Server::Workflow::*',
-            params => { namespace => $params->namespace, },
-        );
-
-    }
-
     # erase expired entries
     $self->cleanup;
     $self->set_entry(  # from ::Util

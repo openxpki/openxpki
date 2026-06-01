@@ -15,8 +15,7 @@ use OpenXPKI::Server::Context qw( CTX );
 
 =head2 assert_current_pki_realm_within_workflow
 
-If the calling code is within OpenXPKI::Server::Workflow namespace, check
-whether the requested PKI realm matches the current one.
+Method was removed!
 
 B<Parameters>
 
@@ -35,28 +34,8 @@ signature_for assert_current_pki_realm_within_workflow => (
     positional => [ 'Str' ],
 );
 sub assert_current_pki_realm_within_workflow ($self, $requested_pki_realm) {
-    # access to the _global realm is always allowed
-    return 1 if $requested_pki_realm eq '_global';
-
-    my @caller = $self->rawapi->my_caller(1); # who called our calling code?
-
-    # if there is no caller left (shouldn't happen)
-    return 1 unless scalar @caller;
-
-    # if caller is NOT within Workflow namespace
-    return 1 unless $caller[0] =~ m{ \A OpenXPKI::Server::Workflow }xms;
-
-    # if Workflow: check
-    my $current_pki_realm = CTX('session')->data->pki_realm;
-    return 1 if $requested_pki_realm eq $current_pki_realm;
-
     OpenXPKI::Exception->throw(
-        message => 'Requested PKI realm must match current one if datapool is accessed from within OpenXPKI::Server::Workflow',
-        params => {
-            called_from     => sprintf("%s:%s", @caller[1,2]),
-            requested_realm => $requested_pki_realm,
-            current_realm   => $current_pki_realm,
-        },
+        message => 'The assert_current_pki_realm_within_workflow was removed',
     );
 }
 

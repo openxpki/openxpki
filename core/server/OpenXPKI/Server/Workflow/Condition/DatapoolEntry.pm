@@ -31,7 +31,7 @@ sub _evaluate
         if ($self->param('pki_realm') eq '_global') {
             $params->{pki_realm} = '_global';
         } elsif($self->param('pki_realm') ne CTX('session')->data->pki_realm) {
-            workflow_error( 'Access to foreign realm is not allowed' );
+            configuration_error( 'Access to foreign realm is not allowed' );
         }
     }
 

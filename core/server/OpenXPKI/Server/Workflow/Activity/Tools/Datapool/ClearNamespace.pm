@@ -14,9 +14,20 @@ sub execute {
 
     configuration_error('Mandatory parameter namespace missing or empty') unless($self->param('namespace'));
 
-    CTX('api2')->clear_data_pool_namespace(
+    my $params = {
         namespace => $self->param('namespace'),
-    );
+    };
+
+    if ($self->param('pki_realm')) {
+        if ($self->param('pki_realm') eq '_global') {
+            $params->{pki_realm} = '_global';
+        } elsif($self->param('pki_realm') ne CTX('session')->data->pki_realm) {
+            workflow_error( 'Access to foreign realm is not allowed' );
+        }
+    }
+
+    CTX('api2')->clear_data_pool_namespace(%$params);
+
 
     CTX('log')->application()->info('Cleared datapool namespace '.$self->param('namespace'));
 

@@ -110,11 +110,6 @@ command "modify_data_pool_entry" => {
 
     my $requested_pki_realm = $params->pki_realm;
 
-    # when called from a workflow we only allow the current realm
-    # NOTE: only check direct caller. if workflow is deeper in the caller
-    # chain we assume it's ok.
-    $self->assert_current_pki_realm_within_workflow($requested_pki_realm);
-
     # check if the value is there at all
     my $existing = $self->get_entry($requested_pki_realm, $params->namespace, $params->key);
     ##! 64: $existing
