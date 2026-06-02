@@ -22,11 +22,11 @@ sub execute {
     # one of error, overwrite, merge, skip
     my $mode = $self->param('mode') || 'error';
 
-    if ($mode !~ /(error|overwrite|skip|merge)/) {
+    if ($mode !~ /(error|overwrite|update|skip|merge)/) {
         configuration_error('Invalid mode ' . $mode);
     }
 
-    my $attr = $self->param('metadata');
+    my $attr = $self->param('metadata') || {};
 
     foreach my $key (keys %{$params}) {
         next unless($key =~ /^meta_(.*)/);
@@ -88,5 +88,5 @@ prefix) and the values directly as parameter I<metadata>.
     metadata:
       new_attribute: my_value
 
-Both modes can be combined, the I<metadata> has is loaded first, and
+Both modes can be combined, the I<metadata> hash is loaded first, and
 individual parameters of the same name will overwrite existing ones.

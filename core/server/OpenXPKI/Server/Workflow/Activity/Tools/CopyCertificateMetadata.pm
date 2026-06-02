@@ -2,8 +2,7 @@ package OpenXPKI::Server::Workflow::Activity::Tools::CopyCertificateMetadata;
 use OpenXPKI -base => 'OpenXPKI::Server::Workflow::Activity';
 
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Serialization::Simple;
-use Workflow::Exception qw(configuration_error workflow_error);
+use Workflow::Exception qw(configuration_error);
 
 sub execute {
     ##! 1: 'start'
@@ -11,20 +10,17 @@ sub execute {
     my $context  = $workflow->context();
     my $params = $self->param();
 
-    my $ser  = OpenXPKI::Serialization::Simple->new();
-
     my $source_cert_identifier = $self->param('source_cert_identifier');
     my $cert_identifier = $self->param('cert_identifier') || $context->param('cert_identifier');
 
     ##! 16: ' cert_identifier' . $cert_identifier
 
     # one of error, overwrite, merge, skip
-    my $mode = $self->param('mode') || 'error';
+    my $mode = $self->param('mode') || 'merge';
 
-    if ($mode !~ /(error|overwrite|skip)/) {
+    if ($mode !~ /(error|overwrite|update|skip|merge)/) {
         configuration_error('Invalid mode ' . $mode);
     }
-
     ##! 16: ' parameters: ' . Dumper $params
 
     my @attribute;
@@ -50,20 +46,28 @@ sub execute {
         }
     );
 
+    my %attrib;
     while (my $item = $sth_attrib->fetchrow_hashref) {
         ##! 32: 'Value ' . Dumper $item
-        $dbi->insert(
-            into => 'certificate_attributes',
-            values => {
-                attribute_key        => AUTO_ID,
-                identifier           => $cert_identifier,
-                attribute_contentkey => $item->{attribute_contentkey},
-                attribute_value      => $item->{attribute_value},
-            }
-        );
+        my $key = $item->{attribute_contentkey};
+        $key =~ s/\Ameta_//;
+        my $val = $item->{attribute_value};
+        if (exists $attrib{$key}) {
+            $attrib{$key} = [ $attrib{$key} ] unless ref $attrib{$key};
+            push @{$attrib{$key}}, $val;
+        } else {
+            $attrib{$key} = $val;
+        }
     }
 
+    ##! 16: 'Attributes to copy: ' . Dumper \%attrib
+    return unless %attrib;
 
+    CTX('api2')->set_cert_metadata(
+        identifier => $cert_identifier,
+        attribute  => \%attrib,
+        mode       => $mode,
+    );
 
 }
 
@@ -78,8 +82,7 @@ OpenXPKI::Server::Workflow::Activity::Tools::CopyCertificateMetadata
 
 =head1 Description
 
-Copy certificate meta_ attributes from one certificate to another. The
-target is NOT checked for any existing data.
+Copy certificate metadata from one certificate to another, uses the set_cert_me
 
 =head2 Configuration
 
@@ -88,12 +91,20 @@ target is NOT checked for any existing data.
        source_cert_identifier: 2DLIufyJvo0yJDLIuf346
        cert_identifier: 0utS7yqMTAy2DLIufyJvoc2GSCs
        attribute: email requestor
+       mode: merge
 
-Load the metadata attributes named by I<attribute> from the certificate
-given as I<source_cert_identifier> and write them to I<cert_identifier>.
+=head2 Parameters
 
-The meta_ prefix is added internally and must not ne provided, if attributes
-is omited all attributes with the meta_ prefixed are copied. Attributes can
-be stated as a space separated list or directly as array ref.
+=over
 
+=item * C<source_cert_identifier> I<Str> - identifier of the certificate to copy attributes from
 
+=item * C<cert_identifier> I<Str> - target certificate identifier; falls back to the workflow context value
+
+=item * C<attribute> I<Str|ArrayRef> - space-separated list or array ref of attribute names to copy.
+The C<meta_> prefix is added internally and must not be provided.
+If omitted, all C<meta_*> attributes are copied.
+
+=item * C<mode> I<Str> - conflict handling mode passed to C<set_cert_metadata>, default is C<merge>.
+
+=back

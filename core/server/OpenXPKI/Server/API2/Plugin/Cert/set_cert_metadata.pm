@@ -48,6 +48,10 @@ removed, new ones will be appended. Passing an empty array will remove
 all existing entries. Passing a, non-empty, scalar will cause an
 exception.
 
+=item update
+
+Same as overwrite but if no value exists the incoming value is dropped.
+
 =item merge
 
 Add the new value(s) if they do not already exists, will work with
@@ -80,7 +84,7 @@ overwrite mode, pass an empty array:
 command "set_cert_metadata" => {
     identifier => { isa => 'Base64', required => 1, },
     attribute  => { isa => 'HashRef', required => 1 },
-    mode  => { isa => 'Str', matching => qr{ \A ( error | overwrite | skip | merge ) \Z }x, default => 'error' },
+    mode  => { isa => 'Str', matching => qr{ \A ( error | overwrite | update | skip | merge ) \Z }x, default => 'error' },
 } => sub {
     my ($self, $params) = @_;
 
@@ -157,6 +161,14 @@ command "set_cert_metadata" => {
         );
         my $item = $attr->{'meta_'.$key};
         ##! 64: "  OLD: " . Dumper($item)
+
+        if ($mode eq 'update') {
+            # if there is no value we just do noting
+            next KEY unless($item);
+
+            # remainder works the same way as overwrite
+            $mode = 'overwrite';
+        }
 
         # nothing is set so we can just insert anything we find
         if (!$item) {
