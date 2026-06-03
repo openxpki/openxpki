@@ -604,7 +604,7 @@ sub __generate_response {
     if (blessed $skey and $skey->isa('OpenXPKI::Crypto::Backend::API')) {
         # as we are unable to get the key details from the token we
         # check the signer certificate for the used pubkey algorithm
-        my $pkAlg = $racert->_cert()->PubKeyAlg();
+        my $pkAlg = $racert->get_public_key_alg();
         OpenXPKI::Exception->throw(
             message => 'Unsupported RA key type', params => { type => $pkAlg }
         ) unless ($pkAlg eq 'RSA');
@@ -644,7 +644,7 @@ sub __generate_response {
             signerInfos  => { siSet => [{
                     version => 1,
                     sid => { issuerAndSerialNumber => {
-                        issuer => $racert->_cert()->{'tbsCertificate'}->{'issuer'}->{'rdnSequence'},
+                        issuer => $racert->get_issuer_rdn(),
                         serialNumber => $racert->get_serial(),
                     }},
                     authenticatedAttributes => { 'aaSet' => \@authAttr },
@@ -707,8 +707,8 @@ sub create_cert_response {
     my ($cbc, $content_key, $iv) = $self->__get_cbc();
 
     my $cert = $self->signer();
-    my $rkey = $cert->_cert()->pubkey();
-    my $pkAlg = $cert->_cert()->PubKeyAlg();
+    my $rkey = $cert->get_spki_der();
+    my $pkAlg = $cert->get_public_key_alg();
     my ($encryptedKey, $keyEncAlg);
     if ($pkAlg eq 'RSA') {
         if ($self->key_alg() eq 'rsaesOaep') {
@@ -737,7 +737,7 @@ sub create_cert_response {
                     'version' => 0,
                     'encryptedKey' => $encryptedKey,
                     'issuerAndSerialNumber' => {
-                        issuer => $cert->_cert()->{'tbsCertificate'}->{'issuer'}->{'rdnSequence'},
+                        issuer => $cert->get_issuer_rdn(),
                         serialNumber => $cert->get_serial(),
                     }
                 }]
