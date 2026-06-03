@@ -3,7 +3,7 @@ use OpenXPKI;
 
 use parent qw( OpenXPKI::Server::Workflow::Activity );
 
-use Crypt::PKCS10 1.8;
+use OpenXPKI::Crypt::PKCS10;
 use Workflow::Exception qw( workflow_error configuration_error );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Serialization::Simple;
@@ -42,13 +42,13 @@ sub execute
 
 
     if (!$self->param('keepformat')) {
-        Crypt::PKCS10->setAPIversion(1);
-        my $csr = Crypt::PKCS10->new( $data, ignoreNonBase64 => 1, verifySignature => 0  );
-
-        workflow_error('Unable to parse PKCS10 container in CSR::PersistRequest')
-            unless($csr);
-
-        $data = $csr->csrRequest(1);
+        my $csr;
+        try {
+            $csr = OpenXPKI::Crypt::PKCS10->new($data);
+        } catch ($e) {
+            workflow_error('Unable to parse PKCS10 container in CSR::PersistRequest');
+        }
+        $data = $csr->pem();
     }
 
     my $source_ref = $serializer->deserialize($context->param('sources')) || {};

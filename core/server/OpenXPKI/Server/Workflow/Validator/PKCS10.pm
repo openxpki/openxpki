@@ -4,7 +4,7 @@ use OpenXPKI;
 use parent qw( OpenXPKI::Server::Workflow::Validator );
 
 use Workflow::Exception qw( validation_error );
-use Crypt::PKCS10 2.000;
+use OpenXPKI::Crypt::PKCS10;
 use MIME::Base64;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Crypt::PKCS7;
@@ -22,34 +22,27 @@ sub _validate {
 
     my $verify_signature = not (defined $self->param('verify_signature') and not $self->param('verify_signature'));
 
-    Crypt::PKCS10->setAPIversion(1);
-    my $decoded = Crypt::PKCS10->new($pkcs10,
-        ignoreNonBase64 => 1,
-        verifySignature => 0,
-    );
-
-    my $error;
-    $error = Crypt::PKCS10->error unless $decoded;
+    my ($decoded, $error);
+    try {
+        $decoded = OpenXPKI::Crypt::PKCS10->new($pkcs10);
+    } catch ($e) {
+        $error = $e;
+    }
 
     # try to unwrap as PKCS7 renewal request containers if allowed
     if (not $decoded and $self->param('unwrap_pkcs7')) {
-
-        eval{
+        try {
             ##! 16: 'try to parse a PKCS7'
             my $p7 = OpenXPKI::Crypt::PKCS7->new($pkcs10);
             ##! 128: $p7->envelope
             $pkcs10 = $p7->payload;
             ##! 32: encode_base64($pkcs10)
-            $decoded = Crypt::PKCS10->new( $pkcs10,
-                ignoreNonBase64 => 1,
-                verifySignature => 0,
-            );
-
-            die Crypt::PKCS10->error unless $decoded;
+            $decoded = OpenXPKI::Crypt::PKCS10->new($pkcs10);
             $error = undef;
             CTX('log')->application->info("Input was PKCS#7 container with valid PKCS#10 payload");
-        };
-        $error = $EVAL_ERROR if $EVAL_ERROR;
+        } catch ($e) {
+            $error = $e;
+        }
     }
 
     if (not $decoded) {
@@ -68,12 +61,12 @@ sub _validate {
         validation_error("I18N_OPENXPKI_UI_VALIDATOR_PKCS10_PARSE_ERROR");
     }
 
-    if ($verify_signature and not $decoded->checkSignature) {
+    if ($verify_signature and not $decoded->check_signature) {
         CTX('log')->application->error("Invalid signature on PKCS#10 request");
         validation_error("I18N_OPENXPKI_UI_VALIDATOR_PKCS10_SIGNATURE_ERROR");
     }
 
-    if (not ($decoded->subject or $self->param('empty_subject'))) {
+    if (not ($decoded->get_subject or $self->param('empty_subject'))) {
         CTX('log')->application->error('PKCS#10 has no subject');
         validation_error('I18N_OPENXPKI_UI_VALIDATOR_PKCS10_NO_SUBJECT_ERROR');
     }

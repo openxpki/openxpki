@@ -42,7 +42,7 @@ use List::Util qw( any );
 # CPAN modules
 use Connector;
 use Connector::Builtin::Inline;
-use Crypt::PKCS10;
+use OpenXPKI::Crypt::PKCS10;
 use Log::Log4perl qw( :nowarn );
 use Mojo::Message::Request;
 use Mojo::Util qw( url_unescape );
@@ -1381,16 +1381,22 @@ sub set_pkcs10_and_tid ($self, $pkcs10 = undef) {
         die $self->new_response( 40003 );
     };
 
-    Crypt::PKCS10->setAPIversion(1);
-    my $decoded = Crypt::PKCS10->new($pkcs10, ignoreNonBase64 => 1, verifySignature => 1);
-    if (!$decoded) {
-        $self->log->error('Unable to parse PKCS10: '. Crypt::PKCS10->error);
+    my $decoded;
+    try {
+        $decoded = OpenXPKI::Crypt::PKCS10->new($pkcs10);
+    } catch ($e) {
+        $self->log->error('Unable to parse PKCS10: ' . $e);
         $self->log->debug($pkcs10);
         die $self->new_response( 40002 );
     }
 
-    $self->add_wf_param(pkcs10 =>$decoded->csrRequest(1));
-    $self->add_wf_param(transaction_id => sha1_hex($decoded->csrRequest));
+    if (!$decoded->check_signature()) {
+        $self->log->error('Invalid signature on PKCS10');
+        die $self->new_response( 40002 );
+    }
+
+    $self->add_wf_param(pkcs10 => $decoded->pem());
+    $self->add_wf_param(transaction_id => $decoded->get_transaction_id());
 }
 
 =head1 LEGACY CGI METHODS

@@ -3,7 +3,7 @@ use OpenXPKI;
 
 use parent qw( OpenXPKI::Server::Workflow::Validator );
 
-use Crypt::PKCS10;
+use OpenXPKI::Crypt::PKCS10;
 use OpenXPKI::Server::Context qw( CTX );
 use Workflow::Exception qw( validation_error configuration_error );
 
@@ -26,30 +26,24 @@ sub _validate {
     my $key_alg = 'unknown';
     my $key_params = {};
 
-    Crypt::PKCS10->setAPIversion(1);
-    my $decoded = Crypt::PKCS10->new( $pkcs10, ignoreNonBase64 => 1, verifySignature => 0);
-    if (!$decoded) {
+    my $decoded;
+    try {
+        $decoded = OpenXPKI::Crypt::PKCS10->new($pkcs10);
+    } catch ($e) {
         validation_error('I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_CAN_NOT_PARSE_PKCS10');
     }
 
-    my $key_param;
-    eval {
-        $key_param = $decoded->subjectPublicKeyParams();
-    };
+    my $alg = $decoded->get_public_key_alg();
+    my $params = $decoded->get_key_params();
 
-    if (!$key_param || !$key_param->{keytype}) {
-        CTX('log')->application()->warn("Unable to get key parameters from PKCS10");
-        validation_error('I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_ALGO_NOT_SUPPORTED');
-    } elsif ($key_param->{keytype} eq 'RSA') {
+    if ($alg eq 'RSA') {
         $key_alg = 'rsa';
-        $key_params = { key_length =>  $key_param->{keylen} };
-    } elsif ($key_param->{keytype} eq 'DSA') {
-        $key_alg = 'dsa';
-        $key_params = { key_length =>  $key_param->{keylen} };
-    } elsif ($key_param->{keytype} eq 'ECC') {
+        $key_params = { key_length => $params->{key_length} };
+    } elsif ($alg eq 'EC') {
         $key_alg = 'ec';
-        $key_params = { key_length =>  $key_param->{keylen}, curve_name => $key_param->{curve} };
+        $key_params = { key_length => $params->{key_length}, curve_name => $params->{curve_name} };
     } else {
+        CTX('log')->application()->warn("Unable to get key parameters from PKCS10");
         validation_error('I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_ALGO_NOT_SUPPORTED');
     }
 
