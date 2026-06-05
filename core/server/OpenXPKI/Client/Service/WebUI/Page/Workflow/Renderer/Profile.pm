@@ -373,7 +373,7 @@ sub render_server_password ($self, $args, $wf_action, $param = undef) {
         my @param = split /!/, $param;
         # Legacy format, section only
         if (@param == 1) {
-             $extra{'length'} = $param[0];
+            $extra{'length'} = $param[0];
         } elsif (@param == 2 && $param[0] =~ m{\A\d+\z}) {
             $extra{'length'} = $param[1];
         } else {
@@ -384,9 +384,23 @@ sub render_server_password ($self, $args, $wf_action, $param = undef) {
     $extra{'length'} ||= 18;
 
     my $wf_action_info = $wf_info->{activity}->{$wf_action};
+
+    if (!$extra{'field'}) {
+        # filter all fields that are volatile and end on "password"
+        my @password_fields = map {
+            ($_->{name} =~ m{\A_(\w*)password}) ? $_->{name} : ()
+        } $wf_action_info->{field}->@*;
+
+        if (scalar @password_fields == 1) {
+            $extra{'field'} = $password_fields[0];
+        } else {
+            $extra{'field'} = '_password';
+        }
+    }
+
     foreach my $field (@{$wf_action_info->{field}}) {
         my $value;
-        if ($field->{name} eq '_password') {
+        if ($field->{name} eq $extra{'field'}) {
             $value = $self->send_command_v2( 'get_random', \%extra );
             if (!$value) {
                 $self->status->error('I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_ERROR_LABEL');
