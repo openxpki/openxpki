@@ -67,8 +67,9 @@ my %HASH_ALG_OID = (
 
 # Known public key algorithm OIDs → normalized name
 my %PUBKEY_ALG = (
-    '1.2.840.113549.1.1.1' => 'RSA',   # rsaEncryption
-    '1.2.840.10045.2.1'    => 'EC',    # id-ecPublicKey
+    '1.2.840.113549.1.1.1'  => 'RSA',   # rsaEncryption
+    '1.2.840.113549.1.1.10' => 'RSA',   # id-RSASSA-PSS (RSA-PSS key)
+    '1.2.840.10045.2.1'     => 'EC',    # id-ecPublicKey
 );
 
 # Known EC curve OIDs → (curve_name, key_length_bits)
@@ -212,7 +213,7 @@ my $SCHEMA = q{
         fullName [0] IMPLICIT GeneralNames
     }
     DistributionPoint ::= SEQUENCE {
-        distributionPoint [0] ANY OPTIONAL,
+        distributionPoint [0] EXPLICIT DistributionPointName OPTIONAL,
         reasons           [1] ANY OPTIONAL,
         cRLIssuer         [2] ANY OPTIONAL
     }
@@ -668,11 +669,6 @@ sub _build_key_usage {
         $data_offset = 5;  # tag(1) + len_marker(1) + len(2) + unused_bits(1)
     }
 
-    my $unused_bits = unpack('C', substr($der, $data_offset - 1, 1));
-    OpenXPKI::Exception->throw(
-        message => 'Keyusage field has unused bits',
-    ) unless $unused_bits == 0;  # RFC 5280 §4.2.1.3: must be zero
-
     my $data = substr($der, $data_offset);
     my @data_bytes = unpack('C*', $data);
     my @bits;
@@ -920,6 +916,12 @@ sub _build_key_params {
         my $spki_der = $self->get_spki_der or return { key_length => 0 };
         my $pk = eval { Crypt::PK::RSA->new->import_key(\$spki_der) };
         return { key_length => $pk->size * 8 } if $pk;
+        # Fallback for RSA-PSS keys: parse RSAPublicKey from raw key bytes
+        my $rsa_pub = eval { $self->_asn1('RSAPublicKey')->decode($pub_der) };
+        if ($rsa_pub && $rsa_pub->{modulus}) {
+            my $bits = length($rsa_pub->{modulus}->as_bin) - 2;  # Math::BigInt bin = '0b...'
+            return { key_length => $bits } if $bits > 0;
+        }
         return { key_length => 0 };
     }
 
@@ -1012,17 +1014,24 @@ sub check_signature {
 
     if ($alg eq 'RSA') {
         require Crypt::PK::RSA;
-        my $pk = eval { Crypt::PK::RSA->new->import_key(\$spki_der) }
-            or do { warn "RSA key import failed: $@"; return 0 };
-        my ($padding, $hash_name);
+        my $pk = eval { Crypt::PK::RSA->new->import_key(\$spki_der) };
+        # Fallback for RSA-PSS keys whose SPKI uses a non-standard OID
+        unless ($pk) {
+            my $raw_pub = $self->get_pub_key;
+            $pk = eval { Crypt::PK::RSA->new->import_key(\$raw_pub) };
+        }
+        return 0 unless $pk;
+        my ($padding, $hash_name, @extra);
         if ($hash eq 'pss') {
+            my ($pss_hash, $salt_len) = $self->_pss_params;
             $padding   = 'pss';
-            $hash_name = $self->_pss_hash_name;
+            $hash_name = $pss_hash;
+            push @extra, $salt_len;
         } else {
             $padding   = 'v1.5';
             $hash_name = uc($hash);
         }
-        return eval { $pk->verify_message($sig, $tbs_der, $hash_name, $padding) } ? 1 : 0;
+        return eval { $pk->verify_message($sig, $tbs_der, $hash_name, $padding, @extra) } ? 1 : 0;
     }
     if ($alg eq 'EC') {
         require Crypt::PK::ECC;
@@ -1049,18 +1058,23 @@ sub _tbs_der {
     return substr($inner, 0, $tbs_tag_b + $tbs_len_b + $tbs_len);
 }
 
-# Extract the hash algorithm name from RSASSA-PSS-params DER.
-# RFC 4055 default is SHA-1 when the field is absent.
-sub _pss_hash_name {
+# Extract hash name and salt length from RSASSA-PSS-params DER.
+# RFC 4055 defaults: SHA-1, salt length 20.
+sub _pss_params {
     my $self = shift;
     my $params_der = $self->_parsed->{signatureAlgorithm}{parameters}
-        or return 'SHA1';
+        or return ('SHA1', 20);
     my $pss = eval { $self->_asn1('RsassaPssParams')->decode($params_der) }
-        or return 'SHA1';
-    my $oid = $pss->{hashAlgorithm}{algorithm}
-        or return 'SHA1';
-    return $HASH_ALG_OID{$oid} // 'SHA1';
+        or return ('SHA1', 20);
+    my $hash = do {
+        my $oid = $pss->{hashAlgorithm}{algorithm} // '';
+        $HASH_ALG_OID{$oid} // 'SHA1';
+    };
+    my $salt = $pss->{saltLength} // 20;
+    return ($hash, $salt);
 }
+
+sub _pss_hash_name { ($_[0]->_pss_params)[0] }
 
 =head2 get_extension_value (name_or_oid)
 

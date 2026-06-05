@@ -91,9 +91,8 @@ has cdp => (
         my $dps = $self->_asn1('CRLDistributionPoints')->decode($der) or return [];
         my @uris;
         for my $dp (@$dps) {
-            next unless $dp->{distributionPoint};
-            my $dpname = $self->_asn1('DistributionPointName')->decode($dp->{distributionPoint});
-            next unless $dpname && $dpname->{fullName};
+            my $dpname = $dp->{distributionPoint} or next;
+            next unless $dpname->{fullName};
             for my $gn (@{$dpname->{fullName}}) {
                 push @uris, $gn->{uniformResourceIdentifier}
                     if $gn->{uniformResourceIdentifier};
