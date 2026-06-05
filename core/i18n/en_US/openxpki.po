@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2026-05-05 13:37+0200\n"
+"PO-Revision-Date: 2026-06-05 11:50+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-"
 "devel@lists.sourceforge.net>\n"
@@ -505,6 +505,9 @@ msgstr "Wrong passphrase: no encrypted secret share could be unlocked."
 msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SPLIT_EMPTY_SHARE"
 msgstr "Empty share or passphrase given."
 
+msgid "I18N_OPENXPKI_UI_CSR_CUSTOM_EXTENSION_LABEL"
+msgstr "Certificate Extensions"
+
 msgid "I18N_OPENXPKI_UI_CSR_EXT_CERTIFICATE_TEMPLATE"
 msgstr "Certificate Template"
 
@@ -744,7 +747,6 @@ msgstr "The requested entity was not found"
 msgid "I18N_OPENXPKI_UI_ERROR_DURING_PUBLICATION"
 msgstr "Backend error during publishing"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_ERROR_ISSUER_UNKNOWN"
 msgstr "Certificate issuer is unknown"
 
@@ -1227,21 +1229,18 @@ msgstr "Workflow Search"
 msgid "I18N_OPENXPKI_UI_METADATA_SECTION_LIFECYCLE_DESC"
 msgstr "Action"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_METADATA_SECTION_LIFECYCLE_LABEL"
-msgstr "Action"
+msgstr "Lifecycle related items"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_METADATA_SECTION_OWNER_DESC"
 msgstr "Action"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_METADATA_SECTION_OWNER_LABEL"
-msgstr "Action"
+msgstr "Owner related items"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_METADATA_SECTION_SYSTEM_LABEL"
-msgstr "Action"
+msgstr "System related items"
 
 msgid "I18N_OPENXPKI_UI_META_APPLICATION_ID"
 msgstr "Application ID"
@@ -1567,13 +1566,11 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_LABEL"
 msgstr "Default profile style"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_CASIGNER_LABEL"
-msgstr "User, Sign and Encrypt"
+msgstr "CA Signer (internal)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_CA_SIGNER_LABEL"
-msgstr "User, Sign and Encrypt"
+msgstr "CA Signer (internal)"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_CN_DESC"
 msgstr "Common Name"
@@ -2247,21 +2244,17 @@ msgstr "An error occured during input validation"
 msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE_INVALID"
 msgstr "The following fields do not match the expected type of value"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_FAILED_REGEX"
 msgstr "Value failed allowed expression."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_LESS_THAN_MIN_COUNT"
-msgstr "The marked fields are required."
+msgstr "Field has less items as expected"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_MAX_COUNT_EXCEEDED"
-msgstr "The number of fields exceeds the allowed count."
+msgstr "Field has more items as expected"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_REQUIRED_BUT_EMPTY"
-msgstr "Required field is empty"
+msgstr "Field is required but empty"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYREUSE_KEY_ALREADY_EXISTS"
 msgstr "A certificate with the same public key already exists!"
@@ -2364,23 +2357,18 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_LABEL"
 msgstr "Approve Request"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_IMPORT_KEY_DESC"
-msgstr "Generate key for this request"
+msgstr "Import an existing private key for the CA signer certificate."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_IMPORT_KEY_LABEL"
-msgstr "Generate key"
+msgstr "Import Key"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_UPLOAD_CERTIFICATE_DESC"
 msgstr ""
-"Please paste (or use the upload handle) the PEM encoded certificate you have "
-"received from the external ca to be uploaded. Upload is only possible if the "
-"certificate issuer is known and the certificate key matches the one "
-"requested from this workflow!"
+"Please paste (or use the upload handle) the PEM encoded certificate to be "
+"uploaded. The certificate issuer must be known and the certificate key must "
+"match the one generated or imported in this workflow."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_UPLOAD_CERTIFICATE_LABEL"
 msgstr "Upload Certificate"
 
@@ -2891,8 +2879,17 @@ msgstr "Successful Workflows"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_TITLE"
 msgstr "Bulk handle workflows"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_DOWNLOAD_KEY"
+msgstr "Download key"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_ELIGIBILITY_RECHECK_LABEL"
 msgstr "Recheck Eligibility"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_EXPORT_CSR"
+msgstr "Export certificate signing request"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_GENERATE_CA"
+msgstr "Generate self-signed CA"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_PROCEED_LABEL"
 msgstr "Submit with Policy Exception"
@@ -3005,19 +3002,17 @@ msgstr "Cache Interval"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_ALIAS_LABEL"
 msgstr "CA Alias"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_GENERATE_SIGNER_IMPORT_KEY_DESC"
-msgstr "Components forming the certificates subject alternative name."
+msgstr "Paste the PEM-encoded private key to import."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_GENERATE_SIGNER_IMPORT_KEY_LABEL"
-msgstr "SubjectAltName parts"
+msgstr "Private Key (PEM)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_GENERATE_SIGNER_IMPORT_KEY_PASSWORD_DESC"
-msgstr "Components forming the certificates subject alternative name."
+msgstr ""
+"Password to decrypt the private key (leave empty if the key is not "
+"encrypted)."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_GENERATE_SIGNER_IMPORT_KEY_PASSWORD_LABEL"
 msgstr "Private Key Password"
 
@@ -3256,9 +3251,8 @@ msgstr "usually not required, use the selector on the right or type a datetime"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_TOOLTIP"
 msgstr "the revocation will be scheduled after the given date"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DOWNLOAD_LABEL"
-msgstr "Password"
+msgstr "Download"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ELIGIBILITY_RESULT_LABEL"
 msgstr "Eligibility Result"
@@ -4278,53 +4272,52 @@ msgstr "Canceled"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CAPUBLISH_INITIAL_LABEL"
 msgstr "Publish CA/CRL Information"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_CHOOSE_KEY_SOURCE_DESC"
-msgstr "The certificate was issued and will be send to the client on request."
+msgstr ""
+"Select how the private key for the CA signer certificate should be provided."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_CHOOSE_KEY_SOURCE_HINT"
-msgstr "Generate key for this request"
+msgstr ""
+"Please select whether you want to generate a new private key or import an "
+"existing one."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_CHOOSE_KEY_SOURCE_LABEL"
-msgstr "Private Key Password"
+msgstr "Choose Key Source"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_ENTER_SUBJECT_DESC"
 msgstr "Provide information to build the subject of the certificate from."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_ENTER_SUBJECT_LABEL"
 msgstr "Certificate Subject"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_EXPORT_CSR_READY_DESC"
+msgstr ""
+"The private key has been generated. Please download and safely store it now."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_EXPORT_CSR_READY_LABEL"
+msgstr "Import Key"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_GENERATE_KEY_LABEL"
-msgstr "Generate key"
+msgstr "Generate Key"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_IMPORT_KEY_LABEL"
-msgstr "Additional Request Information"
+msgstr "Import Key"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_KEY_CONFIRMED_LABEL"
-msgstr "Private Key Password"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_KEY_DOWNLOAD_READY_DESC"
-msgstr "Generate key for this request"
+msgstr ""
+"The private key has been generated. Please download and safely store it now."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_KEY_DOWNLOAD_READY_LABEL"
-msgstr "Private Key Password"
+msgstr "Download Private Key"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_SUCCESS_DESC"
-msgstr "The certificate was issued and will be send to the client on request."
+msgstr ""
+"The CA signer certificate has been successfully created and registered."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_SUCCESS_LABEL"
-msgstr "SUCCESS"
+msgstr "CA Signer Certificate Created"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERTRENEW_FAILURE_DESC"
 msgstr ""
@@ -4843,15 +4836,13 @@ msgstr "Request registration of a new ACME user account"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_NEWACCOUNT_LABEL"
 msgstr "ACME Account Registration"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_GENERATE_SIGNER_DESC"
 msgstr ""
-"Certificate Enrollment workflow used for certificate enrollment via "
-"automated interfaces (e.g. SCEP, RPC)."
+"Workflow to generate and register a CA signer certificate, including private "
+"key generation or import and optional certificate upload."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_GENERATE_SIGNER_LABEL"
-msgstr "Certificate Enrollment"
+msgstr "Generate CA Signer Certificate"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_DESC"
 msgstr ""
@@ -5152,6 +5143,9 @@ msgstr "Yes"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_LOST"
 #~ msgstr "key unavailable"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_KEY_CONFIRMED_LABEL"
+#~ msgstr "Key Downloaded"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_SUMMARY_FIELD_REPORT_DATA_LABEL"

@@ -630,6 +630,10 @@ msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SPLIT_EMPTY_SHARE"
 msgstr "Nessun dato disponibile"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CSR_CUSTOM_EXTENSION_LABEL"
+msgstr "Azione"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CSR_EXT_CERTIFICATE_TEMPLATE"
 msgstr "non dopo il"
 
@@ -3553,8 +3557,20 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_TITLE"
 msgstr "Bulk handle workflows"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_DOWNLOAD_KEY"
+msgstr "Richiesta Aggiornamento"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_ELIGIBILITY_RECHECK_LABEL"
 msgstr "Ri-Valuta la Policy"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_EXPORT_CSR"
+msgstr "Esporta il Certificato nel formato desiderato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_GENERATE_CA"
+msgstr "Richiesta Aggiornamento"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_PROCEED_LABEL"
 msgstr "Invia con Eccezione alla Policy"
@@ -5175,16 +5191,20 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_ENTER_SUBJECT_LABEL"
 msgstr "Stato"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_EXPORT_CSR_READY_DESC"
+msgstr "Genera la chiave per questa richiesta"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_EXPORT_CSR_READY_LABEL"
+msgstr "Stato"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_GENERATE_KEY_LABEL"
 msgstr "Genera chiave"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_IMPORT_KEY_LABEL"
 msgstr "Stato"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_KEY_CONFIRMED_LABEL"
-msgstr "Creator"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_KEY_DOWNLOAD_READY_DESC"
@@ -6526,6 +6546,10 @@ msgstr "Sì"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ADDUSER_SUCCESS_LABEL"
 #~ msgstr "Certificato Emesso"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_KEY_CONFIRMED_LABEL"
+#~ msgstr "Creator"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_PENDING_DESC"

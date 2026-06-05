@@ -505,6 +505,10 @@ msgstr "Falsche Passphrase für Share"
 msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SPLIT_EMPTY_SHARE"
 msgstr "Share zurücksetzen"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CSR_CUSTOM_EXTENSION_LABEL"
+msgstr "Aktion"
+
 msgid "I18N_OPENXPKI_UI_CSR_EXT_CERTIFICATE_TEMPLATE"
 msgstr "Certificate Template"
 
@@ -2943,8 +2947,20 @@ msgstr "Erfolgreiche Workflows"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_TITLE"
 msgstr "Massenbearbeitung"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_DOWNLOAD_KEY"
+msgstr "Antrag aktualisieren"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_ELIGIBILITY_RECHECK_LABEL"
 msgstr "Berechtigung erneut prüfen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_EXPORT_CSR"
+msgstr "Exportiert Zertifikate über die RPC API"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_GENERATE_CA"
+msgstr "Antrag aktualisieren"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_PROCEED_LABEL"
 msgstr "Trotz Policy-Verletzung absenden"
@@ -4379,16 +4395,20 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_ENTER_SUBJECT_LABEL"
 msgstr "Zertifikatsinhalte festlegen"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_EXPORT_CSR_READY_DESC"
+msgstr "Schlüsselpaar für diesen Antrag erstellen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_EXPORT_CSR_READY_LABEL"
+msgstr "Erweiterte Antragsdaten eingeben"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_GENERATE_KEY_LABEL"
 msgstr "Erzeuge Schlüsselpaar"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_IMPORT_KEY_LABEL"
 msgstr "Erweiterte Antragsdaten eingeben"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_KEY_CONFIRMED_LABEL"
-msgstr "Schlüsselkennwort festlegen"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_KEY_DOWNLOAD_READY_DESC"
@@ -5266,6 +5286,10 @@ msgstr "ja"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_LOST"
 #~ msgstr "Schlüssel unzugänglich"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_KEY_CONFIRMED_LABEL"
+#~ msgstr "Schlüsselkennwort festlegen"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_SUMMARY_FIELD_REPORT_DATA_LABEL"
