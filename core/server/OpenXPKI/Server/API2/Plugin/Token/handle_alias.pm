@@ -224,7 +224,11 @@ protected_command "create_alias" => {
 
         # alias exists and has the same validity
         # this is a noop so we just return the existing alias
-        return { alias => $exists->{alias} };
+        return {
+            alias => $exists->{alias},
+            notbefore => $exists->{notbefore},
+            notafter => $exists->{notafter},
+        };
     }
 
 
@@ -242,7 +246,11 @@ protected_command "create_alias" => {
         }
     );
 
-    return { alias => $alias };
+    return {
+        alias => $alias,
+        notbefore => $notbefore,
+        notafter => $notafter,
+    };
 
 };
 
