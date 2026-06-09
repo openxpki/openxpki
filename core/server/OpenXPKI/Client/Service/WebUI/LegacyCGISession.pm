@@ -10,6 +10,8 @@ monkey_patch 'CGI::Session', new_patched => sub ($class, @args) {
 # The Moose constructor will also get the name "new_patched"!
 extends 'CGI::Session' => { -constructor_name => 'new_patched' };
 
+with 'OpenXPKI::Client::Service::WebUI::Session::Role';
+
 # Core modules
 use Module::Load ();
 use Carp;
@@ -19,7 +21,7 @@ use Log::Log4perl qw(:easy);
 
 =head1 NAME
 
-OpenXPKI::Client::Service::WebUI::Session
+OpenXPKI::Client::Service::WebUI::LegacyCGISession
 
 =head1 DESCRIPTION
 

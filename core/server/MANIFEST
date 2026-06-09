@@ -185,6 +185,7 @@ OpenXPKI/Client/Service/WebUI/Response/Status.pm
 OpenXPKI/Client/Service/WebUI/Response/User.pm
 OpenXPKI/Client/Service/WebUI/Session.pm
 OpenXPKI/Client/Service/WebUI/SessionCookie.pm
+OpenXPKI/Client/Service/WebUI/Session/Role.pm
 
 ## Config Layers
 OpenXPKI/Config/Backend.pm

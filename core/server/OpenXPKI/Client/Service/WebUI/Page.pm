@@ -25,6 +25,8 @@ use OpenXPKI::Client::Service::WebUI::JWT;
 use OpenXPKI::Client::Service::WebUI::Response;
 use OpenXPKI::Log4perl;
 
+use OpenXPKI::Client::Service::WebUI::Session::Role;
+
 =pod
 
 =head1 METHODS AND ATTRIBUTES
@@ -357,7 +359,7 @@ has last_reply => (
 
 has session => (
     is => 'ro',
-    isa => 'OpenXPKI::Client::Service::WebUI::Session',
+    isa => 'OpenXPKI::Client::Service::WebUI::Session::Role',
     init_arg => undef,
     lazy => 1,
     default => sub ($self) { $self->webui->session },

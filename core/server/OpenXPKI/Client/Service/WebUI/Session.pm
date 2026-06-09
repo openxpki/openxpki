@@ -1,6 +1,8 @@
 package OpenXPKI::Client::Service::WebUI::Session;
 use OpenXPKI -class;
 
+with 'OpenXPKI::Client::Service::WebUI::Session::Role';
+
 require overload;
 
 # Core modules
@@ -378,6 +380,11 @@ sub flush ($self) {
         $self->{status} &= ~(STATUS_NEW | STATUS_MODIFIED);
     }
 
+    # Disconnect old DB handle to avoid leaking connections.
+    # The new Session object will lazily create its own connection.
+    $self->db->disconnect if $self->has_db;
+
+
     return 1;
 }
 
@@ -392,10 +399,6 @@ sub clone ($self) {
     $self->log->debug('Clone frontend session');
     $self->delete;
     $self->flush;
-
-    # Disconnect old DB handle to avoid leaking connections.
-    # The new Session object will lazily create its own connection.
-    $self->db->disconnect if $self->has_db;
 
     return ref($self)->new(
         db_params  => $self->db_params,

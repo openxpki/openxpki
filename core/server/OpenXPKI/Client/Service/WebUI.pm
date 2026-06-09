@@ -111,7 +111,7 @@ sub session; # pre-declaration required so Role::Base requirement is met before 
 has session => (
     init_arg => undef,
     is => 'rw', # "rw" as it may be refreshed
-    isa => 'OpenXPKI::Client::Service::WebUI::Session|Undef',
+    isa => 'OpenXPKI::Client::Service::WebUI::Session::Role|Undef',
     lazy => 1,
     predicate => 'has_session',
     builder => '_build_session',
@@ -265,7 +265,7 @@ sub _build_session ($self) {
         # Legacy File driver
         if (($driver//'') ne 'driver:openxpki') {
             $conf //= { Directory => '/tmp' };
-
+            require OpenXPKI::Client::Service::WebUI::LegacyCGISession;
             $legacy_file_session = OpenXPKI::Client::Service::WebUI::LegacyCGISession->new_patched(
                 $driver, # may be undef
                 $id,     # may be undef
@@ -917,8 +917,7 @@ sub cleanup ($self) {
     if ($self->has_session) {
         # write session changes to storage
         $self->session->flush;
-        # close session DB connection to avoid leaking handles
-        $self->session->db->disconnect if $self->session->has_db;
+
     }
     # detach backend
     $self->client->detach if $self->has_client;
