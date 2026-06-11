@@ -98,6 +98,7 @@ command "list_aliases" => {
             'aliases.notbefore',
             'aliases.notafter',
             'aliases.alias',
+            'aliases.generation',
             'aliases.identifier',
             'certificate.status',
         ],
@@ -109,7 +110,7 @@ command "list_aliases" => {
         order_by => [ '-aliases.notbefore' ],
     );
 
-    return $aliases || {};
+    return $aliases || [];
 };
 
 __PACKAGE__->meta->make_immutable;
