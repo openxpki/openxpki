@@ -25,6 +25,11 @@ B<Parameters>
 
 =item * C<with_subject_styles> I<Bool> - include subject styles for each profile. Default: FALSE
 
+=item * C<group> I<AlphaPunct> - filter profiles by group
+
+Show only profiles that belong to the named group, the special name I<default>
+will also include all profiles that have no group set.
+
 =back
 
 B<Changes compared to API v1:> Parameter C<NOHIDE> was renamed to C<showall>
@@ -46,7 +51,8 @@ command "get_cert_profiles" => {
 
         if ($params->group) {
             my @groups = $config->get_scalar_as_list([ 'profile', $profile, 'group' ]);
-            next unless (grep { $_ eq $params->group } @groups);
+            # if group is set to <default> we also accept anything which as no group
+            next unless ((grep { $_ eq $params->group } @groups) || ($params->group eq 'default' && @groups == 0));
         }
 
         # show profiles if "showall" was given or where at least one style has a config entry "ui"

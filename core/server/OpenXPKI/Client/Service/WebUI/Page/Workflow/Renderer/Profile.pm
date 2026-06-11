@@ -16,6 +16,7 @@ use List::Util qw( any first );
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::i18n qw( i18nGettext );
 
+# accepts group!<group> as parameters
 sub render_profile_select ($self, $args, $wf_action, $param = '') {
 
     $self->log->trace('render_profile_select with args: ' . Dumper $args) if $self->log->is_trace;
@@ -45,8 +46,23 @@ sub render_profile_select ($self, $args, $wf_action, $param = '') {
         next unless ($item);
 
         if ('cert_profile' eq $name) {
+
+            # check if the form has a group filter
+            my $group = '';
+            if ($param =~ m{group!(\w\-)+}) {
+                $group = 1;
+                $self->log->debug('render_profile_select with group filter ' . $group);
+            }
             # Get profiles from backend: { id => { ... }, id => { ... } }
-            my $profiles = $self->send_command_v2(get_cert_profiles => { with_subject_styles => 1 });
+            my $profiles = $self->send_command_v2(get_cert_profiles => {
+                with_subject_styles => 1 ,
+                ($group ? ( group => $group ) : ())
+            });
+
+            if ($param =~ m{profile!keep} && $context->{cert_profile}) {
+                my $profile = $context->{cert_profile};
+                $profiles = { $profile => $profiles->{$profile} };
+            }
 
             # Transform hash into list and sort it
             # Apply translation to sort on translated strings
@@ -77,6 +93,76 @@ sub render_profile_select ($self, $args, $wf_action, $param = '') {
                 @profiles;
 
             $item->{options} = \@profiles;
+        }
+
+        push @fields, $item, @more_items;
+    }
+
+    # record the workflow info in the session
+    push @fields, $self->wf_token_field($wf_info, {
+        wf_action => $wf_action,
+        wf_fields => \@fields,
+    });
+
+    my $form = $self->main->add_form(
+        action => 'workflow',
+        submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
+    );
+    $form->add_field(%{ $_ }) for @fields;
+
+    #
+    # Show description section if there are any profile descriptions
+    #
+    if (scalar @profiledesc > 0) {
+        $self->main->add_section({
+            type => 'keyvalue',
+            content => {
+                label => 'I18N_OPENXPKI_UI_PROFILE_HINT_LIST',
+                description => '',
+                data => \@profiledesc
+        }});
+    }
+}
+
+# render subprofile select based on the cert_profile in context (cert_subject_style)
+sub render_profile_style_select ($self, $args, $wf_action, $param = '') {
+
+    $self->log->trace('render_profile_style_select with args: ' . Dumper $args) if $self->log->is_trace;
+
+    my $wf_info = $args->{wf_info};
+    my $context = $wf_info->{workflow}->{context};
+    my @profiledesc;
+
+    # loop through action input fields
+    my @fields;
+    foreach my $field ($wf_info->{activity}->{$wf_action}->{field}->@*) {
+        my $name = $field->{name};
+
+        # get field definition
+        my ($item, @more_items) = $self->render_input_field($field, $context->{$name});
+        next unless ($item);
+
+        if ('cert_subject_style' eq $name) {
+
+            # Get profiles from backend: { id => { ... }, id => { ... } }
+            my $subject_styles = $self->send_command_v2(get_cert_subject_profiles => {
+                profile => $context->{cert_profile},
+            });
+
+            # Transform hash into list and sort it (by value as we use numeric prefixes here)
+            my @styles = sort { lc($a->{value}) cmp lc($b->{value}) } values $subject_styles->%*;
+            @profiledesc =
+                map { { value => $_->{description}, label => $_->{label} } }
+                grep { $_->{description} }
+                @styles;
+
+            $item->{options} = \@styles;
+
+            # unset value if it is not part of the selection
+            if (defined $item->{value} && !any { $_->{value} eq $item->{value} } @styles) {
+                $item->{value} = ''
+            }
+
         }
 
         push @fields, $item, @more_items;
