@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2026-06-05 11:50+0200\n"
+"PO-Revision-Date: 2026-06-11 17:47+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-"
 "devel@lists.sourceforge.net>\n"
@@ -1114,6 +1114,9 @@ msgstr "Bulk Approve/Reject"
 msgid "I18N_OPENXPKI_UI_MENU_BULK_REVOKE_CERTIFICATE"
 msgstr "Bulk Revoke"
 
+msgid "I18N_OPENXPKI_UI_MENU_CA_BOOTSTRAP"
+msgstr "Create/Import new CA Signer"
+
 msgid "I18N_OPENXPKI_UI_MENU_CA_CERTIFICATES"
 msgstr "CA Certificates"
 
@@ -1565,9 +1568,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_LABEL"
 msgstr "Default profile style"
-
-msgid "I18N_OPENXPKI_UI_PROFILE_CASIGNER_LABEL"
-msgstr "CA Signer (internal)"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_CA_SIGNER_LABEL"
 msgstr "CA Signer (internal)"
@@ -2357,19 +2357,19 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_LABEL"
 msgstr "Approve Request"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_IMPORT_KEY_DESC"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_BOOTSTRAP_IMPORT_KEY_DESC"
 msgstr "Import an existing private key for the CA signer certificate."
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_IMPORT_KEY_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_BOOTSTRAP_IMPORT_KEY_LABEL"
 msgstr "Import Key"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_UPLOAD_CERTIFICATE_DESC"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_BOOTSTRAP_UPLOAD_CERTIFICATE_DESC"
 msgstr ""
 "Please paste (or use the upload handle) the PEM encoded certificate to be "
 "uploaded. The certificate issuer must be known and the certificate key must "
 "match the one generated or imported in this workflow."
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_UPLOAD_CERTIFICATE_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_BOOTSTRAP_UPLOAD_CERTIFICATE_LABEL"
 msgstr "Upload Certificate"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_DESC"
@@ -2605,6 +2605,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SELECT_PROFILE_LABEL"
 msgstr "Select Profile"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SELECT_SUBJECT_STYLE_DESC"
+msgstr ""
+"Change the subprofile for your certificate, please note that this will clear "
+"all fields you might already have entered."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SELECT_SUBJECT_STYLE_LABEL"
+msgstr "Change Subject Style"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SET_ISSUER_LABEL"
 msgstr "Set Issuer"
 
@@ -2634,6 +2642,12 @@ msgstr "Accept Request"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ACCEPT_REQUEST_LABEL"
 msgstr "Accept Request"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ADOPT_REQUEST_DESC"
+msgstr "Adopt Request"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ADOPT_REQUEST_LABEL"
+msgstr "Adopt Request"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_OVERRIDE_POLICY_DESC"
 msgstr ""
@@ -3002,18 +3016,18 @@ msgstr "Cache Interval"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_ALIAS_LABEL"
 msgstr "CA Alias"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_GENERATE_SIGNER_IMPORT_KEY_DESC"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_BOOTSTRAP_IMPORT_KEY_DESC"
 msgstr "Paste the PEM-encoded private key to import."
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_GENERATE_SIGNER_IMPORT_KEY_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_BOOTSTRAP_IMPORT_KEY_LABEL"
 msgstr "Private Key (PEM)"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_GENERATE_SIGNER_IMPORT_KEY_PASSWORD_DESC"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_BOOTSTRAP_IMPORT_KEY_PASSWORD_DESC"
 msgstr ""
 "Password to decrypt the private key (leave empty if the key is not "
 "encrypted)."
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_GENERATE_SIGNER_IMPORT_KEY_PASSWORD_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_BOOTSTRAP_IMPORT_KEY_PASSWORD_LABEL"
 msgstr "Private Key Password"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_DESC"
@@ -4272,51 +4286,45 @@ msgstr "Canceled"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CAPUBLISH_INITIAL_LABEL"
 msgstr "Publish CA/CRL Information"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_CHOOSE_KEY_SOURCE_DESC"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_CHOOSE_KEY_SOURCE_DESC"
 msgstr ""
 "Select how the private key for the CA signer certificate should be provided."
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_CHOOSE_KEY_SOURCE_HINT"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_CHOOSE_KEY_SOURCE_HINT"
 msgstr ""
 "Please select whether you want to generate a new private key or import an "
 "existing one."
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_CHOOSE_KEY_SOURCE_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_CHOOSE_KEY_SOURCE_LABEL"
 msgstr "Choose Key Source"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_ENTER_SUBJECT_DESC"
-msgstr "Provide information to build the subject of the certificate from."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_ENTER_SUBJECT_LABEL"
-msgstr "Certificate Subject"
-
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_EXPORT_CSR_READY_DESC"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_EXPORT_CSR_READY_DESC"
 msgstr ""
 "The private key has been generated. Please download and safely store it now."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_EXPORT_CSR_READY_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_EXPORT_CSR_READY_LABEL"
 msgstr "Import Key"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_GENERATE_KEY_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_GENERATE_KEY_LABEL"
 msgstr "Generate Key"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_IMPORT_KEY_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_IMPORT_KEY_LABEL"
 msgstr "Import Key"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_KEY_DOWNLOAD_READY_DESC"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_KEY_DOWNLOAD_READY_DESC"
 msgstr ""
 "The private key has been generated. Please download and safely store it now."
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_KEY_DOWNLOAD_READY_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_KEY_DOWNLOAD_READY_LABEL"
 msgstr "Download Private Key"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_SUCCESS_DESC"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_SUCCESS_DESC"
 msgstr ""
 "The CA signer certificate has been successfully created and registered."
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_SUCCESS_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_SUCCESS_LABEL"
 msgstr "CA Signer Certificate Created"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERTRENEW_FAILURE_DESC"
@@ -4462,6 +4470,14 @@ msgstr "This request is awaiting approval by a registration officer."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_LABEL"
 msgstr "Request awaits approval"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PREPARING_DESC"
+msgstr ""
+"The request workflow is prepared in the background, you will be redirected "
+"shortly."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PREPARING_LABEL"
+msgstr "Request workflow being prepared"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_REJECTED_DESC"
 msgstr ""
 "Your request has been rejected by the registration office. You may find a "
@@ -4501,6 +4517,15 @@ msgstr "This workflow has finished with success and can not be restarted"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUCCESS_LABEL"
 msgstr "Certificate Issued"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_ADOPT_REQUEST_DESC"
+msgstr ""
+"The request shown below was received without authentication. If you are the "
+"originator of this request, please select the 'Adopt Request' button to "
+"assign yourself as owner and proceed with the request."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_ADOPT_REQUEST_LABEL"
+msgstr "Adopt Request"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_MANUAL_AUTHORIZATION_DESC"
 msgstr ""
@@ -4554,6 +4579,15 @@ msgstr "This workflow failed finally and can not be restarted"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_LABEL"
 msgstr "FAILURE"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FORKED_DESC"
+msgstr ""
+"This request was handed over to another workflow for further processing. "
+"Follow the link below to check the status of the request and download the "
+"certificate."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FORKED_LABEL"
+msgstr "Manual Processing"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_CERTIFICATE_DESC"
 msgstr ""
@@ -4836,12 +4870,12 @@ msgstr "Request registration of a new ACME user account"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_NEWACCOUNT_LABEL"
 msgstr "ACME Account Registration"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_GENERATE_SIGNER_DESC"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_BOOTSTRAP_DESC"
 msgstr ""
 "Workflow to generate and register a CA signer certificate, including private "
 "key generation or import and optional certificate upload."
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_GENERATE_SIGNER_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_BOOTSTRAP_LABEL"
 msgstr "Generate CA Signer Certificate"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_DESC"
@@ -5105,6 +5139,9 @@ msgstr "Yes"
 #~ msgid "I18N_OPENXPKI_UI_METADATA_SECTION_NOTIFICATION_LABEL"
 #~ msgstr "Expiry Notification"
 
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_CASIGNER_LABEL"
+#~ msgstr "CA Signer (internal)"
+
 #~ msgid "I18N_OPENXPKI_UI_SESSION_LAST_LOGIN"
 #~ msgstr "Last Login"
 
@@ -5129,6 +5166,9 @@ msgstr "Yes"
 #~ msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_FIELD_REPORT_DATA_LABEL"
 #~ msgstr "Certificate Detail Report "
 
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_FORK_REQUEST_LABEL"
+#~ msgstr "Manual processing"
+
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_UNKNOWN_TYPE"
 #~ msgstr "Cannot initiate workflow: type unknown"
 
@@ -5144,7 +5184,13 @@ msgstr "Yes"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_LOST"
 #~ msgstr "key unavailable"
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_KEY_CONFIRMED_LABEL"
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_ENTER_SUBJECT_DESC"
+#~ msgstr "Provide information to build the subject of the certificate from."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_ENTER_SUBJECT_LABEL"
+#~ msgstr "Certificate Subject"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_KEY_CONFIRMED_LABEL"
 #~ msgstr "Key Downloaded"
 
 #, fuzzy

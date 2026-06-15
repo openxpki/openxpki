@@ -1430,6 +1430,11 @@ msgstr "Mostra Liste Revoche (CRL)"
 msgid "I18N_OPENXPKI_UI_MENU_BULK_REVOKE_CERTIFICATE"
 msgstr "Revoca Certificato"
 
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_CA_BOOTSTRAP"
+msgstr "Mostra Liste Revoche (CRL)"
+
 msgid "I18N_OPENXPKI_UI_MENU_CA_CERTIFICATES"
 msgstr "Certificati CA"
 
@@ -2008,10 +2013,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_LABEL"
 msgstr "Stile profilo di default"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_PROFILE_CASIGNER_LABEL"
-msgstr "Persone Fisiche (Email Sicura / Autenticazione)"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_CA_SIGNER_LABEL"
@@ -2984,19 +2985,19 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_LABEL"
 msgstr "Approva Revoca"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_IMPORT_KEY_DESC"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_BOOTSTRAP_IMPORT_KEY_DESC"
 msgstr "Genera la chiave per questa richiesta"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_IMPORT_KEY_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_BOOTSTRAP_IMPORT_KEY_LABEL"
 msgstr "Genera chiave"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_UPLOAD_CERTIFICATE_DESC"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_BOOTSTRAP_UPLOAD_CERTIFICATE_DESC"
 msgstr "Programma questo certificato per la revoca"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_UPLOAD_CERTIFICATE_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_BOOTSTRAP_UPLOAD_CERTIFICATE_LABEL"
 msgstr "Revoca Certificato"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_DESC"
@@ -3246,6 +3247,19 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SELECT_PROFILE_LABEL"
 msgstr "Seleziona Profilo"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SELECT_SUBJECT_STYLE_DESC"
+msgstr ""
+"Modifica gli elementi del campo Soggetto della richiesta di certificazione. "
+"Il campo Soggetto finale sarà composto dagli elementi inseriti da te in base "
+"al profilo di certificazione selezionato e dalla policy dell’autorità di "
+"certificazione. Potrai ricontrollare e modificare il campo Soggetto prima "
+"dell’invio finale della richiesta."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SELECT_SUBJECT_STYLE_LABEL"
+msgstr "Modifica Soggetto"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SET_ISSUER_LABEL"
 msgstr "Modifica Soggetto"
 
@@ -3281,6 +3295,14 @@ msgstr "Respingi Richiesta"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ACCEPT_REQUEST_LABEL"
+msgstr "Respingi Richiesta"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ADOPT_REQUEST_DESC"
+msgstr "Respingi Richiesta"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ADOPT_REQUEST_LABEL"
 msgstr "Respingi Richiesta"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_OVERRIDE_POLICY_DESC"
@@ -3709,21 +3731,21 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_ALIAS_LABEL"
 msgstr "Metodo Cifratura Chiave"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_GENERATE_SIGNER_IMPORT_KEY_DESC"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_BOOTSTRAP_IMPORT_KEY_DESC"
 msgstr ""
 "Componenti che formano il Nome Alternativo per il campo Soggetto del "
 "certificato."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_GENERATE_SIGNER_IMPORT_KEY_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_BOOTSTRAP_IMPORT_KEY_LABEL"
 msgstr "Componenti SAN SubjectAltName"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_GENERATE_SIGNER_IMPORT_KEY_PASSWORD_DESC"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_BOOTSTRAP_IMPORT_KEY_PASSWORD_DESC"
 msgstr " "
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_GENERATE_SIGNER_IMPORT_KEY_PASSWORD_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_BOOTSTRAP_IMPORT_KEY_PASSWORD_LABEL"
 msgstr "Creator"
 
 #, fuzzy
@@ -5165,12 +5187,12 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CAPUBLISH_INITIAL_LABEL"
 msgstr "Stato"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_CHOOSE_KEY_SOURCE_DESC"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_CHOOSE_KEY_SOURCE_DESC"
 msgstr ""
 "Il certificato è stato emesso e verrà inviato al client SCEP su richiesta."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_CHOOSE_KEY_SOURCE_HINT"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_CHOOSE_KEY_SOURCE_HINT"
 msgstr ""
 "Qui sotto puoi vedere i nuovi metadati per questo certificato, scegli con "
 "quale azione intendi proseguire:<br>Modifica Dati riporterà al form di "
@@ -5179,49 +5201,40 @@ msgstr ""
 "salvandoli nel database e terminando il Workflow."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_CHOOSE_KEY_SOURCE_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_CHOOSE_KEY_SOURCE_LABEL"
 msgstr "Creator"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_ENTER_SUBJECT_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_ENTER_SUBJECT_LABEL"
-msgstr "Stato"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_EXPORT_CSR_READY_DESC"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_EXPORT_CSR_READY_DESC"
 msgstr "Genera la chiave per questa richiesta"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_EXPORT_CSR_READY_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_EXPORT_CSR_READY_LABEL"
 msgstr "Stato"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_GENERATE_KEY_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_GENERATE_KEY_LABEL"
 msgstr "Genera chiave"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_IMPORT_KEY_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_IMPORT_KEY_LABEL"
 msgstr "Stato"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_KEY_DOWNLOAD_READY_DESC"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_KEY_DOWNLOAD_READY_DESC"
 msgstr "Genera la chiave per questa richiesta"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_KEY_DOWNLOAD_READY_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_KEY_DOWNLOAD_READY_LABEL"
 msgstr "Creator"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_SUCCESS_DESC"
-msgstr ""
-"Il certificato è stato emesso e verrà inviato al client SCEP su richiesta."
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_SUCCESS_DESC"
+msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_SUCCESS_LABEL"
-msgstr "SUCCESSO"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_SUCCESS_LABEL"
+msgstr "Certificato Emesso"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERTRENEW_FAILURE_DESC"
@@ -5383,6 +5396,16 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_LABEL"
 msgstr "Richiesta in attesa di approvazione"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PREPARING_DESC"
+msgstr ""
+"Questa richiesta è in attesa di autorizzazione da parte di un ufficiale di "
+"registrazione."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PREPARING_LABEL"
+msgstr "Richiesta in attesa di approvazione"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_REJECTED_DESC"
 msgstr ""
 "La tua richiesta è stata respinta dall’ufficio registrazioni. Puoi trovare "
@@ -5425,6 +5448,14 @@ msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUCCESS_LABEL"
 msgstr "Certificato Emesso"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_ADOPT_REQUEST_DESC"
+msgstr "Respingi Richiesta"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_ADOPT_REQUEST_LABEL"
+msgstr "Respingi Richiesta"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_MANUAL_AUTHORIZATION_DESC"
@@ -5477,6 +5508,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_DESC"
 msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_LABEL"
+msgstr "FALLIMENTO"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FORKED_DESC"
+msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FORKED_LABEL"
 msgstr "FALLIMENTO"
 
 #, fuzzy
@@ -5783,12 +5822,15 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_NEWACCOUNT_LABEL"
 msgstr "Pubblica Informazioni CA"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_GENERATE_SIGNER_DESC"
-msgstr "Esporta il Certificato nel formato desiderato"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_BOOTSTRAP_DESC"
+msgstr ""
+"Pubblica le Informazioni sulla Autorità di certificazione (CA, Certification "
+"Authority), ovvero Certificati della CA e Liste Revoche (CRL) in archivi "
+"predefiniti."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_GENERATE_SIGNER_LABEL"
-msgstr "Esporta Certificato"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_BOOTSTRAP_LABEL"
+msgstr "Pubblica Informazioni CA"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_DESC"
 msgstr ""
@@ -6151,6 +6193,10 @@ msgstr "Sì"
 #~ msgid "I18N_OPENXPKI_UI_METADATA_SECTION_NOTIFICATION_LABEL"
 #~ msgstr "Commento"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_CASIGNER_LABEL"
+#~ msgstr "Persone Fisiche (Email Sicura / Autenticazione)"
+
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
 #~ msgstr "Seleziona prima un profilo nel campo soprastante"
 
@@ -6255,6 +6301,14 @@ msgstr "Sì"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ADDUSER_UPDATE_CONTEXT_LABEL"
 #~ msgstr "Aggiorna Informazioni"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_UPLOAD_CERTIFICATE_DESC"
+#~ msgstr "Programma questo certificato per la revoca"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_UPLOAD_CERTIFICATE_LABEL"
+#~ msgstr "Revoca Certificato"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDITUSER_LOAD_DATA_DESC"
@@ -6548,8 +6602,29 @@ msgstr "Sì"
 #~ msgstr "Certificato Emesso"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_ENTER_SUBJECT_DESC"
+#~ msgstr "This workflow has finished with success and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_ENTER_SUBJECT_LABEL"
+#~ msgstr "Stato"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_GENERATE_KEY_LABEL"
+#~ msgstr "Genera chiave"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_KEY_CONFIRMED_LABEL"
 #~ msgstr "Creator"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_SUCCESS_DESC"
+#~ msgstr ""
+#~ "Il certificato è stato emesso e verrà inviato al client SCEP su richiesta."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_SUCCESS_LABEL"
+#~ msgstr "SUCCESSO"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_PENDING_DESC"
@@ -6655,6 +6730,14 @@ msgstr "Sì"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ADDUSER_LABEL"
 #~ msgstr "Tipo"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_GENERATE_SIGNER_DESC"
+#~ msgstr "Esporta il Certificato nel formato desiderato"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_GENERATE_SIGNER_LABEL"
+#~ msgstr "Esporta Certificato"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_DESC"

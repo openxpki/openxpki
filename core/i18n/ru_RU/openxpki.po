@@ -1447,6 +1447,10 @@ msgid "I18N_OPENXPKI_UI_MENU_BULK_REVOKE_CERTIFICATE"
 msgstr "Отозвать сертификат"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_CA_BOOTSTRAP"
+msgstr "Имя учетной записи"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_MENU_CA_CERTIFICATES"
 msgstr "Выпуск списка отзыва сертификатов (CRL)"
 
@@ -2071,10 +2075,6 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_LABEL"
 msgstr "Профиль TLS сервера "
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_PROFILE_CASIGNER_LABEL"
-msgstr "Профиль пользователя"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_CA_SIGNER_LABEL"
@@ -3185,19 +3185,19 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_LABEL"
 msgstr "Утвердить заявку на отзыв сертификата (CRR)"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_IMPORT_KEY_DESC"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_BOOTSTRAP_IMPORT_KEY_DESC"
 msgstr "Пауза"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_IMPORT_KEY_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_BOOTSTRAP_IMPORT_KEY_LABEL"
 msgstr "Пауза"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_UPLOAD_CERTIFICATE_DESC"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_BOOTSTRAP_UPLOAD_CERTIFICATE_DESC"
 msgstr "Отозвать сертификат"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_UPLOAD_CERTIFICATE_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_BOOTSTRAP_UPLOAD_CERTIFICATE_LABEL"
 msgstr "Отозвать сертификат"
 
 #, fuzzy
@@ -3445,6 +3445,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SELECT_PROFILE_LABEL"
 msgstr "Изменить профиль сертификата "
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SELECT_SUBJECT_STYLE_DESC"
+msgstr "Изменить имя в заявке"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SELECT_SUBJECT_STYLE_LABEL"
+msgstr "Изменить имя в заявке"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SET_ISSUER_LABEL"
 msgstr "Изменить имя в заявке"
 
@@ -3478,6 +3486,14 @@ msgstr "Отклонить заявку на отзыв сертификата"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ACCEPT_REQUEST_LABEL"
+msgstr "Отклонить заявку на отзыв сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ADOPT_REQUEST_DESC"
+msgstr "Отклонить заявку на отзыв сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ADOPT_REQUEST_LABEL"
 msgstr "Отклонить заявку на отзыв сертификата"
 
 #, fuzzy
@@ -3915,19 +3931,19 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_ALIAS_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_GENERATE_SIGNER_IMPORT_KEY_DESC"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_BOOTSTRAP_IMPORT_KEY_DESC"
 msgstr "TCP-порт, используемый с данным сертификатом"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_GENERATE_SIGNER_IMPORT_KEY_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_BOOTSTRAP_IMPORT_KEY_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_GENERATE_SIGNER_IMPORT_KEY_PASSWORD_DESC"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_BOOTSTRAP_IMPORT_KEY_PASSWORD_DESC"
 msgstr "TCP-порт, используемый с данным сертификатом"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_GENERATE_SIGNER_IMPORT_KEY_PASSWORD_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_BOOTSTRAP_IMPORT_KEY_PASSWORD_LABEL"
 msgstr "Технологические процессы"
 
 #, fuzzy
@@ -5581,59 +5597,51 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CAPUBLISH_INITIAL_LABEL"
 msgstr "Идет запуск... "
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_CHOOSE_KEY_SOURCE_DESC"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_CHOOSE_KEY_SOURCE_DESC"
 msgstr "Технологические процессы"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_CHOOSE_KEY_SOURCE_HINT"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_CHOOSE_KEY_SOURCE_HINT"
 msgstr "Добавление LDAP-узла"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_CHOOSE_KEY_SOURCE_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_CHOOSE_KEY_SOURCE_LABEL"
 msgstr "Технологические процессы"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_ENTER_SUBJECT_DESC"
-msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_ENTER_SUBJECT_LABEL"
-msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_EXPORT_CSR_READY_DESC"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_EXPORT_CSR_READY_DESC"
 msgstr "Пауза"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_EXPORT_CSR_READY_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_EXPORT_CSR_READY_LABEL"
 msgstr ""
 "Начальное состояние технологического процесса публикации сертификатов через "
 "LDAP"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_GENERATE_KEY_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_GENERATE_KEY_LABEL"
 msgstr "Пауза"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_IMPORT_KEY_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_IMPORT_KEY_LABEL"
 msgstr ""
 "Начальное состояние технологического процесса публикации сертификатов через "
 "LDAP"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_KEY_DOWNLOAD_READY_DESC"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_KEY_DOWNLOAD_READY_DESC"
 msgstr "Пауза"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_KEY_DOWNLOAD_READY_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_KEY_DOWNLOAD_READY_LABEL"
 msgstr "Технологические процессы"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_SUCCESS_DESC"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_SUCCESS_DESC"
 msgstr "Технологические процессы"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_SUCCESS_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_SUCCESS_LABEL"
 msgstr "Технологические процессы"
 
 #, fuzzy
@@ -5811,6 +5819,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PREPARING_DESC"
+msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PREPARING_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_REJECTED_DESC"
 msgstr "Технологические процессы"
 
@@ -5845,6 +5861,14 @@ msgstr "Технологические процессы"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUCCESS_LABEL"
 msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_ADOPT_REQUEST_DESC"
+msgstr "Отклонить заявку на отзыв сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_ADOPT_REQUEST_LABEL"
+msgstr "Отклонить заявку на отзыв сертификата"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_MANUAL_AUTHORIZATION_DESC"
@@ -5896,6 +5920,14 @@ msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FORKED_DESC"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FORKED_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
@@ -6191,12 +6223,12 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_NEWACCOUNT_LABEL"
 msgstr "Технологические процессы"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_GENERATE_SIGNER_DESC"
-msgstr "Экспорт"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_BOOTSTRAP_DESC"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_GENERATE_SIGNER_LABEL"
-msgstr "Родительский технологический процесс"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_BOOTSTRAP_LABEL"
+msgstr "Технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_DESC"
@@ -6566,6 +6598,10 @@ msgstr "Имя учетной записи"
 #~ msgstr "Родительский технологический процесс"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_CASIGNER_LABEL"
+#~ msgstr "Профиль пользователя"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
 #~ msgstr "Профиль пользователя"
 
@@ -6668,6 +6704,14 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ADDUSER_UPDATE_CONTEXT_LABEL"
 #~ msgstr "Изменить дополнительную информацию"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_UPLOAD_CERTIFICATE_DESC"
+#~ msgstr "Отозвать сертификат"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_UPLOAD_CERTIFICATE_LABEL"
+#~ msgstr "Отозвать сертификат"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDITUSER_LOAD_DATA_DESC"
@@ -6985,7 +7029,27 @@ msgstr "Имя учетной записи"
 #~ msgstr "Технологические процессы"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_ENTER_SUBJECT_DESC"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_ENTER_SUBJECT_LABEL"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_GENERATE_KEY_LABEL"
+#~ msgstr "Пауза"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_KEY_CONFIRMED_LABEL"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_SUCCESS_DESC"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_SUCCESS_LABEL"
 #~ msgstr "Технологические процессы"
 
 #, fuzzy
@@ -7087,6 +7151,14 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ADDUSER_LABEL"
 #~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_GENERATE_SIGNER_DESC"
+#~ msgstr "Экспорт"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_GENERATE_SIGNER_LABEL"
+#~ msgstr "Родительский технологический процесс"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PREREG_REPORT_DESC"

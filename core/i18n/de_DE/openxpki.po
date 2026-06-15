@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2026-04-07 18:21+0200\n"
+"PO-Revision-Date: 2026-06-15 16:22+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-"
 "devel@lists.sourceforge.net>\n"
@@ -86,7 +86,6 @@ msgstr "Sitzung abgelaufen - bitte erneut anmelden"
 msgid "I18N_OPENXPKI_UI_BACKEND_UNREACHABLE"
 msgstr "Der Server ist nicht erreichbar oder antwortet nicht"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_BLAH"
 msgstr "Nein"
 
@@ -505,9 +504,8 @@ msgstr "Falsche Passphrase für Share"
 msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SPLIT_EMPTY_SHARE"
 msgstr "Share zurücksetzen"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_CSR_CUSTOM_EXTENSION_LABEL"
-msgstr "Aktion"
+msgstr "Zertifikatserweiterungen"
 
 msgid "I18N_OPENXPKI_UI_CSR_EXT_CERTIFICATE_TEMPLATE"
 msgstr "Certificate Template"
@@ -744,7 +742,6 @@ msgstr "Die angeforderte Entität konnte nicht gefunden werden."
 msgid "I18N_OPENXPKI_UI_ERROR_DURING_PUBLICATION"
 msgstr "Systemfehler während der Veröffentlichung"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_ERROR_ISSUER_UNKNOWN"
 msgstr "Der Aussteller des Zertifikates ist unbekannt"
 
@@ -1039,9 +1036,8 @@ msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_4096"
 msgstr "4096 Bit"
 
 # Remove?
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_KEY_XX_YY"
-msgstr "Key"
+msgstr "Benutzername"
 
 msgid "I18N_OPENXPKI_UI_LAST_UPDATE_LABEL"
 msgstr "Letzte Änderung"
@@ -1111,6 +1107,9 @@ msgstr "Massenbearbeitung"
 
 msgid "I18N_OPENXPKI_UI_MENU_BULK_REVOKE_CERTIFICATE"
 msgstr "Massensperrung"
+
+msgid "I18N_OPENXPKI_UI_MENU_CA_BOOTSTRAP"
+msgstr "CA Initialisierung"
 
 msgid "I18N_OPENXPKI_UI_MENU_CA_CERTIFICATES"
 msgstr "CA-Zertifikate"
@@ -1223,25 +1222,20 @@ msgstr "Systemstatus"
 msgid "I18N_OPENXPKI_UI_MENU_WORKFLOW_SEARCH"
 msgstr "Workflow-Suche"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_METADATA_SECTION_LIFECYCLE_DESC"
 msgstr "Aktion"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_METADATA_SECTION_LIFECYCLE_LABEL"
-msgstr "Aktion"
+msgstr "Eigenschaften Lebenszyklus"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_METADATA_SECTION_OWNER_DESC"
 msgstr "Aktion"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_METADATA_SECTION_OWNER_LABEL"
-msgstr "Aktion"
+msgstr "Eigenschaften Eigentümer"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_METADATA_SECTION_SYSTEM_LABEL"
-msgstr "Aktion"
+msgstr "Eigenschaften System"
 
 msgid "I18N_OPENXPKI_UI_META_APPLICATION_ID"
 msgstr "Anwendungs-ID"
@@ -1276,7 +1270,6 @@ msgstr " "
 msgid "I18N_OPENXPKI_UI_META_INFORMATION"
 msgstr "Information"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_META_INFORMATION_DESC"
 msgstr "Information"
 
@@ -1349,7 +1342,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_META_SYSTEM_ENVIRONMENT"
 msgstr "Systemumgebung"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_META_SYSTEM_ENVIRONMENT_DESC"
 msgstr "Systemumgebung"
 
@@ -1578,13 +1570,8 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_LABEL"
 msgstr "Standardmodus"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_PROFILE_CASIGNER_LABEL"
-msgstr "Benutzer (Secure eMail/Anmeldung)"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_CA_SIGNER_LABEL"
-msgstr "Benutzer (Secure eMail/Anmeldung)"
+msgstr "Ausstellerzertifikat (intern)"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_CN_DESC"
 msgstr "Bezeichner (CN)"
@@ -2272,28 +2259,17 @@ msgstr "Bei der Überprüfung der Eingaben ist ein Fehler aufgetreten"
 msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE_INVALID"
 msgstr "Die nachfolgenden Felder haben einen unerwarteten Eingabewert"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_FAILED_REGEX"
-msgstr ""
-"Der eingegebene Wert entspricht nicht dem geforderten Format. Bitte "
-"korrigieren Sie die Werte in den markierten Feldern und versuchen Sie es "
-"erneut."
+msgstr "Der eingegebene Wert entspricht nicht dem geforderten Ausdruck."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_LESS_THAN_MIN_COUNT"
-msgstr ""
-"Die markierten Felder sind erforderlich. Bitte füllen Sie die Felder aus und "
-"versuchen Sie es erneut."
+msgstr "Es sind weniger Werte angegeben als erwartet."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_MAX_COUNT_EXCEEDED"
-msgstr "Es wurden mehr Felder gewählt als zulässig."
+msgstr "Es sind mehr Werte angegeben als erwartet."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_REQUIRED_BUT_EMPTY"
-msgstr ""
-"Dieses Feld erfordert die Angabe eines Wertes. Bitte stellen Sie sicher, "
-"dass das markierte Feld ausgefüllt ist."
+msgstr "Dieses Feld erfordert die Angabe eines Wertes."
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYREUSE_KEY_ALREADY_EXISTS"
 msgstr ""
@@ -2397,23 +2373,16 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_LABEL"
 msgstr "Antrag genehmigen"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_IMPORT_KEY_DESC"
-msgstr "Schlüsselpaar für diesen Antrag erstellen"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_BOOTSTRAP_IMPORT_KEY_DESC"
+msgstr "Importieren Sie einen vorhandenen privaten Schlüssel für das CA-Signaturzertifikat."
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_IMPORT_KEY_LABEL"
-msgstr "Erzeuge Schlüsselpaar"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_BOOTSTRAP_IMPORT_KEY_LABEL"
+msgstr "Schlüssel importieren"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_UPLOAD_CERTIFICATE_DESC"
-msgstr ""
-"Bitte fügen Sie das PEM formatierte Zertifikat, welches Sie von der externen "
-"CA erhalten haben, in das Feld ein. Das Zertifikat wird nur akzeptiert wenn "
-"der Aussteller bekannt ist und der Schlüssel zu ihren Antrag passt!"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_BOOTSTRAP_UPLOAD_CERTIFICATE_DESC"
+msgstr "Bitte fügen Sie das PEM-kodierte Zertifikat ein (oder verwenden Sie die Upload-Funktion). Der Aussteller des Zertifikats muss bekannt sein und der Zertifikatsschlüssel muss zu dem in diesem Workflow erzeugten oder importierten Schlüssel passen."
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_UPLOAD_CERTIFICATE_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_BOOTSTRAP_UPLOAD_CERTIFICATE_LABEL"
 msgstr "Zertifikat hochladen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_DESC"
@@ -2482,29 +2451,23 @@ msgstr "Bitte passen Sie die Meta-Daten über das folgende Formular an."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_BASE_LABEL"
 msgstr "Meta-Daten anpassen"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_ENTITY_DESC"
-msgstr "Bitte passen Sie die Meta-Daten über das folgende Formular an."
+msgstr "Bitte aktualisieren Sie die Informationen über das folgende Formular."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_ENTITY_LABEL"
-msgstr "Meta-Daten anpassen"
+msgstr "Entitäts-Informationen bearbeiten"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_LIFECYCLE_DESC"
-msgstr "Bitte passen Sie die Meta-Daten über das folgende Formular an."
+msgstr "Bitte aktualisieren Sie die Informationen über das folgende Formular."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_LIFECYCLE_LABEL"
-msgstr "Meta-Daten anpassen"
+msgstr "Lebenszyklus-Informationen bearbeiten"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_OWNER_DESC"
-msgstr "Bitte passen Sie die Meta-Daten über das folgende Formular an."
+msgstr "Bitte aktualisieren Sie die Informationen über das folgende Formular."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_OWNER_LABEL"
-msgstr "Meta-Daten anpassen"
+msgstr "Eigentümer-Informationen bearbeiten"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CLEANUP_DESC"
 msgstr "Workflow aufräumen"
@@ -2664,6 +2627,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SELECT_PROFILE_LABEL"
 msgstr "Zertifikatsprofil"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SELECT_SUBJECT_STYLE_DESC"
+msgstr "Ändern Sie das Unterprofil für Ihr Zertifikat. Bitte beachten Sie, dass dadurch alle bereits eingegebenen Felder gelöscht werden."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SELECT_SUBJECT_STYLE_LABEL"
+msgstr "Subject-Stil ändern"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SET_ISSUER_LABEL"
 msgstr "Issuer setzen"
 
@@ -2694,6 +2663,12 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ACCEPT_REQUEST_LABEL"
 msgstr "Antrag annehmen"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ADOPT_REQUEST_DESC"
+msgstr "Antrag übernehmen"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ADOPT_REQUEST_LABEL"
+msgstr "Antrag übernehmen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_OVERRIDE_POLICY_DESC"
 msgstr ""
@@ -2947,20 +2922,17 @@ msgstr "Erfolgreiche Workflows"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_TITLE"
 msgstr "Massenbearbeitung"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_DOWNLOAD_KEY"
-msgstr "Antrag aktualisieren"
+msgstr "Schlüssel herunterladen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_ELIGIBILITY_RECHECK_LABEL"
 msgstr "Berechtigung erneut prüfen"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_EXPORT_CSR"
-msgstr "Exportiert Zertifikate über die RPC API"
+msgstr "Zertifikatsantrag exportieren"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_GENERATE_CA"
-msgstr "Antrag aktualisieren"
+msgstr "Selbstsignierte CA erzeugen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_PROCEED_LABEL"
 msgstr "Trotz Policy-Verletzung absenden"
@@ -2977,17 +2949,14 @@ msgstr "Laufzeit ändern"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_UPDATE_ENDPOINT_AUTH_LABEL"
 msgstr "Aktualisiere Autorisierung"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_UPDATE_ENTITY_LABEL"
-msgstr "Antrag aktualisieren"
+msgstr "Entitäts-Informationen bearbeiten"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_UPDATE_LIFECYCLE_LABEL"
-msgstr "Antrag aktualisieren"
+msgstr "Lebenszyklus-Informationen bearbeiten"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_UPDATE_OWNER_LABEL"
-msgstr "Antrag aktualisieren"
+msgstr "Eigentümer-Informationen bearbeiten"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CANCEL_BUTTON"
 msgstr "Antrag abbrechen"
@@ -3074,21 +3043,17 @@ msgstr "Cache-Intervall"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_ALIAS_LABEL"
 msgstr "CA Alias"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_GENERATE_SIGNER_IMPORT_KEY_DESC"
-msgstr "Bestandteile zum Aufbau des Subject Alternative Name."
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_BOOTSTRAP_IMPORT_KEY_DESC"
+msgstr "Fügen Sie den zu importierenden PEM-kodierten privaten Schlüssel ein."
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_GENERATE_SIGNER_IMPORT_KEY_LABEL"
-msgstr "SubjectAltName Bestandteile"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_BOOTSTRAP_IMPORT_KEY_LABEL"
+msgstr "Privater Schlüssel (PEM)"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_GENERATE_SIGNER_IMPORT_KEY_PASSWORD_DESC"
-msgstr "Bestandteile zum Aufbau des Subject Alternative Name."
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_BOOTSTRAP_IMPORT_KEY_PASSWORD_DESC"
+msgstr "Kennwort zur Entschlüsselung des privaten Schlüssels (leer lassen, falls der Schlüssel nicht verschlüsselt ist)."
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_GENERATE_SIGNER_IMPORT_KEY_PASSWORD_LABEL"
-msgstr "Schlüsselkennwort festlegen"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_BOOTSTRAP_IMPORT_KEY_PASSWORD_LABEL"
+msgstr "Kennwort des privaten Schlüssels"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_DESC"
 msgstr " "
@@ -3327,9 +3292,8 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_TOOLTIP"
 msgstr "die Sperrung wird nach dem angegebenen Zeitpunkt ausgeführt"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DOWNLOAD_LABEL"
-msgstr "Passwort"
+msgstr "Herunterladen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ELIGIBILITY_RESULT_LABEL"
 msgstr "Berechtigungsprüfung"
@@ -3474,34 +3438,27 @@ msgstr " "
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_PARAMS_LABEL"
 msgstr "Schlüsselparameter"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_ENTITIY_DESC"
 msgstr "E-Mail-Adresse des Verantwortlichen für dieses Zertifikat."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_ENTITIY_LABEL"
-msgstr "Eigentümer (Gruppe)"
+msgstr "Entitäts-Informationen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_HASH"
 msgstr "Meta-Daten (key/value)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_LIFECYCLE_DESC"
 msgstr "E-Mail-Adresse des Verantwortlichen für dieses Zertifikat."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_LIFECYCLE_LABEL"
-msgstr "System Identifier"
+msgstr "Lebenszyklus-Informationen"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_OWNER_DESC"
 msgstr "Eigentümer (Gruppe)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_OWNER_LABEL"
-msgstr "Eigentümer (Gruppe)"
+msgstr "Eigentümer-Informationen"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_SYSTEM_LABEL"
 msgstr "System Identifier"
 
@@ -4372,61 +4329,38 @@ msgstr "Abgebrochen"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CAPUBLISH_INITIAL_LABEL"
 msgstr "Zertifikat veröffentlichen"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_CHOOSE_KEY_SOURCE_DESC"
-msgstr ""
-"Das Zertifikat wurde ausgestellt und wird auf Anforderung an den "
-"Antragsteller gesendet."
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_CHOOSE_KEY_SOURCE_DESC"
+msgstr "Wählen Sie aus, wie der private Schlüssel für das CA-Signaturzertifikat bereitgestellt werden soll."
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_CHOOSE_KEY_SOURCE_HINT"
-msgstr "Schlüsselpaar für diesen Antrag erstellen"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_CHOOSE_KEY_SOURCE_HINT"
+msgstr "Bitte wählen Sie, ob Sie einen neuen privaten Schlüssel erzeugen oder einen vorhandenen importieren möchten."
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_CHOOSE_KEY_SOURCE_LABEL"
-msgstr "Schlüsselkennwort festlegen"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_CHOOSE_KEY_SOURCE_LABEL"
+msgstr "Schlüsselquelle wählen"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_ENTER_SUBJECT_DESC"
-msgstr "Aus diesen Informationen wird das Subject des Zertifikates erstellt."
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_EXPORT_CSR_READY_DESC"
+msgstr "Der private Schlüssel wurde erzeugt. Bitte laden Sie ihn jetzt herunter und bewahren Sie ihn sicher auf."
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_ENTER_SUBJECT_LABEL"
-msgstr "Zertifikatsinhalte festlegen"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_EXPORT_CSR_READY_LABEL"
+msgstr "Schlüssel importieren"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_EXPORT_CSR_READY_DESC"
-msgstr "Schlüsselpaar für diesen Antrag erstellen"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_GENERATE_KEY_LABEL"
+msgstr "Schlüssel erzeugen"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_EXPORT_CSR_READY_LABEL"
-msgstr "Erweiterte Antragsdaten eingeben"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_IMPORT_KEY_LABEL"
+msgstr "Schlüssel importieren"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_GENERATE_KEY_LABEL"
-msgstr "Erzeuge Schlüsselpaar"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_KEY_DOWNLOAD_READY_DESC"
+msgstr "Der private Schlüssel wurde erzeugt. Bitte laden Sie ihn jetzt herunter und bewahren Sie ihn sicher auf."
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_IMPORT_KEY_LABEL"
-msgstr "Erweiterte Antragsdaten eingeben"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_KEY_DOWNLOAD_READY_LABEL"
+msgstr "Privaten Schlüssel herunterladen"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_KEY_DOWNLOAD_READY_DESC"
-msgstr "Schlüsselpaar für diesen Antrag erstellen"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_SUCCESS_DESC"
+msgstr "Das CA-Signaturzertifikat wurde erfolgreich erstellt und registriert."
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_KEY_DOWNLOAD_READY_LABEL"
-msgstr "Schlüsselkennwort festlegen"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_SUCCESS_DESC"
-msgstr ""
-"Das Zertifikat wurde ausgestellt und wird auf Anforderung an den "
-"Antragsteller gesendet."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_SUCCESS_LABEL"
-msgstr "erfolgreich"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_SUCCESS_LABEL"
+msgstr "CA-Signaturzertifikat erstellt"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERTRENEW_FAILURE_DESC"
 msgstr ""
@@ -4583,6 +4517,13 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_LABEL"
 msgstr "Antrag erwartet Freigabe"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PREPARING_DESC"
+msgstr ""
+"Der Antragsprozess wird vorbereitet, sie werden in Kürze weitergeleitet."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PREPARING_LABEL"
+msgstr "Antragsprozess wird vorbereitet"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_REJECTED_DESC"
 msgstr ""
 "Ihr Antrag wurde von der Registrierungsstelle abgelehnt, die Begründung "
@@ -4628,6 +4569,16 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUCCESS_LABEL"
 msgstr "Zertifikat ausgestellt"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_ADOPT_REQUEST_DESC"
+msgstr ""
+"Das folgende Zertifikat wurde zur angegebenen Transaktions-ID gefunden. Wenn "
+"Sie dieses Zertifikat beantragt haben, klicken Sie auf 'Antrag mit mir "
+"verknüpfen'. Sollten Sie nicht der Antragsteller sein, schließen Sie die "
+"Seite bitte."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_ADOPT_REQUEST_LABEL"
+msgstr "Antrag mit Antragsteller verknüpfen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_MANUAL_AUTHORIZATION_DESC"
 msgstr ""
@@ -4682,6 +4633,15 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_LABEL"
 msgstr "FAILURE"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FORKED_DESC"
+msgstr ""
+"Dieser Zertifikatsantrag wurde zur weiteren Bearbeitung an einen neuen "
+"Workflow übergeben. Folgen Sie dem unten angebenen Link um das Zertifikat "
+"herunterzuladen bzw. den aktuellen Status einzusehen."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FORKED_LABEL"
+msgstr "Manuelle Weiterverarbeitung"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_CERTIFICATE_DESC"
 msgstr ""
@@ -4973,15 +4933,11 @@ msgstr "Registrierung eines neuen Nutzerkontos für ACME."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_NEWACCOUNT_LABEL"
 msgstr "ACME Antrag für Nutzerkonto"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_GENERATE_SIGNER_DESC"
-msgstr ""
-"Workflow zum automatischen Ausstellen von Zertifikaten (z. B. über SCEP, "
-"RPC, etc.)."
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_BOOTSTRAP_DESC"
+msgstr "Workflow zur Erzeugung und Registrierung eines CA-Signaturzertifikats, einschließlich Erzeugung oder Import des privaten Schlüssels und optionalem Zertifikats-Upload."
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_GENERATE_SIGNER_LABEL"
-msgstr "Zertifikatsantrag (API)"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_BOOTSTRAP_LABEL"
+msgstr "CA-Signaturzertifikat erzeugen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_DESC"
 msgstr ""
@@ -5130,13 +5086,11 @@ msgstr "Privaten Schlüssel herunterladen"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"
 msgstr "Typ"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_MANAGE_METADATA_DESC"
-msgstr "Ändern der Meta-Daten eines Zertifikates"
+msgstr "Ändern der Meta-Daten wie z.B. der Kontaktinformationen des Eigentümers, die einem Zertifikat zugeordnet sind."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_MANAGE_METADATA_LABEL"
-msgstr "Meta-Daten ändern"
+msgstr "Meta-Daten verwalten"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_DESC"
 msgstr ""
@@ -5245,6 +5199,10 @@ msgstr "ja"
 #~ msgstr "Ablaufbenachrichtigung"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_CASIGNER_LABEL"
+#~ msgstr "Benutzer (Secure eMail/Anmeldung)"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_REPORT_FIELD_VALID_REVOKED"
 #~ msgstr "Nicht abgelaufene, jedoch gesperrte Zertifikate"
 
@@ -5272,6 +5230,21 @@ msgstr "ja"
 #~ msgid "I18N_OPENXPKI_UI_STATUS_SUMMARY_FIELD_REPORT_DATA_LABEL"
 #~ msgstr "Detaillierter Zertifikatsbericht"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_UPLOAD_CERTIFICATE_DESC"
+#~ msgstr ""
+#~ "Bitte fügen Sie das PEM formatierte Zertifikat, welches Sie von der "
+#~ "externen CA erhalten haben, in das Feld ein. Das Zertifikat wird nur "
+#~ "akzeptiert wenn der Aussteller bekannt ist und der Schlüssel zu ihren "
+#~ "Antrag passt!"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_GENERATE_SIGNER_UPLOAD_CERTIFICATE_LABEL"
+#~ msgstr "Zertifikat hochladen"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_FORK_REQUEST_LABEL"
+#~ msgstr "Manuell weiterbearbeiten"
+
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_UNKNOWN_TYPE"
 #~ msgstr "Der Workflow konnte nicht gestartet werden: Typ unbekannt"
 
@@ -5288,12 +5261,45 @@ msgstr "ja"
 #~ msgstr "Schlüssel unzugänglich"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_ENTER_SUBJECT_DESC"
+#~ msgstr ""
+#~ "Aus diesen Informationen wird das Subject des Zertifikates erstellt."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_ENTER_SUBJECT_LABEL"
+#~ msgstr "Zertifikatsinhalte festlegen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_GENERATE_KEY_LABEL"
+#~ msgstr "Erzeuge Schlüsselpaar"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_KEY_CONFIRMED_LABEL"
 #~ msgstr "Schlüsselkennwort festlegen"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_SUCCESS_DESC"
+#~ msgstr ""
+#~ "Das Zertifikat wurde ausgestellt und wird auf Anforderung an den "
+#~ "Antragsteller gesendet."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_SUCCESS_LABEL"
+#~ msgstr "erfolgreich"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_SUMMARY_FIELD_REPORT_DATA_LABEL"
 #~ msgstr "Detaillierter Zertifikatsbericht"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_GENERATE_SIGNER_DESC"
+#~ msgstr ""
+#~ "Workflow zum automatischen Ausstellen von Zertifikaten (z. B. über SCEP, "
+#~ "RPC, etc.)."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_GENERATE_SIGNER_LABEL"
+#~ msgstr "Zertifikatsantrag (API)"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_STATUS_SUMMARY_DESC"
