@@ -82,7 +82,7 @@
     "eslint-plugin-qunit": "^8.1.2",
     "flatpickr": "^4.6.13",
     "globals": "^15.15.0",
-    "js-yaml": "^4.1.0",
+    "js-yaml": "^4.2.0",
     "jsdoc": "^4.0.4",
     "loader.js": "^4.7.0",
     "luxon": "^3.5.0",
