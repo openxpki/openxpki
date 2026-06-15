@@ -341,12 +341,14 @@ command "validate_certificate" => {
 
     my $command = {
         COMMAND => 'verify_cert',
-        # TODO - replace with NOVALIDITY once we have openssl 1.1 - see #446
-        ATTIME => $params->novalidity ? ($x509->notafter - 1) : 0,
         CERTIFICATE => $entity,
         TRUSTED => $root,
         CHAIN => join "\n", @work_chain,
     };
+
+    if ($params->novalidity) {
+        $command->{NOVALIDITY} = 1;
+    }
 
     my @cert_to_fetch_crl;
     if (any { $params->crl_check eq $_ } ('soft','leaf')) {

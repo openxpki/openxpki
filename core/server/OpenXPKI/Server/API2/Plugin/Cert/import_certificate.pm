@@ -420,8 +420,7 @@ sub _is_issuer_valid ($self, $arg) {
             COMMAND => 'verify_cert',
             CERTIFICATE => $arg->cert->pem,
             TRUSTED => $arg->issuer_cert->{data},
-            # TODO - replace with NOVALIDITY once we have openssl 1.1 - see #446
-            ATTIME => $arg->cert->notbefore + 1,
+            NOVALIDITY => 1,
         });
     }
 
@@ -442,7 +441,7 @@ sub _is_issuer_valid ($self, $arg) {
             COMMAND => 'verify_cert',
             CERTIFICATE => $arg->cert->pem,
             # TODO - replace with NOVALIDITY once we have openssl 1.1 - see #446
-            ATTIME => $arg->cert->notbefore + 1,
+            NOVALIDITY => 1,
             TRUSTED => $root,
             CHAIN => join "\n", @work_chain
         });

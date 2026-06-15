@@ -32,6 +32,9 @@ sub get_command
         push @command, "-attime", $self->{ATTIME};
     }
 
+    if ($self->{NOVALIDITY}) {
+        push @command, "-no_check_time";
+    }
 
     if ($self->{CRL_CHECK}) {
         push @command, ($self->{CRL_CHECK} eq 'leaf' ? '-crl_check' : '-crl_check_all');
@@ -68,11 +71,6 @@ sub get_result
 
     if ($result =~ /: OK/) {
         return 1;
-    } elsif ($self->{NOVALIDITY}) {
-        # can be replaced by no_check_time with openssl 1.1
-        my @res = map { ($_ !~ /(error|OK)/ || $_ =~ /error 10.*expired/)  ? () : $_ } split /\n/, $result;
-        ##! 32: 'no validity ' . Dumper \@res
-        return ($res[0] && $res[0] eq 'OK') ? -1 : 0;
     } else {
         return undef;
     }
