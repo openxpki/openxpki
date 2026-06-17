@@ -71,6 +71,9 @@ OpenXPKI/Client/API/Command/api.pm
 OpenXPKI/Client/API/Command/api/execute.pm
 OpenXPKI/Client/API/Command/api/help.pm
 OpenXPKI/Client/API/Command/api/list.pm
+OpenXPKI/Client/API/Command/auth.pm
+OpenXPKI/Client/API/Command/auth/password.pm
+OpenXPKI/Client/API/Command/auth/verify.pm
 OpenXPKI/Client/API/Command/certificate.pm
 OpenXPKI/Client/API/Command/certificate/add.pm
 OpenXPKI/Client/API/Command/certificate/show.pm
