@@ -12,7 +12,8 @@ OpenXPKI::Client::API::Command::token::list
 
 =head1 DESCRIPTION
 
-List active cryptographic tokens in the current realm.
+List cryptographic tokens in the current realm. By default only active tokens
+are listed, add C<expired> or C<upcoming> to include them in the list.
 
 Returns a hash with C<token_types> (type-to-group mapping) and
 C<token_groups> containing the active aliases and detailed token
@@ -22,6 +23,9 @@ information for each group.
 
 command "list" => {
     type => { isa => 'Str', 'label' => 'Restrict to this token type (e.g. certsign)', hint => 'hint_type' },
+    expired => { isa => 'Bool', label => 'Show only expired token' },
+    upcoming => { isa => 'Bool', label => 'Show only token with future validity' },
+    subject => { isa => 'Bool', label => 'Include the certificate subject for each token' },
 } => sub ($self, $param) {
 
     my $groups = $self->run_command('list_token_groups');
@@ -32,8 +36,13 @@ command "list" => {
         @names = ( $groups->param($param->type) );
     }
 
+    my %validity = (valid => 1);
+    foreach my $key ('expired','upcoming') {
+        $validity{$key} = 1 if $param->$key;
+    }
+
     foreach my $group (@names) {
-        my $entries = $self->run_command('list_active_aliases', { group => $group });
+        my $entries = $self->run_command('list_aliases', { group => $group, %validity });
         next unless ($entries->result->@*);
         my $grp = {
             count => (scalar @{$entries->result}),
@@ -42,8 +51,15 @@ command "list" => {
         };
         foreach my $entry (@{$entries->result}) {
             my $token = $self->run_command('get_token_info', { alias => $entry->{alias} });
-            delete $token->params->{key_cert};
-            push @{$grp->{token}}, $token->params;
+            my $item = { $token->params->%*, $entry->%* };
+            delete $item->{key_cert};
+            if ($param->subject) {
+                my $cert = $self->run_command('get_cert', {
+                    identifier => $item->{key_cert_identifier}, format => 'DBINFO',
+                });
+                $item->{subject} = $cert->param('subject');
+            }
+            push @{$grp->{token}}, $item;
         }
         $res->{token_groups}->{$group} = $grp;
     }

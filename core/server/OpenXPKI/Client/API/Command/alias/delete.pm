@@ -22,7 +22,6 @@ before deletion. Token aliases must be managed via C<token delete>.
 
 command "delete" => {
     alias => { isa => 'Str', 'label' => 'Alias name to delete', required => 1 },
-    remove_key => { isa => 'Bool', 'label' => 'Also remove the associated key (not yet implemented)' },
 } => sub ($self, $param) {
 
     # TODO Parameter remove_key is not processed
