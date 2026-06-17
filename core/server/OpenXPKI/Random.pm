@@ -3,6 +3,8 @@ use OpenXPKI -class;
 
 use OpenXPKI::Server::Context qw( CTX );
 use MIME::Base64;
+use Crypt::PRNG;
+use Log::Log4perl;
 
 use Fcntl qw( :DEFAULT ); # import F_* and O_* constants
 
@@ -11,6 +13,15 @@ use Fcntl qw( :DEFAULT ); # import F_* and O_* constants
 Return random numbers safe for cryptographic use
 
 https://www.xkcd.com/221/
+
+The class is usable both inside the server and in client or standalone
+tools. Primary source of random is /dev/urandom or, in server context,
+the socket given in C<system.random.socket.location>.
+
+Falls back to (L<Crypt::PRNG>) if socket does not exist.
+
+The C<mode=strong> is only available in server context, it uses the crypto
+default token with the configured engine.
 
 =cut
 
@@ -21,6 +32,46 @@ has token => (
         return CTX('api2')->get_default_token();
     },
 );
+
+# Logger abstraction: inside the server we route through the system log,
+# in client / standalone / test contexts we fall back to a plain Log4perl
+# logger so callers never have to guard logging with hascontext() checks.
+has logger => (
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+        return OpenXPKI::Server::Context::hascontext('server')
+            ? CTX('log')->system()
+            : Log::Log4perl->get_logger();
+    },
+);
+
+# Entropy source location. Inside the server it is read from the config
+# (system.random.socket.location), everywhere else we use /dev/urandom.
+# The builder returns the empty string when no usable source is found
+# (explicitly unset, or not existing / not readable) which switches
+# get_random over to the token / PRNG fallback.
+has socket => (
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_socket',
+);
+
+sub _build_socket {
+    my $self = shift;
+
+    my $socket = OpenXPKI::Server::Context::hascontext('server')
+        ? (CTX('config')->get(['system', 'random', 'socket', 'location']) // '/dev/urandom')
+        : '/dev/urandom';
+
+    # empty string explicitly disables the socket source
+    return '' unless $socket;
+
+    # fall back if the configured source is missing or not readable
+    return '' unless (-e $socket && -r $socket);
+
+    return $socket;
+}
 
 =head1 Configuration
 
@@ -91,13 +142,17 @@ sub get_random {
 
     my $rand;
 
-    CTX('log')->system()->trace("Request to $length bytes of random using mode $mode")
-        if (CTX('log')->system()->is_trace);
+    $self->logger->trace("Request to $length bytes of random using mode $mode")
+        if ($self->logger->is_trace);
 
     if ($mode eq 'strong') {
-       $rand = $self->_get_strong_random( $length );
+       $rand = $self->_get_random_from_token( $length, 1 );
+    } elsif ($self->socket) {
+       $rand = $self->_get_random_from_socket( $length  );
+    } elsif (OpenXPKI::Server::Context::hascontext('server')) {
+        $rand = $self->_get_random_from_token( $length );
     } else {
-       $rand = $self->_get_regular_random( $length  );
+        $rand = $self->_get_random_from_prng( $length  );
     }
 
     if ($format eq 'base64') {
@@ -112,38 +167,41 @@ sub get_random {
 
 }
 
-sub _get_strong_random {
+sub _get_random_from_token {
 
     my $self = shift;
     my $length = shift;
+    my $engine = shift;
+
+    OpenXPKI::Exception->throw (
+        message => "Generating random using the token layer works only in server context"
+    ) unless OpenXPKI::Server::Context::hascontext('server');
 
     return $self->token()->command({
         COMMAND => 'create_random',
         RANDOM_LENGTH => $length,
         BINARY => 1,
+        NOENGINE => ($engine ? 0 : 1),
     });
 
 }
 
-sub _get_regular_random {
+sub _get_random_from_socket {
 
     my $self = shift;
     my $length = shift;
 
-    my $socket = CTX('config')->get(['system', 'random', 'socket', 'location']) // '/dev/urandom';
+    my $socket = $self->socket;
 
-    # if socket is the empty string we use openssl instead
-    if (!$socket) {
-        CTX('log')->system()->trace("No socket set for get_random, fallback to openssl") if (CTX('log')->system()->is_trace);
-        return $self->token()->command({
-            COMMAND => 'create_random',
-            RANDOM_LENGTH => $length,
-            BINARY => 1,
-            NOENGINE => 1,
-        });
-    }
+    OpenXPKI::Exception->throw (
+        message => "No socket given to fetch random from"
+    ) unless($socket);
 
     sysopen my $RND, $socket, O_RDONLY;
+
+    OpenXPKI::Exception->throw (
+        message => "Given socket does not exist or is not readable"
+    ) unless ($RND);
 
     my $rand = '';
     my $numread = 0;
@@ -161,6 +219,16 @@ sub _get_regular_random {
     return $rand;
 
 }
+
+sub _get_random_from_prng {
+
+    my $self = shift;
+    my $length = shift;
+
+    return Crypt::PRNG::random_bytes($length);
+
+}
+
 
 __PACKAGE__->meta->make_immutable;
 
