@@ -39,6 +39,7 @@ command "list" => {
     expired => { isa => 'Bool', label => 'Show only expired aliases' },
     valid => { isa => 'Bool', label => 'Show only currently valid aliases' },
     upcoming => { isa => 'Bool', label => 'Show only aliases with future validity' },
+    subject => { isa => 'Bool', label => 'Include the certificate subject for each alias' },
 } => sub ($self, $param) {
 
     my $groups;
@@ -57,9 +58,19 @@ command "list" => {
 
     foreach my $group (@$groups) {
         my $entries = $self->run_command('list_aliases', { group => $group, %validity } );
+        my $items = $entries->result;
+        if ($param->subject) {
+            foreach my $item (@$items) {
+                next unless $item->{identifier};
+                my $cert = $self->run_command('get_cert', {
+                    identifier => $item->{identifier}, format => 'DBINFO',
+                });
+                $item->{subject} = $cert->param('subject');
+            }
+        }
         $res->{$group} = {
-            count => (scalar @{$entries->result}),
-            item => $entries->result,
+            count => (scalar @$items),
+            item => $items,
         };
     }
     return $res;
