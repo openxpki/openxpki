@@ -30,7 +30,9 @@ sub execute {
     CTX('log')->application()->info("start crl issue for ca $ca_alias, workflow " . $workflow->id);
 
     my $param = $self->param();
+    my $error_key = $param->{error_key};
     delete $param->{'ca_alias'};
+    delete $param->{error_key};
     ##! 32: 'Extra params ' . Dumper $param
 
     my $set_context = $nice_backend->issueCRL( $ca_alias, $param );
@@ -46,6 +48,11 @@ sub execute {
             $self->pause('I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_SIGNING_FAILED');
         }
 
+        if ($error_key) {
+            $context->param({ $error_key => $error });
+            return 1;
+        }
+
         if (my $exc = OpenXPKI::Exception->caught()) {
             $exc->rethrow();
         } else {
@@ -53,6 +60,7 @@ sub execute {
         }
     }
 
+    $context->param({ $error_key => undef }) if ($error_key);
 
     ##! 64: 'Setting Context ' . Dumper $set_context
     #while (my ($key, $value) = each(%$set_context)) {

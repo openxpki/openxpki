@@ -47,8 +47,10 @@ sub execute {
     CTX('log')->application()->info("start cert issue for serial $csr_serial, workflow " . $workflow->id);
 
     my $param = $self->param();
+    my $error_key = $param->{error_key};
     delete $param->{'csr_serial'};
     delete $param->{'ca_alias'};
+    delete $param->{error_key};
 
     my $set_context;
     eval {
@@ -74,12 +76,19 @@ sub execute {
             $self->pause($error);
         }
 
+        if ($error_key) {
+            $context->param({ $error_key => $error });
+            return 1;
+        }
+
         if (my $exc = OpenXPKI::Exception->caught()) {
             $exc->rethrow();
         } else {
             OpenXPKI::Exception->throw( message => $error );
         }
     }
+
+    $context->param({ $error_key => undef }) if ($error_key);
 
     ##! 64: 'Setting Context ' . Dumper $set_context
     for my $key (keys %{$set_context} ) {

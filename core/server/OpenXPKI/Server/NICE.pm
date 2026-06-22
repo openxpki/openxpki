@@ -1,5 +1,5 @@
 package OpenXPKI::Server::NICE;
-use OpenXPKI -class;
+use OpenXPKI qw( -class -typeconstraints );
 
 use Encode;
 use OpenXPKI::Server::Context qw( CTX );
@@ -49,6 +49,13 @@ has register_issuer => (
     isa => 'Str',
     default => ''
 );
+
+has issuance_model => (
+    is => 'rw',
+    isa => enum([qw( sync async upload )]),
+    default => 'sync'
+);
+
 
 # Moose pre-constuctor to map single argument activity into expected hashref
 
