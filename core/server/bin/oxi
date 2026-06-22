@@ -316,7 +316,7 @@ if (my $keyfile = $opt{'auth-key'}) {
 } else {
     my $keyfile = glob("~/.oxi/client.key");
     # first try to autodetect the admin mode key file...
-    if ((not $opt{'no-auth'}) && -e $keyfile && -r $keyfile) {
+    if ((not $opt{'no-auth'}) && -e $keyfile && -r $keyfile && -s $keyfile) {
         $auth_args{account_key} = $keyfile;
 
     # ...and second the user config file.
@@ -461,10 +461,6 @@ This disables reading payload arguments from the command line.
 =item --out|o
 
 Redirect the output to the given file.
-
-=item --auth-config|-c
-
-Path to a config file to read the authentication details from.
 
 =item --auth-key|-k
 
