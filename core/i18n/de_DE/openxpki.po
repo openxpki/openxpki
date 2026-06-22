@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2026-06-15 16:22+0200\n"
+"PO-Revision-Date: 2026-06-22 14:26+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-"
 "devel@lists.sourceforge.net>\n"
@@ -151,9 +151,6 @@ msgstr "Zeige Zertifikatskette"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL"
 msgstr "Detailinformationen"
-
-msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOES_NOT_EXIST"
-msgstr "Zertifikat existiert nicht"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER"
 msgstr "Identifier"
@@ -368,6 +365,23 @@ msgstr ""
 "Anzahl der Treffer ist größer als die gesetzte Exportbegrenzung. Die Liste "
 "enthält nicht alle Treffer!"
 
+msgid "I18N_OPENXPKI_UI_CERT_IMPORT_FAILED_CHAIN_INCOMPLETE"
+msgstr "Zertifikatsimport fehlgeschlagen - Zertifikatskette ist unvollständig"
+
+msgid "I18N_OPENXPKI_UI_CERT_IMPORT_FAILED_ISSUER_NOT_FOUND"
+msgstr "Zertifikatsimport fehlgeschlagen - Aussteller nicht gefunden"
+
+msgid "I18N_OPENXPKI_UI_CERT_IMPORT_FAILED_ISSUER_NOT_IN_ALIAS_GROUP"
+msgstr ""
+"Zertifikatsimport fehlgeschlagen - Aussteller ist nicht in der Gruppe der "
+"erlaubten Aussteller"
+
+msgid "I18N_OPENXPKI_UI_CERT_IMPORT_FAILED_IS_SELFSIGNED"
+msgstr "Zertifikatsimport fehlgeschlagen - Zertifikat ist 'self-signed'"
+
+msgid "I18N_OPENXPKI_UI_CERT_IMPORT_FAILED_PUBLIC_KEY_MISMATCH"
+msgstr "Zertifikatsimport fehlgeschlagen - Public Key weicht ab"
+
 msgid "I18N_OPENXPKI_UI_CERT_ISSUER_UNKNOWN"
 msgstr "Der Aussteller des Zertifikates ist unbekannt"
 
@@ -522,11 +536,20 @@ msgstr "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_LABELI18N_OPENXPKI_UI_BULK_PEND
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT"
 msgstr ""
 
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT_REPLACE"
+msgstr "Zertifikat ausgetauscht"
+
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
 msgstr ""
 
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
 msgstr ""
+
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_COMPROMISE"
+msgstr "Schlüssel kompromittiert"
+
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_LOST"
+msgstr "Schlüssel unzugänglich"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_ACME_REGISTRATION_LABEL"
 msgstr "ACME Registrierungen (Endpunkte)"
@@ -536,6 +559,9 @@ msgstr "Kryptographische Schlüssel"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_DELETE_ENTRY"
 msgstr "Löschen"
+
+msgid "I18N_OPENXPKI_UI_DATAPOOL_DETAILS"
+msgstr "Inhalt des Eintrages"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_ENCRYPTED"
 msgstr "Format"
@@ -560,9 +586,6 @@ msgstr "Inventory"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_KEY"
 msgstr "Eintrag"
-
-msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
-msgstr "Ändern"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_MOTD_LABEL"
 msgstr "Message of the Day"
@@ -723,6 +746,9 @@ msgstr "Antragssteller-Zertifikat ist abgelaufen."
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_NOT_AUTHORIZED"
 msgstr "Antragssteller-Zertifikat ist nicht autorisiert."
+
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_NOT_TRUSTED"
+msgstr "Antragssteller-Zertifikat wird nicht vertraut."
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_REVOKED"
 msgstr "Antragssteller-Zertifikat ist gesperrt."
@@ -2223,6 +2249,11 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_NOT_DEFINED"
 msgstr "Unbekanntes Feld in den Eingabedaten."
 
+msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_PARTS_HAS_ERRORS"
+msgstr ""
+"Ein oder mehrere Felder weisen Fehler auf. Bitte korrigieren Sie die Werte "
+"in den markierten Feldern und versuchen Sie es erneut."
+
 msgid "I18N_OPENXPKI_UI_VALIDATOR_COMMON_NAME_EMPTY"
 msgstr ""
 "Der Common Name, der aus den übergebenen Daten berechnet wurde, ist leer!"
@@ -2262,11 +2293,17 @@ msgstr "Die nachfolgenden Felder haben einen unerwarteten Eingabewert"
 msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_FAILED_REGEX"
 msgstr "Der eingegebene Wert entspricht nicht dem geforderten Ausdruck."
 
+msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_HAS_ERRORS"
+msgstr "Bei der Überprüfung der Eingaben ist ein Fehler aufgetreten"
+
 msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_LESS_THAN_MIN_COUNT"
 msgstr "Es sind weniger Werte angegeben als erwartet."
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_MAX_COUNT_EXCEEDED"
 msgstr "Es sind mehr Werte angegeben als erwartet."
+
+msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_NOT_DEFINED"
+msgstr "Unbekanntes Feld in den Eingabedaten."
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_REQUIRED_BUT_EMPTY"
 msgstr "Dieses Feld erfordert die Angabe eines Wertes."
@@ -2374,13 +2411,19 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_LABEL"
 msgstr "Antrag genehmigen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_BOOTSTRAP_IMPORT_KEY_DESC"
-msgstr "Importieren Sie einen vorhandenen privaten Schlüssel für das CA-Signaturzertifikat."
+msgstr ""
+"Importieren Sie einen vorhandenen privaten Schlüssel für das CA-"
+"Signaturzertifikat."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_BOOTSTRAP_IMPORT_KEY_LABEL"
 msgstr "Schlüssel importieren"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_BOOTSTRAP_UPLOAD_CERTIFICATE_DESC"
-msgstr "Bitte fügen Sie das PEM-kodierte Zertifikat ein (oder verwenden Sie die Upload-Funktion). Der Aussteller des Zertifikats muss bekannt sein und der Zertifikatsschlüssel muss zu dem in diesem Workflow erzeugten oder importierten Schlüssel passen."
+msgstr ""
+"Bitte fügen Sie das PEM-kodierte Zertifikat ein (oder verwenden Sie die "
+"Upload-Funktion). Der Aussteller des Zertifikats muss bekannt sein und der "
+"Zertifikatsschlüssel muss zu dem in diesem Workflow erzeugten oder "
+"importierten Schlüssel passen."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_BOOTSTRAP_UPLOAD_CERTIFICATE_LABEL"
 msgstr "Zertifikat hochladen"
@@ -2628,7 +2671,9 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SELECT_PROFILE_LABEL"
 msgstr "Zertifikatsprofil"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SELECT_SUBJECT_STYLE_DESC"
-msgstr "Ändern Sie das Unterprofil für Ihr Zertifikat. Bitte beachten Sie, dass dadurch alle bereits eingegebenen Felder gelöscht werden."
+msgstr ""
+"Ändern Sie das Unterprofil für Ihr Zertifikat. Bitte beachten Sie, dass "
+"dadurch alle bereits eingegebenen Felder gelöscht werden."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SELECT_SUBJECT_STYLE_LABEL"
 msgstr "Subject-Stil ändern"
@@ -2943,6 +2988,9 @@ msgstr "Policy-Prüfung wiederholen"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_REMOVE_TOKEN_LABEL"
 msgstr "Registrierung löschen"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_RESTART_ISSUANCE"
+msgstr "Ausstellung wiederholen"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_SET_VALIDITY_LABEL"
 msgstr "Laufzeit ändern"
 
@@ -3050,7 +3098,9 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_BOOTSTRAP_IMPORT_KEY_LABEL"
 msgstr "Privater Schlüssel (PEM)"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_BOOTSTRAP_IMPORT_KEY_PASSWORD_DESC"
-msgstr "Kennwort zur Entschlüsselung des privaten Schlüssels (leer lassen, falls der Schlüssel nicht verschlüsselt ist)."
+msgstr ""
+"Kennwort zur Entschlüsselung des privaten Schlüssels (leer lassen, falls der "
+"Schlüssel nicht verschlüsselt ist)."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_BOOTSTRAP_IMPORT_KEY_PASSWORD_LABEL"
 msgstr "Kennwort des privaten Schlüssels"
@@ -3251,6 +3301,9 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRL_LIST_LABEL"
 msgstr "CRLs"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRL_PROFILE_LABEL"
+msgstr "CRL Profil"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRL_PROFILE_LIST_LABEL"
 msgstr "CRL Profil"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRL_VALIDITY_LABEL"
@@ -4330,16 +4383,22 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CAPUBLISH_INITIAL_LABEL"
 msgstr "Zertifikat veröffentlichen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_CHOOSE_KEY_SOURCE_DESC"
-msgstr "Wählen Sie aus, wie der private Schlüssel für das CA-Signaturzertifikat bereitgestellt werden soll."
+msgstr ""
+"Wählen Sie aus, wie der private Schlüssel für das CA-Signaturzertifikat "
+"bereitgestellt werden soll."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_CHOOSE_KEY_SOURCE_HINT"
-msgstr "Bitte wählen Sie, ob Sie einen neuen privaten Schlüssel erzeugen oder einen vorhandenen importieren möchten."
+msgstr ""
+"Bitte wählen Sie, ob Sie einen neuen privaten Schlüssel erzeugen oder einen "
+"vorhandenen importieren möchten."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_CHOOSE_KEY_SOURCE_LABEL"
 msgstr "Schlüsselquelle wählen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_EXPORT_CSR_READY_DESC"
-msgstr "Der private Schlüssel wurde erzeugt. Bitte laden Sie ihn jetzt herunter und bewahren Sie ihn sicher auf."
+msgstr ""
+"Der private Schlüssel wurde erzeugt. Bitte laden Sie ihn jetzt herunter und "
+"bewahren Sie ihn sicher auf."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_EXPORT_CSR_READY_LABEL"
 msgstr "Schlüssel importieren"
@@ -4351,7 +4410,9 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_IMPORT_KEY_LABEL"
 msgstr "Schlüssel importieren"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_KEY_DOWNLOAD_READY_DESC"
-msgstr "Der private Schlüssel wurde erzeugt. Bitte laden Sie ihn jetzt herunter und bewahren Sie ihn sicher auf."
+msgstr ""
+"Der private Schlüssel wurde erzeugt. Bitte laden Sie ihn jetzt herunter und "
+"bewahren Sie ihn sicher auf."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_KEY_DOWNLOAD_READY_LABEL"
 msgstr "Privaten Schlüssel herunterladen"
@@ -4588,6 +4649,15 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_MANUAL_AUTHORIZATION_LABEL"
 msgstr "Warten auf manuelle Authentisierung"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ERROR_ON_ISSUE_DESC"
+msgstr ""
+"Die Ausstellung des Zertifikates ist fehlgeschlagen, weitere Details finden "
+"Sie in der nachfolgenden Ausgabe. Falls Sie den Fehler beheben können, "
+"starten Sie die Ausstellung erneut, anderenfalls verwerfen Sie den Antrag."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ERROR_ON_ISSUE_LABEL"
+msgstr "Zertifikatsausstellung fehlgeschlagen"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION"
 msgstr ""
 "Der Workflow wurde durch ein unvorhergesehenes Ereignis unterbrochen. Bitte "
@@ -4719,6 +4789,15 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_DESC"
 msgstr "Dieser Workflow wartet auf weitere Bearbeitung."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_EXTERNAL_ISSUE_DESC"
+msgstr ""
+"Das Zertifikat muss von einer externen Zertifizierungsstelle ausgestellt "
+"werden, exportieren Sie den Zertifikatsantrag und importieren Sie das "
+"erstellte Zertifikat über 'Zerfikat hochladen'."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_EXTERNAL_ISSUE_LABEL"
+msgstr "Warte auf externe Zertifikatsausstellung"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_LABEL"
 msgstr "Bearbeitung ausstehend"
@@ -4934,7 +5013,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_ACME_NEWACCOUNT_LABEL"
 msgstr "ACME Antrag für Nutzerkonto"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_BOOTSTRAP_DESC"
-msgstr "Workflow zur Erzeugung und Registrierung eines CA-Signaturzertifikats, einschließlich Erzeugung oder Import des privaten Schlüssels und optionalem Zertifikats-Upload."
+msgstr ""
+"Workflow zur Erzeugung und Registrierung eines CA-Signaturzertifikats, "
+"einschließlich Erzeugung oder Import des privaten Schlüssels und optionalem "
+"Zertifikats-Upload."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_BOOTSTRAP_LABEL"
 msgstr "CA-Signaturzertifikat erzeugen"
@@ -5087,7 +5169,9 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"
 msgstr "Typ"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_MANAGE_METADATA_DESC"
-msgstr "Ändern der Meta-Daten wie z.B. der Kontaktinformationen des Eigentümers, die einem Zertifikat zugeordnet sind."
+msgstr ""
+"Ändern der Meta-Daten wie z.B. der Kontaktinformationen des Eigentümers, die "
+"einem Zertifikat zugeordnet sind."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_MANAGE_METADATA_LABEL"
 msgstr "Meta-Daten verwalten"
@@ -5191,8 +5275,11 @@ msgstr "aufwecken"
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "ja"
 
-#~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_NOT_TRUSTED"
-#~ msgstr "Antragssteller-Zertifikat wird nicht vertraut."
+#~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOES_NOT_EXIST"
+#~ msgstr "Zertifikat existiert nicht"
+
+#~ msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
+#~ msgstr "Ändern"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_METADATA_SECTION_NOTIFICATION_LABEL"
@@ -5245,20 +5332,23 @@ msgstr "ja"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_FORK_REQUEST_LABEL"
 #~ msgstr "Manuell weiterbearbeiten"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_UPLOAD_CERTIFICATE_DESC"
+#~ msgstr ""
+#~ "Bitte fügen Sie das PEM formatierte Zertifikat, welches Sie von der "
+#~ "externen CA erhalten haben, in das Feld ein. Das Zertifikat wird nur "
+#~ "akzeptiert wenn der Aussteller bekannt ist und der Schlüssel zu ihren "
+#~ "Antrag passt!"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_UPLOAD_CERTIFICATE_LABEL"
+#~ msgstr "Zertifikat hochladen"
+
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_UNKNOWN_TYPE"
 #~ msgstr "Der Workflow konnte nicht gestartet werden: Typ unbekannt"
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT_REPLACE"
-#~ msgstr "Zertifikat ausgetauscht"
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
 #~ msgstr "Service eingestellt"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_COMPROMISE"
-#~ msgstr "Schlüssel kompromittiert"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_LOST"
-#~ msgstr "Schlüssel unzugänglich"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_GENERATE_SIGNER_ENTER_SUBJECT_DESC"

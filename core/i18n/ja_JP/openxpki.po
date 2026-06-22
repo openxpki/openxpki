@@ -155,9 +155,6 @@ msgstr "証明書チェイン参照"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL"
 msgstr "証明書情報(シリアル)"
 
-msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOES_NOT_EXIST"
-msgstr "証明書が存在していません"
-
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER"
 msgstr "証明書識別名"
 
@@ -372,6 +369,26 @@ msgstr "メタデータの更新"
 msgid "I18N_OPENXPKI_UI_CERT_EXPORT_EXCEEDS_LIMIT"
 msgstr "結果がエクスポート制限より大きい場合、正しくエクスポートできません。"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_IMPORT_FAILED_CHAIN_INCOMPLETE"
+msgstr "関連するワークフローを表示"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_IMPORT_FAILED_ISSUER_NOT_FOUND"
+msgstr "CRLの発行者証明書を見つけることができません"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_IMPORT_FAILED_ISSUER_NOT_IN_ALIAS_GROUP"
+msgstr "CRLの発行者証明書を見つけることができません"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_IMPORT_FAILED_IS_SELFSIGNED"
+msgstr "証明書ライフサイクルサポート"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_IMPORT_FAILED_PUBLIC_KEY_MISMATCH"
+msgstr "結果がエクスポート制限より大きい場合、正しくエクスポートできません。"
+
 msgid "I18N_OPENXPKI_UI_CERT_ISSUER_UNKNOWN"
 msgstr "証明書発行者が不明です"
 
@@ -531,11 +548,23 @@ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT"
 msgstr "証明書を失効する理由を指定します。"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT_REPLACE"
+msgstr "証明書を失効する理由を指定します。"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
 msgstr "証明書を失効する理由を指定します。"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
+msgstr "証明書を失効する理由を指定します。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_COMPROMISE"
+msgstr "証明書鍵が漏洩しました"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_LOST"
 msgstr "証明書を失効する理由を指定します。"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_ACME_REGISTRATION_LABEL"
@@ -546,6 +575,10 @@ msgstr "暗号キー"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_DELETE_ENTRY"
 msgstr "削除"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_DETAILS"
+msgstr "変更日時"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_ENCRYPTED"
 msgstr "形式"
@@ -570,9 +603,6 @@ msgstr "インベントリ"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_KEY"
 msgstr "エントリ"
-
-msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
-msgstr "変更"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_MOTD_LABEL"
 msgstr "本日のメッセージ"
@@ -732,6 +762,10 @@ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_EXPIRED"
 msgstr "署名者証明書の有効期限が切れています。"
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_NOT_AUTHORIZED"
+msgstr "依頼者は承認された署名者リストにありません。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_NOT_TRUSTED"
 msgstr "依頼者は承認された署名者リストにありません。"
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_REVOKED"
@@ -2305,6 +2339,10 @@ msgstr "1つ以上の件名フィールドにエラーがあります。"
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_NOT_DEFINED"
 msgstr "このフィールドはプロファイル設定では定義されていません。"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_PARTS_HAS_ERRORS"
+msgstr "1つ以上の件名フィールドにエラーがあります。"
+
 msgid "I18N_OPENXPKI_UI_VALIDATOR_COMMON_NAME_EMPTY"
 msgstr "コモンネームが空です。"
 
@@ -2344,12 +2382,20 @@ msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_FAILED_REGEX"
 msgstr "値は式に当てはまりませんでした。"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_HAS_ERRORS"
+msgstr "入力の検証中にエラーが発生しました"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_LESS_THAN_MIN_COUNT"
 msgstr "マークされたフィールドは必須です。"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_MAX_COUNT_EXCEEDED"
 msgstr "フィールド数が制限を超えています。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_NOT_DEFINED"
+msgstr "このフィールドはプロファイル設定では定義されていません。"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_REQUIRED_BUT_EMPTY"
@@ -3031,6 +3077,10 @@ msgstr "ポリシーの再評価"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_REMOVE_TOKEN_LABEL"
 msgstr "トークン削除"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_RESTART_ISSUANCE"
+msgstr "RPC API経由で証明書をエクスポート"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_SET_VALIDITY_LABEL"
 msgstr "有効性の変更"
 
@@ -3347,6 +3397,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRL_LIST_LABEL"
 msgstr "CRLリスト"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRL_PROFILE_LABEL"
+msgstr "CRLのプロファイル"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRL_PROFILE_LIST_LABEL"
 msgstr "CRLのプロファイル"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRL_VALIDITY_LABEL"
@@ -4652,6 +4706,16 @@ msgstr "手動による認証が保留中です。"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_MANUAL_AUTHORIZATION_LABEL"
 msgstr "手動認証が保留中"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ERROR_ON_ISSUE_DESC"
+msgstr ""
+"与えられた証明書の発行者が登録されていません。ワークフローを継続またはキャン"
+"セルするには、発行者証明書を提示してください。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ERROR_ON_ISSUE_LABEL"
+msgstr "不完全なチェーン"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION"
 msgstr "予期しない中断"
 
@@ -4780,6 +4844,17 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_DESC"
 msgstr "この要求は登録責任者による承認待ちです。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_EXTERNAL_ISSUE_DESC"
+msgstr ""
+"Please review your request and use the \"submit\" button if you are "
+"confident that the information is correct. If you want to abort the request, "
+"use the \"cancel\" button to terminate this request."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_EXTERNAL_ISSUE_LABEL"
+msgstr "要求確認"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_LABEL"
 msgstr "承認待ち"
@@ -5244,6 +5319,12 @@ msgstr "実行"
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "はい"
 
+#~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOES_NOT_EXIST"
+#~ msgstr "証明書が存在していません"
+
+#~ msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
+#~ msgstr "変更"
+
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_METADATA_SECTION_NOTIFICATION_LABEL"
 #~ msgstr "有効期限の通知"
@@ -5272,16 +5353,20 @@ msgstr "はい"
 #~ msgstr "証明書アップロード"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT_REPLACE"
-#~ msgstr "証明書を失効する理由を指定します。"
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_UPLOAD_CERTIFICATE_DESC"
+#~ msgstr ""
+#~ "Please paste (or use the upload handle) the PEM encoded certificate you "
+#~ "have received from the external ca to be uploaded. Upload is only "
+#~ "possible if the certificate issuer is known and the certificate key "
+#~ "matches the one requested from this workflow!"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_UPLOAD_CERTIFICATE_LABEL"
+#~ msgstr "証明書アップロード"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
 #~ msgstr "証明書を失効する理由を指定します。"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_COMPROMISE"
-#~ msgstr "証明書鍵が漏洩しました"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_LOST"

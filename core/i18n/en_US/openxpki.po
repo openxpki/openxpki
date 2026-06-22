@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2026-06-11 17:47+0200\n"
+"PO-Revision-Date: 2026-06-22 14:26+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-"
 "devel@lists.sourceforge.net>\n"
@@ -152,9 +152,6 @@ msgstr "Show certificate chain"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL"
 msgstr "Certificate Information"
-
-msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOES_NOT_EXIST"
-msgstr "Certificate does not exists"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER"
 msgstr "Identifier"
@@ -371,6 +368,23 @@ msgstr ""
 "Result set is larger than the export limit, some result items are not "
 "included in this list!"
 
+msgid "I18N_OPENXPKI_UI_CERT_IMPORT_FAILED_CHAIN_INCOMPLETE"
+msgstr "Certificate Import failed - chain is incomplete"
+
+msgid "I18N_OPENXPKI_UI_CERT_IMPORT_FAILED_ISSUER_NOT_FOUND"
+msgstr "Certificate Import failed - certificate has no issuer"
+
+msgid "I18N_OPENXPKI_UI_CERT_IMPORT_FAILED_ISSUER_NOT_IN_ALIAS_GROUP"
+msgstr ""
+"Certificate Import failed - certificate issuer not listed in the allowed "
+"issuer group"
+
+msgid "I18N_OPENXPKI_UI_CERT_IMPORT_FAILED_IS_SELFSIGNED"
+msgstr "Certificate Import failed - certificate is self signed"
+
+msgid "I18N_OPENXPKI_UI_CERT_IMPORT_FAILED_PUBLIC_KEY_MISMATCH"
+msgstr "Certificate Import failed - public key does not match request"
+
 msgid "I18N_OPENXPKI_UI_CERT_ISSUER_UNKNOWN"
 msgstr "Certificate issuer is unknown"
 
@@ -526,12 +540,21 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT"
 msgstr "This is just a prefix"
 
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT_REPLACE"
+msgstr "certificate replace"
+
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
 msgstr "discontinued"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
 msgstr "This is just a prefix"
+
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_COMPROMISE"
+msgstr "private key compromised"
+
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_LOST"
+msgstr "private key lost"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_ACME_REGISTRATION_LABEL"
 msgstr "ACME Account Registrations (Endpoints)"
@@ -541,6 +564,9 @@ msgstr "Cryptographic Keys"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_DELETE_ENTRY"
 msgstr "Delete"
+
+msgid "I18N_OPENXPKI_UI_DATAPOOL_DETAILS"
+msgstr "Content of Entry"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_ENCRYPTED"
 msgstr "Format"
@@ -565,9 +591,6 @@ msgstr "Inventory"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_KEY"
 msgstr "Entry"
-
-msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
-msgstr "Modify"
 
 msgid "I18N_OPENXPKI_UI_DATAPOOL_MOTD_LABEL"
 msgstr "Message of the Day"
@@ -728,6 +751,9 @@ msgstr "Signer certificate is expired."
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_NOT_AUTHORIZED"
 msgstr "Requester is not in authorized signer list"
+
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_NOT_TRUSTED"
+msgstr "Signer certificate is not trusted."
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_REVOKED"
 msgstr "Signer certificate is revoked"
@@ -2212,6 +2238,9 @@ msgstr "One or more subject fields have errors."
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_NOT_DEFINED"
 msgstr "This field is not defined in the profile settings."
 
+msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_PARTS_HAS_ERRORS"
+msgstr "One or more subject parts have errors."
+
 msgid "I18N_OPENXPKI_UI_VALIDATOR_COMMON_NAME_EMPTY"
 msgstr "The common name which will be created from the information is empty!"
 
@@ -2247,11 +2276,17 @@ msgstr "The following fields do not match the expected type of value"
 msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_FAILED_REGEX"
 msgstr "Value failed allowed expression."
 
+msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_HAS_ERRORS"
+msgstr "An error occured during input validation"
+
 msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_LESS_THAN_MIN_COUNT"
 msgstr "Field has less items as expected"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_MAX_COUNT_EXCEEDED"
 msgstr "Field has more items as expected"
+
+msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_NOT_DEFINED"
+msgstr "This field is not defined in the metadata settings."
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_REQUIRED_BUT_EMPTY"
 msgstr "Field is required but empty"
@@ -2914,6 +2949,9 @@ msgstr "Re-Evaluate Policy"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_REMOVE_TOKEN_LABEL"
 msgstr "Remove Token"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_RESTART_ISSUANCE"
+msgstr "Restart Issuance"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_SET_VALIDITY_LABEL"
 msgstr "Change Validity"
 
@@ -3227,6 +3265,9 @@ msgstr "CRLs"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRL_PROFILE_LABEL"
 msgstr "CRL Profile"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRL_PROFILE_LIST_LABEL"
+msgstr "CRL Profile"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRL_VALIDITY_LABEL"
 msgstr "CRL Validity"
 
@@ -3426,9 +3467,8 @@ msgstr "Owner (Group)"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_OWNER_LABEL"
 msgstr "Owner Information"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_SYSTEM_LABEL"
-msgstr "System Identifier"
+msgstr "System Information"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_AUTH_ENDPOINT_LABEL"
 msgstr "Endpoint Auth."
@@ -4298,14 +4338,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_CHOOSE_KEY_SOURCE_LABEL"
 msgstr "Choose Key Source"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_EXPORT_CSR_READY_DESC"
 msgstr ""
-"The private key has been generated. Please download and safely store it now."
+"The certificate signing request has been generated. Please download it and "
+"sign using an external CA or use the button to generate a self-signed issuer "
+"certificate."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_EXPORT_CSR_READY_LABEL"
-msgstr "Import Key"
+msgstr "Certificate signing request ready"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_BOOTSTRAP_GENERATE_KEY_LABEL"
 msgstr "Generate Key"
@@ -4535,6 +4575,15 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_MANUAL_AUTHORIZATION_LABEL"
 msgstr "Manual Authentication Required"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ERROR_ON_ISSUE_DESC"
+msgstr ""
+"The certificate issuance process has failed, you can find details in the "
+"output below. Restart the issuance process if you are able to address the "
+"errors or discard the workflow."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ERROR_ON_ISSUE_LABEL"
+msgstr "Certificate Issue Failed"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION"
 msgstr ""
 "This workflow was interrupted by an unexpected event, please contact the "
@@ -4667,6 +4716,15 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_DESC"
 msgstr "This request is awaiting approval by an registration officer."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_EXTERNAL_ISSUE_DESC"
+msgstr ""
+"The certificate has to be issued by an external issuer, please transfer the "
+"request to the external party and upload the certificate using the "
+"'certificate upload' button."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_EXTERNAL_ISSUE_LABEL"
+msgstr "Certificate External Issue Pending"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_LABEL"
 msgstr "Approval Pending"
@@ -5132,8 +5190,11 @@ msgstr "Wake Up"
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "Yes"
 
-#~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_NOT_TRUSTED"
-#~ msgstr "Signer certificate is not trusted."
+#~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOES_NOT_EXIST"
+#~ msgstr "Certificate does not exists"
+
+#~ msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
+#~ msgstr "Modify"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_METADATA_SECTION_NOTIFICATION_LABEL"
@@ -5169,17 +5230,22 @@ msgstr "Yes"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_FORK_REQUEST_LABEL"
 #~ msgstr "Manual processing"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_UPLOAD_CERTIFICATE_DESC"
+#~ msgstr ""
+#~ "Please paste (or use the upload handle) the PEM encoded certificate you "
+#~ "have received from the external ca to be uploaded. Upload is only "
+#~ "possible if the certificate issuer is known and the certificate key "
+#~ "matches the one requested from this workflow!"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_UPLOAD_CERTIFICATE_LABEL"
+#~ msgstr "Upload Certificate"
+
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_UNKNOWN_TYPE"
 #~ msgstr "Cannot initiate workflow: type unknown"
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT_REPLACE"
-#~ msgstr "certificate replace"
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
 #~ msgstr "service discontinued"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_COMPROMISE"
-#~ msgstr "key compromised"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_LOST"
 #~ msgstr "key unavailable"

@@ -196,10 +196,6 @@ msgstr "Numero di serie del certificato"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL"
 msgstr "Informazioni Certificato"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOES_NOT_EXIST"
-msgstr "Numero di serie del certificato"
-
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER"
 msgstr "Identificatore del certificato"
 
@@ -461,6 +457,27 @@ msgid "I18N_OPENXPKI_UI_CERT_EXPORT_EXCEEDS_LIMIT"
 msgstr "Richiesta"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_IMPORT_FAILED_CHAIN_INCOMPLETE"
+msgstr "Mostra i workflow correlati"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_IMPORT_FAILED_ISSUER_NOT_FOUND"
+msgstr "Pagina richiesta non trovata"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_IMPORT_FAILED_ISSUER_NOT_IN_ALIAS_GROUP"
+msgstr "Pagina richiesta non trovata"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_IMPORT_FAILED_IS_SELFSIGNED"
+msgstr "Report Completo"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_IMPORT_FAILED_PUBLIC_KEY_MISMATCH"
+msgstr "Richiesta"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERT_ISSUER_UNKNOWN"
 msgstr "sconosciuto"
 
@@ -657,6 +674,12 @@ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT"
 msgstr ""
 "Ulteriori informazioni utili a spiegare il motivo della richiesta di revoca."
 
+# This is just a prefix
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT_REPLACE"
+msgstr ""
+"Ulteriori informazioni utili a spiegare il motivo della richiesta di revoca."
+
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
 msgstr "non specificato / altra ragione"
@@ -664,6 +687,16 @@ msgstr "non specificato / altra ragione"
 # This is just a prefix
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
+msgstr ""
+"Ulteriori informazioni utili a spiegare il motivo della richiesta di revoca."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_COMPROMISE"
+msgstr "la chiave del certificato è stata compromessa"
+
+# This is just a prefix
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_LOST"
 msgstr ""
 "Ulteriori informazioni utili a spiegare il motivo della richiesta di revoca."
 
@@ -680,6 +713,10 @@ msgstr "Chiave"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DATAPOOL_DELETE_ENTRY"
 msgstr "Chiave"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DATAPOOL_DETAILS"
+msgstr "Nome utente"
 
 # Remove?
 #, fuzzy
@@ -716,10 +753,6 @@ msgstr "Nome utente"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DATAPOOL_KEY"
 msgstr "Chiave"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
-msgstr "Nome utente"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DATAPOOL_MOTD_LABEL"
@@ -945,6 +978,10 @@ msgstr "Errore sconosciuto"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_NOT_AUTHORIZED"
+msgstr "Revoca Certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_NOT_TRUSTED"
 msgstr "Revoca Certificato"
 
 #, fuzzy
@@ -2799,6 +2836,10 @@ msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_NOT_DEFINED"
 msgstr "Questo campo non è definito nelle impostazioni del profilo."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_PARTS_HAS_ERRORS"
+msgstr "Uno o più campi Soggetto contengono errori."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_COMMON_NAME_EMPTY"
 msgstr "Fallita convalida dell’espressione data"
 
@@ -2844,12 +2885,20 @@ msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_FAILED_REGEX"
 msgstr "Valore non consentito."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_HAS_ERRORS"
+msgstr "Uno o più campi Soggetto contengono errori."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_LESS_THAN_MIN_COUNT"
 msgstr "I campi indicati devono essere compilati."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_MAX_COUNT_EXCEEDED"
 msgstr "Il numero di campi eccede il massimo consentito."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_NOT_DEFINED"
+msgstr "Questo campo non è definito nelle impostazioni del profilo."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_INPUT_FIELD_REQUIRED_BUT_EMPTY"
@@ -3605,6 +3654,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_REMOVE_TOKEN_LABEL"
 msgstr "Id Transazione SCEP"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_RESTART_ISSUANCE"
+msgstr "Esporta il Certificato nel formato desiderato"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_SET_VALIDITY_LABEL"
 msgstr "Modifica Validità"
 
@@ -3980,6 +4033,10 @@ msgstr "Validità Firmatario"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRL_PROFILE_LABEL"
+msgstr "Profilo Certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRL_PROFILE_LIST_LABEL"
 msgstr "Profilo Certificato"
 
 #, fuzzy
@@ -5465,6 +5522,14 @@ msgstr "In attesa di autenticazione manuale"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_MANUAL_AUTHORIZATION_LABEL"
 msgstr "In attesa di autenticazione manuale"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ERROR_ON_ISSUE_DESC"
+msgstr "superato il limite dei retry"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ERROR_ON_ISSUE_LABEL"
+msgstr "SUCCESSO"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION"
 msgstr ""
 "Questo Workflow è stato interrotto da un evento imprevisto, contatta per "
@@ -5592,6 +5657,14 @@ msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_DESC"
 msgstr "Questa Richiesta di Revoca è in attesa di approvazione."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_EXTERNAL_ISSUE_DESC"
+msgstr "Questa Richiesta di Revoca è in attesa di approvazione."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_EXTERNAL_ISSUE_LABEL"
+msgstr "In Attesa di Approvazione"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_LABEL"
@@ -6152,6 +6225,10 @@ msgstr "Sì"
 #~ msgid "I18N_OPENXPKI_UI_BULK_PENDING_ENROLLMENT_LABEL"
 #~ msgstr "Registrazione"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOES_NOT_EXIST"
+#~ msgstr "Numero di serie del certificato"
+
 # Remove?
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CERT_SUBJECT_PARTS"
@@ -6165,6 +6242,10 @@ msgstr "Sì"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_DATAPOOL_ACME_ACCOUNT_LABEL"
 #~ msgstr "Risultati Ricerca Certificati"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
+#~ msgstr "Nome utente"
 
 #~ msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
 #~ msgstr "Il valore date/time inserito non è stato convalidato."
@@ -6359,6 +6440,14 @@ msgstr "Sì"
 #~ msgstr "Aggiorna Informazioni"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_UPLOAD_CERTIFICATE_DESC"
+#~ msgstr "Programma questo certificato per la revoca"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_UPLOAD_CERTIFICATE_LABEL"
+#~ msgstr "Revoca Certificato"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RESETPASS_ASK_CLIENT_PASSWORD_DESC"
 #~ msgstr ""
 #~ "Inserisci una password a protezione della chiave. Questa password sarà "
@@ -6541,20 +6630,9 @@ msgstr "Sì"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RESETPASS_RESET_PASSWORD_PLACEHOLDER"
 #~ msgstr "Please retype the password"
 
-# This is just a prefix
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT_REPLACE"
-#~ msgstr ""
-#~ "Ulteriori informazioni utili a spiegare il motivo della richiesta di "
-#~ "revoca."
-
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
 #~ msgstr "non specificato / altra ragione"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY_COMPROMISE"
-#~ msgstr "la chiave del certificato è stata compromessa"
 
 # This is just a prefix
 #, fuzzy
