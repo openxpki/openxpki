@@ -30,6 +30,8 @@ Will result in
 =cut
 
 use DateTime;
+use OpenXPKI::Crypt::DN;
+use OpenXPKI::Crypt::X509;
 use OpenXPKI::DateTime;
 use OpenXPKI::Server::Context qw( CTX );
 
@@ -47,6 +49,13 @@ sub get_hash {
     my $cert_id = shift;
 
     return unless ($cert_id);
+
+    if ($cert_id =~ m{-----BEGIN CERTIFICATE-----}) {
+        my $x509 = OpenXPKI::Crypt::X509->new($cert_id);
+        $self->{_hash} = $x509->db_hash;
+        $self->{_hash}->{subject_hash} = $x509->subject_hash;
+        return $self->{_hash};
+    }
 
     # To prevent loading the same item again and again, we always cache
     # the last hash and reuse it
@@ -243,6 +252,39 @@ sub dn {
 
 }
 
+=head2 issuer_dn
+
+Same as C<dn> for the issuer dn.
+
+=cut
+
+sub issuer_dn {
+
+    my $self = shift;
+    my $cert_id = shift;
+    my $component = shift;
+
+    my $hash = $self->get_hash( $cert_id );
+    if (!$hash) {
+        return;
+    }
+
+    $hash->{issuer_hash} = OpenXPKI::Crypt::DN::from_string($hash->{issuer_dn})
+        unless ($hash->{issuer_hash});
+
+    my $dn = $hash->{issuer_hash};
+
+    if (!$component) {
+        return $dn;
+    }
+
+    if (!$dn->{$component}) {
+        return;
+    }
+
+    return $dn->{$component}->[0];
+
+}
 
 =head2 notbefore(cert_identifier, format)
 
