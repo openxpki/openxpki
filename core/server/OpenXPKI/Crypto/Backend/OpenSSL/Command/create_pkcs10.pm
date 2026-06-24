@@ -51,7 +51,17 @@ sub get_command
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_SUBJECT");
     }
 
-    push @command, ('-x509') if ($self->{TOX509});
+    if ($self->{TOX509}) {
+        push @command, ('-x509');
+
+        # explicit notbefore/notafter is not available in older openssl versions
+        # we therefore can just use days here to create the validity
+        # convert the notafter date into the number of days from now
+        # in rare cases we might loose a day if processing takes too long
+        my $days = int(($self->{PROFILE}->get_notafter()->epoch() - time()) / 86400);
+        push @command, ('-days', $days );
+    }
+
     push @command, ('-nameopt', 'utf8');
     push @command, ('-engine', $engine) if ($engine);
     push @command, ('-keyform', $keyform) if ($keyform);
