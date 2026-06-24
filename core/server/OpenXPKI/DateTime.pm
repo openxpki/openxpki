@@ -29,6 +29,9 @@ sub convert_date {
         );
     }
 
+    # upgrade to generalizedtime for openssl dates after 2049
+    $outformat = 'generalizedtime' if ( $outformat eq 'openssltime' && $date->year > 2049 );
+
     return $date->epoch()                   if ( $outformat eq 'epoch' );
     return $date->iso8601()                 if ( $outformat eq 'iso8601' );
     return $date->strftime("%y%m%d%H%M%SZ") if ( $outformat eq 'openssltime' );
@@ -256,8 +259,8 @@ If OUTFORMAT is not specified the output format defaults to iso8601.
 Possible output formats:
   iso8601:     ISO 8601 formatted date (YYYY-MM-DDTHH:MM:SS), default
   epoch:       seconds since the epoch
-  openssltime: time format used in OpenSSL index files (YYMMDDHHMMSSZ)
-    Note: this can NOT be used for dates >2050 as cert validity!
+  openssltime: time format used in OpenSSL index files ([YY]YYMMDDHHMMSSZ)
+                year is expanded to 4 digits for year > 2049
   generalizedtime: time format used in OpenSSL index files (YYYYMMDDHHMMSSZ)
   terse:       terse time format (YYYYMMDDHHMMSS)
   printable:   human readable ISO-like time format (YYYY-MM-DD HH:MM:SS)

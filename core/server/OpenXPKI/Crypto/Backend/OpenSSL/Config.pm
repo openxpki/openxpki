@@ -346,7 +346,7 @@ sub __get_ca_section {
 
         if (my $notbefore = $profile->get_notbefore()) {
             my $startdate = OpenXPKI::DateTime::convert_date({
-                OUTFORMAT => ($notbefore->year > 2049 ? 'generalizedtime' : 'openssltime'),
+                OUTFORMAT => 'openssltime',
                 DATE      => $notbefore,
             });
             push @config, 'default_startdate = ' . $startdate;
@@ -354,7 +354,7 @@ sub __get_ca_section {
 
         if (my $notafter = $profile->get_notafter()) {
             my $enddate = OpenXPKI::DateTime::convert_date({
-                OUTFORMAT => ($notafter->year > 2049 ? 'generalizedtime' : 'openssltime'),
+                OUTFORMAT => 'openssltime',
                 DATE      => $notafter,
             });
             push @config, 'default_enddate = ' . $enddate;
