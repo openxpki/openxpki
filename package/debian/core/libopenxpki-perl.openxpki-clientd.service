@@ -16,7 +16,7 @@ SupplementaryGroups=www-data
 
 RuntimeDirectory=openxpki-clientd
 RuntimeDirectoryMode=0755
-TimeoutStartSec=5s
+TimeoutStartSec=30s
 TimeoutStopSec=10s
 Restart=on-failure
 PrivateTmp=true

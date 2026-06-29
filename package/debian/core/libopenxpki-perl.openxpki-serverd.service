@@ -3,7 +3,7 @@ Description=OpenXPKI Trustcenter Backend
 After=network.target apache2.service
 
 [Service]
-type=notify
+Type=notify
 NotifyAccess=main
 TimeoutStartSec=120s
 PIDFile=/run/openxpkid/openxpkid.pid
