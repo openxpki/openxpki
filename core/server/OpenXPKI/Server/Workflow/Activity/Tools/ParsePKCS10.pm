@@ -75,7 +75,7 @@ sub execute {
         }
     }
 
-    workflow_error('PKCS10 structure can not be parsed', { error => $error }) unless($decoded);
+    workflow_error(sprintf('PKCS10 structure can not be parsed: %s', $error)) unless($decoded);
 
     if ($verify_signature) {
         if ($decoded->check_signature()) {

@@ -36,7 +36,7 @@ sub execute {
     }
 
     if ($cert->{status} ne 'ISSUED') {
-        workflow_error('certificate to be revoked is not in state "issued"', status => $cert->{status});
+        workflow_error(sprintf('certificate to be revoked is not in state "issued" (status: %s)', $cert->{status}));
     }
 
     my $param = $self->param();

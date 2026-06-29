@@ -59,8 +59,7 @@ sub execute {
         sanitize => 1
     );
 
-    workflow_error('Result of render_subject is empty',
-            profile => $profile, style => $style) unless ($cert_subject);
+    workflow_error(sprintf('Result of render_subject is empty (profile: %s, style: %s)', $profile, $style)) unless ($cert_subject);
 
     ##! 32: 'Subject is ' . $cert_subject
     CTX('log')->application()->info("Rendering subject: $cert_subject");
@@ -69,10 +68,10 @@ sub execute {
     my $parsed;
     eval { $parsed = OpenXPKI::DN->new($cert_subject); };
 
-    workflow_error("Unable to parse subject into DN", { cert_subject => $cert_subject })
+    workflow_error(sprintf("Unable to parse subject into DN: %s", $cert_subject))
         unless($parsed);
 
-    workflow_error("Unable to validate parsed subject", { cert_subject => $cert_subject })
+    workflow_error(sprintf("Unable to validate parsed subject: %s", $cert_subject))
         unless(OpenXPKI::Util->validate('ParsedDN', [ $parsed->get_parsed() ]));
 
     my $cert_san_parts  = $context->param('cert_san_parts');
