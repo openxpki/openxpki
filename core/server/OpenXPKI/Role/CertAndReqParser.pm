@@ -621,7 +621,14 @@ has cert_subject_parts => (
 
 sub _build_cert_subject_parts {
     my $self = shift;
-    my $hash = {%{$self->subject_hash}};  # shallow copy to avoid mutating subject_hash
+    my $hash;
+
+    # convert RDN keys to uppercase
+    for my $rdn (keys $self->subject_hash->%*) {
+        $hash->{uc($rdn)} = $self->subject_hash->{$rdn};
+    }
+
+    # add SAN_* items to hash
     for my $san ($self->get_subject_alt_name->@*) {
         my ($type, $value) = $san->@*;
         my $key = 'SAN_' . uc($type);

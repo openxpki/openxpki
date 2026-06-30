@@ -107,6 +107,24 @@ vbXpZCfp57xJs6VUTREUvmz6/r8fodcw0CLmLWmow6vrUnZRT1iqEDqf2to4YNs3
 +utxlrVV1zvd+Uzfa5P55ZKFHtueXCo6Nm3ZcJyKkVG2WbRcjwNEI8A=
 -----END CERTIFICATE-----';
 
+# EC cert whose subject exercises the less common RDN attribute OIDs
+# (emailAddress, serialNumber, unstructuredName, unstructuredAddress)
+my $rdn_cert = '-----BEGIN CERTIFICATE-----
+MIICSjCCAfGgAwIBAgIULdm1Zh1vejHtNyCbmF4LOthrZDEwCgYIKoZIzj0EAwIw
+ezERMA8GA1UEAwwIUkROIFRlc3QxHjAcBgkqhkiG9w0BCQEWD3JkbkBleGFtcGxl
+LmNvbTERMA8GA1UEBRMIQUJDMTIzNDUxGDAWBgkqhkiG9w0BCQIMCXNvbWUtaG9z
+dDEZMBcGCSqGSIb3DQEJCAwKMTkyLjAuMi4xMDAeFw0yNjA2MjkxNDI1NDBaFw0z
+NjA2MjYxNDI1NDBaMHsxETAPBgNVBAMMCFJETiBUZXN0MR4wHAYJKoZIhvcNAQkB
+Fg9yZG5AZXhhbXBsZS5jb20xETAPBgNVBAUTCEFCQzEyMzQ1MRgwFgYJKoZIhvcN
+AQkCDAlzb21lLWhvc3QxGTAXBgkqhkiG9w0BCQgMCjE5Mi4wLjIuMTAwWTATBgcq
+hkjOPQIBBggqhkjOPQMBBwNCAASj4ufH/+UCWETsw0ZedBVEgCxqEG13/w9WsM2K
+xgsWrb3y+/hgMhGSAVWaBknO7mpGKssOM+WJBjelAITL+yajo1MwUTAdBgNVHQ4E
+FgQUbCB0gpArEoxE5V0B+o2vb8bYpEUwHwYDVR0jBBgwFoAUbCB0gpArEoxE5V0B
++o2vb8bYpEUwDwYDVR0TAQH/BAUwAwEB/zAKBggqhkjOPQQDAgNHADBEAiAI5RZJ
+skApb788kbKoZioBWSAdOyvH+WQlVMC2FLmaAQIgSz/bM73Lvd9hWiLRQVRskh+V
+ESG2jvcckojtrqlfhJ8=
+-----END CERTIFICATE-----';
+
 # -------------------------------------------------------------------------
 # Original SAN test (backward-compat)
 # -------------------------------------------------------------------------
@@ -386,6 +404,37 @@ subtest 'RSA CA certificate' => sub {
     is($x->is_ca,         1, 'is_ca true');
 
     is($x->get_ext_key_usage, undef, 'no EKU on CA');
+};
+
+# -------------------------------------------------------------------------
+# RDN attribute mapping – emailAddress / serialNumber /
+# unstructuredName / unstructuredAddress
+# -------------------------------------------------------------------------
+subtest 'RDN attribute mapping' => sub {
+    my $x = OpenXPKI::Crypt::X509->new($rdn_cert);
+    ok($x, 'parsed');
+
+    is($x->get_serial, '261759648466835433591197164673504883371831682097', 'serial');
+
+    # The textual subject must use the human readable RDN names for the
+    # less common attribute OIDs:
+    #   1.2.840.113549.1.9.1 => emailAddress
+    #   1.2.840.113549.1.9.2 => unstructuredName
+    #   1.2.840.113549.1.9.8 => unstructuredAddress
+    #   2.5.4.5              => serialNumber
+    is($x->get_subject,
+        'unstructuredAddress=192.0.2.10,unstructuredName=some-host,'
+        . 'serialNumber=ABC12345,emailAddress=rdn@example.com,CN=RDN Test',
+        'subject renders RDN attribute names');
+
+    # subject_hash uses the uppercased attribute names as keys
+    is_deeply($x->subject_hash, {
+        CN                  => ['RDN Test'],
+        EMAILADDRESS        => ['rdn@example.com'],
+        SERIALNUMBER        => ['ABC12345'],
+        UNSTRUCTUREDNAME    => ['some-host'],
+        UNSTRUCTUREDADDRESS => ['192.0.2.10'],
+    }, 'subject_hash keyed by RDN attribute names');
 };
 
 done_testing;

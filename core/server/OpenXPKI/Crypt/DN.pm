@@ -132,9 +132,10 @@ Returns a hashref with the RDN types as keys, known OIDs are translated
 to their textual representation (see OpenXPKI::Role::SubjectOID). The
 values are lists holding the textual representation of the RNS components.
 
-To provide backwards compatibility with OpenXPKI::DN all keys are in
-uppercase letters and the value elements are listed with the "most
-significant" item first.
+To provide backwards compatibility with OpenXPKI::DN the value elements are
+listed with the "most significant" item first.
+
+B<Note>: Uppercase conversion of RDN keys was removed in 3.34!
 
 =cut
 

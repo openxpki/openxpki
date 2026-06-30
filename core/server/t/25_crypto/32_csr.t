@@ -84,6 +84,18 @@ BggrBgEFBQcDATAKBggqhkjOPQQDAgNIADBFAiEAmBFrBjE/KPAoOqmWkFIu2NiP
 uW1J+1lSj73duPe17RcCICggGOynMy9klEH9ST8wm2A3n1IJ6Dt4glPv4r9dY5xR
 -----END CERTIFICATE REQUEST-----';
 
+# EC P-256 CSR whose subject exercises the less common RDN attribute OIDs
+# (emailAddress, serialNumber, unstructuredName, unstructuredAddress)
+my $rdn_csr = '-----BEGIN CERTIFICATE REQUEST-----
+MIIBPzCB5wIBADCBhDEVMBMGA1UEAwwMUkROIENTUiBUZXN0MSIwIAYJKoZIhvcN
+AQkBFhNyZG4tY3NyQGV4YW1wbGUuY29tMREwDwYDVQQFEwhDU1I5ODc2NTEXMBUG
+CSqGSIb3DQEJAgwIY3NyLWhvc3QxGzAZBgkqhkiG9w0BCQgMDDE5OC41MS4xMDAu
+NzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABOUgWyfriNddBu4FDhB3Q68xqQrp
+DTB+UhzkqvLsTvEmKm/dO39YI20Xrql9Y3HLHeave4jUUehmn5fkL5h8nSqgADAK
+BggqhkjOPQQDAgNHADBEAiAF1ETQsekJD2Iu3lw9PsfOAPw5QoZhON3OVfX1+OjQ
+vwIgIFuPW953sG+qJM0qOXv9EMPnz3xv6M+oU9xViCJnF6o=
+-----END CERTIFICATE REQUEST-----';
+
 # ---------------------------------------------------------------------------
 # Original CSR – backward-compat checks
 # ---------------------------------------------------------------------------
@@ -306,6 +318,37 @@ subtest 'EC P-256 CSR' => sub {
 
     # No challengePassword
     is($x->get_attribute_value('challengePassword'), undef, 'no challengePassword');
+};
+
+# ---------------------------------------------------------------------------
+# RDN attribute mapping – emailAddress / serialNumber /
+# unstructuredName / unstructuredAddress
+# ---------------------------------------------------------------------------
+subtest 'RDN attribute mapping' => sub {
+    my $x = OpenXPKI::Crypt::PKCS10->new($rdn_csr);
+    ok($x, 'parsed');
+
+    is($x->cn, 'RDN CSR Test', 'cn');
+
+    # The textual subject must use the human readable RDN names for the
+    # less common attribute OIDs:
+    #   1.2.840.113549.1.9.1 => emailAddress
+    #   1.2.840.113549.1.9.2 => unstructuredName
+    #   1.2.840.113549.1.9.8 => unstructuredAddress
+    #   2.5.4.5              => serialNumber
+    is($x->get_subject,
+        'unstructuredAddress=198.51.100.7,unstructuredName=csr-host,'
+        . 'serialNumber=CSR98765,emailAddress=rdn-csr@example.com,CN=RDN CSR Test',
+        'subject renders RDN attribute names');
+
+    # subject_hash uses the uppercased attribute names as keys
+    is_deeply($x->subject_hash, {
+        CN                  => ['RDN CSR Test'],
+        EMAILADDRESS        => ['rdn-csr@example.com'],
+        SERIALNUMBER        => ['CSR98765'],
+        UNSTRUCTUREDNAME    => ['csr-host'],
+        UNSTRUCTUREDADDRESS => ['198.51.100.7'],
+    }, 'subject_hash keyed by RDN attribute names');
 };
 
 done_testing;
