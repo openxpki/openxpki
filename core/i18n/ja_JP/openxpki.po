@@ -389,6 +389,10 @@ msgstr "証明書ライフサイクルサポート"
 msgid "I18N_OPENXPKI_UI_CERT_IMPORT_FAILED_PUBLIC_KEY_MISMATCH"
 msgstr "結果がエクスポート制限より大きい場合、正しくエクスポートできません。"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_IMPORT_FAILED_ROOT_IMPORT_DISALLOWED"
+msgstr "証明書ライフサイクルサポート"
+
 msgid "I18N_OPENXPKI_UI_CERT_ISSUER_UNKNOWN"
 msgstr "証明書発行者が不明です"
 
@@ -3399,10 +3403,6 @@ msgstr "CRLリスト"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRL_PROFILE_LABEL"
 msgstr "CRLのプロファイル"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRL_PROFILE_LIST_LABEL"
-msgstr "CRLのプロファイル"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRL_VALIDITY_LABEL"
 msgstr "CRLの有効期限"
 
@@ -5363,6 +5363,10 @@ msgstr "はい"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_UPLOAD_CERTIFICATE_LABEL"
 #~ msgstr "証明書アップロード"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRL_PROFILE_LIST_LABEL"
+#~ msgstr "CRLのプロファイル"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"

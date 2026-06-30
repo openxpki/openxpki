@@ -382,6 +382,11 @@ msgstr "Zertifikatsimport fehlgeschlagen - Zertifikat ist 'self-signed'"
 msgid "I18N_OPENXPKI_UI_CERT_IMPORT_FAILED_PUBLIC_KEY_MISMATCH"
 msgstr "Zertifikatsimport fehlgeschlagen - Public Key weicht ab"
 
+msgid "I18N_OPENXPKI_UI_CERT_IMPORT_FAILED_ROOT_IMPORT_DISALLOWED"
+msgstr ""
+"Zertifikatsimport fehlgeschlagen - Zertifikatskette vorhanden aber Import "
+"nicht erlaubt."
+
 msgid "I18N_OPENXPKI_UI_CERT_ISSUER_UNKNOWN"
 msgstr "Der Aussteller des Zertifikates ist unbekannt"
 
@@ -3303,9 +3308,6 @@ msgstr "CRLs"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRL_PROFILE_LABEL"
 msgstr "CRL Profil"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRL_PROFILE_LIST_LABEL"
-msgstr "CRL Profil"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRL_VALIDITY_LABEL"
 msgstr "CRL Gültigkeit"
 
@@ -5346,6 +5348,9 @@ msgstr "ja"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_UNKNOWN_TYPE"
 #~ msgstr "Der Workflow konnte nicht gestartet werden: Typ unbekannt"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRL_PROFILE_LIST_LABEL"
+#~ msgstr "CRL Profil"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
 #~ msgstr "Service eingestellt"
