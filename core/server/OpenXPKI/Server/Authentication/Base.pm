@@ -171,25 +171,19 @@ sub map_role {
     my $self = shift;
     my $role = shift || '';
 
-    my @roles = (ref $role eq 'ARRAY') ? $role->@* : ( $role );
-
-    ##! 16: 'map role(s) ' . join(', ', @roles)
+    ##! 16: 'map role ' . $role
     # no role map defined, do nothing
-    return $roles[0] unless ($self->has_rolemap);
+    return $role unless ($self->has_rolemap);
 
     my $rolemap = $self->rolemap;
-    ##! 128: $rolemap
 
-    # walk over all roles and return if the role is found in the map
-    for my $rr (@roles) {
-        next unless($rolemap->{$rr});
-        $self->log->debug("Role $rr found in map: " . $rolemap->{$rr});
-        return $rolemap->{$rr};
-    }
+    ##! 128: $rolemap
+    # role contained in map
+    return $rolemap->{$role} if ($rolemap->{$role});
 
     $self->log->debug("Role $role not found in map, check for _default");
 
-    # the _default key marks a default role
+    # the asterisk marks a default role
     return $rolemap->{'_default'} if ($rolemap->{'_default'});
 
     $self->log->info("Unknown role $role was given");
@@ -227,11 +221,6 @@ if a string was passed it was split at the delimiter character.
 =item role
 
 Should receive a role preset, type is String/Undef.
-
-=item rolemap
-
-A HashRef to map external role names (key) to internal roles (value),
-L<see map_roles>.
 
 =item authinfo
 
@@ -282,15 +271,13 @@ it returns the unmodified input value.
 
 =head3 map_role
 
-Expects a single string or a list of strings representing the *external*
-name of the role (as delivered from the authentication provider). Iterates
-over the given list, checks if I<rolemap> contains the given string and
-returns the value of the first item found.
+Check if the given string is a valid key in I<rolemap> and return its
+value.
 
-Add the special key I<_default> to the I<rolemap> to use as a fallback in case
+You can define the special key I<_default> to use as a fallback in case
 the string is not found. If neither one matches, undef is returned.
 
-If I<rolemap> is not set, returns the input string / the first item of the list.
+If I<rolemap> is not set, returns the input string.
 
 =head3 register_login
 
