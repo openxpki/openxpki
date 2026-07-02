@@ -52,8 +52,11 @@ sub execute {
                 workflow_id          => $csr_wf_id->{attribute_value},
             },
         );
-        $cert_subject_style = $res->{'workflow_context_value'};
-        CTX('log')->application()->debug("Subject style $cert_subject_style found in workflow");
+        if ($cert_subject_style = $res->{'workflow_context_value'}) {
+            CTX('log')->application()->debug("Subject style $cert_subject_style found in workflow");
+        } else {
+            CTX('log')->application()->debug('Linked CSR workflow does not hold a Subject style');
+        }
 
     }
 
