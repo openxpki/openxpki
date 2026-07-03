@@ -923,8 +923,8 @@ sub __get_action_buttons ($self, $wf_info) {
                 }
             }
             if (my $break = $hint->{break}) {
-                $button{'break_before'} = 1 if $break == 'before';
-                $button{'break_after'} = 1  if $break == 'after';
+                $button{'break_before'} = 1 if lc($break) eq 'before';
+                $button{'break_after'} = 1  if lc($break) eq 'after';
             }
 
         }
