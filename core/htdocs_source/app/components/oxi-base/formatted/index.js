@@ -107,10 +107,6 @@ export default class OxiFormattedComponent extends Component {
         }
     }
 
-    /**
-     * Selects all text inside the clicked `<code>` element via the browser Selection API.
-     * @memberOf OxiBase::Formatted
-     */
     _parseNumeric(decimals = 0, multiplier = 1, suffix = '') {
         let v = this.args.value;
         if (v === null || v === undefined || v === '') return { text: '-', negative: false };
@@ -134,6 +130,10 @@ export default class OxiFormattedComponent extends Component {
 
     get percentValue() { return this._parseNumeric(2, 100, '%'); }
 
+    /**
+     * Selects all text inside the clicked `<code>` element via the browser Selection API.
+     * @memberOf OxiBase::Formatted
+     */
     @action
     selectCode(event) {
         let element = event.target;
