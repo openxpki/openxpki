@@ -226,6 +226,7 @@ OpenXPKI/Crypt/Profile/DTO/AuthorityKeyIdentifier.pm
 OpenXPKI/Crypt/Profile/DTO/BasicConstraints.pm
 OpenXPKI/Crypt/Profile/DTO/CRLDistributionPoints.pm
 OpenXPKI/Crypt/Profile/DTO/CustomOid.pm
+OpenXPKI/Crypt/Profile/DTO/ExtCertificateTemplate.pm
 OpenXPKI/Crypt/Profile/DTO/ExtendedKeyUsage.pm
 OpenXPKI/Crypt/Profile/DTO/IssuerAltName.pm
 OpenXPKI/Crypt/Profile/DTO/KeyUsage.pm
@@ -325,6 +326,7 @@ OpenXPKI/DTO/ValidationException.pm
 # Collection of reusable items as Moose::Role
 OpenXPKI/Role/ACME.pm
 OpenXPKI/Role/ASN1Parse.pm
+OpenXPKI/Role/CertAndReqParser.pm
 OpenXPKI/Role/DNSValidation.pm
 OpenXPKI/Role/FileUtil.pm
 OpenXPKI/Role/IssuerSerial.pm
@@ -770,6 +772,8 @@ cgi-bin/est.fcgi
 cgi-bin/healthcheck.fcgi
 
 # Client UI
+htdocs/robots.txt
+
 # NOTE:
 #   core/htdocs_source/update-manifest.pl will update the list below.
 #   UPDATE_MANIFEST_UI_LIST - do not remove this comment
