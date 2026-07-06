@@ -362,20 +362,16 @@ sub flush ($self) {
         $self->clear_metainfo;
         $self->clear_params;
         $self->{status} &= ~(STATUS_NEW | STATUS_DELETED);
-        return 1;
     }
-
-    # Deleted: remove from database
-    if ($self->{status} & STATUS_DELETED) {
+    # Deleted: remove from database.
+    elsif ($self->{status} & STATUS_DELETED) {
         $self->_db_remove;
         $self->clear_metainfo;
         $self->clear_params;
         $self->{status} &= ~STATUS_DELETED;
-        return 1;
     }
-
-    # New or modified: serialize and store
-    if ($self->{status} & (STATUS_NEW | STATUS_MODIFIED)) {
+    # New or modified: serialize and store.
+    elsif ($self->{status} & (STATUS_NEW | STATUS_MODIFIED)) {
         $self->_db_store;
         $self->{status} &= ~(STATUS_NEW | STATUS_MODIFIED);
     }
