@@ -1,20 +1,50 @@
-Please list items to be added to the final release comment here
-
 New Features
-- `oxi` can now pass payload parameters via JSON
-- `oxi alias|token list` shows the certificate subject (--subject), alias
-  details in token output and offers options for expired/upcoming items
+- `oxi` CLI major rework: new commands, support for complex payloads
+  and much improved error handling
+- Cryptographic chain validation added to EvaluateSignerTrust
 - Authentication::Base::map_role now accepts an array of roles and uses the
   first one that matches the role_map
+- New Moose types for SAN/Email/IP validation, RelativeDate and X509CertObject
+- New database TLS option system.database.main.tls
+- Complete rewrite of the ReadTheDocs documentation
+- New module for metadata managment (EE only)
+- New workflow persister mode "inline"
+- New status page activities: alias and CRL status, certificate and
+  workflow statistics (EE only)
+- New activities for inline token generation and alias handling (EE only)
 
 Upgrades, Improvements and Bugfixes
+- Client/frontend session rewritten without CGI::Session (JSON
+  serialization); fixed DB connection leak causing "Too many connections"
+- Logging and audit rework (Log4perl categories, shared client/server
+  logger role, reworked audit statements)
+- systemd notify used to monitor service startup; socket directory is
+  created when not running under systemd
 - Datapool condition/validator gained a pki_realm parameter to validate
   items in the _global realm
-- Datapool API methods no longer enforce cross-realm / sys namespace checks;
-  these checks moved into the workflow classes
-- `oxi create` now ignores an empty keyfile (needed when redirecting output)
-- corrected the Release.key fingerprint in the QUICKSTART documentation
+- OpenSSL v3 / HSM-protected key fixes, RSA-PSS parsing fixes, self-signed
+  certificate creation via create_pkcs10, injection prevention in the
+  OpenSSL config builder
+- numerous EST/SCEP/ACME pickup, cookie/nginx-header and error-handling fixes
+- NICE::Proxy error handling reworked and chain import improved in the ProxyCA
+  backend (EE only)
+- Overwrite RHEL9 crypto policy for SHA1 support in openssl calls
 
 Removals, Deprecations, Breaking Changes
-- Datapool cross-realm access and sys* namespace restrictions are now
-  enforced by the workflow classes instead of the API layer
+- BREAKING: new ASN1 parser for X509 and PKCS#10 replaces Crypt::PKCS10.
+  Subject/SAN handling changed: RDN order in dirName/otherName, composed
+  RDNs, no more forced RDN uppercasing (O:Crypt:DN)
+- BREAKING: Mandatory syntax check on SAN items (e.g. SAN DNS must be a
+  legal DNS name)
+- BREAKING: validate_certificate API command reworked (changed
+  behavior/return); the _void realm was replaced with <undef>
+- BREAKING: support for legacy workflow serialization removed;
+- BREAKING: removed database drivers DB2 and the legacy DBD::mysql-based MariaDB
+- BREAKING: deprecated CTX('log')->log(), ->debug(), ->info() etc. logging
+  methods removed
+- BREAKING: OpenXPKI::Server::Database renamed to OpenXPKI::Database; legacy
+  class OpenXPKI::MooseParams removed
+- Removed old/insecure OpenSSL::Config and old OpenSSL Profile classes
+- Removed support for the custom X-Forwarded-Host header
+- Removed support for a fixed auth stack via config login.stack
+- Removed the tokenapi config option

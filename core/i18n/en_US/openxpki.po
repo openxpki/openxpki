@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2026-06-22 14:26+0200\n"
+"PO-Revision-Date: 2026-07-03 10:58+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-"
 "devel@lists.sourceforge.net>\n"
@@ -1257,16 +1257,8 @@ msgstr "System Status"
 msgid "I18N_OPENXPKI_UI_MENU_WORKFLOW_SEARCH"
 msgstr "Workflow Search"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_METADATA_SECTION_LIFECYCLE_DESC"
-msgstr "Action"
-
 msgid "I18N_OPENXPKI_UI_METADATA_SECTION_LIFECYCLE_LABEL"
 msgstr "Lifecycle related items"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_METADATA_SECTION_OWNER_DESC"
-msgstr "Action"
 
 msgid "I18N_OPENXPKI_UI_METADATA_SECTION_OWNER_LABEL"
 msgstr "Owner related items"
@@ -2471,21 +2463,18 @@ msgstr "Please update the information using the form below."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_BASE_LABEL"
 msgstr "Modify Certificate Metadata"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_ENTITY_DESC"
 msgstr "Please update the information using the form below."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_ENTITY_LABEL"
 msgstr "Modify Entity Information"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_LIFECYCLE_DESC"
 msgstr "Please update the information using the form below."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_LIFECYCLE_LABEL"
 msgstr "Modify Lifecycle Information"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_OWNER_DESC"
 msgstr "Please update the information using the form below."
 
@@ -3443,9 +3432,8 @@ msgstr "  "
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_PARAMS_LABEL"
 msgstr "Key Parameters"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_ENTITIY_DESC"
-msgstr "Email address of the responsible person for this certificate."
+msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_ENTITIY_LABEL"
 msgstr "Entity Information"
@@ -3453,16 +3441,14 @@ msgstr "Entity Information"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_HASH"
 msgstr "Metadata (key/value)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_LIFECYCLE_DESC"
-msgstr "Email address of the responsible person for this certificate."
+msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_LIFECYCLE_LABEL"
 msgstr "Lifecycle Information"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_OWNER_DESC"
-msgstr "Owner (Group)"
+msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_METADATA_OWNER_LABEL"
 msgstr "Owner Information"
@@ -4692,6 +4678,12 @@ msgstr ""
 "<i>persist data</i> to write back the data to the certificate database. If "
 "you cancel the workflow, your changes will be lost."
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_VIEW_DESC"
+msgstr "Find the metadata currently associated with the certificate below."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_VIEW_LABEL"
+msgstr "Certificate Metadata"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_NICE_CONNECT_FAILURE_DESC"
 msgstr ""
 "Unable to connect to the CA interface. Please find further details in the "
@@ -5175,6 +5167,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_TRUSTGROUP_IMPORT_LABEL"
 msgstr "Import to Trustgroup"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_VIEW_METADATA_DESC"
+msgstr "Display the metadata associated with a certificate."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_VIEW_METADATA_LABEL"
+msgstr "Show Metadata"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION"
 msgstr "Unable to load workflow information."
 
@@ -5197,8 +5195,16 @@ msgstr "Yes"
 #~ msgstr "Modify"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_METADATA_SECTION_LIFECYCLE_DESC"
+#~ msgstr "Action"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_METADATA_SECTION_NOTIFICATION_LABEL"
 #~ msgstr "Expiry Notification"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_METADATA_SECTION_OWNER_DESC"
+#~ msgstr "Action"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_CASIGNER_LABEL"
 #~ msgstr "CA Signer (internal)"

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2026-06-22 14:26+0200\n"
+"PO-Revision-Date: 2026-07-03 10:37+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-"
 "devel@lists.sourceforge.net>\n"
@@ -1253,14 +1253,8 @@ msgstr "Systemstatus"
 msgid "I18N_OPENXPKI_UI_MENU_WORKFLOW_SEARCH"
 msgstr "Workflow-Suche"
 
-msgid "I18N_OPENXPKI_UI_METADATA_SECTION_LIFECYCLE_DESC"
-msgstr "Aktion"
-
 msgid "I18N_OPENXPKI_UI_METADATA_SECTION_LIFECYCLE_LABEL"
 msgstr "Eigenschaften Lebenszyklus"
-
-msgid "I18N_OPENXPKI_UI_METADATA_SECTION_OWNER_DESC"
-msgstr "Aktion"
 
 msgid "I18N_OPENXPKI_UI_METADATA_SECTION_OWNER_LABEL"
 msgstr "Eigenschaften Eigentümer"
@@ -4766,6 +4760,14 @@ msgstr ""
 "speichern</i> übernehmen. Falls Sie den Workflow abbrechen werden ihre "
 "Änderungen verworfen."
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_VIEW_DESC"
+msgstr ""
+"Nachfolgenden sehen Sie die derzeit hinterlegten Meta-Daten des gewählten "
+"Zertifikates. "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_VIEW_LABEL"
+msgstr "Zertifikat Meta-Daten "
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_NICE_CONNECT_FAILURE_DESC"
 msgstr ""
 "Die Verbindung zur CA ist konnte nicht hergestellt werden. Weitere Details "
@@ -5262,6 +5264,12 @@ msgstr "Importiert ein Zertifikat und verknüpft es mit einer Trustgroup."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_TRUSTGROUP_IMPORT_LABEL"
 msgstr "Import in Trustgroup"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_VIEW_METADATA_DESC"
+msgstr "Zeigt die Meta-Daten eines Zertifikates an."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_VIEW_METADATA_LABEL"
+msgstr "Meta-Daten anzeigen"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION"
 msgstr "Workflowinformationen konnten nicht geladen werden."
 
@@ -5283,9 +5291,15 @@ msgstr "ja"
 #~ msgid "I18N_OPENXPKI_UI_DATAPOOL_MODIFY_ENTRY"
 #~ msgstr "Ändern"
 
+#~ msgid "I18N_OPENXPKI_UI_METADATA_SECTION_LIFECYCLE_DESC"
+#~ msgstr "Aktion"
+
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_METADATA_SECTION_NOTIFICATION_LABEL"
 #~ msgstr "Ablaufbenachrichtigung"
+
+#~ msgid "I18N_OPENXPKI_UI_METADATA_SECTION_OWNER_DESC"
+#~ msgstr "Aktion"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_CASIGNER_LABEL"

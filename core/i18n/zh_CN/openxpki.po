@@ -1402,15 +1402,7 @@ msgid "I18N_OPENXPKI_UI_MENU_WORKFLOW_SEARCH"
 msgstr "工作流程搜索"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_METADATA_SECTION_LIFECYCLE_DESC"
-msgstr "操作"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_METADATA_SECTION_LIFECYCLE_LABEL"
-msgstr "操作"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_METADATA_SECTION_OWNER_DESC"
 msgstr "操作"
 
 #, fuzzy
@@ -5035,6 +5027,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_UPDATE_PENDING_DESC"
 msgstr "此吊销请求需要批准。"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_VIEW_DESC"
+msgstr "此工作流程最终失败。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_VIEW_LABEL"
+msgstr "已更新"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_NICE_CONNECT_FAILURE_DESC"
 msgstr "此工作流程最终失败。"
 
@@ -5514,6 +5514,14 @@ msgstr "证书导出"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_TRUSTGROUP_IMPORT_LABEL"
 msgstr "证书导出"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_VIEW_METADATA_DESC"
+msgstr "更改证书元数据。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_VIEW_METADATA_LABEL"
+msgstr "更改元数据"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION"
 msgstr "无法加载工作流信息。"
 
@@ -5585,8 +5593,16 @@ msgstr "是"
 #~ msgstr "加密密码"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_METADATA_SECTION_LIFECYCLE_DESC"
+#~ msgstr "操作"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_METADATA_SECTION_NOTIFICATION_LABEL"
 #~ msgstr "Endpoint / Server"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_METADATA_SECTION_OWNER_DESC"
+#~ msgstr "操作"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_CASIGNER_LABEL"
@@ -5997,10 +6013,6 @@ msgstr "是"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_PENDING_LABEL"
 #~ msgstr "等待批准"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_REVIEW_DESC"
-#~ msgstr "此工作流程最终失败。"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_REVIEW_LABEL"

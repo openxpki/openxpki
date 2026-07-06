@@ -1619,15 +1619,7 @@ msgid "I18N_OPENXPKI_UI_MENU_WORKFLOW_SEARCH"
 msgstr "Cerca Workflow"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_METADATA_SECTION_LIFECYCLE_DESC"
-msgstr "Azione"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_METADATA_SECTION_LIFECYCLE_LABEL"
-msgstr "Azione"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_METADATA_SECTION_OWNER_DESC"
 msgstr "Azione"
 
 #, fuzzy
@@ -5634,6 +5626,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_UPDATE_PENDING_DESC"
 msgstr "Questa Richiesta di Revoca è in attesa di approvazione."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_VIEW_DESC"
+msgstr "Questo Workflow è definitivamente fallito."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_VIEW_LABEL"
+msgstr "Aggiorna"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_NICE_CONNECT_FAILURE_DESC"
 msgstr "Questo Workflow è definitivamente fallito."
 
@@ -6197,6 +6197,14 @@ msgstr "Esporta il Certificato nel formato desiderato"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_TRUSTGROUP_IMPORT_LABEL"
 msgstr "Esporta Certificato"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_VIEW_METADATA_DESC"
+msgstr "Modifica i Metadati di un certificato."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_VIEW_METADATA_LABEL"
+msgstr "Modifica Metadati"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION"
 msgstr "Impossibile trovare le informazioni relative al Workflow"
 
@@ -6272,8 +6280,16 @@ msgstr "Sì"
 #~ msgstr "Scegli tu stesso la password"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_METADATA_SECTION_LIFECYCLE_DESC"
+#~ msgstr "Azione"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_METADATA_SECTION_NOTIFICATION_LABEL"
 #~ msgstr "Commento"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_METADATA_SECTION_OWNER_DESC"
+#~ msgstr "Azione"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_CASIGNER_LABEL"
@@ -6716,10 +6732,6 @@ msgstr "Sì"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_PENDING_LABEL"
 #~ msgstr "In Attesa di Approvazione"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_REVIEW_DESC"
-#~ msgstr "Questo Workflow è definitivamente fallito."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_REVIEW_LABEL"

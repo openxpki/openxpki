@@ -1272,15 +1272,7 @@ msgid "I18N_OPENXPKI_UI_MENU_WORKFLOW_SEARCH"
 msgstr "ワークフロー検索"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_METADATA_SECTION_LIFECYCLE_DESC"
-msgstr "実行"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_METADATA_SECTION_LIFECYCLE_LABEL"
-msgstr "実行"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_METADATA_SECTION_OWNER_DESC"
 msgstr "実行"
 
 #, fuzzy
@@ -4820,6 +4812,17 @@ msgstr ""
 "内容が失われます。"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_VIEW_DESC"
+msgstr ""
+"現在、証明書に関連付けられているメタデータは、以下で確認することができます。"
+"ボタンを使用して、データのさまざまな側面を変更します。変更した後、ワークフ"
+"ローを送信する必要があります。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_VIEW_LABEL"
+msgstr "証明書メタデータの変更"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_NICE_CONNECT_FAILURE_DESC"
 msgstr ""
 "This certificate can not be renewed as the preconditions for renewal are not "
@@ -5304,6 +5307,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_TRUSTGROUP_IMPORT_LABEL"
 msgstr "トラストグループへのインポート"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_VIEW_METADATA_DESC"
+msgstr "証明書のメタデータを参照します。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_VIEW_METADATA_LABEL"
+msgstr "メタデータの参照"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION"
 msgstr "ワークフロー情報を読み込めません。"
 
@@ -5326,8 +5337,16 @@ msgstr "はい"
 #~ msgstr "変更"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_METADATA_SECTION_LIFECYCLE_DESC"
+#~ msgstr "実行"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_METADATA_SECTION_NOTIFICATION_LABEL"
 #~ msgstr "有効期限の通知"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_METADATA_SECTION_OWNER_DESC"
+#~ msgstr "実行"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_CASIGNER_LABEL"
