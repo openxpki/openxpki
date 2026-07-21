@@ -121,6 +121,13 @@ sub revokeCertificate {
         return undef;
     }
 
+    CTX('log')->audit('entity')->info('certificate revoked',
+        certid          => $cert_identifier,
+        reason_code     => $reason_code,
+        revocation_time => $revocation_time,
+        pki_realm       => $pki_realm,
+    );
+
     ##! 32: $cert
     return $self->use_revocation_id() ? { revocation_id => $cert->{revocation_id} } : 1;
 
