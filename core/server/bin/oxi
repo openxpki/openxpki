@@ -378,6 +378,11 @@ TRACE(Dumper $res);
 
 my $json = JSON::PP->new();
 
+# JSON::PP::Boolean values (used e.g. by API responses) would otherwise be
+# dumped by YAML::PP as blessed Perl objects. Round-trip them through
+# JSON::PP so they come back as plain "true"/"false" strings.
+my $json_bool_stringify = JSON::PP->new->boolean_values('false', 'true');
+
 if ($res->state == 200) {
     my $out = $res->payload;
     if (blessed $out) {
@@ -404,7 +409,7 @@ if ($res->state == 200) {
         print $OUT $json->encode($out);
     } else {
         my $ypp = YAML::PP->new( schema => [qw/ + Perl tags=!perl / ]);
-        print $OUT $ypp->dump_string($out);
+        print $OUT $ypp->dump_string($json_bool_stringify->decode($json_bool_stringify->encode($out)));
     }
     exit 0;
 
