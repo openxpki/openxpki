@@ -4,6 +4,7 @@ use OpenXPKI qw( -class -nonmoose );
 extends 'Log::Log4perl::Layout::PatternLayout';
 
 use Log::Log4perl;
+use JSON;
 
 sub render {
     my $self = shift;
@@ -31,6 +32,8 @@ sub render {
 
         my @keys = sort keys %param;
         if (@keys) {
+            my $vv = $param{$_} // 'undef';
+            $vv = encode_json($vv) if (ref $vv);
             $msg .= '|'. join("|", map { $_.'='.($param{$_} // 'undef') } @keys);
         }
 
@@ -68,7 +71,10 @@ When using this module, this becomes:
     Private Key used|operation=Signature|pkey=IssuerCA1
 
 Keys are sorted, key/value pairs are joined using "=", the keypairs are
-joined using the Pipe "|".
+joined using the Pipe "|". If the value is not a scalar it is serialized
+using JSON, e.g.
+
+    Metadata changed|attribute=example|value=['foo','bar']
 
 The class also support the legacy format where the paramaters are passed as
 hash in the second argument.

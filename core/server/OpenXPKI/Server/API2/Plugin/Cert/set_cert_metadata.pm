@@ -16,7 +16,15 @@ use OpenXPKI::Types;
 
 =head2 set_cert_metadata
 
-Update the metadata of a certificate stored in the certificate_attributes table.
+Writes or updates C<meta_*> attributes for a certificate in the
+C<certificate_attributes> table. The C<meta_> prefix is added internally;
+do not include it in the attribute keys.
+
+Writes any changes made to the system audit log for each key where
+C<metadata.field.$key.audit> is true.
+
+Single-character values consisting of C<->, C<.>, C<e>, or C<+> are
+normalized to C<n/a> to work around a MySQL driver limitation.
 
 B<Parameters>
 
@@ -93,6 +101,7 @@ command "set_cert_metadata" => {
     my $dbi = CTX('dbi');
 
     my $log = CTX('log')->application();
+
     ##! 16: $cert_identifier
     ##! 16: $params->attribute
 
@@ -123,6 +132,10 @@ command "set_cert_metadata" => {
                 attribute_value      => $value,
             }
         );
+    };
+
+    my $audit_log = sub {
+        CTX('log')->audit('entity')->info( 'certificate metadata ' . shift , certid => $cert_identifier, @_ );
     };
 
     my $metadata = $params->attribute;
@@ -170,18 +183,25 @@ command "set_cert_metadata" => {
             $mode = 'overwrite';
         }
 
+        # Check if this field is marked to generate audit messages
+        my $want_audit = CTX('config')->get(['metadata','field', $key, 'audit']);
+
         # nothing is set so we can just insert anything we find
         if (!$item) {
             ##! 32: '  -> no item found, plain insert'
             if (!ref $value) {
                 $insert_item->( $key, $value );
                 $log->info("Certificate metadata '$key': append (set) '$value'");
-                next KEY;
+            } else {
+                foreach my $val (@{$value}) {
+                    $insert_item->( $key, $val );
+                    $log->info("Certificate metadata '$key': append (set) '$val'");
+                }
             }
-            foreach my $val (@{$value}) {
-                $insert_item->( $key, $val );
-                $log->info("Certificate metadata '$key': append (set) '$val'");
-            }
+            $audit_log->('added',
+                attribute => $key,
+                value => $value,
+            ) if ($want_audit);
             next KEY;
         }
 
@@ -229,6 +249,8 @@ command "set_cert_metadata" => {
         ##! 64: "  add: " . join(", ", @add)
         ##! 64: "  delete: " . join(", ", @delete)
 
+        # we just want to log if we really changed anything
+        my %msg;
         if ($mode eq 'overwrite') {
             # simple inplace overwrite for a single value
             if ((scalar @delete == 1) && (scalar @add == 1)) {
@@ -243,23 +265,39 @@ command "set_cert_metadata" => {
                         identifier           => $cert_identifier,
                     }
                 );
+                $audit_log->('replaced',
+                    attribute => $key,
+                    value => $add[0],
+                    oldvalue => $delete[0]
+                ) if ($want_audit);
                 next KEY;
             }
             # remove anything from delete
-            $dbi->delete(
-                from => 'certificate_attributes',
-                where => {
-                    identifier           => $cert_identifier,
-                    attribute_contentkey => 'meta_'.$key,
-                    attribute_value      => \@delete,
-                }
-            ) if (@delete);
+            if (@delete) {
+                $dbi->delete(
+                    from => 'certificate_attributes',
+                    where => {
+                        identifier           => $cert_identifier,
+                        attribute_contentkey => 'meta_'.$key,
+                        attribute_value      => \@delete,
+                    }
+                );
+                $msg{removed} = \@delete;
+            }
         }
 
         # create new entries for all items in @add
         foreach my $val (@add) {
             $insert_item->( $key, $val );
         }
+        $msg{added} = \@add if(@add);
+
+        # create log item if needed
+        $audit_log->('updated',
+            attribute => $key,
+            oldvalue => $item,
+            %msg
+        ) if ($want_audit && keys %msg);
 
     } # end KEY loop
 };
