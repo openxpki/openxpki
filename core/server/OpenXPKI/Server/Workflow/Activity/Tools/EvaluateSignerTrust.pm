@@ -502,8 +502,8 @@ activated if you have otherwise validated the certificate.
 
 =item crl_check
 
-Only used with external signers. Valid values are C<leaf> or C<all>.
-Tries to use CRLs when validating the certificate for either the
+Only used with external signers. Valid values are C<none>, C<leaf>, C<all> or
+C<soft>. Tries to use CRLs when validating the certificate for either the
 leaf certificate or the full chain. See C<validate_certificate> API method.
 
 =item allow_surrogate_certificate

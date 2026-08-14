@@ -382,6 +382,9 @@ command "validate_certificate" => {
             }
         ) unless ($pem_crl || $params->crl_check eq 'soft');
 
+        # none given (and soft set) - noop
+        next unless ($pem_crl);
+
         ##! 32: 'got crl for ' . $issuer_identifier
         push @crls, $pem_crl;
     }
