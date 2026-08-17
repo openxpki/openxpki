@@ -152,6 +152,7 @@ sub build_config
         '[ openssl_init ]',
         'engines = engine_section',
         'alg_section = evp_properties',
+        'providers = provider_section',
         '');
 
     # attach engine configuration, empty block if no engine is used
@@ -160,10 +161,22 @@ sub build_config
         push @config, @engines;
     }
 
-    # overrides for algorithm handling
+    # overrides for algorithm handling - special to RHEL9
     push @config, '[ evp_properties ]';
     if (CTX('config')->get('system.tunables.os.rhel9.enablesha1')) {
         push @config, 'rh-allow-sha1-signatures = yes';
+    }
+
+    push @config, '[ provider_section ]';
+    # enable legacy algorithms on openssl3 systems (tested with SLES15, RHEL9)
+    if (CTX('config')->get('system.tunables.openssl.provider.legacy')) {
+        push @config,
+            'default = default_sect',
+            'legacy = legacy_sect',
+            '[default_sect]',
+            'activate = 1',
+            '[legacy_sect]',
+            'activate = 1';
     }
 
     # We overwrite the DN by -subj so this is irrelevant but OpenSSL
