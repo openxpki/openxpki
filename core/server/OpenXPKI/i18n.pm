@@ -17,10 +17,13 @@ our %_translated_refs;
 
 
 sub set_locale_prefix {
-    $locale_prefix = shift;
-    if (not -e $locale_prefix) {
-        OpenXPKI::Exception->throw(message => "Specified locale directory '$locale_prefix' does not exist");
+    my $prefix = shift // '';
+    # an empty prefix resets to the built in gettext default and is the only
+    # way for a persistent process to get rid of a previously set directory
+    if ($prefix ne '' and not -e $prefix) {
+        OpenXPKI::Exception->throw(message => "Specified locale directory '$prefix' does not exist");
     }
+    $locale_prefix = $prefix;
 }
 
 sub i18nGettext {
@@ -159,6 +162,10 @@ and the storage of the activated language.
 
 The only parameter is a directory in the filesystem. The function is used
 to set the path to the directory with the mo databases.
+
+Pass an empty value (or nothing) to reset to the gettext default. Persistent
+processes that serve configurations with and without an explicit directory
+must do so, otherwise the directory of the previous configuration is used.
 
 =head2 i18nGettext
 

@@ -119,15 +119,17 @@ sub index ($self) {
     die "Service class $class does not consume role OpenXPKI::Client::Service::Role::Base"
         unless $service->DOES('OpenXPKI::Client::Service::Role::Base');
 
-    # Setup locale if defined
-    if (my $prefix = ($config->get('locale.prefix') // $config->get('global.locale_directory'))) {
-        $self->log->trace('Set locale prefix to '.$prefix);
-        set_locale_prefix($prefix);
-    }
-    if (my $language = ($config->get('locale.language') // $config->get('global.default_language'))) {
-        $self->log->trace('Set language to '.$language);
-        set_language($language);
-    }
+    # Setup locale.
+    # CAVE: gettext directory and language are process global state while the
+    # workers of the Mojolicious server are persistent. Both must therefore be
+    # set on *every* request - if we skipped the call for an endpoint that has
+    # no value configured it would inherit the value of whatever endpoint this
+    # worker handled before.
+    my $prefix = $config->get('locale.prefix') // $config->get('global.locale_directory') // '';
+    my $language = $config->get('locale.language') // $config->get('global.default_language') // '';
+    $self->log->trace("Set locale prefix to '$prefix', language to '$language'");
+    set_locale_prefix($prefix);
+    set_language($language);
 
     # Preparations and checks
     $self->log->trace("Request handling (1/3): preparations and checks");

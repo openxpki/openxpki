@@ -13,7 +13,7 @@ Log::Log4perl->easy_init($FATAL);
 
 use OpenXPKI::i18n;
 
-plan tests => 6;
+plan tests => 8;
 
 my $orig = 'I18N_OPENXPKI_UI_TEST';
 my $de = "special % \\ \" ' ! \x{00E4}\x{00F6}\x{00FC}";
@@ -62,5 +62,17 @@ my $struct_de = {
 lives_and {
     cmp_deeply OpenXPKI::i18n::i18n_walk($struct), $struct_de;
 } 'translate nested structure - i18n_walk()';
+
+# A persistent process that serves configurations with and without an explicit
+# locale directory must be able to get back to the default, otherwise the
+# directory of the previously handled configuration is used.
+lives_and {
+    OpenXPKI::i18n::set_locale_prefix('');
+    is $OpenXPKI::i18n::locale_prefix, '';
+} 'reset locale path with an empty value';
+
+throws_ok {
+    OpenXPKI::i18n::set_locale_prefix("$Bin/does-not-exist");
+} qr{does not exist}, 'refuse a locale path that does not exist';
 
 1;
