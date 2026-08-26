@@ -50,6 +50,7 @@ AES. Session IDs are HMAC-hashed when an encryption key is configured.
         table_name  => 'test',      # optional
         encrypt_key => $key,        # optional
         log_ip      => 1,           # optional
+        client_ip   => $ip,         # optional
     );
 
 =cut
@@ -127,6 +128,22 @@ has log_ip => (
     is => 'ro',
     isa => 'Bool',
     default => sub { 0 },
+);
+
+=head2 client_ip
+
+The IP address of the client that sent the current request, written to the
+session table if L</log_ip> is enabled.
+
+Must be passed in by the caller: this class is used from a persistent daemon
+where the process environment does not carry the request environment.
+
+=cut
+
+has client_ip => (
+    is => 'rw',
+    isa => 'Str',
+    default => sub { '' },
 );
 
 =head2 table_name
@@ -401,6 +418,7 @@ sub clone ($self) {
         table_name => $self->table_name,
         $self->has_encrypt_key ? (encrypt_key => $self->encrypt_key) : (),
         $self->log_ip          ? (log_ip      => $self->log_ip)      : (),
+        $self->client_ip       ? (client_ip   => $self->client_ip)   : (),
     );
 }
 
@@ -563,7 +581,7 @@ sub _db_store ($self) {
     # Encrypt if configured
     $datastr = encode_base64($self->crypt->encrypt($datastr),'') if $self->crypt;
 
-    my $ip = ($self->log_ip && $ENV{REMOTE_ADDR}) ? $ENV{REMOTE_ADDR} : '';
+    my $ip = $self->log_ip ? $self->client_ip : '';
     my $now = time();
 
     $self->db->merge_and_commit(

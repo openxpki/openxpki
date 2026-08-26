@@ -56,10 +56,12 @@ my $build_session = \&OpenXPKI::Client::Service::WebUI::_build_session;
         return bless {
             config => $args{config} // MockConfig->new,
             log    => MockLog->new,
+            remote_address => $args{remote_address} // '192.0.2.7',
         }, $class;
     }
     sub config                 { $_[0]->{config} }
     sub log                    { $_[0]->{log} }
+    sub remote_address         { $_[0]->{remote_address} }
     sub normalized_request_url { MockUrl->new }
     # Throw so the try/catch in _build_session catches it and $id stays undef
     sub session_cookie         { die "no session cookie in test\n" }
@@ -157,8 +159,11 @@ subtest 'Old config syntax with EncryptKey and LogIP' => sub {
     isa_ok $session, 'OpenXPKI::Client::Service::WebUI::Session', 'session';
     is  $session->encrypt_key, 'mykey', 'encrypt_key set on Session';
     ok  $session->log_ip,               'log_ip set on Session';
+    # the daemon has no request environment in %ENV, so the address of the
+    # current request must be passed in by the caller
+    is  $session->client_ip, '192.0.2.7', 'client_ip taken from the request';
 
-    done_testing 3;
+    done_testing 4;
 };
 
 ################################################################################

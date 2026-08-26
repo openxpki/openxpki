@@ -282,6 +282,7 @@ sub _build_session ($self) {
     my $session = $legacy_file_session // OpenXPKI::Client::Service::WebUI::Session->new(
         db_params  => $db_params,
         id         => $id,
+        client_ip  => $self->remote_address,
         defined($encrypt_key) ? (encrypt_key => $encrypt_key) : (),
         defined($log_ip)      ? (log_ip      => $log_ip)      : (),
     );
