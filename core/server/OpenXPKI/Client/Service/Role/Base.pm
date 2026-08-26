@@ -442,6 +442,9 @@ sub _build_client_simple ($self) {
             config => $self->config->get_hash('global'), # realm and locale
             auth => $self->config->get_hash('auth') || {}, # auth config
             client => $self->client,
+            # the per request webserver environment - %ENV holds only the
+            # SSL_CLIENT_* vars inside the Mojolicious daemon
+            env => $self->request->env,
         );
     }
     catch ($err) {

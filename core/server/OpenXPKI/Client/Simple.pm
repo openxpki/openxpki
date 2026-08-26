@@ -44,6 +44,19 @@ has '_config' => (
     required => 1,
 );
 
+# The webserver environment used to resolve the "envkeys" of a client based
+# auth stack. Defaults to the process environment, which is correct for CGI
+# style callers where the webserver environment *is* the process environment.
+# Callers running inside a persistent daemon must pass the per request
+# environment instead, otherwise values leak between requests or are missing
+# entirely (only SSL_CLIENT_* are injected into %ENV there).
+has env => (
+    is => 'ro',
+    isa => 'HashRef',
+    lazy => 1,
+    default => sub { \%ENV },
+);
+
 
 has 'realm' => (
     is => 'ro',
@@ -253,7 +266,7 @@ sub _init_client ($self, $client, $old_client = undef) {
                     $auth_stack = $stack;
                     last;
                 } elsif ($stack_type eq 'client') {
-                    if ($ENV{REMOTE_USER} or $ENV{'OPENXPKI_USER'}) {
+                    if ($self->env->{REMOTE_USER} or $self->env->{'OPENXPKI_USER'}) {
                         $log->debug("Auth stack: selecting '$stack' / client");
                         $auth_stack = $stack;
                         last;
@@ -261,7 +274,7 @@ sub _init_client ($self, $client, $old_client = undef) {
                     $log->debug("Auth stack: skipping '$stack' / client");
                     next;
                 } elsif ($stack_type eq 'x509') {
-                    if ($ENV{SSL_CLIENT_CERT}) {
+                    if ($self->env->{SSL_CLIENT_CERT}) {
                         $log->debug("Auth stack: selecting '$stack' / x509");
                         $auth_stack = $stack;
                         last;
@@ -300,32 +313,32 @@ sub _init_client ($self, $client, $old_client = undef) {
         if ($login_type eq 'X509') {
             OpenXPKI::Exception::Authentication->throw(
                 message => 'I18N_OPENXPKI_UI_ENDPOINT_REQUIRES_TLS_CLIENT_AUTHENTICATION'
-            ) unless ($ENV{SSL_CLIENT_CERT});
-            $data->{certificate} = $ENV{SSL_CLIENT_CERT};
+            ) unless ($self->env->{SSL_CLIENT_CERT});
+            $data->{certificate} = $self->env->{SSL_CLIENT_CERT};
             my @chain;
             # larger chains are very unlikely and we dont support stupid clients
             for (my $cc=0;$cc<=3;$cc++)   {
-                my $chaincert = $ENV{'SSL_CLIENT_CERT_CHAIN_'.$cc};
+                my $chaincert = $self->env->{'SSL_CLIENT_CERT_CHAIN_'.$cc};
                 last unless ($chaincert);
                 push @chain, $chaincert;
             }
             $data->{chain} = \@chain if(@chain);
 
         } elsif ($login_type eq 'CLIENT') {
-            $self->logger()->trace('ENV is ' . Dumper \%ENV) if $self->logger->is_trace;
+            $self->logger()->trace('ENV is ' . Dumper $self->env) if $self->logger->is_trace;
             # we reuse the defaults for the old SSO handler from the UI
 
             if ($auth->{envkeys}) {
                 foreach my $key (keys %{$auth->{envkeys}}) {
                     my $envkey = $auth->{envkeys}->{$key};
                     $self->logger()->debug("Try to load $key from $envkey");
-                    next unless defined ($ENV{$envkey});
-                    $data->{$key} = $ENV{$envkey};
+                    next unless defined ($self->env->{$envkey});
+                    $data->{$key} = $self->env->{$envkey};
                 }
             # legacy support
-            } elsif (my $user = $ENV{'OPENXPKI_USER'} || $ENV{'REMOTE_USER'} || '') {
+            } elsif (my $user = $self->env->{'OPENXPKI_USER'} || $self->env->{'REMOTE_USER'} || '') {
                 $data->{username} = $user;
-                $data->{role} = $ENV{'OPENXPKI_GROUP'} if($ENV{'OPENXPKI_GROUP'});
+                $data->{role} = $self->env->{'OPENXPKI_GROUP'} if($self->env->{'OPENXPKI_GROUP'});
             }
 
         } elsif($login_type eq 'PASSWD') {
