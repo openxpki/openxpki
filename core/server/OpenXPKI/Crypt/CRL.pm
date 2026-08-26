@@ -442,7 +442,7 @@ sub __revoked_certs_list {
             if ( $ext->{'extnID'} eq '2.5.29.21' ) { # OID for crlReason
                 # The value portion is an enum item which consists of 3 bytes
                 # the last one is the assigned integer of the enum structure
-                my $rc = ord(substr($_->{extnValue},2));
+                my $rc = ord(substr($ext->{extnValue},2));
                 $v[1] = $crl_reason_list->[$rc] if (defined $rc);
                 last;
             }
