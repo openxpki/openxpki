@@ -75,26 +75,20 @@ sub op_handlers {
             });
         },
         'ping' => sub ($self) {
-            # try backend connection
-            my $client;
+            # CAVE: the client is shared with the WebUI across all requests of
+            # this worker (see OpenXPKI::Client::Web helper "oxi_client"), so we
+            # must not create a session or close the connection here - the first
+            # would leave an orphaned session behind on every poll, the second
+            # would force the next WebUI request to reconnect.
+            # A successful PING already proves that socket, transport,
+            # serialization and service protocol are working.
             try {
-                $client = $self->client;
-                my $reply = $self->client->send_receive_service_msg('PING');
-
-                $client->init_session;
-                $self->log->debug("Got new client: " . $client->session_id);
-            }
-            catch ($err) {
-                $client = undef;
-                $self->log->debug("Unable to bootstrap client: $err");
-            }
-            # respond
-            if ($client and $client->is_connected) {
-                $client->close_connection;
+                $self->client->send_receive_service_msg('PING');
                 $self->log->trace('Ping OK');
                 return $self->new_response(result => { ping => 1 });
-            } else {
-                $self->log->error('Ping failed');
+            }
+            catch ($err) {
+                $self->log->error("Ping failed: $err");
                 return $self->new_response(result => { ping => 0 }, error => 500);
             }
         },
