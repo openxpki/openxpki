@@ -26,6 +26,8 @@ Will result in
 
 =cut
 
+use Digest::SHA qw( sha1 );
+
 use OpenXPKI::Crypt::PKCS10;
 use OpenXPKI::Crypt::DN;
 use OpenXPKI::Server::Context qw( CTX );
