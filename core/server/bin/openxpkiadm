@@ -191,7 +191,7 @@ sub certificate_import {
         }
 
         if ($res) {
-            $params{identifier} = $res->{identifer};
+            $params{identifier} = $res->{identifier};
         } else {
             $params{identifier} = CTX('api2')->get_cert_identifier( cert => $extracted_certdata );
         }

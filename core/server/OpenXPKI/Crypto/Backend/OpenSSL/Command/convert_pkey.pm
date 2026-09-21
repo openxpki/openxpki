@@ -77,7 +77,7 @@ sub get_command
         $command .= " -outform der";
     }
 
-    if ($self->{ENC_ALG} && !$self->{NOPASSWD}) {
+    if ($self->{ENC_ALG} && !$self->{NOPASSWD} && $self->{OUT} eq "PEM") {
         $command .= " -".$self->{ENC_ALG};
         $command .= " -passout env:outpwd";
 
