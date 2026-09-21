@@ -76,12 +76,15 @@ sub deserialize
     } elsif ( $string =~ /^OXB64:/ ) {
         return decode_base64( substr($string, 6 ) );
 
-    # The legacy encoder has one of these keywords and a separator
-    # non-linebreak character as separator is no longer detected here
-    # UNCOMMENT LINES BELOW FOR LEGACY SUPPORT
-    #} elsif ( $string =~ /^(SCALAR|ARRAY|HASH|UNDEF|BASE64)\n/ ) {
-    #    return $self->_legacy()->deserialize( $string );
-
+    # Legacy workflow sessions from OpenXPKI <= 3.33
+	} elsif ( $string =~ /^(SCALAR|ARRAY|HASH|UNDEF|BASE64)(?:\n|-)/ ) {
+        my $separator =
+            ($string =~ /^(?:SCALAR|ARRAY|HASH|UNDEF|BASE64)-/)
+            ? '-'
+            : "\n";
+        return OpenXPKI::Serialization::Legacy->new({
+            SEPARATOR => $separator
+        })->deserialize($string);
     }
 
     OpenXPKI::Exception->throw(
@@ -104,8 +107,7 @@ sub is_serialized {
 
     return 1 if ($msg =~ /^(OXJSF1|OXB64)/);
 
-    # UNCOMMENT LINE BELOW FOR LEGACY SUPPORT
-    # return 1 if ($msg =~ /^((SCALAR|ARRAY|HASH|UNDEF|BASE64)\n)/);
+    return 1 if ($msg =~ /^((SCALAR|ARRAY|HASH|UNDEF|BASE64)(?:\n|-))/);
 
     return 0;
 

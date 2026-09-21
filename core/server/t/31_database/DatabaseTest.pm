@@ -24,6 +24,12 @@ has 'data' => (
     default => sub { [] },
 );
 
+has 'capture_logs' => (
+    is => 'rw',
+    isa => 'Bool',
+    default => 0,
+);
+
 enum 'DBMS', [qw( SQLite MySQL MariaDB2 Oracle PostgreSQL )];
 
 # restrict tests to certain dbms
@@ -152,11 +158,13 @@ sub run ($self, $name, $plan, $tests) {
                     dbi_params => $dbi_params,
                     columns => $self->columns,
                     data => $self->data,
+                    capture_logs => $self->capture_logs,
                 );
                 $conn2 = DatabaseTestConnection->new(
                     type => $dbtype,
                     dbi_params => $dbi_params,
                     columns => $self->columns,
+                    capture_logs => $self->capture_logs,
                 );
             } $dbi_params->{type}.": create Database instances";
 
