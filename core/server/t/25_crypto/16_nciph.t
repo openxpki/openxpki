@@ -20,8 +20,8 @@ else
 }
 
 use OpenXPKI::Crypto::TokenManager;
-use OpenXPKI::Crypto::Profile::Certificate;
-use OpenXPKI::Crypto::Profile::CRL;
+use OpenXPKI::Crypt::Profile::Certificate;
+use OpenXPKI::Crypt::Profile::CRL;
 # TODO: See Issue #188 - PKCS7 is missing!
 #use OpenXPKI::Crypto::PKCS7;
 use OpenXPKI::FileUtils;
@@ -93,7 +93,7 @@ print STDERR "RSA: $key\n" if ($ENV{DEBUG});
 $fu->write_file ({FILENAME => "$basedir/$dir/key.pem", CONTENT => $key});
 
 ## create profile
-my $profile = OpenXPKI::Crypto::Profile::Certificate->new (
+my $profile = OpenXPKI::Crypt::Profile::Certificate->new (
                   CONFIG    => $cache,
                   PKI_REALM => "Test nCipher Root CA",
                   TYPE      => "ENDENTITY",
@@ -133,7 +133,7 @@ ok (1);
 print STDERR "PKCS#12 length: ".length ($pkcs12)."\n" if ($ENV{DEBUG});
 
 ### create CRL profile...
-$profile = OpenXPKI::Crypto::Profile::CRL->new (
+$profile = OpenXPKI::Crypt::Profile::CRL->new (
                   CONFIG    => $cache,
                   PKI_REALM => "Test nCipher Root CA",
                   CA        => "INTERNAL_CA_NCIPH");

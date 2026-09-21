@@ -15,8 +15,8 @@ print STDERR "OpenXPKI::Crypto::Command: Create user certs and issue CRLs with U
 
 use OpenXPKI::FileUtils;
 use OpenXPKI::Crypto::TokenManager;
-use OpenXPKI::Crypto::Profile::Certificate;
-use OpenXPKI::Crypto::Profile::CRL;
+use OpenXPKI::Crypt::Profile::Certificate;
+use OpenXPKI::Crypt::Profile::CRL;
 
 our $cache;
 our $cacert;
@@ -84,7 +84,7 @@ for (my $i=0; $i < scalar @example; $i++)
     OpenXPKI::FileUtils->write_file ({FILENAME => "$basedir/test-ca/utf8.$i.pkcs10.pem", CONTENT => $csr, FORCE => 1});
 
     ## create profile
-    my $profile = OpenXPKI::Crypto::Profile::Certificate->new (
+    my $profile = OpenXPKI::Crypt::Profile::Certificate->new (
             TYPE  => "ENDENTITY",
             ID    => "user_auth_enc",
             CA    => "test-ca",
@@ -118,7 +118,7 @@ for (my $i=0; $i < scalar @example; $i++)
     # No certificate matches private key
 
     ## create CRL
-    $profile = OpenXPKI::Crypto::Profile::CRL->new (
+    $profile = OpenXPKI::Crypt::Profile::CRL->new (
                    CONFIG    => $cache,
                    PKI_REALM => "Test Root CA",
                    CA        => "INTERNAL_CA_1");

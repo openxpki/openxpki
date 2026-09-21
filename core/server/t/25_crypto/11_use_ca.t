@@ -159,24 +159,16 @@ lives_and {
 
 ## create profile
 my $cert_profile;
-use_ok "OpenXPKI::Crypto::Profile::Certificate";
+use_ok "OpenXPKI::Crypt::Profile::Certificate";
 lives_and {
     my $cert = $oxitest->certhelper_database->cert("alpha-signer-2");
-    $cert_profile = OpenXPKI::Crypto::Profile::Certificate->new(
-        TYPE  => "ENDENTITY",
-        ID    => "user_auth_enc",
-        CA    => "alpha",
-        CACERTIFICATE => {
-            DATA        => $cert->data,
-            SUBJECT     => $cert->db->{subject},
-            IDENTIFIER  => $cert->db->{identifier},
-            NOTBEFORE   => $cert->db->{notbefore},
-            NOTAFTER    => $cert->db->{notafter},
-        },
+    $cert_profile = OpenXPKI::Crypt::Profile::Certificate->new(
+       profile_name => "user_auth_enc",
+       issuer_alias => "alpha-signer-2",
     );
     $cert_profile->set_serial(1);
     $cert_profile->set_subject($subject);
-    is $cert_profile->{PROFILE}->{SUBJECT}, $subject;
+    is lc($cert_profile->get_subject()), lc($subject);
 } "Create certificate profile";
 
 ## create cert
@@ -204,17 +196,16 @@ lives_and {
 
 ## create CRL profile
 my $crl_profile;
-use_ok "OpenXPKI::Crypto::Profile::CRL";
+use_ok "OpenXPKI::Crypt::Profile::CRL";
 lives_and {
-    $crl_profile = OpenXPKI::Crypto::Profile::CRL->new(
-        CA => "alpha",
-        VALIDITY => {
+    $crl_profile = OpenXPKI::Crypt::Profile::CRL->new(
+        issuer_alias => "alpha-signer-2",
+        validity => {
             VALIDITYFORMAT => 'relativedate',
             VALIDITY => "+000014",
         },
-        CACERTIFICATE => $oxitest->certhelper_database->cert("alpha-signer-2")->data,
     );
-    is $crl_profile->{PROFILE}->{DAYS}, 14;
+    is $crl_profile->get_nextupdate_in_days(), 14;
 } "Create CRL profile";
 
 ## otherwise test 34 fails
