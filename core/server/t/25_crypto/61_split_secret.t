@@ -27,7 +27,7 @@ SKIP: {
         Module::Load::load("OpenXPKI::Crypto::Secret::SplitEncrypted");
     }
     catch ($error) {
-        skip 'EE only test', 10 if $error =~ /^Can't locate/;
+        skip 'EE only test', 11 if $error =~ /^Can't locate/;
         die $error;
     }
 

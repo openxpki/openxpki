@@ -72,7 +72,7 @@ cert_list_ok
 cert_list_ok
     [
         @ids,
-        qr/ \Q$a_alice_2_id\E \W+ revoked ((?!identifier).)* MelaleucaAlternifolia /msxi,
+        qr/ Identifier:\s+\Q$a_alice_2_id\E\s+\(REVOKED\).*?MelaleucaAlternifolia /msxi,
     ],
     qw(--realm alpha --all);
 

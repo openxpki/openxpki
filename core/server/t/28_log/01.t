@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 # Core modules
-use Test::More tests => 5;
+use Test::More tests => 4;
 use File::Temp qw( tempfile );
 
 use English;
@@ -57,17 +57,14 @@ BEGIN { use_ok "OpenXPKI::Server::Log" };
 my $log = OpenXPKI::Server::Log->new(config => \$log_conf);
 
 # Not logged
-ok (! $log->log (FACILITY => "auth",
-               PRIORITY => "debug",
-               MESSAGE  => "I shall not be there"), 'Suppressed test message');
+$log->auth->debug("I shall not be there");
 
 ok (! -s $openxpki_log, 'Log file has zero size');
 
 # loggged
 
-ok ($log->log (FACILITY => "auth",
-               PRIORITY => "info",
-               MESSAGE  => "See me"), 'Test message');
+$log->auth->info("See me");
+ok (-s $openxpki_log, 'Test message');
 
 my $log_contents = do { # slurp
     local $INPUT_RECORD_SEPARATOR;
