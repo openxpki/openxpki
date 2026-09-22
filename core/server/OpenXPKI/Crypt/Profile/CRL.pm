@@ -13,6 +13,8 @@ use OpenXPKI::Server::Context qw( CTX );
 
 =head1 NAME
 
+=encoding utf8
+
 OpenXPKI::Crypt::Profile::CRL - Moose-based CRL profile
 
 =head1 SYNOPSIS

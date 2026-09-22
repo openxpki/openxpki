@@ -8,6 +8,8 @@ with qw(
 
 =head1 NAME
 
+=encoding utf8
+
 OpenXPKI::Client::Service::WebUI - service to deliver web page contents via JSON
 
 =head1 DESCRIPTION

@@ -13,6 +13,8 @@ use Moose::Meta::Class;
 
 =head1 NAME
 
+=encoding utf8
+
 OpenXPKI::Server::API2::Plugin::Crypto::password_quality::Validate
 
 =head1 DESCRIPTION

@@ -15,6 +15,8 @@ use OpenXPKI::DN;
 
 =head1 NAME
 
+=encoding utf8
+
 OpenXPKI::Types - Collection of Moose types used for API command
 parameters
 

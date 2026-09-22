@@ -3,6 +3,8 @@ use OpenXPKI -role;
 
 =head1 NAME
 
+=encoding utf8
+
 OpenXPKI::Role::CertAndReqParser - Shared ASN.1 parser for X.509 certificates
 and PKCS#10 certificate signing requests
 

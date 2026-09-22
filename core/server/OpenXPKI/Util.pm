@@ -21,6 +21,8 @@ our @EXPORT = qw( AUTO_ID );
 
 =head1 NAME
 
+=encoding utf8
+
 OpenXPKI::Util - common utility functions to avoid duplicate code.
 
 =head1 SYNOPSIS

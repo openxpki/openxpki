@@ -27,6 +27,8 @@ my $_OCSP_NOCHECK_OID = '1.3.6.1.5.5.7.48.1.5';
 
 =head1 NAME
 
+=encoding utf8
+
 OpenXPKI::Crypt::Profile::Certificate - Moose-based X.509 certificate profile
 
 =head1 SYNOPSIS

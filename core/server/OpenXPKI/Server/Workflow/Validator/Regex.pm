@@ -119,6 +119,8 @@ sub validate {
 
 =head1 NAME
 
+=encoding utf8
+
 OpenXPKI::Server::Workflow::Validator::Regex
 
 =head1 DESCRIPTION

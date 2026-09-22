@@ -4,6 +4,8 @@ use namespace::autoclean;
 
 =head1 NAME
 
+=encoding utf8
+
 OpenXPKI::Client::Service::WebUI::Page - base class for web UI pages
 
 =cut

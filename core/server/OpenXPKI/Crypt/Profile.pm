@@ -19,6 +19,8 @@ use OpenXPKI::Crypt::Profile::DTO::CustomOid;
 
 =head1 NAME
 
+=encoding utf8
+
 OpenXPKI::Crypt::Profile - Abstract base class for Moose-based X.509 profiles
 
 =head1 DESCRIPTION

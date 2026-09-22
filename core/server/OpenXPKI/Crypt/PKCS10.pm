@@ -14,6 +14,8 @@ our %KNOWN_ATTR = (
     certificateTemplateName => '1.3.6.1.4.1.311.20.2',
 );
 
+=encoding utf8
+
 =head1 Name
 
 OpenXPKI::Crypt::PKCS10

@@ -21,6 +21,8 @@ my %_SAN_CLASS = (
 
 =head1 NAME
 
+=encoding utf8
+
 OpenXPKI::Crypt::Profile::Role::SubjectAltName - shared SAN handling for profile classes
 
 =head1 DESCRIPTION
