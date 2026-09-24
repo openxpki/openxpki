@@ -450,7 +450,7 @@ An IPv4 or IPv6 address string, validated via L<NetAddr::IP>.
 
 subtype 'IP',
     as 'Str',
-    where { NetAddr::IP->new($_) },
+    where { /^[0-9A-Fa-f:.\/]+$/ && NetAddr::IP->new($_) },
     message { sprintf "'%s' is not a valid IPv4 or IPv6 address", ($_ // '<undef>') };
 
 =head2 IPv4
