@@ -93,7 +93,7 @@ $db->run("WebUI session", 3, sub {
 
         # Per-parameter expiration
         $session->expire('key1', 1);
-        sleep 2;
+        sleep 3;
 
         # flush()
 

@@ -200,7 +200,7 @@ subtest 'database cache / other instance' => sub {
     is $tm2->get_secret_inserted_part_count("monkey_island"), 3, 'completion status 3/3';
     is $obj_inits, 1, '  no init on follow up queries';
 
-    sleep 2;
+    sleep 3;
 
     lives_and {
         is $tm2->is_secret_complete("monkey_island"), 1;
@@ -224,7 +224,7 @@ lives_and {
     is $tm2->is_secret_complete("monkey_island"), 1;
 } "other instance: incorrectly fetch status 'complete' during 'cache_check_if_complete'";
 
-sleep 2;
+sleep 3;
 
 lives_and {
     is $tm2->is_secret_complete("monkey_island"), 0;
