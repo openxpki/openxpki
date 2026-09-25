@@ -229,13 +229,14 @@ sub debug {
 sub __censor_msg {
     my $msg  = shift;
 
-    $msg =~ s{openssl\ enc.*}{openssl enc \*the rest of this debug message is censored by OpenXPKI::Debug\* }xms;
-    $msg =~ s{_password([A-Za-z_]*) .*}{_password$1 \*the rest of this debug message is censored by OpenXPKI::Debug\* }xms;
-    $msg =~ s{PASS([A-Za-z_]*) .*}{PASS$1 \*the rest of this debug message is censored by OpenXPKI::Debug\* }xms;
-    $msg =~ s{PRIVATE([A-za-z_]*) .*}{PRIVATE$1 \*the rest of this debug message is censored by OpenXPKI::Debug\* }xms;
-    $msg =~ s{SECRET([A-za-z_]*) .*}{SECRET$1 \*the rest of this debug message is censored by OpenXPKI::Debug\* }xms;
-    $msg =~ s{secret([A-za-z_]*) .*}{secret$1 \*the rest of this debug message is censored by OpenXPKI::Debug\* }xms;
-    $msg =~ s{symmetric_cipher([A-za-z_]*) .*}{symmetric_cipher$1 \*the rest of this debug message is censored by OpenXPKI::Debug\* }xms;
+    $msg =~ s{openssl\ enc.*\z}{openssl enc \*the rest of this debug message is censored by OpenXPKI::Debug\* }xms;
+    $msg =~ s{_password([A-Za-z_]*) .*\z}{_password$1 \*the rest of this debug message is censored by OpenXPKI::Debug\* }xms;
+    $msg =~ s{password:([A-Za-z_]*) .*\z}{password$1 \*the rest of this debug message is censored by OpenXPKI::Debug\* }xms;
+    $msg =~ s{PASS([A-Za-z_]*) .*\z}{PASS$1 \*the rest of this debug message is censored by OpenXPKI::Debug\* }xms;
+    $msg =~ s{PRIVATE([A-za-z_]*\z) .*}{PRIVATE$1 \*the rest of this debug message is censored by OpenXPKI::Debug\* }xms;
+    $msg =~ s{SECRET([A-za-z_]*\z) .*}{SECRET$1 \*the rest of this debug message is censored by OpenXPKI::Debug\* }xms;
+    $msg =~ s{secret([A-za-z_]*\z) .*}{secret$1 \*the rest of this debug message is censored by OpenXPKI::Debug\* }xms;
+    $msg =~ s{symmetric_cipher([A-za-z_]*\z) .*}{symmetric_cipher$1 \*the rest of this debug message is censored by OpenXPKI::Debug\* }xms;
 
     return $msg;
 }
