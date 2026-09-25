@@ -1,6 +1,11 @@
 use strict;
 use warnings;
 
+BEGIN {
+    binmode STDERR, ":utf8";
+    binmode STDOUT, ":utf8";
+}
+
 use Test::More;
 use Test::Exception;
 use MIME::Base64;
