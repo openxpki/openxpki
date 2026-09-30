@@ -3,6 +3,7 @@ use OpenXPKI -role;
 
 use Convert::ASN1 ':tag';
 use List::Util 'any';
+use Time::Local qw(timegm_modern);
 
 our %tagmap = (
     'INTEGER'           => 2,
@@ -31,6 +32,47 @@ Return the ASN1 litaral name for a tag number, e.g. 12 => UTF8String
 sub tag_class_to_string {
     my $tag = shift;
     return $tagmap_reverse{$tag} ? $tagmap_reverse{$tag} : $tag;
+}
+
+=head2 asn1_time_to_epoch
+
+Expects an I<UTCTime> or I<GeneralizedTime> as raw string, as decoded by
+L<Convert::ASN1> with option C<decode =E<gt> { time =E<gt> 'raw' }>, and
+returns it as epoch. The argument can also be the hash of a I<Time>
+CHOICE (I<utcTime> / I<generalTime>). The type is derived from the number
+of digits, a two digit year is mapped to 1950 - 2049 (RFC 5280 4.1.2.5.1).
+Fractional seconds are ignored. Returns undef if the argument is undef.
+
+The builtin time decoder of Convert::ASN1 must not be used as it yields
+wrong results for years beyond 2899 (e.g. the RFC 5280 "no well-defined
+expiration date" 99991231235959Z).
+
+=cut
+
+sub asn1_time_to_epoch {
+
+    my $time = shift;
+    return unless defined $time;
+
+    $time = $time->{generalTime} // $time->{utcTime} if (ref $time eq 'HASH');
+    return unless defined $time;
+
+    my ($year, $mon, $mday, $hour, $min, $sec, $zone, $sign, $zhour, $zmin) =
+        ($time =~ m{\A((?:\d\d)?\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(?:[.,]\d+)?(Z|([-+])(\d\d)(\d\d))\z})
+        or OpenXPKI::Exception->throw(
+            message => 'Invalid ASN.1 time format',
+            params => { time => $time },
+        );
+
+    $year += ($year < 50 ? 2000 : 1900) if (length $year == 2);
+
+    my $epoch = timegm_modern($sec, $min, $hour, $mday, $mon - 1, $year);
+    if ($zone ne 'Z') {
+        my $offset = $zhour * 3600 + $zmin * 60;
+        $epoch += ($sign eq '-') ? $offset : -$offset;
+    }
+    return $epoch;
+
 }
 
 sub decode_tag_as_string {

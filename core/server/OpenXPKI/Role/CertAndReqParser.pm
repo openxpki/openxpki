@@ -404,7 +404,7 @@ sub _asn1 {
     my ($self, $node) = @_;
     state $asn;
     unless ($asn) {
-        $asn = Convert::ASN1->new;
+        $asn = Convert::ASN1->new( decode => { time => q(raw) } );
         $asn->prepare($SCHEMA) or OpenXPKI::Exception->throw(
             message => 'ASN.1 schema preparation failed',
             params  => { error => $asn->error },

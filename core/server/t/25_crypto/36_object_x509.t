@@ -437,4 +437,24 @@ subtest 'RDN attribute mapping' => sub {
     }, 'subject_hash keyed by RDN attribute names');
 };
 
+# -------------------------------------------------------------------------
+# GeneralizedTime beyond 2899 - "no well-defined expiration date"
+# -------------------------------------------------------------------------
+subtest 'notAfter 99991231235959Z' => sub {
+    my $x = OpenXPKI::Crypt::X509->new('-----BEGIN CERTIFICATE-----
+MIIBiDCCAS+gAwIBAgIUXrZJbhmBlomPh/d/4UYB5HM8+iwwCgYIKoZIzj0EAwIw
+GTEXMBUGA1UEAwwOTm8gRXhwaXJ5IFRlc3QwIBcNMjYwMTAxMDAwMDAwWhgPOTk5
+OTEyMzEyMzU5NTlaMBkxFzAVBgNVBAMMDk5vIEV4cGlyeSBUZXN0MFkwEwYHKoZI
+zj0CAQYIKoZIzj0DAQcDQgAEa+rnESG6aoZvBMCyzRMuXVSc5Wu3/qpZ05WOYNYq
+fAPg9v87AqYQtz3FFj+bGKsmRHn8JR59qm8Iwvimby6DFaNTMFEwHQYDVR0OBBYE
+FAJdPWZzSq/RdSYGyS/5T1b+C93+MB8GA1UdIwQYMBaAFAJdPWZzSq/RdSYGyS/5
+T1b+C93+MA8GA1UdEwEB/wQFMAMBAf8wCgYIKoZIzj0EAwIDRwAwRAIgcTsa43Fy
+gRVT3oCS9ISFqFof2lJjJ+IyXSmja2tHH3wCIA8X1jlKqJfpmcyT+Ktm/G1VzYmS
+jVFjubo1A1qmXlB5
+-----END CERTIFICATE-----');
+    is($x->notbefore, 1767225600, 'notbefore (UTCTime)');
+    is($x->notafter,  253402300799, 'notafter (GeneralizedTime)');
+    is($x->get_notafter('iso8601'), '9999-12-31T23:59:59', 'get_notafter(iso8601)');
+};
+
 done_testing;

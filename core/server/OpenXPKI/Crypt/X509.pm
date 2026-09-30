@@ -54,7 +54,7 @@ has notbefore => (
     init_arg => undef,
     isa     => 'Int',
     lazy    => 1,
-    default => sub { _asn1_time_to_epoch(shift->_parsed->{tbsCertificate}{validity}{notBefore}) }
+    default => sub { asn1_time_to_epoch(shift->_parsed->{tbsCertificate}{validity}{notBefore}) }
 );
 
 has notafter => (
@@ -62,7 +62,7 @@ has notafter => (
     init_arg => undef,
     isa     => 'Int',
     lazy    => 1,
-    default => sub { _asn1_time_to_epoch(shift->_parsed->{tbsCertificate}{validity}{notAfter}) }
+    default => sub { asn1_time_to_epoch(shift->_parsed->{tbsCertificate}{validity}{notAfter}) }
 );
 
 has serial => (
@@ -229,12 +229,6 @@ sub _get_validity {
         DATE      => $date,
         OUTFORMAT => $format,
     });
-}
-
-# Convert::ASN1 decodes UTCTime/GeneralizedTime as epoch integers inside a CHOICE hashref.
-sub _asn1_time_to_epoch {
-    my $time = shift;
-    return $time->{generalTime} // $time->{utcTime};
 }
 
 sub _to_db_hash {
