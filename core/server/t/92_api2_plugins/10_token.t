@@ -18,7 +18,7 @@ use lib "$Bin/../lib";
 use OpenXPKI::Test;
 use OpenXPKI::Test::CertHelper::Database;
 
-plan tests => 17;
+plan tests => 19;
 
 #
 # Setup test context
@@ -189,6 +189,17 @@ lives_and {
     is $data, $av1->db_alias->{alias};
 } "get_token_alias_by_type - previously valid token/cert alias ('validity' with DateTime objects)";
 
+lives_and {
+    my $data = $api->get_token_alias_by_type(
+        type => "datasafe",
+        validity => {
+            notbefore => DateTime->from_epoch(epoch => $av1->db->{notbefore}),
+            notafter  => DateTime->from_epoch(epoch => $av1->db->{notafter}),
+        },
+    );
+    is $data, $av1->db_alias->{alias};
+} "get_token_alias_by_type - 'validity' matching exactly notbefore and notafter includes the boundaries";
+
 #
 # get_trust_anchors
 #
@@ -269,6 +280,20 @@ lives_and {
         },
     );
 } "list_active_aliases - using group, validity and check_online";
+
+lives_and {
+    my $data = $api->list_active_aliases(
+        group => $as1->db_alias->{group_id},
+        validity => {
+            notbefore => DateTime->from_epoch(epoch => $as1->db->{notbefore}),
+            notafter  => DateTime->from_epoch(epoch => $as1->db->{notafter}),
+        },
+    );
+
+    cmp_deeply $data, [
+        superhashof({ alias => $as1->db_alias->{alias} }),
+    ];
+} "list_active_aliases - 'validity' matching exactly notbefore and notafter includes the boundaries";
 
 lives_and {
     my $data = $api->list_active_aliases(

@@ -39,8 +39,8 @@ command "list_alias_groups" => {
 
     my %query;
     %query = (
-        'notbefore' => { '<' => time() },
-        'notafter'  => { '>' => time() },
+        'notbefore' => { '<=' => time() },
+        'notafter'  => { '>=' => time() },
     ) if ($params->valid);
 
     my $groups = CTX('dbi')->select_column(

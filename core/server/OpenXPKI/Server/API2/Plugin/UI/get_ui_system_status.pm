@@ -92,8 +92,8 @@ command "get_ui_system_status" => {
             where => {
                 'aliases.pki_realm' => $pki_realm,
                 group_id => $groups->{certsign},
-                notbefore => { '<', $now },
-                notafter => { '>', $now },
+                notbefore => { '<=', $now },
+                notafter => { '>=', $now },
             },
             group_by => ["aliases.identifier","profile"],
             order_by => "latest_update",

@@ -101,8 +101,8 @@ command "list_active_aliases" => {
         where => {
             'pki_realm' => $pki_realm,
             'group_id'  => $group,
-            'notbefore' => { '<' => $validity->{notbefore} },
-            'notafter'  => { '>' => $validity->{notafter} },
+            'notbefore' => { '<=' => $validity->{notbefore} },
+            'notafter'  => { '>=' => $validity->{notafter} },
         },
         order_by => [ '-notbefore' ],
     );

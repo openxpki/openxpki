@@ -69,8 +69,8 @@ command "list_aliases" => {
 
     my %query;
     %query = (
-        'aliases.notbefore' => { '<' => time() },
-        'aliases.notafter'  => { '>' => time() },
+        'aliases.notbefore' => { '<=' => time() },
+        'aliases.notafter'  => { '>=' => time() },
     ) if ($params->valid);
 
     if ($params->expired) {

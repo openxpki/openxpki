@@ -69,8 +69,8 @@ command "evaluate_trust_rule" => {
                 where   => {
                     group_id => $match,
                     identifier => $identifier,
-                    notbefore => { '<' => time },
-                    notafter  => { '>' => time },
+                    notbefore => { '<=' => time },
+                    notafter  => { '>=' => time },
                     pki_realm => [ $trustrule->{realm}, '_global' ],
                 },
             );

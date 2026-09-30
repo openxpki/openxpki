@@ -137,8 +137,8 @@ sub _token_alias_by_group {
         where => {
             'aliases.pki_realm' => $pki_realm,
             'aliases.group_id'  => $group,
-            'aliases.notbefore' => { '<' => $validity_epoch->{notbefore} },
-            'aliases.notafter'  => { '>' => $validity_epoch->{notafter} },
+            'aliases.notbefore' => { '<=' => $validity_epoch->{notbefore} },
+            'aliases.notafter'  => { '>=' => $validity_epoch->{notafter} },
             'certificate.status' => 'ISSUED',
         },
         order_by => [ '-aliases.notbefore' ],
