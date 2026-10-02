@@ -22,7 +22,7 @@ use OpenXPKI::Client::Service::WebUI::Auth;
 
 {
     package MockSession;
-    sub new  { bless { _data => {} }, shift }
+    sub new  { my ($class, %data) = @_; bless { _data => { %data } }, $class }
     sub param {
         my ($self, $key, $val) = @_;
         $self->{_data}{$key} = $val if @_ > 2;
@@ -143,6 +143,7 @@ sub make_webui {
         _ui_response         => $ui_response,
         _base_url            => $base_url,
         _realm_mode          => $args{realm_mode}   // 'select',
+        _current_realm       => $args{current_realm},
         _realm_selection_layout   => $args{realm_selection_layout} // 'card',
         _logout_called       => 0,
         _init_client_called  => 0,
@@ -158,6 +159,7 @@ sub make_webui {
         base_url     => sub { $_[0]->{_base_url} },
         script_url   => sub { $_[0]->{_base_url} },
         realm_mode   => sub { $_[0]->{_realm_mode} },
+        has_current_realm => sub { defined $_[0]->{_current_realm} },
         realm_selection_layout => sub { $_[0]->{_realm_selection_layout} },
         param        => sub { $params->{$_[1]} },
         url_path_for => sub { '/' . $_[1] },
@@ -367,6 +369,42 @@ subtest 'login() - action login!realm stores chosen realm in session' => sub {
     is $session->param('auth_stack'), undef,   'auth_stack cleared when realm changes';
 };
 
+subtest 'login() - action login!realm is ignored in path mode' => sub {
+    my $session = MockSession->new(pki_realm => 'systemca', auth_stack => 'Cert');
+    my ($auth, $webui) = new_auth(
+        session    => $session,
+        realm_mode => 'path',
+        current_realm => 'systemca',
+        params     => { pki_realm => 'democa' },
+    );
+    $auth->login('login', 'login!realm', { SERVICE_MSG => 'GET_AUTHENTICATION_STACK', PARAMS => {} });
+    is $session->param('pki_realm'), 'systemca', 'realm from URL path kept';
+    is $session->param('auth_stack'), 'Cert', 'auth stack kept';
+};
+
+subtest 'login() - action login!realm is ignored in path mode without detected realm' => sub {
+    my $session = MockSession->new;
+    my ($auth, $webui) = new_auth(
+        session    => $session,
+        realm_mode => 'path',
+        params     => { pki_realm => 'democa' },
+    );
+    $auth->login('login', 'login!realm', { SERVICE_MSG => 'GET_AUTHENTICATION_STACK', PARAMS => {} });
+    is $session->param('pki_realm'), undef, 'realm not written to session';
+};
+
+subtest 'login() - action login!realm is ignored if the realm was detected from the hostname' => sub {
+    my $session = MockSession->new(pki_realm => 'systemca');
+    my ($auth, $webui) = new_auth(
+        session    => $session,
+        realm_mode => 'hostname',
+        current_realm => 'systemca',
+        params     => { pki_realm => 'democa' },
+    );
+    $auth->login('login', 'login!realm', { SERVICE_MSG => 'GET_AUTHENTICATION_STACK', PARAMS => {} });
+    is $session->param('pki_realm'), 'systemca', 'realm from hostname kept';
+};
+
 # ---------------------------------------------------------------------------
 # login() - auth-stack selection
 # ---------------------------------------------------------------------------
@@ -450,6 +488,18 @@ subtest 'login() - action login!stack stores chosen stack in session' => sub {
         },
     });
     is $session->param('auth_stack'), 'Local', 'chosen stack written to session';
+};
+
+subtest 'login() - action login!stack is ignored for a fixed auth stack' => sub {
+    my $session = MockSession->new(pki_realm => 'democa', auth_stack => 'Cert', is_fixed_auth_stack => 1);
+    my ($auth, $webui) = new_auth(
+        session    => $session,
+        realm_mode => 'path',
+        current_realm => 'democa',
+        params     => { auth_stack => 'Local' },
+    );
+    $auth->login('login', 'login!stack', { SERVICE_MSG => 'GET_PASSWD_LOGIN', PARAMS => { field => [] } });
+    is $session->param('auth_stack'), 'Cert', 'fixed auth stack kept';
 };
 
 subtest 'login() - login!stack with internal stack name: internal stack filtered, remaining public stack autoselected' => sub {

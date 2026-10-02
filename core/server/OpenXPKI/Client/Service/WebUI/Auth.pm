@@ -293,13 +293,23 @@ sub login ($self, $page, $action, $reply) {
 
     # Read login parameters "pki_realm" and "auth_stack"
     if ($action eq 'login!realm' and my $realm = scalar $self->webui->param('pki_realm')) {
-        $self->log->debug("Overwrite realm with '$realm' set via action '$action'");
-        $self->webui->session->param('pki_realm', $realm);
-        $self->webui->session->param('auth_stack', undef);
+        # The realm is bound to the URL path / hostname if it was detected
+        # from it, the realm selection offers links in this case
+        if ('path' eq $self->webui->realm_mode or $self->webui->has_current_realm) {
+            $self->log->warn("Ignore realm '$realm' set via action '$action' - realm is defined by the URL");
+        } else {
+            $self->log->debug("Overwrite realm with '$realm' set via action '$action'");
+            $self->webui->session->param('pki_realm', $realm);
+            $self->webui->session->param('auth_stack', undef);
+        }
     }
     if ($action eq 'login!stack' and my $stack = scalar $self->webui->param('auth_stack')) {
-        $self->log->debug("Overwrite auth stack with '$stack' set via action '$action'");
-        $self->webui->session->param('auth_stack', $stack);
+        if ($self->webui->session->param('is_fixed_auth_stack')) {
+            $self->log->warn("Ignore auth stack '$stack' set via action '$action' - auth stack is fixed");
+        } else {
+            $self->log->debug("Overwrite auth stack with '$stack' set via action '$action'");
+            $self->webui->session->param('auth_stack', $stack);
+        }
     }
 
     my $realm = $self->webui->session->param('pki_realm') || '';
