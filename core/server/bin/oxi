@@ -272,7 +272,7 @@ if ($opt{payload}) {
     LOGDIE('Given payload file is not readable: ' . $opt{payload})
         unless (-r $opt{payload});
 
-    my $blob = OpenXPKI::FileUtils->new->read_file($opt{params});
+    my $blob = OpenXPKI::FileUtils->new->read_file($opt{payload});
     try {
         $params{payload} = decode_json($blob);
     } catch ($error) {
