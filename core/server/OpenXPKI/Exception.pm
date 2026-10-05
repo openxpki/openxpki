@@ -11,7 +11,7 @@ use Log::Log4perl;
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context;
-use OpenXPKI::i18n qw( i18nGettext );
+use OpenXPKI::i18n (); # circular use: its exporter may not be set up yet
 use OpenXPKI::Log4perl;
 
 use Exception::Class (
