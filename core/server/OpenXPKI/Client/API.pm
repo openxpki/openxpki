@@ -205,8 +205,8 @@ Extract the POD documentation found at I<$section> from the given
 I<$rel_package_or_path> (or all POD if I<$section> is omitted).
 
 I<$rel_package_or_path> is either a file path or the the last part of the
-package name consisting of command or command+C<::>+subcommand, e.g. C<acme> or
-C<acme::create>.
+package name consisting of command or command+C<::>+subcommand, e.g. C<token> or
+C<token::add>.
 
 Uses L<POD::Find/pod_where> to find the file to read the POD from.
 
@@ -244,8 +244,8 @@ Extract the POD documentation found at I<$section> from the given
 I<$rel_package_or_path> (or all POD if I<$section> is omitted).
 
 I<$rel_package_or_path> is either a file path or the the last part of the
-package name consisting of command or command+C<::>+subcommand, e.g. C<acme> or
-C<acme::create>.
+package name consisting of command or command+C<::>+subcommand, e.g. C<token> or
+C<token::add>.
 
 Returns a POD string.
 
@@ -261,8 +261,8 @@ Extract the POD documentation found at I<$section> from the given
 I<$rel_package_or_path>.
 
 I<$rel_package_or_path> is either a file path or the the last part of the
-package name consisting of command or command+C<::>+subcommand, e.g. C<acme> or
-C<acme::create>.
+package name consisting of command or command+C<::>+subcommand, e.g. C<token> or
+C<token::add>.
 
 Converts the POD section contents (without heading) to plain text via
 L<Pod::POM::View::Text>.
