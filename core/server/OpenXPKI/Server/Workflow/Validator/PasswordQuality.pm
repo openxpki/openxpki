@@ -123,7 +123,8 @@ C<length> check: set maxmimum password length (default: 255).
 =head2 dictionaries
 
 C<dict> check: a comma separated list of files where the first existing one
-is used for dictionary checks (default: /usr/dict/web2, /usr/dict/words, /usr/share/dict/words, /usr/share/dict/linux.words).
+is used for dictionary checks (default: /usr/share/dict/words,
+/usr/share/dict/linux.words).
 
 =head2 mindiffchars
 

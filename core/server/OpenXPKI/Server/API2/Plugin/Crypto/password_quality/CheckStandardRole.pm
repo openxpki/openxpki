@@ -58,8 +58,6 @@ has dictionaries => (
     predicate => 'has_dictionaries',
     lazy => 1,
     default => sub { [ qw(
-        /usr/dict/web2
-        /usr/dict/words
         /usr/share/dict/words
         /usr/share/dict/linux.words
     ) ] },

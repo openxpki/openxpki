@@ -111,8 +111,8 @@ I<Parameters - C<dict> check>
 =over
 
 =item * C<dictionaries> I<ArrayRef> - list of files where the
-first existing one is used for dictionary checks (default: /usr/dict/web2,
-/usr/dict/words, /usr/share/dict/words, /usr/share/dict/linux.words).
+first existing one is used for dictionary checks (default:
+/usr/share/dict/words, /usr/share/dict/linux.words).
 
 =back
 
