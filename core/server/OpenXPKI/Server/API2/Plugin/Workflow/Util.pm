@@ -273,13 +273,15 @@ sub _execute_activity_async {
         if (CTX('session')->type ne 'Memory') {
             my $session = OpenXPKI::Server::Session->new(type => "Memory")->create;
             $session->data->user( CTX('session')->data->user );
-            $session->data->role( $role || CTX('session')->data->role );
+            $session->data->role( CTX('session')->data->role );
             $session->data->pki_realm( CTX('session')->data->pki_realm );
 
             OpenXPKI::Server::Context::setcontext({ session => $session, force => 1 });
             Log::Log4perl::MDC->put('sid', $session->short_id);
             Log::Log4perl::MDC->put('role', $session->data->role );
         }
+        # an inherited Memory session is the child's own copy, the parent keeps its role
+        CTX('session')->data->role( $role ) if $role;
 
         # as the fork as closed any open dbi connections and execute_action
         # does an implicit commit after execution we need to open a transation
