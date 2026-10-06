@@ -337,7 +337,7 @@ sub init_export ($self, $args) {
     $query->{start} = $startat;
 
     if (!$query->{order}) {
-        $query->{order} = 'certificate.notbefore';
+        $query->{order} = 'notbefore';
         if (!defined $query->{reverse}) {
             $query->{reverse} = 1;
         }
