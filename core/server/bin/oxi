@@ -390,8 +390,15 @@ if ($res->state == 200) {
     }
 
     # redirect output if needed
-    my $outfile = $opt{out} || '/dev/stdout';
-    open(my $OUT, '>', $outfile) || die "unable to write to outfile at $outfile\n";
+    # write to the existing STDOUT unless an outfile is given, reopening
+    # /dev/stdout truncates a file STDOUT is redirected to and fails if the
+    # process has no permission on the device (e.g. after su)
+    my $OUT;
+    if (my $outfile = $opt{out}) {
+        open($OUT, '>', $outfile) || die "unable to write to outfile at $outfile\n";
+    } else {
+        open($OUT, '>&', \*STDOUT) || die "unable to write to STDOUT\n";
+    }
 
     # output plain strings as is and ignore format flags
     if (ref $out eq '')  {
