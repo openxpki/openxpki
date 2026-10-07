@@ -74,7 +74,8 @@ sub init_export ($self, $args) {
     my @lines = $self->render_result_list( $search_result, $body );
     my $colcnt = scalar @head - 1;
     foreach my $line (@lines) {
-        my @t = @{$line};
+        # formatted cells (e.g. the creator tooltip or link) export their visible text
+        my @t = map { ref $_ eq 'HASH' ? ($_->{label} // $_->{value} // '') : ($_ // '') } @{$line};
         # this hides invisible fields (assumes that hidden fields are always at the end)
         $buffer .= join("\t", @t[0..$colcnt])."\n"
     }
