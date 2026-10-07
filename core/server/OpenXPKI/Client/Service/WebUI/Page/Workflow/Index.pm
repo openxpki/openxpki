@@ -225,7 +225,7 @@ sub __check_for_validation_error {
         my $field_errors = $reply->{'ERROR'}->{ERRORS};
         if (ref $field_errors eq 'ARRAY') {
             $self->log->info('Input validation error on fields '.
-                join(",", map { ref $_ ? $_->{name} : $_ } @{$field_errors}));
+                join(",", map { ref $_ ? ($_->{name} // '-') : $_ } @{$field_errors}));
         } else {
             $self->log->info('Input validation error');
         }
