@@ -133,6 +133,8 @@ sub _notfound ($self, $logmsg) {
             description => 'The requested content was not found!'
         }
     });
+    # false: callers of _build_path stop
+    return;
 }
 
 __PACKAGE__->meta->make_immutable;
