@@ -19,7 +19,8 @@ use OpenXPKI::i18n qw( i18nGettext );
 # accepts group!<group> as parameters
 sub render_profile_select ($self, $args, $wf_action, $param = '') {
 
-    $self->log->trace('render_profile_select with args: ' . Dumper $args) if $self->log->is_trace;
+    $self->log->trace('render_profile_select: ' . Dumper { args => $args, param => $param } )
+        if $self->log->is_trace;
 
     my $wf_info = $args->{wf_info};
     my $context = $wf_info->{workflow}->{context};
@@ -49,8 +50,8 @@ sub render_profile_select ($self, $args, $wf_action, $param = '') {
 
             # check if the form has a group filter
             my $group = '';
-            if ($param =~ m{group!(\w\-)+}) {
-                $group = 1;
+            if ($param =~ m{group!([\w\-]+)}) {
+                $group = $1;
                 $self->log->debug('render_profile_select with group filter ' . $group);
             }
             # Get profiles from backend: { id => { ... }, id => { ... } }
