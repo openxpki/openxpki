@@ -19,6 +19,12 @@ sub init_log ($self, $args) {
         id => $id,
     }, { nostatus  => 1 });
 
+    if (not $wf_info) {
+        $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION');
+        $self->log->warn('Unable to load workflow info for id ' . $id);
+        return $self;
+    }
+
     $self->set_page(
         label => $self->page_label($wf_info, 'I18N_OPENXPKI_UI_WORKFLOW_LOG'),
         large => 1,

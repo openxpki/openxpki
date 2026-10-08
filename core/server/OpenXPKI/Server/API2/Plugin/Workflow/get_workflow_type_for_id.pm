@@ -38,13 +38,19 @@ command "get_workflow_type_for_id" => {
     ##! 32: $id
     my $db_result = CTX('dbi')->select_one(
         from => 'workflow',
-        columns => [ 'workflow_type' ],
+        columns => [ 'workflow_type', 'pki_realm' ],
         where => { workflow_id => $id },
     )
     or OpenXPKI::Exception->throw(
         message => 'No workflow found with the given ID',
         params  => { ID => $id },
     );
+
+    OpenXPKI::Exception->throw(
+        message => 'Workflow lives in a differnet realm',
+        params  => { ID => $id, pki_realm => $db_result->{pki_realm} },
+    ) unless (CTX('session')->data->pki_realm eq $db_result->{pki_realm});
+
 
     ##! 64: $db_result
 
