@@ -6,6 +6,8 @@ use namespace::autoclean;
 
 OpenXPKI::Client::Service::WebUI::Page - base class for web UI pages
 
+=encoding UTF-8
+
 =cut
 
 # Core modules

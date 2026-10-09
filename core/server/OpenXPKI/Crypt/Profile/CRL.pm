@@ -15,6 +15,8 @@ use OpenXPKI::Server::Context qw( CTX );
 
 OpenXPKI::Crypt::Profile::CRL - Moose-based CRL profile
 
+=encoding UTF-8
+
 =head1 SYNOPSIS
 
   my $profile = OpenXPKI::Crypt::Profile::CRL->new(

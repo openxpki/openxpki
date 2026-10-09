@@ -6,6 +6,8 @@ use OpenXPKI -role;
 OpenXPKI::Role::CertAndReqParser - Shared ASN.1 parser for X.509 certificates
 and PKCS#10 certificate signing requests
 
+=encoding UTF-8
+
 =head1 DESCRIPTION
 
 Provides a unified Convert::ASN1 schema, extension parsing, subject DN parsing

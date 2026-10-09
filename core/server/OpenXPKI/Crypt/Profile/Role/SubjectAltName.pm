@@ -23,6 +23,8 @@ my %_SAN_CLASS = (
 
 OpenXPKI::Crypt::Profile::Role::SubjectAltName - shared SAN handling for profile classes
 
+=encoding UTF-8
+
 =head1 DESCRIPTION
 
 Provides the L</subject_alt_name> attribute and the L</add_subject_alt_name> /

@@ -18,6 +18,8 @@ use OpenXPKI::DN;
 OpenXPKI::Types - Collection of Moose types used for API command
 parameters
 
+=encoding UTF-8
+
 =head1 TYPES
 
 =head2 AlphaPunct

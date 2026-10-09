@@ -121,6 +121,8 @@ sub validate {
 
 OpenXPKI::Server::Workflow::Validator::Regex
 
+=encoding UTF-8
+
 =head1 DESCRIPTION
 
 Validates a workflow context value against a regular expression or a named

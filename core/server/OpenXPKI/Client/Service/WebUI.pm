@@ -10,6 +10,8 @@ with qw(
 
 OpenXPKI::Client::Service::WebUI - service to deliver web page contents via JSON
 
+=encoding UTF-8
+
 =head1 DESCRIPTION
 
 Client service class that implements the OpenXPKI web UI JSON API. It
