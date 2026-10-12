@@ -42,7 +42,7 @@ There is also a ready-to-use docker image *whiterabbitsecurity/openxpki3*, see h
 
 ## Support / Issue Tracker
 
-Check out the documentation on [readthedocs](http://openxpki.readthedocs.org/). There is also a [complete quickstart manual](http://openxpki.readthedocs.org/en/master/quickstart.html).
+Check out the documentation on [readthedocs](http://openxpki.readthedocs.org/). There is also a [complete quickstart manual](https://openxpki.readthedocs.io/en/master/getting-started/quickstart.html).
 
 Please use the [projects mailing lists](https://lists.sourceforge.net/lists/listinfo/openxpki-users) to get support. Please do **NOT** use the github issue tracker for general support and ask on the list before filing an issue. If you file an issue, add sufficient information to reproduce the problem.
 
