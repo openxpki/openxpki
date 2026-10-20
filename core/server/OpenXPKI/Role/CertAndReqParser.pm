@@ -109,6 +109,16 @@ my %SAN_TYPE = (
     otherName                => 'otherName',
 );
 
+# otherName types whose value is a structure rather than a single string, mapped to the ASN.1
+# type (declared in $SCHEMA below) that decodes it. The value of an otherName is an open type
+# governed by its type-id (RFC 5280 section 4.2.1.6), so the dispatch is by that OID. Types not
+# listed here take the generic string path in _build_subject_alt_name, which refuses nested
+# structures. To support another structured otherName: declare its ASN.1 in $SCHEMA, add a row
+# here and a rendering of its fields in _build_subject_alt_name.
+my %OTHERNAME_SCHEMA = (
+    '1.3.6.1.5.5.7.8.4' => 'HardwareModuleName',   # id-on-hardwareModuleName, RFC 4108 section 5 (IEEE 802.1AR DevID)
+);
+
 # KeyUsage bit positions (index → name, bit 0 = MSB of first byte)
 my @KEY_USAGE_BITS = qw(
     digitalSignature
@@ -176,6 +186,12 @@ my $SCHEMA = q{
     OtherName ::= SEQUENCE {
         type  OBJECT IDENTIFIER,
         value [0] EXPLICIT ANY
+    }
+    -- HardwareModuleName (RFC 4108 section 5): value of the otherName id-on-hardwareModuleName
+    -- carried by IEEE 802.1AR DevID certificates; hardware type as an OID, module serial as bytes
+    HardwareModuleName ::= SEQUENCE {
+        hwType      OBJECT IDENTIFIER,
+        hwSerialNum OCTET STRING
     }
     GeneralName ::= CHOICE {
         otherName     [0] IMPLICIT OtherName,
@@ -587,6 +603,22 @@ sub _build_subject_alt_name {
                     : do { (my $hex = sprintf('%*v02X', ':', $val)) =~ s/([[:xdigit:]]{2}):([[:xdigit:]]{2})/$1$2/g; $hex };
             } elsif ($type eq 'directoryName') {
                 # directoryName decoded as Name struct by EXPLICIT Name schema
+            } elsif ($type eq 'otherName' && $OTHERNAME_SCHEMA{$val->{type}}) {
+                # structured otherName with a known schema (%OTHERNAME_SCHEMA): decode the value
+                # with the type's own ASN.1 instead of the string path below, whose helper dies on
+                # nested structures. A value that does not match its schema is refused.
+                my $schema = $OTHERNAME_SCHEMA{$val->{type}};
+                my $parser = $self->_asn1($schema);   # keep the instance: find() returns a copy and error() is per instance
+                my $decoded_value = $parser->decode($val->{value})
+                    or OpenXPKI::Exception->throw(
+                        message => "Failed to decode $schema otherName in subjectAltName",
+                        params  => { type => $val->{type}, error => $parser->error },
+                    );
+                if ($schema eq 'HardwareModuleName') {
+                    # hwType as dotted OID, hwSerialNum as hex
+                    $val = sprintf('%s;hwType=%s;hwSerialNum=%s', $val->{type},
+                        $decoded_value->{hwType}, unpack('H*', $decoded_value->{hwSerialNum}));
+                }
             } elsif ($type eq 'otherName') {
                 my ($tagval, $type) = decode_tag_as_string($val->{value});
                 if (defined $type) {
