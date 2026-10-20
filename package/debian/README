@@ -1,6 +1,6 @@
 If you want to try out OpenXPKI, you should use our prebuild packages at
 http://packages.openxpki.org. Check out the quickstart how-to at
-https://openxpki.readthedocs.org/en/master/quickstart.html
+https://openxpki.readthedocs.io/en/master/getting-started/quickstart.html
 
 These instuctions should work on debian wheezy and
 Ubuntu 14.04 LTS server.
