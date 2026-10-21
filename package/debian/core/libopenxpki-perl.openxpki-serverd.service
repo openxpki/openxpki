@@ -1,6 +1,7 @@
 [Unit]
 Description=OpenXPKI Trustcenter Backend
-After=network.target apache2.service
+Documentation=https://openxpki.readthedocs.io/en/master/backend/backend.html
+After=network.target
 
 [Service]
 Type=notify
