@@ -51,7 +51,8 @@ copyright = u'2026, The OpenXPKI Project'
 # built documents.
 #
 # The short X.Y version.
-version = re.sub('^v', '', os.popen('git describe').read().strip())
+_vergen = f"{os.path.dirname(__file__)}/../tools/vergen"
+version = os.popen(f"{_vergen} --format version").read()
 # The full version, including alpha/beta/rc tags.
 release = version
 
