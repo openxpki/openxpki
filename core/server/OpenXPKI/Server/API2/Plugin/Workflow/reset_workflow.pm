@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Workflow::reset_workflow
+OpenXPKI::Server::API2::Plugin::Workflow::reset_workflow - Reset a workflow
 
 =cut
 

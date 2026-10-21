@@ -10,7 +10,7 @@ use List::Util 'any';
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::alias::list
+OpenXPKI::Client::API::Command::alias::list - List aliases
 
 =head1 DESCRIPTION
 

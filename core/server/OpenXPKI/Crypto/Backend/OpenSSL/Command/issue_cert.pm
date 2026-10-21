@@ -119,7 +119,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Command::issue_cert
+OpenXPKI::Crypto::Backend::OpenSSL::Command::issue_cert - Issue a certificate
 
 =head1 Functions
 

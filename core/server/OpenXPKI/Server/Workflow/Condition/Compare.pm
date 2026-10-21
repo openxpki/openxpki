@@ -65,7 +65,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::Compare
+OpenXPKI::Server::Workflow::Condition::Compare - Numeric comparison
 
 =head1 DESCRIPTION
 

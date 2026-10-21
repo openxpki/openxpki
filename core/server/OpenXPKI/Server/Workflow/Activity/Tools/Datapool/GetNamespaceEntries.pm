@@ -62,7 +62,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::Datapool::GetNamespaceEntries
+OpenXPKI::Server::Workflow::Activity::Tools::Datapool::GetNamespaceEntries - Get all entries in a datapool namespace
 
 =head1 Description
 

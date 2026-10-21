@@ -82,7 +82,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::KeyParams
+OpenXPKI::Server::Workflow::Condition::KeyParams - Check key parameters
 
 =head1 Description
 

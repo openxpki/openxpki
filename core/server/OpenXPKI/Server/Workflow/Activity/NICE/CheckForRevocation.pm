@@ -36,7 +36,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::NICE::CheckForRevocation
+OpenXPKI::Server::Workflow::Activity::NICE::CheckForRevocation - Check if certificate is revoked
 
 =head1 Description
 

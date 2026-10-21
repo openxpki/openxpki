@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Workflow::wakeup_resume_workflow
+OpenXPKI::Server::API2::Plugin::Workflow::wakeup_resume_workflow - Resume a workflow
 
 =cut
 

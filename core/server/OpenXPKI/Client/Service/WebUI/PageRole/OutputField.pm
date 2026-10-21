@@ -19,6 +19,11 @@ use MIME::Base64;
 use OpenXPKI::Dumper;
 use OpenXPKI::Serialization::Simple;
 
+=head1 Name
+
+OpenXPKI::Client::Service::WebUI::PageRole::OutputField - Output field role
+
+=head1 UI Methods
 
 =head2 render_output_field
 

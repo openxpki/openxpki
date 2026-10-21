@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Token::get_certificate_for_alias
+OpenXPKI::Server::API2::Plugin::Token::get_certificate_for_alias - Get certificate by alias
 
 =head1 COMMANDS
 

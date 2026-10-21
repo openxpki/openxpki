@@ -123,7 +123,7 @@ sub execute {
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Activity::Transfer::SCP
+OpenXPKI::Server::Workflow::Activity::Transfer::SCP - Copy a file with SCP
 
 =head1 Description
 

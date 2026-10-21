@@ -83,7 +83,7 @@ sub execute {
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::LoadCertificateMetadata
+OpenXPKI::Server::Workflow::Activity::Tools::LoadCertificateMetadata - Load certificate metadata
 
 =head1 Description
 

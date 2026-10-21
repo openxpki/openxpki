@@ -21,6 +21,14 @@ use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
 use Log::Log4perl::MDC;
 
+=head1 NAME
+
+OpenXPKI::Service::CLI - Client command-line interface
+
+=head1 DESCRIPTION
+
+=cut
+
 has 'kid_list' => (
     is => 'rw',
     isa => 'HashRef',

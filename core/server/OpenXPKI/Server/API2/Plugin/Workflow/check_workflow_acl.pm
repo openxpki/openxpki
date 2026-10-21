@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Workflow::check_workflow_acl
+OpenXPKI::Server::API2::Plugin::Workflow::check_workflow_acl - Check whether a workflow is accessible
 
 =cut
 

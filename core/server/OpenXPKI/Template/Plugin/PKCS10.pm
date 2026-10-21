@@ -3,7 +3,11 @@ use OpenXPKI;
 
 use parent qw( Template::Plugin );
 
-=head1 OpenXPKI::Template::Plugin::PKCS10
+=head1 Name
+
+OpenXPKI::Template::Plugin::PKCS10 - PKCS10 template plugin
+
+=head1 Description
 
 Plugin for Template::Toolkit to retrieve properties of a certificate
 request from the PKCS10 PEM formatted request. All methods require the

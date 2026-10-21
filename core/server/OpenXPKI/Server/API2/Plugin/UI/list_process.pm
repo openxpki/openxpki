@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::UI::list_process
+OpenXPKI::Server::API2::Plugin::UI::list_process - List server processes
 
 =cut
 

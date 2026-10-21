@@ -1,6 +1,10 @@
 package OpenXPKI::Role::FileUtil;
 use OpenXPKI -role;
 
+=head1 Name
+
+OpenXPKI::Role::FileUtil - File role
+
 =head1 Attributes
 
 =over

@@ -264,7 +264,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::CLI
+OpenXPKI::Crypto::CLI - OpenSSL CLI base class
 
 =head1 Desription
 

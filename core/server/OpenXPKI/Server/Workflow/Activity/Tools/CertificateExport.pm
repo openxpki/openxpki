@@ -182,7 +182,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::CertificateExport
+OpenXPKI::Server::Workflow::Activity::Tools::CertificateExport - Export a certificate
 
 =head1 Description
 

@@ -7,7 +7,7 @@ command_setup
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::cli::show
+OpenXPKI::Client::API::Command::cli::show - Show CLI configration
 
 =head1 DESCRIPTION
 

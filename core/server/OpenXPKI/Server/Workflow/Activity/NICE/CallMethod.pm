@@ -59,7 +59,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::NICE::CallMethod
+OpenXPKI::Server::Workflow::Activity::NICE::CallMethod - Call a NICE method
 
 =head1 Description
 

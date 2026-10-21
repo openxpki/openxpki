@@ -95,7 +95,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Validator::KeyGenerationParams
+OpenXPKI::Server::Workflow::Validator::KeyGenerationParams - Key generation parameter validator
 
 =head1 Description
 

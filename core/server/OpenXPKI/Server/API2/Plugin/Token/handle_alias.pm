@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Token::handle_alias
+OpenXPKI::Server::API2::Plugin::Token::handle_alias - Create an alias
 
 =cut
 

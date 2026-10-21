@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Crypto::password_quality
+OpenXPKI::Server::API2::Plugin::Crypto::password_quality - Evaluate password quality
 
 =head1 COMMANDS
 

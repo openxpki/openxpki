@@ -7,6 +7,10 @@ with qw(
     OpenXPKI::Client::Service::WebUI::PageRole::Pager
 );
 
+=head1 Name
+
+OpenXPKI::Client::Service::WebUI::Page::Workflow::Result - Workflow result UI
+
 =head1 UI Methods
 
 =head2 init_result

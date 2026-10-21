@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Profile::render_templates
+OpenXPKI::Server::API2::Plugin::Profile::render_templates - Render a certificate subject
 
 =head1 COMMANDS
 

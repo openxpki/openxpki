@@ -75,7 +75,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_verify
+OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_verify - Verify PKCS7 data
 
 =head1 Functions
 

@@ -55,7 +55,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::CertificateNotYetRevoked
+OpenXPKI::Server::Workflow::Condition::CertificateNotYetRevoked - Check if a certificate is revoked
 
 =head1 DESCRIPTION
 

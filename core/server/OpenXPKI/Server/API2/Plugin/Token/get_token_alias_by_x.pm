@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Token::get_token_alias_by_x
+OpenXPKI::Server::API2::Plugin::Token::get_token_alias_by_x - Get best token
 
 =head1 COMMANDS
 

@@ -21,7 +21,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Observer::Debug
+OpenXPKI::Server::Workflow::Observer::Debug - Debug workflow observer
 
 =head1 Description
 

@@ -103,7 +103,7 @@ __END__;
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::SearchWorkflow
+OpenXPKI::Server::Workflow::Activity::Tools::SearchWorkflow - Find a workflow
 
 =head1 Description
 

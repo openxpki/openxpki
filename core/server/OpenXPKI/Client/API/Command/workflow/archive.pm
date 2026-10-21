@@ -8,7 +8,7 @@ command_setup
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::workflow::archive
+OpenXPKI::Client::API::Command::workflow::archive - Archive a workflow
 
 =head1 DESCRIPTION
 

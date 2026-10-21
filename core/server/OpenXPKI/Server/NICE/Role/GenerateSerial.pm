@@ -6,7 +6,7 @@ use OpenXPKI::Server::Context qw( CTX );
 
 =head1 NAME
 
-OpenXPKI::Server::NICE::Role::GenerateSerial
+OpenXPKI::Server::NICE::Role::GenerateSerial - NICE serial generation role
 
 =head1 DESCRIPTION
 

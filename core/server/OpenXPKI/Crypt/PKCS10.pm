@@ -16,7 +16,7 @@ our %KNOWN_ATTR = (
 
 =head1 Name
 
-OpenXPKI::Crypt::PKCS10
+OpenXPKI::Crypt::PKCS10 - PKCS10 utilities
 
 =head1 Description
 

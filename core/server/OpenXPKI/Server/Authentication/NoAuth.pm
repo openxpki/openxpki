@@ -65,7 +65,11 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
-=head1 OpenXPKI::Server::Authentication::NoAuth
+=head1 Name
+
+OpenXPKI::Server::Authentication::NoAuth - No-op authenticator
+
+=head1 Description
 
 This handler does not perform any authentication, it relies on an
 external party to pass in authenticated information.

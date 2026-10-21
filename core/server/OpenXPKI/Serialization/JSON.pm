@@ -79,7 +79,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Serialization::Simple
+OpenXPKI::Serialization::Simple - JSON serializer
 
 =head1 Description
 

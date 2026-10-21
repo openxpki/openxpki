@@ -84,7 +84,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::CertificateHasStatus
+OpenXPKI::Server::Workflow::Condition::CertificateHasStatus - Check certificate status
 
 =head1 DESCRIPTION
 

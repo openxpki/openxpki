@@ -42,7 +42,7 @@ __END__;
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::CalculateRequestHMAC
+OpenXPKI::Server::Workflow::Activity::Tools::CalculateRequestHMAC - Calculate an HMAC for a CSR
 
 =head1 Description
 

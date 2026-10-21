@@ -8,7 +8,7 @@ command_setup
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::workflow::fail
+OpenXPKI::Client::API::Command::workflow::fail - Fail a workflow
 
 =head1 DESCRIPTION
 

@@ -10,6 +10,13 @@ use Workflow 1.39;
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
 
+=head1 Name
+
+OpenXPKI::Workflow::Config - Workflow configuration
+
+=head1 Description
+
+=cut
 
 has '_workflow_config' => (
     is => 'rw',

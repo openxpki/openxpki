@@ -57,7 +57,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Validator::KeyReuse
+OpenXPKI::Server::Workflow::Validator::KeyReuse - Key uniqueness validator
 
 =head1 SYNOPSIS
 

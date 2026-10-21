@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Workflow::create_workflow_instance
+OpenXPKI::Server::API2::Plugin::Workflow::create_workflow_instance - Create a new workflow
 
 =cut
 # Core modules

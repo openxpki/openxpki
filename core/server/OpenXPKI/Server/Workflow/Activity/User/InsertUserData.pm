@@ -35,7 +35,7 @@ sub execute {
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::User::InsertUserData
+OpenXPKI::Server::Workflow::Activity::User::InsertUserData - Add a new user
 
 =head1 Description
 

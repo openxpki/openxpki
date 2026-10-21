@@ -59,7 +59,7 @@ sub execute {
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::UpdateCertificateMetadata
+OpenXPKI::Server::Workflow::Activity::Tools::UpdateCertificateMetadata - Update certificate metadata
 
 =head1 Description
 

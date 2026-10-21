@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Workflow::get_openapi_typespec
+OpenXPKI::Server::API2::Plugin::Workflow::get_openapi_typespec - Get OpenAPI type specification
 
 =cut
 

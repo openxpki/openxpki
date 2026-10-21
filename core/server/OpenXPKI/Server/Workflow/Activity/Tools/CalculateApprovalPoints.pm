@@ -57,7 +57,7 @@ __END__;
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::CalculateApprovalPoints
+OpenXPKI::Server::Workflow::Activity::Tools::CalculateApprovalPoints - Calculate approval points
 
 =head1 Description
 

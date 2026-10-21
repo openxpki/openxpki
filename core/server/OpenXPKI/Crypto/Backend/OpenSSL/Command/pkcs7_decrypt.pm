@@ -120,7 +120,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_decrypt
+OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_decrypt - Decrypt PKCS7 data
 
 =head1 Functions
 

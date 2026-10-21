@@ -147,7 +147,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Reports::Timeline
+OpenXPKI::Server::Workflow::Activity::Reports::Timeline - Generate timeline report
 
 =head1 Description
 

@@ -10,7 +10,7 @@ with qw(
 
 =head1 Name
 
-OpenXPKI::Database::Driver::MariaDB2
+OpenXPKI::Database::Driver::MariaDB2 - MariaDB database driver
 
 =cut
 

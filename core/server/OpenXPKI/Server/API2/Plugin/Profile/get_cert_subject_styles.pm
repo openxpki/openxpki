@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Profile::get_cert_subject_styles
+OpenXPKI::Server::API2::Plugin::Profile::get_cert_subject_styles - Get subject styles for a profile
 
 =head1 COMMANDS
 

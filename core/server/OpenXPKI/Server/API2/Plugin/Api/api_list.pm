@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Api::api_list
+OpenXPKI::Server::API2::Plugin::Api::api_list - List API commands
 
 =cut
 

@@ -67,7 +67,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::WFHash
+OpenXPKI::Server::Workflow::Condition::WFHash - Check keys in a hash
 
 =head1 SYNOPSIS
 

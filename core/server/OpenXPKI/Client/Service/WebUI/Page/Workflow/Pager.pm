@@ -6,6 +6,10 @@ with qw(
     OpenXPKI::Client::Service::WebUI::PageRole::QueryCache
 );
 
+=head1 Name
+
+OpenXPKI::Client::Service::WebUI::Page::Workflow::Pager - Workflow pager UI
+
 =head1 UI Methods
 
 =head2 init_pager

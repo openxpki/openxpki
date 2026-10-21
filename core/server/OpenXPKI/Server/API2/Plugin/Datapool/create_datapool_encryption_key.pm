@@ -5,7 +5,7 @@ with 'OpenXPKI::Server::API2::Plugin::Datapool::Util';
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Datapool::create_datapool_encryption_key
+OpenXPKI::Server::API2::Plugin::Datapool::create_datapool_encryption_key - Create datapool encryption key
 
 =cut
 

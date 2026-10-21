@@ -103,7 +103,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Tool::CreateJavaKeystore::Command::create_keystore
+OpenXPKI::Crypto::Tool::CreateJavaKeystore::Command::create_keystore - Create a keystore
 
 =head1 Functions
 

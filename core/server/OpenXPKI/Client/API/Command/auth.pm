@@ -3,7 +3,7 @@ use OpenXPKI -role;
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::auth
+OpenXPKI::Client::API::Command::auth - Authentication command group
 
 =head1 DESCRIPTION
 

@@ -9,7 +9,7 @@ use OpenXPKI::Password;
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::auth::verify
+OpenXPKI::Client::API::Command::auth::verify - Verify a password
 
 =head1 DESCRIPTION
 

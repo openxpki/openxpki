@@ -39,7 +39,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::CertificateIsLocalEntity
+OpenXPKI::Server::Workflow::Condition::CertificateIsLocalEntity - Check if a realm has a certificate
 
 =head1 DESCRIPTION
 

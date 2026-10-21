@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Workflow::execute_workflow_activity
+OpenXPKI::Server::API2::Plugin::Workflow::execute_workflow_activity - Execute a workflow activity
 
 =cut
 

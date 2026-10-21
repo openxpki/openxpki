@@ -5,7 +5,7 @@ with 'OpenXPKI::Server::API2::Plugin::Datapool::Util';
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Datapool::clear_data_pool_namespace
+OpenXPKI::Server::API2::Plugin::Datapool::clear_data_pool_namespace - Clear a datapool namespace
 
 =cut
 

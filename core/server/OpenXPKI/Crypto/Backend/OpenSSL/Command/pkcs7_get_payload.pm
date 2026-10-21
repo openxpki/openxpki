@@ -39,7 +39,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_get_payload
+OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_get_payload - Extract the payload from PKCS7 data
 
 =head1 Functions
 

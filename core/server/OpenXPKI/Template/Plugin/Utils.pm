@@ -13,7 +13,11 @@ use Crypt::PK::ECC;
 
 use OpenXPKI::DN;
 
-=head1 OpenXPKI::Template::Plugin::Utils
+=head1 Name
+
+OpenXPKI::Template::Plugin::Utils - Utility template plugins
+
+=head1 Description
 
 Plugin for Template::Toolkit providing some string manipulation functions.
 

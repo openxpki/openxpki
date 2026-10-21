@@ -94,7 +94,7 @@ __END__;
 
 =head1 Name
 
-OpenXPKI::Server::Log::Appender::Database
+OpenXPKI::Server::Log::Appender::Database - Database log appender
 
 =head1 Description
 

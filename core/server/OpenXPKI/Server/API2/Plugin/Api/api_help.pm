@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Api::api_help
+OpenXPKI::Server::API2::Plugin::Api::api_help - Generate API help
 
 =cut
 

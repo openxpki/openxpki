@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Import::import_crl
+OpenXPKI::Server::API2::Plugin::Import::import_crl - Import a CRL
 
 =cut
 

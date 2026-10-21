@@ -119,7 +119,7 @@ sub validate {
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Validator::Regex
+OpenXPKI::Server::Workflow::Validator::Regex - Regular expression validator
 
 =head1 DESCRIPTION
 

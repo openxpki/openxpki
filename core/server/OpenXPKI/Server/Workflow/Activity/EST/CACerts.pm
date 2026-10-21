@@ -39,7 +39,7 @@ __END__;
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::EST::CACerts
+OpenXPKI::Server::Workflow::Activity::EST::CACerts - Generate PKCS7 certificate chain
 
 =head1 Description
 

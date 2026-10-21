@@ -7,7 +7,7 @@ use MIME::Base64;
 
 =head1 Name
 
-OpenXPKI::Crypt::ECDH
+OpenXPKI::Crypt::ECDH - ECDH key exchange
 
 =head1 Description
 

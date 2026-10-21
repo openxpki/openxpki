@@ -81,7 +81,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Observer::Log
+OpenXPKI::Server::Workflow::Observer::Log - Logging workflow observer
 
 =head1 Description
 

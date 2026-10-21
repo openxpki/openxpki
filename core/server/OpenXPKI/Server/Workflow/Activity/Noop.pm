@@ -14,7 +14,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Noop
+OpenXPKI::Server::Workflow::Activity::Noop - No-op activity
 
 =head1 Description
 

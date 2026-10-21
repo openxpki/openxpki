@@ -42,7 +42,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::Connector::Exists
+OpenXPKI::Server::Workflow::Condition::Connector::Exists - Check if a connector exists
 
 =head1 SYNOPSIS
 

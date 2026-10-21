@@ -5,6 +5,14 @@ use Net::DNS;
 use Net::DNS::Resolver;
 use OpenXPKI::Types;
 
+=head1 Name
+
+OpenXPKI::Role::DNSValidation - DNS role
+
+=head1 Description
+
+=cut
+
 has timeout => (
     is => 'ro',
     isa => 'Int',

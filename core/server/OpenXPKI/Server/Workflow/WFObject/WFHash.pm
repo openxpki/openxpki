@@ -54,7 +54,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::WFObject::WFHash
+OpenXPKI::Server::Workflow::WFObject::WFHash - Hash for use in workflows
 
 =head1 DESCRIPTION
 

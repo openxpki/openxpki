@@ -49,7 +49,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::CertificateHasSuccessor
+OpenXPKI::Server::Workflow::Condition::CertificateHasSuccessor - Check for a successor certificate
 
 =head1 SYNOPSIS
 

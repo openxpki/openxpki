@@ -72,7 +72,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::IsWrappedRequest
+OpenXPKI::Server::Workflow::Condition::IsWrappedRequest - Check if a certificate is wrapped in a container
 
 =head1 DESCRIPTION
 

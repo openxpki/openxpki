@@ -103,7 +103,11 @@ has proc_state_i18n => (
     } },
 );
 
-=head1 OpenXPKI::Client::Service::WebUI::Page::Workflow
+=head1 Name
+
+OpenXPKI::Client::Service::WebUI::Page::Workflow - Workflow UI base
+
+=head1 Description
 
 Generic UI handler class to render a workflow into gui elements.
 It first present a description of the workflow generated from the initial

@@ -69,7 +69,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::Datapool::GetEntry
+OpenXPKI::Server::Workflow::Activity::Tools::Datapool::GetEntry - Get a datapool entry
 
 =head1 Description
 

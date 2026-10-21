@@ -17,7 +17,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Field
+OpenXPKI::Server::Workflow::Field - Action field base class
 
 =head1 Description
 

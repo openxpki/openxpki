@@ -49,7 +49,11 @@ sub generate {
 1;
 __END__
 
-=head1 OpenXPKI::Template::Plugin::RandomPassword
+=head1 Name
+
+OpenXPKI::Template::Plugin::RandomPassword - Random password template plugin
+
+=head1 Description
 
 This module implements a Template Toolkit plugin that generates randomly
 generated passwords in RFC2307 syntax. The used alphabet is Base64.

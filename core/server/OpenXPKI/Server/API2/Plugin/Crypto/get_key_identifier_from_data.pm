@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Crypto::get_key_identifier_from_data
+OpenXPKI::Server::API2::Plugin::Crypto::get_key_identifier_from_data - Get a key identifier
 
 =cut
 

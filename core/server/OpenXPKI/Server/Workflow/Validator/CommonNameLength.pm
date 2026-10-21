@@ -65,7 +65,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Validator::CommonNameLength
+OpenXPKI::Server::Workflow::Validator::CommonNameLength - Common name length validator
 
 =head1 Description
 

@@ -5,7 +5,7 @@ use OpenXPKI::Server::Context qw( CTX );
 
 =head1 NAME
 
-OpenXPKI::Server::NICE::Role::RevokeCertificate
+OpenXPKI::Server::NICE::Role::RevokeCertificate - NICE certificate revocation role
 
 =head2 Instance Parameters
 

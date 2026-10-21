@@ -11,7 +11,7 @@ use OpenXPKI::Server::Context qw( CTX );
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Validator::PasswordQuality
+OpenXPKI::Server::Workflow::Validator::PasswordQuality - Password quality validator
 
 =head1 SYNOPSIS
 

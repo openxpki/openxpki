@@ -40,7 +40,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Validator::WFHash
+OpenXPKI::Server::Workflow::Validator::WFHash - Hash validator
 
 =head1 SYNOPSIS
 

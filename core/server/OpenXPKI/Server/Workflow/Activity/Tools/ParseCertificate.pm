@@ -86,7 +86,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::ParseCertificate
+OpenXPKI::Server::Workflow::Activity::Tools::ParseCertificate - Parse a certificate
 
 =head1 Description
 

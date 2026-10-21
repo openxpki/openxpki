@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Cert::is_local_entity
+OpenXPKI::Server::API2::Plugin::Cert::is_local_entity - Check if a realm has a certificate
 
 =cut
 

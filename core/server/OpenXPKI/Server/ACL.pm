@@ -64,7 +64,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::ACL
+OpenXPKI::Server::ACL - Server authorization
 
 =head1 Description
 

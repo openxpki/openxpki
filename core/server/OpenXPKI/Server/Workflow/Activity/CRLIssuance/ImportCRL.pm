@@ -39,7 +39,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::CRLIssuance::ImportCRL
+OpenXPKI::Server::Workflow::Activity::CRLIssuance::ImportCRL - Import a CRL
 
 =head1 Description
 

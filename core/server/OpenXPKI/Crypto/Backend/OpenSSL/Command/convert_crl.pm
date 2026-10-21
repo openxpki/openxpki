@@ -72,7 +72,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_crl
+OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_crl - Convert between CRL formats
 
 =head1 Functions
 

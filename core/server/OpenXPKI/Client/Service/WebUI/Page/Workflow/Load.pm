@@ -3,6 +3,10 @@ use OpenXPKI -class;
 
 extends 'OpenXPKI::Client::Service::WebUI::Page::Workflow';
 
+=head1 Name
+
+OpenXPKI::Client::Service::WebUI::Page::Workflow::Load - Workflow load UI
+
 =head1 UI Methods
 
 =head2 action_load

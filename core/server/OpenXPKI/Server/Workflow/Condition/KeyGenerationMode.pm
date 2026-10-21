@@ -69,7 +69,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::KeyGenerationMode
+OpenXPKI::Server::Workflow::Condition::KeyGenerationMode - Check key generation mode
 
 =head1 DESCRIPTION
 

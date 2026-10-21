@@ -48,7 +48,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Reports::Summary
+OpenXPKI::Server::Workflow::Activity::Reports::Summary - Summarize reports
 
 =head1 Description
 

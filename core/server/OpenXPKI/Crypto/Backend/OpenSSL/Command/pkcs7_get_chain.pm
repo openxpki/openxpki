@@ -134,7 +134,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_get_chain
+OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_get_chain - Extract the certificate chain from PKCS7 data
 
 =head1 Functions
 

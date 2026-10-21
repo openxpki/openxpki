@@ -21,7 +21,7 @@ use OpenXPKI::Client::API::Util;
 
 =head1 NAME
 
-OpenXPKI::Client::API
+OpenXPKI::Client::API - Root class for client commands
 
 =head1 DESCRIPTION
 

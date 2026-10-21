@@ -87,7 +87,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Command::create_pkey
+OpenXPKI::Crypto::Backend::OpenSSL::Command::create_pkey - Generate a key pair
 
 =head1 Functions
 

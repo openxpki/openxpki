@@ -80,7 +80,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Validator::InvalidityTime
+OpenXPKI::Server::Workflow::Validator::InvalidityTime - Invalidity time validator
 
 =head1 SYNOPSIS
 

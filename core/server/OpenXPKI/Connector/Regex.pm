@@ -114,7 +114,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Connector::Regex;
+OpenXPKI::Connector::Regex - Regular expression connector
 
 =head1 DESCRIPTION
 

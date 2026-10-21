@@ -11,7 +11,7 @@ command_setup
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::acme::create
+OpenXPKI::Client::API::Command::acme::create - Register a new ACME account
 
 =head1 DESCRIPTION
 

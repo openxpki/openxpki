@@ -4,7 +4,7 @@ use OpenXPKI -dto;
 
 =head1 NAME
 
-OpenXPKI::Client::Service::WebUI::Response
+OpenXPKI::Client::Service::WebUI::Response - JSON Response
 
 =head1 DESCRIPTION
 

@@ -148,7 +148,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::Connector::GetValue
+OpenXPKI::Server::Workflow::Activity::Tools::Connector::GetValue - Get a connector value
 
 =head1 Description
 

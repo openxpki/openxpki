@@ -5,7 +5,7 @@ use OpenXPKI::Server::Context qw( CTX );
 
 =head1 NAME
 
-OpenXPKI::Server::NICE::Role::KeyInDataPool
+OpenXPKI::Server::NICE::Role::KeyInDataPool - NICE private key loader role
 
 =head2
 

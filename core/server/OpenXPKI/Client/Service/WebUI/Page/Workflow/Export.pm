@@ -13,6 +13,10 @@ use Encode;
 use OpenXPKI::DateTime;
 use OpenXPKI::i18n qw( i18nTokenizer );
 
+=head1 Name
+
+OpenXPKI::Client::Service::WebUI::Page::Workflow::Export - Workflow export UI
+
 =head1 UI Methods
 
 =head2 init_export

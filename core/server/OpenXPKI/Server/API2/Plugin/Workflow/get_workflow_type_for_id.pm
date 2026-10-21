@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_type_for_id
+OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_type_for_id - Get workflow type
 
 =cut
 

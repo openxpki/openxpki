@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Secret::clear_secret
+OpenXPKI::Server::API2::Plugin::Secret::clear_secret - Clear a secret group
 
 =cut
 

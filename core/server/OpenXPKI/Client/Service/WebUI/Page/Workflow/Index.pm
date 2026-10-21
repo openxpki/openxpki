@@ -9,6 +9,10 @@ use List::Util qw( any );
 # Project modules
 use OpenXPKI::Util;
 
+=head1 Name
+
+OpenXPKI::Client::Service::WebUI::Page::Workflow::Index - Workflow index UI
+
 =head1 UI Methods
 
 =head2 init_index

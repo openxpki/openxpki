@@ -90,7 +90,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Command::sign_digest
+OpenXPKI::Crypto::Backend::OpenSSL::Command::sign_digest - Sign a digest
 
 =head1 Functions
 

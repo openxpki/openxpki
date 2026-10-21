@@ -7,7 +7,11 @@ use Date::Parse;
 extends 'OpenXPKI::Client::Service::WebUI::Page::Workflow';
 with 'OpenXPKI::Client::Service::WebUI::PageRole::QueryCache';
 
-=head1 OpenXPKI::Client::Service::WebUI::Page::Bulk
+=head1 Name
+
+OpenXPKI::Client::Service::WebUI::Page::Bulk - Bulk page
+
+=head1 Description
 
 Inherits from workflow, offers methods for workflow bulk processing.
 

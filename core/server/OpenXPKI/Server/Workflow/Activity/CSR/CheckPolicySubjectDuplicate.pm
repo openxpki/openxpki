@@ -96,7 +96,7 @@ sub execute
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Activity::CSR::CheckPolicySubjectDuplicate
+OpenXPKI::Server::Workflow::Activity::CSR::CheckPolicySubjectDuplicate - Check for duplicate subjects
 
 =head1 DESCRIPTION
 

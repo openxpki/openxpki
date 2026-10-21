@@ -20,7 +20,7 @@ use OpenXPKI::Defaults;
 
 =head1 NAME
 
-OpenXPKI::Crypto::SecretManager
+OpenXPKI::Crypto::SecretManager - Secret manager
 
 =head1 Description
 

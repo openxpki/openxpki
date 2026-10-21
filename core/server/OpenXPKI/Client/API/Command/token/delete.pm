@@ -9,7 +9,7 @@ command_setup
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::token::delete
+OpenXPKI::Client::API::Command::token::delete - Delete a token
 
 =head1 DESCRIPTION
 

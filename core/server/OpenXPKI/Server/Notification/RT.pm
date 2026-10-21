@@ -3,6 +3,12 @@ use OpenXPKI -class;
 
 extends 'OpenXPKI::Server::Notification::Base';
 
+=head1 Name
+
+OpenXPKI::Server::Notification::RT - SMTP RequestTracker notifier
+
+=cut
+
 ## SMTP Notifier using RT::Client::REST to connect to a
 ## RT RequestTracker ticket system
 

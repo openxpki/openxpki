@@ -31,7 +31,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Reports::GetList
+OpenXPKI::Server::Workflow::Activity::Reports::GetList - List reports
 
 =head1 Description
 

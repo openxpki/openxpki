@@ -15,7 +15,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::AlwaysTrue
+OpenXPKI::Server::Workflow::Condition::AlwaysTrue - Always true condition
 
 =head1 DESCRIPTION
 

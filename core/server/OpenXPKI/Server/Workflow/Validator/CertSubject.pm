@@ -65,7 +65,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Validator::CertSubject
+OpenXPKI::Server::Workflow::Validator::CertSubject - Certificate subject validator
 
 =head1 SYNOPSIS
 

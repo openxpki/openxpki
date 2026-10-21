@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Cert::is_certificate_owner
+OpenXPKI::Server::API2::Plugin::Cert::is_certificate_owner - Check certificate ownership
 
 =cut
 

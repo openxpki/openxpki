@@ -3,7 +3,11 @@ use OpenXPKI;
 
 use parent qw( Template::Plugin );
 
-=head1 OpenXPKI::Template::Plugin::DateTime
+=head1 Name
+
+OpenXPKI::Template::Plugin::DateTime - DateTime template plugin
+
+=head1 Description
 
 Plugin for Template::Toolkit to interact with OpenXPKI::DateTime
 

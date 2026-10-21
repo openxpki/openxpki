@@ -59,7 +59,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::CSR::GeneratePKCS10
+OpenXPKI::Server::Workflow::Activity::CSR::GeneratePKCS10 - Generate a CSR
 
 =head1 Description
 

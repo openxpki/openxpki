@@ -69,7 +69,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::BuildPKCS7CertList
+OpenXPKI::Server::Workflow::Activity::Tools::BuildPKCS7CertList - Convert certificates to PKCS7
 
 =head1 Description
 

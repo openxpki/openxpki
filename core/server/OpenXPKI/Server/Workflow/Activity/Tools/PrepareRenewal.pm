@@ -137,7 +137,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::PrepareRenewal
+OpenXPKI::Server::Workflow::Activity::Tools::PrepareRenewal - Load certificate renewal information
 
 =head1 Description
 

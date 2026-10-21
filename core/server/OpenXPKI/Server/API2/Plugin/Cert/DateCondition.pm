@@ -3,7 +3,9 @@ use OpenXPKI -class;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Cert::DateCondition
+OpenXPKI::Server::API2::Plugin::Cert::DateCondition - SQL date condition
+
+=head1 DESCRIPTION
 
 Used to assemble an SQL WHERE condition regarding dates that assures the
 strictest date range is used.

@@ -32,7 +32,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::NICE::UnrevokeCertificate
+OpenXPKI::Server::Workflow::Activity::NICE::UnrevokeCertificate - Un-revoke a certificate
 
 =head1 Description
 

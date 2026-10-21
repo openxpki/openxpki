@@ -50,7 +50,7 @@ __END__;
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::GetIdentifierForAlias
+OpenXPKI::Server::Workflow::Activity::Tools::GetIdentifierForAlias - Get a certificate identifier for an alias
 
 =head1 Description
 

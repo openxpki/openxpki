@@ -11,7 +11,7 @@ use OpenXPKI::Serialization::Simple;
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::token::show
+OpenXPKI::Client::API::Command::token::show - Show token details
 
 =head1 DESCRIPTION
 

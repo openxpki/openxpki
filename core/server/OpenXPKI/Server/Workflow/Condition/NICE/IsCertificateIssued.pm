@@ -25,7 +25,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::NICE::IsCertificateIssued
+OpenXPKI::Server::Workflow::Condition::NICE::IsCertificateIssued - Check if a certificate is issued
 
 =head1 DESCRIPTION
 

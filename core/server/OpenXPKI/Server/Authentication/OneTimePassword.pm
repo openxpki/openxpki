@@ -102,7 +102,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Authentication::OneTimePassword
+OpenXPKI::Server::Authentication::OneTimePassword - One-time password authenticator
 
 =head1 Description
 

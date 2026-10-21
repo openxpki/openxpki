@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Cert::private_key
+OpenXPKI::Server::API2::Plugin::Cert::private_key - Get generated private key
 
 =cut
 

@@ -46,7 +46,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+OpenXPKI::Server::Workflow::Activity::Tools::SetContext - Set context from activity
 
 =head1 Description
 

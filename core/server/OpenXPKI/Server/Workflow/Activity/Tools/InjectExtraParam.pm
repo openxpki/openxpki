@@ -51,7 +51,7 @@ __END__;
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::InjectExtraParam
+OpenXPKI::Server::Workflow::Activity::Tools::InjectExtraParam - Add items to context
 
 =head1 Description
 

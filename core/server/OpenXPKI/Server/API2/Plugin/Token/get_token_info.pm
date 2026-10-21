@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Token::get_token_info
+OpenXPKI::Server::API2::Plugin::Token::get_token_info - Get token details
 
 =cut
 

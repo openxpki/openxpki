@@ -207,7 +207,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Command
+OpenXPKI::Crypto::Backend::OpenSSL::Command - OpenSSL command wrapper
 
 =head1 Description
 

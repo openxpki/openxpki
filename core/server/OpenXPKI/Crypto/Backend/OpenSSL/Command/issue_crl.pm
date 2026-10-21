@@ -115,7 +115,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Command::issue_crl
+OpenXPKI::Crypto::Backend::OpenSSL::Command::issue_crl - Issue a CRL
 
 =head1 Functions
 

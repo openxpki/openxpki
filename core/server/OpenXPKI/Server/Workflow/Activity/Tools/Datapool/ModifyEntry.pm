@@ -73,7 +73,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::Datapool::ModifyEntry
+OpenXPKI::Server::Workflow::Activity::Tools::Datapool::ModifyEntry - Modify a datapool entry
 
 =head1 Description
 

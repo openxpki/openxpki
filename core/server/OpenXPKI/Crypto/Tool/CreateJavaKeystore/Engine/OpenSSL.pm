@@ -7,7 +7,7 @@ use parent qw(OpenXPKI::Crypto::Backend::OpenSSL::Engine);
 
 =head1 Name
 
-OpenXPKI::Crypto::Tool::CreateJavaKeystore:Engine::OpenSSL
+OpenXPKI::Crypto::Tool::CreateJavaKeystore:Engine::OpenSSL - OpenSSL engine
 
 =head1 Description
 

@@ -52,7 +52,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::IsCertificateOwner
+OpenXPKI::Server::Workflow::Condition::IsCertificateOwner - Check the certificate owner
 
 =head1 SYNOPSIS
 

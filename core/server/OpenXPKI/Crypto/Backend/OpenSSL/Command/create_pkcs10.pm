@@ -93,7 +93,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Command::create_pkcs10
+OpenXPKI::Crypto::Backend::OpenSSL::Command::create_pkcs10 - Create a PKCS10 CSR
 
 =head1 Functions
 

@@ -3,6 +3,12 @@ use OpenXPKI -class;
 
 extends 'OpenXPKI::Server::Notification::Base';
 
+=head1 Name
+
+OpenXPKI::Server::Notification::ServiceNow - ServiceNow notifier
+
+=cut
+
 ## Notifier for the ServiceNow Ticket System
 ## using their public SOAP API via SOAP::Lite
 

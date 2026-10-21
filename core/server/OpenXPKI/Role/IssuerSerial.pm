@@ -3,6 +3,12 @@ use OpenXPKI -role;
 
 use OpenXPKI::Crypt::DN;
 
+=head1 Name
+
+OpenXPKI::Role::IssuerSerial - Issuer serial number role
+
+=head1 Description
+
 =head2 iasn_from_hash
 
 static helper method to convert a I<issuerAndSerialNumber> hash from

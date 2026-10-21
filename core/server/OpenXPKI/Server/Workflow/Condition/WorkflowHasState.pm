@@ -54,7 +54,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::WorkflowHasState
+OpenXPKI::Server::Workflow::Condition::WorkflowHasState - Check workflow state
 
 =head1 DESCRIPTION
 

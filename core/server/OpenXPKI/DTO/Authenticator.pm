@@ -3,6 +3,10 @@ use OpenXPKI qw( -class -typeconstraints );
 
 use Crypt::PK::ECC;
 
+=head1 Name
+
+OpenXPKI::DTO::Authenticator - Data transfer object authenticator
+
 =head1 Attributes
 
 =head2 pki_realm

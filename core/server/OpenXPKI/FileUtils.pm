@@ -12,7 +12,11 @@ my %temp_handles     :ATTR;
 my %temp_dir         :ATTR;
 
 
-=head1 OpenXPKI::FileUtils
+=head1 Name
+
+OpenXPKI::FileUtils - File utilities
+
+=head1 Description
 
 Helper class for file operations and temp file management.
 

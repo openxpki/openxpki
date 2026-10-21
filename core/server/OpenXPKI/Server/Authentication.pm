@@ -577,7 +577,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Authentication
+OpenXPKI::Server::Authentication - Authentication framework
 
 =head1 Description
 

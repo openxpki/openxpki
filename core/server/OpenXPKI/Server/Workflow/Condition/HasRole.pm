@@ -53,7 +53,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::HasRole
+OpenXPKI::Server::Workflow::Condition::HasRole - Check the session's role
 
 =head1 SYNOPSIS
 

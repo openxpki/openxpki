@@ -61,7 +61,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::MergeContextHash
+OpenXPKI::Server::Workflow::Activity::Tools::MergeContextHash - Merge context from an activity
 
 =head1 Description
 

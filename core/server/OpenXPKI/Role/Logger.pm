@@ -4,6 +4,10 @@ use OpenXPKI qw( -role -typeconstraints );
 # Project modules
 use OpenXPKI::Log4perl;
 
+=head1 NAME
+
+OpenXPKI::Role::Logger - Logger role
+
 =head1 ATTRIBUTES
 
 =over

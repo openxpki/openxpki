@@ -56,7 +56,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::SetContextHash
+OpenXPKI::Server::Workflow::Activity::Tools::SetContextHash - Set hash in the context
 
 =head1 Description
 

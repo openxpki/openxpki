@@ -52,7 +52,11 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
-=head1 OpenXPKI::Server::Authentication::Anonymous
+=head1 Name
+
+OpenXPKI::Server::Authentication::Anonymous - Anonymous authenticator
+
+=head1 Description
 
 This is the class which supports OpenXPKI with an anonymous authentication
 method. Incoming parameters are ignored, the authentication handle will

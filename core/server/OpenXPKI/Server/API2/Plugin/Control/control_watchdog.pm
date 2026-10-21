@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Control::control_watchdog
+OpenXPKI::Server::API2::Plugin::Control::control_watchdog - Start/stop a watchdog
 
 =cut
 

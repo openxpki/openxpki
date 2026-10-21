@@ -35,7 +35,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::IsEqual
+OpenXPKI::Server::Workflow::Condition::IsEqual - Check if keys are equal
 
 =head1 DESCRIPTION
 

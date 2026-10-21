@@ -75,7 +75,7 @@ __END__;
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Activity::CSR::CheckPolicyKeyDuplicate
+OpenXPKI::Server::Workflow::Activity::CSR::CheckPolicyKeyDuplicate - Check for duplicate public keys
 
 =head1 DESCRIPTION
 

@@ -101,7 +101,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::Approved
+OpenXPKI::Server::Workflow::Condition::Approved - Check for approval
 
 =head1 SYNOPSIS
 

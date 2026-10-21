@@ -39,7 +39,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::Datapool::ClearNamespace
+OpenXPKI::Server::Workflow::Activity::Tools::Datapool::ClearNamespace - Clear a datapool namespace
 
 =head1 Description
 

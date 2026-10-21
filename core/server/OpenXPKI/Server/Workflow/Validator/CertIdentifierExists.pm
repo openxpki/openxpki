@@ -70,7 +70,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Validator::CertIdentifierExists
+OpenXPKI::Server::Workflow::Validator::CertIdentifierExists - Certificate identifier existance validator
 
 =head1 SYNOPSIS
 

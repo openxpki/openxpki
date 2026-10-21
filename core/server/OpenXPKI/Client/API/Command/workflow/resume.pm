@@ -8,7 +8,7 @@ command_setup
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::workflow::resume
+OpenXPKI::Client::API::Command::workflow::resume - Resume a workflow
 
 =head1 DESCRIPTION
 

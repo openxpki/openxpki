@@ -5,7 +5,7 @@ with 'OpenXPKI::Server::API2::Plugin::Datapool::Util';
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Datapool::modify_data_pool_entry
+OpenXPKI::Server::API2::Plugin::Datapool::modify_data_pool_entry - Modify a datapool entry
 
 =cut
 

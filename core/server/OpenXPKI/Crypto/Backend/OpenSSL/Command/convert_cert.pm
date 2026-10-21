@@ -150,7 +150,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_cert
+OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_cert - Convert between certificate formats
 
 =head1 Functions
 

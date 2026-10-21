@@ -54,7 +54,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Log::CLI
+OpenXPKI::Server::Log::CLI - Standard output log appender
 
 =head1 Description
 

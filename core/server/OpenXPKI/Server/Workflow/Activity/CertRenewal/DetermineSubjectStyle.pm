@@ -113,7 +113,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::DetermineSubjectStyle
+OpenXPKI::Server::Workflow::Activity::Tools::DetermineSubjectStyle - Determine subject style
 
 =head1 Description
 

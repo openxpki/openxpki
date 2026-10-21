@@ -285,7 +285,7 @@ sub execute {
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Activity::Tools::EvaluateSignerTrust
+OpenXPKI::Server::Workflow::Activity::Tools::EvaluateSignerTrust - Evaluate signer trust
 
 =head1 SYNOPSIS
 

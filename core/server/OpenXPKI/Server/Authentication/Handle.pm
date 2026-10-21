@@ -120,7 +120,11 @@ __PACKAGE__->meta->make_immutable;
 
 __END__;
 
-=head1 OpenXPKI::Server::Authentication::Handle
+=head1 Name
+
+OpenXPKI::Server::Authentication::Handle - Authentication result
+
+=head1 Description
 
 A stub class that encapsulates the result of a user authentication
 attempt.

@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Cert::import_chain
+OpenXPKI::Server::API2::Plugin::Cert::import_chain - Import a certificate chain
 
 =cut
 

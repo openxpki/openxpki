@@ -3,7 +3,7 @@ use OpenXPKI -class;
 
 =head1 NAME
 
-OpenXPKI::Server::Notification::Handler
+OpenXPKI::Server::Notification::Handler - Notification handler
 
 =head1 DESCRIPTION
 

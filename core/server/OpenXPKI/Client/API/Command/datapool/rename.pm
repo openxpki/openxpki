@@ -8,7 +8,7 @@ command_setup
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::datapool::rename
+OpenXPKI::Client::API::Command::datapool::rename - Rename a datapool entry
 
 =head1 DESCRIPTION
 

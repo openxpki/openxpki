@@ -148,7 +148,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Command::create_pkcs12
+OpenXPKI::Crypto::Backend::OpenSSL::Command::create_pkcs12 - Create a PKCS12 object
 
 =head1 Functions
 

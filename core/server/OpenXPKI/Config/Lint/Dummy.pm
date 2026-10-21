@@ -15,7 +15,7 @@ __PACKAGE__->meta->make_immutable;
 
 =head1 NAME
 
-OpenXPKI::Config::Lint::Dummy
+OpenXPKI::Config::Lint::Dummy - Configuration linting example
 
 =head1 DESCRIPTION
 

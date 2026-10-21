@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_instance_types
+OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_instance_types - List workflow types
 
 =cut
 

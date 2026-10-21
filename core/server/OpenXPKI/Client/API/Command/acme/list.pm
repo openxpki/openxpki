@@ -9,7 +9,7 @@ command_setup
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::acme::list
+OpenXPKI::Client::API::Command::acme::list - List ACME accounts
 
 =head1 DESCRIPTION
 

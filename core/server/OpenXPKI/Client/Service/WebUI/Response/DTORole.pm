@@ -7,6 +7,10 @@ use List::Util qw( any );
 # CPAN modules
 use Moose::Util qw( does_role );
 
+=head1 NAME
+
+OpenXPKI::Client::Service::WebUI::Response::DTORole - Data transfer object role
+
 =head1 DESCRIPTION
 
 B<Not intended for direct use.> Please use L<OpenXPKI::Client::Service::WebUI::Response::DTO>

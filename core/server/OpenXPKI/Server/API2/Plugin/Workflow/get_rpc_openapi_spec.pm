@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Workflow::get_rpc_openapi_spec
+OpenXPKI::Server::API2::Plugin::Workflow::get_rpc_openapi_spec - Get RPC OpenAPI specification
 
 =cut
 

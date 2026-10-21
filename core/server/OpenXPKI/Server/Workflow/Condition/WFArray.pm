@@ -116,7 +116,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::WFArray
+OpenXPKI::Server::Workflow::Condition::WFArray - Check size of array
 
 =head1 SYNOPSIS
 

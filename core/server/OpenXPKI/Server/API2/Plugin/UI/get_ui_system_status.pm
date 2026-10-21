@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::UI::get_ui_system_status
+OpenXPKI::Server::API2::Plugin::UI::get_ui_system_status - Get UI system details
 
 =cut
 

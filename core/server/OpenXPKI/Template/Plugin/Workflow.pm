@@ -3,7 +3,11 @@ use OpenXPKI;
 
 use parent qw( Template::Plugin );
 
-=head1 OpenXPKI::Template::Plugin::Workflow
+=head1 Name
+
+OpenXPKI::Template::Plugin::Workflow - Workflow template plugin
+
+=head1 Description
 
 Plugin for Template::Toolkit to retrieve properties of a workflow.
 All commands expect the workflow id as first parameter.

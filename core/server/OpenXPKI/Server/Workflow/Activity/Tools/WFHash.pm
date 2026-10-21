@@ -79,7 +79,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::WFHash
+OpenXPKI::Server::Workflow::Activity::Tools::WFHash - Hash for use in workflows
 
 =head1 Description
 

@@ -20,6 +20,10 @@ has __validity_options => (
     ];}
 );
 
+=head1 Name
+
+OpenXPKI::Client::Service::WebUI::Page::Workflow::Search - Workflow search UI
+
 =head1 UI Methods
 
 =head2 init_search

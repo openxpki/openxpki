@@ -32,7 +32,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::WorkflowCreator
+OpenXPKI::Server::Workflow::Condition::WorkflowCreator - Check if the current user created this workflow
 
 =head1 SYNOPSIS
 

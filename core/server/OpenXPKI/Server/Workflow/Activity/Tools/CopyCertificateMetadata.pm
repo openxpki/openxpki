@@ -78,7 +78,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::CopyCertificateMetadata
+OpenXPKI::Server::Workflow::Activity::Tools::CopyCertificateMetadata - Copy metadata between certificates
 
 =head1 Description
 

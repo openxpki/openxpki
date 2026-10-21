@@ -3,6 +3,10 @@ use OpenXPKI -class;
 
 with 'OpenXPKI::DTO::Message';
 
+=head1 NAME
+
+OpenXPKI::DTO::Message::Command - DTO command
+
 =head1 SYNOPSIS
 
 Execute a regular command on the backend.

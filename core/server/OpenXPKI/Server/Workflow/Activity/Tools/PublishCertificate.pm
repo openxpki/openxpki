@@ -124,7 +124,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::PublishCertificate
+OpenXPKI::Server::Workflow::Activity::Tools::PublishCertificate - Publish a certificate
 
 =head1 Description
 

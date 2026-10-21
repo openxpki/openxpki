@@ -84,7 +84,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::CertificateHasAttribute
+OpenXPKI::Server::Workflow::Condition::CertificateHasAttribute - Check for certificate attribute
 
 =head1 SYNOPSIS
 

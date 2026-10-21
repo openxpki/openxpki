@@ -18,7 +18,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::CertificateAttribute
+OpenXPKI::Server::Workflow::Condition::CertificateAttribute - Check for certificatre attribute
 
 =head1 DESCRIPTION
 

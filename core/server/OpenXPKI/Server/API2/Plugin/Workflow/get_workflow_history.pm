@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_history
+OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_history - Get workflow history
 
 =cut
 

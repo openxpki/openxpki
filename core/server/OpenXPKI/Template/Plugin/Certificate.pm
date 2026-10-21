@@ -3,7 +3,11 @@ use OpenXPKI;
 
 use parent qw( Template::Plugin );
 
-=head1 OpenXPKI::Template::Plugin::Certificate
+=head1 Name
+
+OpenXPKI::Template::Plugin::Certificate - Certificate template plugin
+
+=head1 Description
 
 Plugin for Template::Toolkit to retrieve properties of a certificate by the
 certificate identifier. All methods require the cert_identifier as first

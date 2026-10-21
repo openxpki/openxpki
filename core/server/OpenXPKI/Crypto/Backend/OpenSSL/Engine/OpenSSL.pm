@@ -39,7 +39,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Engine::OpenSSL
+OpenXPKI::Crypto::Backend::OpenSSL::Engine::OpenSSL - OpenSSL default engine
 
 =head1 Description
 

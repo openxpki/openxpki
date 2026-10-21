@@ -3,7 +3,11 @@ use OpenXPKI;
 
 use parent qw( Template::Plugin );
 
-=head1 OpenXPKI::Template::Plugin::Profile
+=head1 Name
+
+OpenXPKI::Template::Plugin::Profile - Profile template plugin
+
+=head1 Description
 
 Plugin for Template::Toolkit to retrieve properties of a profile definition.
 All methods require the profile name as first and (where useful) the style

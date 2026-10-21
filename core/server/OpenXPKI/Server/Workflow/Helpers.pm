@@ -6,6 +6,12 @@ use Workflow::Exception qw( configuration_error );
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Context qw( CTX );
 
+=head1 Name
+
+OpenXPKI::Server::Workflow::Helpers - Workflow helpers
+
+=head1 Description
+
 =head2 get_service_config_path
 
 Helper to pull in information from the config layer with fallback to

@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::UI::render_template
+OpenXPKI::Server::API2::Plugin::UI::render_template - Render a template
 
 =cut
 

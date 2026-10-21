@@ -8,7 +8,11 @@ use Log::Log4perl;
 
 use Fcntl qw( :DEFAULT ); # import F_* and O_* constants
 
-=head1 OpenXPKI::Random
+=head1 Name
+
+OpenXPKI::Random - Generate random number for cryptography
+
+=head1 Description
 
 Return random numbers safe for cryptographic use
 

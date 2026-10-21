@@ -20,7 +20,7 @@ sub error_ispresent {
 
 =head1 Name
 
-OpenXPKI::Crypto::Tool::CreateJavaKeystore::CLI
+OpenXPKI::Crypto::Tool::CreateJavaKeystore::CLI - CreateKeystore wrapper
 
 =head1 Desription
 

@@ -32,7 +32,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::GetCertificateIdentifier
+OpenXPKI::Server::Workflow::Activity::Tools::GetCertificateIdentifier - Get a certificate identifier
 
 =head1 Description
 

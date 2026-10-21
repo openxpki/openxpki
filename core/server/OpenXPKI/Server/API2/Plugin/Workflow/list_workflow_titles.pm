@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Workflow::list_workflow_titles
+OpenXPKI::Server::API2::Plugin::Workflow::list_workflow_titles - List workflow titles
 
 =cut
 

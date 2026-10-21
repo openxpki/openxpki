@@ -9,7 +9,7 @@ use OpenXPKI::Password;
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::auth::password
+OpenXPKI::Client::API::Command::auth::password - Create a password digest
 
 =head1 DESCRIPTION
 

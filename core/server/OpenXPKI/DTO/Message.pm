@@ -3,6 +3,10 @@ use OpenXPKI -role;
 
 use Module::Load ();
 
+=head1 Name
+
+OpenXPKI::DTO::Message - Data transfer object message
+
 =head1 Attributes
 
 =head2 session_id

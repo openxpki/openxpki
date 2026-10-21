@@ -95,7 +95,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Validator::ValidCertificate
+OpenXPKI::Server::Workflow::Validator::ValidCertificate - Certificate syntax validator
 
 =head1 SYNOPSIS
 

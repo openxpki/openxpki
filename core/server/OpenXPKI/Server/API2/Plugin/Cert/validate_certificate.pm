@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Cert::validate_certificate
+OpenXPKI::Server::API2::Plugin::Cert::validate_certificate - Validate a certificate
 
 =cut
 

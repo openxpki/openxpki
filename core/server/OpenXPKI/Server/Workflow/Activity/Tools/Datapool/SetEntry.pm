@@ -90,7 +90,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry
+OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry - Set a datapool entry
 
 =head1 Description
 

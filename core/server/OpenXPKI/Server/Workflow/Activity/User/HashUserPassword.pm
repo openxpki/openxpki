@@ -33,7 +33,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::User::HashUserPassword
+OpenXPKI::Server::Workflow::Activity::User::HashUserPassword - Digest a password
 
 =head1 Description
 

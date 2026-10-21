@@ -408,7 +408,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity
+OpenXPKI::Server::Workflow::Activity - Workflow activity base class
 
 =head1 Description
 

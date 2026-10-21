@@ -45,7 +45,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::CertificateHasProfile
+OpenXPKI::Server::Workflow::Condition::CertificateHasProfile - Check certificate profile
 
 =head1 DESCRIPTION
 

@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Token::get_default_token
+OpenXPKI::Server::API2::Plugin::Token::get_default_token - Get default token
 
 =head1 COMMANDS
 

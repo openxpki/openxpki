@@ -9,7 +9,7 @@ use OpenXPKI::Crypt::PKCS7;
 
 =head1 NAME
 
-OpenXPKI::Crypt::PKCS7::CertificateList
+OpenXPKI::Crypt::PKCS7::CertificateList - PKCS7 certificate list
 
 =head1 DESCRIPTION
 

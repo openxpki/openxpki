@@ -91,7 +91,7 @@ __PACKAGE__->meta->make_immutable;
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Activity::CSR::CheckPolicyDNS
+OpenXPKI::Server::Workflow::Activity::CSR::CheckPolicyDNS - Check subject DNS resolution
 
 =head1 DESCRIPTION
 

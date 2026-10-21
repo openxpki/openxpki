@@ -71,7 +71,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Engine::PKCS11
+OpenXPKI::Crypto::Backend::OpenSSL::Engine::PKCS11 - OpenSC PKCS11 engine
 
 =head1 Description
 

@@ -16,7 +16,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::GetSystemStatus
+OpenXPKI::Server::Workflow::Activity::Tools::GetSystemStatus - Get system status
 
 =head1 Description
 

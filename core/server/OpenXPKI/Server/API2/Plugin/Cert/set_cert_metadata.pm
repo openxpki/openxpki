@@ -4,7 +4,7 @@ use OpenXPKI;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Cert::set_cert_metadata
+OpenXPKI::Server::API2::Plugin::Cert::set_cert_metadata - Set certificate metadata
 
 =cut
 

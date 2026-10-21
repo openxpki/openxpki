@@ -61,7 +61,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Persister::Null
+OpenXPKI::Server::Workflow::Persister::Null - Null workflow persister
 
 =head1 DESCRIPTION
 

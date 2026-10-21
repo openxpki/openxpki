@@ -52,7 +52,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::NICE::GenerateKey
+OpenXPKI::Server::Workflow::Activity::NICE::GenerateKey - Generate a private key
 
 =head1 Description
 

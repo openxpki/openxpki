@@ -113,7 +113,7 @@ __END__;
 
 =head1 NAME
 
-OpenXPKI::Connector::WorkflowContext;
+OpenXPKI::Connector::WorkflowContext - Workflow context connector
 
 =head1 DESCRIPTION
 

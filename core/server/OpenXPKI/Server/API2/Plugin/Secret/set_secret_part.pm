@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Secret::set_secret_part
+OpenXPKI::Server::API2::Plugin::Secret::set_secret_part - Set value of a secret group
 
 =cut
 

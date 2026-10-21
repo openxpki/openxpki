@@ -29,7 +29,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::CancelApprovals
+OpenXPKI::Server::Workflow::Activity::Tools::CancelApprovals - Cancel workflow approvals
 
 =head1 Description
 

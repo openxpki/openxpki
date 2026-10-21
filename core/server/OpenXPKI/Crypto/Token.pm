@@ -21,6 +21,10 @@ sub online {
 
 1;
 
-=head1 OpenXPKI::Crypto::Token
+=head1 Name
+
+OpenXPKI::Crypto::Token - Token layer base class
+
+=head1 Description
 
 Base class for the new token layer

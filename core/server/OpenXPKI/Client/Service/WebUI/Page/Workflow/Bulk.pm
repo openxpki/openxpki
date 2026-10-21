@@ -4,6 +4,10 @@ use OpenXPKI -class;
 extends 'OpenXPKI::Client::Service::WebUI::Page::Workflow';
 with 'OpenXPKI::Client::Service::WebUI::PageRole::QueryCache';
 
+=head1 Name
+
+OpenXPKI::Client::Service::WebUI::Page::Workflow::Bulk - Workflow bulk UI
+
 =head1 UI Methods
 
 =head2 action_bulk

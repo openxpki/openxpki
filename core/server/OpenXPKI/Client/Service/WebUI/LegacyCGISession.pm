@@ -21,7 +21,7 @@ use Log::Log4perl qw(:easy);
 
 =head1 NAME
 
-OpenXPKI::Client::Service::WebUI::LegacyCGISession
+OpenXPKI::Client::Service::WebUI::LegacyCGISession - Legacy CGI session
 
 =head1 DESCRIPTION
 

@@ -53,7 +53,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Validator::Connector
+OpenXPKI::Server::Workflow::Validator::Connector - Connector validator
 
 =head1 SYNOPSIS
 

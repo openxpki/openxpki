@@ -154,7 +154,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::PublishCRLs
+OpenXPKI::Server::Workflow::Activity::Tools::PublishCRLs - Publish a CRL
 
 =head1 Description
 

@@ -9,7 +9,7 @@ command_setup
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::cli::create
+OpenXPKI::Client::API::Command::cli::create - Generate a CLI key pair
 
 =head1 DESCRIPTION
 

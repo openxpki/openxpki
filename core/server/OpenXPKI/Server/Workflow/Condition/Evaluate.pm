@@ -55,7 +55,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::Evaluate
+OpenXPKI::Server::Workflow::Condition::Evaluate - Evaluate a condition with perl
 
 =head1 DESCRIPTION
 

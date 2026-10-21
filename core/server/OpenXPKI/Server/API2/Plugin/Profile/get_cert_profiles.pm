@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Profile::get_cert_profiles
+OpenXPKI::Server::API2::Plugin::Profile::get_cert_profiles - List certificate profiles
 
 =head1 COMMANDS
 

@@ -10,7 +10,7 @@ with qw(
 
 =head1 Name
 
-OpenXPKI::Database::Driver::MySQL
+OpenXPKI::Database::Driver::MySQL - MySQL database driver
 
 =cut
 

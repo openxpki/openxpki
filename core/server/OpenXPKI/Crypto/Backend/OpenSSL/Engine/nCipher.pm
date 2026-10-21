@@ -474,7 +474,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Engine::nCipher
+OpenXPKI::Crypto::Backend::OpenSSL::Engine::nCipher - nCipher engine
 
 =head1 Description
 

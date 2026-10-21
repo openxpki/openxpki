@@ -14,7 +14,7 @@ use OpenXPKI::Crypt::X509;
 
 =head1 Name
 
-OpenXPKI::Crypto::Token::Inline
+OpenXPKI::Crypto::Token::Inline - Inline token
 
 =head1 Description
 

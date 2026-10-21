@@ -1,6 +1,14 @@
 package OpenXPKI::Client::Service::WebUI::Page::Certificate;
 use OpenXPKI -class;
 
+=head1 Name
+
+OpenXPKI::Client::Service::WebUI::Page::Certificate - Certificate page
+
+=head1 Description
+
+=cut
+
 extends 'OpenXPKI::Client::Service::WebUI::Page';
 with qw(
     OpenXPKI::Client::Service::WebUI::PageRole::QueryCache

@@ -11,7 +11,7 @@ use OpenXPKI::Crypt::X509;
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::alias::add
+OpenXPKI::Client::API::Command::alias::add - Add an alias
 
 =head1 DESCRIPTION
 

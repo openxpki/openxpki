@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Cert::get_cert
+OpenXPKI::Server::API2::Plugin::Cert::get_cert - Get a certificate
 
 =cut
 

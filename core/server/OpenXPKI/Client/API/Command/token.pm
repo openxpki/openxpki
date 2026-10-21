@@ -9,7 +9,7 @@ use Digest::SHA qw(sha256_hex);
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::token
+OpenXPKI::Client::API::Command::token - Token command group
 
 =head1 DESCRIPTION
 

@@ -6,6 +6,12 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Workflow::Factory;
 use OpenXPKI::Workflow::Field;
 
+=head1 Name
+
+OpenXPKI::Server::API2::Plugin::Profile::Util - Configuration profile utilities
+
+=head2 Description
+
 =head2 get_input_elements
 
 Read field definitions from config and return them in a HashRef.

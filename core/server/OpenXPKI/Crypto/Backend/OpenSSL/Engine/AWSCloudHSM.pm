@@ -22,7 +22,7 @@ sub get_password
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Engine::AWSCloudHSM
+OpenXPKI::Crypto::Backend::OpenSSL::Engine::AWSCloudHSM - AWS cloud HSM engine
 
 =head1 Description
 

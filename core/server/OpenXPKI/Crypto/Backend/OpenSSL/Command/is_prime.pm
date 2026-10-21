@@ -52,7 +52,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Command::is_prime
+OpenXPKI::Crypto::Backend::OpenSSL::Command::is_prime - Check for primality
 
 =head1 Functions
 

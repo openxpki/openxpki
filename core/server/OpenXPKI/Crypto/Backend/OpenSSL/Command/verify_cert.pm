@@ -81,7 +81,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Command::verify_cert
+OpenXPKI::Crypto::Backend::OpenSSL::Command::verify_cert - Verify a certificate
 
 =head1 Functions
 

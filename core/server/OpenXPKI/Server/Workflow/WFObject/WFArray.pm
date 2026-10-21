@@ -169,7 +169,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::WFObject::WFArray
+OpenXPKI::Server::Workflow::WFObject::WFArray - Array for use in workflows
 
 =head1 DESCRIPTION
 

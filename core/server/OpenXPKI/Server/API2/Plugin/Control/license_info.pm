@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Control::license_info
+OpenXPKI::Server::API2::Plugin::Control::license_info - Get protocol configuration
 
 =cut
 

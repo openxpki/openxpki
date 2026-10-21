@@ -221,7 +221,7 @@ sub execute
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Activity::Tools::SearchCertificates
+OpenXPKI::Server::Workflow::Activity::Tools::SearchCertificates - Find a certificate
 
 =head1 DESCRIPTION
 

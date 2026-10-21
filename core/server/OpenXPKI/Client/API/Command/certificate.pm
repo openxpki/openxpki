@@ -3,7 +3,7 @@ use OpenXPKI -role;
 
 =head1 NAME
 
-OpenXPKI::CLI::Command::certificate
+OpenXPKI::CLI::Command::certificate - Certificate command group
 
 =head1 DESCRIPTION
 

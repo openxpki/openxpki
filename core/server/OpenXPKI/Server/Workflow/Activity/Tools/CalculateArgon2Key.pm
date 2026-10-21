@@ -35,7 +35,7 @@ __END__;
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::CalculateArgon2Key
+OpenXPKI::Server::Workflow::Activity::Tools::CalculateArgon2Key - Digest a password using Argon2
 
 =head1 Description
 

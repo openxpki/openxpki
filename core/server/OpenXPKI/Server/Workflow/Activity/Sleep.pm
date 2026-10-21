@@ -25,7 +25,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Sleep
+OpenXPKI::Server::Workflow::Activity::Sleep - Wait for a duration
 
 =head1 Description
 

@@ -4,7 +4,7 @@ use OpenXPKI;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Cert::import_certificate
+OpenXPKI::Server::API2::Plugin::Cert::import_certificate - Import a certificate
 
 =cut
 

@@ -63,7 +63,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::UpdateContextHash
+OpenXPKI::Server::Workflow::Activity::Tools::UpdateContextHash - Update a hash in the context
 
 =head1 Description
 

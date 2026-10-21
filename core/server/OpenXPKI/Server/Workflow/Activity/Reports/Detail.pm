@@ -482,7 +482,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Reports::Detail
+OpenXPKI::Server::Workflow::Activity::Reports::Detail - Generate a detailed report
 
 =head1 Description
 

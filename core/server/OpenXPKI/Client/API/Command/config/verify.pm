@@ -8,7 +8,7 @@ command_setup
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::config::verify
+OpenXPKI::Client::API::Command::config::verify - Verify configuration
 
 =head1 DESCRIPTION
 

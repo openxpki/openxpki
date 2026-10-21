@@ -136,7 +136,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::Approve
+OpenXPKI::Server::Workflow::Activity::Tools::Approve - Approve a workflow
 
 =head1 Description
 

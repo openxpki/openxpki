@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Profile::list_used_profiles
+OpenXPKI::Server::API2::Plugin::Profile::list_used_profiles - List used profiles
 
 =head1 COMMANDS
 

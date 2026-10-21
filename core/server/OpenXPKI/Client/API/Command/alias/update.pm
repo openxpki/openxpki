@@ -9,7 +9,7 @@ command_setup
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::alias::update
+OpenXPKI::Client::API::Command::alias::update - Update an alias
 
 =head1 DESCRIPTION
 

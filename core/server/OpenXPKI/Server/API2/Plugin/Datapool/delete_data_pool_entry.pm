@@ -5,7 +5,7 @@ with 'OpenXPKI::Server::API2::Plugin::Datapool::Util';
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Datapool::delete_data_pool_entry
+OpenXPKI::Server::API2::Plugin::Datapool::delete_data_pool_entry - Delete an entry from a datapool
 
 =cut
 

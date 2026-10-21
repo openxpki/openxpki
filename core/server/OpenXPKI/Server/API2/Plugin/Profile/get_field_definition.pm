@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Profile::get_field_definition
+OpenXPKI::Server::API2::Plugin::Profile::get_field_definition - Get profile/style inputs
 
 =head1 COMMANDS
 

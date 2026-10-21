@@ -1,7 +1,11 @@
 package OpenXPKI::Control::Role;
 use OpenXPKI -role;
 
-=head1 OpenXPKI::Control::Role
+=head1 Name
+
+OpenXPKI::Control::Role - Command role
+
+=head1 Description
 
 Role that must be consumed by backend classes that provide an C<openxpkictl>
 scope:

@@ -4,6 +4,10 @@ use OpenXPKI -role;
 use Crypt::PK::RSA;
 use Crypt::PK::ECC;
 
+=head1 Name
+
+OpenXPKI::Role::ACME - ACME role
+
 =head1 Attributes
 
 =head2 account_id

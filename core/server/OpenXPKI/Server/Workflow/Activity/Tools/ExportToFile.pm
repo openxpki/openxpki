@@ -86,7 +86,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::ExportToFile
+OpenXPKI::Server::Workflow::Activity::Tools::ExportToFile - Export data to a file
 
 =head1 Description
 

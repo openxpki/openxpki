@@ -42,7 +42,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::PublishAny
+OpenXPKI::Server::Workflow::Activity::Tools::PublishAny - Publish data to connectors
 
 =head1 Description
 

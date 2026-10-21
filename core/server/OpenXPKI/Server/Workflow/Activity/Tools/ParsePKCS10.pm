@@ -293,7 +293,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::ParsePKCS10
+OpenXPKI::Server::Workflow::Activity::Tools::ParsePKCS10 - Parse a PKCS10 container
 
 =head1 Description
 

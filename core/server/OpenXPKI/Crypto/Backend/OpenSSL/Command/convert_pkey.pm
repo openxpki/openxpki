@@ -114,7 +114,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_pkey
+OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_pkey - Convert between public key formats
 
 =head1 Description
 

@@ -71,7 +71,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::GenerateKey
+OpenXPKI::Server::Workflow::Activity::Tools::GenerateKey - Generate a private key
 
 =head1 Description
 

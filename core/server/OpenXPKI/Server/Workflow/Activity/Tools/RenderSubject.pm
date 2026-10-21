@@ -171,7 +171,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::RenderSubject
+OpenXPKI::Server::Workflow::Activity::Tools::RenderSubject - Render a certificate subject
 
 =head1 Description
 

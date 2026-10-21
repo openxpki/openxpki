@@ -25,7 +25,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode
+OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode - Set workflow error code
 
 =head1 Description
 

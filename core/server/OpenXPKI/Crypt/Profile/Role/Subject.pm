@@ -1,6 +1,11 @@
 package OpenXPKI::Crypt::Profile::Role::Subject;
 use OpenXPKI -role;
 
+=head1 NAME
+
+OpenXPKI::Crypt::Profile::Role::Subject - LDAP subject
+
+=head1 Description
 
 =head2 subject (ParsedDN, rw)
 

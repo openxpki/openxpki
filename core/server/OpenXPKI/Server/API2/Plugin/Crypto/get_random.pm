@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Crypto::get_random
+OpenXPKI::Server::API2::Plugin::Crypto::get_random - Generate cryptographic random data
 
 =cut
 

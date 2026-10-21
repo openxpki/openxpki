@@ -84,7 +84,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::DateTime
+OpenXPKI::Server::Workflow::Condition::DateTime - Check a date/time
 
 Generic class to check a value against a timespec.
 

@@ -28,7 +28,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::SetStatusMessage
+OpenXPKI::Server::Workflow::Activity::Tools::SetStatusMessage - Set workflow status message
 
 =head1 Description
 

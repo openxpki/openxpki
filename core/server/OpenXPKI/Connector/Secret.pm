@@ -48,7 +48,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Connector::Secret;
+OpenXPKI::Connector::Secret - Secret connector
 
 =head1 DESCRIPTION
 

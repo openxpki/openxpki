@@ -8,7 +8,7 @@ command_setup
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::workflow::reset
+OpenXPKI::Client::API::Command::workflow::reset - Reset a workflow
 
 =head1 DESCRIPTION
 

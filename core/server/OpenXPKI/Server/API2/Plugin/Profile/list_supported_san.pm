@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Profile::list_supported_san
+OpenXPKI::Server::API2::Plugin::Profile::list_supported_san - Get profile SAN attributes
 
 =head1 COMMANDS
 

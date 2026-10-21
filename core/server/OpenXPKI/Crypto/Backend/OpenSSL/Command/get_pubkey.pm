@@ -87,7 +87,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Command::get_pubkey
+OpenXPKI::Crypto::Backend::OpenSSL::Command::get_pubkey - Get a public key from a private key
 
 =head1 Description
 

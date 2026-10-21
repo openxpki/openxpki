@@ -8,7 +8,7 @@ use OpenXPKI::Server::Context qw( CTX );
 
 =head1 NAME
 
-OpenXPKI::Server::NICE::Role::KeyGenerationLocal
+OpenXPKI::Server::NICE::Role::KeyGenerationLocal - NICE key generation role
 
 =head2 generateKey
 

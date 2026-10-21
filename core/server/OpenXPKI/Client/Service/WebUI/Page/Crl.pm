@@ -3,6 +3,12 @@ use OpenXPKI -class;
 
 extends 'OpenXPKI::Client::Service::WebUI::Page';
 
+=head1 Name
+
+OpenXPKI::Client::Service::WebUI::Page::Crl - CRL page
+
+=head1 Description
+
 =head2 init_index
 
 Default shows the data including download options of the latest CRL for all

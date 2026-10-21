@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Profile::get_additional_information_fields
+OpenXPKI::Server::API2::Plugin::Profile::get_additional_information_fields - Get additional information
 
 =head1 COMMANDS
 

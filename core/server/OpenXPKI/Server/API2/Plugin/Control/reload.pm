@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Control::reload
+OpenXPKI::Server::API2::Plugin::Control::reload - Reload the server
 
 =cut
 

@@ -175,7 +175,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::CSR::PersistRequest
+OpenXPKI::Server::Workflow::Activity::CSR::PersistRequest - Persist a CSR
 
 =head1 Description
 

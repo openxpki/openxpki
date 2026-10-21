@@ -7,7 +7,7 @@ use IO::Uncompress::Gunzip qw(gunzip $GunzipError);
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Crypto::password_quality::TopPasswords
+OpenXPKI::Server::API2::Plugin::Crypto::password_quality::TopPasswords - List of common passwords
 
 =head1 DESCRIPTION
 

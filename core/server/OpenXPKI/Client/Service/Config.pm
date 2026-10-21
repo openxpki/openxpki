@@ -161,6 +161,12 @@ sub endpoint_config ($self, $service, $endpoint = undef) {
     return $self->get_wrapper([ 'service', $service, $endpoint ]);
 }
 
+=head1 Name
+
+OpenXPKI::Client::Service::Config - Client service configuration
+
+=head1 Description
+
 =head2 log4perl_conf
 
 Reads the logger configuration (common, Mojolicious server, service endpoints)

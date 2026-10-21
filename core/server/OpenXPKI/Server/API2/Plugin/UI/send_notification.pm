@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::UI::send_notification
+OpenXPKI::Server::API2::Plugin::UI::send_notification - Send a notification
 
 =cut
 

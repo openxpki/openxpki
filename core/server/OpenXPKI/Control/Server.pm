@@ -3,6 +3,10 @@ use OpenXPKI -class;
 
 with 'OpenXPKI::Control::Role';
 
+=head1 NAME
+
+OpenXPKI::Control::Server - Server command
+
 =head1 DESCRIPTION
 
 Control OpenXPKI server processes.

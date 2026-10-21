@@ -41,7 +41,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::NICE::Factory
+OpenXPKI::Server::NICE::Factory - NICE factory
 
 =head1 Description
 

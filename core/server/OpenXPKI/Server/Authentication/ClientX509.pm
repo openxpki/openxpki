@@ -47,7 +47,11 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
-=head1 OpenXPKI::Server::Authentication::ClientX509
+=head1 Name
+
+OpenXPKI::Server::Authentication::ClientX509 - X.509 authenticator
+
+=head1 Description
 
 Leaves the SSL negotation to the client, requires the certificate chain
 of the authenticated client to be passed.

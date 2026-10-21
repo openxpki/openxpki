@@ -32,7 +32,7 @@ sub execute {
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::User::PersistUserData
+OpenXPKI::Server::Workflow::Activity::User::PersistUserData - Save a user
 
 =head1 Description
 

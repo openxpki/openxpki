@@ -55,7 +55,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::SubjectValid
+OpenXPKI::Server::Workflow::Condition::SubjectValid - Check if a subject is valid
 
 
 =head1 DESCRIPTION

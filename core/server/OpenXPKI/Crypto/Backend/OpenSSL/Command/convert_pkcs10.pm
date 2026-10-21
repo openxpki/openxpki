@@ -77,7 +77,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_pkcs10
+OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_pkcs10 - Convert between PKCS10 formats
 
 =head1 Functions
 

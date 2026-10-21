@@ -42,7 +42,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::RenameContext
+OpenXPKI::Server::Workflow::Activity::Tools::RenameContext - Rename context values
 
 =head1 Description
 

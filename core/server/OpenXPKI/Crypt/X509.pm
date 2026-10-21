@@ -3,6 +3,14 @@ use OpenXPKI -class;
 
 with 'OpenXPKI::Role::CertAndReqParser';
 
+=head1 Name
+
+OpenXPKI::Crypt::X509 - X509 utilities
+
+=head1 Description
+
+=cut
+
 use Digest::SHA qw(sha1_hex);
 use OpenXPKI::DateTime;
 use OpenXPKI::Crypt::DN;

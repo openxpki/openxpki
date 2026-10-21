@@ -8,7 +8,7 @@ command_setup
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::config::smtptest
+OpenXPKI::Client::API::Command::config::smtptest - Send a test email
 
 =head1 DESCRIPTION
 

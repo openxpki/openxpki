@@ -63,7 +63,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::StringToArray
+OpenXPKI::Server::Workflow::Activity::Tools::StringToArray - Split a string into parts
 
 =head1 Description
 

@@ -18,7 +18,7 @@ use OpenXPKI::Server::Context qw( CTX );
 
 =head1 NAME
 
-OpenXPKI::Crypt::PKCS7::SCEP
+OpenXPKI::Crypt::PKCS7::SCEP - PKCS7 SCEP utilities
 
 =head1 DESCRIPTION
 

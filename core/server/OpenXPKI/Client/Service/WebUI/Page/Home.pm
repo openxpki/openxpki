@@ -3,6 +3,14 @@ use OpenXPKI -class;
 
 extends 'OpenXPKI::Client::Service::WebUI::Page';
 
+=head1 Name
+
+OpenXPKI::Client::Service::WebUI::Page::Home - Home page
+
+=head1 Description
+
+=cut
+
 sub BUILD ($self, $args) {
     $self->page->label('I18N_OPENXPKI_UI_HOME_WELCOME_HEAD');
 }

@@ -109,7 +109,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_pkcs8
+OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_pkcs8 - Convert between PKCS8 formats
 
 =head1 Description
 

@@ -145,7 +145,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::EvaluateEligibility
+OpenXPKI::Server::Workflow::Activity::Tools::EvaluateEligibility - Evaluate CSR eligibility
 
 =head1 Description
 

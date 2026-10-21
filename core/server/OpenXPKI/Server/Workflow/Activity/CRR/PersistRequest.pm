@@ -108,7 +108,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::CRR::PersistRequest
+OpenXPKI::Server::Workflow::Activity::CRR::PersistRequest - Persist a revocation request
 
 =head1 Description
 

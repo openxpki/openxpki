@@ -53,7 +53,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::Disconnect
+OpenXPKI::Server::Workflow::Activity::Tools::Disconnect - Continue a workflow in the background
 
 =head1 Description
 

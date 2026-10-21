@@ -3,7 +3,7 @@ use OpenXPKI -role;
 
 =head1 NAME
 
-OpenXPKI::CLI::Command::datapool
+OpenXPKI::CLI::Command::datapool - Datapool command group
 
 =head1 DESCRIPTION
 

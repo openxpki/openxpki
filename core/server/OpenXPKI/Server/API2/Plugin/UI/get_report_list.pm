@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::UI::get_report_list
+OpenXPKI::Server::API2::Plugin::UI::get_report_list - List reports
 
 =cut
 

@@ -65,7 +65,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Command::create_params
+OpenXPKI::Crypto::Backend::OpenSSL::Command::create_params - Generate a key pair with parameters
 
 =head1 Functions
 

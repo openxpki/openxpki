@@ -3,7 +3,11 @@ use OpenXPKI qw( -class -nonmoose -typeconstraints );
 
 extends 'Template::Plugin';
 
-=head1 OpenXPKI::Template::Plugin::CheckDNS
+=head1 Name
+
+OpenXPKI::Template::Plugin::CheckDNS - DNS checking template plugin
+
+=head1 Description
 
 =head2 How to use
 

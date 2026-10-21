@@ -120,7 +120,7 @@ sub _will_need_update : RESTRICTED {
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::WFObject
+OpenXPKI::Server::Workflow::WFObject - Workflow
 
 =head1 DESCRIPTION
 
@@ -140,7 +140,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::WFObject
+OpenXPKI::Server::Workflow::WFObject - Object for use in workflows
 
 =head1 DESCRIPTION
 

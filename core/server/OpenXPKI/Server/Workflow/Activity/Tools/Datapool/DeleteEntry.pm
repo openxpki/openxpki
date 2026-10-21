@@ -48,7 +48,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::Datapool::DeleteEntry
+OpenXPKI::Server::Workflow::Activity::Tools::Datapool::DeleteEntry - Delete a datapool entry
 
 =head1 Description
 

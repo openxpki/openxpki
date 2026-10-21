@@ -28,7 +28,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::SetCreator
+OpenXPKI::Server::Workflow::Activity::Tools::SetCreator - Set workflow creator
 
 =head1 Description
 

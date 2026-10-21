@@ -7,7 +7,7 @@ use OpenXPKI::DN;
 
 =head1 Name
 
-OpenXPKI::Crypt::DN
+OpenXPKI::Crypt::DN - DN utilities
 
 =head1 Description
 

@@ -3,6 +3,12 @@ use OpenXPKI -class;
 
 extends 'OpenXPKI::Client::Service::WebUI::Page';
 
+=head1 Name
+
+OpenXPKI::Client::Service::WebUI::Page::Login - Login page
+
+=head1 Description
+
 =head2 init_realm_cards
 
 For path based realm selection: show links to all realms incl. image and description.

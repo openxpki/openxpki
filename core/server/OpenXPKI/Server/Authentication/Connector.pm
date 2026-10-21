@@ -99,7 +99,11 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
-=head1 OpenXPKI::Server::Authentication::Connector
+=head1 Name
+
+OpenXPKI::Server::Authentication::Connector - Connector authenticator
+
+=head1 Description
 
 Passphrase based authentication using connector backend.
 

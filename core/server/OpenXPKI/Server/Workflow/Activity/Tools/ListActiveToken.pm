@@ -51,7 +51,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::ListActiveToken
+OpenXPKI::Server::Workflow::Activity::Tools::ListActiveToken - List active token aliases
 
 =head1 Description
 

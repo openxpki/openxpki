@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Crypto::validate_ruleset
+OpenXPKI::Server::API2::Plugin::Crypto::validate_ruleset - Check data against a ruleset
 
 =head1 COMMANDS
 

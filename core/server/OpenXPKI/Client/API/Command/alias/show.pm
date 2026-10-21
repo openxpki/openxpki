@@ -8,7 +8,7 @@ command_setup
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::alias::show
+OpenXPKI::Client::API::Command::alias::show - Show alias details
 
 =head1 DESCRIPTION
 

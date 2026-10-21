@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::UI::get_user_role_realm
+OpenXPKI::Server::API2::Plugin::UI::get_user_role_realm - Get session details
 
 =cut
 

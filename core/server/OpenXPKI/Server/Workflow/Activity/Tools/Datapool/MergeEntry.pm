@@ -90,7 +90,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Activity::Tools::Datapool::MergeEntry
+OpenXPKI::Server::Workflow::Activity::Tools::Datapool::MergeEntry - Merge datapool entries
 
 =head1 DESCRIPTION
 

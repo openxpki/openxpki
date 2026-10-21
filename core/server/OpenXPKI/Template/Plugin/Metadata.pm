@@ -3,7 +3,11 @@ use OpenXPKI;
 
 use parent qw( Template::Plugin );
 
-=head1 OpenXPKI::Template::Plugin::Metadata
+=head1 Name
+
+OpenXPKI::Template::Plugin::Metadata - Metadata template plugin
+
+=head1 Description
 
 Plugin for Template::Toolkit to retrieve metadata via the config layer.
 The plugin can access any value below the metadata node in the realm.

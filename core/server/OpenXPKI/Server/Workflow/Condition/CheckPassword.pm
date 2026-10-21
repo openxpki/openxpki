@@ -41,7 +41,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::CheckPassword
+OpenXPKI::Server::Workflow::Condition::CheckPassword - Match a password
 
 =head1 DESCRIPTION
 

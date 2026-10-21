@@ -33,7 +33,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::UserExists
+OpenXPKI::Server::Workflow::Condition::UserExists - Check if a user exists
 
 =head1 DESCRIPTION
 

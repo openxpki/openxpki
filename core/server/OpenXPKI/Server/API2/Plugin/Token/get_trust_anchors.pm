@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Token::get_trust_anchors
+OpenXPKI::Server::API2::Plugin::Token::get_trust_anchors - Get trust anchors
 
 =head1 COMMANDS
 

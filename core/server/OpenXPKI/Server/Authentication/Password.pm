@@ -93,7 +93,11 @@ __PACKAGE__->meta->make_immutable;
 __END__
 
 
-=head1 OpenXPKI::Server::Authentication::Password
+=head1 Name
+
+OpenXPKI::Server::Authentication::Password - Passphrase authenticator
+
+=head1 Description
 
 Passphrase based authentication against a given user database. The users
 must be provided as a key/value list where the key is equal to the

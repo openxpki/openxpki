@@ -38,7 +38,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Validator::BooleanHasFields
+OpenXPKI::Server::Workflow::Validator::BooleanHasFields - Argument presence validator
 
 =head1 SYNOPSIS
 

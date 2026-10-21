@@ -7,7 +7,7 @@ command_setup
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::certificate::show
+OpenXPKI::Client::API::Command::certificate::show - Show certificate details
 
 =head1 DESCRIPTION
 

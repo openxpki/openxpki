@@ -321,7 +321,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::VolatileVault
+OpenXPKI::Crypto::VolatileVault - Volatile vault
 
 =head1 Description
 

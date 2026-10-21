@@ -44,7 +44,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute
+OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute - Set a workflow attribute
 
 =head1 Description
 

@@ -83,7 +83,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::DatapoolEntry
+OpenXPKI::Server::Workflow::Condition::DatapoolEntry - Check a datapool entry
 
 =head1 SYNOPSIS
     private_key_not_empty:

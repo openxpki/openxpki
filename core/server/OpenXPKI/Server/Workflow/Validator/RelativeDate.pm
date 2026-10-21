@@ -40,7 +40,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Validator::RelativeDate
+OpenXPKI::Server::Workflow::Validator::RelativeDate - Relative date validator
 
 =head1 DESCRIPTION
 

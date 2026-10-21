@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Profile::preset_subject_parts_from_profile
+OpenXPKI::Server::API2::Plugin::Profile::preset_subject_parts_from_profile - Get certificate subject defaults
 
 =head1 COMMANDS
 

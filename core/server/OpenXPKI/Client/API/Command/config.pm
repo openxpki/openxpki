@@ -3,7 +3,7 @@ use OpenXPKI -role;
 
 =head1 NAME
 
-OpenXPKI::CLI::Command::config
+OpenXPKI::CLI::Command::config - Configuration command group
 
 =head1 DESCRIPTION
 

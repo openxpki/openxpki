@@ -79,7 +79,7 @@ __END__;
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::NICE::UsableTokenForValidity
+OpenXPKI::Server::Workflow::Condition::NICE::UsableTokenForValidity - Check if a token is valid
 
 =head1 Description
 

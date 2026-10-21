@@ -11,7 +11,7 @@ use OpenXPKI::Serialization::Simple;
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::token::update
+OpenXPKI::Client::API::Command::token::update - Update a token
 
 =head1 DESCRIPTION
 

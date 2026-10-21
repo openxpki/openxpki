@@ -9,7 +9,7 @@ use OpenXPKI::DTO::ValidationException;
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::alias
+OpenXPKI::Client::API::Command::alias - Alias command group
 
 =head1 DESCRIPTION
 

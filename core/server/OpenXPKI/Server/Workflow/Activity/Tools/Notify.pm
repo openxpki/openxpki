@@ -70,7 +70,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::Notify
+OpenXPKI::Server::Workflow::Activity::Tools::Notify - Send a notification
 
 =head1 Description
 

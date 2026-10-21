@@ -3,7 +3,7 @@ use OpenXPKI -class;
 
 =head1 NAME
 
-OpenXPKI::Client::API::Response
+OpenXPKI::Client::API::Response - Client API response
 
 =head1 SYNOPSIS
 

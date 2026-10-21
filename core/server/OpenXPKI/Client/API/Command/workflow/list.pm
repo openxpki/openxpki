@@ -8,7 +8,7 @@ command_setup
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::workflow::list
+OpenXPKI::Client::API::Command::workflow::list - List workflows
 
 =head1 DESCRIPTION
 

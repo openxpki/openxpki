@@ -44,7 +44,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::Connector::IsValue
+OpenXPKI::Server::Workflow::Condition::Connector::IsValue - Match a connector's value
 
 =head1 SYNOPSIS
 

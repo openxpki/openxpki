@@ -8,7 +8,7 @@ command_setup
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::workflow::wakeup
+OpenXPKI::Client::API::Command::workflow::wakeup - Wake up a workflow
 
 =head1 DESCRIPTION
 

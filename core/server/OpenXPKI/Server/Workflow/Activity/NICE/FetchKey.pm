@@ -49,7 +49,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::NICE::FetchKey
+OpenXPKI::Server::Workflow::Activity::NICE::FetchKey - Fetch a private key
 
 =head1 Description
 

@@ -3,7 +3,7 @@ use OpenXPKI -class;
 
 =head1 NAME
 
-OpenXPKI::Serialization::Simple
+OpenXPKI::Serialization::Simple - Simple serializer
 
 =cut
 

@@ -3,6 +3,10 @@ use OpenXPKI -class;
 
 with 'OpenXPKI::DTO::Message';
 
+=head1 NAME
+
+OpenXPKI::DTO::Message::Enquiry - DTO enquiry
+
 =head1 SYNOPSIS
 
 Run a service query against the server

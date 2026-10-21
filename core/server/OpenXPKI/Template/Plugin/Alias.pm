@@ -3,7 +3,11 @@ use OpenXPKI;
 
 use parent qw( Template::Plugin );
 
-=head1 OpenXPKI::Template::Plugin::Alias
+=head1 Name
+
+OpenXPKI::Template::Plugin::Alias - Alias template plugin
+
+=head1 Description
 
 Plugin for Template::Toolkit to retrieve properties of an alias.
 

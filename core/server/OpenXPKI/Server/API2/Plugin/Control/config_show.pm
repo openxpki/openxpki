@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Control::config_show
+OpenXPKI::Server::API2::Plugin::Control::config_show - Show configuration
 
 =cut
 

@@ -12,7 +12,7 @@ use OpenXPKI::Crypt::X509;
 
 =head1 Name
 
-OpenXPKI::Crypto::TokenManager
+OpenXPKI::Crypto::TokenManager - Token manager
 
 =head1 Description
 

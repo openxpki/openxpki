@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Control::purge_application_log
+OpenXPKI::Server::API2::Plugin::Control::purge_application_log - Purge old records from the application log
 
 =cut
 

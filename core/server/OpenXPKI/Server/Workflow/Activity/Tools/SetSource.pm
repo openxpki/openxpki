@@ -46,7 +46,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::SetSource
+OpenXPKI::Server::Workflow::Activity::Tools::SetSource - Set source of fields
 
 =head1 Description
 

@@ -86,7 +86,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::ValidateChallengePassword
+OpenXPKI::Server::Workflow::Activity::Tools::ValidateChallengePassword - Validate challenge password
 
 =head1 Description
 

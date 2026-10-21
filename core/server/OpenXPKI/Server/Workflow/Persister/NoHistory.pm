@@ -19,7 +19,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Persister::NoHistory
+OpenXPKI::Server::Workflow::Persister::NoHistory - DBI workflow persister without history
 
 =head1 Description
 

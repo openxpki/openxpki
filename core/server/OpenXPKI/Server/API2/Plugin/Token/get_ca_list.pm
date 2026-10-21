@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Token::get_ca_list
+OpenXPKI::Server::API2::Plugin::Token::get_ca_list - List signing certificates
 
 =cut
 

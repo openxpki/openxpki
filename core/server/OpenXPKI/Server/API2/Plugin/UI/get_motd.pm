@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::UI::get_motd
+OpenXPKI::Server::API2::Plugin::UI::get_motd - Get message of the day
 
 =cut
 

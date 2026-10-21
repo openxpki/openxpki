@@ -11,7 +11,7 @@ use OpenXPKI::Crypt::X509;
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::token::add
+OpenXPKI::Client::API::Command::token::add - Add a token
 
 =head1 DESCRIPTION
 

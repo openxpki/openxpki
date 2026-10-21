@@ -990,7 +990,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow
+OpenXPKI::Server::Workflow - Workflow base class
 
 =head1 Description
 

@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Secret::get_secrets
+OpenXPKI::Server::API2::Plugin::Secret::get_secrets - List secret groups
 
 =cut
 

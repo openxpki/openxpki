@@ -65,7 +65,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::Pause
+OpenXPKI::Server::Workflow::Activity::Tools::Pause - Pause a workflow
 
 =head1 Description
 

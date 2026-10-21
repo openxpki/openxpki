@@ -597,7 +597,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Persister::DBI
+OpenXPKI::Server::Workflow::Persister::DBI - DBI workflow persister
 
 =head1 Description
 

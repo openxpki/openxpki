@@ -100,7 +100,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Condition
+OpenXPKI::Server::Workflow::Condition - Workflow condition base class
 
 =head1 Description
 

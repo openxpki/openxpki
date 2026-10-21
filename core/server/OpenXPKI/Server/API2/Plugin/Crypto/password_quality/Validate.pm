@@ -13,7 +13,7 @@ use Moose::Meta::Class;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Crypto::password_quality::Validate
+OpenXPKI::Server::API2::Plugin::Crypto::password_quality::Validate - Evaluate password quality
 
 =head1 DESCRIPTION
 

@@ -255,7 +255,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Connector::DataPool;
+OpenXPKI::Connector::DataPool - Datapool connector
 
 =head1 DESCRIPTION
 

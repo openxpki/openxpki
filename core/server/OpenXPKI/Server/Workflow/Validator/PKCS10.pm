@@ -80,7 +80,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Validator::PKCS10
+OpenXPKI::Server::Workflow::Validator::PKCS10 - PKCS10 syntax validator
 
 =head1 SYNOPSIS
 

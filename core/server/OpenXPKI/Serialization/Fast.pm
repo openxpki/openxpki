@@ -48,7 +48,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Serialization::Fast
+OpenXPKI::Serialization::Fast - Faster serializer
 
 =head1 Description
 

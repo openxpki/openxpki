@@ -37,6 +37,10 @@ has __default_wfdetails => (
     ] },
 );
 
+=head1 Name
+
+OpenXPKI::Client::Service::WebUI::Page::Workflow::Info - Workflow info UI
+
 =head1 UI Methods
 
 =head2 init_info

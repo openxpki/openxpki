@@ -43,7 +43,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::Matches
+OpenXPKI::Server::Workflow::Condition::Matches - Use a regular expression to match a key
 
 =head1 DESCRIPTION
 

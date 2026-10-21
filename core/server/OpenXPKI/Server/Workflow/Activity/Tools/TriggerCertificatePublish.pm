@@ -76,7 +76,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::TriggerCertificatePublish
+OpenXPKI::Server::Workflow::Activity::Tools::TriggerCertificatePublish - Trigger certificate publication
 
 =head1 Description
 

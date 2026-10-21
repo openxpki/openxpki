@@ -67,7 +67,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::PublishCA
+OpenXPKI::Server::Workflow::Activity::Tools::PublishCA - Publish a CA certificate
 
 =head1 Description
 

@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Cert::evaluate_trust_rule
+OpenXPKI::Server::API2::Plugin::Cert::evaluate_trust_rule - Evaluate a trust rule
 
 =cut
 

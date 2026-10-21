@@ -8,7 +8,7 @@ command_setup
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::workflow::create
+OpenXPKI::Client::API::Command::workflow::create - Create a workflow
 
 =head1 DESCRIPTION
 

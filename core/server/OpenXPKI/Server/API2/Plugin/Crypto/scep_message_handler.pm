@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Crypto::scep_message_handler
+OpenXPKI::Server::API2::Plugin::Crypto::scep_message_handler - Handle SCEP messages
 
 =cut
 

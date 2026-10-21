@@ -60,7 +60,7 @@ __END__;
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::AddCertExtension
+OpenXPKI::Server::Workflow::Activity::Tools::AddCertExtension - Add item to certificate extensions
 
 =head1 Description
 

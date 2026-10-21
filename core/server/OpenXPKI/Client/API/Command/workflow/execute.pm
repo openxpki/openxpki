@@ -8,7 +8,7 @@ command_setup
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::workflow::execute
+OpenXPKI::Client::API::Command::workflow::execute - Execute a workflow activity
 
 =head1 DESCRIPTION
 

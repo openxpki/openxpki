@@ -19,7 +19,7 @@ sub get_keyform
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Engine::LunaGem
+OpenXPKI::Crypto::Backend::OpenSSL::Engine::LunaGem - Gemalto Luna HSM engine
 
 =head1 Description
 

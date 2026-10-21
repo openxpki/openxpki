@@ -60,7 +60,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::CopyContextFromWorkflow
+OpenXPKI::Server::Workflow::Activity::Tools::CopyContextFromWorkflow - Copy a context between certificates
 
 =head1 Description
 

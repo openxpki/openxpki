@@ -4,6 +4,14 @@ use OpenXPKI -class;
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
 
+=head1 Name
+
+OpenXPKI::Workflow::Field - Workflow context field
+
+=head1 Description
+
+=cut
+
 has 'config' => (
     is => 'rw',
     isa => 'Connector',

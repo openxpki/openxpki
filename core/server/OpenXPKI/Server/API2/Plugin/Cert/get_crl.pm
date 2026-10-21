@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Cert::get_crl
+OpenXPKI::Server::API2::Plugin::Cert::get_crl - Get CRL
 
 =cut
 

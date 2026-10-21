@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Profile::get_key_algs
+OpenXPKI::Server::API2::Plugin::Profile::get_key_algs - Get profile key algoritms
 
 =head1 COMMANDS
 

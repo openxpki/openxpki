@@ -78,7 +78,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Command::create_random
+OpenXPKI::Crypto::Backend::OpenSSL::Command::create_random - Generate random data
 
 =head1 Functions
 

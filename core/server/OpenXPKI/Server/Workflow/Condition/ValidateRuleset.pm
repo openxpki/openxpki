@@ -52,7 +52,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::ValidateRuleset
+OpenXPKI::Server::Workflow::Condition::ValidateRuleset - Validate parameters against a ruleset
 
 =head1 Description
 

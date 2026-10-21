@@ -5,7 +5,7 @@ use OpenXPKI::Serialization::Simple;
 
 =head1 NAME
 
-OpenXPKI::CLI::Command::workflow
+OpenXPKI::CLI::Command::workflow - Workflow command group
 
 =head1 DESCRIPTION
 

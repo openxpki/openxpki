@@ -39,7 +39,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::CLI
+OpenXPKI::Crypto::Backend::OpenSSL::CLI - OpenSSL wrapper
 
 =head1 Desription
 

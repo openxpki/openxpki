@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Profile::get_key_enc
+OpenXPKI::Server::API2::Plugin::Profile::get_key_enc - Get profile key encryption
 
 =head1 COMMANDS
 

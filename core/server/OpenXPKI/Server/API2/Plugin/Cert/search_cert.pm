@@ -5,7 +5,7 @@ with 'OpenXPKI::Server::API2::TenantRole';
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Cert::search_cert
+OpenXPKI::Server::API2::Plugin::Cert::search_cert - Find a certificate
 
 =head1 COMMANDS
 

@@ -34,7 +34,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::LoadPolicy
+OpenXPKI::Server::Workflow::Activity::Tools::LoadPolicy - Load a policy
 
 =head1 Description
 

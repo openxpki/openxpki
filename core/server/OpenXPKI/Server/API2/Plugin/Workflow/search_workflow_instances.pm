@@ -5,7 +5,7 @@ with 'OpenXPKI::Server::API2::TenantRole';
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Workflow::search_workflow_instances
+OpenXPKI::Server::API2::Plugin::Workflow::search_workflow_instances - Find a workflow
 
 =cut
 

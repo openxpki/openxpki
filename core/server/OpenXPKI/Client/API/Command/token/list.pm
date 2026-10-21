@@ -8,7 +8,7 @@ command_setup
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::token::list
+OpenXPKI::Client::API::Command::token::list - List tokens
 
 =head1 DESCRIPTION
 

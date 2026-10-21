@@ -30,7 +30,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Status::GetSystemStatus
+OpenXPKI::Server::Workflow::Activity::Status::GetSystemStatus - Get system status
 
 =head1 Description
 

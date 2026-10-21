@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Profile::list_used_issuers
+OpenXPKI::Server::API2::Plugin::Profile::list_used_issuers - List realm issuers
 
 =head1 COMMANDS
 

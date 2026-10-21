@@ -61,7 +61,7 @@ __END__;
 
 =head1 Name
 
-OpenXPKI::Server::Log::Appender::Audit
+OpenXPKI::Server::Log::Appender::Audit - Audit log appender
 
 =head1 Description
 

@@ -161,7 +161,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::PresetProfileFields
+OpenXPKI::Server::Workflow::Activity::Tools::PresetProfileFields - Load profile information
 
 =head1 Description
 

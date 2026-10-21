@@ -45,7 +45,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::NICE::TestConnection
+OpenXPKI::Server::Workflow::Activity::NICE::TestConnection - Test NICE connection
 
 =head1 Description
 

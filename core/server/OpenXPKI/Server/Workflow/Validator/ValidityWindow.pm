@@ -45,7 +45,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Validator::ValidityWindow
+OpenXPKI::Server::Workflow::Validator::ValidityWindow - Validity time window validator
 
 =head1 SYNOPSIS
 

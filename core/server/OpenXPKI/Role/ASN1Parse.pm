@@ -4,6 +4,14 @@ use OpenXPKI -role;
 use Convert::ASN1 ':tag';
 use List::Util 'any';
 
+=head1 Name
+
+OpenXPKI::Role::ASN1Parse - ASN1 role
+
+=head1 Description
+
+=cut
+
 our %tagmap = (
     'INTEGER'           => 2,
     'BIT STRING'        => 3,

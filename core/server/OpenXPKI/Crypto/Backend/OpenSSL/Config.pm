@@ -775,7 +775,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Config
+OpenXPKI::Crypto::Backend::OpenSSL::Config - Generate an OpenSSL configuration
 
 =head1 Description
 

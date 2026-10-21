@@ -57,7 +57,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Skeleton
+OpenXPKI::Server::Workflow::Activity::Skeleton - Example workflow activity
 
 =head1 Description
 

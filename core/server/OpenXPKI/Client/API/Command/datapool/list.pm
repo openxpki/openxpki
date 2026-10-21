@@ -8,7 +8,7 @@ command_setup
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::datapool::list
+OpenXPKI::Client::API::Command::datapool::list - List datapool keys
 
 =head1 DESCRIPTION
 

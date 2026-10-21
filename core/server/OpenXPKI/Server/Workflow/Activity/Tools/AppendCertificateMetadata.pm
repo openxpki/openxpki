@@ -50,7 +50,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::AppendCertificateMetadata
+OpenXPKI::Server::Workflow::Activity::Tools::AppendCertificateMetadata - Add certificate metadata
 
 =head1 Description
 

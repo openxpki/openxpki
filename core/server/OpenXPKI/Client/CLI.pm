@@ -11,7 +11,7 @@ use OpenXPKI::DTO::Message;
 
 =head1 NAME
 
-OpenXPKI::Client::CLI
+OpenXPKI::Client::CLI - Client command line interface
 
 =head1 SYNOPSIS
 

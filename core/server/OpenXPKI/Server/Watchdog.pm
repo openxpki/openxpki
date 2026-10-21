@@ -4,7 +4,7 @@ use OpenXPKI -class;
 
 =head1 NAME
 
-The watchdog thread
+OpenXPKI::Server::Watchdog - Watchdog thread
 
 =head1 DESCRIPTION
 

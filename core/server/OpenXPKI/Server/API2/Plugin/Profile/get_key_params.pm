@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Profile::get_key_params
+OpenXPKI::Server::API2::Plugin::Profile::get_key_params - Get algorithm parameters
 
 =head1 COMMANDS
 

@@ -545,7 +545,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Serialization::Simple
+OpenXPKI::Serialization::Simple - Legacy serializer
 
 =head1 Description
 

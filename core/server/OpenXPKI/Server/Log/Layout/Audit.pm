@@ -45,7 +45,7 @@ __PACKAGE__->meta->make_immutable;
 
 =head1 Name
 
-OpenXPKI::Server::Log::Layout::Audit
+OpenXPKI::Server::Log::Layout::Audit - Audit log layout
 
 =head1 Description
 

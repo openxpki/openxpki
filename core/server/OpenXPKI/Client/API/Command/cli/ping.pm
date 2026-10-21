@@ -7,7 +7,7 @@ command_setup
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::cli::ping
+OpenXPKI::Client::API::Command::cli::ping - Ping the OpenXPKI server
 
 =head1 DESCRIPTION
 

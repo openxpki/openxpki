@@ -3,6 +3,10 @@ use OpenXPKI -class;
 
 extends 'OpenXPKI::Client::Service::WebUI::Page::Workflow';
 
+=head1 Name
+
+OpenXPKI::Client::Service::WebUI::Page::Workflow::History - Workflow history UI
+
 =head1 UI Methods
 
 =head2 init_history

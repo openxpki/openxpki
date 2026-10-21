@@ -8,6 +8,9 @@ use Moose::Exporter;
 # Project modules
 use OpenXPKI::Client::Service::WebUI::Response::DTORole;
 
+=head1 NAME
+
+OpenXPKI::Client::Service::WebUI::Response::DTO - Data transfer object
 
 =head1 DESCRIPTION
 

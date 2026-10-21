@@ -166,7 +166,7 @@ __END__
 
 =head1 Name
 
- OpenXPKI::Server::Context (Singleton)
+OpenXPKI::Server::Context - Server context (singleton)
 
 =head1 Description
 

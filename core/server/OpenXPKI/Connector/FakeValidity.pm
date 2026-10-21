@@ -72,7 +72,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Connector::FakeValidity;
+OpenXPKI::Connector::FakeValidity - Connector to fake certificate validity
 
 =head1 DESCRIPTION
 

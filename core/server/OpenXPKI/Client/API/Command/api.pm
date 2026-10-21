@@ -3,7 +3,7 @@ use OpenXPKI -role;
 
 =head1 NAME
 
-OpenXPKI::CLI::Command::api
+OpenXPKI::CLI::Command::api - Generic command group
 
 =head1 DESCRIPTION
 

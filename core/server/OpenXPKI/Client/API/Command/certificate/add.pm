@@ -10,7 +10,7 @@ use OpenXPKI::Crypt::X509;
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::certificate::add
+OpenXPKI::Client::API::Command::certificate::add - Add a certificate
 
 =head1 DESCRIPTION
 

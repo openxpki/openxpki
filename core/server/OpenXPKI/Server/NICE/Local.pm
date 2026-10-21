@@ -536,7 +536,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::NICE::Local
+OpenXPKI::Server::NICE::Local - Local NICE implementation
 
 =head1 Description
 

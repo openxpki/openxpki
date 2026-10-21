@@ -140,7 +140,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Role::Publish
+OpenXPKI::Server::Workflow::Role::Publish - Workflow publisher role
 
 =head1 Description
 

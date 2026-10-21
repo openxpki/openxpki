@@ -23,7 +23,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::NICE::IsCertificatePending
+OpenXPKI::Server::Workflow::Condition::NICE::IsCertificatePending - Check if a certificate is pending
 
 =head1 DESCRIPTION
 

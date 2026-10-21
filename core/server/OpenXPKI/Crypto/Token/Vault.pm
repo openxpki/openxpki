@@ -11,7 +11,7 @@ use OpenXPKI::Server::Context qw( CTX );
 
 =head1 Name
 
-OpenXPKI::Crypto::Token::Vault
+OpenXPKI::Crypto::Token::Vault - Token in a vault
 
 =head1 Description
 

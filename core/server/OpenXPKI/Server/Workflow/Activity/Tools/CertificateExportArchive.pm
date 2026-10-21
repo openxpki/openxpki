@@ -106,7 +106,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::CertificateExportArchive
+OpenXPKI::Server::Workflow::Activity::Tools::CertificateExportArchive - Create a zip archive of a certificate
 
 =head1 Description
 

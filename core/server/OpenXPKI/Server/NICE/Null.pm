@@ -9,7 +9,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::NICE::Null
+OpenXPKI::Server::NICE::Null - Null NICE implementation
 
 =head1 Description
 

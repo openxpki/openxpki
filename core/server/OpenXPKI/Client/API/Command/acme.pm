@@ -32,7 +32,7 @@ sub _load_directory {
 
 =head1 NAME
 
-OpenXPKI::CLI::Command::acme
+OpenXPKI::CLI::Command::acme - ACME command group
 
 =head1 DESCRIPTION
 

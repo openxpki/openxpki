@@ -7,6 +7,14 @@ use OpenXPKI::FileUtils;
 use OpenXPKI::Serialization::Simple;
 #use OpenXPKI::Server::Context qw( CTX );
 
+=head1 Name
+
+OpenXPKI::Template - String templating system
+
+=head1 Description
+
+=cut
+
 sub new {
     my ($class, $args) = @_;
 

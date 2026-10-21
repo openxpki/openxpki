@@ -52,7 +52,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::SubjectsMatch
+OpenXPKI::Server::Workflow::Condition::SubjectsMatch - Check if two subjects match
 
 
 =head1 DESCRIPTION

@@ -126,7 +126,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::CRLIssuance::CreateQueue
+OpenXPKI::Server::Workflow::Activity::CRLIssuance::CreateQueue - Create CRL issuance queue
 
 =head1 Description
 

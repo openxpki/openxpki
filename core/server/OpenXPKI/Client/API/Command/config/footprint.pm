@@ -8,7 +8,7 @@ command_setup
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::config::footprint
+OpenXPKI::Client::API::Command::config::footprint - Show configuration summary
 
 =head1 DESCRIPTION
 

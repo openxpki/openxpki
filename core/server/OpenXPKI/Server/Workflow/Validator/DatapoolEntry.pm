@@ -51,7 +51,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Validator::DatapoolEntry
+OpenXPKI::Server::Workflow::Validator::DatapoolEntry - Datapool entry validator
 
 =head1 SYNOPSIS
 

@@ -4,6 +4,10 @@ use OpenXPKI -class;
 with 'OpenXPKI::DTO::Message';
 # Do NOT inherit from Command as this will undermine the security logic!
 
+=head1 NAME
+
+OpenXPKI::DTO::Message::ProtectedCommand - DTO protected command
+
 =head1 SYNOPSIS
 
 Execute a command on the backend which is marked as protected

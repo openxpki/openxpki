@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Crypto::generate_key
+OpenXPKI::Server::API2::Plugin::Crypto::generate_key - Generate a key pair
 
 =cut
 

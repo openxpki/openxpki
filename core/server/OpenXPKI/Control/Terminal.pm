@@ -3,6 +3,10 @@ use OpenXPKI -class;
 
 with 'OpenXPKI::Control::Role';
 
+=head1 NAME
+
+OpenXPKI::Control::Terminal - Terminal command
+
 =head1 DESCRIPTION
 
 Control internally managed OpenXPKI terminal daemon processes (a feature of

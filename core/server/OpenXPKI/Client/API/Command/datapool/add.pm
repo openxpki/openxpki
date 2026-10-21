@@ -8,7 +8,7 @@ command_setup
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::datapool::add
+OpenXPKI::Client::API::Command::datapool::add - Add an entry to the datapool
 
 =head1 DESCRIPTION
 

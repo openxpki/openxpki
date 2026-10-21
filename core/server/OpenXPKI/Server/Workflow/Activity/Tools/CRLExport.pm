@@ -69,7 +69,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::CRLExport
+OpenXPKI::Server::Workflow::Activity::Tools::CRLExport - Export a CRL
 
 =head1 Description
 

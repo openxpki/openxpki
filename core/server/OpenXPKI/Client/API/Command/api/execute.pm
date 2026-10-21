@@ -8,7 +8,7 @@ command_setup
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::api::execute
+OpenXPKI::Client::API::Command::api::execute - Execute a command
 
 =head1 DESCRIPTION
 

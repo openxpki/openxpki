@@ -5,7 +5,7 @@ with 'OpenXPKI::Server::API2::Plugin::Datapool::Util';
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Datapool::get_datavault_status
+OpenXPKI::Server::API2::Plugin::Datapool::get_datavault_status - Get datapool encryption status
 
 =cut
 

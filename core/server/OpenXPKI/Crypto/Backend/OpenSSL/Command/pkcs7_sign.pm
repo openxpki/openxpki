@@ -121,7 +121,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_sign
+OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_sign - Sign PKCS7 data
 
 =head1 Functions
 

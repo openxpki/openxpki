@@ -76,7 +76,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::NICE::IssueCRL
+OpenXPKI::Server::Workflow::Activity::NICE::IssueCRL - Issue a CRL
 
 =head1 Description
 

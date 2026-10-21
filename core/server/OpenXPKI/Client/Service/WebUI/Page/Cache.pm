@@ -3,6 +3,11 @@ use OpenXPKI -class;
 
 extends 'OpenXPKI::Client::Service::WebUI::Page';
 
+=head1 Name
+
+OpenXPKI::Client::Service::WebUI::Page::Cache - Cache page
+
+=head1 Description
 
 =head2 init_fetch
 

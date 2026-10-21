@@ -56,7 +56,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::GeneratePassword
+OpenXPKI::Server::Workflow::Activity::Tools::GeneratePassword - Generate a password
 
 =head1 Description
 

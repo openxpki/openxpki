@@ -204,7 +204,11 @@ sub map_role {
 
  __END__;
 
-=head1 OpenXPKI::Server::Authentication::Base
+=head1 Name
+
+OpenXPKI::Server::Authentication::Base - Base authenticator
+
+=head1 Description
 
 The base class for all authentication handlers.
 

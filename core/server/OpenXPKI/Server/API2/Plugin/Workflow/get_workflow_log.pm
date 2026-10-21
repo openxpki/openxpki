@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_log
+OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_log - Get workflow messages
 
 =cut
 

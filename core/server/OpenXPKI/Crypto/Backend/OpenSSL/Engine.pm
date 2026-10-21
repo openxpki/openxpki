@@ -323,7 +323,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Engine
+OpenXPKI::Crypto::Backend::OpenSSL::Engine - OpenSSL engine base class
 
 =head1 Description
 

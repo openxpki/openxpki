@@ -4,6 +4,11 @@ use OpenXPKI -role;
 # CPAN modules
 use Types::Standard;
 
+=head1 Name
+
+OpenXPKI::Client::Service::WebUI::Page::Workflow::Pager - Workflow pager UI
+
+=head1 UI Methods
 
 =head2 __build_pager
 

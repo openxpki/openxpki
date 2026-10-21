@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::UI::get_session_info
+OpenXPKI::Server::API2::Plugin::UI::get_session_info - Get session details
 
 =cut
 

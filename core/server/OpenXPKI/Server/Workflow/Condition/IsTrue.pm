@@ -57,7 +57,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::IsTrue
+OpenXPKI::Server::Workflow::Condition::IsTrue - Check if a key is truthy
 
 =head1 DESCRIPTION
 

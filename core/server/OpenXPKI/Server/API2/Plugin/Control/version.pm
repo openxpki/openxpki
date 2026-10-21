@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Control::version
+OpenXPKI::Server::API2::Plugin::Control::version - Get version information
 
 =cut
 

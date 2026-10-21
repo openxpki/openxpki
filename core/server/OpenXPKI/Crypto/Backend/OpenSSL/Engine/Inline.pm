@@ -50,7 +50,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Engine::OpenSSL
+OpenXPKI::Crypto::Backend::OpenSSL::Engine::OpenSSL - OpenSSL dummy engine
 
 =head1 Description
 

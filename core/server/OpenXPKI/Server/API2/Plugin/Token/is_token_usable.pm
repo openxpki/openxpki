@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Token::is_token_usable
+OpenXPKI::Server::API2::Plugin::Token::is_token_usable - Check if an alias is usable
 
 =cut
 

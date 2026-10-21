@@ -401,7 +401,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::NICE
+OpenXPKI::Server::NICE - Nice interface for certificate enrollment
 
 =head1 Description
 

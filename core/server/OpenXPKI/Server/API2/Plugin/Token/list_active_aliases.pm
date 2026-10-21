@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Token::list_active_aliases
+OpenXPKI::Server::API2::Plugin::Token::list_active_aliases - List active aliases
 
 =cut
 

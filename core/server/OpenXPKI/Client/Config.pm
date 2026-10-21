@@ -15,7 +15,11 @@ use OpenXPKI::Log4perl;
 use OpenXPKI::Log4perl::MojoLogger;
 use OpenXPKI::i18n qw( set_language set_locale_prefix);
 
-=head1 OpenXPKI::Client::Config
+=head1 Name
+
+OpenXPKI::Client::Config - CGI client configuration
+
+=head1 Description
 
 This is a helper package for all cgi based client interfaces to read a
 client config file base on the name of the script called. It was designed

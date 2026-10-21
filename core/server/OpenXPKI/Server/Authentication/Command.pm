@@ -147,7 +147,11 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
-=head1 OpenXPKI::Server::Authentication::Command
+=head1 Name
+
+OpenXPKI::Server::Authentication::Command - System command authenticator
+
+=head1 Description
 
 This is the class which supports OpenXPKI with an authentication method
 via an external program. The input parameters are are passed as a hash

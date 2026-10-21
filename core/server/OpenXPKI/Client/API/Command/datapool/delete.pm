@@ -8,7 +8,7 @@ command_setup
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::datapool::delete
+OpenXPKI::Client::API::Command::datapool::delete - Delete an entry from the datapool
 
 =head1 DESCRIPTION
 

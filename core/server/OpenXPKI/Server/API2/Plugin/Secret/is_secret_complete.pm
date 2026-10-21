@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Secret::is_secret_complete
+OpenXPKI::Server::API2::Plugin::Secret::is_secret_complete - Check if a secret is complete
 
 =cut
 

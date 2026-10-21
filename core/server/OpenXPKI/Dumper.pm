@@ -41,7 +41,7 @@ __END__;
 
 =head1 NAME
 
-OpenXPKI::Dumper
+OpenXPKI::Dumper - Censoring dumper
 
 =head1 DESCRIPTION
 

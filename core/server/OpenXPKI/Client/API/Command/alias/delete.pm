@@ -9,7 +9,7 @@ command_setup
 
 =head1 NAME
 
-OpenXPKI::Client::API::Command::alias::delete
+OpenXPKI::Client::API::Command::alias::delete - Delete an alias
 
 =head1 DESCRIPTION
 

@@ -51,7 +51,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Status::GetTokenStatus
+OpenXPKI::Server::Workflow::Activity::Status::GetTokenStatus - Get token status
 
 =head1 Description
 

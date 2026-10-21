@@ -3,7 +3,7 @@ use OpenXPKI -plugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::UI::get_menu
+OpenXPKI::Server::API2::Plugin::UI::get_menu - Get UI pages for a role
 
 =cut
 

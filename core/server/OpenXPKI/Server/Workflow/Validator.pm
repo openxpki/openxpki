@@ -160,7 +160,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Validator
+OpenXPKI::Server::Workflow::Validator - Workflow validator base class
 
 =head1 SYNOPSIS
 
