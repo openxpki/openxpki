@@ -162,7 +162,7 @@ the OpenXPKI operation), is
   copy sample configuration for this case with
     cp -R /usr/local/share/examples/openxpki/config/* /usr/local/etc/openxpki/
   and follow advice at:
-  https://openxpki.readthedocs.org/en/latest/quickstart.html
+  https://openxpki.readthedocs.io/en/master/getting-started/quickstart.html
   Without this deployment procedure OpenXPKI server would not start.
 - If you want more complex role for your server inside the PKI infrastructure,
   then you need to perform further deployment procedure for your server atop
