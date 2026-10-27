@@ -81,6 +81,7 @@ sub get_command {
     push @command, ("-nodetach") if ( not $self->{DETACH} );
     push @command, ("-engine", $engine) if ($engine);
     push @command, ("-keyform", $keyform) if ($keyform);
+    push @command, ("-md", $self->{DIGEST} // "sha512");
 
     push @command, ("-in", $self->write_temp_file( $self->{CONTENT} ));
     push @command, ("-inkey", $self->{KEYFILE}) if ( $self->{KEYFILE} );
@@ -147,6 +148,8 @@ ENGINE_USAGE ::= ALWAYS||PRIV_KEY_OPS too.
 =item * PASSWD
 
 =item * DETACH (strip off the content from the resulting PKCS#7 structure)
+
+=item * DIGEST (defaults to sha512)
 
 =back
 
